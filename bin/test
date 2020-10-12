@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+if [ -d ~/.vmodules/vnum ]; then
+    mv ~/.vmodules/vnum ~/.vmodules/old_vnum
+    rm -rf ~/.vmodules/vnum
+fi
+
+mkdir -p ~/.vmodules/vnum
+cp -r ./* ~/.vmodules/vnum
+
+v test .
+find . -name '*_test' | xargs rm -f
+
+rm -rf ~/.vmodules/vnum
+if [ -d ~/.vmodules/old_vnum ]; then
+    mv ~/.vmodules/old_vnum ~/.vmodules/vnum
+fi
