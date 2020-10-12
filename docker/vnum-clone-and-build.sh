@@ -20,7 +20,7 @@ fi
 
 BRANCH="v${VNUM_VERSION}"
 if [ "${VNUM_VERSION}" = "latest" ]; then
-  BRANCH="master"
+  BRANCH="main"
 fi
 
 git clone -b $BRANCH --single-branch --depth 1 https://github.com/vlang/vnum.git /opt/vlang/v/vlib/vnum
