@@ -1,0 +1,11 @@
+# Executables files
+test
+test.exe
+
+# Temporary files
+vsl.tmp.c
+fns.txt
+
+!/bin/test
+
+/docs/build
