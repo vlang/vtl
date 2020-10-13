@@ -1,6 +1,6 @@
 module num
 
-import math
+import vsl.math
 
 //
 // Buffer is a generic interface to represent data storage

@@ -1,6 +1,6 @@
 module num
 
-// import math
+// import vsl.math
 
 // NdArray stored the data necessary to operate on a contiguous
 // data buffer in n dimensions

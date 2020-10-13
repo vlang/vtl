@@ -1,6 +1,6 @@
 module num
 
-import math
+import vsl.math
 
 // shape_size returns the number of elements represented
 // by a provided shape
