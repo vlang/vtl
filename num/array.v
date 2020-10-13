@@ -1,6 +1,6 @@
 module num
 
-// import vsl.math
+import vsl.math
 
 // NdArray stored the data necessary to operate on a contiguous
 // data buffer in n dimensions
@@ -83,87 +83,87 @@ pub fn (n NdArray) assign(other NdArray) {
 // slice returns a view of an ndarray from a variadic list
 // of indexing operations.  The returned view does not
 // own its new data, but shares data with another ndarray
-// pub fn (t NdArray) slice(idx ... []int) NdArray {
-// 	mut newshape := t.shape.clone()
-// 	mut newstrides := t.strides.clone()
-// 	mut newflags := default_flags('C', t.ndims)
-// 	newflags.owndata = false
-// 	mut indexer := []int{}
-// 	for i, dex in idx {
-// 		mut fi := 0
-// 		mut li := 0
-// 		// dimension is entirely included in output
-// 		if dex.len == 0 {
-// 			assert newshape[i] == t.shape[i]
-// 			assert newstrides[i] == t.strides[i]
-// 			indexer << 0
-// 		}
-// 		// dimension sliced from array
-// 		if dex.len == 1 {
-// 			newshape[i] = 0
-// 			newstrides[i] = 0
-// 			fi = dex[0]
-// 			if fi < 0 {
-// 				fi += t.shape[i]
-// 			}
-// 			indexer << fi
-// 		}
-// 		// dimension specified by start and stop value
-// 		else if dex.len == 2 {
-// 			fi = dex[0]
-// 			li = dex[1]
-// 			if fi < 0 {
-// 				fi += t.shape[i]
-// 			}
-// 			if li < 0 {
-// 				li += t.shape[i]
-// 			}
-// 			if fi == li {
-// 				newshape[i] = 0
-// 				newstrides[i] = 0
-// 				indexer << fi
-// 			} else {
-// 				newshape[i] = li - fi
-// 				indexer << fi
-// 			}
-// 		}
-// 		// dimension specified by start, stop, and step
-// 		else if dex.len == 3 {
-// 			fi = dex[0]
-// 			li = dex[1]
-// 			step := dex[2]
-// 			abstep := int(math.abs(step))
-// 			if fi < 0 {
-// 				fi += t.shape[i]
-// 			}
-// 			if li < 0 {
-// 				li += t.shape[i]
-// 			}
-// 			offset := li - fi
-// 			newshape[i] = offset / abstep + offset % abstep
-// 			newstrides[i] = step * newstrides[i]
-// 			indexer << fi
-// 		}
-// 	}
-// 	// remove 0 shaped dimensions
-// 	newshape_, newstrides_ := filter_shape_not_strides(newshape, newstrides)
-// 	mut ptr := 0
-// 	mut i := 0
-// 	for i < indexer.len {
-// 		ptr += t.strides[i] * indexer[i]
-// 		i++
-// 	}
-// 	mut ret := NdArray{
-// 		shape: newshape_
-// 		strides: newstrides_
-// 		ndims: newshape_.len
-// 		size: shape_size(newshape_)
-// 		storage: t.storage.offset(ptr)
-// 		flags: newflags
-// 	}
-// 	ret.update_flags(all_flags())
-// 	return ret
-// }
+pub fn (t NdArray) slice(idx [][]int) NdArray {
+ 	mut newshape := t.shape.clone()
+ 	mut newstrides := t.strides.clone()
+ 	mut newflags := default_flags('C', t.ndims)
+ 	newflags.owndata = false
+ 	mut indexer := []int{}
+ 	for i, dex in idx {
+ 		mut fi := 0
+ 		mut li := 0
+ 		// dimension is entirely included in output
+ 		if dex.len == 0 {
+ 			assert newshape[i] == t.shape[i]
+ 			assert newstrides[i] == t.strides[i]
+ 			indexer << 0
+ 		}
+ 		// dimension sliced from array
+ 		if dex.len == 1 {
+ 			newshape[i] = 0
+ 			newstrides[i] = 0
+ 			fi = dex[0]
+ 			if fi < 0 {
+ 				fi += t.shape[i]
+ 			}
+ 			indexer << fi
+ 		}
+ 		// dimension specified by start and stop value
+ 		else if dex.len == 2 {
+ 			fi = dex[0]
+ 			li = dex[1]
+ 			if fi < 0 {
+ 				fi += t.shape[i]
+ 			}
+ 			if li < 0 {
+ 				li += t.shape[i]
+ 			}
+ 			if fi == li {
+ 				newshape[i] = 0
+ 				newstrides[i] = 0
+ 				indexer << fi
+ 			} else {
+ 				newshape[i] = li - fi
+ 				indexer << fi
+ 			}
+ 		}
+ 		// dimension specified by start, stop, and step
+ 		else if dex.len == 3 {
+ 			fi = dex[0]
+ 			li = dex[1]
+ 			step := dex[2]
+ 			abstep := int(math.abs(step))
+ 			if fi < 0 {
+ 				fi += t.shape[i]
+ 			}
+ 			if li < 0 {
+ 				li += t.shape[i]
+ 			}
+ 			offset := li - fi
+ 			newshape[i] = offset / abstep + offset % abstep
+ 			newstrides[i] = step * newstrides[i]
+ 			indexer << fi
+ 		}
+ 	}
+ 	// remove 0 shaped dimensions
+ 	newshape_, newstrides_ := filter_shape_not_strides(newshape, newstrides)
+ 	mut ptr := 0
+ 	mut i := 0
+ 	for i < indexer.len {
+ 		ptr += t.strides[i] * indexer[i]
+ 		i++
+ 	}
+ 	mut ret := NdArray{
+ 		shape: newshape_
+ 		strides: newstrides_
+ 		ndims: newshape_.len
+ 		size: shape_size(newshape_)
+ 		storage: t.storage.offset(ptr)
+ 		flags: newflags
+ 	}
+ 	ret.update_flags(all_flags())
+ 	return ret
+}
 
 // slice_hilo returns a view of an array from a list of starting
 // indices and a list of closing indices.  This is slightly less

@@ -36,55 +36,55 @@ fn test_set() {
 	assert num.allclose(a, expected)
 }
 
-// fn test_slice() {
-// 	a := num.from_int([0, 1, 2, 3, 4, 5, 6, 7, 8], [3, 3])
-// 	slice := a.slice([0])
-// 	expected := num.from_int([0, 1, 2], [3])
-// 	assert num.allclose(expected, slice)
-// }
+fn test_slice() {
+	a := num.from_int([0, 1, 2, 3, 4, 5, 6, 7, 8], [3, 3])
+	slice := a.slice([[0]])
+	expected := num.from_int([0, 1, 2], [3])
+	assert num.allclose(expected, slice)
+}
 
-// fn test_slice_implicit() {
-// 	a := num.from_int([0, 1, 2, 3], [2, 2])
-// 	slice := a.slice([]int{}, [1])
-// 	expected := num.from_int([1, 3], [2])
-// 	assert num.allclose(slice, expected)
-// }
+fn test_slice_implicit() {
+	a := num.from_int([0, 1, 2, 3], [2, 2])
+	slice := a.slice([[]int{}, [1]])
+	expected := num.from_int([1, 3], [2])
+	assert num.allclose(slice, expected)
+}
 
-// fn test_negative_slice() {
-// 	a := num.from_int([1, 2, 3], [3])
-// 	slice := a.slice([0, 3, -1])
-// 	expected := num.from_int([3, 2, 1], [3])
-// 	assert num.allclose(slice, expected)
-// }
+fn test_negative_slice() {
+	a := num.from_int([1, 2, 3], [3])
+	slice := a.slice([[0, 3, -1]])
+	expected := num.from_int([3, 2, 1], [3])
+	assert num.allclose(slice, expected)
+}
 
-// fn test_slice_hilo() {
-// 	a := num.from_int([1, 2, 3, 4], [2, 2])
-// 	slice := a.slice_hilo([0], [2])
-// 	assert num.allclose(a, slice)
-// }
+fn test_slice_hilo() {
+	a := num.from_int([1, 2, 3, 4], [2, 2])
+	slice := a.slice_hilo([0], [2])
+	assert num.allclose(a, slice)
+}
 
-// fn test_slice_flags() {
-// 	a := num.from_int([1, 2, 3], [3])
-// 	assert a.flags.owndata
-// 	slice := a.slice([]int{})
-// 	assert !slice.flags.owndata
-// }
+fn test_slice_flags() {
+	a := num.from_int([1, 2, 3], [3])
+	assert a.flags.owndata
+	slice := a.slice([[]int{}])
+	assert !slice.flags.owndata
+}
 
-// fn test_assign_broadcast() {
-// 	a := num.from_int([1, 2, 3, 4], [2, 2])
-// 	slice := a.slice([0])
-// 	a.assign(slice)
-// 	expected := num.from_int([1, 2, 1, 2], [2, 2])
-// 	assert num.allclose(expected, a)
-// }
+fn test_assign_broadcast() {
+	a := num.from_int([1, 2, 3, 4], [2, 2])
+	slice := a.slice([[0]])
+	a.assign(slice)
+	expected := num.from_int([1, 2, 1, 2], [2, 2])
+	assert num.allclose(expected, a)
+}
 
-// fn test_assign_same_shape() {
-// 	a := num.from_int([1, 2, 3, 4], [2, 2])
-// 	slice := a.slice([0])
-// 	a.slice([1]).assign(slice)
-// 	expected := num.from_int([1, 2, 1, 2], [2, 2])
-// 	assert num.allclose(expected, a)
-// }
+fn test_assign_same_shape() {
+	a := num.from_int([1, 2, 3, 4], [2, 2])
+	slice := a.slice([[0]])
+	a.slice([[1]]).assign(slice)
+	expected := num.from_int([1, 2, 1, 2], [2, 2])
+	assert num.allclose(expected, a)
+}
 
 fn test_fill() {
 	a := num.from_int([1, 2, 3, 4], [2, 2])
