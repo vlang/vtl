@@ -19,8 +19,8 @@ pub fn matrix_norm(a num.NdArray, norm byte) f64 {
 	return blas.dlange(a, norm)
 }
 
-pub fn cholesky(a num.NdArray, uplo byte) num.NdArray {
-	return blas.dpotrf(a, uplo)
+pub fn cholesky(a num.NdArray, up bool) num.NdArray {
+	return blas.dpotrf(a, up)
 }
 
 pub fn det(a num.NdArray) f64 {
