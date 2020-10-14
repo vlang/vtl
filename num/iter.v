@@ -20,7 +20,7 @@ pub mut:
 // This function always increments arrays that are fortran contiguous
 // and c-contiguous in the same order, so no adjustments need to be
 // made.
-// 
+//
 // TODO: optimize for c-contiguous arrays that can be iterated over
 // in a flat order.
 pub fn (mut iter NdIter) next() bool {
@@ -89,7 +89,7 @@ pub mut:
 // This function always increments arrays that are fortran contiguous
 // and c-contiguous in the same order, so no adjustments need to be
 // made.
-// 
+//
 // TODO: optimize for c-contiguous arrays that can be iterated over
 // in a flat order.
 pub fn (mut iter NdIter2) next() bool {
@@ -172,7 +172,7 @@ pub mut:
 // This function always increments arrays that are fortran contiguous
 // and c-contiguous in the same order, so no adjustments need to be
 // made.
-// 
+//
 // TODO: optimize for c-contiguous arrays that can be iterated over
 // in a flat order.
 pub fn (mut iter NdIter3) next() bool {
@@ -269,7 +269,7 @@ pub mut:
 // This function always increments arrays that are fortran contiguous
 // and c-contiguous in the same order, so no adjustments need to be
 // made.
-// 
+//
 // TODO: optimize for c-contiguous arrays that can be iterated over
 // in a flat order.
 pub fn (mut iter NdIter4) next() bool {

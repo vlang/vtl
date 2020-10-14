@@ -19,8 +19,7 @@ pub fn allocate_workspace(size int) Workspace {
 pub fn fortran_view_or_copy(t num.NdArray) num.NdArray {
 	if t.flags.fortran {
 		return t.view()
-	}
-	else {
+	} else {
 		return t.copy('F')
 	}
 }
@@ -41,22 +40,22 @@ pub fn assert_matrix(a num.NdArray) {
 	}
 }
 
-pub fn ddot(a num.NdArray, b num.NdArray) f64 {
+pub fn ddot(a, b num.NdArray) f64 {
 	if a.ndims != 1 || b.ndims != 1 {
 		panic('Tensors must be one dimensional')
-	}
-	else if a.size != b.size {
+	} else if a.size != b.size {
 		panic('Tensors must have the same shape')
 	}
 	return C.cblas_ddot(a.size, a.buffer(), a.strides[0], b.buffer(), b.strides[0])
 }
 
-pub fn dger(a num.NdArray, b num.NdArray) num.NdArray {
+pub fn dger(a, b num.NdArray) num.NdArray {
 	if a.ndims != 1 || b.ndims != 1 {
 		panic('Tensors must be one dimensional')
 	}
 	out := num.empty([a.size, b.size])
-	C.cblas_dger(blas.lapack_row_major, a.size, b.size, 1.0, a.buffer(), a.strides[0], b.buffer(), b.strides[0], out.buffer(), out.shape[1])
+	C.cblas_dger(blas.lapack_row_major, a.size, b.size, 1.0, a.buffer(), a.strides[0],
+		b.buffer(), b.strides[0], out.buffer(), out.shape[1])
 	return out
 }
 
@@ -107,7 +106,7 @@ pub fn det(a num.NdArray) f64 {
 	ldet := num.prod(ret.diagonal())
 	mut detp := 1
 	for i := 0; i < n; i++ {
-		if (i + 1) != unsafe{*(ipiv + i)} {
+		if (i + 1) != unsafe {*(ipiv + i)} {
 			detp = -detp
 		}
 	}
@@ -129,29 +128,25 @@ pub fn inv(a num.NdArray) num.NdArray {
 	lwork := n * n
 	work := &f64(v_calloc(lwork * int(sizeof(f64))))
 	info = C.LAPACKE_dgetri(&n, ret.buffer(), &n, ipiv, &work)
-        if info != 0 {
-                panic('lapack failed')
-        }
+	if info != 0 {
+		panic('lapack failed')
+	}
 	return ret
 }
 
-pub fn matmul(a num.NdArray, b num.NdArray) num.NdArray {
+pub fn matmul(a, b num.NdArray) num.NdArray {
 	dest := num.empty([a.shape[0], b.shape[1]])
-	ma := match (a.flags.contiguous) {
-		true{
-			a
-		}
-		else {
-			a.copy('C')}
+	ma := match a.flags.contiguous {
+		true { a }
+		else { a.copy('C') }
 	}
-	mb := match (b.flags.contiguous) {
-		true{
-			b
-		}
-		else {
-			b.copy('C')}
+	mb := match b.flags.contiguous {
+		true { b }
+		else { b.copy('C') }
 	}
-	C.cblas_dgemm(blas.lapack_row_major, blas.c_trans(false), blas.c_trans(false), ma.shape[0], mb.shape[1], ma.shape[1], 1.0, ma.buffer(), ma.shape[1], mb.buffer(), mb.shape[1], 1.0, dest.buffer(), dest.shape[1])
+	C.cblas_dgemm(blas.cblas_col_major, blas.c_trans(false), blas.c_trans(false), ma.shape[0],
+		mb.shape[1], ma.shape[1], 1.0, ma.buffer(), ma.shape[1], mb.buffer(), mb.shape[1], 1.0,
+		dest.buffer(), dest.shape[1])
 	return dest
 }
 
@@ -183,7 +178,8 @@ pub fn eig(a num.NdArray) []num.NdArray {
 	jobvr := blas.job_vlr(true)
 	jobvl := blas.job_vlr(true)
 	info := 0
-	C.LAPACKE_dgeev(jobvl, jobvr, &n, ret.buffer(), &n, wr.buffer(), wl.buffer(), vl.buffer(), &n, vr.buffer(), &n, workspace.work)
+	C.LAPACKE_dgeev(jobvl, jobvr, &n, ret.buffer(), &n, wr.buffer(), wl.buffer(), vl.buffer(),
+		&n, vr.buffer(), &n, workspace.work)
 	if info > 0 {
 		panic('QR algorithm failed')
 	}
@@ -218,14 +214,15 @@ pub fn eigvals(a num.NdArray) num.NdArray {
 	jobvr := blas.job_vlr(false)
 	jobvl := blas.job_vlr(false)
 	info := 0
-	C.LAPACKE_dgeev(jobvl, jobvr, &n, ret.buffer(), &n, wr.buffer(), wl.buffer(), vl.buffer(), &n, vr.buffer(), &n, workspace.work)
+	C.LAPACKE_dgeev(jobvl, jobvr, &n, ret.buffer(), &n, wr.buffer(), wl.buffer(), vl.buffer(),
+		&n, vr.buffer(), &n, workspace.work)
 	if info > 0 {
 		panic('QR algorithm failed')
 	}
 	return wr
 }
 
-pub fn solve(a num.NdArray, b num.NdArray) num.NdArray {
+pub fn solve(a, b num.NdArray) num.NdArray {
 	assert_square_matrix(a)
 	af := fortran_view_or_copy(a)
 	bf := b.copy('F')

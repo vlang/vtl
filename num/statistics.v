@@ -6,7 +6,9 @@ import math
 pub fn sum(n NdArray) f64 {
 	mut i := 0.0
 	for iter := n.iter(); !iter.done; iter.next() {
-		unsafe{i += *iter.ptr}
+		unsafe {
+			i += *iter.ptr
+		}
 	}
 	return i
 }
@@ -15,7 +17,9 @@ pub fn sum(n NdArray) f64 {
 pub fn prod(n NdArray) f64 {
 	mut i := 1.0
 	for iter := n.iter(); !iter.done; iter.next() {
-		unsafe{i *= *iter.ptr}
+		unsafe {
+			i *= *iter.ptr
+		}
 	}
 	return i
 }

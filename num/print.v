@@ -185,8 +185,7 @@ fn format_float(v f64, notation bool) string {
 	} else {
 		unsafe {
 			buf := malloc(8 * 5 + 1)
-// TODO
-			C.sprintf(charptr(buf), '%g', v)
+                        C.sprintf(charptr(buf), '%g', v)
 			return tos(buf, vstrlen(buf))
 		}
 	}
