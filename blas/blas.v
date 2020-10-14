@@ -3,13 +3,6 @@ module blas
 import vnum.num
 import vsl.blas
 
-pub enum BlasTranspose {
-	no_trans = 111
-	trans = 112
-	conj_trans = 113
-	con_no_trans = 114
-}
-
 pub struct Workspace {
 	size int
 	work &f64
@@ -80,27 +73,23 @@ pub fn dlange(a num.NdArray, norm byte) f64 {
 	}
 	m := fortran_view_or_copy(a)
 	work := &f64(v_calloc(m.shape[0] * int(sizeof(f64))))
-	return C.LAPACKE_dlange(&norm, &m.shape[0], &m.shape[1], m.buffer(), &m.shape[0], work)
+	return C.LAPACKE_dlange(norm, &m.shape[0], &m.shape[1], m.buffer(), &m.shape[0], work)
 }
 
-pub fn dpotrf(a num.NdArray, uplo byte) num.NdArray {
+pub fn dpotrf(a num.NdArray, up bool) num.NdArray {
 	if a.ndims != 2 {
 		panic('Tensor must be two-dimensional')
 	}
 	ret := a.copy('F')
 	info := 0
-	C.LAPACKE_dpotrf(&uplo, &ret.shape[0], ret.buffer(), &ret.shape[0], &info)
+	C.LAPACKE_dpotrf(blas.l_uplo(up), &ret.shape[0], ret.buffer(), &ret.shape[0], &info)
 	if info > 0 {
 		panic('Tensor is not positive definite')
 	}
-	if uplo == `U` {
+	if up {
 		num.triu_inpl(ret)
-	}
-	else if uplo == `L` {
+	} else {
 		num.tril_inpl(ret)
-	}
-	else {
-		panic('Invalid option provided for UPLO')
 	}
 	return ret
 }
@@ -171,11 +160,11 @@ pub fn eigh(a num.NdArray) []num.NdArray {
 	ret := a.copy('F')
 	n := ret.shape[0]
 	w := num.empty([n])
-	jobz := `V`
-	uplo := `L`
+	jobz := blas.job_vlr(true)
+	uplo := blas.l_uplo(false)
 	info := 0
 	workspace := allocate_workspace(3 * n - 1)
-	C.LAPACKE_dsyev(&jobz, &uplo, &n, ret.buffer(), &n, w.buffer(), workspace.work)
+	C.LAPACKE_dsyev(jobz, uplo, &n, ret.buffer(), &n, w.buffer(), workspace.work)
 	if info > 0 {
 		panic('Failed to converge')
 	}
@@ -191,10 +180,10 @@ pub fn eig(a num.NdArray) []num.NdArray {
 	vl := num.allocate_cpu([n, n], 'F')
 	vr := vl.copy('C')
 	workspace := allocate_workspace(n * 4)
-	jobvr := `V`
-	jobvl := `V`
+	jobvr := blas.job_vlr(true)
+	jobvl := blas.job_vlr(true)
 	info := 0
-	C.LAPACKE_dgeev(&jobvl, &jobvr, &n, ret.buffer(), &n, wr.buffer(), wl.buffer(), vl.buffer(), &n, vr.buffer(), &n, workspace.work)
+	C.LAPACKE_dgeev(jobvl, jobvr, &n, ret.buffer(), &n, wr.buffer(), wl.buffer(), vl.buffer(), &n, vr.buffer(), &n, workspace.work)
 	if info > 0 {
 		panic('QR algorithm failed')
 	}
@@ -205,12 +194,12 @@ pub fn eigvalsh(a num.NdArray) num.NdArray {
 	assert_square_matrix(a)
 	ret := fortran_view_or_copy(a)
 	n := ret.shape[0]
-	jobz := `V`
-	uplo := `L`
+	jobz := blas.job_vlr(true)
+	uplo := blas.l_uplo(false)
 	info := 0
 	w := num.empty([n])
 	workspace := allocate_workspace(3 * n - 1)
-	C.LAPACKE_dsyev(&jobz, &uplo, &n, ret.buffer(), &n, w.buffer(), workspace.work)
+	C.LAPACKE_dsyev(jobz, uplo, &n, ret.buffer(), &n, w.buffer(), workspace.work)
 	if info > 0 {
 		panic('Failed to converge')
 	}
@@ -226,10 +215,10 @@ pub fn eigvals(a num.NdArray) num.NdArray {
 	vl := num.allocate_cpu([n, n], 'F')
 	vr := vl.copy('C')
 	workspace := allocate_workspace(n * 3)
-	jobvr := `N`
-	jobvl := `N`
+	jobvr := blas.job_vlr(false)
+	jobvl := blas.job_vlr(false)
 	info := 0
-	C.LAPACKE_dgeev(&jobvl, &jobvr, &n, ret.buffer(), &n, wr.buffer(), wl.buffer(), vl.buffer(), &n, vr.buffer(), &n, workspace.work)
+	C.LAPACKE_dgeev(jobvl, jobvr, &n, ret.buffer(), &n, wr.buffer(), wl.buffer(), vl.buffer(), &n, vr.buffer(), &n, workspace.work)
 	if info > 0 {
 		panic('QR algorithm failed')
 	}
@@ -263,10 +252,10 @@ pub fn hessenberg(a num.NdArray) num.NdArray {
 	ihi := 0
 	job := `B`
 	info := 0
-	C.LAPACKE_dgebal(&job, &n, ret.buffer(), &n, &ilo, &ihi, s.buffer(), &info)
+	C.LAPACKE_dgebal(job, &n, ret.buffer(), &n, &ilo, &ihi, s.buffer(), &info)
 	tau := num.empty([n])
 	workspace := allocate_workspace(n)
-	C.LAPACKE_dgehrd(&n, &ilo, &ihi, ret.buffer(), &n, tau.buffer(), workspace.work)
+	C.LAPACKE_dgehrd(n, &ilo, &ihi, ret.buffer(), &n, tau.buffer(), workspace.work)
 	num.triu_inpl_offset(ret, -1)
 	return ret
 }
