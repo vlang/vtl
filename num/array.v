@@ -46,7 +46,7 @@ pub fn (t NdArray) str() string {
 }
 
 pub fn (t NdArray) buffer() &f64 {
-	return t.storage.ptr()
+	return t.storage.buffer
 }
 
 // get returns a scalar value at a provided index

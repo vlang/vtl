@@ -94,7 +94,7 @@ pub fn (c CpuStorage) get(index, shape, strides []int) f64 {
 // allocates storage for use with computations on a GPU
 pub fn cpu(size int) CpuStorage {
 	unsafe {
-		buffer := malloc(size * int(sizeof(f64)))
+		buffer := v_calloc(size * int(sizeof(f64)))
 		return CpuStorage{
 			buffer: buffer
 		}
