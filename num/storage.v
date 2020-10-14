@@ -1,6 +1,6 @@
 module num
 
-import vsl.math
+import math
 
 //
 // Buffer is a generic interface to represent data storage
@@ -15,7 +15,7 @@ import vsl.math
 // }
 // Storage for computations run on a CPU
 pub struct CpuStorage {
-	buffer voidptr
+	buffer &f64
 }
 
 pub fn (c CpuStorage) str() string {
@@ -94,9 +94,9 @@ pub fn (c CpuStorage) get(index, shape, strides []int) f64 {
 // allocates storage for use with computations on a GPU
 pub fn cpu(size int) CpuStorage {
 	unsafe {
-		buffer := []f64{len: size}
+		buffer := &f64(malloc(size * int(sizeof(f64))))
 		return CpuStorage{
-			buffer: &f64(buffer.data)
+			buffer: buffer
 		}
 	}
 }

@@ -3,7 +3,7 @@ module blas
 import vnum.num
 import vsl.blas
 
-pub enum blas_transpose {
+pub enum BlasTranspose {
 	no_trans = 111
 	trans = 112
 	conj_trans = 113
@@ -15,15 +15,15 @@ pub struct Workspace {
 	work &f64
 }
 
-fn allocate_workspace(size int) Workspace {
-	ptr := *f64(calloc(size * sizeof(f64)))
+pub fn allocate_workspace(size int) Workspace {
+	ptr := &f64(v_calloc(size * int(sizeof(f64))))
 	return Workspace{
 		size: size
 		work: ptr
 	}
 }
 
-fn fortran_view_or_copy(t num.NdArray) num.NdArray {
+pub fn fortran_view_or_copy(t num.NdArray) num.NdArray {
 	if t.flags.fortran {
 		return t.view()
 	} else {
@@ -31,23 +31,23 @@ fn fortran_view_or_copy(t num.NdArray) num.NdArray {
 	}
 }
 
-fn fortran_copy(t num.NdArray) num.NdArray {
+pub fn fortran_copy(t num.NdArray) num.NdArray {
 	return t.copy('F')
 }
 
-fn assert_square_matrix(a num.NdArray) {
+pub fn assert_square_matrix(a num.NdArray) {
 	if a.ndims != 2 || a.shape[0] != a.shape[1] {
 		panic('Matrix is not square')
 	}
 }
 
-fn assert_matrix(a num.NdArray) {
+pub fn assert_matrix(a num.NdArray) {
 	if a.ndims != 2 {
 		panic('Tensor is not two-dimensional')
 	}
 }
 
-fn ddot(a, b num.NdArray) f64 {
+pub fn ddot(a, b num.NdArray) f64 {
 	if a.ndims != 1 || b.ndims != 1 {
 		panic('Tensors must be one dimensional')
 	} else if a.size != b.size {
@@ -56,39 +56,40 @@ fn ddot(a, b num.NdArray) f64 {
 	return C.cblas_ddot(a.size, a.buffer(), a.strides[0], b.buffer(), b.strides[0])
 }
 
-fn dger(a, b num.NdArray) num.NdArray {
+pub fn dger(a, b num.NdArray) num.NdArray {
 	if a.ndims != 1 || b.ndims != 1 {
 		panic('Tensors must be one dimensional')
 	}
 	out := num.empty([a.size, b.size])
-	blas.dger(a.size, b.size, 1.0, a.buffer(), a.strides[0], mut b.buffer(), b.strides[0],
+	blas.dger(a.size, b.size, 1.0, a.buffer(), a.strides[0], b.buffer(), b.strides[0],
 		out.buffer(), out.shape[1])
 	return out
 }
 
-fn dnrm2(a num.NdArray) f64 {
+pub fn dnrm2(a num.NdArray) f64 {
 	if a.ndims != 1 {
 		panic('Tensor must be one dimensional')
 	}
 	return C.cblas_dnrm2(a.size, a.buffer(), a.strides[0])
 }
 
-fn dlange(a num.NdArray, norm byte) f64 {
+pub fn dlange(a num.NdArray, norm byte) f64 {
 	if a.ndims != 2 {
 		panic('Tensor must be two-dimensional')
 	}
 	m := fortran_view_or_copy(a)
-	work := *f64(calloc(m.shape[0] * sizeof(f64)))
-	return C.LAPACKER_dlange(&norm, &m.shape[0], &m.shape[1], m.buffer(), &m.shape[0],
+	work := &f64(v_calloc(m.shape[0] * int(sizeof(f64))))
+	return C.LAPACKE_dlange(&norm, &m.shape[0], &m.shape[1], m.buffer(), &m.shape[0],
 		work)
 }
 
-fn dpotrf(a num.NdArray, uplo byte) num.NdArray {
+pub fn dpotrf(a num.NdArray, uplo byte) num.NdArray {
 	if a.ndims != 2 {
 		panic('Tensor must be two-dimensional')
 	}
 	ret := a.copy('F')
-	blas.dpotrf(uplo == `U`, ret.shape[0], mut ret.buffer(), ret.shape[0])
+        mut ret_buffer := &f64(ret.buffer())
+	blas.dpotrf(uplo == `U`, ret.shape[0], mut ret_buffer, ret.shape[0])
 	if uplo == `U` {
 		num.triu_inpl(ret)
 	} else if uplo == `L` {
@@ -99,39 +100,41 @@ fn dpotrf(a num.NdArray, uplo byte) num.NdArray {
 	return ret
 }
 
-fn det(a num.NdArray) f64 {
+pub fn det(a num.NdArray) f64 {
 	ret := a.copy('F')
 	m := a.shape[0]
 	n := a.shape[1]
-	ipiv := *int(calloc(sizeof(int) * n))
+	ipiv := &int(v_calloc(int(sizeof(int)) * n))
 	info := 0
-	blas.dgetrf(m, n, mut ret.buffer(), m, ipiv)
+        mut ret_buffer := &f64(ret.buffer())
+	blas.dgetrf(m, n, mut ret_buffer, m, ipiv)
 	ldet := num.prod(ret.diagonal())
 	mut detp := 1
 	for i := 0; i < n; i++ {
-		if (i + 1) != *(ipiv + i) {
+		if (i + 1) != unsafe{*(ipiv + i)} {
 			detp = -detp
 		}
 	}
 	return ldet * detp
 }
 
-fn inv(a num.NdArray) num.NdArray {
+pub fn inv(a num.NdArray) num.NdArray {
 	if a.ndims != 2 || a.shape[0] != a.shape[1] {
 		panic('Matrix must be square')
 	}
 	ret := a.copy('F')
 	n := a.shape[0]
-	ipiv := *int(calloc(n * sizeof(int)))
+	ipiv := &int(v_calloc(n * int(sizeof(int))))
 	info := 0
-	blas.dgetrf(n, n, mut ret.buffer(), n, ipiv)
+        mut ret_buffer := &f64(ret.buffer())
+	blas.dgetrf(n, n, mut ret_buffer, n, ipiv)
 	lwork := n * n
-	work := *f64(calloc(lwork * sizeof(f64)))
-	C.dgetri_(&n, ret.buffer(), &n, ipiv, work, &lwork, &info)
+	work := &f64(v_calloc(lwork * int(sizeof(f64))))
+	C.LAPACKE_dgetri(&n, ret_buffer, &n, ipiv, work, &lwork, &info)
 	return ret
 }
 
-fn matmul(a, b num.NdArray) num.NdArray {
+pub fn matmul(a, b num.NdArray) num.NdArray {
 	dest := num.empty([a.shape[0], b.shape[1]])
 	ma := match (a.flags.contiguous) {
 		true { a }
@@ -146,7 +149,7 @@ fn matmul(a, b num.NdArray) num.NdArray {
 	return dest
 }
 
-fn eigh(a num.NdArray) []num.NdArray {
+pub fn eigh(a num.NdArray) []num.NdArray {
 	assert_square_matrix(a)
 	ret := a.copy('F')
 	n := ret.shape[0]
@@ -163,7 +166,7 @@ fn eigh(a num.NdArray) []num.NdArray {
 	return [w, ret]
 }
 
-fn eig(a num.NdArray) []num.NdArray {
+pub fn eig(a num.NdArray) []num.NdArray {
 	assert_square_matrix(a)
 	ret := a.copy('F')
 	n := ret.shape[0]
@@ -173,7 +176,7 @@ fn eig(a num.NdArray) []num.NdArray {
 	vr := vl.copy('C')
 	workspace := allocate_workspace(n * 4)
 	info := 0
-	blas.dgeev(true, true, n, mut ret.buffer(), n, mut wr.buffer(), wl.buffer(), vl.buffer(),
+	blas.dgeev(true, true, n, ret.buffer(), n, mut wr.buffer(), wl.buffer(), vl.buffer(),
 		n, vr.buffer(), n, workspace.work, workspace.size)
 	return [wr, vl]
 }
@@ -219,7 +222,7 @@ pub fn solve(a, b num.NdArray) num.NdArray {
 	if bf.ndims > 1 {
 		m = bf.shape[1]
 	}
-	ipiv := *int(calloc(n * sizeof(int)))
+	ipiv := &int(v_calloc(n * int(sizeof(int))))
 	info := 0
 	blas.dgesv(n, m, af.buffer(), n, ipiv, bf.buffer(), m)
 	return bf
