@@ -27,7 +27,7 @@ pub fn broadcastable(arr, other NdArray) []int {
 		}
 	}
 	panic('Shapes $arr.shape and $other.shape are not broadcastable')
-        return [] // needed since every function needs a return statement by default
+	return [] // needed since every function needs a return statement by default
 }
 
 // broadcast2 broadcasts two ndarrays against each other

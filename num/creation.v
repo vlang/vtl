@@ -30,7 +30,7 @@ pub fn eye(m, n, k int) NdArray {
 }
 
 // Return the identity array.
-// 
+//
 // The identity array is a square array with ones on the main diagonal.
 pub fn identity(n int) NdArray {
 	return eye(n, n, 0)
