@@ -144,7 +144,7 @@ pub fn matmul(a, b num.NdArray) num.NdArray {
 		true { b }
 		else { b.copy('C') }
 	}
-	C.cblas_dgemm(blas.cblas_col_major, blas.c_trans(false), blas.c_trans(false), ma.shape[0],
+	C.cblas_dgemm(blas.cblas_row_major, blas.c_trans(false), blas.c_trans(false), ma.shape[0],
 		mb.shape[1], ma.shape[1], 1.0, ma.buffer(), ma.shape[1], mb.buffer(), mb.shape[1], 1.0,
 		dest.buffer(), dest.shape[1])
 	return dest
