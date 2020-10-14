@@ -21,7 +21,7 @@ Because we use CV for linking VSL with many libraries, it is not enough to use t
 
 ### Install dependencies
 
-VNUM required VSL's OpenBLAS and LAPACKE wrappers. If you wish you to use vnum without these, the `vnum.num` module will still function as normal.
+VNUM requires VSL's OpenBLAS and LAPACKE wrappers. If you wish you to use vnum without these, the `vnum.num` module will still function as normal.
 
 Follow this [install instructions](https://github.com/vlang/vsl#install-vsl-locally) at VSL docs in order to install VSL with all needed dependencies.
 
