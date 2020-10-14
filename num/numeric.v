@@ -1,6 +1,6 @@
 module num
 
-import vsl.math
+import math
 
 // Return evenly spaced values within a given interval.
 // Values are generated within the half-open interval [0, n)

@@ -15,27 +15,13 @@ We use VSL as backend for some functionalities and VLS links with existent libra
 
 ## Installation
 
-Because of C dependencies and other libraries, the easiest way to work with VNUM is via Docker. Having Docker and VS Code installed, you can start developing powerful numerical simulations using VNUM in a matter of seconds. Furthermore, the best part of it is that it works on Windows, Linux, and macOS out of the box.
-
-### Quick, containerized (recommended)
-
-1. Install Docker
-2. Install Visual Studio Code
-3. Install the Remote Development extension for VS Code
-4. Clone this repository
-5. Create your application within a container (see gif below)
-
-Done. And your system will remain "clean".
-
-![](static/vscode-open-in-container.gif)
-
-Our [Docker Image](https://hub.docker.com/repository/docker/vsl/vsl) also contains V and the V Tools for working with VS Code (or not). Below is a video showing the convenience of VS Code + the V tools + VSL.
-
 ## Install VNUM locally
 
 Because we use CV for linking VSL with many libraries, it is not enough to use the so convenient `v install` _or_ `vpkg get` functionality for installing VSL. First we need to install some dependencies in order to have VSL working as expected.
 
 ### Install dependencies
+
+VNUM required VSL's OpenBLAS and LAPACKE wrappers. If you wish you to use vnum without these, the `vnum.num` module will still function as normal.
 
 Follow this [install instructions](https://github.com/vlang/vsl#install-vsl-locally) at VSL docs in order to install VSL with all needed dependencies.
 
