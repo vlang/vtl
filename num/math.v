@@ -3,32 +3,32 @@ module num
 import math
 
 [inline]
-fn num_add(a, b f64) f64 {
+fn num_add(a f64, b f64) f64 {
 	return a + b
 }
 
 [inline]
-fn num_subtract(a, b f64) f64 {
+fn num_subtract(a f64, b f64) f64 {
 	return a - b
 }
 
 [inline]
-fn num_divide(a, b f64) f64 {
+fn num_divide(a f64, b f64) f64 {
 	return a / b
 }
 
 [inline]
-fn num_multiply(a, b f64) f64 {
+fn num_multiply(a f64, b f64) f64 {
 	return a * b
 }
 
 // add adds two ndarrays elementwise
-pub fn add(a, b NdArray) NdArray {
+pub fn add(a NdArray, b NdArray) NdArray {
 	return map2(a, b, num_add)
 }
 
 // add_aa adds two ndarrays elementwise
-pub fn add_aa(a, b NdArray) NdArray {
+pub fn add_aa(a NdArray, b NdArray) NdArray {
 	return add(a, b)
 }
 
@@ -43,12 +43,12 @@ pub fn add_sa(a f64, b NdArray) NdArray {
 }
 
 // subtract subtracts two ndarrays elementwise
-pub fn subtract(a, b NdArray) NdArray {
+pub fn subtract(a NdArray, b NdArray) NdArray {
 	return map2(a, b, num_subtract)
 }
 
 // subtract_aa subtracts two ndarrays elementwise
-pub fn subtract_aa(a, b NdArray) NdArray {
+pub fn subtract_aa(a NdArray, b NdArray) NdArray {
 	return subtract(a, b)
 }
 
@@ -63,12 +63,12 @@ pub fn subtract_sa(a f64, b NdArray) NdArray {
 }
 
 // divide dives two ndarrays elementwise
-pub fn divide(a, b NdArray) NdArray {
+pub fn divide(a NdArray, b NdArray) NdArray {
 	return map2(a, b, num_divide)
 }
 
 // divide_aa divides two ndarrays elementwise
-pub fn divide_aa(a, b NdArray) NdArray {
+pub fn divide_aa(a NdArray, b NdArray) NdArray {
 	return divide(a, b)
 }
 
@@ -83,12 +83,12 @@ pub fn divide_sa(a f64, b NdArray) NdArray {
 }
 
 // multiplies two arrays elementwise
-pub fn multiply(a, b NdArray) NdArray {
+pub fn multiply(a NdArray, b NdArray) NdArray {
 	return map2(a, b, num_multiply)
 }
 
 // multiply_aa multiples two ndarrays elementwise
-pub fn multiply_aa(a, b NdArray) NdArray {
+pub fn multiply_aa(a NdArray, b NdArray) NdArray {
 	return multiply(a, b)
 }
 
@@ -123,12 +123,12 @@ pub fn atan(a NdArray) NdArray {
 }
 
 // atan2 returns the atan2 elementwise of two ndarrays
-pub fn atan2(a, b NdArray) NdArray {
+pub fn atan2(a NdArray, b NdArray) NdArray {
 	return map2(a, b, math.atan2)
 }
 
 // atan2_aa returns the atan2 elementwise of two ndarrays
-pub fn atan2_aa(a, b NdArray) NdArray {
+pub fn atan2_aa(a NdArray, b NdArray) NdArray {
 	return map2(a, b, math.atan2)
 }
 
@@ -193,12 +193,12 @@ pub fn floor(a NdArray) NdArray {
 }
 
 // fmod returns the elementwise fmod of two ndarrays
-pub fn fmod(a, b NdArray) NdArray {
+pub fn fmod(a NdArray, b NdArray) NdArray {
 	return map2(a, b, math.fmod)
 }
 
 // fmod_aa returns the elementwise fmod of two ndarrays
-pub fn fmod_aa(a, b NdArray) NdArray {
+pub fn fmod_aa(a NdArray, b NdArray) NdArray {
 	return map2(a, b, math.fmod)
 }
 
@@ -218,12 +218,12 @@ pub fn gamma(a NdArray) NdArray {
 }
 
 // hypot returns the elementwise hypot of two ndarrays
-pub fn hypot(a, b NdArray) NdArray {
+pub fn hypot(a NdArray, b NdArray) NdArray {
 	return map2(a, b, math.hypot)
 }
 
 // hypot_aa returns the elementwise hypot of two ndarrays
-pub fn hypot_aa(a, b NdArray) NdArray {
+pub fn hypot_aa(a NdArray, b NdArray) NdArray {
 	return map2(a, b, math.hypot)
 }
 
@@ -258,12 +258,12 @@ pub fn lgamma(a NdArray) NdArray {
 }
 
 // log_n returns the elementwise log_n of two ndarrays
-pub fn log_n(a, b NdArray) NdArray {
+pub fn log_n(a NdArray, b NdArray) NdArray {
 	return map2(a, b, math.log_n)
 }
 
 // log_n_aa returns the elementwise log_n of two ndarrays
-pub fn log_n_aa(a, b NdArray) NdArray {
+pub fn log_n_aa(a NdArray, b NdArray) NdArray {
 	return log_n(a, b)
 }
 
@@ -278,12 +278,12 @@ pub fn log_n_sa(a f64, b NdArray) NdArray {
 }
 
 // maximum returns the elementwise max of two ndarrays
-pub fn maximum(a, b NdArray) NdArray {
+pub fn maximum(a NdArray, b NdArray) NdArray {
 	return map2(a, b, math.max)
 }
 
 // maximum_aa returns the elementwise max of two ndarrays
-pub fn maximum_aa(a, b NdArray) NdArray {
+pub fn maximum_aa(a NdArray, b NdArray) NdArray {
 	return map2(a, b, math.max)
 }
 
@@ -298,12 +298,12 @@ pub fn maximum_sa(a f64, b NdArray) NdArray {
 }
 
 // minimum returns the elementwise min of a two ndarrays
-pub fn minimum(a, b NdArray) NdArray {
+pub fn minimum(a NdArray, b NdArray) NdArray {
 	return map2(a, b, math.min)
 }
 
 // minimum_aa returns the elementwise min of two ndarrays
-pub fn minimum_aa(a, b NdArray) NdArray {
+pub fn minimum_aa(a NdArray, b NdArray) NdArray {
 	return map2(a, b, math.min)
 }
 
@@ -318,12 +318,12 @@ pub fn minimum_sa(a f64, b NdArray) NdArray {
 }
 
 // pow returns the elementwise power of two ndarrays
-pub fn pow(a, b NdArray) NdArray {
+pub fn pow(a NdArray, b NdArray) NdArray {
 	return map2(a, b, math.pow)
 }
 
 // pow_aa returns the elementwise power of two ndarrays
-pub fn pow_aa(a, b NdArray) NdArray {
+pub fn pow_aa(a NdArray, b NdArray) NdArray {
 	return map2(a, b, math.pow)
 }
 

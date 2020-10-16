@@ -49,7 +49,7 @@ pub fn map_scalar_lhs(a f64, b NdArray, op TwoParamsFn) NdArray {
 }
 
 // map2 maps a function along two ndarrays
-pub fn map2(a, b NdArray, op TwoParamsFn) NdArray {
+pub fn map2(a NdArray, b NdArray, op TwoParamsFn) NdArray {
 	ab, bb := broadcast2(a, b)
 	ret := allocate_cpu(ab.shape, 'C')
 	for iter := ret.iter3(ab, bb); !iter.done; iter.next() {
@@ -62,7 +62,7 @@ pub fn map2(a, b NdArray, op TwoParamsFn) NdArray {
 
 // apply2 applies a function to two ndarrays, storing the result in
 // the first ndarray
-pub fn apply2(a, b NdArray, op TwoParamsFn) {
+pub fn apply2(a NdArray, b NdArray, op TwoParamsFn) {
 	bb := broadcast_if(b, a.shape)
 	for iter := a.iter2(bb); !iter.done; iter.next() {
 		unsafe {
@@ -72,7 +72,7 @@ pub fn apply2(a, b NdArray, op TwoParamsFn) {
 }
 
 // map3 maps a function along three ndarrays
-pub fn map3(a, b, c NdArray, op ThreeParamsFn) NdArray {
+pub fn map3(a NdArray, b NdArray, c NdArray, op ThreeParamsFn) NdArray {
 	ab, bb, cb := broadcast3(a, b, c)
 	ret := allocate_cpu(ab.shape, 'C')
 	for iter := ret.iter4(ab, bb, cb); !iter.done; iter.next() {
@@ -85,7 +85,7 @@ pub fn map3(a, b, c NdArray, op ThreeParamsFn) NdArray {
 
 // apply3 applies a function to three ndarrays, storing the result in the
 // first ndarray
-pub fn apply3(a, b, c NdArray, op ThreeParamsFn) {
+pub fn apply3(a NdArray, b NdArray, c NdArray, op ThreeParamsFn) {
 	bb := broadcast_if(b, a.shape)
 	cb := broadcast_if(c, a.shape)
 	for iter := a.iter3(bb, cb); !iter.done; iter.next() {

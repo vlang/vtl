@@ -37,7 +37,7 @@ mut:
 	results        Results
 }
 
-pub fn new(rate f64, iterations, units int, activator Activator) Network {
+pub fn new(rate f64, iterations int, units int, activator Activator) Network {
 	mut m := Network{
 		learning_rate: rate
 		iterations: iterations
@@ -64,7 +64,7 @@ pub fn new(rate f64, iterations, units int, activator Activator) Network {
 	return m
 }
 
-pub fn (mut n Network) learn(inputs, outputs num.NdArray) {
+pub fn (mut n Network) learn(inputs num.NdArray, outputs num.NdArray) {
 	incols := inputs.shape[1]
 	outcols := outputs.shape[1]
 	n.weights.input_hidden = normals(incols, n.hidden_units)
@@ -84,7 +84,7 @@ pub fn (mut n Network) forward(input num.NdArray) {
 	n.results.output_sum = output_sum
 }
 
-pub fn (mut n Network) back(input, output num.NdArray) {
+pub fn (mut n Network) back(input num.NdArray, output num.NdArray) {
 	error_output_layer := num.subtract(output, n.results.output_result)
 	delta_output_layer := num.multiply(n.activate_prime(&n.results.output_sum), error_output_layer)
 	mut hidden_output_changes := la.matmul(n.results.hidden_result.t(), delta_output_layer)

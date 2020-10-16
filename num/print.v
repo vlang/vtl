@@ -22,7 +22,7 @@ pub fn concatenate(ts []NdArray, axis int) NdArray {
 
 // for arrays that are too large, calculate only the leading and trailing
 // items along each axis
-fn leading_trailing(a NdArray, edgeitems int, lo, hi []int) NdArray {
+fn leading_trailing(a NdArray, edgeitems int, lo []int, hi []int) NdArray {
 	axis := lo.len
 	if axis == a.ndims {
 		return a.slice_hilo(lo, hi)
@@ -49,7 +49,7 @@ fn leading_trailing(a NdArray, edgeitems int, lo, hi []int) NdArray {
 }
 
 // extends a line to contain new elements
-fn extend_line(s, line, word string, line_width int, next_line_prefix string) []string {
+fn extend_line(s string, line string, word string, line_width int, next_line_prefix string) []string {
 	mut sn := s
 	mut ln := line
 	needs_wrap := ln.len + word.len > line_width
@@ -156,13 +156,13 @@ fn recursor(a NdArray, index []int, hanging_indent string, curr_width int, summa
 }
 
 // format an array, array2string is just a wrapper around this
-fn format_array(a NdArray, line_width int, next_line_prefix, separator string, edge_items int, summary_insert string, max_len int) string {
+fn format_array(a NdArray, line_width int, next_line_prefix string, separator string, edge_items int, summary_insert string, max_len int) string {
 	return recursor(a, [], next_line_prefix, line_width, summary_insert, edge_items, separator,
 		max_len)
 }
 
 // public method for printing arrays, if custom behavior is needed
-pub fn array2string(a NdArray, separator, prefix string) string {
+pub fn array2string(a NdArray, separator string, prefix string) string {
 	if a.shape.len == 0 {
 		return '[]'
 	}
@@ -185,7 +185,7 @@ fn format_float(v f64, notation bool) string {
 	} else {
 		unsafe {
 			buf := malloc(8 * 5 + 1)
-                        C.sprintf(charptr(buf), '%g', v)
+			C.sprintf(charptr(buf), '%g', v)
 			return tos(buf, vstrlen(buf))
 		}
 	}

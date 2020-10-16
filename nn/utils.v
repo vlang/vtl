@@ -3,7 +3,7 @@ module nn
 import vnum.num
 import math
 
-fn normals(rows, cols int) num.NdArray {
+fn normals(rows int, cols int) num.NdArray {
 	return num.random(0, 1, [rows, cols])
 }
 

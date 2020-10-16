@@ -214,7 +214,7 @@ pub fn (mut iter NdIter3) next() bool {
 
 // iter2 returns a flat iterator over two ndarrays, commonly used
 // for reduction operations
-pub fn (n NdArray) iter3(other, other2 NdArray) &NdIter3 {
+pub fn (n NdArray) iter3(other NdArray, other2 NdArray) &NdIter3 {
 	mut backstrides_a := [0].repeat(n.ndims)
 	mut backstrides_b := [0].repeat(n.ndims)
 	mut backstrides_c := [0].repeat(n.ndims)
@@ -317,7 +317,7 @@ pub fn (mut iter NdIter4) next() bool {
 
 // iter2 returns a flat iterator over two ndarrays, commonly used
 // for reduction operations
-pub fn (n NdArray) iter4(other, other2, other3 NdArray) &NdIter4 {
+pub fn (n NdArray) iter4(other NdArray, other2 NdArray, other3 NdArray) &NdIter4 {
 	mut backstrides_a := [0].repeat(n.ndims)
 	mut backstrides_b := [0].repeat(n.ndims)
 	mut backstrides_c := [0].repeat(n.ndims)

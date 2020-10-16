@@ -3,11 +3,11 @@ module num
 import rand
 import time
 
-fn rand_between(min, max f64) f64 {
+fn rand_between(min f64, max f64) f64 {
 	return rand.f64_in_range(min, max)
 }
 
-pub fn random(min, max f64, shape []int) NdArray {
+pub fn random(min f64, max f64, shape []int) NdArray {
 	ret := empty(shape)
 	for i := ret.iter(); !i.done; i.next() {
 		unsafe {

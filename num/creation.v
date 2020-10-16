@@ -13,7 +13,7 @@ pub fn empty_like(t NdArray) NdArray {
 }
 
 // Return a 2-D array with ones on the diagonal and zeros elsewhere.
-pub fn eye(m, n, k int) NdArray {
+pub fn eye(m int, n int, k int) NdArray {
 	ret := zeros([m, n])
 	mut iter := ret.iter()
 	for i := 0; i < m; i++ {
@@ -165,7 +165,7 @@ pub fn from_f32_2d(a [][]f32) NdArray {
 // from_int takes a one dimensional array of uinteger values
 // and coerces it into an arbitrary shaped ndarray if possible.
 // Panics if the shape provided does not hold the provided array
-pub fn from_int(a, shape []int) NdArray {
+pub fn from_int(a []int, shape []int) NdArray {
 	data := a.map(f64(it))
 	size := shape_size(shape)
 	if size != a.len {
