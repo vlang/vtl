@@ -29,7 +29,7 @@ pub fn (c CpuStorage) ptr() &f64 {
 
 // stride offset returns a raw pointer representing the starting offset
 // for arrays that may be negatively strided
-pub fn (c CpuStorage) stride_offset(shape, strides []int) &f64 {
+pub fn (c CpuStorage) stride_offset(shape []int, strides []int) &f64 {
 	mut ptr := c.ptr()
 	for i := 0; i < shape.len; i++ {
 		if strides[i] < 0 {
@@ -60,7 +60,7 @@ pub fn (c CpuStorage) offset(start int) CpuStorage {
 }
 
 // set sets a value given a provided index and strides.
-pub fn (c CpuStorage) set(index, shape, strides []int, value f64) {
+pub fn (c CpuStorage) set(index []int, shape []int, strides []int, value f64) {
 	mut raw := c.stride_offset(shape, strides)
 	for i := 0; i < shape.len; i++ {
 		mut idxer := index[i]
@@ -77,7 +77,7 @@ pub fn (c CpuStorage) set(index, shape, strides []int, value f64) {
 }
 
 // get returns a value given a provided index and strides
-pub fn (c CpuStorage) get(index, shape, strides []int) f64 {
+pub fn (c CpuStorage) get(index []int, shape []int, strides []int) f64 {
 	mut raw := c.stride_offset(shape, strides)
 	for i := 0; i < shape.len; i++ {
 		mut idxer := index[i]

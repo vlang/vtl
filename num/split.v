@@ -6,7 +6,7 @@ module num
 // integer that does not equally divide the axis. For an array of length
 // l that should be split into n sections, it returns l % n sub-arrays of
 // size l//n + 1 and the rest of size l//n.
-pub fn array_split(a NdArray, ind, axis int) []NdArray {
+pub fn array_split(a NdArray, ind int, axis int) []NdArray {
 	ntotal := a.shape[axis]
 	neach := ntotal / ind
 	extras := ntotal % ind
@@ -39,7 +39,7 @@ pub fn array_split_expl(a NdArray, ind []int, axis int) []NdArray {
 // Split an array into multiple sub-arrays. The array will be divided into
 // N equal arrays along axis. If such a split is not possible,
 // panic
-pub fn split(a NdArray, ind, axis int) []NdArray {
+pub fn split(a NdArray, ind int, axis int) []NdArray {
 	n := a.shape[axis]
 	if n % ind != 0 {
 		panic('Array split does not result in an equal division')
@@ -125,7 +125,7 @@ pub fn dsplit_expl(a NdArray, ind []int) []NdArray {
 
 // Generic splitting function that contains the underlying functionality
 // for all split operations, should not be made public.
-fn splitter(a NdArray, axis, n int, div_points []int) []NdArray {
+fn splitter(a NdArray, axis int, n int, div_points []int) []NdArray {
 	mut subary := []NdArray{}
 	sary := a.swapaxes(axis, 0)
 	for i := 0; i < n; i++ {

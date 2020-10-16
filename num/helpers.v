@@ -45,7 +45,7 @@ fn fstrides(shape []int) []int {
 }
 
 // shape_compare asserts that two shapes are equal
-pub fn shape_compare(s1, s2 []int) bool {
+pub fn shape_compare(s1 []int, s2 []int) bool {
 	if s1.len != s2.len {
 		return false
 	}
@@ -59,7 +59,7 @@ pub fn shape_compare(s1, s2 []int) bool {
 
 // is_fortran_contiguous checks if an array is contiguous with a col-major
 // memory layout
-fn is_fortran_contiguous(shape, strides []int, ndims int) bool {
+fn is_fortran_contiguous(shape []int, strides []int, ndims int) bool {
 	if ndims == 0 {
 		return true
 	}
@@ -84,7 +84,7 @@ fn is_fortran_contiguous(shape, strides []int, ndims int) bool {
 
 // is_contiguous checks if an array is contiguous with a row-major
 // memory layout
-fn is_contiguous(shape, strides []int, ndims int) bool {
+fn is_contiguous(shape []int, strides []int, ndims int) bool {
 	if ndims == 0 {
 		return true
 	}
@@ -109,7 +109,7 @@ fn is_contiguous(shape, strides []int, ndims int) bool {
 
 // filter_shape_not_strides removes 0 size dimensions from the shape
 // and strides of an array
-fn filter_shape_not_strides(shape, strides []int) ([]int, []int) {
+fn filter_shape_not_strides(shape []int, strides []int) ([]int, []int) {
 	mut newshape := []int{}
 	mut newstrides := []int{}
 	for i := 0; i < shape.len; i++ {
@@ -136,7 +136,7 @@ fn pad_with_zeros(pad []int, ndims int) []int {
 
 // pad_with_max pads a shape with the maximum axis value to support
 // an indexing operation
-fn pad_with_max(pad, shape []int, ndims int) []int {
+fn pad_with_max(pad []int, shape []int, ndims int) []int {
 	mut newpad := pad.clone()
 	diff := ndims - pad.len
 	if diff > 0 {
@@ -167,7 +167,7 @@ fn assert_shape_off_axis(ts []NdArray, axis int, shape []int) []int {
 
 // irange returns an array between start and stop, incremented by
 // 1
-pub fn irange(start, stop int) []int {
+pub fn irange(start int, stop int) []int {
 	mut ret := []int{}
 	for i in start .. stop {
 		ret << i
@@ -219,7 +219,7 @@ fn axis_op_dims(n NdArray, axis int, op TwoParamsFn) NdArray {
 }
 
 // checks if two floating point ndarrays are close within a tolerance
-pub fn allclose(a, b NdArray) bool {
+pub fn allclose(a NdArray, b NdArray) bool {
 	rtol := 1e-5
 	atol := 1e-8
 	if !shape_compare(a.shape, b.shape) {

@@ -20,7 +20,7 @@ pub fn seq(n int) NdArray {
 // Return evenly spaced values within a given interval.
 // Values are generated within the half-open interval [start, stop)
 // (in other words, the interval including start but excluding stop).
-pub fn seq_between(start, end int) NdArray {
+pub fn seq_between(start int, end int) NdArray {
 	d := end - start
 	ret := seq(d)
 	return add_as(ret, start)
@@ -29,7 +29,7 @@ pub fn seq_between(start, end int) NdArray {
 // Return evenly spaced numbers over a specified interval.
 // Returns num evenly spaced samples, calculated over the interval
 // [start, stop].
-pub fn linspace(start, stop f64, num int) NdArray {
+pub fn linspace(start f64, stop f64, num int) NdArray {
 	div := num - 1
 	mut y := seq(num)
 	delta := stop - start
@@ -50,21 +50,21 @@ pub fn linspace(start, stop f64, num int) NdArray {
 // Return numbers spaced evenly on a log scale.
 // In linear space, the sequence starts at base ** start
 // (base to the power of start) and ends with base ** stop
-pub fn logspace(start, stop f64, num int) NdArray {
+pub fn logspace(start f64, stop f64, num int) NdArray {
 	return logspace_base(start, stop, num, 10.0)
 }
 
 // Return numbers spaced evenly on a log scale.
 // In linear space, the sequence starts at base ** start
 // (base to the power of start) and ends with base ** stop
-pub fn logspace_base(start, stop f64, num int, base f64) NdArray {
+pub fn logspace_base(start f64, stop f64, num int, base f64) NdArray {
 	return pow_sa(base, linspace(start, stop, num))
 }
 
 // Return numbers spaced evenly on a log scale (a geometric progression).
 // This is similar to logspace, but with endpoints specified directly.
 // Each output sample is a constant multiple of the previous.
-pub fn geomspace(start, stop f64, num int) NdArray {
+pub fn geomspace(start f64, stop f64, num int) NdArray {
 	if start == 0 || stop == 0 {
 		panic('Geometric sequence cannot include 0')
 	}

@@ -3,11 +3,11 @@ module la
 import vnum.blas
 import vnum.num
 
-pub fn dot(a, b num.NdArray) f64 {
+pub fn dot(a num.NdArray, b num.NdArray) f64 {
 	return blas.ddot(a, b)
 }
 
-pub fn outer(a, b num.NdArray) num.NdArray {
+pub fn outer(a num.NdArray, b num.NdArray) num.NdArray {
 	return blas.dger(a, b)
 }
 
@@ -31,7 +31,7 @@ pub fn inv(a num.NdArray) num.NdArray {
 	return blas.inv(a)
 }
 
-pub fn matmul(a, b num.NdArray) num.NdArray {
+pub fn matmul(a num.NdArray, b num.NdArray) num.NdArray {
 	return blas.matmul(a, b)
 }
 
@@ -51,7 +51,7 @@ pub fn eigvals(a num.NdArray) num.NdArray {
 	return blas.eigvals(a)
 }
 
-pub fn solve(a, b num.NdArray) num.NdArray {
+pub fn solve(a num.NdArray, b num.NdArray) num.NdArray {
 	return blas.solve(a, b)
 }
 
@@ -67,7 +67,7 @@ fn int_prod(a []int) int {
 	return i
 }
 
-pub fn tensordot(a, b num.NdArray, ax_a, ax_b []int) num.NdArray {
+pub fn tensordot(a num.NdArray, b num.NdArray, ax_a []int, ax_b []int) num.NdArray {
 	as_ := a.shape
 	nda := a.ndims
 	bs := b.shape

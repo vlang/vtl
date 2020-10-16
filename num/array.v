@@ -170,7 +170,7 @@ pub fn (t NdArray) slice(idx [][]int) NdArray {
 // general than slice, but is used for internal methods since
 // it doesn't use variadic arguments.  This method will be used
 // until V has better support for 2D arrays.
-pub fn (t NdArray) slice_hilo(idx1, idx2 []int) NdArray {
+pub fn (t NdArray) slice_hilo(idx1 []int, idx2 []int) NdArray {
 	mut newshape := t.shape.clone()
 	mut newstrides := t.strides.clone()
 	mut newflags := default_flags('C', t.ndims)
@@ -310,7 +310,7 @@ pub fn (t NdArray) t() NdArray {
 
 // swapaxes returns a view of an ndarray with two axes
 // swapped.
-pub fn (t NdArray) swapaxes(a1, a2 int) NdArray {
+pub fn (t NdArray) swapaxes(a1 int, a2 int) NdArray {
 	mut order := irange(0, t.ndims)
 	tmp := order[a1]
 	order[a1] = order[a2]

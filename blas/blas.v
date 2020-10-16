@@ -40,7 +40,7 @@ pub fn assert_matrix(a num.NdArray) {
 	}
 }
 
-pub fn ddot(a, b num.NdArray) f64 {
+pub fn ddot(a num.NdArray, b num.NdArray) f64 {
 	if a.ndims != 1 || b.ndims != 1 {
 		panic('Tensors must be one dimensional')
 	} else if a.size != b.size {
@@ -49,7 +49,7 @@ pub fn ddot(a, b num.NdArray) f64 {
 	return C.cblas_ddot(a.size, a.buffer(), a.strides[0], b.buffer(), b.strides[0])
 }
 
-pub fn dger(a, b num.NdArray) num.NdArray {
+pub fn dger(a num.NdArray, b num.NdArray) num.NdArray {
 	if a.ndims != 1 || b.ndims != 1 {
 		panic('Tensors must be one dimensional')
 	}
@@ -134,7 +134,7 @@ pub fn inv(a num.NdArray) num.NdArray {
 	return ret
 }
 
-pub fn matmul(a, b num.NdArray) num.NdArray {
+pub fn matmul(a num.NdArray, b num.NdArray) num.NdArray {
 	dest := num.empty([a.shape[0], b.shape[1]])
 	ma := match a.flags.contiguous {
 		true { a }
@@ -222,7 +222,7 @@ pub fn eigvals(a num.NdArray) num.NdArray {
 	return wr
 }
 
-pub fn solve(a, b num.NdArray) num.NdArray {
+pub fn solve(a num.NdArray, b num.NdArray) num.NdArray {
 	assert_square_matrix(a)
 	af := fortran_view_or_copy(a)
 	bf := b.copy('F')
