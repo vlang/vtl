@@ -60,7 +60,7 @@ pub fn (c CpuStorage) offset(start int) CpuStorage {
 }
 
 // set sets a value given a provided index and strides.
-pub fn (c CpuStorage) set(index []int, shape []int, strides []int, value f64) {
+pub fn (mut c CpuStorage) set(index []int, shape []int, strides []int, value f64) {
 	mut raw := c.stride_offset(shape, strides)
 	for i := 0; i < shape.len; i++ {
 		mut idxer := index[i]

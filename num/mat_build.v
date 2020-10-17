@@ -23,7 +23,7 @@ pub fn diag_flat(a NdArray) NdArray {
 
 // Lower triangle of an array.
 // Modifies an array inplace with elements above the k-th diagonal zeroed.
-fn tril_inplace_offset(t NdArray, offset int) {
+fn tril_inplace_offset(mut t NdArray, offset int) {
 	mut i := 0
 	for i < t.shape[0] {
 		mut j := 0
@@ -39,7 +39,7 @@ fn tril_inplace_offset(t NdArray, offset int) {
 
 // Upper triangle of an array.
 // Modifies an array inplace with elements below the k-th diagonal zeroed.
-fn triu_inplace_offset(t NdArray, offset int) {
+fn triu_inplace_offset(mut t NdArray, offset int) {
 	mut i := 0
 	for i < t.shape[0] {
 		mut j := 0
@@ -56,55 +56,55 @@ fn triu_inplace_offset(t NdArray, offset int) {
 // Lower triangle of an array.
 // Returns a copy of an array with elements above the diagonal zeroed
 pub fn tril(t NdArray) NdArray {
-	ret := t.copy('C')
-	tril_inplace_offset(ret, 0)
+	mut ret := t.copy('C')
+	tril_inplace_offset(mut ret, 0)
 	return ret
 }
 
 // Lower triangle of an array.
 // Returns a copy of an array with elements above the kth diagonal zeroed
 pub fn tril_offset(t NdArray, offset int) NdArray {
-	ret := t.copy('C')
-	tril_inplace_offset(ret, offset)
+	mut ret := t.copy('C')
+	tril_inplace_offset(mut ret, offset)
 	return ret
 }
 
 // Lower triangle of an array.
 // Modifies an array inplace with elements above the diagonal zeroed.
-pub fn tril_inpl(t NdArray) {
-	tril_inplace_offset(t, 0)
+pub fn tril_inpl(mut t NdArray) {
+	tril_inplace_offset(mut t, 0)
 }
 
 // Lower triangle of an array.
 // Modifies an array inplace with elements above the k-th diagonal zeroed.
-pub fn tril_inpl_offset(t NdArray, offset int) {
-	tril_inplace_offset(t, offset)
+pub fn tril_inpl_offset(mut t NdArray, offset int) {
+	tril_inplace_offset(mut t, offset)
 }
 
 // Upper triangle of an array.
 // Returns a copy of an array with elements below the diagonal zeroed
 pub fn triu(t NdArray) NdArray {
-	ret := t.copy('C')
-	triu_inplace_offset(ret, 0)
+	mut ret := t.copy('C')
+	triu_inplace_offset(mut ret, 0)
 	return ret
 }
 
 // Upper triangle of an array.
 // Returns a copy of an array with elements below the kth diagonal zeroed
 pub fn triu_offset(t NdArray, offset int) NdArray {
-	ret := t.copy('C')
-	triu_inplace_offset(ret, offset)
+	mut ret := t.copy('C')
+	triu_inplace_offset(mut ret, offset)
 	return ret
 }
 
 // Upper triangle of an array.
 // Modifies an array inplace with elements below the diagonal zeroed.
-pub fn triu_inpl(t NdArray) {
-	triu_inplace_offset(t, 0)
+pub fn triu_inpl(mut t NdArray) {
+	triu_inplace_offset(mut t, 0)
 }
 
 // Upper triangle of an array.
 // Modifies an array inplace with elements below the k-th diagonal zeroed.
-pub fn triu_inpl_offset(t NdArray, offset int) {
-	triu_inpl_offset(t, offset)
+pub fn triu_inpl_offset(mut t NdArray, offset int) {
+	triu_inpl_offset(mut t, offset)
 }
