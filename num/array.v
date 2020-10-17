@@ -5,6 +5,7 @@ import math
 // NdArray stored the data necessary to operate on a contiguous
 // data buffer in n dimensions
 pub struct NdArray {
+mut:
 	storage CpuStorage
 pub:
 	size    int
@@ -55,7 +56,7 @@ pub fn (n NdArray) get(index []int) f64 {
 }
 
 // set sets a scalar value at a provided index
-pub fn (n NdArray) set(index []int, value f64) {
+pub fn (mut n NdArray) set(index []int, value f64) {
 	n.storage.set(index, n.shape, n.strides, value)
 }
 

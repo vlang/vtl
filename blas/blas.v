@@ -79,16 +79,16 @@ pub fn dpotrf(a num.NdArray, up bool) num.NdArray {
 	if a.ndims != 2 {
 		panic('Tensor must be two-dimensional')
 	}
-	ret := a.copy('F')
+	mut ret := a.copy('F')
 	info := 0
 	C.LAPACKE_dpotrf(blas.l_uplo(up), &ret.shape[0], ret.buffer(), &ret.shape[0], &info)
 	if info > 0 {
 		panic('Tensor is not positive definite')
 	}
 	if up {
-		num.triu_inpl(ret)
+		num.triu_inpl(mut ret)
 	} else {
-		num.tril_inpl(ret)
+		num.tril_inpl(mut ret)
 	}
 	return ret
 }
@@ -239,7 +239,7 @@ pub fn solve(a num.NdArray, b num.NdArray) num.NdArray {
 
 pub fn hessenberg(a num.NdArray) num.NdArray {
 	assert_square_matrix(a)
-	ret := a.copy('F')
+	mut ret := a.copy('F')
 	if ret.shape[0] < 2 {
 		return ret
 	}
@@ -253,6 +253,6 @@ pub fn hessenberg(a num.NdArray) num.NdArray {
 	tau := num.empty([n])
 	workspace := allocate_workspace(n)
 	C.LAPACKE_dgehrd(n, &ilo, &ihi, ret.buffer(), &n, tau.buffer(), workspace.work)
-	num.triu_inpl_offset(ret, -1)
+	num.triu_inpl_offset(mut ret, -1)
 	return ret
 }

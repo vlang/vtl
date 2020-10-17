@@ -30,7 +30,7 @@ fn test_get() {
 }
 
 fn test_set() {
-	a := num.allocate_cpu([3, 3], 'C')
+	mut a := num.allocate_cpu([3, 3], 'C')
 	a.set([1, 1], 3.0)
 	expected := num.from_int([0, 0, 0, 0, 3, 0, 0, 0, 0], [3, 3])
 	assert num.allclose(a, expected)
