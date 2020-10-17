@@ -2,9 +2,9 @@ module num
 
 pub type OneParamFn = fn (x f64) f64
 
-pub type TwoParamsFn = fn (x, y f64) f64
+pub type TwoParamsFn = fn (x f64, y f64) f64
 
-pub type ThreeParamsFn = fn (x, y, z f64) f64
+pub type ThreeParamsFn = fn (x f64, y f64, z f64) f64
 
 // amap maps a function to a single ndarray
 pub fn amap(n NdArray, op OneParamFn) NdArray {
