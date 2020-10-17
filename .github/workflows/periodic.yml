@@ -1,5 +1,4 @@
-name: Periodic
-
+name: Periodic Check
 on:
   schedule:
     - cron:  '31 1,12 * * *'
@@ -8,12 +7,23 @@ jobs:
   ubuntu:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
+    - name: Checkout Latest V
       uses: actions/checkout@v2
-    - name: Set up V version latest
-      uses: nocturlab/setup-vlang-action@v1
       with:
-        v-version: latest
-      id: v
+        repository: vlang/v
+    - name: Checkout VNUM
+      uses: actions/checkout@v2
+      with:
+        path: vnum
+    - name: Build V
+      run: |
+        make
+        sudo ./v symlink
+    - name: V doctor
+      run: v doctor
+    - name: Install VNUM dependencies
+      run: |
+        sudo apt-get install --quiet -y --no-install-recommends gfortran liblapacke-dev libopenblas-dev
+        v install vsl
     - name: run tests
-      run: make test
+      run: cd vnum; make test
