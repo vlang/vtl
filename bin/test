@@ -9,7 +9,7 @@ mkdir -p ~/.vmodules/vnum
 cp -r ./* ~/.vmodules/vnum
 
 v test .
-find . -name '*_test' | xargs rm -f
+find . -name '*_test' -exec rm -f {} +
 
 rm -rf ~/.vmodules/vnum
 if [ -d ~/.vmodules/old_vnum ]; then

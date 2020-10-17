@@ -8,7 +8,7 @@ fi
 mkdir -p ~/.vmodules/vnum
 cp -r ./* ~/.vmodules/vnum
 
-find . -name "*.v" | xargs v fmt -w
+find . -name "*.v" -exec v fmt -w {} +
 
 rm -rf ~/.vmodules/vnum
 [ -d ~/.vmodules/old_vnum ] && mv ~/.vmodules/old_vnum ~/.vmodules/vnum
