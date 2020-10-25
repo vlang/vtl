@@ -46,16 +46,18 @@ pub fn ddot(a num.NdArray, b num.NdArray) f64 {
 	} else if a.size != b.size {
 		panic('Tensors must have the same shape')
 	}
-	return C.cblas_ddot(a.size, a.buffer(), a.strides[0], b.buffer(), b.strides[0])
+	return blas.ddot(a.size, a.f64_array(), a.strides[0], b.f64_array(), b.strides[0])
 }
 
-pub fn dger(a num.NdArray, b num.NdArray) num.NdArray {
+pub fn dger(a num.NdArray, mut b num.NdArray) num.NdArray {
 	if a.ndims != 1 || b.ndims != 1 {
 		panic('Tensors must be one dimensional')
 	}
 	out := num.empty([a.size, b.size])
-	C.cblas_dger(blas.lapack_row_major, a.size, b.size, 1.0, a.buffer(), a.strides[0],
-		b.buffer(), b.strides[0], out.buffer(), out.shape[1])
+        mut mut_b := b.f64_array()
+	blas.dger(a.size, b.size, 1.0, a.f64_array(), a.strides[0],
+		mut mut_b, b.strides[0], out.f64_array(), out.shape[1])
+        b.assign(num.from_f64(mut_b, b.shape))
 	return out
 }
 
@@ -63,7 +65,7 @@ pub fn dnrm2(a num.NdArray) f64 {
 	if a.ndims != 1 {
 		panic('Tensor must be one dimensional')
 	}
-	return C.cblas_dnrm2(a.size, a.buffer(), a.strides[0])
+	return blas.dnrm2(a.size, a.f64_array(), a.strides[0])
 }
 
 pub fn dlange(a num.NdArray, norm byte) f64 {
@@ -71,8 +73,8 @@ pub fn dlange(a num.NdArray, norm byte) f64 {
 		panic('Tensor must be two-dimensional')
 	}
 	m := fortran_view_or_copy(a)
-	work := &f64(v_calloc(m.shape[0] * int(sizeof(f64))))
-	return C.LAPACKE_dlange(norm, &m.shape[0], &m.shape[1], m.buffer(), &m.shape[0], work)
+	work := []f64{len: m.shape[0] * int(sizeof(f64))}
+	return blas.dlange(norm, m.shape[0], m.shape[1], m.f64_array(), m.shape[0], work)
 }
 
 pub fn dpotrf(a num.NdArray, up bool) num.NdArray {
@@ -80,11 +82,9 @@ pub fn dpotrf(a num.NdArray, up bool) num.NdArray {
 		panic('Tensor must be two-dimensional')
 	}
 	mut ret := a.copy('F')
-	info := 0
-	C.LAPACKE_dpotrf(blas.l_uplo(up), &ret.shape[0], ret.buffer(), &ret.shape[0], &info)
-	if info > 0 {
-		panic('Tensor is not positive definite')
-	}
+        mut mut_ret := ret.f64_array()
+	blas.dpotrf(up, ret.shape[0], mut mut_ret, ret.shape[0])
+        ret.assign(num.from_f64(mut_ret, ret.shape))
 	if up {
 		num.triu_inpl(mut ret)
 	} else {
@@ -97,16 +97,14 @@ pub fn det(a num.NdArray) f64 {
 	ret := a.copy('F')
 	m := a.shape[0]
 	n := a.shape[1]
-	ipiv := &int(v_calloc(int(sizeof(int)) * n))
-	info := 0
-	C.LAPACKE_dgetrf(&m, &n, ret.buffer(), &m, ipiv, &info)
-	if info > 0 {
-		panic('Singular matrix')
-	}
+	ipiv := []int{len: (int(sizeof(int)) * n)}
+        mut mut_a := a.f64_array()
+	blas.dgetrf(m, n, mut mut_a, m, ipiv)
+        a.assign(num.from_f64(mut_a, a.shape))
 	ldet := num.prod(ret.diagonal())
 	mut detp := 1
 	for i := 0; i < n; i++ {
-		if (i + 1) != unsafe {*(ipiv + i)} {
+		if (i + 1) != ipiv[i] {
 			detp = -detp
 		}
 	}
@@ -119,23 +117,16 @@ pub fn inv(a num.NdArray) num.NdArray {
 	}
 	ret := a.copy('F')
 	n := a.shape[0]
-	ipiv := &int(v_calloc(n * int(sizeof(int))))
-	mut info := 0
-	C.LAPACKE_dgetrf(&n, &n, ret.buffer(), &n, ipiv, &info)
-	if info > 0 {
-		panic('Singular matrix')
-	}
-	lwork := n * n
-	work := &f64(v_calloc(lwork * int(sizeof(f64))))
-	info = C.LAPACKE_dgetri(&n, ret.buffer(), &n, ipiv, &work)
-	if info != 0 {
-		panic('lapack failed')
-	}
+	ipiv := []int{len: (n * int(sizeof(int)))}
+	mut mut_ret := ret.f64_array()
+	blas.dgetrf(n, n, mut mut_ret, n, ipiv)
+	blas.dgetri(n, mut mut_ret, n, ipiv)
+        ret.assign(num.from_f64(mut_ret, ret.shape))
 	return ret
 }
 
 pub fn matmul(a num.NdArray, b num.NdArray) num.NdArray {
-	dest := num.empty([a.shape[0], b.shape[1]])
+	mut dest := []f64{len: a.shape[0] * b.shape[1]}
 	ma := match a.flags.contiguous {
 		true { a }
 		else { a.copy('C') }
@@ -144,10 +135,10 @@ pub fn matmul(a num.NdArray, b num.NdArray) num.NdArray {
 		true { b }
 		else { b.copy('C') }
 	}
-	C.cblas_dgemm(blas.cblas_row_major, blas.c_trans(false), blas.c_trans(false), ma.shape[0],
-		mb.shape[1], ma.shape[1], 1.0, ma.buffer(), ma.shape[1], mb.buffer(), mb.shape[1], 1.0,
-		dest.buffer(), dest.shape[1])
-	return dest
+	blas.dgemm(false, false, ma.shape[0],
+		mb.shape[1], ma.shape[1], 1.0, ma.f64_array(), ma.shape[1], mb.f64_array(), mb.shape[1], 1.0,
+		mut dest, mb.shape[1])
+	return num.from_f64(dest, [a.shape[0], b.shape[1]])
 }
 
 pub fn eigh(a num.NdArray) []num.NdArray {

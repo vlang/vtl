@@ -7,8 +7,8 @@ pub fn dot(a num.NdArray, b num.NdArray) f64 {
 	return blas.ddot(a, b)
 }
 
-pub fn outer(a num.NdArray, b num.NdArray) num.NdArray {
-	return blas.dger(a, b)
+pub fn outer(a num.NdArray, mut b num.NdArray) num.NdArray {
+	return blas.dger(a, mut b)
 }
 
 pub fn vector_norm(a num.NdArray) f64 {
