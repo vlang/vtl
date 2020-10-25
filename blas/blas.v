@@ -54,10 +54,10 @@ pub fn dger(a num.NdArray, mut b num.NdArray) num.NdArray {
 		panic('Tensors must be one dimensional')
 	}
 	out := num.empty([a.size, b.size])
-        mut mut_b := b.f64_array()
-	blas.dger(a.size, b.size, 1.0, a.f64_array(), a.strides[0],
-		mut mut_b, b.strides[0], out.f64_array(), out.shape[1])
-        b.assign(num.from_f64(mut_b, b.shape))
+	mut mut_b := b.f64_array()
+	blas.dger(a.size, b.size, 1.0, a.f64_array(), a.strides[0], mut mut_b, b.strides[0],
+		out.f64_array(), out.shape[1])
+	b.assign(num.from_f64(mut_b, b.shape))
 	return out
 }
 
@@ -82,9 +82,9 @@ pub fn dpotrf(a num.NdArray, up bool) num.NdArray {
 		panic('Tensor must be two-dimensional')
 	}
 	mut ret := a.copy('F')
-        mut mut_ret := ret.f64_array()
+	mut mut_ret := ret.f64_array()
 	blas.dpotrf(up, ret.shape[0], mut mut_ret, ret.shape[0])
-        ret.assign(num.from_f64(mut_ret, ret.shape))
+	ret.assign(num.from_f64(mut_ret, ret.shape))
 	if up {
 		num.triu_inpl(mut ret)
 	} else {
@@ -98,9 +98,9 @@ pub fn det(a num.NdArray) f64 {
 	m := a.shape[0]
 	n := a.shape[1]
 	ipiv := []int{len: (int(sizeof(int)) * n)}
-        mut mut_a := a.f64_array()
+	mut mut_a := a.f64_array()
 	blas.dgetrf(m, n, mut mut_a, m, ipiv)
-        a.assign(num.from_f64(mut_a, a.shape))
+	a.assign(num.from_f64(mut_a, a.shape))
 	ldet := num.prod(ret.diagonal())
 	mut detp := 1
 	for i := 0; i < n; i++ {
@@ -121,7 +121,7 @@ pub fn inv(a num.NdArray) num.NdArray {
 	mut mut_ret := ret.f64_array()
 	blas.dgetrf(n, n, mut mut_ret, n, ipiv)
 	blas.dgetri(n, mut mut_ret, n, ipiv)
-        ret.assign(num.from_f64(mut_ret, ret.shape))
+	ret.assign(num.from_f64(mut_ret, ret.shape))
 	return ret
 }
 
@@ -135,9 +135,8 @@ pub fn matmul(a num.NdArray, b num.NdArray) num.NdArray {
 		true { b }
 		else { b.copy('C') }
 	}
-	blas.dgemm(false, false, ma.shape[0],
-		mb.shape[1], ma.shape[1], 1.0, ma.f64_array(), ma.shape[1], mb.f64_array(), mb.shape[1], 1.0,
-		mut dest, mb.shape[1])
+	blas.dgemm(false, false, ma.shape[0], mb.shape[1], ma.shape[1], 1.0, ma.f64_array(),
+		ma.shape[1], mb.f64_array(), mb.shape[1], 1.0, mut dest, mb.shape[1])
 	return num.from_f64(dest, [a.shape[0], b.shape[1]])
 }
 

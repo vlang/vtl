@@ -51,9 +51,9 @@ pub fn (t NdArray) buffer() &f64 {
 }
 
 pub fn (t NdArray) f64_array() []f64 {
-        mut a := []f64{cap: t.size}
-        a.push_many(t.buffer(), t.size)
-        return a
+	mut a := []f64{cap: t.size}
+	a.push_many(t.buffer(), t.size)
+	return a
 }
 
 // get returns a scalar value at a provided index
