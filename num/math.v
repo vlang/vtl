@@ -1,6 +1,6 @@
 module num
 
-import math
+import vsl.vmath as math
 
 [inline]
 fn num_add(a f64, b f64) f64 {

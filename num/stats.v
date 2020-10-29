@@ -1,6 +1,6 @@
 module num
 
-import math
+import vsl.vmath as math
 
 // sum returns the sum of all elements of an ndarray
 pub fn sum(n NdArray) f64 {
