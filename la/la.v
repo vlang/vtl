@@ -2,6 +2,7 @@ module la
 
 import vnum.num
 import vsl.blas
+import vsl.la
 
 struct Workspace {
 	size int
@@ -46,19 +47,15 @@ pub fn ddot(a num.NdArray, b num.NdArray) f64 {
 	} else if a.size != b.size {
 		panic('Tensors must have the same shape')
 	}
-	return blas.ddot(a.size, a.f64_array(), a.strides[0], b.f64_array(), b.strides[0])
+	return la.vector_dot(a.f64_array(), b.f64_array())
 }
 
-pub fn dger(a num.NdArray, mut b num.NdArray) num.NdArray {
+pub fn dger(a num.NdArray, b num.NdArray) num.NdArray {
 	if a.ndims != 1 || b.ndims != 1 {
 		panic('Tensors must be one dimensional')
 	}
-	out := num.empty([a.size, b.size])
-	mut mut_b := b.f64_array()
-	blas.dger(a.size, b.size, 1.0, a.f64_array(), a.strides[0], mut mut_b, b.strides[0],
-		out.f64_array(), out.shape[1])
-	b.assign(num.from_f64(mut_b, b.shape))
-	return out
+        m := la.vector_vector_tr_mul(1.0, a.f64_array(), b.f64_array())
+	return num.from_f64_2d(m.get_deep2())
 }
 
 pub fn dnrm2(a num.NdArray) f64 {
@@ -73,8 +70,8 @@ pub fn dlange(a num.NdArray, norm byte) f64 {
 		panic('Tensor must be two-dimensional')
 	}
 	m := fortran_view_or_copy(a)
-	work := []f64{len: m.shape[0] * int(sizeof(f64))}
-	return blas.dlange(norm, m.shape[0], m.shape[1], m.f64_array(), m.shape[0], work)
+	workspace := []f64{len: m.shape[0] * int(sizeof(f64))}
+	return blas.dlange(norm, m.shape[0], m.shape[1], m.f64_array(), m.shape[0], workspace)
 }
 
 pub fn dpotrf(a num.NdArray, up bool) num.NdArray {
@@ -94,27 +91,15 @@ pub fn dpotrf(a num.NdArray, up bool) num.NdArray {
 }
 
 pub fn det(a num.NdArray) f64 {
-	ret := fortran_copy(a)
+        assert_square_matrix(a)
 	m := a.shape[0]
 	n := a.shape[1]
-	ipiv := []int{len: (int(sizeof(int)) * n)}
-	mut mut_a := a.f64_array()
-	blas.dgetrf(m, n, mut mut_a, m, ipiv)
-	a.assign(num.from_f64(mut_a, a.shape))
-	ldet := num.prod(ret.diagonal())
-	mut detp := 1
-	for i := 0; i < n; i++ {
-		if (i + 1) != ipiv[i] {
-			detp = -detp
-		}
-	}
-	return ldet * detp
+        mat := la.matrix_raw(m, n, a.f64_array())
+	return mat.det()
 }
 
 pub fn inv(a num.NdArray) num.NdArray {
-	if a.ndims != 2 || a.shape[0] != a.shape[1] {
-		panic('Matrix must be square')
-	}
+	assert_square_matrix(a)
 	ret := fortran_copy(a)
 	n := a.shape[0]
 	ipiv := []int{len: (n * int(sizeof(int)))}
