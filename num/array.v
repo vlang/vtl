@@ -56,6 +56,12 @@ pub fn (t NdArray) f64_array() []f64 {
 	return a
 }
 
+pub fn (t NdArray) int_array() []int {
+	mut a := []int{cap: t.size}
+	a.push_many(t.buffer(), t.size)
+	return a
+}
+
 // get returns a scalar value at a provided index
 pub fn (n NdArray) get(index []int) f64 {
 	return n.storage.get(index, n.shape, n.strides)
