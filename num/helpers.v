@@ -202,18 +202,18 @@ fn shape_sum(shape []int) int {
 // applies a reduction operation to an axis
 fn axis_op(n NdArray, axis int, op TwoParamsFn) NdArray {
 	mut iter := n.axis(axis)
-	ret := iter.next().copy('C')
+	mut ret := iter.next().copy('C')
 	for i := 1; i < iter.size; i++ {
-		apply2(ret, iter.next(), op)
+		apply2(mut ret, iter.next(), op)
 	}
 	return ret
 }
 
 fn axis_op_dims(n NdArray, axis int, op TwoParamsFn) NdArray {
 	mut iter := n.axis_with_dims(axis)
-	ret := iter.next().copy('C')
+	mut ret := iter.next().copy('C')
 	for i := 1; i < iter.size; i++ {
-		apply2(ret, iter.next(), op)
+		apply2(mut ret, iter.next(), op)
 	}
 	return ret
 }

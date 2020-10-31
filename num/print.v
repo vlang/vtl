@@ -7,7 +7,7 @@ pub fn concatenate(ts []NdArray, axis int) NdArray {
 	newshape[axis] = 0
 	newshape = assert_shape_off_axis(ts, axis, newshape)
 	ret := allocate_cpu(newshape, 'C')
-	mut lo := [0].repeat(newshape.len)
+	mut lo := []int{len: newshape.len}
 	mut hi := newshape.clone()
 	hi[axis] = 0
 	for t in ts {
