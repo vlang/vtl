@@ -11,8 +11,8 @@ pub fn array_split(a NdArray, ind int, axis int) []NdArray {
 	neach := ntotal / ind
 	extras := ntotal % ind
 	mut sizes := [0]
-	sizes << [neach + 1].repeat(extras)
-	sizes << [neach].repeat(ind - extras)
+	sizes << []int{len: extras, init: neach + 1}
+	sizes << []int{len: ind - extras, init: neach}
 	mut rt := 0
 	for i := 0; i < sizes.len; i++ {
 		tmp := rt

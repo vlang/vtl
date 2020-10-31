@@ -86,7 +86,7 @@ pub fn stack(ts []NdArray, axis int) NdArray {
 pub fn atleast_2d(a NdArray) NdArray {
 	dim := 2 - a.ndims
 	if dim > 0 {
-		mut pad := [1].repeat(dim)
+		mut pad := []int{len: dim, init: 1}
 		pad << a.shape
 		return a.reshape(pad)
 	}

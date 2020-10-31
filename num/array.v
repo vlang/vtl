@@ -258,7 +258,7 @@ pub fn (t NdArray) reshape(shape []int) NdArray {
 	if newsize != cur_size {
 		panic('Cannot reshape')
 	}
-	mut newstrides := [0].repeat(newshape.len)
+	mut newstrides := []int{len: newshape.len}
 	if t.flags.fortran && !t.flags.contiguous {
 		newstrides = fstrides(newshape)
 	} else {
@@ -286,8 +286,8 @@ pub fn (t NdArray) transpose(order []int) NdArray {
 	if n != t.ndims {
 		panic('Bad number of dimensions')
 	}
-	mut permutation := [0].repeat(32)
-	mut reverse_permutation := [-1].repeat(32)
+	mut permutation := []int{len: 32}
+	mut reverse_permutation := []int{len: 32, init: -1}
 	mut i := 0
 	for i < n {
 		mut axis := order[i]

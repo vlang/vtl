@@ -13,13 +13,13 @@ pub fn broadcastable(arr NdArray, other NdArray) []int {
 		}
 	} else {
 		if sz > osz {
-			mut othershape := [1].repeat(sz - osz)
+			mut othershape := []int{len: sz - osz, init: 1}
 			othershape << other.shape
 			if broadcast_equal(arr.shape, othershape) {
 				return broadcastable_shape(arr.shape, othershape)
 			}
 		} else {
-			mut selfshape := [1].repeat(osz - sz)
+			mut selfshape := []int{len: osz - sz, init: 1}
 			selfshape << arr.shape
 			if broadcast_equal(selfshape, other.shape) {
 				return broadcastable_shape(selfshape, other.shape)
@@ -57,11 +57,11 @@ pub fn broadcast3(a NdArray, b NdArray, c NdArray) (NdArray, NdArray, NdArray) {
 		return a, b, c
 	} else {
 		nd := max_dims(a, b, c)
-		mut shape := [0].repeat(nd)
+		mut shape := []int{len: nd}
 		t := [a, b, c]
 		for i := 0; i < t.len; i++ {
 			diff := nd - t[i].ndims
-			mut tshape := [1].repeat(diff)
+			mut tshape := []int{len: diff, init: 1}
 			tshape << t[i].shape
 			for j := 0; j < shape.len; j++ {
 				if tshape[j] > shape[j] {
@@ -79,11 +79,11 @@ pub fn broadcast4(a NdArray, b NdArray, c NdArray, d NdArray) (NdArray, NdArray,
 		return a, b, c, d
 	} else {
 		nd := max_dims(a, b, c, d)
-		mut shape := [0].repeat(nd)
+		mut shape := []int{len: nd}
 		t := [a, b, c, d]
 		for i := 0; i < t.len; i++ {
 			diff := nd - t[i].ndims
-			mut tshape := [1].repeat(diff)
+			mut tshape := []int{len: diff, init: 1}
 			tshape << t[i].shape
 			for j := 0; j < shape.len; j++ {
 				if tshape[j] > shape[j] {
@@ -125,7 +125,7 @@ fn broadcast_equal(a []int, b []int) bool {
 fn broadcast_strides(dest_shape []int, src_shape []int, dest_strides []int, src_strides []int) []int {
 	dims := dest_shape.len
 	start := dims - src_shape.len
-	mut ret := [0].repeat(dims)
+	mut ret := []int{len: dims}
 	mut i := dims - 1
 	for i >= start {
 		s := src_shape[i - start]

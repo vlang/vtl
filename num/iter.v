@@ -51,13 +51,13 @@ pub fn (mut iter NdIter) next() bool {
 // iter returns a flat iterator over an ndarray, commonly used
 // for reduction operations
 pub fn (n NdArray) iter() &NdIter {
-	mut backstrides := [0].repeat(n.ndims)
+	mut backstrides := []int{len: n.ndims}
 	for i := 0; i < n.ndims; i++ {
 		backstrides[i] = n.strides[i] * (n.shape[i] - 1)
 	}
 	return &NdIter{
 		ptr: n.storage.stride_offset(n.shape, n.strides)
-		coord: [0].repeat(n.ndims)
+		coord: []int{len: n.ndims}
 		backstrides: backstrides
 		shape: n.shape
 		strides: n.strides
@@ -126,8 +126,8 @@ pub fn (mut iter NdIter2) next() bool {
 // iter2 returns a flat iterator over two ndarrays, commonly used
 // for reduction operations
 pub fn (n NdArray) iter2(other NdArray) &NdIter2 {
-	mut backstrides_a := [0].repeat(n.ndims)
-	mut backstrides_b := [0].repeat(n.ndims)
+	mut backstrides_a := []int{len: n.ndims}
+	mut backstrides_b := []int{len: n.ndims}
 	for i := 0; i < n.ndims; i++ {
 		backstrides_a[i] = n.strides[i] * (n.shape[i] - 1)
 		backstrides_b[i] = other.strides[i] * (other.shape[i] - 1)
@@ -135,7 +135,7 @@ pub fn (n NdArray) iter2(other NdArray) &NdIter2 {
 	return &NdIter2{
 		ptr_a: n.storage.stride_offset(n.shape, n.strides)
 		ptr_b: other.storage.stride_offset(other.shape, other.strides)
-		coord: [0].repeat(n.ndims)
+		coord: []int{len: n.ndims}
 		shape: n.shape
 		backstrides_a: backstrides_a
 		backstrides_b: backstrides_b
@@ -215,9 +215,9 @@ pub fn (mut iter NdIter3) next() bool {
 // iter2 returns a flat iterator over two ndarrays, commonly used
 // for reduction operations
 pub fn (n NdArray) iter3(other NdArray, other2 NdArray) &NdIter3 {
-	mut backstrides_a := [0].repeat(n.ndims)
-	mut backstrides_b := [0].repeat(n.ndims)
-	mut backstrides_c := [0].repeat(n.ndims)
+	mut backstrides_a := []int{len: n.ndims}
+	mut backstrides_b := []int{len: n.ndims}
+	mut backstrides_c := []int{len: n.ndims}
 	for i := 0; i < n.ndims; i++ {
 		backstrides_a[i] = n.strides[i] * (n.shape[i] - 1)
 		backstrides_b[i] = other.strides[i] * (other.shape[i] - 1)
@@ -227,7 +227,7 @@ pub fn (n NdArray) iter3(other NdArray, other2 NdArray) &NdIter3 {
 		ptr_a: n.storage.stride_offset(n.shape, n.strides)
 		ptr_b: other.storage.stride_offset(other.shape, other.strides)
 		ptr_c: other2.storage.stride_offset(other2.shape, other2.strides)
-		coord: [0].repeat(n.ndims)
+		coord: []int{len: n.ndims}
 		shape: n.shape
 		backstrides_a: backstrides_a
 		backstrides_b: backstrides_b
@@ -318,10 +318,10 @@ pub fn (mut iter NdIter4) next() bool {
 // iter2 returns a flat iterator over two ndarrays, commonly used
 // for reduction operations
 pub fn (n NdArray) iter4(other NdArray, other2 NdArray, other3 NdArray) &NdIter4 {
-	mut backstrides_a := [0].repeat(n.ndims)
-	mut backstrides_b := [0].repeat(n.ndims)
-	mut backstrides_c := [0].repeat(n.ndims)
-	mut backstrides_d := [0].repeat(n.ndims)
+	mut backstrides_a := []int{len: n.ndims}
+	mut backstrides_b := []int{len: n.ndims}
+	mut backstrides_c := []int{len: n.ndims}
+	mut backstrides_d := []int{len: n.ndims}
 	for i := 0; i < n.ndims; i++ {
 		backstrides_a[i] = n.strides[i] * (n.shape[i] - 1)
 		backstrides_b[i] = other.strides[i] * (other.shape[i] - 1)
@@ -333,7 +333,7 @@ pub fn (n NdArray) iter4(other NdArray, other2 NdArray, other3 NdArray) &NdIter4
 		ptr_b: other.storage.stride_offset(other.shape, other.strides)
 		ptr_c: other2.storage.stride_offset(other2.shape, other2.strides)
 		ptr_d: other3.storage.stride_offset(other3.shape, other3.strides)
-		coord: [0].repeat(n.ndims)
+		coord: []int{len: n.ndims}
 		shape: n.shape
 		backstrides_a: backstrides_a
 		backstrides_b: backstrides_b

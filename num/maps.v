@@ -18,7 +18,7 @@ pub fn amap(n NdArray, op OneParamFn) NdArray {
 }
 
 // apply applies a function in place on a single ndarray
-pub fn apply(n NdArray, op OneParamFn) {
+pub fn apply(mut n NdArray, op OneParamFn) {
 	for iter := n.iter(); !iter.done; iter.next() {
 		unsafe {
 			*iter.ptr = op(*iter.ptr)
@@ -62,7 +62,7 @@ pub fn map2(a NdArray, b NdArray, op TwoParamsFn) NdArray {
 
 // apply2 applies a function to two ndarrays, storing the result in
 // the first ndarray
-pub fn apply2(a NdArray, b NdArray, op TwoParamsFn) {
+pub fn apply2(mut a NdArray, b NdArray, op TwoParamsFn) {
 	bb := broadcast_if(b, a.shape)
 	for iter := a.iter2(bb); !iter.done; iter.next() {
 		unsafe {
@@ -85,7 +85,7 @@ pub fn map3(a NdArray, b NdArray, c NdArray, op ThreeParamsFn) NdArray {
 
 // apply3 applies a function to three ndarrays, storing the result in the
 // first ndarray
-pub fn apply3(a NdArray, b NdArray, c NdArray, op ThreeParamsFn) {
+pub fn apply3(mut a NdArray, b NdArray, c NdArray, op ThreeParamsFn) {
 	bb := broadcast_if(b, a.shape)
 	cb := broadcast_if(c, a.shape)
 	for iter := a.iter3(bb, cb); !iter.done; iter.next() {
