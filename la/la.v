@@ -54,7 +54,7 @@ pub fn dger(a num.NdArray, b num.NdArray) num.NdArray {
 	if a.ndims != 1 || b.ndims != 1 {
 		panic('Tensors must be one dimensional')
 	}
-        m := la.vector_vector_tr_mul(1.0, a.f64_array(), b.f64_array())
+	m := la.vector_vector_tr_mul(1.0, a.f64_array(), b.f64_array())
 	return num.from_f64_2d(m.get_deep2())
 }
 
@@ -91,10 +91,10 @@ pub fn dpotrf(a num.NdArray, up bool) num.NdArray {
 }
 
 pub fn det(a num.NdArray) f64 {
-        assert_square_matrix(a)
+	assert_square_matrix(a)
 	m := a.shape[0]
 	n := a.shape[1]
-        mat := la.matrix_raw(m, n, a.f64_array())
+	mat := la.matrix_raw(m, n, a.f64_array())
 	return mat.det()
 }
 
