@@ -1,8 +1,8 @@
 [![Build Status](https://github.com/vlang/vnum/workflows/CI/badge.svg)](https://github.com/vlang/vnum/commits/master)
 
-# VNUM - V Numerical Library
+# VTL - V Tensor Library
 
-## VNUM Provides
+## VTL Provides
 
 - An n-dimensional `NdArray` data structure
 - Sophisticated reduction, elementwise, and accumulation operations
@@ -23,12 +23,12 @@ VNUM requires VSL's OpenBLAS and LAPACKE wrappers. If you wish you to use vnum w
 
 Follow this [install instructions](https://github.com/vlang/vsl#install-vsl-locally) at VSL docs in order to install VSL with all needed dependencies.
 
-### Install VNUM
+### Install VTL
 
 **Via vpm**
 
 ```sh
-$ v install vnum
+$ v install vtl
 ```
 
 **Via [vpkg](https://github.com/v-pkg/vpkg)**
