@@ -1,4 +1,4 @@
-import vnum.num
+import vtl.num
 
 fn test_empty_shape() {
 	a := num.allocate_cpu([], 'C')

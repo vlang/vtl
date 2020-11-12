@@ -1,5 +1,5 @@
 ---
-name: Bug report for VNUM
+name: Bug report for VTL
 about: Please use the apropriate label when submitting an issue: bug/feature request/question.
 title: "New issue"
 labels: ''
@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-#### VNUM version:
+#### VTL version:
 
 
 #### OS:

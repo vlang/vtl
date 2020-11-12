@@ -1,6 +1,6 @@
 module nn
 
-import vnum.num
+import vtl.num
 import math
 
 fn normals(rows int, cols int) num.NdArray {

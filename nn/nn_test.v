@@ -1,5 +1,5 @@
-import vnum.nn
-import vnum.num
+import vtl.nn
+import vtl.num
 
 fn xor_test() {
 	expected := num.from_f64_2d([[0.0387387],

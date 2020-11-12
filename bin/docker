@@ -40,7 +40,7 @@ docker_ini() {
         lockSum=$(md5sum -t v.mod | awk '{ print $1 }')
     fi
 
-    IMAGE_NAME="vnum-${lockSum}:latest"
+    IMAGE_NAME="vtl-${lockSum}:latest"
     IMAGE_NAME_ARRAY=(${IMAGE_NAME//:/ })
 
     if [[ -n "${build}" ]] || [[ "$(docker images ${IMAGE_NAME_ARRAY[0]} | grep ${IMAGE_NAME_ARRAY[1]} 2> /dev/null)" = "" ]]; then
@@ -53,7 +53,7 @@ docker_ini() {
 # docker run
 docker_run() {
     docker run --rm -it -e DISPLAY=:${XPORT} \
-        -v "$(pwd)":"/home/${USER}/vnum" \
+        -v "$(pwd)":"/home/${USER}/vtl" \
         -w "/home/${USER}" \
         ${USER_FLAG} \
         "${IMAGE_NAME}"

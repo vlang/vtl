@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-NAME=vnum_dev
+NAME=vtl_dev
 
 docker logout
 docker login

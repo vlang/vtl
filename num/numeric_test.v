@@ -1,4 +1,4 @@
-import vnum.num
+import vtl.num
 
 fn test_seq() {
 	expected := num.from_int_1d([0, 1, 2, 3, 4])

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-# Syntax: ./vnum-clone-and-build.sh [DEV_IMG] [VNUM_VERSION]
+# Syntax: ./vtl-clone-and-build.sh [DEV_IMG] [VTL_VERSION]
 
 DEV_IMG=${1:-"false"}
-VNUM_VERSION=${2:-"latest"}
+VTL_VERSION=${2:-"latest"}
 VSL_VERSION=${3:-"latest"}
 
 # Install vsl
@@ -18,9 +18,9 @@ if [ "${DEV_IMG}" = "true" ]; then
   exit 0
 fi
 
-BRANCH="v${VNUM_VERSION}"
-if [ "${VNUM_VERSION}" = "latest" ]; then
+BRANCH="v${VTL_VERSION}"
+if [ "${VTL_VERSION}" = "latest" ]; then
   BRANCH="main"
 fi
 
-git clone -b $BRANCH --single-branch --depth 1 https://github.com/vlang/vnum.git /opt/vlang/v/vlib/vnum
+git clone -b $BRANCH --single-branch --depth 1 https://github.com/vlang/vtl.git /opt/vlang/v/vlib/vtl
