@@ -1,4 +1,4 @@
-import vnum.num
+import vtl.num
 
 fn test_num_yielded() {
 	a := num.from_int([1, 2, 3, 4, 5, 6], [3, 2])

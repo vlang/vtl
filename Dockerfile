@@ -55,11 +55,11 @@ RUN git clone https://github.com/vlang/v /opt/vlang/v \
     && chmod a+rwx /opt/vlang/v/cmd/tools \
     && rm -rf /tmp/v
 
-# build vnum
-ARG VNUM_VERSION="latest"
+# build vtl
+ARG VTL_VERSION="latest"
 ARG VSL_VERSION="latest"
-COPY docker/vnum-clone-and-build.sh /tmp/library-scripts/
-RUN /bin/bash /tmp/library-scripts/vnum-clone-and-build.sh "${DEV_IMG}" "${VNUM_VERSION}" "${VSL_VERSION}"
+COPY docker/vtl-clone-and-build.sh /tmp/library-scripts/
+RUN /bin/bash /tmp/library-scripts/vtl-clone-and-build.sh "${DEV_IMG}" "${VTL_VERSION}" "${VSL_VERSION}"
 
 ##################################################################################################
 #                                                                                                #

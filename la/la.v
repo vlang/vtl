@@ -1,6 +1,6 @@
 module la
 
-import vnum.num
+import vtl.num
 import vsl.blas
 import vsl.la
 

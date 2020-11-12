@@ -9,19 +9,19 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: vlang/v
-    - name: Checkout VNUM
+    - name: Checkout VTL
       uses: actions/checkout@v2
       with:
-        path: vnum
+        path: vtl
     - name: Build V
       run: |
         make
         sudo ./v symlink
     - name: V doctor
       run: v doctor
-    - name: Install VNUM dependencies
+    - name: Install VTL dependencies
       run: |
         sudo apt-get install --quiet -y --no-install-recommends gfortran liblapacke-dev libopenblas-dev
         v install vsl
     - name: run tests
-      run: cd vnum; make test
+      run: cd vtl; make test

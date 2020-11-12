@@ -1,4 +1,4 @@
-[![Build Status](https://github.com/vlang/vnum/workflows/CI/badge.svg)](https://github.com/vlang/vnum/commits/master)
+[![Build Status](https://github.com/vlang/vtl/workflows/CI/badge.svg)](https://github.com/vlang/vtl/commits/master)
 
 # VTL - V Tensor Library
 
@@ -9,7 +9,7 @@
 - Data Structures that can easily be passed to C libraries
 - Powerful linear algebra routines backed by VSL that uses LAPACKE and OpenBLAS.
 
-In the docs you can find a complete [Numpy vs Vnum comparison](./docs/NUMPY_COMPARISON.md) 
+In the docs you can find a complete [Numpy vs Vtl comparison](./docs/NUMPY_COMPARISON.md) 
 
 ## Installation
 
@@ -19,7 +19,7 @@ Because we use CV for linking [VSL](https://github.com/vlang/vsl) with many libr
 
 We use VSL as backend for some functionalities and [VSL](https://github.com/vlang/vsl) links with existent libraries written in C and Fortran, such as OpenBLAS and LAPACK. These existing libraries have been fundamental for the development of high-performant simulations over many years. We believe that it is nearly impossible to rewrite these libraries in native V and at the same time achieve the same speed delivered by them.
 
-VNUM requires VSL's OpenBLAS and LAPACKE wrappers. If you wish you to use vnum without these, the `vnum.num` module will still function as normal.
+VTL requires VSL's OpenBLAS and LAPACKE wrappers. If you wish you to use vtl without these, the `vtl.num` module will still function as normal.
 
 Follow this [install instructions](https://github.com/vlang/vsl#install-vsl-locally) at VSL docs in order to install VSL with all needed dependencies.
 
@@ -34,7 +34,7 @@ $ v install vtl
 **Via [vpkg](https://github.com/v-pkg/vpkg)**
 
 ```sh
-$ vpkg get https://github.com/vlang/vnum
+$ vpkg get https://github.com/vlang/vtl
 ```
 
 Done. Installation completed.

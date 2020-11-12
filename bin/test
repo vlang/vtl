@@ -2,10 +2,10 @@
 
 set -euo pipefail
 
-rm -f vnum 
-ln -s . vnum
+rm -f vtl 
+ln -s . vtl
 
 v test .
 
 find . -name '*_test' -exec rm -f {} +
-rm -f vnum
+rm -f vtl

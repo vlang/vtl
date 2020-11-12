@@ -1,4 +1,4 @@
-import vnum.num
+import vtl.num
 
 fn test_concatenate_flat() {
 	a := num.ones([3])

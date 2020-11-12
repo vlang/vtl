@@ -1,7 +1,7 @@
 module nn
 
-import vnum.num
-import vnum.la
+import vtl.num
+import vtl.la
 
 type ActivateFn = fn (a &num.NdArray) num.NdArray
 

@@ -1,4 +1,4 @@
-import vnum.num
+import vtl.num
 
 fn test_dup_flags() {
 	mut a := num.all_flags()

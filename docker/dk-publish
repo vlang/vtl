@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-NAME="vnum"
+NAME="vtl"
 VERSION="latest"
 
 docker logout

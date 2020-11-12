@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-NAME="vnum"
+NAME="vtl"
 VERSION="latest"
 
 echo
@@ -9,5 +9,5 @@ echo "... docker .................................................."
 echo "............................................................."
 echo
 
-docker build --no-cache -t ulisesjeremias/$NAME:$VERSION . --build-arg VNUM_VERSION=$VERSION
+docker build --no-cache -t ulisesjeremias/$NAME:$VERSION . --build-arg VTL_VERSION=$VERSION
 docker images -q -f "dangling=true" | xargs docker rmi

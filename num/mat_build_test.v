@@ -1,4 +1,4 @@
-import vnum.num
+import vtl.num
 
 fn test_diag() {
 	a := num.from_int_1d([1, 2, 3])

@@ -1,4 +1,4 @@
-import vnum.num
+import vtl.num
 
 fn get_input() num.NdArray {
 	return num.from_int([1, 2, 3, 4, 5, 6, 7, 8, 9], [3, 3])

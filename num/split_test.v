@@ -1,4 +1,4 @@
-import vnum.num
+import vtl.num
 
 fn test_array_split() {
 	a := num.seq(9).reshape([3, 3])

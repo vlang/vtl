@@ -1,4 +1,4 @@
-import vnum.num
+import vtl.num
 
 fn test_empty() {
 	a := num.empty([3, 3])

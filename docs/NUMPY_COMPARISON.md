@@ -1,13 +1,13 @@
 # Basic Usage
 
 ```v
->>> import vnum.num
+>>> import vtl.num
 >>> num.seq(30)
 [ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17,
  18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
 ```
 
-`vnum` provides vectorized operations on ndarrays.
+`vtl` provides vectorized operations on ndarrays.
 
 ```v
 >>> a := num.seq(12).reshape([3, 2, 2])
@@ -17,11 +17,11 @@
  [18, 20]]
 ```
 
-Use the `vnum.linalg` module for powerful `BLAS` backed routines.
+Use the `vtl.linalg` module for powerful `BLAS` backed routines.
 
 ```v
->>> import vnum.num
->>> import vnum.la
+>>> import vtl.num
+>>> import vtl.la
 >>> a := num.seq(60).reshape([3, 4, 5])
 >>> b := num.seq(24).reshape([4, 3, 2])
 >>> res := la.tensordot(a, b, [1, 0], [0, 1])
@@ -33,11 +33,11 @@ Use the `vnum.linalg` module for powerful `BLAS` backed routines.
  [4928, 5306]]
 ```
 
-Basic support for Machine Learning is being added in the `vnum.nn` module.  Here is a basic example learning the XOR function
+Basic support for Machine Learning is being added in the `vtl.nn` module.  Here is a basic example learning the XOR function
 
 ```v
->>> import vnum.nn
->>> import vnum.num
+>>> import vtl.nn
+>>> import vtl.num
 >>> features := num.from_int([0, 0, 0, 1, 1, 0, 1, 1], [4, 2])
 >>> labels := num.from_int([0, 1, 1, 0], [4, 1])
 >>> mut m := nn.new(0.7, 10000, 3, "sigmoid")
@@ -54,7 +54,7 @@ Basic support for Machine Learning is being added in the `vnum.nn` module.  Here
 <table>
    <tr>
       <th>NumPy </th>
-      <th>Vnum</th>
+      <th>Vtl</th>
    </tr>
    <tr>
       <td>
@@ -286,9 +286,9 @@ Basic support for Machine Learning is being added in the `vnum.nn` module.  Here
    </tr>
 </table>
 
-# Numpy compared with Vlang VNUM
+# Numpy compared with Vlang VTL
 
-This is a collection of common exercises using numpy, and their equivalent solutions using vnum
+This is a collection of common exercises using numpy, and their equivalent solutions using vtl
 
 #### 1. Import the numpy package under the name `np`
 
@@ -297,7 +297,7 @@ This is a collection of common exercises using numpy, and their equivalent solut
 ```
 
 ```v
->>> import vnum.num
+>>> import vtl.num
 ```
 
 #### 2. Print the numpy version and the configuration
@@ -308,8 +308,8 @@ This is a collection of common exercises using numpy, and their equivalent solut
 ```
 
 ```v
->>> import vnum
->>> print(vnum.version)
+>>> import vtl
+>>> print(vtl.version)
 ```
 
 #### 3. Create a null vector of size 10

@@ -1,4 +1,4 @@
-import vnum.num
+import vtl.num
 
 fn test_broadcast_to() {
 	m := num.from_int_1d([1, 2, 3])

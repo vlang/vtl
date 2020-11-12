@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-if [ -d ~/.vmodules/vnum ]; then
-    mv ~/.vmodules/vnum ~/.vmodules/old_vnum
-    rm -rf ~/.vmodules/vnum
+if [ -d ~/.vmodules/vtl ]; then
+    mv ~/.vmodules/vtl ~/.vmodules/old_vtl
+    rm -rf ~/.vmodules/vtl
 fi
 
-mkdir -p ~/.vmodules/vnum
-cp -r ./* ~/.vmodules/vnum
+mkdir -p ~/.vmodules/vtl
+cp -r ./* ~/.vmodules/vtl
 
 find . -name "*.v" -exec v fmt -w {} +
 
-rm -rf ~/.vmodules/vnum
-[ -d ~/.vmodules/old_vnum ] && mv ~/.vmodules/old_vnum ~/.vmodules/vnum
+rm -rf ~/.vmodules/vtl
+[ -d ~/.vmodules/old_vtl ] && mv ~/.vmodules/old_vtl ~/.vmodules/vtl
