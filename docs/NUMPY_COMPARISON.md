@@ -297,12 +297,13 @@ This is a collection of common exercises using numpy, and their equivalent solut
 ```
 
 ```v
->>> import vtl.num
+>>> import vtl.num as np
 ```
 
 #### 2. Print the numpy version and the configuration
 
 ```python
+>>> import numpy as np
 >>> print(np.__version__)
 >>> np.show_config()
 ```
