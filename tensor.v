@@ -1,6 +1,6 @@
-module tensor
+module vtl
 
-import vtl.tensor.storage
+import vtl.storage
 
 pub enum MemoryFormat {
 	row_major
