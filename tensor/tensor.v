@@ -13,7 +13,7 @@ pub:
 pub mut:
 	shape   []int
 	strides []int
-	data    &storage.CpuStorage // improve using strategy
+	data    &storage.CpuStorage // @todo: improve using strategy
 }
 
 // get returns a scalar value from a Tensor at the provided index
