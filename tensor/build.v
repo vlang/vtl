@@ -13,7 +13,7 @@ pub:
 pub fn new_tensor<T>(data TensorBuildData) Tensor {
 	if data.shape.len == 0 {
 		return Tensor{
-			memory: memory
+			memory: data.memory
 			strides: [1]
 			shape: []
 			data: &storage.new_storage<T>({
@@ -22,12 +22,11 @@ pub fn new_tensor<T>(data TensorBuildData) Tensor {
 			})
 		}
 	}
-	strides := strides_from_shape(shape, memory)
-	size := size_from_shape(shape)
+	strides := strides_from_shape(data.shape, data.memory)
+	size := size_from_shape(data.shape)
 	return Tensor{
-		memory: memory
+		memory: data.memory
 		strides: strides
-		size: size
 		data: &storage.new_storage<T>({
 			cap: size
 			strategy: data.storage
