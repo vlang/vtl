@@ -16,12 +16,52 @@ pub mut:
 	capacity     int
 }
 
-pub fn new_cpu<T>(capacity int) CpuStorage {
+pub fn new_cpu<T>(len int, capacity int) CpuStorage {
+	mut capacity_ := if capacity < mylen { mylen } else { capacity }
+	capacity_ = max(capacity_, vector_minimum_capacity)
 	return CpuStorage{
-		len: 0
-		capacity: max(capacity, vector_minimum_capacity)
-		data: vcalloc(capacity * int(sizeof(T)))
+		len: len
+		capacity: capacity_
+		data: vcalloc(capacity_ * int(sizeof(T)))
+		element_size: int(sizeof(T))
 	}
+}
+
+pub fn new_cpu_with_default<T>(len int, capacity int, val voidptr) cpu {
+	mut capacity_ := if capacity < mylen { mylen } else { capacity }
+	capacity_ = max(capacity_, vector_minimum_capacity)
+	mut cpu := CpuStorage{
+		len: len
+		capacity: capacity_
+		element_size: int(sizeof(T))
+		data: vcalloc(capacity_ * int(sizeof(T)))
+	}
+	if val != 0 {
+		for i in 0 .. cpu.len {
+			unsafe {cpu.set_unsafe(i, val)}
+		}
+	}
+	return cpu
+}
+
+// Private function. Used to implement CpuStorage operator
+pub fn (a CpuStorage) get(i int) voidptr {
+	$if !no_bounds_checking ? {
+		if i < 0 || i >= a.len {
+			panic('CpuStorage.get: index out of range (i == $i, a.len == $a.len)')
+		}
+	}
+	return unsafe {a.get_unsafe(i)}
+}
+
+// Private function. Used to implement assigment to the CpuStorage element.
+pub fn (mut a CpuStorage) set(i int, val voidptr) {
+	$if !no_bounds_checking ? {
+		if i < 0 || i >= a.len {
+			panic('CpuStorage.set: index out of range (i == $i, a.len == $a.len)')
+		}
+	}
+	unsafe {a.set_unsafe(i, val)}
 }
 
 // we manually inline this for single operations for performance without -prod
@@ -33,31 +73,11 @@ fn (a CpuStorage) get_unsafe(i int) voidptr {
 	}
 }
 
-// Private function. Used to implement CpuStorage operator
-fn (a CpuStorage) get(i int) voidptr {
-	$if !no_bounds_checking ? {
-		if i < 0 || i >= a.len {
-			panic('CpuStorage.get: index out of range (i == $i, a.len == $a.len)')
-		}
-	}
-	return unsafe {a.get_unsafe(i)}
-}
-
 // we manually inline this for single operations for performance without -prod
 [inline]
 [unsafe]
 fn (mut a CpuStorage) set_unsafe(i int, val voidptr) {
 	unsafe {C.memcpy(byteptr(a.data) + a.element_size * i, val, a.element_size)}
-}
-
-// Private function. Used to implement assigment to the CpuStorage element.
-fn (mut a CpuStorage) set(i int, val voidptr) {
-	$if !no_bounds_checking ? {
-		if i < 0 || i >= a.len {
-			panic('CpuStorage.set: index out of range (i == $i, a.len == $a.len)')
-		}
-	}
-	unsafe {a.set_unsafe(i, val)}
 }
 
 // Apply growth factor if needed
