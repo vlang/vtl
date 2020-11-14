@@ -9,7 +9,7 @@ pub interface Storage {
 	set(i int, val voidptr)
 }
 
-pub struct StorageType {
+pub struct StorageData {
 	cap      int
 	init     voidptr
 	strategy StorageStrategy
