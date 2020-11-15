@@ -44,7 +44,7 @@ Done. Installation completed.
 To test the module, just type the following command:
 
 ```sh
-$ make test # or ./bin/test
+$ ./bin/test
 ```
 
 ## License
