@@ -8,7 +8,7 @@ fn test_new() {
         assert varray[0] == 1.0
 }
 
-fn main() {
+fn test_from_varray() {
         arr := [1.0, 2.0]
         shape := [2]
 	mut t := from_varray<f64>(arr, shape)
