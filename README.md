@@ -4,7 +4,7 @@
 
 ## VTL Provides
 
-- An n-dimensional `NdArray` data structure
+- An n-dimensional `Tensor` data structure
 - Sophisticated reduction, elementwise, and accumulation operations
 - Data Structures that can easily be passed to C libraries
 - Powerful linear algebra routines backed by VSL that uses LAPACKE and OpenBLAS.
