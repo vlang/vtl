@@ -4,7 +4,7 @@ pub struct TensorData {
 pub:
 	shape   []int
 	init    voidptr = voidptr(0)
-	memory  MemoryFormat = .row_major
+	memory  MemoryFormat = .rowmajor
 	storage StorageStrategy = .cpu
 }
 
@@ -41,7 +41,7 @@ pub fn tensor_to_varray<T>(t Tensor) []T {
 fn strides_from_shape(shape []int, memory MemoryFormat) []int {
 	mut accum := 1
 	mut result := []int{len: shape.len}
-	if memory == .row_major {
+	if memory == .rowmajor {
 		for i := shape.len - 1; i >= 0; i-- {
 			result[i] = accum
 			accum *= shape[i]

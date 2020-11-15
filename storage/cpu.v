@@ -77,6 +77,13 @@ pub fn (mut cpu CpuStorage) set(i int, val voidptr) {
 	unsafe {cpu.set_unsafe(i, val)}
 }
 
+// fill fills an entire storage with a given value
+pub fn (mut cpu CpuStorage) fill(val voidptr) {
+	for i in 0 .. cpu.len {
+		unsafe {cpu.set_unsafe(i, val)}
+	}
+}
+
 pub fn cpu_to_varray<T>(cpu CpuStorage) []T {
         if cpu.element_size == int(sizeof(T)) {
                 mut arr := []T{}
