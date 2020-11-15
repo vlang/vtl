@@ -13,7 +13,7 @@ pub:
 pub mut:
 	shape   []int
 	strides []int
-	data    &storage.CpuStorage // @todo: improve using strategy
+	data    storage.CpuStorage // @todo: improve using strategy
 }
 
 // get returns a scalar value from a Tensor at the provided index
@@ -32,7 +32,7 @@ pub fn (mut t Tensor) set(index []int, val voidptr) {
 	unsafe {t.data.set(offset, val)}
 }
 
-[inline]
+// [inline]
 pub fn (t Tensor) rank() int {
 	return t.shape.len
 }
@@ -40,7 +40,7 @@ pub fn (t Tensor) rank() int {
 // offset returns a pointer to a Tensor's data at
 // a given index
 [inline]
-fn (t Tensor) offset(index []int) int {
+pub fn (t Tensor) offset(index []int) int {
 	mut offset := 0
 	for i := 0; i < t.rank(); i++ {
 		mut j := index[i]

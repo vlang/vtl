@@ -16,31 +16,44 @@ pub mut:
 	capacity     int
 }
 
-pub fn new_cpu<T>(len int, capacity int) CpuStorage {
-	mut capacity_ := if capacity < mylen { mylen } else { capacity }
+pub fn new_cpu(len int, capacity int, element_size int) CpuStorage {
+	mut capacity_ := if capacity < len { len } else { capacity }
 	capacity_ = max(capacity_, vector_minimum_capacity)
 	return CpuStorage{
 		len: len
 		capacity: capacity_
-		data: vcalloc(capacity_ * int(sizeof(T)))
-		element_size: int(sizeof(T))
+		data: vcalloc(capacity_ * element_size)
+		element_size: element_size
 	}
 }
 
-pub fn new_cpu_with_default<T>(len int, capacity int, val voidptr) cpu {
-	mut capacity_ := if capacity < mylen { mylen } else { capacity }
+pub fn new_cpu_with_default(len int, capacity int, element_size int, val voidptr) CpuStorage {
+	mut capacity_ := if capacity < len { len } else { capacity }
 	capacity_ = max(capacity_, vector_minimum_capacity)
 	mut cpu := CpuStorage{
 		len: len
 		capacity: capacity_
-		element_size: int(sizeof(T))
-		data: vcalloc(capacity_ * int(sizeof(T)))
+		element_size: element_size
+		data: vcalloc(capacity_ * element_size)
 	}
 	if val != 0 {
 		for i in 0 .. cpu.len {
 			unsafe {cpu.set_unsafe(i, val)}
 		}
 	}
+	return cpu
+}
+
+pub fn new_array_from_c_array(len int, capacity int, element_size int, c_array voidptr) CpuStorage {
+	capacity_ := if capacity < len { len } else { capacity }
+	cpu := CpuStorage{
+		element_size: element_size
+		data: vcalloc(capacity_ * element_size)
+		len: len
+		capacity: capacity_
+	}
+	// TODO Write all memory functions (like memcpy) in V
+	unsafe {C.memcpy(cpu.data, c_array, len * element_size)}
 	return cpu
 }
 
