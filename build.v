@@ -1,37 +1,36 @@
 module vtl
 
-import vtl.storage
-
-pub struct TensorBuildData {
+pub struct TensorData {
 pub:
 	shape   []int
+	init    voidptr = voidptr(0)
 	memory  MemoryFormat = .row_major
-	init    voidptr
-	storage storage.StorageStrategy
+	storage StorageStrategy = .cpu
 }
 
-pub fn new_tensor<T>(data TensorBuildData) Tensor {
+pub fn new_tensor<T>(data TensorData) Tensor {
 	if data.shape.len == 0 {
+		data_storage := new_storage<T>({
+			strategy: data.storage
+		})
 		return Tensor{
 			memory: data.memory
 			strides: [1]
 			shape: []
-			data: &storage.new_storage<T>({
-				cap: 0
-				strategy: data.storage
-			})
+			data: data_storage
 		}
 	}
 	strides := strides_from_shape(data.shape, data.memory)
 	size := size_from_shape(data.shape)
+	data_storage := new_storage<T>({
+		len: size
+		init: data.init
+		strategy: data.storage
+	})
 	return Tensor{
 		memory: data.memory
 		strides: strides
-		data: &storage.new_storage<T>({
-			cap: size
-			strategy: data.storage
-			init: data.init
-		})
+		data: data_storage
 	}
 }
 
@@ -52,7 +51,7 @@ fn strides_from_shape(shape []int, memory MemoryFormat) []int {
 	return result
 }
 
-pub fn size_from_shape(shape []int) int {
+fn size_from_shape(shape []int) int {
 	mut accum := 1
 	for i in shape {
 		accum *= i
