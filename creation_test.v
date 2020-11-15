@@ -31,7 +31,7 @@ fn test_ones() {
         assert varray[1] == 1.0
 }
 
-fn test_from_full() {
+fn test_full() {
 	mut t := full<f64>([3], 3.0)
         varray := tensor_to_varray<f64>(t)
         assert varray.len == 3
