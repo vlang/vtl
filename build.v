@@ -34,6 +34,10 @@ pub fn new_tensor<T>(data TensorData) Tensor {
 	}
 }
 
+pub fn tensor_to_varray<T>(t Tensor) []T {
+        return storage_to_varray<T>(t.data)
+}
+
 fn strides_from_shape(shape []int, memory MemoryFormat) []int {
 	mut accum := 1
 	mut result := []int{len: shape.len}
