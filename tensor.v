@@ -3,8 +3,8 @@ module vtl
 import vtl.storage
 
 pub enum MemoryFormat {
-	row_major
-	col_major
+	rowmajor
+	colmajor
 }
 
 pub struct Tensor {
@@ -20,6 +20,6 @@ pub struct TensorData {
 pub:
 	shape   []int
 	init    voidptr = voidptr(0)
-	memory  MemoryFormat = .row_major
+	memory  MemoryFormat = .rowmajor
 	storage StorageStrategy = .cpu
 }
