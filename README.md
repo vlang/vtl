@@ -53,6 +53,6 @@ $ make test # or ./bin/test
 
 ## Contributors
 
-> This project is based on the work done by Christopher ([christopherzimmerman](https://github.com/christopherzimmerman)) and the rest of the Vlang Num gruop.
+> This project is based on the work done by Christopher ([christopherzimmerman](https://github.com/christopherzimmerman)) and the rest of the Vlang Num group.
 
 - [Ulises Jeremias Cornejo Fandos](https://github.com/ulises-jeremias) - Core Maintainer
