@@ -8,10 +8,15 @@ pub enum MemoryFormat {
 }
 
 pub struct Tensor {
+mut:
+	data    storage.CpuStorage // @todo: improve using strategy
 pub:
 	memory  MemoryFormat
 pub mut:
 	shape   []int
 	strides []int
-	data    storage.CpuStorage // @todo: improve using strategy
+}
+
+pub fn tensor_to_varray<T>(t Tensor) []T {
+        return storage_to_varray<T>(t.data)
 }

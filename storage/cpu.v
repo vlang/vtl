@@ -44,7 +44,7 @@ pub fn new_cpu_with_default(len int, capacity int, element_size int, val voidptr
 	return cpu
 }
 
-pub fn new_array_from_c_array(len int, capacity int, element_size int, c_array voidptr) CpuStorage {
+pub fn new_cpu_from_c_array(len int, capacity int, element_size int, c_array voidptr) CpuStorage {
 	capacity_ := if capacity < len { len } else { capacity }
 	cpu := CpuStorage{
 		element_size: element_size
