@@ -58,58 +58,67 @@ pub fn new_array_from_c_array(len int, capacity int, element_size int, c_array v
 }
 
 // Private function. Used to implement CpuStorage operator
-pub fn (a CpuStorage) get(i int) voidptr {
+pub fn (cpu CpuStorage) get(i int) voidptr {
 	$if !no_bounds_checking ? {
-		if i < 0 || i >= a.len {
-			panic('CpuStorage.get: index out of range (i == $i, a.len == $a.len)')
+		if i < 0 || i >= cpu.len {
+			panic('CpuStorage.get: index out of range (i == $i, cpu.len == $cpu.len)')
 		}
 	}
-	return unsafe {a.get_unsafe(i)}
+	return unsafe {cpu.get_unsafe(i)}
 }
 
 // Private function. Used to implement assigment to the CpuStorage element.
-pub fn (mut a CpuStorage) set(i int, val voidptr) {
+pub fn (mut cpu CpuStorage) set(i int, val voidptr) {
 	$if !no_bounds_checking ? {
-		if i < 0 || i >= a.len {
-			panic('CpuStorage.set: index out of range (i == $i, a.len == $a.len)')
+		if i < 0 || i >= cpu.len {
+			panic('CpuStorage.set: index out of range (i == $i, cpu.len == $cpu.len)')
 		}
 	}
-	unsafe {a.set_unsafe(i, val)}
+	unsafe {cpu.set_unsafe(i, val)}
+}
+
+pub fn cpu_to_varray<T>(cpu CpuStorage) []T {
+        if cpu.element_size == int(sizeof(T)) {
+                mut arr := []T{}
+                arr.push_many(cpu.data, cpu.len)
+                return arr
+        }
+        panic('CpuStorage.to_varray<T>: incoming type T does not match with the stored data type')
 }
 
 // we manually inline this for single operations for performance without -prod
 [inline]
 [unsafe]
-fn (a CpuStorage) get_unsafe(i int) voidptr {
+fn (cpu CpuStorage) get_unsafe(i int) voidptr {
 	unsafe {
-		return byteptr(a.data) + i * a.element_size
+		return byteptr(cpu.data) + i * cpu.element_size
 	}
 }
 
 // we manually inline this for single operations for performance without -prod
 [inline]
 [unsafe]
-fn (mut a CpuStorage) set_unsafe(i int, val voidptr) {
-	unsafe {C.memcpy(byteptr(a.data) + a.element_size * i, val, a.element_size)}
+fn (mut cpu CpuStorage) set_unsafe(i int, val voidptr) {
+	unsafe {C.memcpy(byteptr(cpu.data) + cpu.element_size * i, val, cpu.element_size)}
 }
 
 // Apply growth factor if needed
 [inline]
-fn (mut a CpuStorage) ensure_capacity(required int) {
-	if required <= a.capacity {
+fn (mut cpu CpuStorage) ensure_capacity(required int) {
+	if required <= cpu.capacity {
 		return
 	}
-	mut capacity := if a.capacity < vector_minimum_capacity { vector_minimum_capacity } else { a.capacity *
+	mut capacity := if cpu.capacity < vector_minimum_capacity { vector_minimum_capacity } else { cpu.capacity *
 			vector_growth_factor }
 	for required > capacity {
 		capacity *= vector_growth_factor
 	}
-	if a.capacity == vector_minimum_capacity {
-		a.data = vcalloc(capacity * a.element_size)
+	if cpu.capacity == vector_minimum_capacity {
+		cpu.data = vcalloc(capacity * cpu.element_size)
 	} else {
-		a.data = v_realloc(a.data, u32(capacity * a.element_size))
+		cpu.data = v_realloc(cpu.data, u32(capacity * cpu.element_size))
 	}
-	a.capacity = capacity
+	cpu.capacity = capacity
 }
 
 [inline]
