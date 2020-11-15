@@ -16,3 +16,17 @@ fn test_from_varray() {
         assert varray.len == 2
         assert varray[1] == 2.0
 }
+
+fn test_from_zeros() {
+	mut t := zeros<f64>([3])
+        varray := tensor_to_varray<f64>(t)
+        assert varray.len == 3
+        assert varray[1] == 0.0
+}
+
+fn test_from_ones() {
+	mut t := ones<f64>([3])
+        varray := tensor_to_varray<f64>(t)
+        assert varray.len == 3
+        assert varray[1] == 1.0
+}

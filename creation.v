@@ -18,18 +18,6 @@ pub fn empty_like(t Tensor) Tensor {
 	return new_tensor_like(t)
 }
 
-// Return a new Tensor of given shape and type, filled with val
-pub fn full<T>(shape []int, val T) Tensor {
-	return new_tensor<T>({ shape: shape, init: &val })
-}
-
-// Return a full Tensor with the same shape and type as a given Tensor
-pub fn full_like<T>(t Tensor, val T) Tensor {
-	mut new_tensor := new_tensor_like(t)
-        new_tensor.fill(&val)
-        return new_tensor
-}
-
 // Return a new Tensor of given shape and type, filled with zeros
 pub fn zeros<T>(shape []int) Tensor {
 	return new_tensor<T>({ shape: shape })
@@ -48,6 +36,18 @@ pub fn ones<T>(shape []int) Tensor {
 // Return an Tensor of ones with the same shape and type as a given Tensor
 pub fn ones_like(t Tensor) Tensor {
 	return full_like<int>(t, 1)
+}
+
+// Return a new Tensor of given shape and type, filled with val
+pub fn full<T>(shape []int, val T) Tensor {
+	return new_tensor<T>({ shape: shape, init: &val })
+}
+
+// Return a full Tensor with the same shape and type as a given Tensor
+pub fn full_like<T>(t Tensor, val T) Tensor {
+	mut new_tensor := new_tensor_like(t)
+        new_tensor.fill(&val)
+        return new_tensor
 }
 
 // from_varray takes a one dimensional array of T values
