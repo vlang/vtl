@@ -15,11 +15,3 @@ pub mut:
 	strides []int
 	data    storage.CpuStorage // @todo: improve using strategy
 }
-
-pub struct TensorData {
-pub:
-	shape   []int
-	init    voidptr = voidptr(0)
-	memory  MemoryFormat = .rowmajor
-	storage StorageStrategy = .cpu
-}
