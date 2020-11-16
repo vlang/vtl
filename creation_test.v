@@ -25,13 +25,14 @@ fn test_from_1d() {
         assert varray[1] == 2.0
 }
 
-// fn test_from_2d() {
-//         arr := [[1.0, 2.0]]
-// 	mut t := from_2d<f64>(arr)
-//         varray := tensor_to_varray<f64>(t)
-//         assert varray.len == 2
-//         assert varray[0] == 2.0
-// }
+fn test_from_2d() {
+        arr := [[1.0, 2.0]]
+	mut t := from_2d<f64>(arr)
+        varray := tensor_to_varray<f64>(t)
+        print(varray)
+        assert varray.len == 2
+        assert varray[1] == 2.0
+}
 
 fn test_zeros() {
 	mut t := zeros<f64>([3])
