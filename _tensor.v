@@ -18,5 +18,5 @@ pub mut:
 }
 
 pub fn tensor_to_varray<T>(t Tensor) []T {
-        return storage_to_varray<T>(t.data)
+	return storage_to_varray<T>(t.data)
 }

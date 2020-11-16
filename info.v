@@ -1,6 +1,5 @@
 module vtl
 
-[inline]
 // rank returns the number of dimensions of a given Tensor
 pub fn (t Tensor) rank() int {
 	return t.shape.len
@@ -10,15 +9,15 @@ pub fn (t Tensor) rank() int {
 // order
 [inline]
 pub fn (t Tensor) is_rowmajor() bool {
-        // @todo: we need to ensure that t.memory is the source of truth
-        return t.memory == .rowmajor
+	// @todo: we need to ensure that t.memory is the source of truth
+	return t.memory == .rowmajor
 }
 
 // is_colmajor returns if a Tensor is supposed to store its data in Col-Major
 // order
 [inline]
 pub fn (t Tensor) is_colmajor() bool {
-        // @todo: we need to ensure that t.memory is the source of truth
+	// @todo: we need to ensure that t.memory is the source of truth
 	return t.memory == .colmajor
 }
 
@@ -26,10 +25,9 @@ pub fn (t Tensor) is_colmajor() bool {
 // order
 [inline]
 pub fn (t Tensor) is_rowmajor_contiguous() bool {
-        if t.rank() == 1 && t.strides[0] != 1 {
+	if t.rank() == 1 && t.strides[0] != 1 {
 		return false
 	}
-
 	mut z := 1
 	for i := t.shape.len - 1; i > 0; i-- {
 		if t.shape[i] != 1 && t.strides[i] != z {
@@ -47,7 +45,6 @@ pub fn (t Tensor) is_colmajor_contigous() bool {
 	if t.rank() == 1 && t.strides[0] != 1 {
 		return false
 	}
-
 	mut z := 1
 	for i := 0; i < t.shape.len; i++ {
 		if t.shape[i] != 1 && t.strides[i] != z {

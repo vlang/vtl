@@ -11,5 +11,5 @@ pub fn (mut t Tensor) set(index []int, val voidptr) {
 [inline]
 pub fn (mut t Tensor) fill(val voidptr) {
 	// @todo: use iterator instead
-        t.data.fill(val)
+	t.data.fill(val)
 }
