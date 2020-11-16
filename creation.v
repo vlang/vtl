@@ -32,7 +32,7 @@ pub fn eye<T>(m int, n int, k int) Tensor {
 		for j in 0 .. n {
 			if i == j - k {
 				val := T(1)
-				ret.data.set(i * n + j, &val)
+                                ret.set([i, j], &val)
 			}
 		}
 	}
@@ -91,7 +91,7 @@ pub fn from_2d<T>(a [][]T) Tensor {
 	for i in 0 .. a.len {
 		for j in 0 .. a[0].len {
 			val := a[i][j]
-			ret.data.set(i * a[0].len + j, &val)
+			ret.set([i, j], &val)
 		}
 	}
 	return ret
@@ -126,6 +126,7 @@ pub fn new_tensor<T>(data TensorData) Tensor {
 		strategy: data.storage
 	})
 	return Tensor{
+                shape: data.shape
 		memory: data.memory
 		strides: strides
 		data: data_storage
