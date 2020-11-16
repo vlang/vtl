@@ -84,6 +84,33 @@ pub fn (mut cpu CpuStorage) fill(val voidptr) {
 	}
 }
 
+// CpuStorage.clone returns an independent copy of a given CpuStorage
+pub fn (cpu &CpuStorage) clone() CpuStorage {
+	mut size := cpu.capacity * cpu.element_size
+	if size == 0 {
+		size++
+	}
+	mut new_cpu := CpuStorage{
+		element_size: cpu.element_size
+		data: vcalloc(size)
+		len: cpu.len
+		capacity: cpu.capacity
+	}
+	// Recursively clone-generated elements if CpuStorage element is CpuStorage type
+	size_of_cpu := int(sizeof(CpuStorage))
+	if cpu.element_size == size_of_cpu {
+		for i in 0 .. cpu.len {
+			ar := CpuStorage{}
+			unsafe {C.memcpy(&ar, cpu.get_unsafe(i), size_of_cpu)}
+			ar_clone := ar.clone()
+			unsafe {new_cpu.set_unsafe(i, &ar_clone)}
+		}
+	} else {
+		unsafe {C.memcpy(byteptr(new_cpu.data), cpu.data, cpu.capacity * cpu.element_size)}
+	}
+	return new_cpu
+}
+
 pub fn cpu_to_varray<T>(cpu CpuStorage) []T {
 	if cpu.element_size == int(sizeof(T)) {
 		mut arr := []T{}

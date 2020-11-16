@@ -32,7 +32,7 @@ pub fn eye<T>(m int, n int, k int) Tensor {
 		for j in 0 .. n {
 			if i == j - k {
 				val := T(1)
-                                ret.set([i, j], &val)
+				ret.set([i, j], &val)
 			}
 		}
 	}
@@ -115,6 +115,7 @@ pub fn new_tensor<T>(data TensorData) Tensor {
 			memory: data.memory
 			strides: [1]
 			shape: []
+			size: 0
 			data: data_storage
 		}
 	}
@@ -126,9 +127,10 @@ pub fn new_tensor<T>(data TensorData) Tensor {
 		strategy: data.storage
 	})
 	return Tensor{
-                shape: data.shape
+		shape: data.shape
 		memory: data.memory
 		strides: strides
+		size: size
 		data: data_storage
 	}
 }
@@ -138,6 +140,7 @@ pub fn new_tensor_like(t Tensor) Tensor {
 		shape: t.shape
 		strides: t.strides
 		memory: t.memory
+		size: t.size
 		data: new_storage_like(t.data)
 	}
 }
@@ -153,6 +156,7 @@ pub fn new_tensor_from_varray<T>(arr []T, data TensorData) Tensor {
 			memory: data.memory
 			strides: [1]
 			shape: []
+			size: size
 			data: data_storage
 		}
 	}
@@ -161,6 +165,7 @@ pub fn new_tensor_from_varray<T>(arr []T, data TensorData) Tensor {
 		shape: data.shape
 		strides: strides
 		memory: data.memory
+		size: size
 		data: data_storage
 	}
 }
