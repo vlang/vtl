@@ -18,6 +18,25 @@ pub fn empty_like(t Tensor) Tensor {
 	return new_tensor_like(t)
 }
 
+// The identity array is a square array with ones on the main diagonal.
+pub fn identity<T>(n int) Tensor {
+	return eye<T>(n, n, 0)
+}
+
+// Return a 2-D array with ones on the diagonal and zeros elsewhere.
+pub fn eye<T>(m int, n int, k int) Tensor {
+	mut ret := zeros<T>([m, n])
+	for i in 0 .. m {
+		for j in 0 .. n {
+                        if i == j - k {
+                                val := T(1)
+                                ret.data.set(i * n + j, &val)
+                        }
+		}
+	}
+	return ret
+}
+
 // Return a new Tensor of given shape and type, filled with zeros
 pub fn zeros<T>(shape []int) Tensor {
 	return new_tensor<T>({ shape: shape })
