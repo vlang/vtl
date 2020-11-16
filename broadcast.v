@@ -79,7 +79,7 @@ pub fn (t Tensor) broadcast_to(shape []int) Tensor {
 	strides := strides_from_shape(shape, .rowmajor)
 	result_strides := broadcast_strides(shape, t.shape, strides, t.strides)
 	return Tensor{
-		data: t.data.clone()
+		data: storage_clone(t.data)
 		shape: shape
 		size: size
 		strides: result_strides
