@@ -63,7 +63,7 @@ pub fn from_2d<T>(a [][]T) Tensor {
 	for i in 0 .. a.len {
 		for j in 0 .. a[0].len {
                         val := a[i][j]
-                        ret.set([i, j], &val)
+                        ret.data.set(i * a[0].len + j, &val)
 		}
 	}
 	return ret
