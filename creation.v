@@ -10,7 +10,9 @@ pub:
 
 // Return a new Tensor of given shape and type, without initializing entries
 pub fn empty<T>(shape []int) Tensor {
-	return new_tensor<T>({ shape: shape })
+	return new_tensor<T>({
+		shape: shape
+	})
 }
 
 // Return a new Tensor with the same shape and type as a given Tensor.
@@ -28,10 +30,10 @@ pub fn eye<T>(m int, n int, k int) Tensor {
 	mut ret := zeros<T>([m, n])
 	for i in 0 .. m {
 		for j in 0 .. n {
-                        if i == j - k {
-                                val := T(1)
-                                ret.data.set(i * n + j, &val)
-                        }
+			if i == j - k {
+				val := T(1)
+				ret.data.set(i * n + j, &val)
+			}
 		}
 	}
 	return ret
@@ -39,7 +41,9 @@ pub fn eye<T>(m int, n int, k int) Tensor {
 
 // Return a new Tensor of given shape and type, filled with zeros
 pub fn zeros<T>(shape []int) Tensor {
-	return new_tensor<T>({ shape: shape })
+	return new_tensor<T>({
+		shape: shape
+	})
 }
 
 // Return an Tensor of zeros with the same shape and type as a given Tensor
@@ -59,14 +63,17 @@ pub fn ones_like(t Tensor) Tensor {
 
 // Return a new Tensor of given shape and type, filled with val
 pub fn full<T>(shape []int, val T) Tensor {
-	return new_tensor<T>({ shape: shape, init: &val })
+	return new_tensor<T>({
+		shape: shape
+		init: &val
+	})
 }
 
 // Return a full Tensor with the same shape and type as a given Tensor
 pub fn full_like<T>(t Tensor, val T) Tensor {
 	mut new_tensor := new_tensor_like(t)
-        new_tensor.fill(&val)
-        return new_tensor
+	new_tensor.fill(&val)
+	return new_tensor
 }
 
 // from_1d takes a one dimensional array of floating point values
@@ -78,11 +85,13 @@ pub fn from_1d<T>(arr []T) Tensor {
 // from_2d takes a two dimensional array of floating point values
 // and returns a two-dimensional Tensor if possible
 pub fn from_2d<T>(a [][]T) Tensor {
-	mut ret := new_tensor<T>({ shape: [a.len, a[0].len] })
+	mut ret := new_tensor<T>({
+		shape: [a.len, a[0].len]
+	})
 	for i in 0 .. a.len {
 		for j in 0 .. a[0].len {
-                        val := a[i][j]
-                        ret.data.set(i * a[0].len + j, &val)
+			val := a[i][j]
+			ret.data.set(i * a[0].len + j, &val)
 		}
 	}
 	return ret
@@ -92,7 +101,9 @@ pub fn from_2d<T>(a [][]T) Tensor {
 // and coerces it into an arbitrary shaped Tensor if possible.
 // Panics if the shape provided does not hold the provided array
 pub fn from_varray<T>(arr []T, shape []int) Tensor {
-	return new_tensor_from_varray<T>(arr, { shape: shape })
+	return new_tensor_from_varray<T>(arr, {
+		shape: shape
+	})
 }
 
 pub fn new_tensor<T>(data TensorData) Tensor {
@@ -122,21 +133,21 @@ pub fn new_tensor<T>(data TensorData) Tensor {
 }
 
 pub fn new_tensor_like(t Tensor) Tensor {
-        return Tensor{
-                shape: t.shape
-                strides: t.strides
-                memory: t.memory
-                data: new_storage_like(t.data)
-        }
-} 
+	return Tensor{
+		shape: t.shape
+		strides: t.strides
+		memory: t.memory
+		data: new_storage_like(t.data)
+	}
+}
 
 pub fn new_tensor_from_varray<T>(arr []T, data TensorData) Tensor {
-        size := size_from_shape(data.shape)
-        if size != arr.len {
+	size := size_from_shape(data.shape)
+	if size != arr.len {
 		panic('Bad shape for array, shape [$arr.len] cannot fit into shape $data.shape')
 	}
 	data_storage := new_storage_from_varray<T>(arr, data.storage)
-        if data.shape.len == 0 {
+	if data.shape.len == 0 {
 		return Tensor{
 			memory: data.memory
 			strides: [1]
@@ -145,10 +156,10 @@ pub fn new_tensor_from_varray<T>(arr []T, data TensorData) Tensor {
 		}
 	}
 	strides := strides_from_shape(data.shape, data.memory)
-        return Tensor{
-                shape: data.shape
-                strides: strides
-                memory: data.memory
-                data: data_storage
-        }
+	return Tensor{
+		shape: data.shape
+		strides: strides
+		memory: data.memory
+		data: data_storage
+	}
 }
