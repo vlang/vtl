@@ -13,10 +13,17 @@ mut:
 pub:
 	memory  MemoryFormat
 pub mut:
+	size    int
 	shape   []int
 	strides []int
 }
 
 pub fn tensor_to_varray<T>(t Tensor) []T {
-	return storage_to_varray<T>(t.data)
+	mut arr := []T{}
+	mut iter := t.init_strided_iteration()
+	for _ in 0 .. t.size {
+		arr.push(t.data.get(iter.pos))
+		iter.next()
+	}
+	return arr
 }
