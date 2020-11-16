@@ -1,7 +1,5 @@
 module vtl
 
-import vtl.storage
-
 pub enum MemoryFormat {
 	rowmajor
 	colmajor
@@ -9,7 +7,7 @@ pub enum MemoryFormat {
 
 pub struct Tensor {
 mut:
-	data    storage.CpuStorage // @todo: improve using strategy
+	data    Storage
 pub:
 	memory  MemoryFormat
 pub mut:
@@ -22,7 +20,7 @@ pub fn tensor_to_varray<T>(t Tensor) []T {
 	mut arr := []T{}
 	mut iter := t.init_strided_iteration()
 	for _ in 0 .. t.size {
-		arr.push(t.data.get(iter.pos))
+		arr.push(storage_get(t.data, iter.pos))
 		iter.next()
 	}
 	return arr

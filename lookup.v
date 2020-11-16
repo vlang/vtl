@@ -5,7 +5,7 @@ module vtl
 pub fn (t Tensor) get(index []int) voidptr {
 	offset := t.offset(index)
 	unsafe {
-		return t.data.get(offset)
+		return storage_get(t.data, offset)
 	}
 }
 
