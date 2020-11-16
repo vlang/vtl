@@ -50,6 +50,25 @@ pub fn full_like<T>(t Tensor, val T) Tensor {
         return new_tensor
 }
 
+// from_1d takes a one dimensional array of floating point values
+// and returns a one dimensional Tensor if possible
+pub fn from_1d<T>(arr []T) Tensor {
+	return from_varray<T>(arr, [arr.len])
+}
+
+// from_2d takes a two dimensional array of floating point values
+// and returns a two-dimensional Tensor if possible
+pub fn from_2d<T>(a [][]T) Tensor {
+	mut ret := new_tensor<T>({ shape: [a.len, a[0].len] })
+	for i in 0 .. a.len {
+		for j in 0 .. a[0].len {
+                        val := a[i][j]
+                        ret.set([i, j], &val)
+		}
+	}
+	return ret
+}
+
 // from_varray takes a one dimensional array of T values
 // and coerces it into an arbitrary shaped Tensor if possible.
 // Panics if the shape provided does not hold the provided array
