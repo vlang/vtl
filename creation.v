@@ -58,7 +58,7 @@ pub fn ones<T>(shape []int) Tensor {
 
 // Return an Tensor of ones with the same shape and type as a given Tensor
 pub fn ones_like(t Tensor) Tensor {
-	return full_like<int>(t, 1)
+	return full_like<f64>(t, 1.0)
 }
 
 // Return a new Tensor of given shape and type, filled with val
