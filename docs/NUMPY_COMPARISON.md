@@ -1,29 +1,29 @@
 # Basic Usage
 
 ```v
->>> import vtl.num
->>> num.seq(30)
-[ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17,
- 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+>>> import vtl
+>>> vtl.range<f64>(to: 30)
+[ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10., 11., 12., 13., 14., 15., 16., 17.,
+ 18., 19., 20., 21., 22., 23., 24., 25., 26., 27., 28., 29.]
 ```
 
-`vtl` provides vectorized operations on ndarrays.
+`vtl` provides vectorized operations on tensors.
 
 ```v
->>> a := num.seq(12).reshape([3, 2, 2])
->>> num.sum_axis(a, 1)
+>>> a := vtl.range<f64>(to: 12).reshape([3, 2, 2])
+>>> vtl.sum_axis(a, 1)
 [[ 2,  4],
  [10, 12],
  [18, 20]]
 ```
 
-Use the `vtl.linalg` module for powerful `BLAS` backed routines.
+Use the `vtl.la` module for powerful `VSL` backed routines.
 
 ```v
->>> import vtl.num
+>>> import vtl
 >>> import vtl.la
->>> a := num.seq(60).reshape([3, 4, 5])
->>> b := num.seq(24).reshape([4, 3, 2])
+>>> a := vtl.range<f64>(to: 60).reshape([3, 4, 5])
+>>> b := vtl.range<f64>(to: 24).reshape([4, 3, 2])
 >>> res := la.tensordot(a, b, [1, 0], [0, 1])
 >>> res
 [[4400, 4730],
@@ -37,9 +37,9 @@ Basic support for Machine Learning is being added in the `vtl.nn` module.  Here 
 
 ```v
 >>> import vtl.nn
->>> import vtl.num
->>> features := num.from_int([0, 0, 0, 1, 1, 0, 1, 1], [4, 2])
->>> labels := num.from_int([0, 1, 1, 0], [4, 1])
+>>> import vtl
+>>> features := vtl.from_varray<f64>([0., 0., 0., 1., 1., 0., 1., 1.], [4, 2])
+>>> labels := vtl.from_varray<f64>([0., 1., 1., 0.], [4, 1])
 >>> mut m := nn.new(0.7, 10000, 3, "sigmoid")
 >>> m.learn(features, labels)
 >>> m.predict(features)
@@ -59,12 +59,12 @@ Basic support for Machine Learning is being added in the `vtl.nn` module.  Here 
    <tr>
       <td>
          <code>
-         np.array([[1.,2.,3.], [4.,5.,6.]])
+         np.array([[1., 2., 3.], [4., 5., 6.]])
          </code>
       </td>
       <td>
          <code>
-         num.from_int([1, 2, 3, 4, 5, 6], [2, 3])
+         vtl.from_varray<f64>([1., 2., 3., 4., 5., 6.], [2, 3])
          </code>
       </td>
    </tr>
@@ -76,7 +76,7 @@ Basic support for Machine Learning is being added in the `vtl.nn` module.  Here 
       </td>
       <td>
          <code>
-         num.seq(10)
+         vtl.range<f64>(to: 10)
          </code>
       </td>
    </tr>
@@ -88,7 +88,7 @@ Basic support for Machine Learning is being added in the `vtl.nn` module.  Here 
       </td>
       <td>
          <code>
-         num.linspace(0, 10, 11)
+         vtl.linspace<f64>(0, 10, 11)
          </code>
       </td>
    </tr>
@@ -100,7 +100,7 @@ Basic support for Machine Learning is being added in the `vtl.nn` module.  Here 
       </td>
       <td>
          <code>
-         num.ones([3, 4, 5])
+         vtl.ones<f64>([3, 4, 5])
          </code>
       </td>
    </tr>
@@ -112,7 +112,7 @@ Basic support for Machine Learning is being added in the `vtl.nn` module.  Here 
       </td>
       <td>
          <code>
-         num.zeros((3, 4, 5))
+         vtl.zeros<f64>([3, 4, 5])
          </code>
       </td>
    </tr>
@@ -124,7 +124,7 @@ Basic support for Machine Learning is being added in the `vtl.nn` module.  Here 
       </td>
       <td>
          <code>
-         num.zeros([3, 4, 5]).copy('F')
+         vtl.zeros([3, 4, 5]).copy('F')
          </code>
       </td>
    </tr>
@@ -136,7 +136,7 @@ Basic support for Machine Learning is being added in the `vtl.nn` module.  Here 
       </td>
       <td>
          <code>
-         num.full([3, 4], 7)
+         vtl.full<f64>([3, 4], 7.)
          </code>
       </td>
    </tr>
@@ -148,7 +148,7 @@ Basic support for Machine Learning is being added in the `vtl.nn` module.  Here 
       </td>
       <td>
          <code>
-         a.get([-1])
+         a.get<f64>([-1])
          </code>
       </td>
    </tr>
@@ -160,7 +160,7 @@ Basic support for Machine Learning is being added in the `vtl.nn` module.  Here 
       </td>
       <td>
          <code>
-         a.get([1, 4])
+         a.get<f64>([1, 4])
          </code>
       </td>
    </tr>
@@ -232,7 +232,7 @@ Basic support for Machine Learning is being added in the `vtl.nn` module.  Here 
       </td>
       <td>
          <code>
-         num.sum_axis(1)
+         vtl.sum_axis(1)
          </code>
       </td>
    </tr>
@@ -244,7 +244,7 @@ Basic support for Machine Learning is being added in the `vtl.nn` module.  Here 
       </td>
       <td>
          <code>
-         num.diag(a)
+         vtl.diag(a)
          </code>
       </td>
    </tr>
@@ -280,7 +280,7 @@ Basic support for Machine Learning is being added in the `vtl.nn` module.  Here 
       </td>
       <td>
          <code>
-         num.concatenate([a, b], 1)
+         vtl.concatenate([a, b], 1)
          </code>
       </td>
    </tr>
@@ -297,7 +297,7 @@ This is a collection of common exercises using numpy, and their equivalent solut
 ```
 
 ```v
->>> import vtl.num
+>>> import vtl
 ```
 
 #### 2. Print the numpy version and the configuration
@@ -321,9 +321,9 @@ This is a collection of common exercises using numpy, and their equivalent solut
 ```
 
 ```v
->>> a := num.zeros([10])
+>>> a := vtl.zeros<f64>([10])
 >>> print(a)
-[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]
 ```
 
 #### 4. Create a null vector of size 10 but the fifth value which is 1
@@ -336,10 +336,10 @@ This is a collection of common exercises using numpy, and their equivalent solut
 ```
 
 ```v
->>> mut z := num.zeros([10])
->>> z.set([4], 1)
+>>> mut z := vtl.zeros<f64>([10])
+>>> z.set<f64>([4], 1)
 >>> print(z)
-[0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
+[0., 0., 0., 0., 1., 0., 0., 0., 0., 0.]
 ```
 
 #### 5. Create a vector with values ranging from 10 to 49
@@ -352,7 +352,7 @@ This is a collection of common exercises using numpy, and their equivalent solut
 ```
 
 ```v
->>> z := num.seq_between(10, 50)
+>>> z := vtl.range<f64>(from: 10, to: 50)
 >>> print(z)
 [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 
 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 
@@ -371,7 +371,7 @@ This is a collection of common exercises using numpy, and their equivalent solut
 ```
 
 ```v
->>> z := num.seq(50)
+>>> z := vtl.range<f64>(to: 50)
 >>> r := z.slice([[0, 50, -1]])
 >>> print(z)
 [49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26,
@@ -390,7 +390,7 @@ This is a collection of common exercises using numpy, and their equivalent solut
 ```
 
 ```v
->>> nz := num.seq(9).reshape([3, 3])
+>>> nz := vtl.range<f64>(to: 9 .reshape([3, 3])
 >>> print(nz)
 [[0, 1, 2], 
 [3, 4, 5], 
@@ -408,7 +408,7 @@ This is a collection of common exercises using numpy, and their equivalent solut
 ```
 
 ```v
->>> z := num.eye(3, 3, 0)
+>>> z := vtl.eye(3, 3, 0)
 >>> print(z)
 [[1, 0, 0], 
 [0, 1, 0], 
@@ -434,7 +434,7 @@ This is a collection of common exercises using numpy, and their equivalent solut
 ```
 
 ```
->>> z := num.random(0, 1, [3, 3, 3])
+>>> z := vtl.random(0, 1, [3, 3, 3])
 >>> print(z)
 [[[   0.17003,  0.0639199,    0.96962], 
  [  0.794206, 0.00541103,   0.384699], 
@@ -458,7 +458,7 @@ This is a collection of common exercises using numpy, and their equivalent solut
 ```
 
 ```v
->>> z := num.random(0, 1, [10, 10])
+>>> z := vtl.random(0, 1, [10, 10])
 >>> zmin, zmax := z.min(), z.max()
 >>> print(zmin, zmax)
 ```
@@ -472,7 +472,7 @@ This is a collection of common exercises using numpy, and their equivalent solut
 ```
 
 ```v
->>> z := num.random(0, 1, [30])
+>>> z := vtl.random(0, 1, [30])
 >>> m := z.mean()
 >>> print(m)
 ```
@@ -496,7 +496,7 @@ This is a collection of common exercises using numpy, and their equivalent solut
 ```
 
 ```v
->>> z := num.ones([10, 10])
+>>> z := vtl.ones([10, 10])
 >>> z.slice([[1, -1], [1, -1]]).fill(0)
 >>> print(z)
 [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
