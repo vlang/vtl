@@ -76,20 +76,15 @@ pub fn full_like<T>(t Tensor, val T) Tensor {
 	return new_tensor
 }
 
-// seq returns a Tensor containing values ranging from [0, n)
-pub fn seq<T>(n int) Tensor {
-	mut res := empty<T>([n])
-	for i := 0; i < n; i++ {
-		v := T(i)
-		res.set([i], &v)
-	}
-	return res
+pub struct BuildRangeData {
+        from int
+        to int
 }
 
 // range returns a Tensor containing values ranging from [start, stop)
-pub fn range<T>(start int, stop int) Tensor {
-	mut res := empty<T>([stop - start])
-	for i := start; i < stop; i++ {
+pub fn range<T>(data BuildRangeData) Tensor {
+	mut res := empty<T>([data.stop - data.start])
+	for i := data.start; i < data.stop; i++ {
 		v := T(i)
 		res.set([i], &v)
 	}
