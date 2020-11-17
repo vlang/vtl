@@ -26,8 +26,6 @@ pub fn tensor_to_varray<T>(t Tensor) []T {
 }
 
 // new_iterator creates an iterator through a Tensor
-// with a fast-track for contiguous Tensors
-[inline]
 pub fn (t Tensor) new_iterator() StridedIterator {
 	if t.is_rowmajor_contiguous() {
 		bs := 0
@@ -56,7 +54,6 @@ pub fn (t Tensor) new_iterator() StridedIterator {
 
 // advance_strided_iteration advances through a non-rowmajor-contiguous
 // Tensor in Row-Major order
-[inline]
 fn advance_strided_iteration(mut s StridedIterator) {
 	unsafe {
 		for i := s.rank - 1; i >= 0; i-- {
