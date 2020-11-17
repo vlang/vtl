@@ -9,7 +9,7 @@ fn rand_between<T>(min T, max T) T {
 
 pub fn random<T>(min T, max T, shape []int) Tensor {
 	ret := empty<T>(shape)
-	mut iter := ret.new_iterator()
+	mut iter := ret.iterator()
 	for _ in 0 .. ret.size {
 		r := rand_between<T>(min, max)
 		storage_set(ret.data, iter.pos, &r)
