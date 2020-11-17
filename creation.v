@@ -76,6 +76,26 @@ pub fn full_like<T>(t Tensor, val T) Tensor {
 	return new_tensor
 }
 
+// seq returns a Tensor containing values ranging from [0, n)
+pub fn seq<T>(n int) Tensor {
+	mut res := empty<T>([n])
+	for i := 0; i < n; i++ {
+		v := T(i)
+		res.set([i], &v)
+	}
+	return res
+}
+
+// range returns a Tensor containing values ranging from [start, stop)
+pub fn range<T>(start int, stop int) Tensor {
+	mut res := empty<T>([stop - start])
+	for i := start; i < stop; i++ {
+		v := T(i)
+		res.set([i], &v)
+	}
+	return res
+}
+
 // from_1d takes a one dimensional array of floating point values
 // and returns a one dimensional Tensor if possible
 pub fn from_1d<T>(arr []T) Tensor {
@@ -116,7 +136,7 @@ pub fn new_tensor<T>(data TensorData) Tensor {
 			strides: [1]
 			shape: []
 			size: 0
-			data: data_storage
+			data: &data_storage
 		}
 	}
 	strides := strides_from_shape(data.shape, data.memory)
@@ -131,17 +151,18 @@ pub fn new_tensor<T>(data TensorData) Tensor {
 		memory: data.memory
 		strides: strides
 		size: size
-		data: data_storage
+		data: &data_storage
 	}
 }
 
 pub fn new_tensor_like(t Tensor) Tensor {
+	storage := new_storage_like(t.data)
 	return Tensor{
 		shape: t.shape
 		strides: t.strides
 		memory: t.memory
 		size: t.size
-		data: new_storage_like(t.data)
+		data: &storage
 	}
 }
 
@@ -157,7 +178,7 @@ pub fn new_tensor_from_varray<T>(arr []T, data TensorData) Tensor {
 			strides: [1]
 			shape: []
 			size: size
-			data: data_storage
+			data: &data_storage
 		}
 	}
 	strides := strides_from_shape(data.shape, data.memory)
@@ -166,6 +187,6 @@ pub fn new_tensor_from_varray<T>(arr []T, data TensorData) Tensor {
 		strides: strides
 		memory: data.memory
 		size: size
-		data: data_storage
+		data: &data_storage
 	}
 }
