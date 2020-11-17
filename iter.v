@@ -17,7 +17,7 @@ pub mut:
 // elements of type T
 pub fn tensor_to_varray<T>(t Tensor) []T {
 	mut arr := []T{}
-	mut iter := t.new_iterator()
+	mut iter := t.iterator()
 	for _ in 0 .. t.size {
 		arr.push(storage_get(t.data, iter.pos))
 		iter.next()
@@ -25,36 +25,41 @@ pub fn tensor_to_varray<T>(t Tensor) []T {
 	return arr
 }
 
-// new_iterator creates an iterator through a Tensor
-pub fn (t Tensor) new_iterator() StridedIterator {
+// iterator creates an iterator through a Tensor
+pub fn (t Tensor) iterator() StridedIterator {
 	if t.is_rowmajor_contiguous() {
-		bs := 0
-		return StridedIterator{
-			pos: 0
-			next_handler: advance_flat_iteration
-			backstrides: &bs
-			coord: &bs
-		}
+		return t.rowmajor_contiguous_iterator()
 	}
-	arr_coord := []int{len: t.rank()}
-	mut arr_backstrides := []int{len: t.rank()}
-	for i := 0; i < t.rank(); i++ {
-		arr_backstrides[i] = t.strides[i] * (t.shape[i] - 1)
-	}
+	return t.strided_iterator()
+}
+
+fn (t Tensor) rowmajor_contiguous_iterator() StridedIterator {
+        bs := 0
+        return StridedIterator{
+                pos: 0
+                next_handler: handle_flatten_iteration
+                backstrides: &bs
+                coord: &bs
+        }
+}
+
+fn (t Tensor) strided_iterator() StridedIterator {
+        coord := []int{len: t.rank()}
+
 	return StridedIterator{
-		coord: &int(arr_coord.data)
-		backstrides: &int(arr_backstrides.data)
+		coord: &int(&coord[0])
+		backstrides: tensor_backstrides(t)
 		rank: t.rank()
 		shape: t.shape
 		strides: t.strides
 		pos: 0
-		next_handler: advance_strided_iteration
+		next_handler: handle_strided_iteration
 	}
 }
 
-// advance_strided_iteration advances through a non-rowmajor-contiguous
+// handle_strided_iteration advances through a non-rowmajor-contiguous
 // Tensor in Row-Major order
-fn advance_strided_iteration(mut s StridedIterator) {
+fn handle_strided_iteration(mut s StridedIterator) {
 	unsafe {
 		for i := s.rank - 1; i >= 0; i-- {
 			if s.coord[i] < s.shape[i] - 1 {
@@ -69,10 +74,18 @@ fn advance_strided_iteration(mut s StridedIterator) {
 	}
 }
 
-// advance_flat_iteration advances through a rowmajor-contiguous Tensor
+fn tensor_backstrides(t Tensor) &int {
+        mut backstrides := []int{len: t.rank()}
+	for i := 0; i < t.rank(); i++ {
+		backstrides[i] = t.strides[i] * (t.shape[i] - 1)
+	}
+        return &int(backstrides.data)
+}
+
+// handle_flatten_iteration advances through a rowmajor-contiguous Tensor
 // in Row-Major order
 [inline]
-fn advance_flat_iteration(mut s StridedIterator) {
+fn handle_flatten_iteration(mut s StridedIterator) {
 	s.pos++
 }
 
