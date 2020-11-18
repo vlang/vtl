@@ -77,8 +77,8 @@ pub fn full_like<T>(t Tensor, val T) Tensor {
 }
 
 pub struct BuildRangeData {
-        from int
-        to int
+	from int
+	to   int
 }
 
 // range returns a Tensor containing values ranging from [start, stop)
