@@ -2,6 +2,7 @@ module vtl
 
 // get returns a scalar value from a Tensor at the provided index
 [inline]
+[unsafe]
 pub fn (t Tensor) get(index []int) voidptr {
 	offset := t.offset(index)
 	unsafe {

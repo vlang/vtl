@@ -54,6 +54,7 @@ fn (t Tensor) strided_iterator() StridedTensorIterator {
 
 // handle_strided_iteration advances through a non-rowmajor-contiguous
 // Tensor in Row-Major order
+[unsafe]
 fn handle_strided_iteration(mut s StridedTensorIterator) voidptr {
         // get current value after update new position
         val := storage_get(s.tensor.data, s.pos)
