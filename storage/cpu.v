@@ -108,10 +108,10 @@ pub fn (cpu &CpuStorage) clone() CpuStorage {
 		for i in 0 .. cpu.len {
 			ar := CpuStorage{}
 			unsafe {
-                                C.memcpy(&ar, cpu.get_unsafe(i), size_of_cpu)
-                                ar_clone := ar.clone()
-			        new_cpu.set_unsafe(i, &ar_clone)
-                        }
+				C.memcpy(&ar, cpu.get_unsafe(i), size_of_cpu)
+				ar_clone := ar.clone()
+				new_cpu.set_unsafe(i, &ar_clone)
+			}
 		}
 	} else {
 		unsafe {C.memcpy(byteptr(new_cpu.data), cpu.data, cpu.capacity * cpu.element_size)}
@@ -151,7 +151,7 @@ pub fn (cpu CpuStorage) slice(start int, _end int) CpuStorage {
 
 [inline]
 pub fn (cpu CpuStorage) offset(start int) CpuStorage {
-        return cpu.slice(start, cpu.len)
+	return cpu.slice(start, cpu.len)
 }
 
 pub fn cpu_to_varray<T>(cpu CpuStorage) []T {

@@ -16,5 +16,4 @@ pub fn (mut t Tensor) fill(val voidptr) {
 // assign sets the values of an Tensor equal to the values of another
 // Tensor of the same shape
 pub fn (t Tensor) assign(other Tensor) {
-	
 }

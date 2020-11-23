@@ -35,26 +35,26 @@ pub fn (t Tensor) iterator() TensorIterator {
 }
 
 fn (t Tensor) rowmajor_contiguous_iterator() TensorIterator {
-        coord := 0
-        bs := 0
-        return t.custom_iterator(
-                coord: &coord
-                backstrides: &bs
-                next_handler: handle_flatten_iteration
-        )
+	coord := 0
+	bs := 0
+	return t.custom_iterator({
+		coord: &coord
+		backstrides: &bs
+		next_handler: handle_flatten_iteration
+	})
 }
 
 fn (t Tensor) strided_iterator() TensorIterator {
 	coord := []int{len: t.rank()}
-        return t.custom_iterator(
-                coord: &int(&coord[0]),
-                backstrides: tensor_backstrides(t),
-                next_handler: handle_strided_iteration
-        )
+	return t.custom_iterator({
+		coord: &int(&coord[0])
+		backstrides: tensor_backstrides(t)
+		next_handler: handle_strided_iteration
+	})
 }
 
 pub struct IteratorBuildData {
-        next_handler IteratorHandler
+	next_handler IteratorHandler
 	coord        &int
 	backstrides  &int
 	pos          int
@@ -62,22 +62,21 @@ pub struct IteratorBuildData {
 
 // iterator creates an iterator through a Tensor with custom data
 pub fn (t Tensor) custom_iterator(data IteratorBuildData) TensorIterator {
-	return TensorIterator {
-                coord: data.coord
-                backstrides: data.backstrides
-                tensor: t
-                pos: data.pos
-                next_handler: data.next_handler
-        }
+	return TensorIterator{
+		coord: data.coord
+		backstrides: data.backstrides
+		tensor: t
+		pos: data.pos
+		next_handler: data.next_handler
+	}
 }
 
 // handle_strided_iteration advances through a non-rowmajor-contiguous
 // Tensor in Row-Major order
 [unsafe]
 fn handle_strided_iteration(mut s TensorIterator) voidptr {
-        // get current value after update new position
-        val := storage_get(s.tensor.data, s.pos)
-
+	// get current value after update new position
+	val := storage_get(s.tensor.data, s.pos)
 	rank := s.tensor.rank()
 	shape := s.tensor.shape
 	strides := s.tensor.strides
@@ -93,16 +92,16 @@ fn handle_strided_iteration(mut s TensorIterator) voidptr {
 			}
 		}
 	}
-        return val
+	return val
 }
 
 // handle_flatten_iteration advances through a rowmajor-contiguous Tensor
 // in Row-Major order
 [inline]
 fn handle_flatten_iteration(mut s TensorIterator) voidptr {
-        // get current value after update new position
-        val := storage_get(s.tensor.data, s.pos)
-        s.pos++
+	// get current value after update new position
+	val := storage_get(s.tensor.data, s.pos)
+	s.pos++
 	return val
 }
 
