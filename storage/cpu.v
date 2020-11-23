@@ -119,6 +119,41 @@ pub fn (cpu &CpuStorage) clone() CpuStorage {
 	return new_cpu
 }
 
+// CpuStorage.slice returns an CpuStorage using the same buffer as original CpuStorage
+// but starting from the `start` element and ending with the element before
+// the `end` element of the original CpuStorage with the length and capacity
+// set to the number of the elements in the slice.
+pub fn (cpu CpuStorage) slice(start int, _end int) CpuStorage {
+	mut end := _end
+	$if !no_bounds_checking ? {
+		if start > end {
+			panic('CpuStorage.slice: invalid slice index ($start > $end)')
+		}
+		if end > cpu.len {
+			panic('CpuStorage.slice: slice bounds out of range ($end >= $cpu.len)')
+		}
+		if start < 0 {
+			panic('CpuStorage.slice: slice bounds out of range ($start < 0)')
+		}
+	}
+	mut data := byteptr(0)
+	unsafe {
+		data = byteptr(cpu.data) + start * cpu.element_size
+	}
+	l := end - start
+	return CpuStorage{
+		element_size: cpu.element_size
+		data: data
+		len: l
+		capacity: l
+	}
+}
+
+[inline]
+pub fn (cpu CpuStorage) offset(start int) CpuStorage {
+        return cpu.slice(start, cpu.len)
+}
+
 pub fn cpu_to_varray<T>(cpu CpuStorage) []T {
 	if cpu.element_size == int(sizeof(T)) {
 		mut arr := []T{}
