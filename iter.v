@@ -1,14 +1,18 @@
 module vtl
 
-// StridedTensorIterator is a struct to hold a Tensors
+// IteratorHandler defines a function to use in order to mutate
+// iteration position
+pub type IteratorHandler = fn (mut s TensorIterator) voidptr
+
+// TensorIterator is a struct to hold a Tensors
 // iteration state while iterating through a Tensor
-pub struct StridedTensorIterator {
+pub struct TensorIterator {
 	tensor       Tensor
-pub mut:
+	next_handler IteratorHandler
+mut:
 	coord        &int
 	backstrides  &int
 	pos          int
-	next_handler fn (mut s StridedTensorIterator) voidptr
 }
 
 // tensor_to_varray<T> returns the flatten representation of a tensor in a v array storing
@@ -23,39 +27,48 @@ pub fn tensor_to_varray<T>(t Tensor) []T {
 }
 
 // iterator creates an iterator through a Tensor
-pub fn (t Tensor) iterator() StridedTensorIterator {
+pub fn (t Tensor) iterator() TensorIterator {
 	if t.is_rowmajor_contiguous() {
 		return t.rowmajor_contiguous_iterator()
 	}
 	return t.strided_iterator()
 }
 
-fn (t Tensor) rowmajor_contiguous_iterator() StridedTensorIterator {
-	bs := 0
-	return StridedTensorIterator{
-		pos: 0
-		next_handler: handle_flatten_iteration
-		backstrides: &bs
-		coord: &bs
-		tensor: t
-	}
+fn (t Tensor) rowmajor_contiguous_iterator() TensorIterator {
+        return t.custom_iterator(next_handler: handle_flatten_iteration)
 }
 
-fn (t Tensor) strided_iterator() StridedTensorIterator {
+fn (t Tensor) strided_iterator() TensorIterator {
 	coord := []int{len: t.rank()}
-	return StridedTensorIterator{
-		coord: &int(&coord[0])
-		backstrides: tensor_backstrides(t)
-		tensor: t
-		pos: 0
-		next_handler: handle_strided_iteration
-	}
+        return t.custom_iterator(
+                coord: &int(&coord[0]),
+                backstrides: tensor_backstrides(t),
+                next_handler: handle_strided_iteration
+        )
+}
+
+pub struct IteratorBuildData {
+        next_handler IteratorHandler
+	coord        &int
+	backstrides  &int
+	pos          int = 0
+}
+
+// iterator creates an iterator through a Tensor with custom data
+pub fn (t Tensor) custom_iterator(data IteratorBuildData) TensorIterator {
+	return TensorIterator {
+                coord: data.coord
+                backstrides: data.backstrides
+                tensor: t
+                pos: data.pos
+                next_handler: data.next_handler
+        }
 }
 
 // handle_strided_iteration advances through a non-rowmajor-contiguous
 // Tensor in Row-Major order
 [unsafe]
-fn handle_strided_iteration(mut s StridedTensorIterator) voidptr {
+fn handle_strided_iteration(mut s TensorIterator) voidptr {
         // get current value after update new position
         val := storage_get(s.tensor.data, s.pos)
 
@@ -80,7 +93,7 @@ fn handle_strided_iteration(mut s StridedTensorIterator) voidptr {
 // handle_flatten_iteration advances through a rowmajor-contiguous Tensor
 // in Row-Major order
 [inline]
-fn handle_flatten_iteration(mut s StridedTensorIterator) voidptr {
+fn handle_flatten_iteration(mut s TensorIterator) voidptr {
         // get current value after update new position
         val := storage_get(s.tensor.data, s.pos)
         s.pos++
@@ -90,7 +103,7 @@ fn handle_flatten_iteration(mut s StridedTensorIterator) voidptr {
 // next calls the iteration type for a given iterator
 // which is either flat or strided and returns a voidptr containing the current value
 [inline]
-pub fn (mut s StridedTensorIterator) next() voidptr {
+pub fn (mut s TensorIterator) next() voidptr {
 	return s.next_handler(s)
 }
 
