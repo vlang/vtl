@@ -107,9 +107,11 @@ pub fn (cpu &CpuStorage) clone() CpuStorage {
 	if cpu.element_size == size_of_cpu {
 		for i in 0 .. cpu.len {
 			ar := CpuStorage{}
-			unsafe {C.memcpy(&ar, cpu.get_unsafe(i), size_of_cpu)}
-			ar_clone := ar.clone()
-			unsafe {new_cpu.set_unsafe(i, &ar_clone)}
+			unsafe {
+                                C.memcpy(&ar, cpu.get_unsafe(i), size_of_cpu)
+                                ar_clone := ar.clone()
+			        new_cpu.set_unsafe(i, &ar_clone)
+                        }
 		}
 	} else {
 		unsafe {C.memcpy(byteptr(new_cpu.data), cpu.data, cpu.capacity * cpu.element_size)}
