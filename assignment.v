@@ -12,3 +12,9 @@ pub fn (mut t Tensor) set(index []int, val voidptr) {
 pub fn (mut t Tensor) fill(val voidptr) {
 	storage_fill(t.data, val)
 }
+
+// assign sets the values of an Tensor equal to the values of another
+// Tensor of the same shape
+pub fn (t Tensor) assign(other Tensor) {
+	
+}

@@ -36,6 +36,15 @@ pub fn new_storage_like(s Storage) Storage {
 }
 
 [inline]
+pub fn new_storage_like_with_len(s Storage, len int) Storage {
+	match s {
+		storage.CpuStorage { return create_storage(len, 0, s.element_size,
+				voidptr(0), storage_strategy(s)) }
+		else { panic('storage not allowed') }
+	}
+}
+
+[inline]
 pub fn new_storage_from_varray<T>(arr []T, strategy StorageStrategy) Storage {
 	return create_storage_from_c_array(arr.len, 0, int(sizeof(T)), arr.data, strategy)
 }
@@ -80,6 +89,13 @@ fn storage_strategy(s Storage) StorageStrategy {
 fn storage_clone(s Storage) Storage {
 	match s {
 		storage.CpuStorage { return unsafe { s.clone() } }
+		else { panic('storage not allowed') }
+	}
+}
+
+fn storage_offset(s Storage, start int) Storage {
+	match s {
+		storage.CpuStorage { return unsafe { s.offset(start) } }
 		else { panic('storage not allowed') }
 	}
 }

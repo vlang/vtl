@@ -1,5 +1,7 @@
 module vtl
 
+import math
+
 pub type MapFn = fn(x voidptr, i int) voidptr
 
 pub type ApplyFn = fn(x voidptr, i int) voidptr
@@ -25,5 +27,135 @@ pub fn (t Tensor) apply(f ApplyFn) {
                         val := f(iter.next(), i)
                         storage_set(t.data, i, &val)
                 }
+	}
+}
+
+// transpose permutes the axes of an ndarray in a specified
+// order and returns a view of the data
+pub fn (t Tensor) transpose(order []int) Tensor {
+	mut ret := new_tensor_like(t)
+	n := order.len
+	if n != t.rank() {
+		panic('Bad number of dimensions')
+	}
+	mut permutation := []int{len: 32}
+	mut reverse_permutation := []int{len: 32, init: -1}
+	mut i := 0
+	for i < n {
+		mut axis := order[i]
+		if axis < 0 {
+			axis = t.rank() + axis
+		}
+		if axis < 0 || axis >= t.rank() {
+			panic('Bad permutation')
+		}
+		if reverse_permutation[axis] != -1 {
+			panic('Bad permutation')
+		}
+		reverse_permutation[axis] = i
+		permutation[i] = axis
+		i++
+	}
+	mut ii := 0
+	for ii < n {
+		ret.shape[ii] = t.shape[permutation[ii]]
+		ret.strides[ii] = t.strides[permutation[ii]]
+		ii++
+	}
+	return ret
+}
+
+// t returns a ful transpose of an ndarray, with the axes
+// reversed
+pub fn (t Tensor) t() Tensor {
+	order := irange(0, t.rank())
+	return t.transpose(order.reverse())
+}
+
+// swapaxes returns a view of an ndarray with two axes
+// swapped.
+pub fn (t Tensor) swapaxes(a1 int, a2 int) Tensor {
+	mut order := irange(0, t.rank())
+	tmp := order[a1]
+	order[a1] = order[a2]
+	order[a2] = tmp
+	return t.transpose(order)
+}
+
+// slice returns a view of an ndarray from a variadic list
+// of indexing operations.  The returned view does not
+// own its new data, but shares data with another ndarray
+pub fn (t Tensor) slice(idx [][]int) Tensor {
+	mut newshape := t.shape
+	mut newstrides := t.strides
+	mut indexer := []int{}
+	for i, dex in idx {
+		mut fi := 0
+		mut li := 0
+		// dimension is entirely included in output
+		if dex.len == 0 {
+			assert newshape[i] == t.shape[i]
+			assert newstrides[i] == t.strides[i]
+			indexer << 0
+		}
+		// dimension sliced from array
+		if dex.len == 1 {
+			newshape[i] = 0
+			newstrides[i] = 0
+			fi = dex[0]
+			if fi < 0 {
+				fi += t.shape[i]
+			}
+			indexer << fi
+		}
+		// dimension specified by start and stop value
+		else if dex.len == 2 {
+			fi = dex[0]
+			li = dex[1]
+			if fi < 0 {
+				fi += t.shape[i]
+			}
+			if li < 0 {
+				li += t.shape[i]
+			}
+			if fi == li {
+				newshape[i] = 0
+				newstrides[i] = 0
+				indexer << fi
+			} else {
+				newshape[i] = li - fi
+				indexer << fi
+			}
+		}
+		// dimension specified by start, stop, and step
+		else if dex.len == 3 {
+			fi = dex[0]
+			li = dex[1]
+			step := dex[2]
+			abstep := int(math.abs(step))
+			if fi < 0 {
+				fi += t.shape[i]
+			}
+			if li < 0 {
+				li += t.shape[i]
+			}
+			offset := li - fi
+			newshape[i] = offset / abstep + offset % abstep
+			newstrides[i] = step * newstrides[i]
+			indexer << fi
+		}
+	}
+	// remove 0 shaped dimensions
+	newshape_, newstrides_ := filter_shape_not_strides(newshape, newstrides)
+	mut offset := 0
+	for i in 0 .. indexer.len {
+		offset += t.strides[i] * indexer[i]
+	}
+        storage := storage_offset(t.data, offset)
+	return Tensor{
+		shape: newshape_
+		strides: newstrides_
+		size: size_from_shape(newshape_)
+		data: &storage
 	}
 }

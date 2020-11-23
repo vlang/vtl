@@ -52,3 +52,50 @@ fn assert_shape(shape []int, ts []Tensor) {
 		}
 	}
 }
+
+// irange returns an array between start and stop, incremented by 1
+fn irange(start int, stop int) []int {
+	mut ret := []int{cap: stop - start}
+	for i in start .. stop {
+		ret << i
+	}
+	return ret
+}
+
+// pad_with_zeros pads a shape with zeros to support an indexing
+// operation
+fn pad_with_zeros(pad []int, ndims int) []int {
+	diff := ndims - pad.len
+	mut newpad := pad
+	mut i := 0
+	for i < diff {
+		newpad << 0
+		i++
+	}
+	return newpad
+}
+
+// pad_with_max pads a shape with the maximum axis value to support
+// an indexing operation
+fn pad_with_max(pad []int, shape []int, ndims int) []int {
+	mut newpad := pad
+	diff := ndims - pad.len
+	if diff > 0 {
+		newpad << shape[pad.len..]
+	}
+	return newpad
+}
+
+// filter_shape_not_strides removes 0 size dimensions from the shape
+// and strides of an array
+fn filter_shape_not_strides(shape []int, strides []int) ([]int, []int) {
+	mut newshape := []int{}
+	mut newstrides := []int{}
+	for i := 0; i < shape.len; i++ {
+		if shape[i] != 0 {
+			newshape << shape[i]
+			newstrides << strides[i]
+		}
+	}
+	return newshape, newstrides
+}

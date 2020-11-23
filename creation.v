@@ -161,6 +161,19 @@ pub fn new_tensor_like(t Tensor) Tensor {
 	}
 }
 
+pub fn new_tensor_like_with_shape(t Tensor, shape []int) Tensor {
+        strides := strides_from_shape(shape, t.memory)
+        size := size_from_shape(shape)
+	storage := new_storage_like_with_len(t.data, size)
+	return Tensor{
+		shape: shape
+		strides: strides
+		memory: t.memory
+		size: size
+		data: &storage
+	}
+}
+
 pub fn new_tensor_from_varray<T>(arr []T, data TensorData) Tensor {
 	size := size_from_shape(data.shape)
 	if size != arr.len {
