@@ -35,7 +35,13 @@ pub fn (t Tensor) iterator() TensorIterator {
 }
 
 fn (t Tensor) rowmajor_contiguous_iterator() TensorIterator {
-        return t.custom_iterator(next_handler: handle_flatten_iteration)
+        coord := 0
+        bs := 0
+        return t.custom_iterator(
+                coord: &coord
+                backstrides: &bs
+                next_handler: handle_flatten_iteration
+        )
 }
 
 fn (t Tensor) strided_iterator() TensorIterator {
@@ -51,7 +57,7 @@ pub struct IteratorBuildData {
         next_handler IteratorHandler
 	coord        &int
 	backstrides  &int
-	pos          int = 0
+	pos          int
 }
 
 // iterator creates an iterator through a Tensor with custom data

@@ -79,28 +79,28 @@ fn storage_strategy(s Storage) StorageStrategy {
 
 fn storage_clone(s Storage) Storage {
 	match s {
-		storage.CpuStorage { return s.clone() }
+		storage.CpuStorage { return unsafe { s.clone() } }
 		else { panic('storage not allowed') }
 	}
 }
 
 fn storage_get(s Storage, i int) voidptr {
 	match s {
-		storage.CpuStorage { return s.get(i) }
+		storage.CpuStorage { return unsafe { s.get(i) } }
 		else { panic('storage not allowed') }
 	}
 }
 
 fn storage_set(s Storage, i int, val voidptr) {
 	match mut s {
-		storage.CpuStorage { s.set(i, val) }
+		storage.CpuStorage { unsafe { s.set(i, val) } }
 		else { panic('storage not allowed') }
 	}
 }
 
 fn storage_fill(s Storage, val voidptr) {
 	match mut s {
-		storage.CpuStorage { s.fill(val) }
+		storage.CpuStorage { unsafe {s.fill(val)} }
 		else { panic('storage not allowed') }
 	}
 }
