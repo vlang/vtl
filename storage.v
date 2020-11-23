@@ -38,8 +38,8 @@ pub fn new_storage_like(s Storage) Storage {
 [inline]
 pub fn new_storage_like_with_len(s Storage, len int) Storage {
 	match s {
-		storage.CpuStorage { return create_storage(len, 0, s.element_size,
-				voidptr(0), storage_strategy(s)) }
+		storage.CpuStorage { return create_storage(len, 0, s.element_size, voidptr(0),
+				storage_strategy(s)) }
 		else { panic('storage not allowed') }
 	}
 }
@@ -88,28 +88,28 @@ fn storage_strategy(s Storage) StorageStrategy {
 
 fn storage_clone(s Storage) Storage {
 	match s {
-		storage.CpuStorage { return unsafe { s.clone() } }
+		storage.CpuStorage { return unsafe {s.clone()} }
 		else { panic('storage not allowed') }
 	}
 }
 
 fn storage_offset(s Storage, start int) Storage {
 	match s {
-		storage.CpuStorage { return unsafe { s.offset(start) } }
+		storage.CpuStorage { return unsafe {s.offset(start)} }
 		else { panic('storage not allowed') }
 	}
 }
 
 fn storage_get(s Storage, i int) voidptr {
 	match s {
-		storage.CpuStorage { return unsafe { s.get(i) } }
+		storage.CpuStorage { return unsafe {s.get(i)} }
 		else { panic('storage not allowed') }
 	}
 }
 
 fn storage_set(s Storage, i int, val voidptr) {
 	match mut s {
-		storage.CpuStorage { unsafe { s.set(i, val) } }
+		storage.CpuStorage { unsafe {s.set(i, val)} }
 		else { panic('storage not allowed') }
 	}
 }
