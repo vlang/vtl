@@ -72,7 +72,7 @@ pub fn full<T>(shape []int, val T) Tensor {
 // Return a full Tensor with the same shape and type as a given Tensor
 pub fn full_like<T>(t Tensor, val T) Tensor {
 	mut new_tensor := new_tensor_like(t)
-	new_tensor.fill(&val)
+	new_tensor.fill(val)
 	return new_tensor
 }
 
@@ -121,6 +121,13 @@ pub fn from_varray<T>(arr []T, shape []int) Tensor {
 	})
 }
 
+// returns a copy of an array with a particular memory
+// layout, either rowmajor-contiguous or colmajor-contiguous
+[inline]
+pub fn (t Tensor) copy(memory MemoryFormat) Tensor {
+	return new_tensor_like_with_memory(t, memory)
+}
+
 pub fn new_tensor<T>(data TensorData) Tensor {
 	if data.shape.len == 0 {
 		data_storage := new_storage<T>({
@@ -157,6 +164,19 @@ pub fn new_tensor_like(t Tensor) Tensor {
 		strides: t.strides
 		memory: t.memory
 		size: t.size
+		data: &storage
+	}
+}
+
+pub fn new_tensor_like_with_memory(t Tensor, memory MemoryFormat) Tensor {
+	strides := strides_from_shape(t.shape, memory)
+	size := size_from_shape(t.shape)
+	storage := new_storage_like_with_len(t.data, size)
+	return Tensor{
+		shape: t.shape
+		strides: strides
+		memory: t.memory
+		size: size
 		data: &storage
 	}
 }

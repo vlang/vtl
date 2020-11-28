@@ -5,6 +5,24 @@ pub fn (t Tensor) rank() int {
 	return t.shape.len
 }
 
+// is_matrix returns if a Tensor is a nxm matrix or not
+[inline]
+pub fn (t Tensor) is_matrix() bool {
+        return t.rank() == 2
+}
+
+// is_matrix returns if a Tensor is a square matrix or not
+[inline]
+pub fn (t Tensor) is_square_matrix() bool {
+        return t.rank() == 2 && t.shape[0] == t.shape[1]
+}
+
+// is_matrix returns if a Tensor is a square 1D vector or not
+[inline]
+pub fn (t Tensor) is_vector() bool {
+        return t.rank() == 1
+}
+
 // is_rowmajor returns if a Tensor is supposed to store its data in Row-Major
 // order
 [inline]
