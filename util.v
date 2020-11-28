@@ -1,5 +1,7 @@
 module vtl
 
+import arrays
+
 fn strides_from_shape(shape []int, memory MemoryFormat) []int {
 	mut accum := 1
 	mut result := []int{len: shape.len}
@@ -98,4 +100,16 @@ fn filter_shape_not_strides(shape []int, strides []int) ([]int, []int) {
 		}
 	}
 	return newshape, newstrides
+}
+
+fn iarray_min(arr []int) int {
+        return arrays.min(arr)
+}
+
+fn iarray_sum(arr []int) int {
+        mut ret := 0
+	for i in arr {
+		ret += i
+	}
+	return ret
 }

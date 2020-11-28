@@ -30,7 +30,27 @@ pub fn (t Tensor) apply(f ApplyFn) {
 	}
 }
 
-// transpose permutes the axes of an ndarray in a specified
+// diagonal returns a view of the diagonal entries
+// of a two dimensional tensor
+pub fn (t Tensor) diagonal() Tensor {
+	nel := iarray_min(t.shape)
+	newshape := [nel]
+	newstrides := [iarray_sum(t.strides)]
+	return Tensor{
+		data: t.data
+		shape: newshape
+		strides: newstrides
+		size: nel
+	}
+}
+
+// ravel returns a flattened view of an ndarray if possible,
+// otherwise a flattened copy
+pub fn (t Tensor) ravel() Tensor {
+	return t.reshape([-1])
+}
+
+// transpose permutes the axes of an tensor in a specified
 // order and returns a view of the data
 pub fn (t Tensor) transpose(order []int) Tensor {
 	mut ret := new_tensor_like(t)
@@ -65,14 +85,14 @@ pub fn (t Tensor) transpose(order []int) Tensor {
 	return ret
 }
 
-// t returns a ful transpose of an ndarray, with the axes
+// t returns a ful transpose of an tensor, with the axes
 // reversed
 pub fn (t Tensor) t() Tensor {
 	order := irange(0, t.rank())
 	return t.transpose(order.reverse())
 }
 
-// swapaxes returns a view of an ndarray with two axes
+// swapaxes returns a view of an tensor with two axes
 // swapped.
 pub fn (t Tensor) swapaxes(a1 int, a2 int) Tensor {
 	mut order := irange(0, t.rank())
@@ -82,9 +102,9 @@ pub fn (t Tensor) swapaxes(a1 int, a2 int) Tensor {
 	return t.transpose(order)
 }
 
-// slice returns a view of an ndarray from a variadic list
+// slice returns a view of an tensor from a variadic list
 // of indexing operations.  The returned view does not
-// own its new data, but shares data with another ndarray
+// own its new data, but shares data with another tensor
 pub fn (t Tensor) slice(idx [][]int) Tensor {
 	mut newshape := t.shape
 	mut newstrides := t.strides
