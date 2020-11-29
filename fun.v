@@ -46,8 +46,22 @@ pub fn (t Tensor) diagonal() Tensor {
 
 // ravel returns a flattened view of an ndarray if possible,
 // otherwise a flattened copy
+[inline]
 pub fn (t Tensor) ravel() Tensor {
 	return t.reshape([-1])
+}
+
+// reshape returns an ndarray with a new shape
+pub fn (t Tensor) reshape(shape []int) Tensor {
+        size := size_from_shape(shape)
+        newshape, newsize := shape_with_autosize(shape, size)
+        if newsize != size {
+		panic('reshape: Cannot reshape')
+	}
+        mut ret := new_tensor_like_with_shape(t, newshape)
+        newstorage := storage_clone(t.data)
+        ret.data = &newstorage
+        return ret
 }
 
 // transpose permutes the axes of an tensor in a specified

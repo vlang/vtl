@@ -16,8 +16,8 @@ pub fn diag<T>(t Tensor) Tensor {
 // The flattened input is placed along the diagonal
 // of the resulting matrix
 pub fn diag_flat<T>(a Tensor) Tensor {
-	ret := zeros<T>([a.size, a.size])
-	ret.diagonal().assign(a.ravel())
+	mut ret := zeros<T>([a.size, a.size]).diagonal()
+        ret.assign(a.ravel())
 	return ret
 }
 

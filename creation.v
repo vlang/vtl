@@ -72,7 +72,7 @@ pub fn full<T>(shape []int, val T) Tensor {
 // Return a full Tensor with the same shape and type as a given Tensor
 pub fn full_like<T>(t Tensor, val T) Tensor {
 	mut new_tensor := new_tensor_like(t)
-	new_tensor.fill(val)
+	new_tensor.fill(&val)
 	return new_tensor
 }
 
