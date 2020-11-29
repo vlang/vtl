@@ -44,14 +44,14 @@ pub fn (t Tensor) diagonal() Tensor {
 	}
 }
 
-// ravel returns a flattened view of an ndarray if possible,
+// ravel returns a flattened view of an Tensor if possible,
 // otherwise a flattened copy
 [inline]
 pub fn (t Tensor) ravel() Tensor {
 	return t.reshape([-1])
 }
 
-// reshape returns an ndarray with a new shape
+// reshape returns an Tensor with a new shape
 pub fn (t Tensor) reshape(shape []int) Tensor {
         size := size_from_shape(shape)
         newshape, newsize := shape_with_autosize(shape, size)
