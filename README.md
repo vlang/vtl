@@ -3,8 +3,8 @@
 # VTL - V Tensor Library
 
 ```v
->>> import vtl { from_varray }
->>> t := from_varray([1., 2., 3., 4.], [2, 2])
+>>> import vtl
+>>> t := vtl.from_varray([1., 2., 3., 4.], [2, 2])
 >>> tget<f64>(t, [1, 1])
 4.0
 ```
