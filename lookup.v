@@ -11,6 +11,13 @@ pub fn (t Tensor) get(index []int) voidptr {
 	return val
 }
 
+[inline]
+pub fn tget<T>(t Tensor, index []int) T {
+	offset := t.offset(index)
+	val := unsafe {storage_get(t.data, offset)}
+	return *(&T(val))
+}
+
 // offset returns the index to a Tensor's data at
 // a given index
 [inline]
