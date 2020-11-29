@@ -9,8 +9,8 @@ pub fn (mut t Tensor) set(index []int, val voidptr) {
 
 // fill fills an entire Tensor with a given value
 [inline]
-pub fn (mut t Tensor) fill<T>(val T) {
-	storage_fill(t.data, &val)
+pub fn (mut t Tensor) fill(val voidptr) {
+	storage_fill(t.data, val)
 }
 
 // assign sets the values of an Tensor equal to the values of another
