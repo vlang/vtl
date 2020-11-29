@@ -17,7 +17,7 @@ pub fn diag<T>(t Tensor) Tensor {
 // of the resulting matrix
 pub fn diag_flat<T>(a Tensor) Tensor {
 	mut ret := zeros<T>([a.size, a.size])
-        ret.diagonal().assign(a.ravel())
+	ret.diagonal().assign(a.ravel())
 	return ret
 }
 
@@ -79,7 +79,7 @@ fn tril_inplace_offset(mut t Tensor, offset int) {
 		mut j := 0
 		for j < t.shape[1] {
 			if i < j - offset {
-                                val := 0
+				val := 0
 				t.set([i, j], &val)
 			}
 			j++
@@ -96,7 +96,7 @@ fn triu_inplace_offset(mut t Tensor, offset int) {
 		mut j := 0
 		for j < t.shape[1] {
 			if i > j - offset {
-                                val := 0
+				val := 0
 				t.set([i, j], &val)
 			}
 			j++

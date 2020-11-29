@@ -106,12 +106,12 @@ fn filter_shape_not_strides(shape []int, strides []int) ([]int, []int) {
 // the use of arrays.min give us an optimizad version of this function
 [inline]
 fn iarray_min(arr []int) int {
-        return arrays.min<int>(arr)
+	return arrays.min<int>(arr)
 }
 
 // iarray_sum returns the sum value of a given array of int values
 fn iarray_sum(arr []int) int {
-        mut ret := 0
+	mut ret := 0
 	for i in arr {
 		ret += i
 	}
@@ -121,10 +121,10 @@ fn iarray_sum(arr []int) int {
 // shape_with_autosize returns a new shape and size with autosize
 // applied if needed
 fn shape_with_autosize(shape []int, size int) ([]int, int) {
-        mut newshape := shape
-        mut newsize := size
-        mut autosize := -1
-        for i, val in newshape {
+	mut newshape := shape
+	mut newsize := size
+	mut autosize := -1
+	for i, val in newshape {
 		if val < 0 {
 			if autosize >= 0 {
 				panic('Only one dimension can be autosized')
@@ -138,5 +138,5 @@ fn shape_with_autosize(shape []int, size int) ([]int, int) {
 		newshape[autosize] = size / newsize
 		newsize *= newshape[autosize]
 	}
-        return newshape, newsize
+	return newshape, newsize
 }

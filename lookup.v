@@ -4,12 +4,11 @@ import math
 
 // get returns a scalar value from a Tensor at the provided index
 [inline]
-[unsafe]
-pub fn (t Tensor) get<T>(index []int) T {
+pub fn (t Tensor) get(index []int) voidptr {
 	offset := t.offset(index)
-	unsafe {
-		return T(storage_get(t.data, offset))
-	}
+	val := unsafe {storage_get(t.data, offset)}
+	// return *(&T(val))
+	return val
 }
 
 // offset returns the index to a Tensor's data at
