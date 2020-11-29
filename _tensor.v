@@ -8,7 +8,6 @@ pub enum MemoryFormat {
 pub struct Tensor {
 mut:
 	data    Storage
-pub:
 	memory  MemoryFormat
 pub mut:
 	size    int

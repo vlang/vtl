@@ -114,9 +114,7 @@ pub fn (t Tensor) swapaxes(a1 int, a2 int) Tensor {
 	return t.transpose(order)
 }
 
-// slice returns a view of an tensor from a variadic list
-// of indexing operations.  The returned view does not
-// own its new data, but shares data with another tensor
+// slice returns a tensor from a variadic list of indexing operations
 pub fn (t Tensor) slice(idx [][]int) Tensor {
 	mut newshape := t.shape
 	mut newstrides := t.strides
@@ -184,10 +182,13 @@ pub fn (t Tensor) slice(idx [][]int) Tensor {
 		offset += t.strides[i] * indexer[i]
 	}
 	storage := storage_offset(t.data, offset)
-	return Tensor{
+	mut ret := Tensor{
 		shape: newshape_
 		strides: newstrides_
 		size: size_from_shape(newshape_)
 		data: &storage
+                memory: .colmajor
 	}
+        ensure_memory(mut ret)
+        return ret
 }

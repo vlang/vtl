@@ -2,6 +2,7 @@ module vtl
 
 import arrays
 
+// strides_from_shape returns the strides from a shape and memory format
 fn strides_from_shape(shape []int, memory MemoryFormat) []int {
 	mut accum := 1
 	mut result := []int{len: shape.len}
@@ -19,12 +20,74 @@ fn strides_from_shape(shape []int, memory MemoryFormat) []int {
 	return result
 }
 
+// size_from_shape returns the allocated size for a given shape
 fn size_from_shape(shape []int) int {
 	mut accum := 1
 	for i in shape {
 		accum *= i
 	}
 	return accum
+}
+
+// shape_with_autosize returns a new shape and size with autosize
+// applied if needed
+fn shape_with_autosize(shape []int, size int) ([]int, int) {
+	mut newshape := shape
+	mut newsize := size
+	mut autosize := -1
+	for i, val in newshape {
+		if val < 0 {
+			if autosize >= 0 {
+				panic('Only one dimension can be autosized')
+			}
+			autosize = i
+		} else {
+			newsize *= val
+		}
+	}
+	if autosize >= 0 {
+		newshape[autosize] = size / newsize
+		newsize *= newshape[autosize]
+	}
+	return newshape, newsize
+}
+
+// filter_shape_not_strides removes 0 size dimensions from the shape
+// and strides of an array
+fn filter_shape_not_strides(shape []int, strides []int) ([]int, []int) {
+	mut newshape := []int{}
+	mut newstrides := []int{}
+	for i := 0; i < shape.len; i++ {
+		if shape[i] != 0 {
+			newshape << shape[i]
+			newstrides << strides[i]
+		}
+	}
+	return newshape, newstrides
+}
+
+// pad_with_zeros pads a shape with zeros to support an indexing
+// operation
+fn pad_with_zeros(pad []int, ndims int) []int {
+	diff := ndims - pad.len
+	mut newpad := pad
+	mut i := 0
+	for i < diff {
+		newpad << 0
+		i++
+	}
+	return newpad
+}
+
+// pad_with_max pads a shape with the maximum axis value to support
+// an indexing operation
+fn pad_with_max(pad []int, shape []int, ndims int) []int {
+	mut newpad := pad
+	diff := ndims - pad.len
+	if diff > 0 {
+		newpad << shape[pad.len..]
+	}
+	return newpad
 }
 
 // assert_rank ensures that a Tensor has a given rank
@@ -66,42 +129,19 @@ fn assert_shape(shape []int, ts []Tensor) {
 	}
 }
 
-// pad_with_zeros pads a shape with zeros to support an indexing
-// operation
-fn pad_with_zeros(pad []int, ndims int) []int {
-	diff := ndims - pad.len
-	mut newpad := pad
-	mut i := 0
-	for i < diff {
-		newpad << 0
-		i++
-	}
-	return newpad
-}
-
-// pad_with_max pads a shape with the maximum axis value to support
-// an indexing operation
-fn pad_with_max(pad []int, shape []int, ndims int) []int {
-	mut newpad := pad
-	diff := ndims - pad.len
-	if diff > 0 {
-		newpad << shape[pad.len..]
-	}
-	return newpad
-}
-
-// filter_shape_not_strides removes 0 size dimensions from the shape
-// and strides of an array
-fn filter_shape_not_strides(shape []int, strides []int) ([]int, []int) {
-	mut newshape := []int{}
-	mut newstrides := []int{}
-	for i := 0; i < shape.len; i++ {
-		if shape[i] != 0 {
-			newshape << shape[i]
-			newstrides << strides[i]
+// ensure_memory sets a correct memory layout to a given tensor
+[inline]
+fn ensure_memory(mut t Tensor) {
+        if t.is_colmajor() {
+		if !t.is_colmajor_contiguous() {
+			t.memory = .rowmajor
 		}
 	}
-	return newshape, newstrides
+        if t.is_contiguous() {
+                if t.rank() > 1 {
+                        t.memory = .rowmajor
+                }
+	}
 }
 
 // irange returns an array between start and stop, incremented by 1
@@ -129,25 +169,4 @@ fn iarray_sum(arr []int) int {
 	return ret
 }
 
-// shape_with_autosize returns a new shape and size with autosize
-// applied if needed
-fn shape_with_autosize(shape []int, size int) ([]int, int) {
-	mut newshape := shape
-	mut newsize := size
-	mut autosize := -1
-	for i, val in newshape {
-		if val < 0 {
-			if autosize >= 0 {
-				panic('Only one dimension can be autosized')
-			}
-			autosize = i
-		} else {
-			newsize *= val
-		}
-	}
-	if autosize >= 0 {
-		newshape[autosize] = size / newsize
-		newsize *= newshape[autosize]
-	}
-	return newshape, newsize
-}
+
