@@ -7,8 +7,7 @@ pub fn (t Tensor) rank() int {
 
 // size returns the number of allocated elements for a given tensor
 pub fn (t Tensor) size() int {
-	// @todo: do it using t.data instead
-	return size_from_shape(t.shape)
+	return t.size
 }
 
 // is_matrix returns if a Tensor is a nxm matrix or not

@@ -120,3 +120,10 @@ fn storage_fill(s Storage, val voidptr) {
 		else { panic('storage not allowed') }
 	}
 }
+
+fn storage_size(s Storage) int {
+	match s {
+		storage.CpuStorage { return s.len }
+		else { panic('storage not allowed') }
+	}
+}
