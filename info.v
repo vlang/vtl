@@ -64,7 +64,7 @@ pub fn (t Tensor) is_rowmajor_contiguous() bool {
 // is_colmajor verifies if a Tensor stores its data in Col-Major
 // order
 [inline]
-pub fn (t Tensor) is_colmajor_contigous() bool {
+pub fn (t Tensor) is_colmajor_contiguous() bool {
 	if t.rank() == 1 && t.strides[0] != 1 {
 		return false
 	}
@@ -82,5 +82,5 @@ pub fn (t Tensor) is_colmajor_contigous() bool {
 // memory layout
 [inline]
 pub fn (t Tensor) is_contiguous() bool {
-	return t.is_rowmajor_contiguous() || t.is_colmajor_contigous()
+	return t.is_rowmajor_contiguous() || t.is_colmajor_contiguous()
 }
