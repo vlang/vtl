@@ -48,3 +48,15 @@ fn test_set() {
 	mut a := *(&f64(val))
 	assert a == 8.0
 }
+
+fn test_transpose() {
+	t := from_varray<f64>([1., 2., 3., 4.], [2, 2])
+	v1 := t.transpose([1, 0])
+	v2 := t.t()
+	v3 := t.swapaxes(1, 0)
+        v1_array := tensor_to_varray<f64>(v1)
+        v2_array := tensor_to_varray<f64>(v2)
+        v3_array := tensor_to_varray<f64>(v3)
+	assert v1_array == v2_array
+	assert v2_array == v3_array
+}
