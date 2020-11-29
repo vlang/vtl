@@ -2,6 +2,13 @@
 
 # VTL - V Tensor Library
 
+```v
+>>> import vtl { new_tensor }
+>>> t := from_varray([1., 2., 3., 4.], [2, 2])
+>>> tget<f64>(t, [1, 1])
+4.0
+```
+
 ## VTL Provides
 
 - An n-dimensional `Tensor` data structure
@@ -9,7 +16,7 @@
 - Data Structures that can easily be passed to C libraries
 - Powerful linear algebra routines backed by VSL that uses LAPACKE and OpenBLAS.
 
-In the docs you can find a complete [Numpy vs Vtl comparison](./docs/NUMPY_COMPARISON.md) 
+In the [docs](./docs/README.md) you can find more information about this module 
 
 ## Installation
 
