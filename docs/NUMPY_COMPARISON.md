@@ -24,7 +24,7 @@ Use the `vtl.la` module for powerful `VSL` backed routines.
 >>> import vtl.la
 >>> a := vtl.range<f64>(to: 60).reshape([3, 4, 5])
 >>> b := vtl.range<f64>(to: 24).reshape([4, 3, 2])
->>> res := la.tensordot(a, b, [1, 0], [0, 1])
+>>> res := lt.tensordot(a, b, [1, 0], [0, 1])
 >>> res
 [[4400, 4730],
  [4532, 4874],
@@ -143,72 +143,72 @@ Basic support for Machine Learning is being added in the `vtl.nn` module.  Here 
    <tr>
       <td>
          <code>
-         a[-1]
+         t[-1]
          </code>
       </td>
       <td>
          <code>
-         a.get<f64>([-1])
-         </code>
-      </td>
-   </tr>
-   <tr>
-      <td>
-         <code>
-         a[1, 4]
-         </code>
-      </td>
-      <td>
-         <code>
-         a.get<f64>([1, 4])
+         t.get<f64>([-1])
          </code>
       </td>
    </tr>
    <tr>
       <td>
          <code>
-         a[1]
+         t[1, 4]
          </code>
       </td>
       <td>
          <code>
-         a.slice([[1]])
-         </code>
-      </td>
-   </tr>
-   <tr>
-      <td>
-         <code>
-         a[0:5]
-         </code>
-      </td>
-      <td>
-         <code>
-         a.slice([[0, 5]])
+         t.get<f64>([1, 4])
          </code>
       </td>
    </tr>
    <tr>
       <td>
          <code>
-         a[1:4:2]
+         t[1]
          </code>
       </td>
       <td>
          <code>
-         a.slice([[1, 4, 2]])
+         t.slice([1])
          </code>
       </td>
    </tr>
    <tr>
       <td>
          <code>
-         a.T
+         t[0:5]
          </code>
       </td>
       <td>
          <code>
-         a.t()
+         t.slice([0, 5])
+         </code>
+      </td>
+   </tr>
+   <tr>
+      <td>
+         <code>
+         t[1:4:2]
+         </code>
+      </td>
+      <td>
+         <code>
+         t.slice([1, 4, 2])
+         </code>
+      </td>
+   </tr>
+   <tr>
+      <td>
+         <code>
+         t.T
+         </code>
+      </td>
+      <td>
+         <code>
+         t.t()
          </code>
       </td>
    </tr>
@@ -220,7 +220,7 @@ Basic support for Machine Learning is being added in the `vtl.nn` module.  Here 
       </td>
       <td>
          <code>
-         la.matmul(mat2, mat2)
+         lt.matmul(mat2, mat2)
          </code>
       </td>
    </tr>
@@ -251,24 +251,24 @@ Basic support for Machine Learning is being added in the `vtl.nn` module.  Here 
    <tr>
       <td>
          <code>
-         a[:] = 3
+         t[:] = 3
          </code>
       </td>
       <td>
          <code>
-         a.fill(3)
+         t.fill(3)
          </code>
       </td>
    </tr>
    <tr>
       <td>
          <code>
-         a[:] = b
+         t[:] = b
          </code>
       </td>
       <td>
          <code>
-         a.assign(b)
+         t.assign(b)
          </code>
       </td>
    </tr>
@@ -372,7 +372,7 @@ This is a collection of common exercises using numpy, and their equivalent solut
 
 ```v
 >>> z := vtl.range<f64>(to: 50)
->>> r := z.slice([[0, 50, -1]])
+>>> r := z.slice([0, 50, -1])
 >>> print(z)
 [49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26,
  25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2,
@@ -497,7 +497,7 @@ This is a collection of common exercises using numpy, and their equivalent solut
 
 ```v
 >>> z := vtl.ones([10, 10])
->>> z.slice([[1, -1], [1, -1]]).fill(0)
+>>> z.slice([1, -1], [1, -1]).fill(0)
 >>> print(z)
 [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 1]

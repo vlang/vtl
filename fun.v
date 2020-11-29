@@ -115,11 +115,12 @@ pub fn (t Tensor) swapaxes(a1 int, a2 int) Tensor {
 }
 
 // slice returns a tensor from a variadic list of indexing operations
-pub fn (t Tensor) slice(idx [][]int) Tensor {
+pub fn (t Tensor) slice(idx ...[]int) Tensor {
 	mut newshape := t.shape
 	mut newstrides := t.strides
 	mut indexer := []int{}
-	for i, dex in idx {
+	for i in 0 .. idx.len {
+                dex := idx[i]
 		mut fi := 0
 		mut li := 0
 		// dimension is entirely included in output

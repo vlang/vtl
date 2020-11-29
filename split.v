@@ -131,7 +131,7 @@ fn splitter(t Tensor, axis int, n int, div_points []int) []Tensor {
 	for i := 0; i < n; i++ {
 		st := div_points[i]
 		en := div_points[i + 1]
-		subary << sary.slice([[st], [en]]).swapaxes(axis, 0)
+		subary << sary.slice([st], [en]).swapaxes(axis, 0)
 	}
 	return subary
 }
