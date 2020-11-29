@@ -27,6 +27,14 @@ fn size_from_shape(shape []int) int {
 	return accum
 }
 
+// assert_rank ensures that a Tensor has a given rank
+[inline]
+fn assert_rank(t Tensor, n int) {
+        if n != t.rank() {
+		panic('Bad number of dimensions')
+	}
+}
+
 // assert_shape_off_axis ensures that the shapes of Tensors match
 // for concatenation, except along the axis being joined
 fn assert_shape_off_axis(ts []Tensor, axis int, shape []int) []int {
@@ -47,21 +55,15 @@ fn assert_shape_off_axis(ts []Tensor, axis int, shape []int) []int {
 	return retshape
 }
 
+// assert_shape ensures that the shapes of Tensors match
+// for each tensor given list of tensors
+[inline]
 fn assert_shape(shape []int, ts []Tensor) {
 	for t in ts {
 		if shape != t.shape {
 			panic('All shapes must be equal')
 		}
 	}
-}
-
-// irange returns an array between start and stop, incremented by 1
-fn irange(start int, stop int) []int {
-	mut ret := []int{cap: stop - start}
-	for i in start .. stop {
-		ret << i
-	}
-	return ret
 }
 
 // pad_with_zeros pads a shape with zeros to support an indexing
@@ -100,6 +102,15 @@ fn filter_shape_not_strides(shape []int, strides []int) ([]int, []int) {
 		}
 	}
 	return newshape, newstrides
+}
+
+// irange returns an array between start and stop, incremented by 1
+fn irange(start int, stop int) []int {
+	mut ret := []int{cap: stop - start}
+	for i in start .. stop {
+		ret << i
+	}
+	return ret
 }
 
 // iarray_min returns the minimum value of a given array of int values

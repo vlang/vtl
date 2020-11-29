@@ -69,9 +69,7 @@ pub fn (t Tensor) reshape(shape []int) Tensor {
 pub fn (t Tensor) transpose(order []int) Tensor {
 	mut ret := new_tensor_like(t)
 	n := order.len
-	if n != t.rank() {
-		panic('Bad number of dimensions')
-	}
+	assert_rank(t, n)
 	mut permutation := []int{len: 32}
 	mut reverse_permutation := []int{len: 32, init: -1}
 	mut i := 0
