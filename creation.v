@@ -132,12 +132,13 @@ pub fn new_tensor<T>(data TensorData) Tensor {
 	if data.shape.len == 0 {
 		data_storage := new_storage<T>({
 			strategy: data.storage
+                        len: 1
 		})
 		return Tensor{
 			memory: data.memory
 			strides: [1]
 			shape: []
-			size: 0
+			size: 1
 			data: &data_storage
 		}
 	}
