@@ -89,7 +89,7 @@ pub fn (t Tensor) broadcast_to(shape []int) Tensor {
 fn broadcast_shapes(args ...[]int) []int {
 	s0 := args[0]
 	mut all_same := true
-	for i := 0; i < args.len; i++ {
+	for i in 0 .. args.len {
 		if s0 != args[i] {
 			all_same = false
 		}
@@ -98,13 +98,13 @@ fn broadcast_shapes(args ...[]int) []int {
 		return s0
 	}
 	mut nd := 0
-	for i := 0; i < args.len; i++ {
+	for i in 0 .. args.len {
 		if args[i].len > nd {
 			nd = args[i].len
 		}
 	}
 	mut result := []int{len: nd}
-	for i := 0; i < args.len; i++ {
+	for i in 0 .. args.len {
 		ai := args[i]
 		d := nd - ai.len
 		mut shape := []int{len: d, init: 1}

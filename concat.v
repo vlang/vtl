@@ -12,7 +12,7 @@ pub fn concatenate(ts []Tensor, axis int) Tensor {
 	for t in ts {
 		if t.shape[axis] != 0 {
 			hi[axis] += t.shape[axis]
-			ret = ret.slice([lo, hi])
+			ret = ret.slice(lo, hi)
 			ret.assign(t)
 			lo[axis] = hi[axis]
 		}
