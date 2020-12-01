@@ -10,14 +10,17 @@ pub const (
 pub type Num = any_float | any_int | byte | f32 | f64 | i16 | i64 | i8 | int | u16 | u32 |
 	u64
 
+// as_type<T> returns a Num casted to a given T type
 pub fn (f Num) as_type<T>() T {
 	return f as T
 }
 
+// etype returns the string representation of the specific type of f
 pub fn (f Num) etype() string {
 	return typeof(f)
 }
 
+// esize returns the int representation of the specific size of f
 pub fn (f Num) esize() int {
 	match f {
 		byte { return int(sizeof(f)) }
@@ -35,6 +38,7 @@ pub fn (f Num) esize() int {
 	}
 }
 
+// esize returns a safe pointer to a given Num
 pub fn (f Num) ptr() voidptr {
 	match f {
 		byte { return voidptr(&f) }
@@ -52,6 +56,7 @@ pub fn (f Num) ptr() voidptr {
 	}
 }
 
+// ptr_to_val_of_type returns the number obtained from ptr
 pub fn ptr_to_val_of_type(ptr voidptr, t string) Num {
 	match t {
 		'byte' {
@@ -108,6 +113,7 @@ pub fn ptr_to_val_of_type(ptr voidptr, t string) Num {
 	}
 }
 
+// str_esize returns the int representation of a given type
 pub fn str_esize(t string) int {
 	match t {
 		'byte' { return int(sizeof(byte)) }
@@ -126,6 +132,7 @@ pub fn str_esize(t string) int {
 	}
 }
 
+// str_esize returns the int representation of the size for a given array of Num
 pub fn arr_esize(arr []Num) int {
 	if arr.len > 0 {
 		return arr[0].esize()
@@ -133,6 +140,7 @@ pub fn arr_esize(arr []Num) int {
 	return default_size
 }
 
+// str_etype returns the type for a given array of Num
 pub fn arr_etype(arr []Num) string {
 	if arr.len > 0 {
 		return arr[0].etype()
@@ -140,6 +148,7 @@ pub fn arr_etype(arr []Num) string {
 	return default_type
 }
 
+// str  returns the string representation for a given Num f
 pub fn (f Num) str() string {
 	match f {
 		byte {
