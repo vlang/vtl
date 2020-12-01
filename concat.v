@@ -1,7 +1,12 @@
 module vtl
 
+pub struct AxisData {
+	axis int
+}
+
 // concatenates two Tensors together
-pub fn concatenate(ts []Tensor, axis int) Tensor {
+pub fn concatenate(ts []Tensor, data AxisData) Tensor {
+	axis := data.axis
 	mut newshape := ts[0].shape
 	newshape[axis] = 0
 	newshape = assert_shape_off_axis(ts, axis, newshape)
