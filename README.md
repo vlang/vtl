@@ -4,7 +4,7 @@
 
 ```v
 >>> import vtl
->>> t := vtl.from_varray([Num(1.), 2., 3., 4.], [2, 2])
+>>> t := vtl.from_varray<f64>([1., 2., 3., 4.], [2, 2])
 >>> t.get([1, 1]) as f64
 4.0
 ```
