@@ -12,7 +12,61 @@ pub type Num = any_float | any_int | byte | f32 | f64 | i16 | i64 | i8 | int | u
 
 // as_type<T> returns a Num casted to a given T type
 pub fn (f Num) as_type<T>() T {
-	return f as T
+	return num_as_type<T>(f)
+}
+
+// num_as_type<T> returns a Num casted to a given T type
+pub fn num_as_type<T>(f Num) T {
+	match f {
+		byte {
+			val := byte(f)
+			return T(val)
+		}
+		u16 {
+			val := u16(f)
+			return T(val)
+		}
+		u32 {
+			val := u32(f)
+			return T(val)
+		}
+		u64 {
+			val := u64(f)
+			return T(val)
+		}
+		i8 {
+			val := i8(f)
+			return T(val)
+		}
+		i16 {
+			val := i16(f)
+			return T(val)
+		}
+		int {
+			val := int(f)
+			return T(val)
+		}
+		i64 {
+			val := i64(f)
+			return T(val)
+		}
+		f32 {
+			val := f32(f)
+			return T(val)
+		}
+		f64 {
+			val := f64(f)
+			return T(val)
+		}
+		any_int {
+			val := any_int(f)
+			return T(val)
+		}
+		any_float {
+			val := any_float(f)
+			return T(val)
+		}
+	}
 }
 
 // etype returns the string representation of the specific type of f
