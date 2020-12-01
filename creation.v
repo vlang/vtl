@@ -91,20 +91,20 @@ pub fn range(data BuildRangeData) Tensor {
 
 // from_1d takes a one dimensional array of floating point values
 // and returns a one dimensional Tensor if possible
-pub fn from_1d(arr []Num) Tensor {
-	return from_varray(arr, [arr.len])
+pub fn from_1d<T>(arr []T) Tensor {
+	return from_varray<T>(arr, [arr.len])
 }
 
 // from_2d takes a two dimensional array of floating point values
 // and returns a two-dimensional Tensor if possible
-pub fn from_2d(a [][]Num) Tensor {
+pub fn from_2d<T>(a [][]T) Tensor {
 	mut ret := new_tensor({
 		shape: [a.len, a[0].len]
 	})
 	for i in 0 .. a.len {
 		for j in 0 .. a[0].len {
 			val := a[i][j]
-			ret.set([i, j], val)
+			ret.set([i, j], Num(val))
 		}
 	}
 	return ret
@@ -113,8 +113,8 @@ pub fn from_2d(a [][]Num) Tensor {
 // from_varray takes a one dimensional array of T values
 // and coerces it into an arbitrary shaped Tensor if possible.
 // Panics if the shape provided does not hold the provided array
-pub fn from_varray(arr []Num, shape []int) Tensor {
-	return new_tensor_from_varray(arr, {
+pub fn from_varray<T>(arr []T, shape []int) Tensor {
+	return new_tensor_from_varray<T>(arr, {
 		shape: shape
 	})
 }
@@ -201,19 +201,19 @@ pub fn new_tensor_like_with_shape(t Tensor, shape []int) Tensor {
 	}
 }
 
-pub fn new_tensor_from_varray(arr []Num, data TensorData) Tensor {
+pub fn new_tensor_from_varray<T>(arr []T, data TensorData) Tensor {
 	size := size_from_shape(data.shape)
 	if size != arr.len {
 		panic('Bad shape for array, shape [$arr.len] cannot fit into shape $data.shape')
 	}
-	data_storage := new_storage_from_varray(arr, data.storage)
+	data_storage := new_storage_from_varray<T>(arr, data.storage)
 	if data.shape.len == 0 {
 		return Tensor{
 			memory: data.memory
 			strides: [1]
 			shape: []
 			size: size
-			etype: arr_etype(arr)
+			etype: typeof(T)
 			data: &data_storage
 		}
 	}
@@ -223,7 +223,7 @@ pub fn new_tensor_from_varray(arr []Num, data TensorData) Tensor {
 		strides: strides
 		memory: data.memory
 		size: size
-		etype: arr_etype(arr)
+		etype: typeof(T)
 		data: &data_storage
 	}
 }

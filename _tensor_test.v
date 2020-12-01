@@ -32,7 +32,7 @@ fn test_colmajor() {
 fn test_get() {
 	arr := [1., 2., 3., 4.]
 	shape := [2, 2]
-	t := from_varray(arr, shape)
+	t := from_varray<f64>(arr, shape)
 	val := t.get([1, 1]) as f64
 	assert val == 4.0
 }
@@ -40,14 +40,14 @@ fn test_get() {
 fn test_set() {
 	arr := [1., 2., 3., 4.]
 	shape := [2, 2]
-	mut t := from_varray(arr, shape)
+	mut t := from_varray<f64>(arr, shape)
 	t.set([1, 1], Num(8.0))
 	val := t.get([1, 1]) as f64
 	assert val == 8.0
 }
 
 fn test_transpose() {
-	t := from_varray([Num(1.), 2., 3., 4.], [2, 2])
+	t := from_varray<f64>([Num(1.), 2., 3., 4.], [2, 2])
 	v1 := t.transpose([1, 0])
 	v2 := t.t()
 	v3 := t.swapaxes(1, 0)

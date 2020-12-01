@@ -11,23 +11,23 @@ fn test_new() {
 }
 
 fn test_from_varray() {
-	arr := [Num(1.0), 2.0]
+	arr := [1.0, 2.0]
 	shape := [2]
-	mut t := from_varray(arr, shape)
+	mut t := from_varray<f64>(arr, shape)
 	varray := tensor_to_varray<f64>(t)
 	assert varray == arr
 }
 
 fn test_from_1d() {
-	arr := [Num(1.0), 2.0]
-	mut t := from_1d(arr)
+	arr := [1.0, 2.0]
+	mut t := from_1d<f64>(arr)
 	varray := tensor_to_varray<f64>(t)
 	assert varray == arr
 }
 
 fn test_from_2d() {
-	arr := [[Num(1.0), 2.0]]
-	mut t := from_2d(arr)
+	arr := [[1.0, 2.0]]
+	mut t := from_2d<f64>(arr)
 	varray := tensor_to_varray<f64>(t)
 	assert varray.len == 2
 	assert varray[1] == 2.0
@@ -35,25 +35,25 @@ fn test_from_2d() {
 
 fn test_eye() {
 	res := eye(3, 3, 0)
-	expected := from_varray([Num(1.), 0., 0., 0., 1., 0., 0., 0., 1.], [3, 3])
+	expected := from_varray<f64>([1.0, 0., 0., 0., 1., 0., 0., 0., 1.], [3, 3])
 	assert tensor_to_varray<f64>(res) == tensor_to_varray<f64>(expected)
 }
 
 fn test_eye_different_shape() {
 	res := eye(2, 4, 0)
-	expected := from_varray([Num(1.), 0., 0., 0., 0., 1., 0., 0.], [2, 4])
+	expected := from_varray<f64>([1.0, 0., 0., 0., 0., 1., 0., 0.], [2, 4])
 	assert tensor_to_varray<f64>(res) == tensor_to_varray<f64>(expected)
 }
 
 fn test_eye_offset() {
 	res := eye(3, 3, 1)
-	expected := from_varray([Num(0.), 1., 0., 0., 0., 1., 0., 0., 0.], [3, 3])
+	expected := from_varray<f64>([0., 1., 0., 0., 0., 1., 0., 0., 0.], [3, 3])
 	assert tensor_to_varray<f64>(res) == tensor_to_varray<f64>(expected)
 }
 
 fn test_identity() {
 	res := identity(3)
-	expected := from_varray([Num(1.), 0., 0., 0., 1., 0., 0., 0., 1.], [3, 3])
+	expected := from_varray<f64>([1.0, 0., 0., 0., 1., 0., 0., 0., 1.], [3, 3])
 	assert tensor_to_varray<f64>(res) == tensor_to_varray<f64>(expected)
 }
 

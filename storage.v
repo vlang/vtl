@@ -16,8 +16,8 @@ pub struct StorageData {
 pub:
 	len      int
 	cap      int
-	init     Num = Num(f64(0.0))
-	etype    string = 'f64'
+	init     Num = default_init
+	etype    string = default_type
 	strategy StorageStrategy = .cpu
 }
 
@@ -46,14 +46,14 @@ pub fn new_storage_like_with_len(s Storage, len int) Storage {
 }
 
 [inline]
-pub fn new_storage_from_varray(arr []Num, strategy StorageStrategy) Storage {
-	return create_storage_from_c_array(arr.len, 0, str_esize(data.etype), arr.data, strategy)
+pub fn new_storage_from_varray<T>(arr []T, strategy StorageStrategy) Storage {
+	return create_storage_from_c_array(arr.len, 0, arr.element_size, arr.data, strategy)
 }
 
 pub fn storage_to_varray<T>(s Storage) []T {
 	match s {
 		storage.CpuStorage {
-			if s.element_size == str_esize(data.etype) {
+			if s.element_size == int(sizeof(T)) {
 				mut arr := []T{}
 				arr.push_many(s.data, s.len)
 				return arr
