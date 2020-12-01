@@ -3,7 +3,7 @@ module vtl
 import rand
 import time
 
-fn rand_between(min Num, max Num) T {
+fn rand_between(min Num, max Num) Num {
 	return Num(rand.f64_in_range(min as f64, max as f64))
 }
 

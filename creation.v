@@ -80,10 +80,10 @@ pub struct BuildRangeData {
 	to   int
 }
 
-// range returns a Tensor containing values ranging from [start, stop)
+// range returns a Tensor containing values ranging from [from, to)
 pub fn range(data BuildRangeData) Tensor {
-	mut res := empty([data.stop - data.start])
-	for i := data.start; i < data.stop; i++ {
+	mut res := empty([data.to - data.from])
+	for i := data.from; i < data.to; i++ {
 		res.set([i], Num(i))
 	}
 	return res
@@ -98,16 +98,13 @@ pub fn from_1d<T>(arr []T) Tensor {
 // from_2d takes a two dimensional array of floating point values
 // and returns a two-dimensional Tensor if possible
 pub fn from_2d<T>(a [][]T) Tensor {
-	mut ret := new_tensor({
-		shape: [a.len, a[0].len]
-	})
+        mut arr := []T{}
 	for i in 0 .. a.len {
 		for j in 0 .. a[0].len {
-			val := a[i][j]
-			ret.set([i, j], Num(val))
+			arr << a[i][j]
 		}
 	}
-	return ret
+	return from_varray<T>(arr, [a.len, a[0].len])
 }
 
 // from_varray takes a one dimensional array of T values
@@ -213,7 +210,7 @@ pub fn new_tensor_from_varray<T>(arr []T, data TensorData) Tensor {
 			strides: [1]
 			shape: []
 			size: size
-			etype: typeof(T)
+			etype: T.name
 			data: &data_storage
 		}
 	}
@@ -223,7 +220,7 @@ pub fn new_tensor_from_varray<T>(arr []T, data TensorData) Tensor {
 		strides: strides
 		memory: data.memory
 		size: size
-		etype: typeof(T)
+		etype: T.name
 		data: &data_storage
 	}
 }

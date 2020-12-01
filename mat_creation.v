@@ -7,17 +7,17 @@ pub fn diag(t Tensor) Tensor {
 	if t.rank() != 1 {
 		panic('Input array must be 1D. Use diag_flat for higher dimensional arrays')
 	}
-	ret := zeros([a.size, a.size])
-	ret.diagonal().assign(t)
+	mut ret := zeros([t.size, t.size]).diagonal()
+        ret.assign(t)
 	return ret
 }
 
 // Construct a diagonal array.
 // The flattened input is placed along the diagonal
 // of the resulting matrix
-pub fn diag_flat(a Tensor) Tensor {
-	mut ret := zeros([a.size, a.size])
-	ret.diagonal().assign(a.ravel())
+pub fn diag_flat(t Tensor) Tensor {
+	mut ret := zeros([t.size, t.size]).diagonal()
+        ret.assign(t.ravel())
 	return ret
 }
 
