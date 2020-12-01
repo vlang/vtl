@@ -47,7 +47,7 @@ fn test_set() {
 }
 
 fn test_transpose() {
-	t := from_varray<f64>([Num(1.), 2., 3., 4.], [2, 2])
+	t := from_varray<f64>([1.0, 2., 3., 4.], [2, 2])
 	v1 := t.transpose([1, 0])
 	v2 := t.t()
 	v3 := t.swapaxes(1, 0)
