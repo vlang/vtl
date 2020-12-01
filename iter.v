@@ -2,7 +2,7 @@ module vtl
 
 // IteratorHandler defines a function to use in order to mutate
 // iteration position
-pub type IteratorHandler = fn (mut s TensorIterator) voidptr
+pub type IteratorHandler = fn (mut s TensorIterator) Num
 
 // TensorIterator is a struct to hold a Tensors
 // iteration state while iterating through a Tensor
@@ -21,7 +21,7 @@ pub fn tensor_to_varray<T>(t Tensor) []T {
 	mut arr := []T{}
 	mut iter := t.iterator()
 	for _ in 0 .. t.size {
-		arr.push(iter.next())
+		arr.push(iter.next() as T)
 	}
 	return arr
 }
@@ -74,9 +74,9 @@ pub fn (t Tensor) custom_iterator(data IteratorBuildData) TensorIterator {
 // handle_strided_iteration advances through a non-rowmajor-contiguous
 // Tensor in Row-Major order
 [unsafe]
-fn handle_strided_iteration(mut s TensorIterator) voidptr {
+fn handle_strided_iteration(mut s TensorIterator) Num {
 	// get current value after update new position
-	val := storage_get(s.tensor.data, s.pos)
+	val := storage_get(s.tensor.data, s.pos, s.tensor.etype)
 	rank := s.tensor.rank()
 	shape := s.tensor.shape
 	strides := s.tensor.strides
@@ -98,17 +98,17 @@ fn handle_strided_iteration(mut s TensorIterator) voidptr {
 // handle_flatten_iteration advances through a rowmajor-contiguous Tensor
 // in Row-Major order
 [inline]
-fn handle_flatten_iteration(mut s TensorIterator) voidptr {
+fn handle_flatten_iteration(mut s TensorIterator) Num {
 	// get current value after update new position
-	val := storage_get(s.tensor.data, s.pos)
+	val := storage_get(s.tensor.data, s.pos, s.tensor.etype)
 	s.pos++
 	return val
 }
 
 // next calls the iteration type for a given iterator
-// which is either flat or strided and returns a voidptr containing the current value
+// which is either flat or strided and returns a Num containing the current value
 [inline]
-pub fn (mut s TensorIterator) next() voidptr {
+pub fn (mut s TensorIterator) next() Num {
 	return s.next_handler(s)
 }
 

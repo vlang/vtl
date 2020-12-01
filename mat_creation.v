@@ -3,11 +3,11 @@ module vtl
 // Construct a diagonal array.
 // Input must be one dimensional and will be placed along
 // the resulting diagonal
-pub fn diag<T>(t Tensor) Tensor {
+pub fn diag(t Tensor) Tensor {
 	if t.rank() != 1 {
 		panic('Input array must be 1D. Use diag_flat for higher dimensional arrays')
 	}
-	ret := zeros<T>([a.size, a.size])
+	ret := zeros([a.size, a.size])
 	ret.diagonal().assign(t)
 	return ret
 }
@@ -15,8 +15,8 @@ pub fn diag<T>(t Tensor) Tensor {
 // Construct a diagonal array.
 // The flattened input is placed along the diagonal
 // of the resulting matrix
-pub fn diag_flat<T>(a Tensor) Tensor {
-	mut ret := zeros<T>([a.size, a.size])
+pub fn diag_flat(a Tensor) Tensor {
+	mut ret := zeros([a.size, a.size])
 	ret.diagonal().assign(a.ravel())
 	return ret
 }

@@ -2,9 +2,9 @@ module vtl
 
 import math
 
-pub type MapFn = fn (x voidptr, i int) voidptr
+pub type MapFn = fn (x Num, i int) Num
 
-pub type ApplyFn = fn (x voidptr, i int) voidptr
+pub type ApplyFn = fn (x Num, i int) Num
 
 // map maps a function to a given Tensor retuning a new Tensor with same shape
 pub fn (t Tensor) map(f MapFn) Tensor {
@@ -13,7 +13,7 @@ pub fn (t Tensor) map(f MapFn) Tensor {
 	for i in 0 .. t.size {
 		unsafe {
 			val := f(iter.next(), i)
-			storage_set(ret.data, i, &val)
+			storage_set(ret.data, i, val)
 		}
 	}
 	return ret
@@ -25,7 +25,7 @@ pub fn (t Tensor) apply(f ApplyFn) {
 	for i in 0 .. t.size {
 		unsafe {
 			val := f(iter.next(), i)
-			storage_set(t.data, i, &val)
+			storage_set(t.data, i, val)
 		}
 	}
 }
@@ -120,7 +120,7 @@ pub fn (t Tensor) slice(idx ...[]int) Tensor {
 	mut newstrides := t.strides
 	mut indexer := []int{}
 	for i in 0 .. idx.len {
-                dex := idx[i]
+		dex := idx[i]
 		mut fi := 0
 		mut li := 0
 		// dimension is entirely included in output
@@ -188,8 +188,8 @@ pub fn (t Tensor) slice(idx ...[]int) Tensor {
 		strides: newstrides_
 		size: size_from_shape(newshape_)
 		data: &storage
-                memory: .colmajor
+		memory: .colmajor
 	}
-        ensure_memory(mut ret)
-        return ret
+	ensure_memory(mut ret)
+	return ret
 }

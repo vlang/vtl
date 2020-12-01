@@ -3,14 +3,14 @@ module vtl
 pub struct TensorData {
 pub:
 	shape   []int
-	init    voidptr = voidptr(0)
+	init    Num = Num(f64(0.0))
 	memory  MemoryFormat = .rowmajor
 	storage StorageStrategy = .cpu
 }
 
 // Return a new Tensor of given shape and type, without initializing entries
-pub fn empty<T>(shape []int) Tensor {
-	return new_tensor<T>({
+pub fn empty(shape []int) Tensor {
+	return new_tensor({
 		shape: shape
 	})
 }
@@ -21,18 +21,17 @@ pub fn empty_like(t Tensor) Tensor {
 }
 
 // The identity array is a square array with ones on the main diagonal.
-pub fn identity<T>(n int) Tensor {
-	return eye<T>(n, n, 0)
+pub fn identity(n int) Tensor {
+	return eye(n, n, 0)
 }
 
 // Return a 2-D array with ones on the diagonal and zeros elsewhere.
-pub fn eye<T>(m int, n int, k int) Tensor {
-	mut ret := zeros<T>([m, n])
+pub fn eye(m int, n int, k int) Tensor {
+	mut ret := zeros([m, n])
 	for i in 0 .. m {
 		for j in 0 .. n {
 			if i == j - k {
-				val := T(1)
-				ret.set([i, j], &val)
+				ret.set([i, j], Num(1.0))
 			}
 		}
 	}
@@ -40,8 +39,8 @@ pub fn eye<T>(m int, n int, k int) Tensor {
 }
 
 // Return a new Tensor of given shape and type, filled with zeros
-pub fn zeros<T>(shape []int) Tensor {
-	return new_tensor<T>({
+pub fn zeros(shape []int) Tensor {
+	return new_tensor({
 		shape: shape
 	})
 }
@@ -52,27 +51,27 @@ pub fn zeros_like(t Tensor) Tensor {
 }
 
 // Return a new Tensor of given shape and type, filled with ones
-pub fn ones<T>(shape []int) Tensor {
-	return full<T>(shape, T(1))
+pub fn ones(shape []int) Tensor {
+	return full(shape, Num(1.0))
 }
 
 // Return an Tensor of ones with the same shape and type as a given Tensor
 pub fn ones_like(t Tensor) Tensor {
-	return full_like<f64>(t, 1.0)
+	return full_like(t, Num(1.0))
 }
 
 // Return a new Tensor of given shape and type, filled with val
-pub fn full<T>(shape []int, val T) Tensor {
-	return new_tensor<T>({
+pub fn full(shape []int, val Num) Tensor {
+	return new_tensor({
 		shape: shape
-		init: &val
+		init: val
 	})
 }
 
 // Return a full Tensor with the same shape and type as a given Tensor
-pub fn full_like<T>(t Tensor, val T) Tensor {
+pub fn full_like(t Tensor, val Num) Tensor {
 	mut new_tensor := new_tensor_like(t)
-	new_tensor.fill(&val)
+	new_tensor.fill(val)
 	return new_tensor
 }
 
@@ -82,31 +81,30 @@ pub struct BuildRangeData {
 }
 
 // range returns a Tensor containing values ranging from [start, stop)
-pub fn range<T>(data BuildRangeData) Tensor {
-	mut res := empty<T>([data.stop - data.start])
+pub fn range(data BuildRangeData) Tensor {
+	mut res := empty([data.stop - data.start])
 	for i := data.start; i < data.stop; i++ {
-		v := T(i)
-		res.set([i], &v)
+		res.set([i], Num(i))
 	}
 	return res
 }
 
 // from_1d takes a one dimensional array of floating point values
 // and returns a one dimensional Tensor if possible
-pub fn from_1d<T>(arr []T) Tensor {
-	return from_varray<T>(arr, [arr.len])
+pub fn from_1d(arr []Num) Tensor {
+	return from_varray(arr, [arr.len])
 }
 
 // from_2d takes a two dimensional array of floating point values
 // and returns a two-dimensional Tensor if possible
-pub fn from_2d<T>(a [][]T) Tensor {
-	mut ret := new_tensor<T>({
+pub fn from_2d(a [][]Num) Tensor {
+	mut ret := new_tensor({
 		shape: [a.len, a[0].len]
 	})
 	for i in 0 .. a.len {
 		for j in 0 .. a[0].len {
 			val := a[i][j]
-			ret.set([i, j], &val)
+			ret.set([i, j], val)
 		}
 	}
 	return ret
@@ -115,8 +113,8 @@ pub fn from_2d<T>(a [][]T) Tensor {
 // from_varray takes a one dimensional array of T values
 // and coerces it into an arbitrary shaped Tensor if possible.
 // Panics if the shape provided does not hold the provided array
-pub fn from_varray<T>(arr []T, shape []int) Tensor {
-	return new_tensor_from_varray<T>(arr, {
+pub fn from_varray(arr []Num, shape []int) Tensor {
+	return new_tensor_from_varray(arr, {
 		shape: shape
 	})
 }
@@ -128,25 +126,29 @@ pub fn (t Tensor) copy(memory MemoryFormat) Tensor {
 	return new_tensor_like_with_memory(t, memory)
 }
 
-pub fn new_tensor<T>(data TensorData) Tensor {
+pub fn new_tensor(data TensorData) Tensor {
+	etype := data.init.etype()
 	if data.shape.len == 0 {
-		data_storage := new_storage<T>({
+		data_storage := new_storage({
 			strategy: data.storage
-                        len: 1
+			etype: etype
+			len: 1
 		})
 		return Tensor{
 			memory: data.memory
 			strides: [1]
 			shape: []
 			size: 1
+			etype: etype
 			data: &data_storage
 		}
 	}
 	strides := strides_from_shape(data.shape, data.memory)
 	size := size_from_shape(data.shape)
-	data_storage := new_storage<T>({
+	data_storage := new_storage({
 		len: size
 		init: data.init
+		etype: etype
 		strategy: data.storage
 	})
 	return Tensor{
@@ -154,6 +156,7 @@ pub fn new_tensor<T>(data TensorData) Tensor {
 		memory: data.memory
 		strides: strides
 		size: size
+		etype: etype
 		data: &data_storage
 	}
 }
@@ -165,6 +168,7 @@ pub fn new_tensor_like(t Tensor) Tensor {
 		strides: t.strides
 		memory: t.memory
 		size: t.size
+		etype: t.etype
 		data: &storage
 	}
 }
@@ -178,6 +182,7 @@ pub fn new_tensor_like_with_memory(t Tensor, memory MemoryFormat) Tensor {
 		strides: strides
 		memory: t.memory
 		size: size
+		etype: t.etype
 		data: &storage
 	}
 }
@@ -191,22 +196,24 @@ pub fn new_tensor_like_with_shape(t Tensor, shape []int) Tensor {
 		strides: strides
 		memory: t.memory
 		size: size
+		etype: t.etype
 		data: &storage
 	}
 }
 
-pub fn new_tensor_from_varray<T>(arr []T, data TensorData) Tensor {
+pub fn new_tensor_from_varray(arr []Num, data TensorData) Tensor {
 	size := size_from_shape(data.shape)
 	if size != arr.len {
 		panic('Bad shape for array, shape [$arr.len] cannot fit into shape $data.shape')
 	}
-	data_storage := new_storage_from_varray<T>(arr, data.storage)
+	data_storage := new_storage_from_varray(arr, data.storage)
 	if data.shape.len == 0 {
 		return Tensor{
 			memory: data.memory
 			strides: [1]
 			shape: []
 			size: size
+			etype: arr_etype(arr)
 			data: &data_storage
 		}
 	}
@@ -216,6 +223,7 @@ pub fn new_tensor_from_varray<T>(arr []T, data TensorData) Tensor {
 		strides: strides
 		memory: data.memory
 		size: size
+		etype: arr_etype(arr)
 		data: &data_storage
 	}
 }
