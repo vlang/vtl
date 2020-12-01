@@ -89,6 +89,12 @@ pub fn range(data BuildRangeData) Tensor {
 	return res
 }
 
+// seq returns a Tensor containing values ranging from [0, to)
+[inline]
+pub fn seq(n int) Tensor {
+        return range({ to: n })
+}
+
 // from_1d takes a one dimensional array of floating point values
 // and returns a one dimensional Tensor if possible
 pub fn from_1d<T>(arr []T) Tensor {
