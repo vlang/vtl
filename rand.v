@@ -4,7 +4,7 @@ import rand
 import time
 
 fn rand_between(min Num, max Num) Num {
-	return Num(rand.f64_in_range(min as f64, max as f64))
+	return Num(rand.f64_in_range(num_as_type<f64>(min), num_as_type<f64>(max)))
 }
 
 pub fn random(min Num, max Num, shape []int) Tensor {

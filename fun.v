@@ -30,6 +30,15 @@ pub fn (t Tensor) apply(f ApplyFn) {
 	}
 }
 
+// tensor_as_type<T> returns a new Tensor with a cast to a given type
+pub fn tensor_as_type<T>(t Tensor) Tensor {
+        arr := tensor_to_varray<T>(t)
+        return new_tensor_from_varray<T>(arr, {
+                shape: t.shape
+                memory: t.memory
+        })
+}
+
 // diagonal returns a view of the diagonal entries
 // of a two dimensional tensor
 pub fn (t Tensor) diagonal() Tensor {

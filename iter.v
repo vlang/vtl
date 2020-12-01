@@ -21,7 +21,7 @@ pub fn tensor_to_varray<T>(t Tensor) []T {
 	mut arr := []T{}
 	mut iter := t.iterator()
 	for _ in 0 .. t.size {
-		arr.push(iter.next().ptr())
+		arr << num_as_type<T>(iter.next())
 	}
 	return arr
 }
