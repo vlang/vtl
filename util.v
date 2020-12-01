@@ -93,7 +93,7 @@ fn pad_with_max(pad []int, shape []int, ndims int) []int {
 // assert_rank ensures that a Tensor has a given rank
 [inline]
 fn assert_rank(t Tensor, n int) {
-        if n != t.rank() {
+	if n != t.rank() {
 		panic('Bad number of dimensions')
 	}
 }
@@ -132,15 +132,15 @@ fn assert_shape(shape []int, ts []Tensor) {
 // ensure_memory sets a correct memory layout to a given tensor
 [inline]
 fn ensure_memory(mut t Tensor) {
-        if t.is_colmajor() {
+	if t.is_colmajor() {
 		if !t.is_colmajor_contiguous() {
 			t.memory = .rowmajor
 		}
 	}
-        if t.is_contiguous() {
-                if t.rank() > 1 {
-                        t.memory = .rowmajor
-                }
+	if t.is_contiguous() {
+		if t.rank() > 1 {
+			t.memory = .rowmajor
+		}
 	}
 }
 
@@ -168,5 +168,3 @@ fn iarray_sum(arr []int) int {
 	}
 	return ret
 }
-
-

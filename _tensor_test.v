@@ -1,7 +1,7 @@
 module vtl
 
 fn test_empty_shape() {
-	t := new_tensor<f64>({
+	t := new_tensor({
 		shape: []
 	})
 	assert t.rank() == 0
@@ -11,7 +11,7 @@ fn test_empty_shape() {
 }
 
 fn test_rowmajor() {
-	t := new_tensor<f64>({
+	t := new_tensor({
 		shape: [2, 2]
 	})
 	assert t.size() == 4
@@ -20,7 +20,7 @@ fn test_rowmajor() {
 }
 
 fn test_colmajor() {
-	t := new_tensor<f64>({
+	t := new_tensor({
 		shape: [2, 2]
 		memory: .colmajor
 	})
@@ -33,7 +33,7 @@ fn test_get() {
 	arr := [1., 2., 3., 4.]
 	shape := [2, 2]
 	t := from_varray(arr, shape)
-	val := tget<f64>(t, [1, 1])
+	val := t.get([1, 1]) as f64
 	assert val == 4.0
 }
 
@@ -41,13 +41,13 @@ fn test_set() {
 	arr := [1., 2., 3., 4.]
 	shape := [2, 2]
 	mut t := from_varray(arr, shape)
-	tset<f64>(mut t, [1, 1], 8.0)
-	val := tget<f64>(t, [1, 1])
+	t.set([1, 1], Num(8.0))
+	val := t.get([1, 1]) as f64
 	assert val == 8.0
 }
 
 fn test_transpose() {
-	t := from_varray([1., 2., 3., 4.], [2, 2])
+	t := from_varray([Num(1.), 2., 3., 4.], [2, 2])
 	v1 := t.transpose([1, 0])
 	v2 := t.t()
 	v3 := t.swapaxes(1, 0)

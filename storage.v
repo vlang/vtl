@@ -16,14 +16,15 @@ pub struct StorageData {
 pub:
 	len      int
 	cap      int
-	init     voidptr
+	init     Num = Num(f64(0.0))
+	etype    string = 'f64'
 	strategy StorageStrategy = .cpu
 }
 
 [inline]
-pub fn new_storage<T>(data StorageData) Storage {
-	element_size := int(sizeof(T))
-	return create_storage(data.len, data.cap, element_size, data.init, data.strategy)
+pub fn new_storage(data StorageData) Storage {
+	element_size := str_esize(data.etype)
+	return create_storage(data.len, data.cap, element_size, data.init.ptr(), data.strategy)
 }
 
 [inline]
@@ -45,19 +46,19 @@ pub fn new_storage_like_with_len(s Storage, len int) Storage {
 }
 
 [inline]
-pub fn new_storage_from_varray<T>(arr []T, strategy StorageStrategy) Storage {
-	return create_storage_from_c_array(arr.len, 0, int(sizeof(T)), arr.data, strategy)
+pub fn new_storage_from_varray(arr []Num, strategy StorageStrategy) Storage {
+	return create_storage_from_c_array(arr.len, 0, str_esize(data.etype), arr.data, strategy)
 }
 
 pub fn storage_to_varray<T>(s Storage) []T {
 	match s {
 		storage.CpuStorage {
-			if s.element_size == int(sizeof(T)) {
+			if s.element_size == str_esize(data.etype) {
 				mut arr := []T{}
 				arr.push_many(s.data, s.len)
 				return arr
 			}
-			panic('CpuStorage.to_varray<T>: incoming type T does not match with the stored data type')
+			panic('CpuStorage.to_varray: incoming type T does not match with the stored data type')
 		}
 		else {
 			panic('storage not allowed')
@@ -100,23 +101,23 @@ fn storage_offset(s Storage, start int) Storage {
 	}
 }
 
-fn storage_get(s Storage, i int) voidptr {
+fn storage_get(s Storage, i int, etype string) Num {
 	match s {
-		storage.CpuStorage { return unsafe {s.get(i)} }
+		storage.CpuStorage { return ptr_to_val_of_type(unsafe {s.get(i)}, etype) }
 		else { panic('storage not allowed') }
 	}
 }
 
-fn storage_set(s Storage, i int, val voidptr) {
+fn storage_set(s Storage, i int, val Num) {
 	match mut s {
-		storage.CpuStorage { unsafe {s.set(i, val)} }
+		storage.CpuStorage { unsafe {s.set(i, val.ptr())} }
 		else { panic('storage not allowed') }
 	}
 }
 
-fn storage_fill(s Storage, val voidptr) {
+fn storage_fill(s Storage, val Num) {
 	match mut s {
-		storage.CpuStorage { unsafe {s.fill(val)} }
+		storage.CpuStorage { unsafe {s.fill(val.ptr())} }
 		else { panic('storage not allowed') }
 	}
 }

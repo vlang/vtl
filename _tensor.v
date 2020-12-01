@@ -7,7 +7,7 @@ pub enum MemoryFormat {
 }
 
 pub struct Tensor {
-        etype   string
+	etype   string = 'f64'
 mut:
 	data    Storage
 	memory  MemoryFormat

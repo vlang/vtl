@@ -3,16 +3,16 @@ module vtl
 import rand
 import time
 
-fn rand_between<T>(min T, max T) T {
-	return T(rand.f64_in_range(min, max))
+fn rand_between(min Num, max Num) T {
+	return Num(rand.f64_in_range(min as f64, max as f64))
 }
 
-pub fn random<T>(min T, max T, shape []int) Tensor {
-	ret := empty<T>(shape)
+pub fn random(min Num, max Num, shape []int) Tensor {
+	ret := empty(shape)
 	mut iter := ret.iterator()
 	for _ in 0 .. ret.size {
-		r := rand_between<T>(min, max)
-		storage_set(ret.data, iter.pos, &r)
+		r := rand_between(min, max)
+		storage_set(ret.data, iter.pos, r)
 		iter.next()
 	}
 	return ret
