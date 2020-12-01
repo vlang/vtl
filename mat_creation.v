@@ -8,7 +8,7 @@ pub fn diag(t Tensor) Tensor {
 		panic('Input array must be 1D. Use diag_flat for higher dimensional arrays')
 	}
 	mut ret := zeros([t.size, t.size]).diagonal()
-        ret.assign(t)
+	ret.assign(t)
 	return ret
 }
 
@@ -17,7 +17,7 @@ pub fn diag(t Tensor) Tensor {
 // of the resulting matrix
 pub fn diag_flat(t Tensor) Tensor {
 	mut ret := zeros([t.size, t.size]).diagonal()
-        ret.assign(t.ravel())
+	ret.assign(t.ravel())
 	return ret
 }
 
