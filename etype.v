@@ -1,13 +1,14 @@
 module vtl
 
 pub const (
-        default_type = 'f64'
-        default_init = Num(f64(0.0))
-        default_size = int(sizeof(f64))
+	default_type = 'f64'
+	default_init = Num(f64(0.0))
+	default_size = int(sizeof(f64))
 )
 
 // `Num` is a sum type that lists the possible types to be decoded and used
-pub type Num = any_float | any_int | byte | f32 | f64 | i16 | i64 | i8 | int | u16 | u32 | u64
+pub type Num = any_float | any_int | byte | f32 | f64 | i16 | i64 | i8 | int | u16 | u32 |
+	u64
 
 pub fn (f Num) as_type<T>() T {
 	return f as T
@@ -36,42 +37,18 @@ pub fn (f Num) esize() int {
 
 pub fn (f Num) ptr() voidptr {
 	match f {
-		byte {
-			return voidptr(&f)
-		}
-		u16 {
-			return voidptr(&f)
-		}
-		u32 {
-			return voidptr(&f)
-		}
-		u64 {
-			return voidptr(&f)
-		}
-		i8 {
-			return voidptr(&f)
-		}
-		i16 {
-			return voidptr(&f)
-		}
-		int {
-			return voidptr(&f)
-		}
-		i64 {
-			return voidptr(&f)
-		}
-		f32 {
-			return voidptr(&f)
-		}
-		f64 {
-			return voidptr(&f)
-		}
-		any_int {
-			return voidptr(&f)
-		}
-		any_float {
-			return voidptr(&f)
-		}
+		byte { return voidptr(&f) }
+		u16 { return voidptr(&f) }
+		u32 { return voidptr(&f) }
+		u64 { return voidptr(&f) }
+		i8 { return voidptr(&f) }
+		i16 { return voidptr(&f) }
+		int { return voidptr(&f) }
+		i64 { return voidptr(&f) }
+		f32 { return voidptr(&f) }
+		f64 { return voidptr(&f) }
+		any_int { return voidptr(&f) }
+		any_float { return voidptr(&f) }
 	}
 }
 
@@ -150,17 +127,17 @@ pub fn str_esize(t string) int {
 }
 
 pub fn arr_esize(arr []Num) int {
-        if arr.len > 0 {
-                return arr[0].esize()
-        }
-        return default_size
+	if arr.len > 0 {
+		return arr[0].esize()
+	}
+	return default_size
 }
 
 pub fn arr_etype(arr []Num) string {
 	if arr.len > 0 {
-                return arr[0].etype()
-        }
-        return default_type
+		return arr[0].etype()
+	}
+	return default_type
 }
 
 pub fn (f Num) str() string {
