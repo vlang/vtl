@@ -84,7 +84,7 @@ pub struct BuildRangeData {
 pub fn range(data BuildRangeData) Tensor {
 	mut res := empty([data.to - data.from])
 	for i := data.from; i < data.to; i++ {
-		res.set([i], Num(i))
+		res.set([i], f64(i))
 	}
 	return res
 }
