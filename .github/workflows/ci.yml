@@ -24,4 +24,4 @@ jobs:
         sudo apt-get install --quiet -y --no-install-recommends gfortran liblapacke-dev libopenblas-dev
         v install vsl
     - name: run tests
-      run: cd vtl; make test
+      run: cd vtl; ./bin/test
