@@ -3,7 +3,7 @@ module vtl
 fn test_cpu_storage_with_default() {
 	s := new_storage({
 		len: 2
-		init: Num(1.0)
+		init: 1.0
 		strategy: .cpu
 	})
 	varray := storage_to_varray<f64>(s)
