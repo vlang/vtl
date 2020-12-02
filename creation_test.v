@@ -3,7 +3,7 @@ module vtl
 fn test_new() {
 	t := new_tensor({
 		shape: [3]
-		init: Num(1.0)
+		init: 1.0
 	})
 	varray := tensor_to_varray<f64>(t)
 	assert varray.len == 3
