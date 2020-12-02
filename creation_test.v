@@ -70,7 +70,7 @@ fn test_ones() {
 }
 
 fn test_full() {
-	mut t := full([3], Num(3.0))
+	mut t := full([3], 3.0)
 	varray := tensor_to_varray<f64>(t)
 	assert varray == [3.0, 3.0, 3.0]
 }
