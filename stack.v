@@ -95,7 +95,7 @@ pub fn concatenate(ts []Tensor, data AxisData) Tensor {
 	return ret
 }
 
-// expand_dims adds an axis to an ndarray in order to support
+// expand_dims adds an axis to a Tensor in order to support
 // broadcasting operations
 pub fn expand_dims(t Tensor, data AxisData) Tensor {
 	axis := data.axis
