@@ -11,10 +11,8 @@ pub fn (t Tensor) map(f MapFn) Tensor {
 	mut ret := new_tensor_like(t)
 	mut iter := t.iterator()
 	for i in 0 .. t.size {
-		unsafe {
-			val := f(iter.next(), i)
-			storage_set(ret.data, i, val)
-		}
+                val := f(iter.next(), i)
+                storage_set(ret.data, i, val)
 	}
 	return ret
 }
@@ -23,10 +21,8 @@ pub fn (t Tensor) map(f MapFn) Tensor {
 pub fn (t Tensor) apply(f ApplyFn) {
 	mut iter := t.iterator()
 	for i in 0 .. t.size {
-		unsafe {
-			val := f(iter.next(), i)
-			storage_set(t.data, i, val)
-		}
+                val := f(iter.next(), i)
+                storage_set(t.data, i, val)
 	}
 }
 
