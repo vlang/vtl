@@ -16,8 +16,8 @@ pub fn (mut t Tensor) fill(val Num) {
 // assign sets the values of an Tensor equal to the values of another
 // Tensor of the same shape
 pub fn (mut t Tensor) assign(other Tensor) {
-        otherb := other.broadcast_to(t.shape)
-        mut iter := otherb.iterator()
+	otherb := other.broadcast_to(t.shape)
+	mut iter := otherb.iterator()
 	for i in 0 .. t.size {
 		storage_set(t.data, i, iter.next())
 	}
