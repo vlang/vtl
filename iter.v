@@ -122,3 +122,25 @@ fn tensor_backstrides(t Tensor) &int {
 	}
 	return &int(backstrides.data)
 }
+
+// Iterate with n tensors
+// iterators creates an array of iterators through a list of tensors
+pub fn (t Tensor) iterators(ts ...Tensor) []TensorIterator {
+        mut iters := []TensorIterator{cap: ts.len + 1}
+        for i := 0; i < ts.len; i++ {
+	        tib := ts[i].broadcast_to(t.shape)
+                iters << tib.iterator()
+        }
+        return iters
+}
+
+// next calls the iteration type for a given list of iterators
+// which is either flat or strided and returns a list of Nums containing the current values
+[inline]
+pub fn (its []TensorIterator) next() []Num {
+        mut nums := []Num{cap: its.len}
+	for mut iter in its {
+                nums << iter.next()
+        }
+        return nums
+}
