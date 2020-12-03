@@ -10,8 +10,8 @@ pub struct Tensor {
 	etype   string = default_type
 mut:
 	data    Storage
-	memory  MemoryFormat
 pub mut:
+	memory  MemoryFormat
 	size    int
 	shape   []int
 	strides []int
