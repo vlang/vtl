@@ -65,3 +65,40 @@ pub fn matmul(a vtl.Tensor, b vtl.Tensor) vtl.Tensor {
 		ma.shape[1], vtl.tensor_to_varray<f64>(mb), mb.shape[1], 1.0, mut dest, mb.shape[1])
 	return vtl.from_varray<f64>(dest, [a.shape[0], b.shape[1]])
 }
+
+pub fn tensordot(a vtl.Tensor, b vtl.Tensor, a_axes_ []int, b_axes_ []int) vtl.Tensor {
+        a_shape := a.shape
+	a_rank := a.rank()
+	b_shape := b.shape
+	b_rank := b.rank()
+        a_axes, b_axes := correct_axes(a, b, a_axes_, b_axes_) or { panic(err) }
+        tmp := irange(0, a_rank)
+	notin := tmp.filter(!(it in a_axes))
+	mut a_newaxes := notin
+	a_newaxes << a_axes
+	mut n2 := 1
+	for axis in a_axes {
+		n2 *= a_shape[axis]
+	}
+	firstdim := notin.map(a_shape[it])
+	val := iarray_prod(firstdim)
+	newshape_a := [val, n2]
+	tmpb := irange(0, b_rank)
+	notinb := tmpb.filter(!(it in b_axes))
+	mut b_newaxes := b_axes
+	b_newaxes << notinb
+	n2 = 1
+	for axis in b_axes {
+		n2 *= b_shape[axis]
+	}
+	firstdimb := notin.map(b_shape[it])
+	valb := iarray_prod(firstdimb)
+	newshape_b := [n2, valb]
+	mut outshape := []int{}
+	outshape << firstdim
+	outshape << firstdimb
+	at := a.transpose(a_newaxes).reshape(newshape_a)
+	bt := b.transpose(b_newaxes).reshape(newshape_b)
+	res := matmul(at, bt)
+	return res.reshape(outshape)
+}
