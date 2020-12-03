@@ -6,6 +6,10 @@ pub type MapFn = fn (x Num, i int) Num
 
 pub type ApplyFn = fn (x Num, i int) Num
 
+pub type NMapFn = fn (x []Num, i int) Num
+
+pub type NApplyFn = fn (x []Num, i int) Num
+
 // map maps a function to a given Tensor retuning a new Tensor with same shape
 pub fn (t Tensor) map(f MapFn) Tensor {
 	mut ret := new_tensor_like(t)
@@ -23,6 +27,26 @@ pub fn (t Tensor) apply(f ApplyFn) {
 	for i in 0 .. t.size {
 		val := f(iter.next(), i)
 		storage_set(t.data, i, val)
+	}
+}
+
+// map maps a function to a given list of Tensor retuning a new Tensor with same shape
+pub fn (t Tensor) nmap(f NMapFn, ts ...Tensor) Tensor {
+	mut ret := new_tensor_like(t)
+	mut iters := t.iterators(ts)
+	for i in 0 .. t.size {
+		val := f(iters.next(), i)
+                storage_set(ret.data, i, val)
+	}
+	return ret
+}
+
+// apply applies a function to each element of a given Tensor
+pub fn (t Tensor) napply(f NApplyFn, ts ...Tensor) {
+	mut iters := t.iterators(ts)
+	for i in 0 .. t.size {
+		val := f(iters.next(), i)
+                storage_set(t.data, i, val)
 	}
 }
 
