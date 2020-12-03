@@ -116,8 +116,23 @@ fn tensor_backstrides(t Tensor) &int {
 // iterators creates an array of iterators through a list of tensors
 pub fn (t Tensor) iterators(ts ...Tensor) []TensorIterator {
 	mut iters := []TensorIterator{cap: ts.len + 1}
+        iters << t.iterator()
 	for i := 0; i < ts.len; i++ {
 		tib := ts[i].broadcast_to(t.shape)
+		iters << tib.iterator()
+	}
+	return iters
+}
+
+// Iterate with n tensors
+// iterators creates an array of iterators through a list of tensors
+pub fn (ts []Tensor) iterators() []TensorIterator {
+	if ts.len == 0 {
+                return []TensorIterator{}
+        }
+        mut iters := []TensorIterator{cap: ts.len}
+	for i := 0; i < ts.len; i++ {
+		tib := ts[i].broadcast_to(ts[0].shape)
 		iters << tib.iterator()
 	}
 	return iters
