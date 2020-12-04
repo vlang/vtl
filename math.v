@@ -2,16 +2,7 @@ module vtl
 
 import vsl.vmath as math
 
-pub type F64Fn = fn (x f64) f64
 
-// wraps float function with Num param
-// fn math_call(f F64Fn) MapFn {
-// return fn (x Num, _ int) Num {
-// val := num_as_type<f64>(x)
-// ret := f(val)
-// return Num(ret)
-// }
-// }
 // abs returns the elementwise abs of an tensor
 [inline]
 pub fn abs(t Tensor) Tensor {
@@ -50,6 +41,18 @@ pub fn atan(t Tensor) Tensor {
 		ret := math.atan(val)
 		return Num(ret)
 	})
+}
+
+// atan2 returns the atan2 elementwise of two tensors
+[inline]
+pub fn atan2(a Tensor, b Tensor) Tensor {
+        f := fn (xs []Num, _ int) Num {
+		x := num_as_type<f64>(xs[0])
+		y := num_as_type<f64>(xs[1])
+		ret := math.atan2(x, y)
+		return Num(ret)
+	}
+	return a.nmap(f, b)
 }
 
 // cbrt returns the elementwise cbrt of an tensor
@@ -122,6 +125,18 @@ pub fn floor(t Tensor) Tensor {
 	})
 }
 
+// fmod returns the fmod elementwise of two tensors
+[inline]
+pub fn fmod(a Tensor, b Tensor) Tensor {
+        f := fn (xs []Num, _ int) Num {
+		x := num_as_type<f64>(xs[0])
+		y := num_as_type<f64>(xs[1])
+		ret := math.fmod(x, y)
+		return Num(ret)
+	}
+	return a.nmap(f, b)
+}
+
 // gamma returns the elementwise gamma of an tensor
 [inline]
 pub fn gamma(t Tensor) Tensor {
@@ -130,6 +145,18 @@ pub fn gamma(t Tensor) Tensor {
 		ret := math.gamma(val)
 		return Num(ret)
 	})
+}
+
+// hypot returns the hypot elementwise of two tensors
+[inline]
+pub fn hypot(a Tensor, b Tensor) Tensor {
+        f := fn (xs []Num, _ int) Num {
+		x := num_as_type<f64>(xs[0])
+		y := num_as_type<f64>(xs[1])
+		ret := math.hypot(x, y)
+		return Num(ret)
+	}
+	return a.nmap(f, b)
 }
 
 // log10 returns the elementwise log10 of an tensor
@@ -150,6 +177,54 @@ pub fn log_gamma(t Tensor) Tensor {
 		ret := math.log_gamma(val)
 		return Num(ret)
 	})
+}
+
+// log_n returns the log_n elementwise of two tensors
+[inline]
+pub fn log_n(a Tensor, b Tensor) Tensor {
+        f := fn (xs []Num, _ int) Num {
+		x := num_as_type<f64>(xs[0])
+		y := num_as_type<f64>(xs[1])
+		ret := math.log_n(x, y)
+		return Num(ret)
+	}
+	return a.nmap(f, b)
+}
+
+// max returns the max elementwise of two tensors
+[inline]
+pub fn max(a Tensor, b Tensor) Tensor {
+        f := fn (xs []Num, _ int) Num {
+		x := num_as_type<f64>(xs[0])
+		y := num_as_type<f64>(xs[1])
+		ret := math.max(x, y)
+		return Num(ret)
+	}
+	return a.nmap(f, b)
+}
+
+// min returns the min elementwise of two tensors
+[inline]
+pub fn min(a Tensor, b Tensor) Tensor {
+        f := fn (xs []Num, _ int) Num {
+		x := num_as_type<f64>(xs[0])
+		y := num_as_type<f64>(xs[1])
+		ret := math.min(x, y)
+		return Num(ret)
+	}
+	return a.nmap(f, b)
+}
+
+// pow returns the pow elementwise of two tensors
+[inline]
+pub fn pow(a Tensor, b Tensor) Tensor {
+        f := fn (xs []Num, _ int) Num {
+		x := num_as_type<f64>(xs[0])
+		y := num_as_type<f64>(xs[1])
+		ret := math.pow(x, y)
+		return Num(ret)
+	}
+	return a.nmap(f, b)
 }
 
 // radians returns the elementwise deg2rad of an tensor
