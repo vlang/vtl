@@ -2,6 +2,45 @@ module vtl
 
 import arrays
 
+// assert_rank ensures that a Tensor has a given rank
+[inline]
+fn assert_rank(t Tensor, n int) {
+	if n != t.rank() {
+		panic('Bad number of dimensions')
+	}
+}
+
+// assert_shape_off_axis ensures that the shapes of Tensors match
+// for concatenation, except along the axis being joined
+fn assert_shape_off_axis(ts []Tensor, axis int, shape []int) []int {
+	mut retshape := shape.clone()
+	for t in ts {
+		if t.shape.len != retshape.len {
+			panic('All inputs must share the same number of axes')
+		}
+		mut i := 0
+		for i < shape.len {
+			if (i != axis) && (t.shape[i] != shape[i]) {
+				panic('All inputs must share a shape off axis')
+			}
+			i++
+		}
+		retshape[axis] += t.shape[axis]
+	}
+	return retshape
+}
+
+// assert_shape ensures that the shapes of Tensors match
+// for each tensor given list of tensors
+[inline]
+fn assert_shape(shape []int, ts []Tensor) {
+	for t in ts {
+		if shape != t.shape {
+			panic('All shapes must be equal')
+		}
+	}
+}
+
 // strides_from_shape returns the strides from a shape and memory format
 fn strides_from_shape(shape []int, memory MemoryFormat) []int {
 	mut accum := 1
@@ -88,45 +127,6 @@ fn pad_with_max(pad []int, shape []int, ndims int) []int {
 		newpad << shape[pad.len..]
 	}
 	return newpad
-}
-
-// assert_rank ensures that a Tensor has a given rank
-[inline]
-fn assert_rank(t Tensor, n int) {
-	if n != t.rank() {
-		panic('Bad number of dimensions')
-	}
-}
-
-// assert_shape_off_axis ensures that the shapes of Tensors match
-// for concatenation, except along the axis being joined
-fn assert_shape_off_axis(ts []Tensor, axis int, shape []int) []int {
-	mut retshape := shape.clone()
-	for t in ts {
-		if t.shape.len != retshape.len {
-			panic('All inputs must share the same number of axes')
-		}
-		mut i := 0
-		for i < shape.len {
-			if (i != axis) && (t.shape[i] != shape[i]) {
-				panic('All inputs must share a shape off axis')
-			}
-			i++
-		}
-		retshape[axis] += t.shape[axis]
-	}
-	return retshape
-}
-
-// assert_shape ensures that the shapes of Tensors match
-// for each tensor given list of tensors
-[inline]
-fn assert_shape(shape []int, ts []Tensor) {
-	for t in ts {
-		if shape != t.shape {
-			panic('All shapes must be equal')
-		}
-	}
 }
 
 // ensure_memory sets a correct memory layout to a given tensor
