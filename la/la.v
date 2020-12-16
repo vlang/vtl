@@ -1,10 +1,9 @@
 module la
 
-import vsl.blas
 import vsl.la
 import vtl
 
-pub fn ddot(a vtl.Tensor, b vtl.Tensor) f64 {
+pub fn dot(a vtl.Tensor, b vtl.Tensor) f64 {
 	if !a.is_vector() || !b.is_vector() {
 		panic('Tensors must be one dimensional')
 	} else if a.size != b.size {
@@ -21,13 +20,6 @@ pub fn dger(a vtl.Tensor, b vtl.Tensor) vtl.Tensor {
 	return vtl.from_2d<f64>(m.get_deep2())
 }
 
-pub fn dnrm2(t vtl.Tensor) f64 {
-	if !t.is_vector() {
-		panic('Tensor must be one dimensional')
-	}
-	return blas.dnrm2(t.size, vtl.tensor_to_varray<f64>(t), t.strides[0])
-}
-
 pub fn det(t vtl.Tensor) f64 {
 	assert_square_matrix(t)
 	m := t.shape[0]
@@ -38,21 +30,14 @@ pub fn det(t vtl.Tensor) f64 {
 
 pub fn inv(t vtl.Tensor) vtl.Tensor {
 	assert_square_matrix(t)
-	mut ret := t.copy(.colmajor)
-	n := t.shape[0]
-	ipiv := []int{len: (n * int(sizeof(int)))}
-	mut mut_ret := vtl.tensor_to_varray<f64>(ret)
-	blas.dgetrf(n, n, mut mut_ret, n, ipiv)
-	blas.dgetri(n, mut mut_ret, n, ipiv)
-	ret.assign(vtl.new_tensor_from_varray<f64>(mut_ret, {
-		shape: ret.shape
-		memory: ret.memory
-	}))
-	return ret
+	mut colmajort := t.copy(.colmajor)
+	mut ret_m := la.new_matrix(colmajort.shape[0], colmajort.shape[1])
+        colmajorm := la.matrix_raw(colmajort.shape[0], colmajort.shape[1], vtl.tensor_to_varray<f64>(colmajort))
+        la.matrix_inv(mut ret_m, colmajorm, true)
+	return vtl.from_2d<f64>(ret_m.get_deep2())
 }
 
 pub fn matmul(a vtl.Tensor, b vtl.Tensor) vtl.Tensor {
-	mut dest := []f64{len: a.shape[0] * b.shape[1]}
 	ma := match a.is_contiguous() {
 		true { a }
 		else { a.copy(.rowmajor) }
@@ -61,9 +46,11 @@ pub fn matmul(a vtl.Tensor, b vtl.Tensor) vtl.Tensor {
 		true { b }
 		else { b.copy(.rowmajor) }
 	}
-	blas.dgemm(false, false, ma.shape[0], mb.shape[1], ma.shape[1], 1.0, vtl.tensor_to_varray<f64>(ma),
-		ma.shape[1], vtl.tensor_to_varray<f64>(mb), mb.shape[1], 1.0, mut dest, mb.shape[1])
-	return vtl.from_varray<f64>(dest, [a.shape[0], b.shape[1]])
+	mut dm := la.new_matrix(a.shape[0], b.shape[1])
+        mam := la.matrix_raw(a.shape[0], a.shape[1], vtl.tensor_to_varray<f64>(ma))
+        mbm := la.matrix_raw(b.shape[0], b.shape[1], vtl.tensor_to_varray<f64>(mb))
+        la.matrix_matrix_mul(mut dm, 1.0, mam, mbm)
+	return vtl.from_2d<f64>(dm.get_deep2())
 }
 
 pub fn tensordot(a vtl.Tensor, b vtl.Tensor, a_axes []int, b_axes []int) vtl.Tensor {
