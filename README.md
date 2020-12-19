@@ -2,14 +2,21 @@
 
 # VTL - V Tensor Library
 
+```v
+>>> import vtl
+>>> t := vtl.from_varray<f64>([1., 2., 3., 4.], [2, 2])
+>>> t.get([1, 1])
+4.0
+```
+
 ## VTL Provides
 
-- An n-dimensional `NdArray` data structure
+- An n-dimensional `Tensor` data structure
 - Sophisticated reduction, elementwise, and accumulation operations
 - Data Structures that can easily be passed to C libraries
 - Powerful linear algebra routines backed by VSL that uses LAPACKE and OpenBLAS.
 
-In the docs you can find a complete [Numpy vs Vtl comparison](./docs/NUMPY_COMPARISON.md) 
+In the [docs](./docs/README.md) you can find more information about this module 
 
 ## Installation
 
@@ -44,7 +51,7 @@ Done. Installation completed.
 To test the module, just type the following command:
 
 ```sh
-$ make test # or ./bin/test
+$ ./bin/test
 ```
 
 ## License
@@ -53,6 +60,8 @@ $ make test # or ./bin/test
 
 ## Contributors
 
-> This project is based on the work done by Christopher ([christopherzimmerman](https://github.com/christopherzimmerman)) and the rest of the Vlang Num group.
+> This work was originally based on the work done by Christopher ([christopherzimmerman](https://github.com/christopherzimmerman)) and the rest of the VLang-Num group. 
+
+> The development of this library continues its course after having reimplemented its core and a large part of its interface. In the same way, we do not want to stop recognizing the work and inspiration that the library done by Christopher has given.
 
 - [Ulises Jeremias Cornejo Fandos](https://github.com/ulises-jeremias) - Core Maintainer

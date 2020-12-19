@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-NAME=vtl_dev
-
-docker logout
-docker login
-docker push ulisesjeremias/$NAME
