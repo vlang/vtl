@@ -50,7 +50,7 @@ fn rprint(t Tensor, index []int, hanging_indent string, curr_width int, summary_
 	axis := index.len
 	axes_left := t.rank() - axis
 	if axes_left == 0 {
-		return rjust(format_num(t.get(index), false), max_len)
+		return rjust(t.get(index).prettify(false), max_len)
 	}
 	next_hanging_indent := hanging_indent + ' '
 	next_width := curr_width - 1
@@ -162,23 +162,12 @@ pub fn tensor_str(t Tensor, separator string, prefix string) string {
 	return format_array(t, 75, next_line_prefix, separator, 3, summary_insert, max_len)
 }
 
-// formats a floating point value to be "pretty"
-fn format_num(val Num, notation bool) string {
-	if notation {
-		return val.strsci(3)
-	} else {
-		unsafe {
-			return val.str()
-		}
-	}
-}
-
 // finds the max string length of a Tensor
 fn max_str_len(t Tensor) int {
 	mut mx := 0
 	mut iter := t.iterator()
 	for _ in 0 .. t.size {
-		val := format_num(iter.next(), false)
+		val := iter.next().prettify(false)
 		if val.len > mx {
 			mx = val.len
 		}
