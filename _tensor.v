@@ -36,8 +36,5 @@ pub fn tensor_to_varray<T>(t Tensor) []T {
 // tensor_as_type<T> returns a new Tensor with a cast to a given type
 pub fn tensor_as_type<T>(t Tensor) Tensor {
 	arr := tensor_to_varray<T>(t)
-	return new_tensor_from_varray<T>(arr, {
-		shape: t.shape
-		memory: t.memory
-	})
+	return new_tensor_from_varray<T>(arr, shape: t.shape, memory: t.memory)
 }

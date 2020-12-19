@@ -26,20 +26,20 @@ pub fn (t Tensor) iterator() TensorIterator {
 fn (t Tensor) rowmajor_contiguous_iterator() TensorIterator {
 	coord := 0
 	bs := 0
-	return t.custom_iterator({
+	return t.custom_iterator(
 		coord: &coord
 		backstrides: &bs
 		next_handler: handle_flatten_iteration
-	})
+	)
 }
 
 fn (t Tensor) strided_iterator() TensorIterator {
 	coord := []int{len: t.rank()}
-	return t.custom_iterator({
+	return t.custom_iterator(
 		coord: &int(&coord[0])
 		backstrides: tensor_backstrides(t)
 		next_handler: handle_strided_iteration
-	})
+	)
 }
 
 pub struct IteratorBuildData {
@@ -116,7 +116,7 @@ fn tensor_backstrides(t Tensor) &int {
 // iterators creates an array of iterators through a list of tensors
 pub fn (t Tensor) iterators(ts ...Tensor) []TensorIterator {
 	mut iters := []TensorIterator{cap: ts.len + 1}
-        iters << t.iterator()
+	iters << t.iterator()
 	for i := 0; i < ts.len; i++ {
 		tib := ts[i].broadcast_to(t.shape)
 		iters << tib.iterator()
@@ -128,9 +128,9 @@ pub fn (t Tensor) iterators(ts ...Tensor) []TensorIterator {
 // iterators creates an array of iterators through a list of tensors
 pub fn (ts []Tensor) iterators() []TensorIterator {
 	if ts.len == 0 {
-                return []TensorIterator{}
-        }
-        mut iters := []TensorIterator{cap: ts.len}
+		return []TensorIterator{}
+	}
+	mut iters := []TensorIterator{cap: ts.len}
 	for i := 0; i < ts.len; i++ {
 		tib := ts[i].broadcast_to(ts[0].shape)
 		iters << tib.iterator()

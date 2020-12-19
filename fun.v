@@ -36,7 +36,7 @@ pub fn (t Tensor) nmap(f NMapFn, ts ...Tensor) Tensor {
 	mut iters := t.iterators(ts)
 	for i in 0 .. t.size {
 		val := f(iters.next(), i)
-                storage_set(ret.data, i, val)
+		storage_set(ret.data, i, val)
 	}
 	return ret
 }
@@ -46,7 +46,7 @@ pub fn (t Tensor) napply(f NApplyFn, ts ...Tensor) {
 	mut iters := t.iterators(ts)
 	for i in 0 .. t.size {
 		val := f(iters.next(), i)
-                storage_set(t.data, i, val)
+		storage_set(t.data, i, val)
 	}
 }
 

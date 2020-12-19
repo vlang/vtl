@@ -10,9 +10,7 @@ pub:
 
 // Return a new Tensor of given shape and type, without initializing entries
 pub fn empty(shape []int) Tensor {
-	return new_tensor({
-		shape: shape
-	})
+	return new_tensor(shape: shape)
 }
 
 // Return a new Tensor with the same shape and type as a given Tensor.
@@ -40,9 +38,7 @@ pub fn eye(m int, n int, k int) Tensor {
 
 // Return a new Tensor of given shape and type, filled with zeros
 pub fn zeros(shape []int) Tensor {
-	return new_tensor({
-		shape: shape
-	})
+	return new_tensor(shape: shape)
 }
 
 // Return an Tensor of zeros with the same shape and type as a given Tensor
@@ -62,10 +58,7 @@ pub fn ones_like(t Tensor) Tensor {
 
 // Return a new Tensor of given shape and type, filled with val
 pub fn full(shape []int, val Num) Tensor {
-	return new_tensor({
-		shape: shape
-		init: val
-	})
+	return new_tensor(shape: shape, init: val)
 }
 
 // Return a full Tensor with the same shape and type as a given Tensor
@@ -92,9 +85,7 @@ pub fn range(data BuildRangeData) Tensor {
 // seq returns a Tensor containing values ranging from [0, to)
 [inline]
 pub fn seq(n int) Tensor {
-	return range({
-		to: n
-	})
+	return range(to: n)
 }
 
 // from_1d takes a one dimensional array of floating point values
@@ -119,9 +110,7 @@ pub fn from_2d<T>(a [][]T) Tensor {
 // and coerces it into an arbitrary shaped Tensor if possible.
 // Panics if the shape provided does not hold the provided array
 pub fn from_varray<T>(arr []T, shape []int) Tensor {
-	return new_tensor_from_varray<T>(arr, {
-		shape: shape
-	})
+	return new_tensor_from_varray<T>(arr, shape: shape)
 }
 
 // returns a copy of an array with a particular memory
@@ -134,11 +123,7 @@ pub fn (t Tensor) copy(memory MemoryFormat) Tensor {
 pub fn new_tensor(data TensorData) Tensor {
 	etype := data.init.etype()
 	if data.shape.len == 0 {
-		data_storage := new_storage({
-			strategy: data.storage
-			etype: etype
-			len: 1
-		})
+		data_storage := new_storage(strategy: data.storage, etype: etype, len: 1)
 		return Tensor{
 			memory: data.memory
 			strides: [1]
@@ -150,12 +135,12 @@ pub fn new_tensor(data TensorData) Tensor {
 	}
 	strides := strides_from_shape(data.shape, data.memory)
 	size := size_from_shape(data.shape)
-	data_storage := new_storage({
+	data_storage := new_storage(
 		len: size
 		init: data.init
 		etype: etype
 		strategy: data.storage
-	})
+	)
 	return Tensor{
 		shape: data.shape
 		memory: data.memory

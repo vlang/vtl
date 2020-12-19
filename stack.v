@@ -6,21 +6,15 @@ pub struct AxisData {
 
 // Stack arrays in sequence vertically (row wise)
 pub fn vstack(ts []Tensor) Tensor {
-	return concatenate(ts, {
-		axis: 0
-	})
+	return concatenate(ts, axis: 0)
 }
 
 // Stack arrays in sequence horizontally (column wise)
 pub fn hstack(ts []Tensor) Tensor {
 	if ts[0].rank() == 1 {
-		return concatenate(ts, {
-			axis: 0
-		})
+		return concatenate(ts, axis: 0)
 	}
-	return concatenate(ts, {
-		axis: 1
-	})
+	return concatenate(ts, axis: 1)
 }
 
 // Stack arrays in sequence depth wise (along third axis)
@@ -32,9 +26,7 @@ pub fn dstack(ts []Tensor) Tensor {
 	}
 	if first.rank() == 1 {
 		arrs := ts.map(it.reshape([1, it.size, 1]))
-		return concatenate(arrs, {
-			axis: 2
-		})
+		return concatenate(arrs, axis: 2)
 	} else {
 		mut arrs := []Tensor{}
 		for t in ts {
@@ -42,9 +34,7 @@ pub fn dstack(ts []Tensor) Tensor {
 			newshape << 1
 			arrs << t.reshape(newshape)
 		}
-		return concatenate(arrs, {
-			axis: 2
-		})
+		return concatenate(arrs, axis: 2)
 	}
 }
 
@@ -57,13 +47,9 @@ pub fn column_stack(ts []Tensor) Tensor {
 	}
 	if first.rank() == 1 {
 		arrs := ts.map(it.reshape([it.size, 1]))
-		return concatenate(arrs, {
-			axis: 1
-		})
+		return concatenate(arrs, axis: 1)
 	} else {
-		return concatenate(ts, {
-			axis: 1
-		})
+		return concatenate(ts, axis: 1)
 	}
 }
 
