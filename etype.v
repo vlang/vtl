@@ -15,6 +15,17 @@ pub fn (f Num) as_type<T>() T {
 	return num_as_type<T>(f)
 }
 
+// formats a floating point value to be "pretty"
+fn (val Num) prettify(notation bool) string {
+	if notation {
+		return val.strsci(3)
+	} else {
+		unsafe {
+			return val.str()
+		}
+	}
+}
+
 // return a string of the input if f64 or f32 in scientific notation
 // with digit_num deciamals displayed, max 17 digits
 pub fn (f Num) strsci(digit_num int) string {
