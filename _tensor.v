@@ -19,7 +19,7 @@ pub mut:
 
 // str returns the string representation of a Tensor
 pub fn (t Tensor) str() string {
-	return '' // tensor_to_str(t, ', ', '')
+	return tensor_str(t, ', ', '')
 }
 
 // tensor_to_varray<T> returns the flatten representation of a tensor in a v array storing
