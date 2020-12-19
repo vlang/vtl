@@ -6,6 +6,8 @@ pub enum MemoryFormat {
 	colmajor
 }
 
+// `Tensor` is the main structure defined by VTL to manage N Dimensional
+// Array of values
 pub struct Tensor {
 	etype   string = default_type
 mut:
