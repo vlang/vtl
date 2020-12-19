@@ -1,7 +1,7 @@
 module vtl
 
 const (
-        max_printable_size = 1000
+	max_printable_size = 1000
 )
 
 // for arrays that are too large, calculate only the leading and trailing
@@ -45,7 +45,7 @@ fn extend_line(s string, line string, word string, line_width int, next_line_pre
 	return [sn, ln]
 }
 
-// recursively print an ndarray
+// rprint will recursively generate a string representation of a Tensor with custom settings
 fn rprint(t Tensor, index []int, hanging_indent string, curr_width int, summary_insert string, edge_items int, separator string, max_len int) string {
 	axis := index.len
 	axes_left := t.rank() - axis
@@ -70,8 +70,8 @@ fn rprint(t Tensor, index []int, hanging_indent string, curr_width int, summary_
 		for lii < leading_items {
 			mut nidx := index.clone()
 			nidx << lii
-			word := rprint(t, nidx, next_hanging_indent, next_width, summary_insert,
-				edge_items, separator, max_len)
+			word := rprint(t, nidx, next_hanging_indent, next_width, summary_insert, edge_items,
+				separator, max_len)
 			ret := extend_line(s, line, word, elem_width, hanging_indent)
 			s = ret[0]
 			line = ret[1]
@@ -88,8 +88,8 @@ fn rprint(t Tensor, index []int, hanging_indent string, curr_width int, summary_
 		for tii >= 2 {
 			mut tidx := index.clone()
 			tidx << -1 * tii
-			word := rprint(t, tidx, next_hanging_indent, next_width, summary_insert,
-				edge_items, separator, max_len)
+			word := rprint(t, tidx, next_hanging_indent, next_width, summary_insert, edge_items,
+				separator, max_len)
 			ret := extend_line(s, line, word, elem_width, hanging_indent)
 			s = ret[0]
 			line = ret[1]
@@ -141,7 +141,8 @@ fn rprint(t Tensor, index []int, hanging_indent string, curr_width int, summary_
 
 // format an array, tensor_str is just a wrapper around this
 fn format_array(t Tensor, line_width int, next_line_prefix string, separator string, edge_items int, summary_insert string, max_len int) string {
-	return rprint(t, [], next_line_prefix, line_width, summary_insert, edge_items, separator, max_len)
+	return rprint(t, [], next_line_prefix, line_width, summary_insert, edge_items, separator,
+		max_len)
 }
 
 // public method for printing arrays, if custom behavior is needed
@@ -172,9 +173,9 @@ fn format_num(val Num, notation bool) string {
 	}
 }
 
-// finds the max string length of an ndarray
+// finds the max string length of a Tensor
 fn max_str_len(t Tensor) int {
-        mut mx := 0
+	mut mx := 0
 	mut iter := t.iterator()
 	for _ in 0 .. t.size {
 		val := format_num(iter.next(), false)
