@@ -1,9 +1,7 @@
 module vtl
 
 fn test_empty_shape() {
-	t := new_tensor({
-		shape: []
-	})
+	t := new_tensor(shape: [])
 	assert t.rank() == 0
 	assert t.strides.len == 1
 	assert t.strides[0] == 1
@@ -11,19 +9,14 @@ fn test_empty_shape() {
 }
 
 fn test_rowmajor() {
-	t := new_tensor({
-		shape: [2, 2]
-	})
+	t := new_tensor(shape: [2, 2])
 	assert t.size() == 4
 	assert t.is_contiguous()
 	assert !t.is_colmajor()
 }
 
 fn test_colmajor() {
-	t := new_tensor({
-		shape: [2, 2]
-		memory: .colmajor
-	})
+	t := new_tensor(shape: [2, 2], memory: .colmajor)
 	assert t.size() == 4
 	assert t.is_contiguous()
 	assert t.is_colmajor()
@@ -60,10 +53,7 @@ fn test_transpose() {
 
 fn test_as_type() {
 	// create tensor of integers
-	t := new_tensor({
-		shape: [2, 2]
-		init: 1
-	})
+	t := new_tensor(shape: [2, 2], init: 1)
 	tf64 := tensor_as_type<f64>(t)
 	assert t.get([1, 1]) as int == 1
 	assert tensor_to_varray<f64>(t) == tensor_to_varray<f64>(tf64)

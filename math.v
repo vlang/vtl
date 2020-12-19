@@ -2,7 +2,6 @@ module vtl
 
 import vsl.vmath as math
 
-
 // abs returns the elementwise abs of an tensor
 [inline]
 pub fn abs(t Tensor) Tensor {
@@ -46,7 +45,7 @@ pub fn atan(t Tensor) Tensor {
 // atan2 returns the atan2 elementwise of two tensors
 [inline]
 pub fn atan2(a Tensor, b Tensor) Tensor {
-        f := fn (xs []Num, _ int) Num {
+	f := fn (xs []Num, _ int) Num {
 		x := num_as_type<f64>(xs[0])
 		y := num_as_type<f64>(xs[1])
 		ret := math.atan2(x, y)
@@ -128,7 +127,7 @@ pub fn floor(t Tensor) Tensor {
 // fmod returns the fmod elementwise of two tensors
 [inline]
 pub fn fmod(a Tensor, b Tensor) Tensor {
-        f := fn (xs []Num, _ int) Num {
+	f := fn (xs []Num, _ int) Num {
 		x := num_as_type<f64>(xs[0])
 		y := num_as_type<f64>(xs[1])
 		ret := math.fmod(x, y)
@@ -150,7 +149,7 @@ pub fn gamma(t Tensor) Tensor {
 // hypot returns the hypot elementwise of two tensors
 [inline]
 pub fn hypot(a Tensor, b Tensor) Tensor {
-        f := fn (xs []Num, _ int) Num {
+	f := fn (xs []Num, _ int) Num {
 		x := num_as_type<f64>(xs[0])
 		y := num_as_type<f64>(xs[1])
 		ret := math.hypot(x, y)
@@ -182,7 +181,7 @@ pub fn log_gamma(t Tensor) Tensor {
 // log_n returns the log_n elementwise of two tensors
 [inline]
 pub fn log_n(a Tensor, b Tensor) Tensor {
-        f := fn (xs []Num, _ int) Num {
+	f := fn (xs []Num, _ int) Num {
 		x := num_as_type<f64>(xs[0])
 		y := num_as_type<f64>(xs[1])
 		ret := math.log_n(x, y)
@@ -194,7 +193,7 @@ pub fn log_n(a Tensor, b Tensor) Tensor {
 // max returns the max elementwise of two tensors
 [inline]
 pub fn max(a Tensor, b Tensor) Tensor {
-        f := fn (xs []Num, _ int) Num {
+	f := fn (xs []Num, _ int) Num {
 		x := num_as_type<f64>(xs[0])
 		y := num_as_type<f64>(xs[1])
 		ret := math.max(x, y)
@@ -206,7 +205,7 @@ pub fn max(a Tensor, b Tensor) Tensor {
 // min returns the min elementwise of two tensors
 [inline]
 pub fn min(a Tensor, b Tensor) Tensor {
-        f := fn (xs []Num, _ int) Num {
+	f := fn (xs []Num, _ int) Num {
 		x := num_as_type<f64>(xs[0])
 		y := num_as_type<f64>(xs[1])
 		ret := math.min(x, y)
@@ -218,7 +217,7 @@ pub fn min(a Tensor, b Tensor) Tensor {
 // pow returns the pow elementwise of two tensors
 [inline]
 pub fn pow(a Tensor, b Tensor) Tensor {
-        f := fn (xs []Num, _ int) Num {
+	f := fn (xs []Num, _ int) Num {
 		x := num_as_type<f64>(xs[0])
 		y := num_as_type<f64>(xs[1])
 		ret := math.pow(x, y)

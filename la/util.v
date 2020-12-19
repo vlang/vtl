@@ -71,9 +71,7 @@ fn tensordot_output_data(a vtl.Tensor, b vtl.Tensor, a_axes_ []int, b_axes_ []in
 	a_rank := a.rank()
 	b_shape := b.shape
 	b_rank := b.rank()
-	a_axes, b_axes := correct_axes(a, b, a_axes_, b_axes_) or {
-		panic(err)
-	}
+	a_axes, b_axes := correct_axes(a, b, a_axes_, b_axes_) or { panic(err) }
 	tmp := irange(0, a_rank)
 	notin := tmp.filter(!(it in a_axes))
 	mut a_newaxes := notin

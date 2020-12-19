@@ -14,12 +14,8 @@ fn test_broadcastable_same_shape() {
 }
 
 fn test_broadcastable_different_shape() {
-	a := vtl.new_tensor({
-		shape: [8, 1, 6, 1]
-	})
-	b := vtl.new_tensor({
-		shape: [7, 1, 5]
-	})
+	a := vtl.new_tensor(shape: [8, 1, 6, 1])
+	b := vtl.new_tensor(shape: [7, 1, 5])
 	shape := vtl.broadcastable(a, b)
 	assert shape == [8, 7, 6, 5]
 }

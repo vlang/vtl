@@ -32,8 +32,8 @@ pub fn inv(t vtl.Tensor) vtl.Tensor {
 	assert_square_matrix(t)
 	mut colmajort := t.copy(.colmajor)
 	mut ret_m := la.new_matrix(colmajort.shape[0], colmajort.shape[1])
-        colmajorm := la.matrix_raw(colmajort.shape[0], colmajort.shape[1], vtl.tensor_to_varray<f64>(colmajort))
-        la.matrix_inv(mut ret_m, colmajorm, true)
+	colmajorm := la.matrix_raw(colmajort.shape[0], colmajort.shape[1], vtl.tensor_to_varray<f64>(colmajort))
+	la.matrix_inv(mut ret_m, colmajorm, true)
 	return vtl.from_2d<f64>(ret_m.get_deep2())
 }
 
@@ -47,9 +47,9 @@ pub fn matmul(a vtl.Tensor, b vtl.Tensor) vtl.Tensor {
 		else { b.copy(.rowmajor) }
 	}
 	mut dm := la.new_matrix(a.shape[0], b.shape[1])
-        mam := la.matrix_raw(a.shape[0], a.shape[1], vtl.tensor_to_varray<f64>(ma))
-        mbm := la.matrix_raw(b.shape[0], b.shape[1], vtl.tensor_to_varray<f64>(mb))
-        la.matrix_matrix_mul(mut dm, 1.0, mam, mbm)
+	mam := la.matrix_raw(a.shape[0], a.shape[1], vtl.tensor_to_varray<f64>(ma))
+	mbm := la.matrix_raw(b.shape[0], b.shape[1], vtl.tensor_to_varray<f64>(mb))
+	la.matrix_matrix_mul(mut dm, 1.0, mam, mbm)
 	return vtl.from_2d<f64>(dm.get_deep2())
 }
 
