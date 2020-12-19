@@ -15,6 +15,25 @@ pub fn (f Num) as_type<T>() T {
 	return num_as_type<T>(f)
 }
 
+// return a string of the input if f64 or f32 in scientific notation
+// with digit_num deciamals displayed, max 17 digits
+pub fn (f Num) strsci(digit_num int) string {
+        match f {
+		byte { return f.str() }
+		u16 { return f.str() }
+		u32 { return f.str() }
+		u64 { return f.str() }
+		i8 { return f.str() }
+		i16 { return f.str() }
+		int { return f.str() }
+		i64 { return f.str() }
+		f32 { return f.strsci(digit_num) }
+		f64 { return f.strsci(digit_num) }
+		any_int { return f.str() }
+		any_float { return f.str() }
+	}
+}
+
 // num_as_type<T> returns a Num casted to a given T type
 pub fn num_as_type<T>(f Num) T {
 	match f {
