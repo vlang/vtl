@@ -39,7 +39,7 @@ pub fn new_cpu_with_default(len int, capacity int, element_size int, val voidptr
 	}
 	if val != 0 {
 		for i in 0 .. cpu.len {
-			unsafe {cpu.set_unsafe(i, val)}
+			unsafe { cpu.set_unsafe(i, val) }
 		}
 	}
 	return cpu
@@ -55,7 +55,7 @@ pub fn new_cpu_from_c_array(len int, capacity int, element_size int, c_array voi
 		capacity: capacity_
 	}
 	// TODO Write all memory functions (like memcpy) in V
-	unsafe {C.memcpy(cpu.data, c_array, len * element_size)}
+	unsafe { C.memcpy(cpu.data, c_array, len * element_size) }
 	return cpu
 }
 
@@ -67,7 +67,7 @@ pub fn (cpu CpuStorage) get(i int) voidptr {
 			panic('CpuStorage.get: index out of range (i == $i, cpu.len == $cpu.len)')
 		}
 	}
-	return unsafe {cpu.get_unsafe(i)}
+	return unsafe { cpu.get_unsafe(i) }
 }
 
 // Private function. Used to implement assigment to the CpuStorage element
@@ -78,14 +78,14 @@ pub fn (mut cpu CpuStorage) set(i int, val voidptr) {
 			panic('CpuStorage.set: index out of range (i == $i, cpu.len == $cpu.len)')
 		}
 	}
-	unsafe {cpu.set_unsafe(i, val)}
+	unsafe { cpu.set_unsafe(i, val) }
 }
 
 // fill fills an entire storage with a given value
 [unsafe]
 pub fn (mut cpu CpuStorage) fill(val voidptr) {
 	for i in 0 .. cpu.len {
-		unsafe {cpu.set_unsafe(i, val)}
+		unsafe { cpu.set_unsafe(i, val) }
 	}
 }
 
@@ -114,7 +114,7 @@ pub fn (cpu &CpuStorage) clone() CpuStorage {
 			}
 		}
 	} else {
-		unsafe {C.memcpy(byteptr(new_cpu.data), cpu.data, cpu.capacity * cpu.element_size)}
+		unsafe { C.memcpy(byteptr(new_cpu.data), cpu.data, cpu.capacity * cpu.element_size) }
 	}
 	return new_cpu
 }
@@ -176,7 +176,7 @@ fn (cpu CpuStorage) get_unsafe(i int) voidptr {
 [inline]
 [unsafe]
 fn (mut cpu CpuStorage) set_unsafe(i int, val voidptr) {
-	unsafe {C.memcpy(byteptr(cpu.data) + cpu.element_size * i, val, cpu.element_size)}
+	unsafe { C.memcpy(byteptr(cpu.data) + cpu.element_size * i, val, cpu.element_size) }
 }
 
 // Apply growth factor if needed

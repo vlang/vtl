@@ -196,51 +196,51 @@ pub fn (f Num) str() string {
 pub fn ptr_to_val_of_type(ptr voidptr, t string) Num {
 	match t {
 		'byte' {
-			val := unsafe {*(&byte(ptr))}
+			val := unsafe { *(&byte(ptr)) }
 			return Num(val)
 		}
 		'u16' {
-			val := unsafe {*(&u16(ptr))}
+			val := unsafe { *(&u16(ptr)) }
 			return Num(val)
 		}
 		'u32' {
-			val := unsafe {*(&u32(ptr))}
+			val := unsafe { *(&u32(ptr)) }
 			return Num(val)
 		}
 		'u64' {
-			val := unsafe {*(&u64(ptr))}
+			val := unsafe { *(&u64(ptr)) }
 			return Num(val)
 		}
 		'i8' {
-			val := unsafe {*(&i8(ptr))}
+			val := unsafe { *(&i8(ptr)) }
 			return Num(val)
 		}
 		'i16' {
-			val := unsafe {*(&i16(ptr))}
+			val := unsafe { *(&i16(ptr)) }
 			return Num(val)
 		}
 		'int' {
-			val := unsafe {*(&int(ptr))}
+			val := unsafe { *(&int(ptr)) }
 			return Num(val)
 		}
 		'i64' {
-			val := unsafe {*(&i64(ptr))}
+			val := unsafe { *(&i64(ptr)) }
 			return Num(val)
 		}
 		'f32' {
-			val := unsafe {*(&f32(ptr))}
+			val := unsafe { *(&f32(ptr)) }
 			return Num(val)
 		}
 		'f64' {
-			val := unsafe {*(&f64(ptr))}
+			val := unsafe { *(&f64(ptr)) }
 			return Num(val)
 		}
 		'any_int' {
-			val := unsafe {*(&any_int(ptr))}
+			val := unsafe { *(&any_int(ptr)) }
 			return Num(val)
 		}
 		'any_float' {
-			val := unsafe {*(&any_float(ptr))}
+			val := unsafe { *(&any_float(ptr)) }
 			return Num(val)
 		}
 		else {

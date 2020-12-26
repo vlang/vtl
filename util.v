@@ -71,7 +71,7 @@ fn size_from_shape(shape []int) int {
 // shape_with_autosize returns a new shape and size with autosize
 // applied if needed
 fn shape_with_autosize(shape []int, size int) ([]int, int) {
-	mut newshape := shape
+	mut newshape := shape.clone()
 	mut newsize := size
 	mut autosize := -1
 	for i, val in newshape {
@@ -109,7 +109,7 @@ fn filter_shape_not_strides(shape []int, strides []int) ([]int, []int) {
 // operation
 fn pad_with_zeros(pad []int, ndims int) []int {
 	diff := ndims - pad.len
-	mut newpad := pad
+	mut newpad := pad.clone()
 	mut i := 0
 	for i < diff {
 		newpad << 0
@@ -121,7 +121,7 @@ fn pad_with_zeros(pad []int, ndims int) []int {
 // pad_with_max pads a shape with the maximum axis value to support
 // an indexing operation
 fn pad_with_max(pad []int, shape []int, ndims int) []int {
-	mut newpad := pad
+	mut newpad := pad.clone()
 	diff := ndims - pad.len
 	if diff > 0 {
 		newpad << shape[pad.len..]

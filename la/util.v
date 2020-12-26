@@ -38,8 +38,8 @@ fn iarray_prod(arr []int) int {
 
 fn correct_axes(a vtl.Tensor, b vtl.Tensor, axes_a_ []int, axes_b_ []int) ?([]int, []int) {
 	mut equal := true
-	mut axes_a := axes_a_
-	mut axes_b := axes_b_
+	mut axes_a := axes_a_.clone()
+	mut axes_b := axes_b_.clone()
 	if axes_a.len != axes_b.len {
 		equal = false
 	} else {
@@ -74,7 +74,7 @@ fn tensordot_output_data(a vtl.Tensor, b vtl.Tensor, a_axes_ []int, b_axes_ []in
 	a_axes, b_axes := correct_axes(a, b, a_axes_, b_axes_) or { panic(err) }
 	tmp := irange(0, a_rank)
 	notin := tmp.filter(!(it in a_axes))
-	mut a_newaxes := notin
+	mut a_newaxes := notin.clone()
 	a_newaxes << a_axes
 	mut n2 := 1
 	for axis in a_axes {
@@ -85,7 +85,7 @@ fn tensordot_output_data(a vtl.Tensor, b vtl.Tensor, a_axes_ []int, b_axes_ []in
 	a_newshape := [val, n2]
 	tmpb := irange(0, b_rank)
 	notinb := tmpb.filter(!(it in b_axes))
-	mut b_newaxes := b_axes
+	mut b_newaxes := b_axes.clone()
 	b_newaxes << notinb
 	n2 = 1
 	for axis in b_axes {
