@@ -89,35 +89,35 @@ fn storage_strategy(s Storage) StorageStrategy {
 
 fn storage_clone(s Storage) Storage {
 	match s {
-		storage.CpuStorage { return unsafe {s.clone()} }
+		storage.CpuStorage { return unsafe { s.clone() } }
 		else { panic('storage not allowed') }
 	}
 }
 
 fn storage_offset(s Storage, start int) Storage {
 	match s {
-		storage.CpuStorage { return unsafe {s.offset(start)} }
+		storage.CpuStorage { return unsafe { s.offset(start) } }
 		else { panic('storage not allowed') }
 	}
 }
 
 fn storage_get(s Storage, i int, etype string) Num {
 	match s {
-		storage.CpuStorage { return ptr_to_val_of_type(unsafe {s.get(i)}, etype) }
+		storage.CpuStorage { return ptr_to_val_of_type(unsafe { s.get(i) }, etype) }
 		else { panic('storage not allowed') }
 	}
 }
 
 fn storage_set(s Storage, i int, val Num) {
 	match mut s {
-		storage.CpuStorage { unsafe {s.set(i, val.ptr())} }
+		storage.CpuStorage { unsafe { s.set(i, val.ptr()) } }
 		else { panic('storage not allowed') }
 	}
 }
 
 fn storage_fill(s Storage, val Num) {
 	match mut s {
-		storage.CpuStorage { unsafe {s.fill(val.ptr())} }
+		storage.CpuStorage { unsafe { s.fill(val.ptr()) } }
 		else { panic('storage not allowed') }
 	}
 }
