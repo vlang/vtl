@@ -1,9 +1,9 @@
 module vtl
 
 pub const (
-	default_type = 'f64'
-	default_init = Num(f64(0.0))
-	default_size = int(sizeof(f64))
+	default_type = 'any_float'
+	default_init = Num(0.0)
+	default_size = int(sizeof(any_float))
 )
 
 // `Num` is a sum type that lists the possible types to be used to define tensor values
