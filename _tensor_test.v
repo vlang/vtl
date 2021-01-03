@@ -34,7 +34,7 @@ fn test_set() {
 	arr := [1., 2., 3., 4.]
 	shape := [2, 2]
 	mut t := from_varray<f64>(arr, shape)
-	t.set([1, 1], 8.0)
+	t.set([1, 1], f64(8.0))
 	val := t.get([1, 1]) as f64
 	assert val == 8.0
 }
@@ -53,7 +53,7 @@ fn test_transpose() {
 
 fn test_as_type() {
 	// create tensor of integers
-	t := new_tensor(shape: [2, 2], init: 1)
+	t := new_tensor(shape: [2, 2], init: int(1))
 	tf64 := tensor_as_type<f64>(t)
 	assert t.get([1, 1]) as int == 1
 	assert tensor_to_varray<f64>(t) == tensor_to_varray<f64>(tf64)

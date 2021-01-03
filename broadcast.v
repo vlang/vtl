@@ -9,13 +9,13 @@ pub fn broadcastable(a Tensor, b Tensor) []int {
 		}
 	} else {
 		if a.rank() > b.rank() {
-			mut b_shape := []int{len: a.rank() - b.rank(), init: 1}
+			mut b_shape := []int{len: a.rank() - b.rank(), init: int(1)}
 			b_shape << b.shape
 			if broadcast_equal(a.shape, b_shape) {
 				return broadcastable_shape(a.shape, b_shape)
 			}
 		} else {
-			mut a_shape := []int{len: b.rank() - a.rank(), init: 1}
+			mut a_shape := []int{len: b.rank() - a.rank(), init: int(1)}
 			a_shape << a.shape
 			if broadcast_equal(a_shape, b.shape) {
 				return broadcastable_shape(a_shape, b.shape)
@@ -107,7 +107,7 @@ fn broadcast_shapes(args ...[]int) []int {
 	for i in 0 .. args.len {
 		ai := args[i]
 		d := nd - ai.len
-		mut shape := []int{len: d, init: 1}
+		mut shape := []int{len: d, init: int(1)}
 		shape << ai
 		for j := 0; j < shape.len; j++ {
 			if shape[j] > result[j] {

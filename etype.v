@@ -1,13 +1,13 @@
 module vtl
 
 pub const (
-	default_type = 'any_float'
+	default_type = 'f64'
 	default_init = Num(0.0)
-	default_size = int(sizeof(any_float))
+	default_size = int(sizeof(f64))
 )
 
 // `Num` is a sum type that lists the possible types to be used to define tensor values
-pub type Num = any_float | any_int | byte | f32 | f64 | i16 | i64 | i8 | int | u16 | u32 |
+pub type Num = byte | f32 | f64 | i16 | i64 | i8 | int | u16 | u32 |
 	u64
 
 // as_type<T> returns a Num casted to a given T type
@@ -40,8 +40,6 @@ pub fn (f Num) strsci(digit_num int) string {
 		i64 { return f.str() }
 		f32 { return f.strsci(digit_num) }
 		f64 { return f.strsci(digit_num) }
-		any_int { return f.str() }
-		any_float { return f.str() }
 	}
 }
 
@@ -88,14 +86,6 @@ pub fn num_as_type<T>(f Num) T {
 			val := f64(f)
 			return T(val)
 		}
-		any_int {
-			val := any_int(f)
-			return T(val)
-		}
-		any_float {
-			val := any_float(f)
-			return T(val)
-		}
 	}
 }
 
@@ -117,8 +107,6 @@ pub fn (f Num) esize() int {
 		i64 { return int(sizeof(f)) }
 		f32 { return int(sizeof(f)) }
 		f64 { return int(sizeof(f)) }
-		any_int { return int(sizeof(f)) }
-		any_float { return int(sizeof(f)) }
 	}
 }
 
@@ -135,8 +123,6 @@ pub fn (f Num) ptr() voidptr {
 		i64 { return voidptr(&f) }
 		f32 { return voidptr(&f) }
 		f64 { return voidptr(&f) }
-		any_int { return voidptr(&f) }
-		any_float { return voidptr(&f) }
 	}
 }
 
@@ -182,12 +168,6 @@ pub fn (f Num) str() string {
 			} else {
 				str_f64
 			}
-		}
-		any_int {
-			return f.str()
-		}
-		any_float {
-			return f.str()
 		}
 	}
 }
@@ -235,14 +215,6 @@ pub fn ptr_to_val_of_type(ptr voidptr, t string) Num {
 			val := unsafe { *(&f64(ptr)) }
 			return Num(val)
 		}
-		'any_int' {
-			val := unsafe { *(&any_int(ptr)) }
-			return Num(val)
-		}
-		'any_float' {
-			val := unsafe { *(&any_float(ptr)) }
-			return Num(val)
-		}
 		else {
 			return Num(0.0)
 		}
@@ -262,8 +234,6 @@ pub fn str_esize(t string) int {
 		'i64' { return int(sizeof(i64)) }
 		'f32' { return int(sizeof(f32)) }
 		'f64' { return int(sizeof(f64)) }
-		'any_int' { return int(sizeof(any_int)) }
-		'any_float' { return int(sizeof(any_float)) }
 		else { return 0 }
 	}
 }
