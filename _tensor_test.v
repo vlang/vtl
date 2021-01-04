@@ -34,7 +34,7 @@ fn test_set() {
 	arr := [1., 2., 3., 4.]
 	shape := [2, 2]
 	mut t := from_varray<f64>(arr, shape)
-	t.set([1, 1], f64(8.0))
+	t.set([1, 1], 8.0)
 	val := t.get([1, 1]) as f64
 	assert val == 8.0
 }
