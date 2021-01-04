@@ -29,7 +29,7 @@ pub fn eye(m int, n int, k int) Tensor {
 	for i in 0 .. m {
 		for j in 0 .. n {
 			if i == j - k {
-				ret.set([i, j], f64(1.0))
+				ret.set([i, j], 1.0)
 			}
 		}
 	}
@@ -48,12 +48,12 @@ pub fn zeros_like(t Tensor) Tensor {
 
 // Return a new Tensor of given shape and type, filled with ones
 pub fn ones(shape []int) Tensor {
-	return full(shape, f64(1.0))
+	return full(shape, 1.0)
 }
 
 // Return an Tensor of ones with the same shape and type as a given Tensor
 pub fn ones_like(t Tensor) Tensor {
-	return full_like(t, f64(1.0))
+	return full_like(t, 1.0)
 }
 
 // Return a new Tensor of given shape and type, filled with val
