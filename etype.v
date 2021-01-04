@@ -2,7 +2,7 @@ module vtl
 
 pub const (
 	default_type = 'f64'
-	default_init = Num(0.0)
+	default_init = Num(f64(0.0))
 	default_size = int(sizeof(f64))
 )
 
