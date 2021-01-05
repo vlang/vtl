@@ -2,7 +2,7 @@ module vtl
 
 // IteratorHandler defines a function to use in order to mutate
 // iteration position
-pub type IteratorHandler = fn (mut s TensorIterator) Num
+pub type IteratorHandler = fn (s TensorIterator) Num
 
 // TensorIterator is a struct to hold a Tensors
 // iteration state while iterating through a Tensor
@@ -95,7 +95,7 @@ fn handle_flatten_iteration(mut s TensorIterator) Num {
 // which is either flat or strided and returns a Num containing the current value
 [inline]
 pub fn (mut s TensorIterator) next() ?Num {
-	if s.iteration == s.tensor.size {
+	if s.iteration >= s.tensor.size {
 		return none
 	}
 	s.iteration++
