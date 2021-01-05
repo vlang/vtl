@@ -12,7 +12,7 @@ pub struct TensorIterator {
 mut:
 	coord        &int
 	backstrides  &int
-        iteration    int
+	iteration    int
 	pos          int
 }
 
@@ -27,11 +27,7 @@ pub fn (t Tensor) iterator() TensorIterator {
 fn (t Tensor) rowmajor_contiguous_iterator() TensorIterator {
 	coord := 0
 	bs := 0
-	return t.custom_iterator(
-		coord: &coord
-		backstrides: &bs
-		next_handler: handle_flatten_iteration
-	)
+	return t.custom_iterator(coord: &coord, backstrides: &bs, next_handler: handle_flatten_iteration)
 }
 
 fn (t Tensor) strided_iterator() TensorIterator {
@@ -99,10 +95,10 @@ fn handle_flatten_iteration(mut s TensorIterator) Num {
 // which is either flat or strided and returns a Num containing the current value
 [inline]
 pub fn (mut s TensorIterator) next() ?Num {
-        if s.iteration == s.tensor.size {
-                return none
-        }
-        s.iteration++
+	if s.iteration == s.tensor.size {
+		return none
+	}
+	s.iteration++
 	return s.next_handler(s)
 }
 
@@ -149,9 +145,9 @@ pub fn (ts []Tensor) iterators() []TensorIterator {
 pub fn (its []TensorIterator) next() []Num {
 	mut nums := []Num{cap: its.len}
 	for mut iter in its {
-                if val := iter.next() {
-		        nums << val
-                }
+		if val := iter.next() {
+			nums << val
+		}
 	}
 	return nums
 }

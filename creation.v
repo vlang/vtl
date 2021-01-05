@@ -4,7 +4,7 @@ pub struct TensorData {
 pub:
 	shape   []int
 	init    Num = Num(f64(0.0))
-	memory  MemoryFormat = .rowmajor
+	memory  MemoryFormat    = .rowmajor
 	storage StorageStrategy = .cpu
 }
 
@@ -135,12 +135,7 @@ pub fn new_tensor(data TensorData) Tensor {
 	}
 	strides := strides_from_shape(data.shape, data.memory)
 	size := size_from_shape(data.shape)
-	data_storage := new_storage(
-		len: size
-		init: data.init
-		etype: etype
-		strategy: data.storage
-	)
+	data_storage := new_storage(len: size, init: data.init, etype: etype, strategy: data.storage)
 	return Tensor{
 		shape: data.shape
 		memory: data.memory
