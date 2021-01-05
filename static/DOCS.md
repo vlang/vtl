@@ -33,7 +33,7 @@ Because we use CV for linking [VSL](https://github.com/vlang/vsl) with many libr
 We use VSL as backend for some functionalities and [VSL](https://github.com/vlang/vsl) links with existent libraries written in C and Fortran, such as OpenBLAS and LAPACK. These existing libraries have been fundamental for the development of high-performant simulations over many years. We believe that it is nearly impossible to rewrite these libraries in native V and at the same time achieve the same speed delivered by them.
 
 VTL requires VSL's OpenBLAS and LAPACKE wrappers. If you wish you to use vtl without these,
-the `vtl.num` module will still function as normal.
+the `vtl` module will still function as normal.
 
 Follow this [install instructions](https://github.com/vlang/vsl#install-vsl-locally) at VSL docs in order to install VSL with all needed dependencies.
 
