@@ -2,7 +2,7 @@ module vtl
 
 // IteratorHandler defines a function to use in order to mutate
 // iteration position
-pub type IteratorHandler = fn (s TensorIterator) Num
+pub type IteratorHandler = fn (mut s TensorIterator) Num
 
 // TensorIterator is a struct to hold a Tensors
 // iteration state while iterating through a Tensor
