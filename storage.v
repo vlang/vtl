@@ -16,7 +16,7 @@ pub struct StorageData {
 pub:
 	len      int
 	cap      int
-	init     Num = default_init
+	init     Num    = default_init
 	etype    string = default_type
 	strategy StorageStrategy = .cpu
 }

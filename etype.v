@@ -7,8 +7,7 @@ pub const (
 )
 
 // `Num` is a sum type that lists the possible types to be used to define tensor values
-pub type Num = byte | f32 | f64 | i16 | i64 | i8 | int | u16 | u32 |
-	u64
+pub type Num = byte | f32 | f64 | i16 | i64 | i8 | int | u16 | u32 | u64
 
 // as_type<T> returns a Num casted to a given T type
 pub fn (f Num) as_type<T>() T {
