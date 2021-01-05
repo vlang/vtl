@@ -1,0 +1,27 @@
+name: Validate Docs
+
+on: [push, pull_request]
+
+jobs:
+  ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Latest V
+      uses: actions/checkout@v2
+      with:
+        repository: vlang/v
+    - name: Checkout VTL
+      uses: actions/checkout@v2
+      with:
+        path: vtl
+    - name: Build V
+      run: |
+        make
+        sudo ./v symlink
+    - name: V doctor
+      run: v doctor
+    - name: Validate docs
+      run: |
+        v install vtl
+        cd vtl
+        v run ../cmd/tools/check-md.v -all
