@@ -7,14 +7,6 @@
 [Contributing](https://github.com/vlang/vtl/blob/main/CONTRIBUTING.md)
 
 </div>
-<div align="center">
-
-[![Mentioned in Awesome V][awesomevbadge]][awesomevurl]
-[![Build Status][workflowbadge]][workflowurl]
-[![Docs Validation][validatedocsbadge]][validatedocsurl]
-[![License: MIT][licensebadge]][licenseurl]
-
-</div>
 
 ```v nofmt
 >>> import vtl
