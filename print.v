@@ -166,10 +166,10 @@ pub fn tensor_str(t Tensor, separator string, prefix string) string {
 fn max_str_len(t Tensor) int {
 	mut mx := 0
 	mut iter := t.iterator()
-	for _ in 0 .. t.size {
-		val := iter.next().prettify(false)
-		if val.len > mx {
-			mx = val.len
+	for val in iter {
+		val_str := val.prettify(false)
+		if val_str.len > mx {
+			mx = val_str.len
 		}
 	}
 	return mx

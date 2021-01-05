@@ -10,10 +10,9 @@ fn rand_between(min Num, max Num) Num {
 pub fn random(min Num, max Num, shape []int) Tensor {
 	ret := empty(shape)
 	mut iter := ret.iterator()
-	for _ in 0 .. ret.size {
+	for _ in iter {
 		r := rand_between(min, max)
 		storage_set(ret.data, iter.pos, r)
-		iter.next()
 	}
 	return ret
 }

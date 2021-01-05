@@ -18,7 +18,7 @@ pub fn (mut t Tensor) fill(val Num) {
 pub fn (mut t Tensor) assign(other Tensor) {
 	otherb := other.broadcast_to(t.shape)
 	mut iter := otherb.iterator()
-	for i in 0 .. t.size {
-		storage_set(t.data, i, iter.next())
+	for val in iter {
+		storage_set(t.data, iter.pos, val)
 	}
 }

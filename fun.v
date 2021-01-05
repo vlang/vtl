@@ -14,9 +14,9 @@ pub type NApplyFn = fn (x []Num, i int) Num
 pub fn (t Tensor) map(f MapFn) Tensor {
 	mut ret := new_tensor_like(t)
 	mut iter := t.iterator()
-	for i in 0 .. t.size {
-		val := f(iter.next(), i)
-		storage_set(ret.data, i, val)
+	for val in iter {
+		next_val := f(val, iter.pos)
+		storage_set(ret.data, iter.pos, next_val)
 	}
 	return ret
 }
@@ -24,9 +24,9 @@ pub fn (t Tensor) map(f MapFn) Tensor {
 // apply applies a function to each element of a given Tensor
 pub fn (t Tensor) apply(f ApplyFn) {
 	mut iter := t.iterator()
-	for i in 0 .. t.size {
-		val := f(iter.next(), i)
-		storage_set(t.data, i, val)
+	for val in iter {
+		next_val := f(val, iter.pos)
+		storage_set(t.data, iter.pos, next_val)
 	}
 }
 
