@@ -12,6 +12,7 @@ pub struct TensorIterator {
 mut:
 	coord        &int
 	backstrides  &int
+        iteration    int
 	pos          int
 }
 
@@ -97,7 +98,11 @@ fn handle_flatten_iteration(mut s TensorIterator) Num {
 // next calls the iteration type for a given iterator
 // which is either flat or strided and returns a Num containing the current value
 [inline]
-pub fn (mut s TensorIterator) next() Num {
+pub fn (mut s TensorIterator) next() ?Num {
+        if s.iteration == s.tensor.size {
+                return none
+        }
+        s.iteration++
 	return s.next_handler(s)
 }
 
@@ -144,7 +149,9 @@ pub fn (ts []Tensor) iterators() []TensorIterator {
 pub fn (its []TensorIterator) next() []Num {
 	mut nums := []Num{cap: its.len}
 	for mut iter in its {
-		nums << iter.next()
+                if val := iter.next() {
+		        nums << val
+                }
 	}
 	return nums
 }

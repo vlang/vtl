@@ -28,10 +28,10 @@ pub fn (t Tensor) str() string {
 // tensor_to_varray<T> returns the flatten representation of a tensor in a v array storing
 // elements of type T
 pub fn tensor_to_varray<T>(t Tensor) []T {
-	mut arr := []T{}
+	mut arr := []T{cap: t.size}
 	mut iter := t.iterator()
-	for _ in 0 .. t.size {
-		arr << num_as_type<T>(iter.next())
+	for val in iter {
+		arr << num_as_type<T>(val)
 	}
 	return arr
 }
