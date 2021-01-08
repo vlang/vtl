@@ -23,7 +23,7 @@ jobs:
       run: v doctor
     - name: Install VTL dependencies
       run: |
-        sudo apt-get install --quiet -y --no-install-recommends gfortran liblapacke-dev libcblas-dev libopenblas-dev
+        sudo apt-get install --quiet -y --no-install-recommends gfortran liblapacke-dev libopenblas-dev
         v install vsl
     - name: run tests
       run: cd vtl; ./bin/test
