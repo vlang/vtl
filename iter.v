@@ -33,7 +33,7 @@ fn (t Tensor) rowmajor_contiguous_iterator() TensorIterator {
 fn (t Tensor) strided_iterator() TensorIterator {
 	coord := []int{len: t.rank()}
 	return t.custom_iterator(
-		coord: &int(&coord[0])
+		coord: unsafe { &int(&coord[0]) }
 		backstrides: tensor_backstrides(t)
 		next_handler: handle_strided_iteration
 	)
@@ -142,7 +142,7 @@ pub fn (ts []Tensor) iterators() []TensorIterator {
 // next calls the iteration type for a given list of iterators
 // which is either flat or strided and returns a list of Nums containing the current values
 [inline]
-pub fn (its []TensorIterator) next() []Num {
+pub fn (mut its []TensorIterator) next() []Num {
 	mut nums := []Num{cap: its.len}
 	for mut iter in its {
 		if val := iter.next() {
