@@ -32,8 +32,8 @@ pub fn inv(t vtl.Tensor) vtl.Tensor {
 	assert_square_matrix(t)
 	mut colmajort := t.copy(.colmajor)
 	mut ret_m := la.new_matrix(colmajort.shape[0], colmajort.shape[1])
-	colmajorm := la.matrix_raw(colmajort.shape[0], colmajort.shape[1], vtl.tensor_to_varray<f64>(colmajort))
-	la.matrix_inv(mut ret_m, colmajorm, true)
+	mut colmajorm := la.matrix_raw(colmajort.shape[0], colmajort.shape[1], vtl.tensor_to_varray<f64>(colmajort))
+	la.matrix_inv(mut ret_m, mut colmajorm, true)
 	return vtl.from_2d<f64>(ret_m.get_deep2())
 }
 
