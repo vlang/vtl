@@ -1,13 +1,13 @@
 module vtl
 
-import vsl.vmath as math
+import vsl.vmath
 
 // abs returns the elementwise abs of an tensor
 [inline]
 pub fn abs(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
-		ret := math.abs(val)
+		ret := vmath.abs(val)
 		return Num(ret)
 	})
 }
@@ -17,7 +17,7 @@ pub fn abs(t Tensor) Tensor {
 pub fn acos(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
-		ret := math.acos(val)
+		ret := vmath.acos(val)
 		return Num(ret)
 	})
 }
@@ -27,7 +27,7 @@ pub fn acos(t Tensor) Tensor {
 pub fn asin(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
-		ret := math.asin(val)
+		ret := vmath.asin(val)
 		return Num(ret)
 	})
 }
@@ -37,7 +37,7 @@ pub fn asin(t Tensor) Tensor {
 pub fn atan(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
-		ret := math.atan(val)
+		ret := vmath.atan(val)
 		return Num(ret)
 	})
 }
@@ -48,7 +48,7 @@ pub fn atan2(a Tensor, b Tensor) Tensor {
 	f := fn (xs []Num, _ int) Num {
 		x := num_as_type<f64>(xs[0])
 		y := num_as_type<f64>(xs[1])
-		ret := math.atan2(x, y)
+		ret := vmath.atan2(x, y)
 		return Num(ret)
 	}
 	return a.nmap(f, b)
@@ -59,7 +59,7 @@ pub fn atan2(a Tensor, b Tensor) Tensor {
 pub fn cbrt(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
-		ret := math.cbrt(val)
+		ret := vmath.cbrt(val)
 		return Num(ret)
 	})
 }
@@ -69,7 +69,7 @@ pub fn cbrt(t Tensor) Tensor {
 pub fn ceil(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
-		ret := math.ceil(val)
+		ret := vmath.ceil(val)
 		return Num(ret)
 	})
 }
@@ -79,7 +79,7 @@ pub fn ceil(t Tensor) Tensor {
 pub fn cos(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
-		ret := math.cos(val)
+		ret := vmath.cos(val)
 		return Num(ret)
 	})
 }
@@ -89,7 +89,7 @@ pub fn cos(t Tensor) Tensor {
 pub fn exp(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
-		ret := math.exp(val)
+		ret := vmath.exp(val)
 		return Num(ret)
 	})
 }
@@ -99,7 +99,7 @@ pub fn exp(t Tensor) Tensor {
 pub fn erf(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
-		ret := math.erf(val)
+		ret := vmath.erf(val)
 		return Num(ret)
 	})
 }
@@ -109,7 +109,7 @@ pub fn erf(t Tensor) Tensor {
 pub fn exp2(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
-		ret := math.exp2(val)
+		ret := vmath.exp2(val)
 		return Num(ret)
 	})
 }
@@ -119,7 +119,7 @@ pub fn exp2(t Tensor) Tensor {
 pub fn floor(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
-		ret := math.floor(val)
+		ret := vmath.floor(val)
 		return Num(ret)
 	})
 }
@@ -130,7 +130,7 @@ pub fn fmod(a Tensor, b Tensor) Tensor {
 	f := fn (xs []Num, _ int) Num {
 		x := num_as_type<f64>(xs[0])
 		y := num_as_type<f64>(xs[1])
-		ret := math.fmod(x, y)
+		ret := vmath.fmod(x, y)
 		return Num(ret)
 	}
 	return a.nmap(f, b)
@@ -141,7 +141,7 @@ pub fn fmod(a Tensor, b Tensor) Tensor {
 pub fn gamma(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
-		ret := math.gamma(val)
+		ret := vmath.gamma(val)
 		return Num(ret)
 	})
 }
@@ -152,7 +152,7 @@ pub fn hypot(a Tensor, b Tensor) Tensor {
 	f := fn (xs []Num, _ int) Num {
 		x := num_as_type<f64>(xs[0])
 		y := num_as_type<f64>(xs[1])
-		ret := math.hypot(x, y)
+		ret := vmath.hypot(x, y)
 		return Num(ret)
 	}
 	return a.nmap(f, b)
@@ -163,7 +163,7 @@ pub fn hypot(a Tensor, b Tensor) Tensor {
 pub fn log10(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
-		ret := math.log10(val)
+		ret := vmath.log10(val)
 		return Num(ret)
 	})
 }
@@ -173,7 +173,7 @@ pub fn log10(t Tensor) Tensor {
 pub fn log_gamma(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
-		ret := math.log_gamma(val)
+		ret := vmath.log_gamma(val)
 		return Num(ret)
 	})
 }
@@ -184,7 +184,7 @@ pub fn log_n(a Tensor, b Tensor) Tensor {
 	f := fn (xs []Num, _ int) Num {
 		x := num_as_type<f64>(xs[0])
 		y := num_as_type<f64>(xs[1])
-		ret := math.log_n(x, y)
+		ret := vmath.log_n(x, y)
 		return Num(ret)
 	}
 	return a.nmap(f, b)
@@ -196,7 +196,7 @@ pub fn max(a Tensor, b Tensor) Tensor {
 	f := fn (xs []Num, _ int) Num {
 		x := num_as_type<f64>(xs[0])
 		y := num_as_type<f64>(xs[1])
-		ret := math.max(x, y)
+		ret := vmath.max(x, y)
 		return Num(ret)
 	}
 	return a.nmap(f, b)
@@ -208,7 +208,7 @@ pub fn min(a Tensor, b Tensor) Tensor {
 	f := fn (xs []Num, _ int) Num {
 		x := num_as_type<f64>(xs[0])
 		y := num_as_type<f64>(xs[1])
-		ret := math.min(x, y)
+		ret := vmath.min(x, y)
 		return Num(ret)
 	}
 	return a.nmap(f, b)
@@ -220,7 +220,7 @@ pub fn pow(a Tensor, b Tensor) Tensor {
 	f := fn (xs []Num, _ int) Num {
 		x := num_as_type<f64>(xs[0])
 		y := num_as_type<f64>(xs[1])
-		ret := math.pow(x, y)
+		ret := vmath.pow(x, y)
 		return Num(ret)
 	}
 	return a.nmap(f, b)
@@ -231,7 +231,7 @@ pub fn pow(a Tensor, b Tensor) Tensor {
 pub fn radians(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
-		ret := math.radians(val)
+		ret := vmath.radians(val)
 		return Num(ret)
 	})
 }
@@ -241,7 +241,7 @@ pub fn radians(t Tensor) Tensor {
 pub fn round(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
-		ret := math.round(val)
+		ret := vmath.round(val)
 		return Num(ret)
 	})
 }
@@ -251,7 +251,7 @@ pub fn round(t Tensor) Tensor {
 pub fn sin(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
-		ret := math.sin(val)
+		ret := vmath.sin(val)
 		return Num(ret)
 	})
 }
@@ -261,7 +261,7 @@ pub fn sin(t Tensor) Tensor {
 pub fn sinh(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
-		ret := math.sinh(val)
+		ret := vmath.sinh(val)
 		return Num(ret)
 	})
 }
@@ -271,7 +271,7 @@ pub fn sinh(t Tensor) Tensor {
 pub fn sqrt(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
-		ret := math.sqrt(val)
+		ret := vmath.sqrt(val)
 		return Num(ret)
 	})
 }
@@ -281,7 +281,7 @@ pub fn sqrt(t Tensor) Tensor {
 pub fn tan(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
-		ret := math.tan(val)
+		ret := vmath.tan(val)
 		return Num(ret)
 	})
 }
@@ -291,7 +291,7 @@ pub fn tan(t Tensor) Tensor {
 pub fn tanh(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
-		ret := math.tanh(val)
+		ret := vmath.tanh(val)
 		return Num(ret)
 	})
 }

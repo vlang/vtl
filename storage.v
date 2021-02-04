@@ -1,6 +1,6 @@
 module vtl
 
-import vtl.storage
+import storage
 
 pub enum StorageStrategy {
 	cpu
