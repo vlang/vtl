@@ -11,14 +11,14 @@ pub struct CpuStorage {
 pub:
 	element_size int
 pub mut:
-	data         voidptr
-	len          int
-	capacity     int
+	data     voidptr
+	len      int
+	capacity int
 }
 
 pub fn new_cpu(len int, capacity int, element_size int) CpuStorage {
 	mut capacity_ := if capacity < len { len } else { capacity }
-	capacity_ = max(capacity_, vector_minimum_capacity)
+	capacity_ = max(capacity_, storage.vector_minimum_capacity)
 	return CpuStorage{
 		len: len
 		capacity: capacity_
@@ -30,7 +30,7 @@ pub fn new_cpu(len int, capacity int, element_size int) CpuStorage {
 [unsafe]
 pub fn new_cpu_with_default(len int, capacity int, element_size int, val voidptr) CpuStorage {
 	mut capacity_ := if capacity < len { len } else { capacity }
-	capacity_ = max(capacity_, vector_minimum_capacity)
+	capacity_ = max(capacity_, storage.vector_minimum_capacity)
 	mut cpu := CpuStorage{
 		len: len
 		capacity: capacity_
@@ -185,12 +185,15 @@ fn (mut cpu CpuStorage) ensure_capacity(required int) {
 	if required <= cpu.capacity {
 		return
 	}
-	mut capacity := if cpu.capacity < vector_minimum_capacity { vector_minimum_capacity } else { cpu.capacity *
-			vector_growth_factor }
-	for required > capacity {
-		capacity *= vector_growth_factor
+	mut capacity := if cpu.capacity < storage.vector_minimum_capacity {
+		storage.vector_minimum_capacity
+	} else {
+		cpu.capacity * storage.vector_growth_factor
 	}
-	if cpu.capacity == vector_minimum_capacity {
+	for required > capacity {
+		capacity *= storage.vector_growth_factor
+	}
+	if cpu.capacity == storage.vector_minimum_capacity {
 		cpu.data = vcalloc(capacity * cpu.element_size)
 	} else {
 		cpu.data = v_realloc(cpu.data, capacity * cpu.element_size)
