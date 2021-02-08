@@ -9,9 +9,9 @@ pub enum MemoryFormat {
 // `Tensor` is the main structure defined by VTL to manage N Dimensional
 // Array of values
 pub struct Tensor {
-	etype   string = default_type
+	etype string = default_type
 mut:
-	data    Storage
+	data Storage
 pub mut:
 	memory  MemoryFormat
 	size    int

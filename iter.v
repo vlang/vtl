@@ -10,10 +10,10 @@ pub struct TensorIterator {
 	tensor       Tensor
 	next_handler IteratorHandler
 mut:
-	coord        &int
-	backstrides  &int
-	iteration    int
-	pos          int
+	coord       &int
+	backstrides &int
+	iteration   int
+	pos         int
 }
 
 // iterator creates an iterator through a Tensor

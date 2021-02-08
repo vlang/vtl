@@ -30,18 +30,24 @@ pub fn new_storage(data StorageData) Storage {
 [inline]
 pub fn new_storage_like(s Storage) Storage {
 	match s {
-		storage.CpuStorage { return create_storage(s.len, s.capacity, s.element_size,
-				voidptr(0), storage_strategy(s)) }
-		else { panic('storage not allowed') }
+		storage.CpuStorage {
+			return create_storage(s.len, s.capacity, s.element_size, voidptr(0), storage_strategy(s))
+		}
+		else {
+			panic('storage not allowed')
+		}
 	}
 }
 
 [inline]
 pub fn new_storage_like_with_len(s Storage, len int) Storage {
 	match s {
-		storage.CpuStorage { return create_storage(len, 0, s.element_size, voidptr(0),
-				storage_strategy(s)) }
-		else { panic('storage not allowed') }
+		storage.CpuStorage {
+			return create_storage(len, 0, s.element_size, voidptr(0), storage_strategy(s))
+		}
+		else {
+			panic('storage not allowed')
+		}
 	}
 }
 
