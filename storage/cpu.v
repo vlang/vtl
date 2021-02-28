@@ -196,7 +196,7 @@ fn (mut cpu CpuStorage) ensure_capacity(required int) {
 	if cpu.capacity == storage.vector_minimum_capacity {
 		cpu.data = vcalloc(capacity * cpu.element_size)
 	} else {
-		cpu.data = v_realloc(cpu.data, capacity * cpu.element_size)
+		unsafe { cpu.data = v_realloc(cpu.data, capacity * cpu.element_size) }
 	}
 	cpu.capacity = capacity
 }
