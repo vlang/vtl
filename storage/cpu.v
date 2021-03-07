@@ -157,7 +157,7 @@ pub fn (cpu CpuStorage) offset(start int) CpuStorage {
 pub fn cpu_to_varray<T>(cpu CpuStorage) []T {
 	if cpu.element_size == int(sizeof(T)) {
 		mut arr := []T{}
-		arr.push_many(cpu.data, cpu.len)
+		unsafe { arr.push_many(cpu.data, cpu.len) }
 		return arr
 	}
 	panic('CpuStorage.to_varray<T>: incoming type T does not match with the stored data type')
