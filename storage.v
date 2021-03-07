@@ -61,7 +61,7 @@ pub fn storage_to_varray<T>(s Storage) []T {
 		storage.CpuStorage {
 			if s.element_size == int(sizeof(T)) {
 				mut arr := []T{}
-				arr.push_many(s.data, s.len)
+				unsafe { arr.push_many(s.data, s.len) }
 				return arr
 			}
 			panic('CpuStorage.to_varray: incoming type T does not match with the stored data type')
@@ -81,9 +81,9 @@ fn create_storage(len int, cap int, element_size int, init voidptr, strategy Sto
 
 fn create_storage_from_c_array(len int, cap int, element_size int, c_array voidptr, strategy StorageStrategy) Storage {
 	if strategy == .cpu {
-		return storage.new_cpu_from_c_array(len, cap, element_size, c_array)
+		return unsafe { storage.new_cpu_from_c_array(len, cap, element_size, c_array) }
 	}
-	return storage.new_cpu_from_c_array(len, cap, element_size, c_array)
+	return unsafe { storage.new_cpu_from_c_array(len, cap, element_size, c_array) }
 }
 
 fn storage_strategy(s Storage) StorageStrategy {
