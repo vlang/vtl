@@ -27,7 +27,6 @@ pub fn new_cpu(len int, capacity int, element_size int) CpuStorage {
 	}
 }
 
-[unsafe]
 pub fn new_cpu_with_default(len int, capacity int, element_size int, val voidptr) CpuStorage {
 	mut capacity_ := if capacity < len { len } else { capacity }
 	capacity_ = max(capacity_, storage.vector_minimum_capacity)
