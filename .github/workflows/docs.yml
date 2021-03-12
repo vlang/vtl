@@ -28,7 +28,7 @@ jobs:
         rm -f ./vtl/README.md
         mv ./vtl/static/DOCS.md ./vtl/README.md
         v doc -m -f html vtl/
-        mv ./vtl/_docs/.html ./vtl/_docs/index.html
+        mv ./vtl/_docs/vtl.html ./vtl/_docs/index.html
     - name: Deploy to gh-pages
       uses: peaceiris/actions-gh-pages@v3
       with:
