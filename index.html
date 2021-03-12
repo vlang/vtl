@@ -4,7 +4,7 @@
 		<meta charset="UTF-8">
 		<meta http-equiv="x-ua-compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title> | vdoc</title>
+		<title>vtl | vdoc</title>
 		<link rel="preconnect" href="https://fonts.gstatic.com">
 		<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 		<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -42,15 +42,15 @@
 				<nav class="search hidden"></nav>
 				<nav class="content hidden">
 					<ul>
-						<li class="open active"><div class="menu-row"><a href="./.html"></a></div></li><li class="open"><div class="menu-row"><a href="./la.html">la</a></div></li><li class="open"><div class="menu-row"><a href="./storage.html">storage</a></div></li>
+						<li class="open active"><div class="menu-row"><a href="./vtl.html">vtl</a></div></li><li class="open"><div class="menu-row"><a href="./la.html">la</a></div></li><li class="open"><div class="menu-row"><a href="./storage.html">storage</a></div></li>
 					</ul>
 				</nav>
 			</header>
 			<div class="doc-scrollview">
 				<div class="doc-container">
 					<div class="doc-content">
-						<section id="readme_" class="doc-node">
-<div align="center">
+						<section id="readme_vtl" class="doc-node">
+							<div class="title"><h1> vtl <a href="#readme_vtl">#</a></h1></div><div align="center">
 <h1>The V Tensor Library</h1>
 <p><a href="https://vlang.io">vlang.io</a> |
 <a href="https://vlang.github.io/vtl">Docs</a> |
@@ -702,8 +702,8 @@ the work and inspiration that the library done by Christopher has given.</p>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
 	len      <span class="token builtin">int</span>
 	cap      <span class="token builtin">int</span>
-	init     Num    <span class="token operator">=</span> <span class="token punctuation">.</span>default_init
-	etype    <span class="token builtin">string</span> <span class="token operator">=</span> <span class="token punctuation">.</span>default_type
+	init     Num    <span class="token operator">=</span> vtl<span class="token punctuation">.</span>default_init
+	etype    <span class="token builtin">string</span> <span class="token operator">=</span> vtl<span class="token punctuation">.</span>default_type
 	strategy StorageStrategy <span class="token operator">=</span> <span class="token punctuation">.</span>cpu
 <span class="token punctuation">}</span></code></pre>
 
@@ -711,7 +711,7 @@ the work and inspiration that the library done by Christopher has given.</p>
 </section>
 						<section id="Tensor" class="doc-node">
 							<div class="title"><h2>struct Tensor <a href="#Tensor">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/_tensor.v#L11"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">Tensor</span> <span class="token punctuation">{</span>
-	etype <span class="token builtin">string</span> <span class="token operator">=</span> <span class="token punctuation">.</span>default_type
+	etype <span class="token builtin">string</span> <span class="token operator">=</span> vtl<span class="token punctuation">.</span>default_type
 <span class="token keyword">mut</span><span class="token punctuation">:</span>
 	data Storage
 <span class="token keyword">pub</span> <span class="token keyword">mut</span><span class="token punctuation">:</span>
@@ -919,10 +919,10 @@ the work and inspiration that the library done by Christopher has given.</p>
 </section>
 
 						<div class="footer">
-							Powered by vdoc. Generated on: 7 Mar 2021 06:04:45
+							Powered by vdoc. Generated on: 12 Mar 2021 03:21:39
 						</div>
 					</div>
-					<div class="doc-toc"><ul><li class="open"><a href="#readme_">README</a></li>
+					<div class="doc-toc"><ul><li class="open"><a href="#readme_vtl">README</a></li>
 <li class="open"><a href="#Constants">Constants</a></li>
 <li class="open"><a href="#arr_esize">fn arr_esize</a>        <ul>
 </ul>
