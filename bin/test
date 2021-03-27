@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -eo pipefail
 
-rm -f vtl 
-ln -s . vtl
-
-echo "Running tests without -autofree"
-v -stats test .
+if [[ -n "${CBLAS_BACKEND}" ]]; then
+    echo "Running tests without -autofree using Open BLAS"
+    v -d cblas -stats test .
+else
+    echo "Running tests without -autofree using VLAS"
+    v -stats test .
+fi
 
 # echo "Running tests with -autofree"
 # v -stats -autofree test .
 
 find . -name '*_test' -exec rm -f {} +
-rm -f vtl
