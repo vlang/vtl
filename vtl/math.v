@@ -4,7 +4,7 @@ import math
 
 // abs returns the elementwise abs of an tensor
 [inline]
-pub fn tensor_abs(t Tensor) Tensor {
+pub fn abs(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
 		ret := math.abs(val)
@@ -14,7 +14,7 @@ pub fn tensor_abs(t Tensor) Tensor {
 
 // acos returns the elementwise acos of an tensor
 [inline]
-pub fn tensor_acos(t Tensor) Tensor {
+pub fn acos(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
 		ret := math.acos(val)
@@ -24,7 +24,7 @@ pub fn tensor_acos(t Tensor) Tensor {
 
 // asin returns the elementwise asin of an tensor
 [inline]
-pub fn tensor_asin(t Tensor) Tensor {
+pub fn asin(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
 		ret := math.asin(val)
@@ -34,7 +34,7 @@ pub fn tensor_asin(t Tensor) Tensor {
 
 // atan returns the elementwise atan of an tensor
 [inline]
-pub fn tensor_atan(t Tensor) Tensor {
+pub fn atan(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
 		ret := math.atan(val)
@@ -44,7 +44,7 @@ pub fn tensor_atan(t Tensor) Tensor {
 
 // atan2 returns the atan2 elementwise of two tensors
 [inline]
-pub fn tensor_atan2(a Tensor, b Tensor) Tensor {
+pub fn atan2(a Tensor, b Tensor) Tensor {
 	f := fn (xs []Num, _ int) Num {
 		x := num_as_type<f64>(xs[0])
 		y := num_as_type<f64>(xs[1])
@@ -56,7 +56,7 @@ pub fn tensor_atan2(a Tensor, b Tensor) Tensor {
 
 // cbrt returns the elementwise cbrt of an tensor
 [inline]
-pub fn tensor_cbrt(t Tensor) Tensor {
+pub fn cbrt(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
 		ret := math.cbrt(val)
@@ -66,7 +66,7 @@ pub fn tensor_cbrt(t Tensor) Tensor {
 
 // ceil returns the elementwise ceil of an tensor
 [inline]
-pub fn tensor_ceil(t Tensor) Tensor {
+pub fn ceil(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
 		ret := math.ceil(val)
@@ -76,7 +76,7 @@ pub fn tensor_ceil(t Tensor) Tensor {
 
 // cos returns the elementwise cos of an tensor
 [inline]
-pub fn tensor_cos(t Tensor) Tensor {
+pub fn cos(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
 		ret := math.cos(val)
@@ -86,7 +86,7 @@ pub fn tensor_cos(t Tensor) Tensor {
 
 // exp returns the elementwise exp of an tensor
 [inline]
-pub fn tensor_exp(t Tensor) Tensor {
+pub fn exp(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
 		ret := math.exp(val)
@@ -96,7 +96,7 @@ pub fn tensor_exp(t Tensor) Tensor {
 
 // erf returns the elementwise erf of an tensor
 [inline]
-pub fn tensor_erf(t Tensor) Tensor {
+pub fn erf(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
 		ret := math.erf(val)
@@ -106,7 +106,7 @@ pub fn tensor_erf(t Tensor) Tensor {
 
 // exp2 returns the elementwise exp2 of an tensor
 [inline]
-pub fn tensor_exp2(t Tensor) Tensor {
+pub fn exp2(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
 		ret := math.exp2(val)
@@ -116,7 +116,7 @@ pub fn tensor_exp2(t Tensor) Tensor {
 
 // floor returns the elementwise floor of an tensor
 [inline]
-pub fn tensor_floor(t Tensor) Tensor {
+pub fn floor(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
 		ret := math.floor(val)
@@ -126,7 +126,7 @@ pub fn tensor_floor(t Tensor) Tensor {
 
 // fmod returns the fmod elementwise of two tensors
 [inline]
-pub fn tensor_fmod(a Tensor, b Tensor) Tensor {
+pub fn fmod(a Tensor, b Tensor) Tensor {
 	f := fn (xs []Num, _ int) Num {
 		x := num_as_type<f64>(xs[0])
 		y := num_as_type<f64>(xs[1])
@@ -138,7 +138,7 @@ pub fn tensor_fmod(a Tensor, b Tensor) Tensor {
 
 // gamma returns the elementwise gamma of an tensor
 [inline]
-pub fn tensor_gamma(t Tensor) Tensor {
+pub fn gamma(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
 		ret := math.gamma(val)
@@ -148,7 +148,7 @@ pub fn tensor_gamma(t Tensor) Tensor {
 
 // hypot returns the hypot elementwise of two tensors
 [inline]
-pub fn tensor_hypot(a Tensor, b Tensor) Tensor {
+pub fn hypot(a Tensor, b Tensor) Tensor {
 	f := fn (xs []Num, _ int) Num {
 		x := num_as_type<f64>(xs[0])
 		y := num_as_type<f64>(xs[1])
@@ -160,7 +160,7 @@ pub fn tensor_hypot(a Tensor, b Tensor) Tensor {
 
 // log10 returns the elementwise log10 of an tensor
 [inline]
-pub fn tensor_log10(t Tensor) Tensor {
+pub fn log10(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
 		ret := math.log10(val)
@@ -170,7 +170,7 @@ pub fn tensor_log10(t Tensor) Tensor {
 
 // log_gamma returns the elementwise log_gamma of an tensor
 [inline]
-pub fn tensor_log_gamma(t Tensor) Tensor {
+pub fn log_gamma(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
 		ret := math.log_gamma(val)
@@ -180,7 +180,7 @@ pub fn tensor_log_gamma(t Tensor) Tensor {
 
 // log_n returns the log_n elementwise of two tensors
 [inline]
-pub fn tensor_log_n(a Tensor, b Tensor) Tensor {
+pub fn log_n(a Tensor, b Tensor) Tensor {
 	f := fn (xs []Num, _ int) Num {
 		x := num_as_type<f64>(xs[0])
 		y := num_as_type<f64>(xs[1])
@@ -192,7 +192,7 @@ pub fn tensor_log_n(a Tensor, b Tensor) Tensor {
 
 // max returns the max elementwise of two tensors
 [inline]
-pub fn tensor_max(a Tensor, b Tensor) Tensor {
+pub fn max(a Tensor, b Tensor) Tensor {
 	f := fn (xs []Num, _ int) Num {
 		x := num_as_type<f64>(xs[0])
 		y := num_as_type<f64>(xs[1])
@@ -204,7 +204,7 @@ pub fn tensor_max(a Tensor, b Tensor) Tensor {
 
 // min returns the min elementwise of two tensors
 [inline]
-pub fn tensor_min(a Tensor, b Tensor) Tensor {
+pub fn min(a Tensor, b Tensor) Tensor {
 	f := fn (xs []Num, _ int) Num {
 		x := num_as_type<f64>(xs[0])
 		y := num_as_type<f64>(xs[1])
@@ -216,7 +216,7 @@ pub fn tensor_min(a Tensor, b Tensor) Tensor {
 
 // pow returns the pow elementwise of two tensors
 [inline]
-pub fn tensor_pow(a Tensor, b Tensor) Tensor {
+pub fn pow(a Tensor, b Tensor) Tensor {
 	f := fn (xs []Num, _ int) Num {
 		x := num_as_type<f64>(xs[0])
 		y := num_as_type<f64>(xs[1])
@@ -228,7 +228,7 @@ pub fn tensor_pow(a Tensor, b Tensor) Tensor {
 
 // radians returns the elementwise deg2rad of an tensor
 [inline]
-pub fn tensor_radians(t Tensor) Tensor {
+pub fn radians(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
 		ret := math.radians(val)
@@ -238,7 +238,7 @@ pub fn tensor_radians(t Tensor) Tensor {
 
 // round rounds elements of an tensor elementwise
 [inline]
-pub fn tensor_round(t Tensor) Tensor {
+pub fn round(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
 		ret := math.round(val)
@@ -248,7 +248,7 @@ pub fn tensor_round(t Tensor) Tensor {
 
 // sin returns the elementwise sin of an tensor
 [inline]
-pub fn tensor_sin(t Tensor) Tensor {
+pub fn sin(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
 		ret := math.sin(val)
@@ -258,7 +258,7 @@ pub fn tensor_sin(t Tensor) Tensor {
 
 // sinh returns the elementwise sinh of an tensor
 [inline]
-pub fn tensor_sinh(t Tensor) Tensor {
+pub fn sinh(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
 		ret := math.sinh(val)
@@ -268,7 +268,7 @@ pub fn tensor_sinh(t Tensor) Tensor {
 
 // sqrt returns the elementwise square root of an tensor
 [inline]
-pub fn tensor_sqrt(t Tensor) Tensor {
+pub fn sqrt(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
 		ret := math.sqrt(val)
@@ -278,7 +278,7 @@ pub fn tensor_sqrt(t Tensor) Tensor {
 
 // tan returns the elementwise tan of an tensor
 [inline]
-pub fn tensor_tan(t Tensor) Tensor {
+pub fn tan(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
 		ret := math.tan(val)
@@ -288,7 +288,7 @@ pub fn tensor_tan(t Tensor) Tensor {
 
 // tanh returns the elementwise tanh of an tensor
 [inline]
-pub fn tensor_tanh(t Tensor) Tensor {
+pub fn tanh(t Tensor) Tensor {
 	return t.map(fn (x Num, _ int) Num {
 		val := num_as_type<f64>(x)
 		ret := math.tanh(val)
