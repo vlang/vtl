@@ -74,6 +74,16 @@
 
 
 </section>
+						<section id="abs" class="doc-node">
+							<div class="title"><h2>fn abs <a href="#abs">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L7"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">abs</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>abs returns the elementwise abs of an tensor</p>
+
+</section>
+						<section id="acos" class="doc-node">
+							<div class="title"><h2>fn acos <a href="#acos">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L17"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">acos</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>acos returns the elementwise acos of an tensor</p>
+
+</section>
 						<section id="arr_esize" class="doc-node">
 							<div class="title"><h2>fn arr_esize <a href="#arr_esize">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/etype.v#L233"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">arr_esize</span><span class="token punctuation">(</span>arr <span class="token punctuation">[</span><span class="token punctuation">]</span>Num<span class="token punctuation">)</span> <span class="token builtin">int</span></code></pre>
 <p>str_esize returns the int representation of the size for a given array of Num</p>
@@ -94,9 +104,34 @@
 <p>Split an array into multiple sub-arrays.  Please refer to the split documentation. The only difference between  these functions is that array_split allows indices_or_sections to be an  integer that does not equally divide the axis. For an array of length  l that should be split into n sections, it returns l % n sub-arrays of  size l//n + 1 and the rest of size l//n.</p>
 
 </section>
+						<section id="asin" class="doc-node">
+							<div class="title"><h2>fn asin <a href="#asin">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L27"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">asin</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>asin returns the elementwise asin of an tensor</p>
+
+</section>
+						<section id="atan" class="doc-node">
+							<div class="title"><h2>fn atan <a href="#atan">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L37"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">atan</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>atan returns the elementwise atan of an tensor</p>
+
+</section>
+						<section id="atan2" class="doc-node">
+							<div class="title"><h2>fn atan2 <a href="#atan2">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L47"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">atan2</span><span class="token punctuation">(</span>a Tensor<span class="token punctuation">,</span> b Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>atan2 returns the atan2 elementwise of two tensors</p>
+
+</section>
 						<section id="broadcastable" class="doc-node">
 							<div class="title"><h2>fn broadcastable <a href="#broadcastable">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/broadcast.v#L5"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">broadcastable</span><span class="token punctuation">(</span>a Tensor<span class="token punctuation">,</span> b Tensor<span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span></code></pre>
 <p>broadcastable takes two Tensors and either returns a valid  broadcastable shape or panics</p>
+
+</section>
+						<section id="cbrt" class="doc-node">
+							<div class="title"><h2>fn cbrt <a href="#cbrt">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L59"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">cbrt</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>cbrt returns the elementwise cbrt of an tensor</p>
+
+</section>
+						<section id="ceil" class="doc-node">
+							<div class="title"><h2>fn ceil <a href="#ceil">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L69"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">ceil</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>ceil returns the elementwise ceil of an tensor</p>
 
 </section>
 						<section id="column_stack" class="doc-node">
@@ -107,6 +142,11 @@
 						<section id="concatenate" class="doc-node">
 							<div class="title"><h2>fn concatenate <a href="#concatenate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/stack.v#L64"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">concatenate</span><span class="token punctuation">(</span>ts <span class="token punctuation">[</span><span class="token punctuation">]</span>Tensor<span class="token punctuation">,</span> data AxisData<span class="token punctuation">)</span> Tensor</code></pre>
 <p>concatenates two Tensors together</p>
+
+</section>
+						<section id="cos" class="doc-node">
+							<div class="title"><h2>fn cos <a href="#cos">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L79"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">cos</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>cos returns the elementwise cos of an tensor</p>
 
 </section>
 						<section id="diag" class="doc-node">
@@ -144,6 +184,21 @@
 <p>Return a new Tensor with the same shape and type as a given Tensor.</p>
 
 </section>
+						<section id="erf" class="doc-node">
+							<div class="title"><h2>fn erf <a href="#erf">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L99"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">erf</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>erf returns the elementwise erf of an tensor</p>
+
+</section>
+						<section id="exp" class="doc-node">
+							<div class="title"><h2>fn exp <a href="#exp">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L89"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">exp</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>exp returns the elementwise exp of an tensor</p>
+
+</section>
+						<section id="exp2" class="doc-node">
+							<div class="title"><h2>fn exp2 <a href="#exp2">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L109"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">exp2</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>exp2 returns the elementwise exp2 of an tensor</p>
+
+</section>
 						<section id="expand_dims" class="doc-node">
 							<div class="title"><h2>fn expand_dims <a href="#expand_dims">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/stack.v#L86"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">expand_dims</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">,</span> data AxisData<span class="token punctuation">)</span> Tensor</code></pre>
 <p>expand_dims adds an axis to a Tensor in order to support  broadcasting operations</p>
@@ -152,6 +207,16 @@
 						<section id="eye" class="doc-node">
 							<div class="title"><h2>fn eye <a href="#eye">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/creation.v#L27"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">eye</span><span class="token punctuation">(</span>m <span class="token builtin">int</span><span class="token punctuation">,</span> n <span class="token builtin">int</span><span class="token punctuation">,</span> k <span class="token builtin">int</span><span class="token punctuation">)</span> Tensor</code></pre>
 <p>Return a 2-D array with ones on the diagonal and zeros elsewhere.</p>
+
+</section>
+						<section id="floor" class="doc-node">
+							<div class="title"><h2>fn floor <a href="#floor">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L119"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">floor</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>floor returns the elementwise floor of an tensor</p>
+
+</section>
+						<section id="fmod" class="doc-node">
+							<div class="title"><h2>fn fmod <a href="#fmod">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L129"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">fmod</span><span class="token punctuation">(</span>a Tensor<span class="token punctuation">,</span> b Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>fmod returns the fmod elementwise of two tensors</p>
 
 </section>
 						<section id="from_1d" class="doc-node">
@@ -179,6 +244,11 @@
 <p>Return a full Tensor with the same shape and type as a given Tensor</p>
 
 </section>
+						<section id="gamma" class="doc-node">
+							<div class="title"><h2>fn gamma <a href="#gamma">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L141"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">gamma</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>gamma returns the elementwise gamma of an tensor</p>
+
+</section>
 						<section id="hsplit" class="doc-node">
 							<div class="title"><h2>fn hsplit <a href="#hsplit">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/split.v#L64"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">hsplit</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">,</span> ind <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>Tensor</code></pre>
 <p>Split an array into multiple sub-arrays horizontally (column-wise).  Please refer to the split documentation. hsplit is equivalent to  split with axis=1, the array is always split along the second axis  regardless of the array dimension.</p>
@@ -194,9 +264,39 @@
 <p>Stack arrays in sequence horizontally (column wise)</p>
 
 </section>
+						<section id="hypot" class="doc-node">
+							<div class="title"><h2>fn hypot <a href="#hypot">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L151"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">hypot</span><span class="token punctuation">(</span>a Tensor<span class="token punctuation">,</span> b Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>hypot returns the hypot elementwise of two tensors</p>
+
+</section>
 						<section id="identity" class="doc-node">
 							<div class="title"><h2>fn identity <a href="#identity">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/creation.v#L22"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">identity</span><span class="token punctuation">(</span>n <span class="token builtin">int</span><span class="token punctuation">)</span> Tensor</code></pre>
 <p>The identity array is a square array with ones on the main diagonal.</p>
+
+</section>
+						<section id="log10" class="doc-node">
+							<div class="title"><h2>fn log10 <a href="#log10">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L163"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">log10</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>log10 returns the elementwise log10 of an tensor</p>
+
+</section>
+						<section id="log_gamma" class="doc-node">
+							<div class="title"><h2>fn log_gamma <a href="#log_gamma">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L173"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">log_gamma</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>log_gamma returns the elementwise log_gamma of an tensor</p>
+
+</section>
+						<section id="log_n" class="doc-node">
+							<div class="title"><h2>fn log_n <a href="#log_n">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L183"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">log_n</span><span class="token punctuation">(</span>a Tensor<span class="token punctuation">,</span> b Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>log_n returns the log_n elementwise of two tensors</p>
+
+</section>
+						<section id="max" class="doc-node">
+							<div class="title"><h2>fn max <a href="#max">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L195"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">max</span><span class="token punctuation">(</span>a Tensor<span class="token punctuation">,</span> b Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>max returns the max elementwise of two tensors</p>
+
+</section>
+						<section id="min" class="doc-node">
+							<div class="title"><h2>fn min <a href="#min">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L207"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">min</span><span class="token punctuation">(</span>a Tensor<span class="token punctuation">,</span> b Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>min returns the min elementwise of two tensors</p>
 
 </section>
 						<section id="new_storage" class="doc-node">
@@ -259,9 +359,19 @@
 <p>Return an Tensor of ones with the same shape and type as a given Tensor</p>
 
 </section>
+						<section id="pow" class="doc-node">
+							<div class="title"><h2>fn pow <a href="#pow">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L219"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">pow</span><span class="token punctuation">(</span>a Tensor<span class="token punctuation">,</span> b Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>pow returns the pow elementwise of two tensors</p>
+
+</section>
 						<section id="ptr_to_val_of_type" class="doc-node">
 							<div class="title"><h2>fn ptr_to_val_of_type <a href="#ptr_to_val_of_type">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/etype.v#L167"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">ptr_to_val_of_type</span><span class="token punctuation">(</span>ptr <span class="token builtin">voidptr</span><span class="token punctuation">,</span> t <span class="token builtin">string</span><span class="token punctuation">)</span> Num</code></pre>
 <p>ptr_to_val_of_type returns the number obtained from ptr</p>
+
+</section>
+						<section id="radians" class="doc-node">
+							<div class="title"><h2>fn radians <a href="#radians">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L231"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">radians</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>radians returns the elementwise deg2rad of an tensor</p>
 
 </section>
 						<section id="random" class="doc-node">
@@ -279,9 +389,24 @@
 <p>range returns a Tensor containing values ranging from [from, to)</p>
 
 </section>
+						<section id="round" class="doc-node">
+							<div class="title"><h2>fn round <a href="#round">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L241"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">round</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>round rounds elements of an tensor elementwise</p>
+
+</section>
 						<section id="seq" class="doc-node">
 							<div class="title"><h2>fn seq <a href="#seq">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/creation.v#L87"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">seq</span><span class="token punctuation">(</span>n <span class="token builtin">int</span><span class="token punctuation">)</span> Tensor</code></pre>
 <p>seq returns a Tensor containing values ranging from [0, to)</p>
+
+</section>
+						<section id="sin" class="doc-node">
+							<div class="title"><h2>fn sin <a href="#sin">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L251"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">sin</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>sin returns the elementwise sin of an tensor</p>
+
+</section>
+						<section id="sinh" class="doc-node">
+							<div class="title"><h2>fn sinh <a href="#sinh">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L261"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">sinh</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>sinh returns the elementwise sinh of an tensor</p>
 
 </section>
 						<section id="split" class="doc-node">
@@ -292,6 +417,11 @@
 						<section id="split_expl" class="doc-node">
 							<div class="title"><h2>fn split_expl <a href="#split_expl">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/split.v#L56"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">split_expl</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">,</span> ind <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> axis <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>Tensor</code></pre>
 <p>Split an array into multiple sub-arrays. The array will be divided into  The entries of ind indicate where along axis the array is split.  For example, [2, 3] would, for axis=0, result in:  ary[:2]  ary[2:3]  ary[3:]</p>
+
+</section>
+						<section id="sqrt" class="doc-node">
+							<div class="title"><h2>fn sqrt <a href="#sqrt">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L271"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">sqrt</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>sqrt returns the elementwise square root of an tensor</p>
 
 </section>
 						<section id="stack" class="doc-node">
@@ -309,14 +439,14 @@
 <p>str_esize returns the int representation of a given type</p>
 
 </section>
-						<section id="tensor_abs" class="doc-node">
-							<div class="title"><h2>fn tensor_abs <a href="#tensor_abs">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L7"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_abs</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>abs returns the elementwise abs of an tensor</p>
+						<section id="tan" class="doc-node">
+							<div class="title"><h2>fn tan <a href="#tan">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L281"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tan</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>tan returns the elementwise tan of an tensor</p>
 
 </section>
-						<section id="tensor_acos" class="doc-node">
-							<div class="title"><h2>fn tensor_acos <a href="#tensor_acos">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L17"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_acos</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>acos returns the elementwise acos of an tensor</p>
+						<section id="tanh" class="doc-node">
+							<div class="title"><h2>fn tanh <a href="#tanh">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L291"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tanh</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>tanh returns the elementwise tanh of an tensor</p>
 
 </section>
 						<section id="tensor_as_type" class="doc-node">
@@ -324,139 +454,9 @@
 <p>tensor_as_type&lt;T&gt; returns a new Tensor with a cast to a given type</p>
 
 </section>
-						<section id="tensor_asin" class="doc-node">
-							<div class="title"><h2>fn tensor_asin <a href="#tensor_asin">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L27"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_asin</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>asin returns the elementwise asin of an tensor</p>
-
-</section>
-						<section id="tensor_atan" class="doc-node">
-							<div class="title"><h2>fn tensor_atan <a href="#tensor_atan">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L37"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_atan</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>atan returns the elementwise atan of an tensor</p>
-
-</section>
-						<section id="tensor_atan2" class="doc-node">
-							<div class="title"><h2>fn tensor_atan2 <a href="#tensor_atan2">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L47"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_atan2</span><span class="token punctuation">(</span>a Tensor<span class="token punctuation">,</span> b Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>atan2 returns the atan2 elementwise of two tensors</p>
-
-</section>
-						<section id="tensor_cbrt" class="doc-node">
-							<div class="title"><h2>fn tensor_cbrt <a href="#tensor_cbrt">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L59"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_cbrt</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>cbrt returns the elementwise cbrt of an tensor</p>
-
-</section>
-						<section id="tensor_ceil" class="doc-node">
-							<div class="title"><h2>fn tensor_ceil <a href="#tensor_ceil">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L69"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_ceil</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>ceil returns the elementwise ceil of an tensor</p>
-
-</section>
-						<section id="tensor_cos" class="doc-node">
-							<div class="title"><h2>fn tensor_cos <a href="#tensor_cos">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L79"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_cos</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>cos returns the elementwise cos of an tensor</p>
-
-</section>
-						<section id="tensor_erf" class="doc-node">
-							<div class="title"><h2>fn tensor_erf <a href="#tensor_erf">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L99"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_erf</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>erf returns the elementwise erf of an tensor</p>
-
-</section>
-						<section id="tensor_exp" class="doc-node">
-							<div class="title"><h2>fn tensor_exp <a href="#tensor_exp">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L89"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_exp</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>exp returns the elementwise exp of an tensor</p>
-
-</section>
-						<section id="tensor_exp2" class="doc-node">
-							<div class="title"><h2>fn tensor_exp2 <a href="#tensor_exp2">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L109"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_exp2</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>exp2 returns the elementwise exp2 of an tensor</p>
-
-</section>
-						<section id="tensor_floor" class="doc-node">
-							<div class="title"><h2>fn tensor_floor <a href="#tensor_floor">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L119"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_floor</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>floor returns the elementwise floor of an tensor</p>
-
-</section>
-						<section id="tensor_fmod" class="doc-node">
-							<div class="title"><h2>fn tensor_fmod <a href="#tensor_fmod">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L129"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_fmod</span><span class="token punctuation">(</span>a Tensor<span class="token punctuation">,</span> b Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>fmod returns the fmod elementwise of two tensors</p>
-
-</section>
-						<section id="tensor_gamma" class="doc-node">
-							<div class="title"><h2>fn tensor_gamma <a href="#tensor_gamma">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L141"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_gamma</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>gamma returns the elementwise gamma of an tensor</p>
-
-</section>
-						<section id="tensor_hypot" class="doc-node">
-							<div class="title"><h2>fn tensor_hypot <a href="#tensor_hypot">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L151"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_hypot</span><span class="token punctuation">(</span>a Tensor<span class="token punctuation">,</span> b Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>hypot returns the hypot elementwise of two tensors</p>
-
-</section>
-						<section id="tensor_log10" class="doc-node">
-							<div class="title"><h2>fn tensor_log10 <a href="#tensor_log10">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L163"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_log10</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>log10 returns the elementwise log10 of an tensor</p>
-
-</section>
-						<section id="tensor_log_gamma" class="doc-node">
-							<div class="title"><h2>fn tensor_log_gamma <a href="#tensor_log_gamma">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L173"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_log_gamma</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>log_gamma returns the elementwise log_gamma of an tensor</p>
-
-</section>
-						<section id="tensor_log_n" class="doc-node">
-							<div class="title"><h2>fn tensor_log_n <a href="#tensor_log_n">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L183"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_log_n</span><span class="token punctuation">(</span>a Tensor<span class="token punctuation">,</span> b Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>log_n returns the log_n elementwise of two tensors</p>
-
-</section>
-						<section id="tensor_max" class="doc-node">
-							<div class="title"><h2>fn tensor_max <a href="#tensor_max">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L195"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_max</span><span class="token punctuation">(</span>a Tensor<span class="token punctuation">,</span> b Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>max returns the max elementwise of two tensors</p>
-
-</section>
-						<section id="tensor_min" class="doc-node">
-							<div class="title"><h2>fn tensor_min <a href="#tensor_min">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L207"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_min</span><span class="token punctuation">(</span>a Tensor<span class="token punctuation">,</span> b Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>min returns the min elementwise of two tensors</p>
-
-</section>
-						<section id="tensor_pow" class="doc-node">
-							<div class="title"><h2>fn tensor_pow <a href="#tensor_pow">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L219"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_pow</span><span class="token punctuation">(</span>a Tensor<span class="token punctuation">,</span> b Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>pow returns the pow elementwise of two tensors</p>
-
-</section>
-						<section id="tensor_radians" class="doc-node">
-							<div class="title"><h2>fn tensor_radians <a href="#tensor_radians">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L231"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_radians</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>radians returns the elementwise deg2rad of an tensor</p>
-
-</section>
-						<section id="tensor_round" class="doc-node">
-							<div class="title"><h2>fn tensor_round <a href="#tensor_round">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L241"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_round</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>round rounds elements of an tensor elementwise</p>
-
-</section>
-						<section id="tensor_sin" class="doc-node">
-							<div class="title"><h2>fn tensor_sin <a href="#tensor_sin">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L251"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_sin</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>sin returns the elementwise sin of an tensor</p>
-
-</section>
-						<section id="tensor_sinh" class="doc-node">
-							<div class="title"><h2>fn tensor_sinh <a href="#tensor_sinh">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L261"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_sinh</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>sinh returns the elementwise sinh of an tensor</p>
-
-</section>
-						<section id="tensor_sqrt" class="doc-node">
-							<div class="title"><h2>fn tensor_sqrt <a href="#tensor_sqrt">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L271"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_sqrt</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>sqrt returns the elementwise square root of an tensor</p>
-
-</section>
 						<section id="tensor_str" class="doc-node">
 							<div class="title"><h2>fn tensor_str <a href="#tensor_str">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/print.v#L149"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_str</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">,</span> separator <span class="token builtin">string</span><span class="token punctuation">,</span> prefix <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token builtin">string</span></code></pre>
 <p>public method for printing arrays, if custom behavior is needed</p>
-
-</section>
-						<section id="tensor_tan" class="doc-node">
-							<div class="title"><h2>fn tensor_tan <a href="#tensor_tan">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L281"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_tan</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>tan returns the elementwise tan of an tensor</p>
-
-</section>
-						<section id="tensor_tanh" class="doc-node">
-							<div class="title"><h2>fn tensor_tanh <a href="#tensor_tanh">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/vtl/math.v#L291"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">tensor_tanh</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-<p>tanh returns the elementwise tanh of an tensor</p>
 
 </section>
 						<section id="tensor_to_varray" class="doc-node">
@@ -867,10 +867,16 @@
 </section>
 
 						<div class="footer">
-							Powered by vdoc. Generated on: 28 Mar 2021 22:05:00
+							Powered by vdoc. Generated on: 28 Mar 2021 23:03:56
 						</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#Constants">Constants</a></li>
+<li class="open"><a href="#abs">fn abs</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#acos">fn acos</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#arr_esize">fn arr_esize</a>        <ul>
 </ul>
 </li>
@@ -883,13 +889,31 @@
 <li class="open"><a href="#array_split_expl">fn array_split_expl</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#asin">fn asin</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#atan">fn atan</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#atan2">fn atan2</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#broadcastable">fn broadcastable</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#cbrt">fn cbrt</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ceil">fn ceil</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#column_stack">fn column_stack</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#concatenate">fn concatenate</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#cos">fn cos</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#diag">fn diag</a>        <ul>
@@ -913,10 +937,25 @@
 <li class="open"><a href="#empty_like">fn empty_like</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#erf">fn erf</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#exp">fn exp</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#exp2">fn exp2</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#expand_dims">fn expand_dims</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#eye">fn eye</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#floor">fn floor</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#fmod">fn fmod</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#from_1d">fn from_1d</a>        <ul>
@@ -934,6 +973,9 @@
 <li class="open"><a href="#full_like">fn full_like</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#gamma">fn gamma</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#hsplit">fn hsplit</a>        <ul>
 </ul>
 </li>
@@ -943,7 +985,25 @@
 <li class="open"><a href="#hstack">fn hstack</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#hypot">fn hypot</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#identity">fn identity</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#log10">fn log10</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#log_gamma">fn log_gamma</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#log_n">fn log_n</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#max">fn max</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#min">fn min</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#new_storage">fn new_storage</a>        <ul>
@@ -982,7 +1042,13 @@
 <li class="open"><a href="#ones_like">fn ones_like</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#pow">fn pow</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#ptr_to_val_of_type">fn ptr_to_val_of_type</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#radians">fn radians</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#random">fn random</a>        <ul>
@@ -994,13 +1060,25 @@
 <li class="open"><a href="#range">fn range</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#round">fn round</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#seq">fn seq</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#sin">fn sin</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#sinh">fn sinh</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#split">fn split</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#split_expl">fn split_expl</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#sqrt">fn sqrt</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#stack">fn stack</a>        <ul>
@@ -1012,94 +1090,16 @@
 <li class="open"><a href="#str_esize">fn str_esize</a>        <ul>
 </ul>
 </li>
-<li class="open"><a href="#tensor_abs">fn tensor_abs</a>        <ul>
+<li class="open"><a href="#tan">fn tan</a>        <ul>
 </ul>
 </li>
-<li class="open"><a href="#tensor_acos">fn tensor_acos</a>        <ul>
+<li class="open"><a href="#tanh">fn tanh</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#tensor_as_type">fn tensor_as_type</a>        <ul>
 </ul>
 </li>
-<li class="open"><a href="#tensor_asin">fn tensor_asin</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#tensor_atan">fn tensor_atan</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#tensor_atan2">fn tensor_atan2</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#tensor_cbrt">fn tensor_cbrt</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#tensor_ceil">fn tensor_ceil</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#tensor_cos">fn tensor_cos</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#tensor_erf">fn tensor_erf</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#tensor_exp">fn tensor_exp</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#tensor_exp2">fn tensor_exp2</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#tensor_floor">fn tensor_floor</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#tensor_fmod">fn tensor_fmod</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#tensor_gamma">fn tensor_gamma</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#tensor_hypot">fn tensor_hypot</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#tensor_log10">fn tensor_log10</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#tensor_log_gamma">fn tensor_log_gamma</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#tensor_log_n">fn tensor_log_n</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#tensor_max">fn tensor_max</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#tensor_min">fn tensor_min</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#tensor_pow">fn tensor_pow</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#tensor_radians">fn tensor_radians</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#tensor_round">fn tensor_round</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#tensor_sin">fn tensor_sin</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#tensor_sinh">fn tensor_sinh</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#tensor_sqrt">fn tensor_sqrt</a>        <ul>
-</ul>
-</li>
 <li class="open"><a href="#tensor_str">fn tensor_str</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#tensor_tan">fn tensor_tan</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#tensor_tanh">fn tensor_tanh</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#tensor_to_varray">fn tensor_to_varray</a>        <ul>
