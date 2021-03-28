@@ -154,19 +154,11 @@ pub fn (f Num) str() string {
 		}
 		f32 {
 			str_f32 := f.str()
-			return if str_f32.ends_with('.') {
-				str_f32 + '0'
-			} else {
-				str_f32
-			}
+			return if str_f32.ends_with('.') { str_f32 + '0' } else { str_f32 }
 		}
 		f64 {
 			str_f64 := f.str()
-			return if str_f64.ends_with('.') {
-				str_f64 + '0'
-			} else {
-				str_f64
-			}
+			return if str_f64.ends_with('.') { str_f64 + '0' } else { str_f64 }
 		}
 	}
 }
@@ -242,7 +234,7 @@ pub fn arr_esize(arr []Num) int {
 	if arr.len > 0 {
 		return arr[0].esize()
 	}
-	return default_size
+	return vtl.default_size
 }
 
 // str_etype returns the type for a given array of Num
@@ -250,5 +242,5 @@ pub fn arr_etype(arr []Num) string {
 	if arr.len > 0 {
 		return arr[0].etype()
 	}
-	return default_type
+	return vtl.default_type
 }

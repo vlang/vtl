@@ -163,8 +163,7 @@ pub fn cpu_to_varray<T>(cpu CpuStorage) []T {
 }
 
 // we manually inline this for single operations for performance without -prod
-[inline]
-[unsafe]
+[inline; unsafe]
 fn (cpu CpuStorage) get_unsafe(i int) voidptr {
 	unsafe {
 		return byteptr(cpu.data) + i * cpu.element_size
@@ -172,8 +171,7 @@ fn (cpu CpuStorage) get_unsafe(i int) voidptr {
 }
 
 // we manually inline this for single operations for performance without -prod
-[inline]
-[unsafe]
+[inline; unsafe]
 fn (mut cpu CpuStorage) set_unsafe(i int, val voidptr) {
 	unsafe { C.memcpy(byteptr(cpu.data) + cpu.element_size * i, val, cpu.element_size) }
 }
@@ -195,16 +193,14 @@ fn (mut cpu CpuStorage) ensure_capacity(required int) {
 	if cpu.capacity == storage.vector_minimum_capacity {
 		cpu.data = vcalloc(capacity * cpu.element_size)
 	} else {
-		unsafe { cpu.data = v_realloc(cpu.data, capacity * cpu.element_size) }
+		unsafe {
+			cpu.data = v_realloc(cpu.data, capacity * cpu.element_size)
+		}
 	}
 	cpu.capacity = capacity
 }
 
 [inline]
 fn max(a int, b int) int {
-	return if a > b {
-		a
-	} else {
-		b
-	}
+	return if a > b { a } else { b }
 }
