@@ -152,7 +152,7 @@ pub fn tensor_str(t Tensor, separator string, prefix string) string {
 	}
 	mut summary_insert := ''
 	mut data := t
-	if t.size > max_printable_size {
+	if t.size > vtl.max_printable_size {
 		summary_insert = '...'
 		data = leading_trailing(t, 3, [], [])
 	}
