@@ -2,17 +2,19 @@ module vtl
 
 import rand
 import time
+import vtl.etype
+import vtl.storage
 
-fn rand_between(min Num, max Num) Num {
-	return Num(rand.f64_in_range(num_as_type<f64>(min), num_as_type<f64>(max)))
+fn rand_between(min etype.Num, max etype.Num) etype.Num {
+	return etype.Num(rand.f64_in_range(etype.num_as_type<f64>(min), etype.num_as_type<f64>(max)))
 }
 
-pub fn random(min Num, max Num, shape []int) Tensor {
+pub fn random(min etype.Num, max etype.Num, shape []int) Tensor {
 	ret := empty(shape)
 	mut iter := ret.iterator()
 	for _ in iter {
 		r := rand_between(min, max)
-		storage_set(ret.data, iter.pos, r)
+		storage.storage_set(ret.data, iter.pos, r)
 	}
 	return ret
 }

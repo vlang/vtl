@@ -1,8 +1,11 @@
 module vtl
 
+import vtl.etype
+import vtl.storage
+
 // IteratorHandler defines a function to use in order to mutate
 // iteration position
-pub type IteratorHandler = fn (mut s TensorIterator) Num
+pub type IteratorHandler = fn (mut s TensorIterator) etype.Num
 
 // TensorIterator is a struct to hold a Tensors
 // iteration state while iterating through a Tensor
@@ -60,9 +63,9 @@ pub fn (t Tensor) custom_iterator(data IteratorBuildData) TensorIterator {
 // handle_strided_iteration advances through a non-rowmajor-contiguous
 // Tensor in Row-Major order
 [unsafe]
-fn handle_strided_iteration(mut s TensorIterator) Num {
+fn handle_strided_iteration(mut s TensorIterator) etype.Num {
 	// get current value after update new position
-	val := storage_get(s.tensor.data, s.pos, s.tensor.etype)
+	val := storage.storage_get(s.tensor.data, s.pos, s.tensor.etype)
 	rank := s.tensor.rank()
 	shape := s.tensor.shape
 	strides := s.tensor.strides
@@ -84,9 +87,9 @@ fn handle_strided_iteration(mut s TensorIterator) Num {
 // handle_flatten_iteration advances through a rowmajor-contiguous Tensor
 // in Row-Major order
 [inline]
-fn handle_flatten_iteration(mut s TensorIterator) Num {
+fn handle_flatten_iteration(mut s TensorIterator) etype.Num {
 	// get current value after update new position
-	val := storage_get(s.tensor.data, s.pos, s.tensor.etype)
+	val := storage.storage_get(s.tensor.data, s.pos, s.tensor.etype)
 	s.pos++
 	return val
 }
@@ -94,7 +97,7 @@ fn handle_flatten_iteration(mut s TensorIterator) Num {
 // next calls the iteration type for a given iterator
 // which is either flat or strided and returns a Num containing the current value
 [inline]
-pub fn (mut s TensorIterator) next() ?Num {
+pub fn (mut s TensorIterator) next() ?etype.Num {
 	if s.iteration >= s.tensor.size {
 		return none
 	}
@@ -142,8 +145,8 @@ pub fn (ts []Tensor) iterators() []TensorIterator {
 // next calls the iteration type for a given list of iterators
 // which is either flat or strided and returns a list of Nums containing the current values
 [inline]
-pub fn (mut its []TensorIterator) next() []Num {
-	mut nums := []Num{cap: its.len}
+pub fn (mut its []TensorIterator) next() []etype.Num {
+	mut nums := []etype.Num{cap: its.len}
 	for mut iter in its {
 		if val := iter.next() {
 			nums << val

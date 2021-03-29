@@ -1,12 +1,14 @@
 module vtl
 
 import math
+import vtl.etype
+import vtl.storage
 
 // get returns a scalar value from a Tensor at the provided index
 [inline]
-pub fn (t Tensor) get(index []int) Num {
+pub fn (t Tensor) get(index []int) etype.Num {
 	offset := t.offset(index)
-	return storage_get(t.data, offset, t.etype)
+	return storage.storage_get(t.data, offset, t.etype)
 }
 
 // offset returns the index to a Tensor's data at

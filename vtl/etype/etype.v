@@ -1,4 +1,4 @@
-module vtl
+module etype
 
 pub const (
 	default_type = 'f64'
@@ -15,7 +15,7 @@ pub fn (f Num) as_type<T>() T {
 }
 
 // formats a floating point value to be "pretty"
-fn (val Num) prettify(notation bool) string {
+pub fn (val Num) prettify(notation bool) string {
 	if notation {
 		return val.strsci(3)
 	} else {
@@ -234,7 +234,7 @@ pub fn arr_esize(arr []Num) int {
 	if arr.len > 0 {
 		return arr[0].esize()
 	}
-	return vtl.default_size
+	return etype.default_size
 }
 
 // str_etype returns the type for a given array of Num
@@ -242,5 +242,5 @@ pub fn arr_etype(arr []Num) string {
 	if arr.len > 0 {
 		return arr[0].etype()
 	}
-	return vtl.default_type
+	return etype.default_type
 }
