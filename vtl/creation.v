@@ -1,11 +1,14 @@
 module vtl
 
+import vtl.etype
+import vtl.storage
+
 pub struct TensorData {
 pub:
 	shape   []int
-	init    Num = Num(f64(0.0))
-	memory  MemoryFormat    = .rowmajor
-	storage StorageStrategy = .cpu
+	init    etype.Num    = etype.Num(f64(0.0))
+	memory  MemoryFormat = .rowmajor
+	storage storage.StorageStrategy = .cpu
 }
 
 // Return a new Tensor of given shape and type, without initializing entries
@@ -57,12 +60,12 @@ pub fn ones_like(t Tensor) Tensor {
 }
 
 // Return a new Tensor of given shape and type, filled with val
-pub fn full(shape []int, val Num) Tensor {
+pub fn full(shape []int, val etype.Num) Tensor {
 	return new_tensor(shape: shape, init: val)
 }
 
 // Return a full Tensor with the same shape and type as a given Tensor
-pub fn full_like(t Tensor, val Num) Tensor {
+pub fn full_like(t Tensor, val etype.Num) Tensor {
 	mut new_tensor := new_tensor_like(t)
 	new_tensor.fill(val)
 	return new_tensor
@@ -123,66 +126,71 @@ pub fn (t Tensor) copy(memory MemoryFormat) Tensor {
 pub fn new_tensor(data TensorData) Tensor {
 	etype := data.init.etype()
 	if data.shape.len == 0 {
-		data_storage := new_storage(strategy: data.storage, etype: etype, len: 1)
+		data_storage := storage.new_storage(strategy: data.storage, etype: etype, len: 1)
 		return Tensor{
 			memory: data.memory
 			strides: [1]
 			shape: []
 			size: 1
 			etype: etype
-			data: &data_storage
+			data: data_storage
 		}
 	}
 	strides := strides_from_shape(data.shape, data.memory)
 	size := size_from_shape(data.shape)
-	data_storage := new_storage(len: size, init: data.init, etype: etype, strategy: data.storage)
+	data_storage := storage.new_storage(
+		len: size
+		init: data.init
+		etype: etype
+		strategy: data.storage
+	)
 	return Tensor{
 		shape: data.shape
 		memory: data.memory
 		strides: strides
 		size: size
 		etype: etype
-		data: &data_storage
+		data: data_storage
 	}
 }
 
 pub fn new_tensor_like(t Tensor) Tensor {
-	storage := new_storage_like(t.data)
+	storage := storage.new_storage_like(t.data)
 	return Tensor{
 		shape: t.shape
 		strides: t.strides
 		memory: t.memory
 		size: t.size
 		etype: t.etype
-		data: &storage
+		data: storage
 	}
 }
 
 pub fn new_tensor_like_with_memory(t Tensor, memory MemoryFormat) Tensor {
 	strides := strides_from_shape(t.shape, memory)
 	size := size_from_shape(t.shape)
-	storage := new_storage_like_with_len(t.data, size)
+	storage := storage.new_storage_like_with_len(t.data, size)
 	return Tensor{
 		shape: t.shape
 		strides: strides
 		memory: t.memory
 		size: size
 		etype: t.etype
-		data: &storage
+		data: storage
 	}
 }
 
 pub fn new_tensor_like_with_shape(t Tensor, shape []int) Tensor {
 	strides := strides_from_shape(shape, t.memory)
 	size := size_from_shape(shape)
-	storage := new_storage_like_with_len(t.data, size)
+	storage := storage.new_storage_like_with_len(t.data, size)
 	return Tensor{
 		shape: shape
 		strides: strides
 		memory: t.memory
 		size: size
 		etype: t.etype
-		data: &storage
+		data: storage
 	}
 }
 
@@ -199,7 +207,7 @@ pub fn new_tensor_from_varray<T>(arr []T, data TensorData) Tensor {
 			shape: []
 			size: size
 			etype: T.name
-			data: &data_storage
+			data: data_storage
 		}
 	}
 	strides := strides_from_shape(data.shape, data.memory)
@@ -209,6 +217,6 @@ pub fn new_tensor_from_varray<T>(arr []T, data TensorData) Tensor {
 		memory: data.memory
 		size: size
 		etype: T.name
-		data: &data_storage
+		data: data_storage
 	}
 }

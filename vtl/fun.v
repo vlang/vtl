@@ -1,14 +1,16 @@
 module vtl
 
 import math
+import vtl.etype
+import vtl.storage
 
-pub type MapFn = fn (x Num, i int) Num
+pub type MapFn = fn (x etype.Num, i int) etype.Num
 
-pub type ApplyFn = fn (x Num, i int) Num
+pub type ApplyFn = fn (x etype.Num, i int) etype.Num
 
-pub type NMapFn = fn (x []Num, i int) Num
+pub type NMapFn = fn (x []etype.Num, i int) etype.Num
 
-pub type NApplyFn = fn (x []Num, i int) Num
+pub type NApplyFn = fn (x []etype.Num, i int) etype.Num
 
 // map maps a function to a given Tensor retuning a new Tensor with same shape
 pub fn (t Tensor) map(f MapFn) Tensor {
@@ -16,7 +18,7 @@ pub fn (t Tensor) map(f MapFn) Tensor {
 	mut iter := t.iterator()
 	for val in iter {
 		next_val := f(val, iter.pos)
-		storage_set(ret.data, iter.pos, next_val)
+		storage.storage_set(ret.data, iter.pos, next_val)
 	}
 	return ret
 }
@@ -26,7 +28,7 @@ pub fn (t Tensor) apply(f ApplyFn) {
 	mut iter := t.iterator()
 	for val in iter {
 		next_val := f(val, iter.pos)
-		storage_set(t.data, iter.pos, next_val)
+		storage.storage_set(t.data, iter.pos, next_val)
 	}
 }
 
@@ -36,7 +38,7 @@ pub fn (t Tensor) nmap(f NMapFn, ts ...Tensor) Tensor {
 	mut iters := t.iterators(...ts)
 	for i in 0 .. t.size {
 		val := f(iters.next(), i)
-		storage_set(ret.data, i, val)
+		storage.storage_set(ret.data, i, val)
 	}
 	return ret
 }
@@ -46,7 +48,7 @@ pub fn (t Tensor) napply(f NApplyFn, ts ...Tensor) {
 	mut iters := t.iterators(...ts)
 	for i in 0 .. t.size {
 		val := f(iters.next(), i)
-		storage_set(t.data, i, val)
+		storage.storage_set(t.data, i, val)
 	}
 }
 
@@ -79,8 +81,8 @@ pub fn (t Tensor) reshape(shape []int) Tensor {
 		panic('reshape: Cannot reshape')
 	}
 	mut ret := new_tensor_like_with_shape(t, newshape)
-	newstorage := storage_clone(t.data)
-	ret.data = &newstorage
+	newstorage := storage.storage_clone(t.data)
+	ret.data = newstorage
 	return ret
 }
 
@@ -202,12 +204,12 @@ pub fn (t Tensor) slice(idx ...[]int) Tensor {
 	for i in 0 .. indexer.len {
 		offset += t.strides[i] * indexer[i]
 	}
-	storage := storage_offset(t.data, offset)
+	storage := storage.storage_offset(t.data, offset)
 	mut ret := Tensor{
 		shape: newshape_
 		strides: newstrides_
 		size: size_from_shape(newshape_)
-		data: &storage
+		data: storage
 		memory: .colmajor
 	}
 	ensure_memory(mut ret)

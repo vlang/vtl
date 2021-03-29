@@ -1,5 +1,8 @@
 module vtl
 
+import vtl.etype
+import vtl.storage
+
 // `MemoryFormat` is a sum type that lists the possible memory layouts
 pub enum MemoryFormat {
 	rowmajor
@@ -9,9 +12,9 @@ pub enum MemoryFormat {
 // `Tensor` is the main structure defined by VTL to manage N Dimensional
 // Array of values
 pub struct Tensor {
-	etype string = default_type
+	etype string = etype.default_type
 mut:
-	data Storage
+	data storage.Storage
 pub mut:
 	memory  MemoryFormat
 	size    int
@@ -31,7 +34,7 @@ pub fn tensor_to_varray<T>(t Tensor) []T {
 	mut arr := []T{cap: t.size}
 	mut iter := t.iterator()
 	for val in iter {
-		arr << num_as_type<T>(val)
+		arr << etype.num_as_type<T>(val)
 	}
 	return arr
 }

@@ -1,5 +1,7 @@
 module vtl
 
+import vtl.storage
+
 // broadcastable takes two Tensors and either returns a valid
 // broadcastable shape or panics
 pub fn broadcastable(a Tensor, b Tensor) []int {
@@ -78,8 +80,9 @@ pub fn (t Tensor) broadcast_to(shape []int) Tensor {
 	size := size_from_shape(shape)
 	strides := strides_from_shape(shape, .rowmajor)
 	result_strides := broadcast_strides(shape, t.shape, strides, t.strides)
+	data_storage := storage.storage_clone(t.data)
 	return Tensor{
-		data: storage_clone(t.data)
+		data: data_storage
 		shape: shape
 		size: size
 		strides: result_strides
