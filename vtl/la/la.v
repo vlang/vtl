@@ -1,6 +1,6 @@
 module la
 
-import vsl.la
+import vsl.vsl.la
 import vtl
 
 pub fn dot(a vtl.Tensor, b vtl.Tensor) f64 {
