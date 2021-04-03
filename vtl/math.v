@@ -1,7 +1,7 @@
 module vtl
 
 import vtl.etype
-import math
+import vsl.vsl.vmath as math
 
 // abs returns the elementwise abs of an tensor
 [inline]
