@@ -25,8 +25,7 @@ jobs:
       run: v doctor
     - name: Build docs
       run: |
-        rm -f ./vtl/README.md
-        mv ./vtl/static/DOCS.md ./vtl/README.md
+        cd vtl
         v doc -m -f html vtl/
         mv ./vtl/_docs/vtl.html ./vtl/_docs/index.html
     - name: Deploy to gh-pages
