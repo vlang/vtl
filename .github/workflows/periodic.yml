@@ -28,8 +28,8 @@ jobs:
     - name: Execute Tests using Pure V Backend with Vlib Math
       run: cd vtl; ./bin/test
     - name: Execute Tests using Pure V Backend with Pure V Math
-      run: cd vtl; VMATH_BACKEND=ON ./bin/test
+      run: cd vtl; ./bin/test --use-vmath
     - name: Execute Tests using Open BLAS Backend
-      run: cd vtl; CBLAS_BACKEND=ON ./bin/test
+      run: cd vtl; ./bin/test --use-cblas
     - name: Execute Tests using Open BLAS Backend and Pure V Math
-      run: cd vtl; VMATH_BACKEND=ON CBLAS_BACKEND=ON ./bin/test
+      run: cd vtl; ./bin/test --use-vmath --use-cblas
