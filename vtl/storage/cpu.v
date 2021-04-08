@@ -113,7 +113,7 @@ fn (cpu &CpuStorage) clone() Storage {
 			}
 		}
 	} else {
-		unsafe { C.memcpy(byteptr(new_cpu.data), cpu.data, cpu.capacity * cpu.element_size) }
+		unsafe { C.memcpy(&byte(new_cpu.data), cpu.data, cpu.capacity * cpu.element_size) }
 	}
 	return new_cpu
 }
@@ -135,9 +135,9 @@ fn (cpu CpuStorage) slice(start int, _end int) Storage {
 			panic('CpuStorage.slice: slice bounds out of range ($start < 0)')
 		}
 	}
-	mut data := byteptr(0)
+	mut data := &byte(0)
 	unsafe {
-		data = byteptr(cpu.data) + start * cpu.element_size
+		data = &byte(cpu.data) + start * cpu.element_size
 	}
 	l := end - start
 	return CpuStorage{
@@ -166,14 +166,14 @@ fn cpu_to_varray<T>(cpu CpuStorage) []T {
 [inline; unsafe]
 fn (cpu CpuStorage) get_unsafe(i int) voidptr {
 	unsafe {
-		return byteptr(cpu.data) + i * cpu.element_size
+		return &byte(cpu.data) + i * cpu.element_size
 	}
 }
 
 // we manually inline this for single operations for performance without -prod
 [inline; unsafe]
 fn (mut cpu CpuStorage) set_unsafe(i int, val voidptr) {
-	unsafe { C.memcpy(byteptr(cpu.data) + cpu.element_size * i, val, cpu.element_size) }
+	unsafe { C.memcpy(&byte(cpu.data) + cpu.element_size * i, val, cpu.element_size) }
 }
 
 // Apply growth factor if needed
