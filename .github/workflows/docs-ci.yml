@@ -24,4 +24,4 @@ jobs:
       run: |
         v install vtl
         cd vtl
-        v run ../cmd/tools/vcheck-md.v -all
+        v check-md .
