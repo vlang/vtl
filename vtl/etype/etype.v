@@ -112,16 +112,16 @@ pub fn (f Num) esize() int {
 // esize returns a safe pointer to a given Num
 pub fn (f Num) ptr() voidptr {
 	match f {
-		byte { return voidptr(&f) }
-		u16 { return voidptr(&f) }
-		u32 { return voidptr(&f) }
-		u64 { return voidptr(&f) }
-		i8 { return voidptr(&f) }
-		i16 { return voidptr(&f) }
-		int { return voidptr(&f) }
-		i64 { return voidptr(&f) }
-		f32 { return voidptr(&f) }
-		f64 { return voidptr(&f) }
+		byte { return unsafe { voidptr(&f) } }
+		u16 { return unsafe { voidptr(&f) } }
+		u32 { return unsafe { voidptr(&f) } }
+		u64 { return unsafe { voidptr(&f) } }
+		i8 { return unsafe { voidptr(&f) } }
+		i16 { return unsafe { voidptr(&f) } }
+		int { return unsafe { voidptr(&f) } }
+		i64 { return unsafe { voidptr(&f) } }
+		f32 { return unsafe { voidptr(&f) } }
+		f64 { return unsafe { voidptr(&f) } }
 	}
 }
 
