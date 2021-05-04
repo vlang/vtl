@@ -65,16 +65,16 @@ pub fn new_storage_like_with_len(s Storage, len int) Storage {
 
 pub fn create_storage(len int, cap int, element_size int, init voidptr, strategy StorageStrategy) Storage {
 	if strategy == .cpu {
-		return storage.new_cpu_with_default(len, cap, element_size, init)
+		return new_cpu_with_default(len, cap, element_size, init)
 	}
-	return storage.new_cpu_with_default(len, cap, element_size, init)
+	return new_cpu_with_default(len, cap, element_size, init)
 }
 
 pub fn create_storage_from_c_array(len int, cap int, element_size int, c_array voidptr, strategy StorageStrategy) Storage {
 	if strategy == .cpu {
-		return unsafe { storage.new_cpu_from_c_array(len, cap, element_size, c_array) }
+		return unsafe { new_cpu_from_c_array(len, cap, element_size, c_array) }
 	}
-	return unsafe { storage.new_cpu_from_c_array(len, cap, element_size, c_array) }
+	return unsafe { new_cpu_from_c_array(len, cap, element_size, c_array) }
 }
 
 pub fn storage_to_varray<T>(s Storage) []T {
