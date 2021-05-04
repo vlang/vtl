@@ -9,7 +9,7 @@
 </div>
 
 ```v ignore
->>> import vtl.vtl
+>>> import vtl
 >>> t := vtl.from_varray([1., 2., 3., 4.], [2, 2])
 >>> t.get([1, 1])
 4.0
