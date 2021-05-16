@@ -1,7 +1,6 @@
 module storage
 
 import vtl.etype
-import vtl.storage
 
 pub enum StorageStrategy {
 	cpu
