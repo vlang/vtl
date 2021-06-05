@@ -89,16 +89,14 @@ pub fn (t Tensor) reshape(shape []int) Tensor {
 		panic('reshape: Cannot reshape')
 	}
 	mut ret := new_tensor_like_with_shape(t, newshape)
-	newstorage := storage.storage_clone(t.data)
-	ret.data = newstorage
+	ret.data = t.data
 	return ret
 }
 
 // transpose permutes the axes of an tensor in a specified
 // order and returns a view of the data
 pub fn (t Tensor) transpose(order []int) Tensor {
-	mut ret := new_tensor_like(t)
-	ret.data = t.data
+	mut ret := t.view()
 	n := order.len
 	assert_rank(t, n)
 	mut permutation := []int{len: 32}
