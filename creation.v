@@ -118,7 +118,7 @@ pub fn from_varray<T>(arr []T, shape []int) Tensor {
 	return new_tensor_from_varray<T>(arr, shape: shape)
 }
 
-// returns a copy of an array with a particular memory
+// copy returns a copy of a Tensor with a particular memory
 // layout, either rowmajor-contiguous or colmajor-contiguous
 [inline]
 pub fn (t Tensor) copy(memory MemoryFormat) Tensor {
@@ -127,7 +127,7 @@ pub fn (t Tensor) copy(memory MemoryFormat) Tensor {
 	return ret
 }
 
-// returns a view of a Tensor, identical to the
+// view returns a view of a Tensor, identical to the
 // parent but not owning its own data
 [inline]
 pub fn (t Tensor) view() Tensor {
@@ -141,6 +141,7 @@ pub fn (t Tensor) view() Tensor {
 	}
 }  
 
+// new_tensor allocates a Tensor onto CPU among other storage models with a given data
 pub fn new_tensor(data TensorData) Tensor {
 	etype := data.init.etype()
 	if data.shape.len == 0 {
@@ -172,6 +173,8 @@ pub fn new_tensor(data TensorData) Tensor {
 	}
 }
 
+// new_tensor_like returns a new tensor created with similar storage properties
+// as the Tensor `t`
 pub fn new_tensor_like(t Tensor) Tensor {
 	storage := storage.new_storage_like(t.data)
 	return Tensor{
@@ -184,6 +187,9 @@ pub fn new_tensor_like(t Tensor) Tensor {
 	}
 }
 
+// new_tensor_like_with_memory returns a new tensor created with similar storage properties
+// as the Tensor `t` with a particular memory
+// layout, either rowmajor-contiguous or colmajor-contiguous
 pub fn new_tensor_like_with_memory(t Tensor, memory MemoryFormat) Tensor {
 	strides := strides_from_shape(t.shape, memory)
 	size := size_from_shape(t.shape)
@@ -198,6 +204,8 @@ pub fn new_tensor_like_with_memory(t Tensor, memory MemoryFormat) Tensor {
 	}
 }
 
+// new_tensor_like_with_shape returns a new tensor created with similar storage properties
+// as the Tensor `t` with a given shape
 pub fn new_tensor_like_with_shape(t Tensor, shape []int) Tensor {
 	strides := strides_from_shape(shape, t.memory)
 	size := size_from_shape(shape)
@@ -212,6 +220,7 @@ pub fn new_tensor_like_with_shape(t Tensor, shape []int) Tensor {
 	}
 }
 
+// new_tensor_from_varray returns a new tensor created from a v array
 pub fn new_tensor_from_varray<T>(arr []T, data TensorData) Tensor {
 	size := size_from_shape(data.shape)
 	if size != arr.len {
