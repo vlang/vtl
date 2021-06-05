@@ -174,7 +174,7 @@ pub fn (t Tensor) slice(idx ...[]int) Tensor {
 			indexer << 0
 		}
 		// dimension sliced from array
-		if dex.len == 1 {
+		else if dex.len == 1 {
 			newshape[i] = 0
 			newstrides[i] = 0
 			fi = dex[0]

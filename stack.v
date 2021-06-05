@@ -63,7 +63,7 @@ pub fn stack(ts []Tensor, data AxisData) Tensor {
 // concatenates two Tensors together
 pub fn concatenate(ts []Tensor, data AxisData) Tensor {
 	axis := data.axis
-	mut newshape := ts[0].shape
+	mut newshape := ts[0].shape.clone()
 	newshape[axis] = 0
 	newshape = assert_shape_off_axis(ts, axis, newshape)
 	mut ret := new_tensor_like_with_shape(ts[0], newshape)
