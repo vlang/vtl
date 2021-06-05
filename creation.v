@@ -127,6 +127,20 @@ pub fn (t Tensor) copy(memory MemoryFormat) Tensor {
 	return ret
 }
 
+// returns a view of a Tensor, identical to the
+// parent but not owning its own data
+[inline]
+pub fn (t Tensor) view() Tensor {
+	return Tensor{
+		data: t.data
+		etype: t.etype
+		memory: t.memory
+		shape: t.shape.clone()
+		strides: t.strides.clone()
+		size: t.size
+	}
+}  
+
 pub fn new_tensor(data TensorData) Tensor {
 	etype := data.init.etype()
 	if data.shape.len == 0 {
