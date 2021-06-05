@@ -4,7 +4,7 @@ fn test_broadcast_column() {
 	m := from_varray<f64>([1., 2., 3.], [3, 1])
 	b := m.broadcast_to([3, 3])
 	expected := from_varray<f64>([1., 1., 1., 2., 2., 2., 3., 3., 3.], [3, 3])
-	assert tensor_to_varray<f64>(b) == tensor_to_varray<f64>(expected)
+	assert b.equal(expected)
 }
 
 fn test_broadcastable_same_shape() {

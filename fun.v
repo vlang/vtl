@@ -60,6 +60,18 @@ pub fn (t Tensor) napply(f NApplyFn, ts ...Tensor) {
 	}
 }
 
+// checks if two Tensors are close
+pub fn (t Tensor) equal(other Tensor) bool {
+	mut iters := t.iterators(...[other])
+	for _ in 0 .. t.size {
+		vals := iters.next()
+		if vals[0] != vals[1] {
+			return false
+		}
+	}
+	return true
+}
+ 
 // diagonal returns a view of the diagonal entries
 // of a two dimensional tensor
 pub fn (t Tensor) diagonal() Tensor {
