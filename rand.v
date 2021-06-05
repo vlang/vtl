@@ -12,9 +12,13 @@ fn rand_between(min etype.Num, max etype.Num) etype.Num {
 pub fn random(min etype.Num, max etype.Num, shape []int) Tensor {
 	ret := empty(shape)
 	mut iter := ret.iterator()
-	for _ in iter {
-		r := rand_between(min, max)
-		storage.storage_set(ret.data, iter.pos, r)
+	mut pos := iter.pos
+	for _ in 0 .. ret.size() {
+		if _ := iter.next() {
+			r := rand_between(min, max)
+			storage.storage_set(ret.data, pos, r)
+			pos = iter.pos
+		}
 	}
 	return ret
 }
