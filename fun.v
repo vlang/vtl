@@ -16,9 +16,13 @@ pub type NApplyFn = fn (x []etype.Num, i int) etype.Num
 pub fn (t Tensor) map(f MapFn) Tensor {
 	mut ret := new_tensor_like(t)
 	mut iter := t.iterator()
-	for val in iter {
-		next_val := f(val, iter.pos)
-		storage.storage_set(ret.data, iter.pos, next_val)
+	mut pos := iter.pos
+	for _ in 0 .. ret.size() {
+		if val := iter.next() {
+			next_val := f(val, pos)
+			storage.storage_set(ret.data, pos, next_val)
+			pos = iter.pos
+		}
 	}
 	return ret
 }
@@ -26,9 +30,13 @@ pub fn (t Tensor) map(f MapFn) Tensor {
 // apply applies a function to each element of a given Tensor
 pub fn (t Tensor) apply(f ApplyFn) {
 	mut iter := t.iterator()
-	for val in iter {
-		next_val := f(val, iter.pos)
-		storage.storage_set(t.data, iter.pos, next_val)
+	mut pos := iter.pos
+	for _ in 0 .. t.size() {
+		if val := iter.next() {
+			next_val := f(val, pos)
+			storage.storage_set(t.data, pos, next_val)
+			pos = iter.pos
+		}
 	}
 }
 
@@ -89,7 +97,7 @@ pub fn (t Tensor) reshape(shape []int) Tensor {
 // transpose permutes the axes of an tensor in a specified
 // order and returns a view of the data
 pub fn (t Tensor) transpose(order []int) Tensor {
-	mut ret := new_tensor_like(t)
+	mut ret := t.copy(t.memory)
 	n := order.len
 	assert_rank(t, n)
 	mut permutation := []int{len: 32}

@@ -21,7 +21,11 @@ pub fn (mut t Tensor) fill(val etype.Num) {
 pub fn (mut t Tensor) assign(other Tensor) {
 	otherb := other.broadcast_to(t.shape)
 	mut iter := otherb.iterator()
-	for val in iter {
-		storage.storage_set(t.data, iter.pos, val)
+	mut pos := iter.pos
+	for _ in 0 .. t.size() {
+		if val := iter.next() {
+			storage.storage_set(t.data, pos, val)
+			pos = iter.pos
+		}
 	}
 }
