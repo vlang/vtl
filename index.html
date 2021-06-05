@@ -340,28 +340,28 @@ the work and inspiration that the library done by Christopher has given.</p>
 
 </section>
 						<section id="new_tensor" class="doc-node">
-							<div class="title"><h2>fn new_tensor <a href="#new_tensor">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/creation.v#L144"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">new_tensor</span><span class="token punctuation">(</span>data TensorData<span class="token punctuation">)</span> Tensor</code></pre>
-
+							<div class="title"><h2>fn new_tensor <a href="#new_tensor">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/creation.v#L145"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">new_tensor</span><span class="token punctuation">(</span>data TensorData<span class="token punctuation">)</span> Tensor</code></pre>
+<p>new_tensor allocates a Tensor onto CPU among other storage models with a given data</p>
 
 </section>
 						<section id="new_tensor_from_varray" class="doc-node">
-							<div class="title"><h2>fn new_tensor_from_varray <a href="#new_tensor_from_varray">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/creation.v#L215"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> new_tensor_from_varray<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>arr <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">T</span><span class="token punctuation">,</span> data TensorData<span class="token punctuation">)</span> Tensor</code></pre>
-
+							<div class="title"><h2>fn new_tensor_from_varray <a href="#new_tensor_from_varray">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/creation.v#L224"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> new_tensor_from_varray<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>arr <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">T</span><span class="token punctuation">,</span> data TensorData<span class="token punctuation">)</span> Tensor</code></pre>
+<p>new_tensor_from_varray returns a new tensor created from a v array</p>
 
 </section>
 						<section id="new_tensor_like" class="doc-node">
-							<div class="title"><h2>fn new_tensor_like <a href="#new_tensor_like">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/creation.v#L175"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">new_tensor_like</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
-
+							<div class="title"><h2>fn new_tensor_like <a href="#new_tensor_like">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/creation.v#L178"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">new_tensor_like</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> Tensor</code></pre>
+<p>new_tensor_like returns a new tensor created with similar storage properties  as the Tensor <code>t</code></p>
 
 </section>
 						<section id="new_tensor_like_with_memory" class="doc-node">
-							<div class="title"><h2>fn new_tensor_like_with_memory <a href="#new_tensor_like_with_memory">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/creation.v#L187"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">new_tensor_like_with_memory</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">,</span> memory MemoryFormat<span class="token punctuation">)</span> Tensor</code></pre>
-
+							<div class="title"><h2>fn new_tensor_like_with_memory <a href="#new_tensor_like_with_memory">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/creation.v#L193"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">new_tensor_like_with_memory</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">,</span> memory MemoryFormat<span class="token punctuation">)</span> Tensor</code></pre>
+<p>new_tensor_like_with_memory returns a new tensor created with similar storage properties  as the Tensor <code>t</code> with a particular memory  layout, either rowmajor-contiguous or colmajor-contiguous</p>
 
 </section>
 						<section id="new_tensor_like_with_shape" class="doc-node">
-							<div class="title"><h2>fn new_tensor_like_with_shape <a href="#new_tensor_like_with_shape">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/creation.v#L201"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">new_tensor_like_with_shape</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">,</span> shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> Tensor</code></pre>
-
+							<div class="title"><h2>fn new_tensor_like_with_shape <a href="#new_tensor_like_with_shape">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/creation.v#L209"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">new_tensor_like_with_shape</span><span class="token punctuation">(</span>t Tensor<span class="token punctuation">,</span> shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> Tensor</code></pre>
+<p>new_tensor_like_with_shape returns a new tensor created with similar storage properties  as the Tensor <code>t</code> with a given shape</p>
 
 </section>
 						<section id="ones" class="doc-node">
@@ -628,7 +628,7 @@ the work and inspiration that the library done by Christopher has given.</p>
 </section>
 						<section id="Tensor.copy" class="doc-node">
 							<div class="title"><h2>fn (Tensor) copy <a href="#Tensor.copy">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/creation.v#L124"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> <span class="token function">copy</span><span class="token punctuation">(</span>memory MemoryFormat<span class="token punctuation">)</span> Tensor</code></pre>
-<p>returns a copy of an array with a particular memory  layout, either rowmajor-contiguous or colmajor-contiguous</p>
+<p>copy returns a copy of a Tensor with a particular memory  layout, either rowmajor-contiguous or colmajor-contiguous</p>
 
 </section>
 						<section id="Tensor.custom_iterator" class="doc-node">
@@ -778,7 +778,7 @@ the work and inspiration that the library done by Christopher has given.</p>
 </section>
 						<section id="Tensor.view" class="doc-node">
 							<div class="title"><h2>fn (Tensor) view <a href="#Tensor.view">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/creation.v#L133"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t Tensor<span class="token punctuation">)</span> <span class="token function">view</span><span class="token punctuation">(</span><span class="token punctuation">)</span> Tensor</code></pre>
-<p>returns a view of a Tensor, identical to the  parent but not owning its own data</p>
+<p>view returns a view of a Tensor, identical to the  parent but not owning its own data</p>
 
 </section>
 						<section id="TensorData" class="doc-node">
@@ -812,7 +812,7 @@ the work and inspiration that the library done by Christopher has given.</p>
 </section>
 
 						<div class="footer">
-							Powered by vdoc. Generated on: 5 Jun 2021 04:08:18
+							Powered by vdoc. Generated on: 5 Jun 2021 04:18:10
 						</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_vtl">README</a></li>
