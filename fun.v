@@ -60,8 +60,11 @@ pub fn (t Tensor) napply(f NApplyFn, ts ...Tensor) {
 	}
 }
 
-// checks if two Tensors are close
+// checks if two Tensors are equal
 pub fn (t Tensor) equal(other Tensor) bool {
+	if t.shape != other.shape {
+		return false
+	}
 	mut iters := t.iterators(...[other])
 	for _ in 0 .. t.size {
 		vals := iters.next()
