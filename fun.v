@@ -160,8 +160,8 @@ pub fn (t Tensor) swapaxes(a1 int, a2 int) Tensor {
 
 // slice returns a tensor from a variadic list of indexing operations
 pub fn (t Tensor) slice(idx ...[]int) Tensor {
-	mut newshape := t.shape
-	mut newstrides := t.strides
+	mut newshape := t.shape.clone()
+	mut newstrides := t.strides.clone()
 	mut indexer := []int{}
 	for i in 0 .. idx.len {
 		dex := idx[i]
