@@ -97,7 +97,8 @@ pub fn (t Tensor) reshape(shape []int) Tensor {
 // transpose permutes the axes of an tensor in a specified
 // order and returns a view of the data
 pub fn (t Tensor) transpose(order []int) Tensor {
-	mut ret := t.copy(t.memory)
+	mut ret := new_tensor_like(t)
+	ret.data = t.data
 	n := order.len
 	assert_rank(t, n)
 	mut permutation := []int{len: 32}
