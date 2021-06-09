@@ -106,23 +106,42 @@ pub fn from_2d<T>(a [][]T) Tensor {
 			arr << a[i][j]
 		}
 	}
-	return from_varray<T>(arr, [a.len, a[0].len])
+	shape := [a.len, a[0].len]
+	return from_varray<T>(arr, shape)
 }
 
 // from_varray takes a one dimensional array of T values
 // and coerces it into an arbitrary shaped Tensor if possible.
 // Panics if the shape provided does not hold the provided array
+[inline]
 pub fn from_varray<T>(arr []T, shape []int) Tensor {
 	return new_tensor_from_varray<T>(arr, shape: shape)
 }
 
-// returns a copy of an array with a particular memory
+// copy returns a copy of a Tensor with a particular memory
 // layout, either rowmajor-contiguous or colmajor-contiguous
 [inline]
 pub fn (t Tensor) copy(memory MemoryFormat) Tensor {
-	return new_tensor_like_with_memory(t, memory)
+	mut ret := new_tensor_like_with_memory(t, memory)
+	ret.data = storage.storage_clone(t.data)
+	return ret
 }
 
+// view returns a view of a Tensor, identical to the
+// parent but not owning its own data
+[inline]
+pub fn (t Tensor) view() Tensor {
+	return Tensor{
+		data: t.data
+		etype: t.etype
+		memory: t.memory
+		shape: t.shape.clone()
+		strides: t.strides.clone()
+		size: t.size
+	}
+}  
+
+// new_tensor allocates a Tensor onto CPU among other storage models with a given data
 pub fn new_tensor(data TensorData) Tensor {
 	etype := data.init.etype()
 	if data.shape.len == 0 {
@@ -145,7 +164,7 @@ pub fn new_tensor(data TensorData) Tensor {
 		strategy: data.storage
 	)
 	return Tensor{
-		shape: data.shape
+		shape: data.shape.clone()
 		memory: data.memory
 		strides: strides
 		size: size
@@ -154,11 +173,13 @@ pub fn new_tensor(data TensorData) Tensor {
 	}
 }
 
+// new_tensor_like returns a new tensor created with similar storage properties
+// as the Tensor `t`
 pub fn new_tensor_like(t Tensor) Tensor {
 	storage := storage.new_storage_like(t.data)
 	return Tensor{
-		shape: t.shape
-		strides: t.strides
+		shape: t.shape.clone()
+		strides: t.strides.clone()
 		memory: t.memory
 		size: t.size
 		etype: t.etype
@@ -166,12 +187,15 @@ pub fn new_tensor_like(t Tensor) Tensor {
 	}
 }
 
+// new_tensor_like_with_memory returns a new tensor created with similar storage properties
+// as the Tensor `t` with a particular memory
+// layout, either rowmajor-contiguous or colmajor-contiguous
 pub fn new_tensor_like_with_memory(t Tensor, memory MemoryFormat) Tensor {
 	strides := strides_from_shape(t.shape, memory)
 	size := size_from_shape(t.shape)
 	storage := storage.new_storage_like_with_len(t.data, size)
 	return Tensor{
-		shape: t.shape
+		shape: t.shape.clone()
 		strides: strides
 		memory: t.memory
 		size: size
@@ -180,12 +204,14 @@ pub fn new_tensor_like_with_memory(t Tensor, memory MemoryFormat) Tensor {
 	}
 }
 
+// new_tensor_like_with_shape returns a new tensor created with similar storage properties
+// as the Tensor `t` with a given shape
 pub fn new_tensor_like_with_shape(t Tensor, shape []int) Tensor {
 	strides := strides_from_shape(shape, t.memory)
 	size := size_from_shape(shape)
 	storage := storage.new_storage_like_with_len(t.data, size)
 	return Tensor{
-		shape: shape
+		shape: shape.clone()
 		strides: strides
 		memory: t.memory
 		size: size
@@ -194,6 +220,7 @@ pub fn new_tensor_like_with_shape(t Tensor, shape []int) Tensor {
 	}
 }
 
+// new_tensor_from_varray returns a new tensor created from a v array
 pub fn new_tensor_from_varray<T>(arr []T, data TensorData) Tensor {
 	size := size_from_shape(data.shape)
 	if size != arr.len {

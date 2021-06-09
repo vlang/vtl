@@ -9,6 +9,7 @@ pub type IteratorHandler = fn (mut s TensorIterator) etype.Num
 
 // TensorIterator is a struct to hold a Tensors
 // iteration state while iterating through a Tensor
+[heap]
 pub struct TensorIterator {
 	tensor       Tensor
 	next_handler IteratorHandler
@@ -69,6 +70,7 @@ fn handle_strided_iteration(mut s TensorIterator) etype.Num {
 	rank := s.tensor.rank()
 	shape := s.tensor.shape
 	strides := s.tensor.strides
+
 	unsafe {
 		for i := rank - 1; i >= 0; i-- {
 			if s.coord[i] < shape[i] - 1 {
@@ -102,7 +104,8 @@ pub fn (mut s TensorIterator) next() ?etype.Num {
 		return none
 	}
 	s.iteration++
-	return s.next_handler(s)
+	val := s.next_handler(mut s)
+	return val
 }
 
 fn tensor_backstrides(t Tensor) &int {
