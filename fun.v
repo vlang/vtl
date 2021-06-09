@@ -16,9 +16,13 @@ pub type NApplyFn = fn (x []etype.Num, i int) etype.Num
 pub fn (t Tensor) map(f MapFn) Tensor {
 	mut ret := new_tensor_like(t)
 	mut iter := t.iterator()
-	for val in iter {
-		next_val := f(val, iter.pos)
-		storage.storage_set(ret.data, iter.pos, next_val)
+	mut pos := iter.pos
+	for _ in 0 .. ret.size() {
+		if val := iter.next() {
+			next_val := f(val, pos)
+			storage.storage_set(ret.data, pos, next_val)
+			pos = iter.pos
+		}
 	}
 	return ret
 }
@@ -26,9 +30,13 @@ pub fn (t Tensor) map(f MapFn) Tensor {
 // apply applies a function to each element of a given Tensor
 pub fn (t Tensor) apply(f ApplyFn) {
 	mut iter := t.iterator()
-	for val in iter {
-		next_val := f(val, iter.pos)
-		storage.storage_set(t.data, iter.pos, next_val)
+	mut pos := iter.pos
+	for _ in 0 .. t.size() {
+		if val := iter.next() {
+			next_val := f(val, pos)
+			storage.storage_set(t.data, pos, next_val)
+			pos = iter.pos
+		}
 	}
 }
 
@@ -52,6 +60,21 @@ pub fn (t Tensor) napply(f NApplyFn, ts ...Tensor) {
 	}
 }
 
+// checks if two Tensors are equal
+pub fn (t Tensor) equal(other Tensor) bool {
+	if t.shape != other.shape {
+		return false
+	}
+	mut iters := t.iterators(...[other])
+	for _ in 0 .. t.size {
+		vals := iters.next()
+		if vals[0] != vals[1] {
+			return false
+		}
+	}
+	return true
+}
+ 
 // diagonal returns a view of the diagonal entries
 // of a two dimensional tensor
 pub fn (t Tensor) diagonal() Tensor {
@@ -81,15 +104,14 @@ pub fn (t Tensor) reshape(shape []int) Tensor {
 		panic('reshape: Cannot reshape')
 	}
 	mut ret := new_tensor_like_with_shape(t, newshape)
-	newstorage := storage.storage_clone(t.data)
-	ret.data = newstorage
+	ret.data = t.data
 	return ret
 }
 
 // transpose permutes the axes of an tensor in a specified
 // order and returns a view of the data
 pub fn (t Tensor) transpose(order []int) Tensor {
-	mut ret := new_tensor_like(t)
+	mut ret := t.view()
 	n := order.len
 	assert_rank(t, n)
 	mut permutation := []int{len: 32}
@@ -138,8 +160,8 @@ pub fn (t Tensor) swapaxes(a1 int, a2 int) Tensor {
 
 // slice returns a tensor from a variadic list of indexing operations
 pub fn (t Tensor) slice(idx ...[]int) Tensor {
-	mut newshape := t.shape
-	mut newstrides := t.strides
+	mut newshape := t.shape.clone()
+	mut newstrides := t.strides.clone()
 	mut indexer := []int{}
 	for i in 0 .. idx.len {
 		dex := idx[i]
@@ -152,7 +174,7 @@ pub fn (t Tensor) slice(idx ...[]int) Tensor {
 			indexer << 0
 		}
 		// dimension sliced from array
-		if dex.len == 1 {
+		else if dex.len == 1 {
 			newshape[i] = 0
 			newstrides[i] = 0
 			fi = dex[0]
