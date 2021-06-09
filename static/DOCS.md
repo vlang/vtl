@@ -73,7 +73,11 @@ $ ./bin/test # execute `./bin/test -h` to know more about the test command
 > and a large part of its interface. In the same way, we do not want to stop recognizing
 > the work and inspiration that the library done by Christopher has given.
 
-- [Ulises Jeremias Cornejo Fandos](https://github.com/ulises-jeremias) - Core Maintainer
+<a href="https://github.com/vlang/vtl/contributors">
+  <img src="https://contrib.rocks/image?repo=vlang/vtl"/>
+</a>
+
+Made with [contributors-img](https://contrib.rocks).
 
 [awesomevbadge]: https://awesome.re/mentioned-badge.svg
 [workflowbadge]: https://github.com/vlang/vtl/workflows/Build%20and%20Test%20with%20deps/badge.svg
