@@ -1,6 +1,5 @@
 module vtl
 
-import math
 import vtl.etype
 import vtl.storage
 
@@ -22,20 +21,6 @@ pub fn (t Tensor) offset(index []int) int {
 			j += t.shape[i]
 		}
 		offset += j * t.strides[i]
-	}
-	return offset
-}
-
-// stride offset returns the index of the starting offset
-// for arrays that may be negatively strided
-pub fn (t Tensor) strided_offset(shape []int, strides []int) int {
-	mut offset := 0
-	for i in 0 .. t.rank() {
-		if strides[i] < 0 {
-			unsafe {
-				offset += (shape[i] - 1) * int(math.abs(strides[i]))
-			}
-		}
 	}
 	return offset
 }

@@ -139,7 +139,7 @@ pub fn (t Tensor) view() Tensor {
 		strides: t.strides.clone()
 		size: t.size
 	}
-}  
+}
 
 // new_tensor allocates a Tensor onto CPU among other storage models with a given data
 pub fn new_tensor(data TensorData) Tensor {

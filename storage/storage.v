@@ -6,22 +6,17 @@ pub enum StorageStrategy {
 	cpu
 }
 
-pub struct NullStorage {}
-
-// sum type to be used for different strategies
-// pub interface Storage {
-// 	element_size int
-// 	data voidptr
-// 	len int
-// 	capacity int
-// 	get(i int) voidptr
-// 	set(i int, val voidptr)
-// 	fill(val voidptr)
-// 	clone() Storage
-// 	slice(start int, end int) Storage
-// 	offset(start int) Storage
-// }
-pub type Storage = CpuStorage | NullStorage
+pub interface Storage {
+	element_size int
+	data voidptr
+	len int
+	capacity int
+	get(index int) voidptr
+	set(index int, val voidptr)
+	offset(start int) Storage
+	fill(val voidptr)
+	clone() Storage
+}
 
 pub struct StorageData {
 pub:
@@ -40,26 +35,12 @@ pub fn new_storage(data StorageData) Storage {
 
 [inline]
 pub fn new_storage_like(s Storage) Storage {
-	match s {
-		CpuStorage {
-			return create_storage(s.len, s.capacity, s.element_size, voidptr(0), storage_strategy(s))
-		}
-		else {
-			panic('unsupported storage')
-		}
-	}
+	return create_storage(s.len, s.capacity, s.element_size, voidptr(0), storage_strategy(s))
 }
 
 [inline]
 pub fn new_storage_like_with_len(s Storage, len int) Storage {
-	match s {
-		CpuStorage {
-			return create_storage(len, 0, s.element_size, voidptr(0), storage_strategy(s))
-		}
-		else {
-			panic('unsupported storage')
-		}
-	}
+	return create_storage(len, 0, s.element_size, voidptr(0), storage_strategy(s))
 }
 
 pub fn create_storage(len int, cap int, element_size int, init voidptr, strategy StorageStrategy) Storage {
@@ -71,9 +52,9 @@ pub fn create_storage(len int, cap int, element_size int, init voidptr, strategy
 
 pub fn create_storage_from_c_array(len int, cap int, element_size int, c_array voidptr, strategy StorageStrategy) Storage {
 	if strategy == .cpu {
-		return unsafe { new_cpu_from_c_array(len, cap, element_size, c_array) }
+		return new_cpu_from_c_array(len, cap, element_size, c_array)
 	}
-	return unsafe { new_cpu_from_c_array(len, cap, element_size, c_array) }
+	return new_cpu_from_c_array(len, cap, element_size, c_array)
 }
 
 pub fn storage_to_varray<T>(s Storage) []T {
@@ -81,7 +62,7 @@ pub fn storage_to_varray<T>(s Storage) []T {
 		CpuStorage {
 			if s.element_size == int(sizeof(T)) {
 				mut arr := []T{}
-				unsafe { arr.push_many(s.data, s.len) }
+				arr.push_many(s.data, s.len)
 				return arr
 			}
 			panic('CpuStorage.to_varray: incoming type T does not match with the stored data type')
@@ -99,44 +80,14 @@ pub fn storage_strategy(s Storage) StorageStrategy {
 	}
 }
 
-pub fn storage_clone(s Storage) Storage {
-	match s {
-		CpuStorage { return unsafe { s.clone() } }
-		else { panic('unsupported storage') }
-	}
-}
-
-pub fn storage_offset(s Storage, start int) Storage {
-	match s {
-		CpuStorage { return unsafe { s.offset(start) } }
-		else { panic('unsupported storage') }
-	}
-}
-
-pub fn storage_get(s Storage, i int, element_type string) etype.Num {
-	match s {
-		CpuStorage { return etype.ptr_to_val_of_type(unsafe { s.get(i) }, element_type) }
-		else { panic('unsupported storage') }
-	}
-}
-
-pub fn storage_set(s Storage, i int, val etype.Num) {
-	match s {
-		CpuStorage { unsafe { s.set(i, val.ptr()) } }
-		else { panic('unsupported storage') }
-	}
+pub fn storage_get(s Storage, idx int, element_type string) etype.Num {
+	return etype.ptr_to_val_of_type(s.get(idx), element_type)
 }
 
 pub fn storage_fill(s Storage, val etype.Num) {
-	match s {
-		CpuStorage { unsafe { s.fill(val.ptr()) } }
-		else { panic('unsupported storage') }
-	}
+	s.fill(val.ptr())
 }
 
-pub fn storage_size(s Storage) int {
-	match s {
-		CpuStorage { return s.len }
-		else { panic('unsupported storage') }
-	}
+pub fn storage_set(s Storage, idx int, val etype.Num) {
+	s.set(idx, val.ptr())
 }
