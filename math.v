@@ -353,16 +353,6 @@ pub fn log2(t Tensor) Tensor {
 	})
 }
 
-// log2_b returns the elementwise log2_b of an tensor
-[inline]
-pub fn log2_b(t Tensor) Tensor {
-	return t.map(fn (x etype.Num, _ int) etype.Num {
-		val := etype.num_as_type<f64>(x)
-		ret := math.log2_b(val)
-		return etype.Num(ret)
-	})
-}
-
 // log_factorial returns the elementwise log_factorial of an tensor
 [inline]
 pub fn log_factorial(t Tensor) Tensor {
