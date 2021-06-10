@@ -20,6 +20,8 @@ source "${ROOT}/util/logs.sh" || exit
 
 set -eo pipefail
 
+test_folder=$(dirname $(dirname "$0"))
+
 flags=""
 
 if [[ -n "${use_cblas}" ]]; then
@@ -43,6 +45,6 @@ if [[ -n "${stats}" ]]; then
 fi
 
 echo "Executing tests with command: \"v ${flags} test .\""
-v ${flags} test .
+v ${flags} test ${test_folder}
 
 find . -name '*_test' -exec rm -f {} +
