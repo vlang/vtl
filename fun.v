@@ -74,7 +74,7 @@ pub fn (t Tensor) equal(other Tensor) bool {
 	}
 	return true
 }
- 
+
 // diagonal returns a view of the diagonal entries
 // of a two dimensional tensor
 pub fn (t Tensor) diagonal() Tensor {

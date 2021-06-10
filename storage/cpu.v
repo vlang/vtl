@@ -16,10 +16,10 @@ pub mut:
 	capacity int
 }
 
-fn new_cpu(len int, capacity int, element_size int) Storage {
+fn new_cpu(len int, capacity int, element_size int) &CpuStorage {
 	mut capacity_ := if capacity < len { len } else { capacity }
 	capacity_ = max(capacity_, storage.vector_minimum_capacity)
-	return CpuStorage{
+	return &CpuStorage{
 		len: len
 		capacity: capacity_
 		data: vcalloc(capacity_ * element_size)
@@ -27,10 +27,10 @@ fn new_cpu(len int, capacity int, element_size int) Storage {
 	}
 }
 
-fn new_cpu_with_default(len int, capacity int, element_size int, val voidptr) CpuStorage {
+fn new_cpu_with_default(len int, capacity int, element_size int, val voidptr) &CpuStorage {
 	mut capacity_ := if capacity < len { len } else { capacity }
 	capacity_ = max(capacity_, storage.vector_minimum_capacity)
-	mut cpu := CpuStorage{
+	mut cpu := &CpuStorage{
 		len: len
 		capacity: capacity_
 		element_size: element_size
@@ -44,10 +44,9 @@ fn new_cpu_with_default(len int, capacity int, element_size int, val voidptr) Cp
 	return cpu
 }
 
-[unsafe]
 fn new_cpu_from_c_array(len int, capacity int, element_size int, c_array voidptr) Storage {
 	capacity_ := if capacity < len { len } else { capacity }
-	cpu := CpuStorage{
+	cpu := &CpuStorage{
 		element_size: element_size
 		data: vcalloc(capacity_ * element_size)
 		len: len
@@ -59,7 +58,6 @@ fn new_cpu_from_c_array(len int, capacity int, element_size int, c_array voidptr
 }
 
 // Private function. Used to implement CpuStorage operator
-[unsafe]
 fn (cpu CpuStorage) get(i int) voidptr {
 	$if !no_bounds_checking ? {
 		if i < 0 || i >= cpu.len {
@@ -70,7 +68,6 @@ fn (cpu CpuStorage) get(i int) voidptr {
 }
 
 // Private function. Used to implement assigment to the CpuStorage element
-[unsafe]
 fn (mut cpu CpuStorage) set(i int, val voidptr) {
 	$if !no_bounds_checking ? {
 		if i < 0 || i >= cpu.len {
@@ -81,7 +78,6 @@ fn (mut cpu CpuStorage) set(i int, val voidptr) {
 }
 
 // fill fills an entire storage with a given value
-[unsafe]
 fn (mut cpu CpuStorage) fill(val voidptr) {
 	for i in 0 .. cpu.len {
 		unsafe { cpu.set_unsafe(i, val) }
@@ -89,13 +85,12 @@ fn (mut cpu CpuStorage) fill(val voidptr) {
 }
 
 // CpuStorage.clone returns an independent copy of a given CpuStorage
-[unsafe]
 fn (cpu &CpuStorage) clone() Storage {
 	mut size := cpu.capacity * cpu.element_size
 	if size == 0 {
 		size++
 	}
-	mut new_cpu := CpuStorage{
+	mut new_cpu := &CpuStorage{
 		element_size: cpu.element_size
 		data: vcalloc(size)
 		len: cpu.len
@@ -105,9 +100,9 @@ fn (cpu &CpuStorage) clone() Storage {
 	size_of_cpu := int(sizeof(CpuStorage))
 	if cpu.element_size == size_of_cpu {
 		for i in 0 .. cpu.len {
-			ar := CpuStorage{}
+			ar := &CpuStorage{}
 			unsafe {
-				C.memcpy(&ar, cpu.get_unsafe(i), size_of_cpu)
+				C.memcpy(ar, cpu.get_unsafe(i), size_of_cpu)
 				ar_clone := ar.clone()
 				new_cpu.set_unsafe(i, &ar_clone)
 			}
@@ -140,7 +135,7 @@ fn (cpu CpuStorage) slice(start int, _end int) Storage {
 		data = &byte(cpu.data) + start * cpu.element_size
 	}
 	l := end - start
-	return CpuStorage{
+	return &CpuStorage{
 		element_size: cpu.element_size
 		data: data
 		len: l
