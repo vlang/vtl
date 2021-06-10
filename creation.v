@@ -187,6 +187,25 @@ pub fn new_tensor_like(t Tensor) Tensor {
 	}
 }
 
+// new_tensor_like_with_etype returns a new tensor created with similar storage properties
+// as the Tensor `t` with a given element type
+pub fn new_tensor_like_with_etype(t Tensor, etype string) Tensor {
+	storage := storage := storage.new_storage(
+		strategy: storage.storage_strategy(t.data),
+		etype: etype,
+		cap: t.data.cap,
+		len: t.data.len,
+	)
+	return Tensor{
+		shape: t.shape.clone()
+		strides: t.strides.clone()
+		memory: t.memory
+		size: t.size
+		etype: etype
+		data: storage
+	}
+}
+
 // new_tensor_like_with_memory returns a new tensor created with similar storage properties
 // as the Tensor `t` with a particular memory
 // layout, either rowmajor-contiguous or colmajor-contiguous

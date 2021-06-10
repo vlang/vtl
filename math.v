@@ -198,7 +198,7 @@ pub fn expm1(t Tensor) Tensor {
 // f32_bits returns the elementwise f32_bits of an tensor
 [inline]
 pub fn f32_bits(t Tensor) Tensor {
-	return t.map(fn (x etype.Num, _ int) etype.Num {
+	return t.map_as<u32>(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f32>(x)
 		ret := math.f32_bits(val)
 		return etype.Num(ret)
@@ -208,7 +208,7 @@ pub fn f32_bits(t Tensor) Tensor {
 // f32_from_bits returns the elementwise f32_from_bits of an tensor
 [inline]
 pub fn f32_from_bits(t Tensor) Tensor {
-	return t.map(fn (x etype.Num, _ int) etype.Num {
+	return t.map_as<f32>(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<u32>(x)
 		ret := math.f32_from_bits(val)
 		return etype.Num(ret)
@@ -218,7 +218,7 @@ pub fn f32_from_bits(t Tensor) Tensor {
 // f64_bits returns the elementwise f64_bits of an tensor
 [inline]
 pub fn f64_bits(t Tensor) Tensor {
-	return t.map(fn (x etype.Num, _ int) etype.Num {
+	return t.map_as<u64>(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.f64_bits(val)
 		return etype.Num(ret)
@@ -228,7 +228,7 @@ pub fn f64_bits(t Tensor) Tensor {
 // f64_from_bits returns the elementwise f64_from_bits of an tensor
 [inline]
 pub fn f64_from_bits(t Tensor) Tensor {
-	return t.map(fn (x etype.Num, _ int) etype.Num {
+	return t.map_as<f64>(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<u64>(x)
 		ret := math.f64_from_bits(val)
 		return etype.Num(ret)
@@ -419,6 +419,30 @@ pub fn min(a Tensor, b Tensor) Tensor {
 	return a.nmap(f, b)
 }
 
+// nextafter returns the nextafter elementwise of two tensors
+[inline]
+pub fn nextafter(a Tensor, b Tensor) Tensor {
+	f := fn (xs []etype.Num, _ int) etype.Num {
+		x := etype.num_as_type<f64>(xs[0])
+		y := etype.num_as_type<f64>(xs[1])
+		ret := math.nextafter(x, y)
+		return etype.Num(ret)
+	}
+	return a.nmap(f, b)
+}
+
+// nextafter32 returns the nextafter32 elementwise of two tensors
+[inline]
+pub fn nextafter32(a Tensor, b Tensor) Tensor {
+	f := fn (xs []etype.Num, _ int) etype.Num {
+		x := etype.num_as_type<f32>(xs[0])
+		y := etype.num_as_type<f32>(xs[1])
+		ret := math.nextafter32(x, y)
+		return etype.Num(ret)
+	}
+	return a.nmap(f, b)
+}
+
 // pow returns the pow elementwise of two tensors
 [inline]
 pub fn pow(a Tensor, b Tensor) Tensor {
@@ -434,7 +458,7 @@ pub fn pow(a Tensor, b Tensor) Tensor {
 // pow10 returns the elementwise pow10 of an tensor
 [inline]
 pub fn pow10(t Tensor) Tensor {
-	return t.map(fn (x etype.Num, _ int) etype.Num {
+	return t.map_as<f64>(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<int>(x)
 		ret := math.pow10(val)
 		return etype.Num(ret)
