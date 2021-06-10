@@ -123,7 +123,7 @@ pub fn from_varray<T>(arr []T, shape []int) Tensor {
 [inline]
 pub fn (t Tensor) copy(memory MemoryFormat) Tensor {
 	mut ret := new_tensor_like_with_memory(t, memory)
-	ret.data = storage.storage_clone(t.data)
+	ret.data = t.data.clone()
 	return ret
 }
 

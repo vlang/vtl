@@ -226,7 +226,7 @@ pub fn (t Tensor) slice(idx ...[]int) Tensor {
 	for i in 0 .. indexer.len {
 		offset += t.strides[i] * indexer[i]
 	}
-	storage := storage.storage_offset(t.data, offset)
+	storage := t.data.offset(offset)
 	mut ret := Tensor{
 		shape: newshape_
 		strides: newstrides_
