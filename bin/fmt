@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
 
-find . -name "*.v" -exec v fmt -w {} +
+vtl_dir_path=$(dirname $(dirname "$0"))
+
+find ${vtl_dir_path} -name "*.v" -exec v fmt -w {} +
