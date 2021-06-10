@@ -68,73 +68,68 @@
 
 </section>
 						<section id="create_storage" class="doc-node">
-							<div class="title"><h2>fn create_storage <a href="#create_storage">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L65"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">create_storage</span><span class="token punctuation">(</span>len <span class="token builtin">int</span><span class="token punctuation">,</span> cap <span class="token builtin">int</span><span class="token punctuation">,</span> element_size <span class="token builtin">int</span><span class="token punctuation">,</span> init <span class="token builtin">voidptr</span><span class="token punctuation">,</span> strategy StorageStrategy<span class="token punctuation">)</span> Storage</code></pre>
+							<div class="title"><h2>fn create_storage <a href="#create_storage">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L46"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">create_storage</span><span class="token punctuation">(</span>len <span class="token builtin">int</span><span class="token punctuation">,</span> cap <span class="token builtin">int</span><span class="token punctuation">,</span> element_size <span class="token builtin">int</span><span class="token punctuation">,</span> init <span class="token builtin">voidptr</span><span class="token punctuation">,</span> strategy StorageStrategy<span class="token punctuation">)</span> Storage</code></pre>
 
 
 </section>
 						<section id="create_storage_from_c_array" class="doc-node">
-							<div class="title"><h2>fn create_storage_from_c_array <a href="#create_storage_from_c_array">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L72"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">create_storage_from_c_array</span><span class="token punctuation">(</span>len <span class="token builtin">int</span><span class="token punctuation">,</span> cap <span class="token builtin">int</span><span class="token punctuation">,</span> element_size <span class="token builtin">int</span><span class="token punctuation">,</span> c_array <span class="token builtin">voidptr</span><span class="token punctuation">,</span> strategy StorageStrategy<span class="token punctuation">)</span> Storage</code></pre>
+							<div class="title"><h2>fn create_storage_from_c_array <a href="#create_storage_from_c_array">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L53"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">create_storage_from_c_array</span><span class="token punctuation">(</span>len <span class="token builtin">int</span><span class="token punctuation">,</span> cap <span class="token builtin">int</span><span class="token punctuation">,</span> element_size <span class="token builtin">int</span><span class="token punctuation">,</span> c_array <span class="token builtin">voidptr</span><span class="token punctuation">,</span> strategy StorageStrategy<span class="token punctuation">)</span> Storage</code></pre>
 
 
 </section>
 						<section id="new_storage" class="doc-node">
-							<div class="title"><h2>fn new_storage <a href="#new_storage">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L36"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">new_storage</span><span class="token punctuation">(</span>data StorageData<span class="token punctuation">)</span> Storage</code></pre>
+							<div class="title"><h2>fn new_storage <a href="#new_storage">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L31"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">new_storage</span><span class="token punctuation">(</span>data StorageData<span class="token punctuation">)</span> Storage</code></pre>
 
 
 </section>
 						<section id="new_storage_like" class="doc-node">
-							<div class="title"><h2>fn new_storage_like <a href="#new_storage_like">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L42"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">new_storage_like</span><span class="token punctuation">(</span>s Storage<span class="token punctuation">)</span> Storage</code></pre>
+							<div class="title"><h2>fn new_storage_like <a href="#new_storage_like">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L37"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">new_storage_like</span><span class="token punctuation">(</span>s Storage<span class="token punctuation">)</span> Storage</code></pre>
 
 
 </section>
 						<section id="new_storage_like_with_len" class="doc-node">
-							<div class="title"><h2>fn new_storage_like_with_len <a href="#new_storage_like_with_len">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L54"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">new_storage_like_with_len</span><span class="token punctuation">(</span>s Storage<span class="token punctuation">,</span> len <span class="token builtin">int</span><span class="token punctuation">)</span> Storage</code></pre>
-
-
-</section>
-						<section id="storage_clone" class="doc-node">
-							<div class="title"><h2>fn storage_clone <a href="#storage_clone">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L102"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">storage_clone</span><span class="token punctuation">(</span>s Storage<span class="token punctuation">)</span> Storage</code></pre>
+							<div class="title"><h2>fn new_storage_like_with_len <a href="#new_storage_like_with_len">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L42"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">new_storage_like_with_len</span><span class="token punctuation">(</span>s Storage<span class="token punctuation">,</span> len <span class="token builtin">int</span><span class="token punctuation">)</span> Storage</code></pre>
 
 
 </section>
 						<section id="storage_fill" class="doc-node">
-							<div class="title"><h2>fn storage_fill <a href="#storage_fill">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L130"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">storage_fill</span><span class="token punctuation">(</span>s Storage<span class="token punctuation">,</span> val etype<span class="token punctuation">.</span>Num<span class="token punctuation">)</span></code></pre>
+							<div class="title"><h2>fn storage_fill <a href="#storage_fill">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L87"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">storage_fill</span><span class="token punctuation">(</span>s Storage<span class="token punctuation">,</span> val etype<span class="token punctuation">.</span>Num<span class="token punctuation">)</span></code></pre>
 
 
 </section>
 						<section id="storage_get" class="doc-node">
-							<div class="title"><h2>fn storage_get <a href="#storage_get">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L116"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">storage_get</span><span class="token punctuation">(</span>s Storage<span class="token punctuation">,</span> i <span class="token builtin">int</span><span class="token punctuation">,</span> element_type <span class="token builtin">string</span><span class="token punctuation">)</span> etype<span class="token punctuation">.</span>Num</code></pre>
-
-
-</section>
-						<section id="storage_offset" class="doc-node">
-							<div class="title"><h2>fn storage_offset <a href="#storage_offset">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L109"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">storage_offset</span><span class="token punctuation">(</span>s Storage<span class="token punctuation">,</span> start <span class="token builtin">int</span><span class="token punctuation">)</span> Storage</code></pre>
+							<div class="title"><h2>fn storage_get <a href="#storage_get">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L83"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">storage_get</span><span class="token punctuation">(</span>s Storage<span class="token punctuation">,</span> idx <span class="token builtin">int</span><span class="token punctuation">,</span> element_type <span class="token builtin">string</span><span class="token punctuation">)</span> etype<span class="token punctuation">.</span>Num</code></pre>
 
 
 </section>
 						<section id="storage_set" class="doc-node">
-							<div class="title"><h2>fn storage_set <a href="#storage_set">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L123"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">storage_set</span><span class="token punctuation">(</span>s Storage<span class="token punctuation">,</span> i <span class="token builtin">int</span><span class="token punctuation">,</span> val etype<span class="token punctuation">.</span>Num<span class="token punctuation">)</span></code></pre>
-
-
-</section>
-						<section id="storage_size" class="doc-node">
-							<div class="title"><h2>fn storage_size <a href="#storage_size">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L137"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">storage_size</span><span class="token punctuation">(</span>s Storage<span class="token punctuation">)</span> <span class="token builtin">int</span></code></pre>
+							<div class="title"><h2>fn storage_set <a href="#storage_set">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L91"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">storage_set</span><span class="token punctuation">(</span>s Storage<span class="token punctuation">,</span> idx <span class="token builtin">int</span><span class="token punctuation">,</span> val etype<span class="token punctuation">.</span>Num<span class="token punctuation">)</span></code></pre>
 
 
 </section>
 						<section id="storage_strategy" class="doc-node">
-							<div class="title"><h2>fn storage_strategy <a href="#storage_strategy">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L95"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">storage_strategy</span><span class="token punctuation">(</span>s Storage<span class="token punctuation">)</span> StorageStrategy</code></pre>
+							<div class="title"><h2>fn storage_strategy <a href="#storage_strategy">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L76"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">storage_strategy</span><span class="token punctuation">(</span>s Storage<span class="token punctuation">)</span> StorageStrategy</code></pre>
 
 
 </section>
 						<section id="storage_to_varray" class="doc-node">
-							<div class="title"><h2>fn storage_to_varray <a href="#storage_to_varray">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L79"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> storage_to_varray<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>s Storage<span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">T</span></code></pre>
+							<div class="title"><h2>fn storage_to_varray <a href="#storage_to_varray">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L60"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> storage_to_varray<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>s Storage<span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">T</span></code></pre>
 
 
 </section>
 						<section id="Storage" class="doc-node">
-							<div class="title"><h2>type Storage <a href="#Storage">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L24"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">type</span> Storage <span class="token operator">=</span> CpuStorage <span class="token operator">|</span> NullStorage</code></pre>
-<p>sum type to be used for different strategies  pub interface Storage {  	element_size int  	data voidptr  	len int  	capacity int  	get(i int) voidptr  	set(i int, val voidptr)  	fill(val voidptr)  	clone() Storage  	slice(start int, end int) Storage  	offset(start int) Storage  }</p>
+							<div class="title"><h2>interface Storage <a href="#Storage">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">interface</span> <span class="token symbol">Storage</span> <span class="token punctuation">{</span>
+	element_size <span class="token builtin">int</span>
+	data <span class="token builtin">voidptr</span>
+	len <span class="token builtin">int</span>
+	capacity <span class="token builtin">int</span>
+	<span class="token function">get</span><span class="token punctuation">(</span>index <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">voidptr</span>
+	<span class="token function">set</span><span class="token punctuation">(</span>index <span class="token builtin">int</span><span class="token punctuation">,</span> val <span class="token builtin">voidptr</span><span class="token punctuation">)</span>
+	<span class="token function">offset</span><span class="token punctuation">(</span>start <span class="token builtin">int</span><span class="token punctuation">)</span> Storage
+	<span class="token function">fill</span><span class="token punctuation">(</span>val <span class="token builtin">voidptr</span><span class="token punctuation">)</span>
+	<span class="token function">clone</span><span class="token punctuation">(</span><span class="token punctuation">)</span> Storage
+<span class="token punctuation">}</span></code></pre>
+
 
 </section>
 						<section id="StorageStrategy" class="doc-node">
@@ -156,13 +151,8 @@
 <p>CpuStorage - this implementation will change once Generics are working correctly</p>
 
 </section>
-						<section id="NullStorage" class="doc-node">
-							<div class="title"><h2>struct NullStorage <a href="#NullStorage">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">NullStorage</span> <span class="token punctuation">{</span><span class="token punctuation">}</span></code></pre>
-
-
-</section>
 						<section id="StorageData" class="doc-node">
-							<div class="title"><h2>struct StorageData <a href="#StorageData">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L26"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">StorageData</span> <span class="token punctuation">{</span>
+							<div class="title"><h2>struct StorageData <a href="#StorageData">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/storage.v#L21"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">StorageData</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
 	len      <span class="token builtin">int</span>
 	cap      <span class="token builtin">int</span>
@@ -175,7 +165,7 @@
 </section>
 
 						<div class="footer">
-							Powered by vdoc. Generated on: 9 Jun 2021 03:32:38
+							Powered by vdoc. Generated on: 10 Jun 2021 03:36:55
 						</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#Constants">Constants</a></li>
@@ -194,22 +184,13 @@
 <li class="open"><a href="#new_storage_like_with_len">fn new_storage_like_with_len</a>        <ul>
 </ul>
 </li>
-<li class="open"><a href="#storage_clone">fn storage_clone</a>        <ul>
-</ul>
-</li>
 <li class="open"><a href="#storage_fill">fn storage_fill</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#storage_get">fn storage_get</a>        <ul>
 </ul>
 </li>
-<li class="open"><a href="#storage_offset">fn storage_offset</a>        <ul>
-</ul>
-</li>
 <li class="open"><a href="#storage_set">fn storage_set</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#storage_size">fn storage_size</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#storage_strategy">fn storage_strategy</a>        <ul>
@@ -218,16 +199,13 @@
 <li class="open"><a href="#storage_to_varray">fn storage_to_varray</a>        <ul>
 </ul>
 </li>
-<li class="open"><a href="#Storage">type Storage</a>        <ul>
+<li class="open"><a href="#Storage">interface Storage</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#StorageStrategy">enum StorageStrategy</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#CpuStorage">struct CpuStorage</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#NullStorage">struct NullStorage</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#StorageData">struct StorageData</a>        <ul>
