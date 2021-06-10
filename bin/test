@@ -20,9 +20,6 @@ source "${ROOT}/util/logs.sh" || exit
 
 set -eo pipefail
 
-rm -f vtl 
-ln -s . vtl
-
 flags=""
 
 if [[ -n "${use_cblas}" ]]; then
@@ -49,5 +46,3 @@ echo "Executing tests with command: \"v ${flags} test .\""
 v ${flags} test .
 
 find . -name '*_test' -exec rm -f {} +
-
-rm -f vtl
