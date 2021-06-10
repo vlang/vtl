@@ -14,7 +14,7 @@ jobs:
     - name: Checkout VTL
       uses: actions/checkout@v2
       with:
-        path: vtl
+        path: ~/.vmodules/vtl
     - name: Build V
       run: |
         make
@@ -25,13 +25,12 @@ jobs:
       run: |
         sudo apt-get install --quiet -y --no-install-recommends gfortran liblapacke-dev libopenblas-dev
         v install vsl
-    - name: Symlink vtl to .vmodules
-      run: ln -s $(realpath vtl) ~/.vmodules/vtl
     - name: Execute Tests using Pure V Backend with Vlib Math
-      run: ./vtl/bin/test
+      run: ~/.vmodules/vtl/bin/test
     - name: Execute Tests using Pure V Backend with Pure V Math
-      run: ./vtl/bin/test --use-vmath
+      run: ~/.vmodules/vtl/bin/test --use-vmath
     - name: Execute Tests using Open BLAS Backend
-      run: ./vtl/bin/test --use-cblas
+      run: ~/.vmodules/vtl/bin/test --use-cblas
     - name: Execute Tests using Open BLAS Backend and Pure V Math
-      run: ./vtl/bin/test --use-vmath --use-cblas
+      run: ~/.vmodules/vtl/bin/test --use-vmath --use-cblas
+
