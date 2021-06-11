@@ -261,3 +261,48 @@ pub fn (t Tensor) slice(idx ...[]int) Tensor {
 	ensure_memory(mut ret)
 	return ret
 }
+
+
+// slice_hilo returns a view of an array from a list of starting
+// indices and a list of closing indices.
+pub fn (t Tensor) slice_hilo(idx1 []int, idx2 []int) Tensor {
+	mut newshape := t.shape.clone()
+	mut newstrides := t.strides.clone()
+	idx_start := pad_with_zeros(idx1, t.rank())
+	idx_end := pad_with_max(idx2, t.shape, t.rank())
+	mut idx := []int{cap: t.rank()}
+	for ii in 0 .. t.rank() {
+		mut fi := idx_start[ii]
+		if fi < 0 {
+			fi += t.shape[ii]
+		}
+		mut li := idx_end[ii]
+		if li < 0 {
+			li += t.shape[ii]
+		}
+		if fi == li {
+			newshape[ii] = 0
+			newstrides[ii] = 0
+			idx << fi
+		} else {
+			offset := li - fi
+			newshape[ii] = offset
+			idx << fi
+		}
+	}
+	// remove 0 shaped dimensions
+	newshape_, newstrides_ := filter_shape_not_strides(newshape, newstrides)
+	mut offset := 0
+	for i in 0 .. t.rank() {
+		offset += t.strides[i] * idx[i]
+	}
+	mut ret := Tensor{
+		shape: newshape_.clone()
+		strides: newstrides_.clone()
+		size: size_from_shape(newshape_)
+		data: t.data.offset(offset)
+		memory: .colmajor
+	}
+	ensure_memory(mut ret)
+	return ret
+}
