@@ -23,13 +23,13 @@ jobs:
       run: |
         sudo apt-get install --quiet -y --no-install-recommends gfortran liblapacke-dev libopenblas-dev
         v install vsl
-    - name: Symlink vtl to .vmodules
-      run: ln -s $(realpath vtl) ~/.vmodules/vtl
+    - name: Move VTL source code to V Modules
+      run: mv ./vtl ~/.vmodules
     - name: Execute Tests using Pure V Backend with Vlib Math
-      run: cd vtl; ./bin/test
+      run: ~/.vmodules/vtl/bin/test
     - name: Execute Tests using Pure V Backend with Pure V Math
-      run: cd vtl; ./bin/test --use-vmath
+      run: ~/.vmodules/vtl/bin/test --use-vmath
     - name: Execute Tests using Open BLAS Backend
-      run: cd vtl; ./bin/test --use-cblas
+      run: ~/.vmodules/vtl/bin/test --use-cblas
     - name: Execute Tests using Open BLAS Backend and Pure V Math
-      run: cd vtl; ./bin/test --use-vmath --use-cblas
+      run: ~/.vmodules/vtl/bin/test --use-vmath --use-cblas
