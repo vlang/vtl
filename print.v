@@ -9,7 +9,7 @@ const (
 fn leading_trailing(t Tensor, edgeitems int, lo []int, hi []int) Tensor {
 	axis := lo.len
 	if axis == t.rank() {
-		return t.slice(lo, hi)
+		return t.slice_hilo(lo, hi)
 	}
 	if t.shape[axis] > 2 * edgeitems {
 		mut flo := lo.clone()

@@ -163,8 +163,7 @@ pub fn (t Tensor) slice(idx ...[]int) Tensor {
 	mut newshape := t.shape.clone()
 	mut newstrides := t.strides.clone()
 	mut indexer := []int{}
-	for i in 0 .. idx.len {
-		dex := idx[i]
+	for i, dex in idx {
 		mut fi := 0
 		mut li := 0
 		// dimension is entirely included in output
@@ -226,12 +225,11 @@ pub fn (t Tensor) slice(idx ...[]int) Tensor {
 	for i in 0 .. indexer.len {
 		offset += t.strides[i] * indexer[i]
 	}
-	storage := t.data.offset(offset)
 	mut ret := Tensor{
-		shape: newshape_
-		strides: newstrides_
+		shape: newshape_.clone()
+		strides: newstrides_.clone()
 		size: size_from_shape(newshape_)
-		data: storage
+		data: t.data.offset(offset)
 		memory: .colmajor
 	}
 	ensure_memory(mut ret)
