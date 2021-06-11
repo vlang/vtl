@@ -27,6 +27,21 @@ pub fn (t Tensor) map(f MapFn) Tensor {
 	return ret
 }
 
+// map_as maps a function to a given Tensor retuning a new Tensor with same shape
+pub fn (t Tensor) map_as<T>(f MapFn) Tensor {
+	mut ret := new_tensor_like_with_etype(t, T.name)
+	mut iter := t.iterator()
+	mut pos := iter.pos
+	for _ in 0 .. ret.size() {
+		if val := iter.next() {
+			next_val := f(val, pos)
+			storage.storage_set(ret.data, pos, next_val)
+			pos = iter.pos
+		}
+	}
+	return ret
+}
+
 // apply applies a function to each element of a given Tensor
 pub fn (t Tensor) apply(f ApplyFn) {
 	mut iter := t.iterator()
@@ -40,9 +55,20 @@ pub fn (t Tensor) apply(f ApplyFn) {
 	}
 }
 
-// map maps a function to a given list of Tensor retuning a new Tensor with same shape
+// nmap maps a function to a given list of Tensor retuning a new Tensor with same shape
 pub fn (t Tensor) nmap(f NMapFn, ts ...Tensor) Tensor {
 	mut ret := new_tensor_like(t)
+	mut iters := t.iterators(...ts)
+	for i in 0 .. t.size {
+		val := f(iters.next(), i)
+		storage.storage_set(ret.data, i, val)
+	}
+	return ret
+}
+
+// nmap_as maps a function to a given list of Tensor retuning a new Tensor with same shape
+pub fn (t Tensor) nmap<T>(f NMapFn, ts ...Tensor) Tensor {
+	mut ret := new_tensor_like_with_etype(t, T.name)
 	mut iters := t.iterators(...ts)
 	for i in 0 .. t.size {
 		val := f(iters.next(), i)
