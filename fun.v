@@ -67,7 +67,7 @@ pub fn (t Tensor) nmap(f NMapFn, ts ...Tensor) Tensor {
 }
 
 // nmap_as maps a function to a given list of Tensor retuning a new Tensor with same shape
-pub fn (t Tensor) nmap<T>(f NMapFn, ts ...Tensor) Tensor {
+pub fn (t Tensor) nmap_as<T>(f NMapFn, ts ...Tensor) Tensor {
 	mut ret := new_tensor_like_with_etype(t, T.name)
 	mut iters := t.iterators(...ts)
 	for i in 0 .. t.size {

@@ -190,10 +190,10 @@ pub fn new_tensor_like(t Tensor) Tensor {
 // new_tensor_like_with_etype returns a new tensor created with similar storage properties
 // as the Tensor `t` with a given element type
 pub fn new_tensor_like_with_etype(t Tensor, etype string) Tensor {
-	storage := storage := storage.new_storage(
+	storage := storage.new_storage(
 		strategy: storage.storage_strategy(t.data),
 		etype: etype,
-		cap: t.data.cap,
+		cap: t.data.capacity,
 		len: t.data.len,
 	)
 	return Tensor{
