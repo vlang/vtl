@@ -13,44 +13,46 @@ pub fn vstack(ts []Tensor) Tensor {
 pub fn hstack(ts []Tensor) Tensor {
 	if ts[0].rank() == 1 {
 		return concatenate(ts, axis: 0)
-	}
+	}  
 	return concatenate(ts, axis: 1)
 }
 
 // Stack arrays in sequence depth wise (along third axis)
 pub fn dstack(ts []Tensor) Tensor {
-	first := ts[0]
-	assert_shape(first.shape, ts)
-	if first.rank() > 2 {
+	first_tensor := ts[0]
+	assert_shape(first_tensor.shape, ts)
+	if first_tensor.rank() > 2 {
 		panic('dstack was given arrays with more than two dimensions')
 	}
-	if first.rank() == 1 {
-		arrs := ts.map(it.reshape([1, it.size, 1]))
-		return concatenate(arrs, axis: 2)
+	if first_tensor.rank() == 1 {
+		next_ts := ts.map(it.reshape([1, it.size, 1]))
+		return concatenate(next_ts, axis: 2)
 	} else {
-		mut arrs := []Tensor{}
+		mut next_ts := []Tensor{cap: ts.len}
 		for t in ts {
 			mut newshape := t.shape.clone()
 			newshape << 1
-			arrs << t.reshape(newshape)
+			next_ts << t.reshape(newshape)
 		}
-		return concatenate(arrs, axis: 2)
+		return concatenate(next_ts, axis: 2)
 	}
 }
 
 // Stack 1-D arrays as columns into a 2-D array.
 pub fn column_stack(ts []Tensor) Tensor {
-	first := ts[0]
-	assert_shape(first.shape, ts)
-	if first.rank() > 2 {
+	first_tensor := ts[0]
+	assert_shape(first_tensor.shape, ts)
+
+	if first_tensor.rank() > 2 {
 		panic('column_stack was given arrays with more than two dimensions')
 	}
-	if first.rank() == 1 {
-		arrs := ts.map(it.reshape([it.size, 1]))
-		return concatenate(arrs, axis: 1)
-	} else {
-		return concatenate(ts, axis: 1)
+
+	if first_tensor.rank() == 1 {
+		next_ts := ts.map(it.reshape([it.size, 1]))
+		return concatenate(next_ts, axis: 1)
 	}
+
+	return concatenate(ts, axis: 1)
 }
 
 // Join a sequence of arrays along a new axis.
