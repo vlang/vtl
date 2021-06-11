@@ -40,6 +40,7 @@ fn (t Tensor) strided_iterator() TensorIterator {
 		coord: unsafe { &int(&coord[0]) }
 		backstrides: tensor_backstrides(t)
 		next_handler: handle_strided_iteration
+		pos: t.strided_offset()
 	)
 }
 
@@ -72,14 +73,18 @@ fn handle_strided_iteration(mut s TensorIterator) etype.Num {
 	strides := s.tensor.strides
 
 	unsafe {
-		for i := rank - 1; i >= 0; i-- {
-			if s.coord[i] < shape[i] - 1 {
-				s.coord[i]++
-				s.pos += strides[i]
+		for k := rank - 1; k >= 0; k-- {
+			if s.coord[k] < shape[k] - 1 {
+				s.coord[k]++
+				s.pos += strides[k]
 				break
 			} else {
-				s.coord[i] = 0
-				s.pos -= s.backstrides[i]
+				if k == 0 {
+					// this will make the iterator finish
+					s.iteration = s.tensor.size
+				}
+				s.coord[k] = 0
+				s.pos -= s.backstrides[k]
 			}
 		}
 	}

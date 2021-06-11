@@ -43,6 +43,7 @@ pub fn new_storage_like_with_len(s Storage, len int) Storage {
 	return create_storage(len, 0, s.element_size, voidptr(0), storage_strategy(s))
 }
 
+[inline]
 pub fn create_storage(len int, cap int, element_size int, init voidptr, strategy StorageStrategy) Storage {
 	if strategy == .cpu {
 		return new_cpu_with_default(len, cap, element_size, init)
@@ -50,6 +51,7 @@ pub fn create_storage(len int, cap int, element_size int, init voidptr, strategy
 	return new_cpu_with_default(len, cap, element_size, init)
 }
 
+[inline]
 pub fn create_storage_from_c_array(len int, cap int, element_size int, c_array voidptr, strategy StorageStrategy) Storage {
 	if strategy == .cpu {
 		return new_cpu_from_c_array(len, cap, element_size, c_array)
@@ -57,6 +59,7 @@ pub fn create_storage_from_c_array(len int, cap int, element_size int, c_array v
 	return new_cpu_from_c_array(len, cap, element_size, c_array)
 }
 
+[inline]
 pub fn storage_to_varray<T>(s Storage) []T {
 	match s {
 		CpuStorage {
@@ -73,6 +76,7 @@ pub fn storage_to_varray<T>(s Storage) []T {
 	}
 }
 
+[inline]
 pub fn storage_strategy(s Storage) StorageStrategy {
 	match s {
 		CpuStorage { return .cpu }
@@ -80,14 +84,19 @@ pub fn storage_strategy(s Storage) StorageStrategy {
 	}
 }
 
+[inline]
 pub fn storage_get(s Storage, idx int, element_type string) etype.Num {
-	return etype.ptr_to_val_of_type(s.get(idx), element_type)
+	corrected_idx := if idx < 0 { s.len + idx } else { idx }
+	return etype.ptr_to_val_of_type(s.get(corrected_idx), element_type)
 }
 
+[inline]
 pub fn storage_fill(s Storage, val etype.Num) {
 	s.fill(val.ptr())
 }
 
+[inline]
 pub fn storage_set(s Storage, idx int, val etype.Num) {
-	s.set(idx, val.ptr())
+	corrected_idx := if idx < 0 { s.len + idx } else { idx }
+	s.set(corrected_idx, val.ptr())
 }

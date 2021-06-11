@@ -84,7 +84,7 @@ fn size_from_shape(shape []int) int {
 // applied if needed
 fn shape_with_autosize(shape []int, size int) ([]int, int) {
 	mut newshape := shape.clone()
-	mut newsize := size
+	mut newsize := 1
 	mut autosize := -1
 	for i, val in newshape {
 		if val < 0 {
@@ -97,6 +97,7 @@ fn shape_with_autosize(shape []int, size int) ([]int, int) {
 		}
 	}
 	if autosize >= 0 {
+		newshape = newshape.clone()
 		newshape[autosize] = size / newsize
 		newsize *= newshape[autosize]
 	}

@@ -40,17 +40,15 @@ fn test_slice_implicit() {
 	assert slice.equal(expected)
 }
 
-// fn test_negative_slice() {
-// 	a := from_varray([1., 2, 3], [3])
-// 	slice := a.slice([0, 3, -1])
-// 	expected := from_varray([3., 2, 1], [3])
-// 	assert slice.equal(expected)
-// }
+fn test_negative_slice() {
+	a := from_varray([1., 2, 3], [3])
+	slice := a.slice([0, 3, -1])
+	expected := from_varray([3., 2, 1], [3])
+	assert slice.equal(expected)
+}
 
 fn test_slice_hilo() {
     t := from_varray([1., 2, 3, 4], [2, 2])
     slice := t.slice_hilo([0], [2])
-	println(t)
-	println(slice)
     assert t.equal(slice)
 }
