@@ -373,16 +373,6 @@ pub fn log_gamma(t Tensor) Tensor {
 	})
 }
 
-// log_gamma returns the elementwise log_gamma of an tensor
-[inline]
-pub fn log_gamma(t Tensor) Tensor {
-	return t.map(fn (x etype.Num, _ int) etype.Num {
-		val := etype.num_as_type<f64>(x)
-		ret := math.log_gamma(val)
-		return etype.Num(ret)
-	})
-}
-
 // log_n returns the log_n elementwise of two tensors
 [inline]
 pub fn log_n(a Tensor, b Tensor) Tensor {

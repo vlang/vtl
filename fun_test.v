@@ -47,10 +47,10 @@ fn test_transpose() {
 // 	assert slice.equal(expected)
 // }
 
-fn test_slice_hilo() {
-    t := from_varray([1., 2, 3, 4], [2, 2])
-    slice := t.slice_hilo([0], [2])
-	println(t)
-	println(slice)
-    assert t.equal(slice)
-}
+// fn test_slice_hilo() {
+//     t := from_varray([1., 2, 3, 4], [2, 2])
+//     slice := t.slice_hilo([0], [2])
+// 	println(t)
+// 	println(slice)
+//     assert t.equal(slice)
+// }
