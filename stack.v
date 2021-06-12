@@ -13,7 +13,7 @@ pub fn vstack(ts []Tensor) Tensor {
 pub fn hstack(ts []Tensor) Tensor {
 	if ts[0].rank() == 1 {
 		return concatenate(ts, axis: 0)
-	}  
+	}
 	return concatenate(ts, axis: 1)
 }
 
