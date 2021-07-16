@@ -71,14 +71,14 @@ fn broadcast_strides(dshape []int, sshape []int, dstrides []int, sstrides []int)
 
 // broadcast_to broadcasts a Tensor to a compatible shape with no
 // data copy
-pub fn (t Tensor) broadcast_to(shape []int) Tensor {
+pub fn (t &Tensor) broadcast_to(shape []int) &Tensor {
 	if t.shape == shape {
 		return t
 	}
 	size := size_from_shape(shape)
 	strides := strides_from_shape(shape, .rowmajor)
 	result_strides := broadcast_strides(shape, t.shape, strides, t.strides)
-	return Tensor{
+	return &Tensor{
 		data: t.data
 		shape: shape
 		size: size
@@ -120,14 +120,14 @@ fn broadcast_shapes(args ...[]int) []int {
 
 // broadcast2 broadcasts two Tensors against each other
 [inline]
-fn broadcast2(a Tensor, b Tensor) (Tensor, Tensor) {
+fn broadcast2(a &Tensor, b &Tensor) (&Tensor, &Tensor) {
 	shape := broadcast_shapes(a.shape, b.shape)
 	return a.broadcast_to(shape), b.broadcast_to(shape)
 }
 
 // broadcast3 broadcasts three Tensors against each other
 [inline]
-fn broadcast3(a Tensor, b Tensor, c Tensor) (Tensor, Tensor, Tensor) {
+fn broadcast3(a Tensor, b Tensor, c Tensor) (&Tensor, &Tensor, &Tensor) {
 	shape := broadcast_shapes(a.shape, b.shape, c.shape)
 	return a.broadcast_to(shape), b.broadcast_to(shape), c.broadcast_to(shape)
 }
