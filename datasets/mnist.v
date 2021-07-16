@@ -4,7 +4,7 @@ import encoding.csv
 import vtl
 
 pub const (
-	mnist_test_url = 'https://pjreddie.com/media/files/mnist_test.csv'
+	mnist_test_url  = 'https://pjreddie.com/media/files/mnist_test.csv'
 	mnist_train_url = 'https://pjreddie.com/media/files/mnist_train.csv'
 )
 
@@ -12,14 +12,14 @@ pub const (
 pub struct MnistDataset {
 pub:
 	train_features &vtl.Tensor
-	train_labels &vtl.Tensor
-	test_features &vtl.Tensor
-	test_labels &vtl.Tensor
+	train_labels   &vtl.Tensor
+	test_features  &vtl.Tensor
+	test_labels    &vtl.Tensor
 }
 
 pub fn load_mnist() ?&MnistDataset {
-	train_features, train_labels := load_mnist_from_url(mnist_train_url) ?
-	test_features, test_labels := load_mnist_from_url(mnist_test_url) ?
+	train_features, train_labels := load_mnist_from_url(datasets.mnist_train_url) ?
+	test_features, test_labels := load_mnist_from_url(datasets.mnist_test_url) ?
 
 	return &MnistDataset{
 		train_features: train_features

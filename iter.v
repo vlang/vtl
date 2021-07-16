@@ -17,8 +17,8 @@ mut:
 	coord       &int
 	backstrides &int
 pub mut:
-	iteration   int
-	pos         int
+	iteration int
+	pos       int
 }
 
 // iterator creates an iterator through a Tensor

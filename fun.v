@@ -262,7 +262,6 @@ pub fn (t &Tensor) slice(idx ...[]int) &Tensor {
 	return ret
 }
 
-
 // slice_hilo returns a view of an array from a list of starting
 // indices and a list of closing indices.
 pub fn (t &Tensor) slice_hilo(idx1 []int, idx2 []int) &Tensor {

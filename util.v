@@ -51,7 +51,7 @@ fn clip_axis(axis int, size int) int {
 		panic('axis out of range')
 	}
 	return next_axis
-} 
+}
 
 // strides_from_shape returns the strides from a shape and memory format
 fn strides_from_shape(shape []int, memory MemoryFormat) []int {
