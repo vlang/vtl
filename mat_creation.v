@@ -3,7 +3,7 @@ module vtl
 // Construct a diagonal array.
 // Input must be one dimensional and will be placed along
 // the resulting diagonal
-pub fn diag(t Tensor) Tensor {
+pub fn diag(t &Tensor) &Tensor {
 	if t.rank() != 1 {
 		panic('Input array must be 1D. Use diag_flat for higher dimensional arrays')
 	}
@@ -15,7 +15,7 @@ pub fn diag(t Tensor) Tensor {
 // Construct a diagonal array.
 // The flattened input is placed along the diagonal
 // of the resulting matrix
-pub fn diag_flat(t Tensor) Tensor {
+pub fn diag_flat(t &Tensor) &Tensor {
 	mut ret := zeros([t.size, t.size]).diagonal()
 	ret.assign(t.ravel())
 	return ret
@@ -23,7 +23,7 @@ pub fn diag_flat(t Tensor) Tensor {
 
 // Lower triangle of an array.
 // Returns a copy of an array with elements above the diagonal zeroed
-pub fn tril(t Tensor) Tensor {
+pub fn tril(t &Tensor) &Tensor {
 	mut ret := t.copy(.rowmajor)
 	tril_inplace_offset(mut ret, 0)
 	return ret
@@ -31,7 +31,7 @@ pub fn tril(t Tensor) Tensor {
 
 // Lower triangle of an array.
 // Returns a copy of an array with elements above the kth diagonal zeroed
-pub fn tril_offset(t Tensor, offset int) Tensor {
+pub fn tril_offset(t Tensor, offset int) &Tensor {
 	mut ret := t.copy(.rowmajor)
 	tril_inplace_offset(mut ret, offset)
 	return ret
@@ -51,7 +51,7 @@ pub fn tril_inpl_offset(mut t Tensor, offset int) {
 
 // Upper triangle of an array.
 // Returns a copy of an array with elements below the diagonal zeroed
-pub fn triu(t Tensor) Tensor {
+pub fn triu(t &Tensor) &Tensor {
 	mut ret := t.copy(.rowmajor)
 	triu_inplace_offset(mut ret, 0)
 	return ret
@@ -59,7 +59,7 @@ pub fn triu(t Tensor) Tensor {
 
 // Upper triangle of an array.
 // Returns a copy of an array with elements below the kth diagonal zeroed
-pub fn triu_offset(t Tensor, offset int) Tensor {
+pub fn triu_offset(t Tensor, offset int) &Tensor {
 	mut ret := t.copy(.rowmajor)
 	triu_inplace_offset(mut ret, offset)
 	return ret

@@ -7,6 +7,7 @@ pub const (
 )
 
 // CpuStorage - this implementation will change once Generics are working correctly
+[heap]
 pub struct CpuStorage {
 pub:
 	element_size int
