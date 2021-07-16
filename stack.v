@@ -76,7 +76,8 @@ pub fn concatenate(ts []&Tensor, data AxisData) &Tensor {
 	for t in ts {
 		if t.shape[axis] != 0 {
 			hi[axis] += t.shape[axis]
-			ret.slice_hilo(lo, hi).assign(t)
+			mut slice := ret.slice_hilo(lo, hi)
+			slice.assign(t)
 			lo[axis] = hi[axis]
 		}
 	}
