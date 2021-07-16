@@ -6,7 +6,7 @@ const (
 
 // for arrays that are too large, calculate only the leading and trailing
 // items along each axis
-fn leading_trailing(t Tensor, edgeitems int, lo []int, hi []int) Tensor {
+fn leading_trailing(t Tensor, edgeitems int, lo []int, hi []int) &Tensor {
 	axis := lo.len
 	if axis == t.rank() {
 		return t.slice_hilo(lo, hi)
@@ -163,7 +163,7 @@ pub fn tensor_str(t Tensor, separator string, prefix string) string {
 }
 
 // finds the max string length of a Tensor
-fn max_str_len(t Tensor) int {
+fn max_str_len(t &Tensor) int {
 	mut mx := 0
 	mut iter := t.iterator()
 	for val in iter {

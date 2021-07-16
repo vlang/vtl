@@ -48,7 +48,7 @@ fn test_negative_slice() {
 }
 
 fn test_slice_hilo() {
-    t := from_varray([1., 2, 3, 4], [2, 2])
-    slice := t.slice_hilo([0], [2])
-    assert t.equal(slice)
+	t := from_varray([1., 2, 3, 4], [2, 2])
+	slice := t.slice_hilo([0], [2])
+	assert t.equal(slice)
 }

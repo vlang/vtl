@@ -5,7 +5,7 @@ import vtl.etype
 
 // abs returns the elementwise abs of an tensor
 [inline]
-pub fn abs(t Tensor) Tensor {
+pub fn abs(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.abs(val)
@@ -15,7 +15,7 @@ pub fn abs(t Tensor) Tensor {
 
 // acos returns the elementwise acos of an tensor
 [inline]
-pub fn acos(t Tensor) Tensor {
+pub fn acos(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.acos(val)
@@ -25,7 +25,7 @@ pub fn acos(t Tensor) Tensor {
 
 // acosh returns the elementwise acosh of an tensor
 [inline]
-pub fn acosh(t Tensor) Tensor {
+pub fn acosh(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.acosh(val)
@@ -35,7 +35,7 @@ pub fn acosh(t Tensor) Tensor {
 
 // asin returns the elementwise asin of an tensor
 [inline]
-pub fn asin(t Tensor) Tensor {
+pub fn asin(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.asin(val)
@@ -45,7 +45,7 @@ pub fn asin(t Tensor) Tensor {
 
 // asinh returns the elementwise asinh of an tensor
 [inline]
-pub fn asinh(t Tensor) Tensor {
+pub fn asinh(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.asinh(val)
@@ -55,7 +55,7 @@ pub fn asinh(t Tensor) Tensor {
 
 // atan returns the elementwise atan of an tensor
 [inline]
-pub fn atan(t Tensor) Tensor {
+pub fn atan(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.atan(val)
@@ -65,7 +65,7 @@ pub fn atan(t Tensor) Tensor {
 
 // atan2 returns the atan2 elementwise of two tensors
 [inline]
-pub fn atan2(a Tensor, b Tensor) Tensor {
+pub fn atan2(a Tensor, b Tensor) &Tensor {
 	f := fn (xs []etype.Num, _ int) etype.Num {
 		x := etype.num_as_type<f64>(xs[0])
 		y := etype.num_as_type<f64>(xs[1])
@@ -77,7 +77,7 @@ pub fn atan2(a Tensor, b Tensor) Tensor {
 
 // atanh returns the elementwise atanh of an tensor
 [inline]
-pub fn atanh(t Tensor) Tensor {
+pub fn atanh(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.atanh(val)
@@ -87,7 +87,7 @@ pub fn atanh(t Tensor) Tensor {
 
 // cbrt returns the elementwise cbrt of an tensor
 [inline]
-pub fn cbrt(t Tensor) Tensor {
+pub fn cbrt(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.cbrt(val)
@@ -97,7 +97,7 @@ pub fn cbrt(t Tensor) Tensor {
 
 // ceil returns the elementwise ceil of an tensor
 [inline]
-pub fn ceil(t Tensor) Tensor {
+pub fn ceil(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.ceil(val)
@@ -107,7 +107,7 @@ pub fn ceil(t Tensor) Tensor {
 
 // cos returns the elementwise cos of an tensor
 [inline]
-pub fn cos(t Tensor) Tensor {
+pub fn cos(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.cos(val)
@@ -117,7 +117,7 @@ pub fn cos(t Tensor) Tensor {
 
 // cosh returns the elementwise cosh of an tensor
 [inline]
-pub fn cosh(t Tensor) Tensor {
+pub fn cosh(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.cosh(val)
@@ -127,7 +127,7 @@ pub fn cosh(t Tensor) Tensor {
 
 // cot returns the elementwise cot of an tensor
 [inline]
-pub fn cot(t Tensor) Tensor {
+pub fn cot(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.cot(val)
@@ -137,7 +137,7 @@ pub fn cot(t Tensor) Tensor {
 
 // degrees returns the elementwise degrees of an tensor
 [inline]
-pub fn degrees(t Tensor) Tensor {
+pub fn degrees(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.degrees(val)
@@ -147,7 +147,7 @@ pub fn degrees(t Tensor) Tensor {
 
 // erf returns the elementwise erf of an tensor
 [inline]
-pub fn erf(t Tensor) Tensor {
+pub fn erf(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.erf(val)
@@ -157,7 +157,7 @@ pub fn erf(t Tensor) Tensor {
 
 // erfc returns the elementwise erfc of an tensor
 [inline]
-pub fn erfc(t Tensor) Tensor {
+pub fn erfc(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.erfc(val)
@@ -167,7 +167,7 @@ pub fn erfc(t Tensor) Tensor {
 
 // exp returns the elementwise exp of an tensor
 [inline]
-pub fn exp(t Tensor) Tensor {
+pub fn exp(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.exp(val)
@@ -177,7 +177,7 @@ pub fn exp(t Tensor) Tensor {
 
 // exp2 returns the elementwise exp2 of an tensor
 [inline]
-pub fn exp2(t Tensor) Tensor {
+pub fn exp2(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.exp2(val)
@@ -187,7 +187,7 @@ pub fn exp2(t Tensor) Tensor {
 
 // expm1 returns the elementwise expm1 of an tensor
 [inline]
-pub fn expm1(t Tensor) Tensor {
+pub fn expm1(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.expm1(val)
@@ -197,7 +197,7 @@ pub fn expm1(t Tensor) Tensor {
 
 // f32_bits returns the elementwise f32_bits of an tensor
 [inline]
-pub fn f32_bits(t Tensor) Tensor {
+pub fn f32_bits(t &Tensor) &Tensor {
 	return t.map_as<u32>(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f32>(x)
 		ret := math.f32_bits(val)
@@ -207,7 +207,7 @@ pub fn f32_bits(t Tensor) Tensor {
 
 // f32_from_bits returns the elementwise f32_from_bits of an tensor
 [inline]
-pub fn f32_from_bits(t Tensor) Tensor {
+pub fn f32_from_bits(t &Tensor) &Tensor {
 	return t.map_as<f32>(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<u32>(x)
 		ret := math.f32_from_bits(val)
@@ -217,7 +217,7 @@ pub fn f32_from_bits(t Tensor) Tensor {
 
 // f64_bits returns the elementwise f64_bits of an tensor
 [inline]
-pub fn f64_bits(t Tensor) Tensor {
+pub fn f64_bits(t &Tensor) &Tensor {
 	return t.map_as<u64>(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.f64_bits(val)
@@ -227,7 +227,7 @@ pub fn f64_bits(t Tensor) Tensor {
 
 // f64_from_bits returns the elementwise f64_from_bits of an tensor
 [inline]
-pub fn f64_from_bits(t Tensor) Tensor {
+pub fn f64_from_bits(t &Tensor) &Tensor {
 	return t.map_as<f64>(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<u64>(x)
 		ret := math.f64_from_bits(val)
@@ -237,7 +237,7 @@ pub fn f64_from_bits(t Tensor) Tensor {
 
 // factorial returns the elementwise factorial of an tensor
 [inline]
-pub fn factorial(t Tensor) Tensor {
+pub fn factorial(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.factorial(val)
@@ -247,7 +247,7 @@ pub fn factorial(t Tensor) Tensor {
 
 // floor returns the elementwise floor of an tensor
 [inline]
-pub fn floor(t Tensor) Tensor {
+pub fn floor(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.floor(val)
@@ -257,7 +257,7 @@ pub fn floor(t Tensor) Tensor {
 
 // fmod returns the fmod elementwise of two tensors
 [inline]
-pub fn fmod(a Tensor, b Tensor) Tensor {
+pub fn fmod(a Tensor, b Tensor) &Tensor {
 	f := fn (xs []etype.Num, _ int) etype.Num {
 		x := etype.num_as_type<f64>(xs[0])
 		y := etype.num_as_type<f64>(xs[1])
@@ -269,7 +269,7 @@ pub fn fmod(a Tensor, b Tensor) Tensor {
 
 // gamma returns the elementwise gamma of an tensor
 [inline]
-pub fn gamma(t Tensor) Tensor {
+pub fn gamma(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.gamma(val)
@@ -279,7 +279,7 @@ pub fn gamma(t Tensor) Tensor {
 
 // gcd returns the gcd elementwise of two tensors
 [inline]
-pub fn gcd(a Tensor, b Tensor) Tensor {
+pub fn gcd(a Tensor, b Tensor) &Tensor {
 	f := fn (xs []etype.Num, _ int) etype.Num {
 		x := etype.num_as_type<i64>(xs[0])
 		y := etype.num_as_type<i64>(xs[1])
@@ -291,7 +291,7 @@ pub fn gcd(a Tensor, b Tensor) Tensor {
 
 // hypot returns the hypot elementwise of two tensors
 [inline]
-pub fn hypot(a Tensor, b Tensor) Tensor {
+pub fn hypot(a Tensor, b Tensor) &Tensor {
 	f := fn (xs []etype.Num, _ int) etype.Num {
 		x := etype.num_as_type<f64>(xs[0])
 		y := etype.num_as_type<f64>(xs[1])
@@ -303,7 +303,7 @@ pub fn hypot(a Tensor, b Tensor) Tensor {
 
 // lcm returns the lcm elementwise of two tensors
 [inline]
-pub fn lcm(a Tensor, b Tensor) Tensor {
+pub fn lcm(a Tensor, b Tensor) &Tensor {
 	f := fn (xs []etype.Num, _ int) etype.Num {
 		x := etype.num_as_type<i64>(xs[0])
 		y := etype.num_as_type<i64>(xs[1])
@@ -315,7 +315,7 @@ pub fn lcm(a Tensor, b Tensor) Tensor {
 
 // log returns the elementwise log of an tensor
 [inline]
-pub fn log(t Tensor) Tensor {
+pub fn log(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.log(val)
@@ -325,7 +325,7 @@ pub fn log(t Tensor) Tensor {
 
 // log10 returns the elementwise log10 of an tensor
 [inline]
-pub fn log10(t Tensor) Tensor {
+pub fn log10(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.log10(val)
@@ -335,7 +335,7 @@ pub fn log10(t Tensor) Tensor {
 
 // log1p returns the elementwise log1p of an tensor
 [inline]
-pub fn log1p(t Tensor) Tensor {
+pub fn log1p(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.log1p(val)
@@ -345,7 +345,7 @@ pub fn log1p(t Tensor) Tensor {
 
 // log2 returns the elementwise log2 of an tensor
 [inline]
-pub fn log2(t Tensor) Tensor {
+pub fn log2(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.log2(val)
@@ -355,7 +355,7 @@ pub fn log2(t Tensor) Tensor {
 
 // log_factorial returns the elementwise log_factorial of an tensor
 [inline]
-pub fn log_factorial(t Tensor) Tensor {
+pub fn log_factorial(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.log_factorial(val)
@@ -365,7 +365,7 @@ pub fn log_factorial(t Tensor) Tensor {
 
 // log_gamma returns the elementwise log_gamma of an tensor
 [inline]
-pub fn log_gamma(t Tensor) Tensor {
+pub fn log_gamma(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.log_gamma(val)
@@ -375,7 +375,7 @@ pub fn log_gamma(t Tensor) Tensor {
 
 // log_n returns the log_n elementwise of two tensors
 [inline]
-pub fn log_n(a Tensor, b Tensor) Tensor {
+pub fn log_n(a Tensor, b Tensor) &Tensor {
 	f := fn (xs []etype.Num, _ int) etype.Num {
 		x := etype.num_as_type<f64>(xs[0])
 		y := etype.num_as_type<f64>(xs[1])
@@ -387,7 +387,7 @@ pub fn log_n(a Tensor, b Tensor) Tensor {
 
 // max returns the max elementwise of two tensors
 [inline]
-pub fn max(a Tensor, b Tensor) Tensor {
+pub fn max(a Tensor, b Tensor) &Tensor {
 	f := fn (xs []etype.Num, _ int) etype.Num {
 		x := etype.num_as_type<f64>(xs[0])
 		y := etype.num_as_type<f64>(xs[1])
@@ -399,7 +399,7 @@ pub fn max(a Tensor, b Tensor) Tensor {
 
 // min returns the min elementwise of two tensors
 [inline]
-pub fn min(a Tensor, b Tensor) Tensor {
+pub fn min(a Tensor, b Tensor) &Tensor {
 	f := fn (xs []etype.Num, _ int) etype.Num {
 		x := etype.num_as_type<f64>(xs[0])
 		y := etype.num_as_type<f64>(xs[1])
@@ -411,7 +411,7 @@ pub fn min(a Tensor, b Tensor) Tensor {
 
 // nextafter returns the nextafter elementwise of two tensors
 [inline]
-pub fn nextafter(a Tensor, b Tensor) Tensor {
+pub fn nextafter(a Tensor, b Tensor) &Tensor {
 	f := fn (xs []etype.Num, _ int) etype.Num {
 		x := etype.num_as_type<f64>(xs[0])
 		y := etype.num_as_type<f64>(xs[1])
@@ -423,7 +423,7 @@ pub fn nextafter(a Tensor, b Tensor) Tensor {
 
 // nextafter32 returns the nextafter32 elementwise of two tensors
 [inline]
-pub fn nextafter32(a Tensor, b Tensor) Tensor {
+pub fn nextafter32(a Tensor, b Tensor) &Tensor {
 	f := fn (xs []etype.Num, _ int) etype.Num {
 		x := etype.num_as_type<f32>(xs[0])
 		y := etype.num_as_type<f32>(xs[1])
@@ -435,7 +435,7 @@ pub fn nextafter32(a Tensor, b Tensor) Tensor {
 
 // pow returns the pow elementwise of two tensors
 [inline]
-pub fn pow(a Tensor, b Tensor) Tensor {
+pub fn pow(a Tensor, b Tensor) &Tensor {
 	f := fn (xs []etype.Num, _ int) etype.Num {
 		x := etype.num_as_type<f64>(xs[0])
 		y := etype.num_as_type<f64>(xs[1])
@@ -447,7 +447,7 @@ pub fn pow(a Tensor, b Tensor) Tensor {
 
 // pow10 returns the elementwise pow10 of an tensor
 [inline]
-pub fn pow10(t Tensor) Tensor {
+pub fn pow10(t &Tensor) &Tensor {
 	return t.map_as<f64>(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<int>(x)
 		ret := math.pow10(val)
@@ -457,7 +457,7 @@ pub fn pow10(t Tensor) Tensor {
 
 // radians returns the elementwise deg2rad of an tensor
 [inline]
-pub fn radians(t Tensor) Tensor {
+pub fn radians(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.radians(val)
@@ -467,7 +467,7 @@ pub fn radians(t Tensor) Tensor {
 
 // round rounds elements of an tensor elementwise
 [inline]
-pub fn round(t Tensor) Tensor {
+pub fn round(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.round(val)
@@ -477,7 +477,7 @@ pub fn round(t Tensor) Tensor {
 
 // round_to_even round_to_evens elements of an tensor elementwise
 [inline]
-pub fn round_to_even(t Tensor) Tensor {
+pub fn round_to_even(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.round_to_even(val)
@@ -487,7 +487,7 @@ pub fn round_to_even(t Tensor) Tensor {
 
 // sin returns the elementwise sin of an tensor
 [inline]
-pub fn sin(t Tensor) Tensor {
+pub fn sin(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.sin(val)
@@ -497,7 +497,7 @@ pub fn sin(t Tensor) Tensor {
 
 // sinh returns the elementwise sinh of an tensor
 [inline]
-pub fn sinh(t Tensor) Tensor {
+pub fn sinh(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.sinh(val)
@@ -507,7 +507,7 @@ pub fn sinh(t Tensor) Tensor {
 
 // sqrt returns the elementwise square root of an tensor
 [inline]
-pub fn sqrt(t Tensor) Tensor {
+pub fn sqrt(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.sqrt(val)
@@ -517,7 +517,7 @@ pub fn sqrt(t Tensor) Tensor {
 
 // tan returns the elementwise tan of an tensor
 [inline]
-pub fn tan(t Tensor) Tensor {
+pub fn tan(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.tan(val)
@@ -527,7 +527,7 @@ pub fn tan(t Tensor) Tensor {
 
 // tanh returns the elementwise tanh of an tensor
 [inline]
-pub fn tanh(t Tensor) Tensor {
+pub fn tanh(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.tanh(val)
@@ -537,7 +537,7 @@ pub fn tanh(t Tensor) Tensor {
 
 // trunc returns the elementwise trunc of an tensor
 [inline]
-pub fn trunc(t Tensor) Tensor {
+pub fn trunc(t &Tensor) &Tensor {
 	return t.map(fn (x etype.Num, _ int) etype.Num {
 		val := etype.num_as_type<f64>(x)
 		ret := math.trunc(val)

@@ -25,13 +25,13 @@ pub mut:
 
 // str returns the string representation of a Tensor
 [inline]
-pub fn (t Tensor) str() string {
+pub fn (t &Tensor) str() string {
 	return tensor_str(t, ', ', '')
 }
 
 // tensor_to_varray<T> returns the flatten representation of a tensor in a v array storing
 // elements of type T
-pub fn tensor_to_varray<T>(t Tensor) []T {
+pub fn tensor_to_varray<T>(t &Tensor) []T {
 	mut arr := []T{cap: t.size}
 	mut iter := t.iterator()
 	for val in iter {
@@ -41,7 +41,7 @@ pub fn tensor_to_varray<T>(t Tensor) []T {
 }
 
 // tensor_as_type<T> returns a new Tensor with a cast to a given type
-pub fn tensor_as_type<T>(t Tensor) Tensor {
+pub fn tensor_as_type<T>(t &Tensor) &Tensor {
 	arr := tensor_to_varray<T>(t)
 	return new_tensor_from_varray<T>(arr, shape: t.shape, memory: t.memory)
 }

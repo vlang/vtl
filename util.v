@@ -12,7 +12,7 @@ fn assert_rank(t Tensor, n int) {
 
 // assert_shape_off_axis ensures that the shapes of Tensors match
 // for concatenation, except along the axis being joined
-fn assert_shape_off_axis(ts []Tensor, axis int, shape []int) []int {
+fn assert_shape_off_axis(ts []&Tensor, axis int, shape []int) []int {
 	mut retshape := shape.clone()
 	for t in ts {
 		if t.shape.len != retshape.len {
@@ -33,7 +33,7 @@ fn assert_shape_off_axis(ts []Tensor, axis int, shape []int) []int {
 // assert_shape ensures that the shapes of Tensors match
 // for each tensor given list of tensors
 [inline]
-fn assert_shape(shape []int, ts []Tensor) {
+fn assert_shape(shape []int, ts []&Tensor) {
 	for t in ts {
 		if shape != t.shape {
 			panic('All shapes must be equal')
@@ -51,7 +51,7 @@ fn clip_axis(axis int, size int) int {
 		panic('axis out of range')
 	}
 	return next_axis
-} 
+}
 
 // strides_from_shape returns the strides from a shape and memory format
 fn strides_from_shape(shape []int, memory MemoryFormat) []int {

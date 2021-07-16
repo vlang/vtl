@@ -21,7 +21,7 @@ pub fn (mut t Tensor) fill(val etype.Num) {
 pub fn (mut t Tensor) assign(other Tensor) {
 	mut iters := t.iterators(other)
 	mut pos := iters[0].pos
-	for i in 0 .. t.size {
+	for _ in 0 .. t.size {
 		vals := iters.next()
 		storage.storage_set(t.data, pos, vals[1])
 		pos = iters[0].pos
