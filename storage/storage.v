@@ -18,7 +18,6 @@ pub interface Storage {
 	clone() Storage
 }
 
-[heap]
 pub struct StorageData {
 pub:
 	len      int
