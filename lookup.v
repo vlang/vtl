@@ -6,7 +6,7 @@ import vsl.vmath as math
 // get returns a scalar value from a Tensor at the provided index
 [inline]
 pub fn (t &Tensor<T>) get<T>(index []int) T {
-	offset := t.offset(index)
+	offset := t.offset_index(index)
 	return storage.storage_get<T>(t.data, offset)
 }
 

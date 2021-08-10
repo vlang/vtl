@@ -4,47 +4,54 @@ import vtl.storage
 
 // IteratorHandler defines a function to use in order to mutate
 // iteration position
-pub type IteratorHandler = fn (mut s TensorIterator) etype.Num
+pub enum IteratorHandler {
+	handle_flatten_iteration
+	handle_strided_iteration
+}
 
 // TensorIterator is a struct to hold a Tensors
 // iteration state while iterating through a Tensor
 [heap]
-pub struct TensorIterator {
-	tensor       Tensor
+pub struct TensorIterator<T> {
+pub:
+	tensor       &Tensor<T>
 	next_handler IteratorHandler
-mut:
+pub mut:
 	coord       &int
 	backstrides &int
-pub mut:
-	iteration int
-	pos       int
+	iteration   int
+	pos         int
 }
 
 // iterator creates an iterator through a Tensor
-pub fn (t &Tensor<T>) iterator() &TensorIterator {
+pub fn (t &Tensor<T>) iterator<T>() &TensorIterator<T> {
 	if t.is_rowmajor_contiguous() {
 		return t.rowmajor_contiguous_iterator()
 	}
 	return t.strided_iterator()
 }
 
-fn (t &Tensor<T>) rowmajor_contiguous_iterator() &TensorIterator {
+fn (t &Tensor<T>) rowmajor_contiguous_iterator<T>() &TensorIterator<T> {
 	coord := 0
 	bs := 0
-	return t.custom_iterator(coord: &coord, backstrides: &bs, next_handler: handle_flatten_iteration)
-}
-
-fn (t &Tensor<T>) strided_iterator() &TensorIterator {
-	coord := []int{len: t.rank()}
-	return t.custom_iterator(
-		coord: unsafe { &int(&coord[0]) }
-		backstrides: tensor_backstrides(t)
-		next_handler: handle_strided_iteration
-		pos: t.strided_offset()
+	return t.custom_iterator<T>(
+		coord: &coord
+		backstrides: &bs
+		next_handler: .handle_flatten_iteration
 	)
 }
 
-pub struct IteratorBuildData {
+fn (t &Tensor<T>) strided_iterator<T>() &TensorIterator<T> {
+	coord := []int{len: t.rank()}
+	return t.custom_iterator<T>(
+		coord: unsafe { &int(&coord[0]) }
+		backstrides: tensor_backstrides<T>(t)
+		next_handler: .handle_strided_iteration
+		pos: t.strided_offset_index()
+	)
+}
+
+pub struct IteratorBuildData<T> {
 	next_handler IteratorHandler
 	coord        &int
 	backstrides  &int
@@ -52,8 +59,8 @@ pub struct IteratorBuildData {
 }
 
 // iterator creates an iterator through a Tensor with custom data
-pub fn (t &Tensor<T>) custom_iterator(data IteratorBuildData) &TensorIterator {
-	return &TensorIterator{
+pub fn (t &Tensor<T>) custom_iterator<T>(data IteratorBuildData<T>) &TensorIterator<T> {
+	return &TensorIterator<T>{
 		coord: data.coord
 		backstrides: data.backstrides
 		tensor: t
@@ -65,9 +72,9 @@ pub fn (t &Tensor<T>) custom_iterator(data IteratorBuildData) &TensorIterator {
 // handle_strided_iteration advances through a non-rowmajor-contiguous
 // Tensor in Row-Major order
 [unsafe]
-fn handle_strided_iteration<T>(mut s TensorIterator) T {
+fn handle_strided_iteration<T>(mut s TensorIterator<T>) T {
 	// get current value after update new position
-	val := storage.storage_get(s.tensor.data, s.pos, s.tensor.etype)
+	val := storage.storage_get<T>(s.tensor.data, s.pos)
 	rank := s.tensor.rank()
 	shape := s.tensor.shape
 	strides := s.tensor.strides
@@ -94,26 +101,33 @@ fn handle_strided_iteration<T>(mut s TensorIterator) T {
 // handle_flatten_iteration advances through a rowmajor-contiguous Tensor
 // in Row-Major order
 [inline]
-fn handle_flatten_iteration(mut s TensorIterator) etype.Num {
+pub fn handle_flatten_iteration<T>(mut s TensorIterator<T>) T {
 	// get current value after update new position
-	val := storage.storage_get(s.tensor.data, s.pos, s.tensor.etype)
-	s.pos++
+	val := storage.storage_get<T>(s.tensor.data, s.pos)
+	defer {
+		s.pos++
+	}
 	return val
 }
 
 // next calls the iteration type for a given iterator
 // which is either flat or strided and returns a Num containing the current value
 [inline]
-pub fn (mut s TensorIterator) next() ?etype.Num {
+pub fn (mut s TensorIterator<T>) next<T>() ?T {
 	if s.iteration >= s.tensor.size {
 		return none
 	}
-	s.iteration++
-	val := s.next_handler(mut s)
-	return val
+	defer {
+		s.iteration++
+	}
+	return if s.next_handler == .handle_flatten_iteration {
+		handle_flatten_iteration<T>(mut s)
+	} else {
+		unsafe { handle_strided_iteration<T>(mut s) }
+	}
 }
 
-fn tensor_backstrides(t &Tensor<T>) &int {
+fn tensor_backstrides<T>(t &Tensor<T>) &int {
 	rank := t.rank()
 	shape := t.shape
 	strides := t.strides
@@ -126,8 +140,8 @@ fn tensor_backstrides(t &Tensor<T>) &int {
 
 // Iterate with n tensors
 // iterators creates an array of iterators through a list of tensors
-pub fn (t &Tensor<T>) iterators(ts ...Tensor) []&TensorIterator {
-	mut iters := []&TensorIterator{cap: ts.len + 1}
+pub fn (t &Tensor<T>) iterators<T>(ts ...&&Tensor<T>) []&TensorIterator<T> {
+	mut iters := []&TensorIterator<T>{cap: ts.len + 1}
 	iters << t.iterator()
 	for i in 0 .. ts.len {
 		tib := ts[i].broadcast_to(t.shape)
@@ -138,11 +152,11 @@ pub fn (t &Tensor<T>) iterators(ts ...Tensor) []&TensorIterator {
 
 // Iterate with n tensors
 // iterators creates an array of iterators through a list of tensors
-pub fn (ts []&Tensor<T>) iterators() []&TensorIterator {
+pub fn (ts []&Tensor<T>) iterators<T>() []&TensorIterator<T> {
 	if ts.len == 0 {
-		return []&TensorIterator{}
+		return []&TensorIterator<T>{}
 	}
-	mut iters := []&TensorIterator{cap: ts.len}
+	mut iters := []&TensorIterator<T>{cap: ts.len}
 	for i in 0 .. ts.len {
 		tib := ts[i].broadcast_to(ts[0].shape)
 		iters << tib.iterator()
@@ -153,8 +167,8 @@ pub fn (ts []&Tensor<T>) iterators() []&TensorIterator {
 // next calls the iteration type for a given list of iterators
 // which is either flat or strided and returns a list of Nums containing the current values
 [inline]
-pub fn (mut its []&TensorIterator) next() []etype.Num {
-	mut nums := []etype.Num{cap: its.len}
+pub fn (mut its []&TensorIterator<T>) next<T>() []T {
+	mut nums := []T{cap: its.len}
 	for mut iter in its {
 		if val := iter.next() {
 			nums << val
