@@ -1,102 +1,81 @@
 module storage
 
-import vtl.etype
+// StorageData is a sum type that lists the possible types to be used to define storage
+pub type StorageDataType = byte | f32 | f64 | i16 | i64 | i8 | int | u16 | u32 | u64
+
+pub interface Storage {}
 
 pub enum StorageStrategy {
 	cpu
 }
 
-pub interface Storage {
-	element_size int
-	data voidptr
-	len int
-	capacity int
-	get(index int) voidptr
-	set(index int, val voidptr)
-	offset(start int) Storage
-	fill(val voidptr)
-	clone() Storage
-}
-
-pub struct StorageData {
-pub:
-	len      int
-	cap      int
-	init     etype.Num       = etype.default_init
-	etype    string          = etype.default_type
-	strategy StorageStrategy = .cpu
-}
-
-[inline]
-pub fn new_storage(data StorageData) Storage {
-	element_size := etype.str_esize(data.etype)
-	return create_storage(data.len, data.cap, element_size, data.init.ptr(), data.strategy)
-}
-
-[inline]
-pub fn new_storage_like(s Storage) Storage {
-	return create_storage(s.len, s.capacity, s.element_size, voidptr(0), storage_strategy(s))
-}
-
-[inline]
-pub fn new_storage_like_with_len(s Storage, len int) Storage {
-	return create_storage(len, 0, s.element_size, voidptr(0), storage_strategy(s))
-}
-
-[inline]
-pub fn create_storage(len int, cap int, element_size int, init voidptr, strategy StorageStrategy) Storage {
+pub fn new_storage<T>(len int, cap int, init T, strategy StorageStrategy) Storage {
 	if strategy == .cpu {
-		return new_cpu_with_default(len, cap, element_size, init)
+		return new_cpu<T>(len, cap, init)
 	}
-	return new_cpu_with_default(len, cap, element_size, init)
+	return new_cpu<T>(len, cap, init)
 }
 
-[inline]
-pub fn create_storage_from_c_array(len int, cap int, element_size int, c_array voidptr, strategy StorageStrategy) Storage {
+pub fn from_array<T>(arr []T, strategy StorageStrategy) Storage {
 	if strategy == .cpu {
-		return new_cpu_from_c_array(len, cap, element_size, c_array)
+		return cpu_from_array<T>(arr)
 	}
-	return new_cpu_from_c_array(len, cap, element_size, c_array)
+	return cpu_from_array<T>(arr)
 }
 
-[inline]
-pub fn storage_to_varray<T>(s Storage) []T {
+pub fn storage_clone<T>(s Storage) Storage {
 	match s {
-		CpuStorage {
-			if s.element_size == int(sizeof(T)) {
-				mut arr := []T{}
-				arr.push_many(s.data, s.len)
-				return arr
-			}
-			panic('CpuStorage.to_varray: incoming type T does not match with the stored data type')
+		CpuStorage<T> {
+			return s.clone()
 		}
 		else {
-			panic('storage not allowed')
+			panic('unsupported storage type')
 		}
 	}
 }
 
-[inline]
-pub fn storage_strategy(s Storage) StorageStrategy {
+pub fn storage_like<T>(s Storage) Storage {
 	match s {
-		CpuStorage { return .cpu }
-		else { panic('storage not allowed') }
+		CpuStorage<T> {
+			return s.like()
+		}
+		else {
+			panic('unsupported storage type')
+		}
 	}
 }
 
-[inline]
-pub fn storage_get(s Storage, idx int, element_type string) etype.Num {
-	corrected_idx := if idx < 0 { s.len + idx } else { idx }
-	return etype.ptr_to_val_of_type(s.get(corrected_idx), element_type)
+pub fn storage_get<T>(s Storage, index int) T {
+	match s {
+		CpuStorage<T> {
+			return s.get(index)
+		}
+		else {
+			panic('unsupported storage type')
+		}
+	}
 }
 
-[inline]
-pub fn storage_fill(s Storage, val etype.Num) {
-	s.fill(val.ptr())
+pub fn storage_fill<T>(s Storage, val T) {
+	match mut s {
+		CpuStorage<T> {
+			for i in 0 .. s.len {
+				s.data[i] = val
+			}
+		}
+		else {
+			panic('unsupported storage type')
+		}
+	}
 }
 
-[inline]
-pub fn storage_set(s Storage, idx int, val etype.Num) {
-	corrected_idx := if idx < 0 { s.len + idx } else { idx }
-	s.set(corrected_idx, val.ptr())
+pub fn storage_set<T>(s Storage, index int, val T) {
+	match mut s {
+		CpuStorage<T> {
+			s.data[index] = val
+		}
+		else {
+			panic('unsupported storage type')
+		}
+	}
 }

@@ -4,7 +4,7 @@ import arrays
 
 // assert_rank ensures that a Tensor has a given rank
 [inline]
-fn assert_rank(t Tensor, n int) {
+fn assert_rank<T>(t Tensor<T>, n int) {
 	if n != t.rank() {
 		panic('Bad number of dimensions')
 	}
@@ -12,7 +12,7 @@ fn assert_rank(t Tensor, n int) {
 
 // assert_shape_off_axis ensures that the shapes of Tensors match
 // for concatenation, except along the axis being joined
-fn assert_shape_off_axis(ts []&Tensor, axis int, shape []int) []int {
+fn assert_shape_off_axis<T>(ts []&Tensor<T>, axis int, shape []int) []int {
 	mut retshape := shape.clone()
 	for t in ts {
 		if t.shape.len != retshape.len {
@@ -33,7 +33,7 @@ fn assert_shape_off_axis(ts []&Tensor, axis int, shape []int) []int {
 // assert_shape ensures that the shapes of Tensors match
 // for each tensor given list of tensors
 [inline]
-fn assert_shape(shape []int, ts []&Tensor) {
+fn assert_shape<T>(shape []int, ts []&Tensor<T>) {
 	for t in ts {
 		if shape != t.shape {
 			panic('All shapes must be equal')
@@ -144,7 +144,7 @@ fn pad_with_max(pad []int, shape []int, ndims int) []int {
 
 // ensure_memory sets a correct memory layout to a given tensor
 [inline]
-fn ensure_memory(mut t Tensor) {
+fn ensure_memory<T>(mut t Tensor<T>) {
 	if t.is_colmajor() {
 		if !t.is_colmajor_contiguous() {
 			t.memory = .rowmajor
