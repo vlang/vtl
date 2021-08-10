@@ -114,10 +114,10 @@ pub fn (t &Tensor<T>) is_contiguous() bool {
 // elements of type T
 pub fn (t &Tensor<T>) to_array() []T {
 	mut arr := []T{cap: t.size}
-	// mut iter := t.iterator()
-	// for val in iter {
-	// 	arr << val
-	// }
+	mut iter := t.iterator()
+	for _ in 0 .. t.size {
+		arr << iter.next() ?
+	}
 	return arr
 }
 
