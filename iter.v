@@ -167,12 +167,11 @@ pub fn (ts []&Tensor<T>) iterators<T>() []&TensorIterator<T> {
 // next calls the iteration type for a given list of iterators
 // which is either flat or strided and returns a list of Nums containing the current values
 [inline]
-pub fn (mut its []&TensorIterator<T>) next<T>() []T {
+pub fn (mut its []&TensorIterator<T>) next<T>() ?[]T {
 	mut nums := []T{cap: its.len}
 	for mut iter in its {
-		if val := iter.next() {
-			nums << val
-		}
+		val := iter.next() ?
+		nums << val
 	}
 	return nums
 }
