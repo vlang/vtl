@@ -18,4 +18,15 @@ fn main() {
 	for _ in 0 .. expected.size {
 		println(iter.next() ?)
 	}
+	println('')
+	println('')
+	println('')
+	println('')
+	println('')
+
+	res := vtl.eye<f64>(2, 4, 0)
+	expected2 := vtl.from_array<f64>([1.0, 0., 0., 0., 0., 1., 0., 0.], [2, 4])
+	println(res)
+	println(expected2)
+	println(res.equal(expected2))
 }

@@ -74,7 +74,9 @@ pub fn (t &Tensor<T>) custom_iterator<T>(data IteratorBuildData<T>) &TensorItera
 [unsafe]
 fn handle_strided_iteration<T>(mut s TensorIterator<T>) T {
 	// get current value after update new position
+	println('PEPE $s.pos')
 	val := storage.storage_get<T>(s.tensor.data, s.pos)
+	println('PERRO $val')
 	rank := s.tensor.rank()
 	shape := s.tensor.shape
 	strides := s.tensor.strides
@@ -138,9 +140,8 @@ fn tensor_backstrides<T>(t &Tensor<T>) &int {
 	return &int(backstrides.data)
 }
 
-// Iterate with n tensors
 // iterators creates an array of iterators through a list of tensors
-pub fn (t &Tensor<T>) iterators<T>(ts ...Tensor<T>) []&TensorIterator<T> {
+pub fn (t &Tensor<T>) iterators<T>(ts []&Tensor<T>) []&TensorIterator<T> {
 	mut iters := []&TensorIterator<T>{cap: ts.len + 1}
 	iters << t.iterator()
 	for i in 0 .. ts.len {
@@ -150,7 +151,6 @@ pub fn (t &Tensor<T>) iterators<T>(ts ...Tensor<T>) []&TensorIterator<T> {
 	return iters
 }
 
-// Iterate with n tensors
 // iterators creates an array of iterators through a list of tensors
 pub fn (ts []&Tensor<T>) iterators<T>() []&TensorIterator<T> {
 	if ts.len == 0 {
@@ -168,6 +168,18 @@ pub fn (ts []&Tensor<T>) iterators<T>() []&TensorIterator<T> {
 // which is either flat or strided and returns a list of Nums containing the current values
 [inline]
 pub fn (mut its []&TensorIterator<T>) next<T>() ?[]T {
+	mut nums := []T{cap: its.len}
+	for mut iter in its {
+		val := iter.next() ?
+		nums << val
+	}
+	return nums
+}
+
+// next calls the iteration type for a given list of iterators
+// which is either flat or strided and returns a list of Nums containing the current values
+[inline]
+pub fn iterators_next<T>(mut its []&TensorIterator<T>) ?[]T {
 	mut nums := []T{cap: its.len}
 	for mut iter in its {
 		val := iter.next() ?

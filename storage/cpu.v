@@ -29,18 +29,18 @@ fn cpu_from_array<T>(arr []T) &CpuStorage<T> {
 
 // Private function. Used to implement CpuStorage operator
 [inline]
-fn (cpu &CpuStorage<T>) get(i int) T {
+fn (cpu &CpuStorage<T>) get<T>(i int) T {
 	return cpu.data[i]
 }
 
 // Private function. Used to implement assigment to the CpuStorage element
 [inline]
-fn (mut cpu CpuStorage<T>) set(i int, val T) {
+fn (mut cpu CpuStorage<T>) set<T>(i int, val T) {
 	cpu.data[i] = val
 }
 
 // fill fills an entire storage with a given value
-fn (mut cpu CpuStorage<T>) fill(val T) {
+fn (mut cpu CpuStorage<T>) fill<T>(val T) {
 	for i in 0 .. cpu.data.len {
 		cpu.data[i] = val
 	}
