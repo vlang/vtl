@@ -13,12 +13,11 @@ pub fn (t &Tensor<T>) map<T, U>(f MapFn<T, U>) &Tensor<U> {
 	mut ret := new_tensor_like<T>(t).as_type<U>()
 	mut iter := t.iterator()
 	mut pos := iter.pos
-	for _ in 0 .. ret.size() {
-		if val := iter.next() {
-			next_val := f(val, pos)
-			storage.storage_set<U>(ret.data, pos, next_val)
-			pos = iter.pos
-		}
+	for {
+		val := iter.next() or { break }
+		next_val := f(val, pos)
+		storage.storage_set<U>(ret.data, pos, next_val)
+		pos = iter.pos
 	}
 	return ret
 }
@@ -27,11 +26,12 @@ pub fn (t &Tensor<T>) map<T, U>(f MapFn<T, U>) &Tensor<U> {
 pub fn (t &Tensor<T>) nmap<T, U>(f NMapFn<T, U>, ts ...Tensor<T>) &Tensor<U> {
 	mut ret := new_tensor_like<T>(t).as_type<U>()
 	mut iters := t.iterators(ts)
-	for i in 0 .. ret.size() {
-		if vals := iterators_next<T>(mut iters) {
-			val := f(vals, i)
-			storage.storage_set<U>(ret.data, i, val)
-		}
+	mut i := 0
+	for {
+		vals := iterators_next<T>(mut iters) or { break }
+		val := f(vals, i)
+		storage.storage_set<U>(ret.data, i, val)
+		i++
 	}
 	return ret
 }
@@ -39,11 +39,12 @@ pub fn (t &Tensor<T>) nmap<T, U>(f NMapFn<T, U>, ts ...Tensor<T>) &Tensor<U> {
 // napply applies a function to each element of a given Tensor
 pub fn (t &Tensor<T>) napply<T>(f NApplyFn<T>, ts ...Tensor<T>) {
 	mut iters := t.iterators(ts)
-	for i in 0 .. t.size() {
-		if vals := iterators_next<T>(mut iters) {
-			val := f(vals, i)
-			storage.storage_set<T>(t.data, i, val)
-		}
+	mut i := 0
+	for {
+		vals := iterators_next<T>(mut iters) or { break }
+		val := f(vals, i)
+		storage.storage_set<T>(t.data, i, val)
+		i++
 	}
 }
 
@@ -53,11 +54,10 @@ pub fn (t &Tensor<T>) equal<T>(other &Tensor<T>) bool {
 		return false
 	}
 	mut iters := t.iterators([other])
-	for _ in 0 .. t.size() {
-		if vals := iterators_next<T>(mut iters) {
-			if vals[0] != vals[1] {
-				return false
-			}
+	for {
+		vals := iterators_next<T>(mut iters) or { break }
+		if vals[0] != vals[1] {
+			return false
 		}
 	}
 	return true
