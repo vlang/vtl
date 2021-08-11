@@ -140,7 +140,7 @@ fn tensor_backstrides<T>(t &Tensor<T>) &int {
 
 // Iterate with n tensors
 // iterators creates an array of iterators through a list of tensors
-pub fn (t &Tensor<T>) iterators<T>(ts ...&&Tensor<T>) []&TensorIterator<T> {
+pub fn (t &Tensor<T>) iterators<T>(ts ...Tensor<T>) []&TensorIterator<T> {
 	mut iters := []&TensorIterator<T>{cap: ts.len + 1}
 	iters << t.iterator()
 	for i in 0 .. ts.len {
