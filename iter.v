@@ -1,6 +1,6 @@
 module vtl
 
-import vtl.storage
+import storage
 
 // IteratorHandler defines a function to use in order to mutate
 // iteration position
