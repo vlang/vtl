@@ -59,7 +59,9 @@ pub fn storage_get<T>(s Storage, index int) T {
 pub fn storage_fill<T>(s Storage, val T) {
 	match mut s {
 		CpuStorage<T> {
-			s.fill(val)
+			for i in 0 .. s.len {
+				s.data[i] = val
+			}
 		}
 		else {
 			panic('unsupported storage type')
@@ -70,7 +72,7 @@ pub fn storage_fill<T>(s Storage, val T) {
 pub fn storage_set<T>(s Storage, index int, val T) {
 	match mut s {
 		CpuStorage<T> {
-			s.set(index, val)
+			s.data[index] = val
 		}
 		else {
 			panic('unsupported storage type')
