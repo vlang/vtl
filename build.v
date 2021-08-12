@@ -59,7 +59,7 @@ pub fn from_array<T>(arr []T, shape []int, data TensorBuildData) &Tensor<T> {
 }
 
 // new_tensor allocates a Tensor onto specified device with a given data
-pub fn new_tensor<T>(init T, data TensorBuildDataWithShape) &Tensor<T> {
+fn new_tensor<T>(init T, data TensorBuildDataWithShape) &Tensor<T> {
 	if data.shape.len == 0 {
 		data_storage := storage.new_storage<T>(1, 0, init, data.storage)
 		return &Tensor<T>{
@@ -84,8 +84,8 @@ pub fn new_tensor<T>(init T, data TensorBuildDataWithShape) &Tensor<T> {
 
 // new_tensor_like returns a new tensor created with similar storage properties
 // as the Tensor t
-pub fn new_tensor_like<T>(t &Tensor<T>) &Tensor<T> {
-	storage := storage.new_storage_like<T>(t.data)
+fn new_tensor_like<T>(t &Tensor<T>) &Tensor<T> {
+	storage := storage.storage_like<T>(t.data)
 	return &Tensor{
 		shape: t.shape.clone()
 		strides: t.strides.clone()
@@ -94,3 +94,19 @@ pub fn new_tensor_like<T>(t &Tensor<T>) &Tensor<T> {
 		data: storage
 	}
 }
+
+// new_tensor_like_with_shape returns a new tensor created with similar storage properties
+// as the Tensor `t` with a given shape
+fn new_tensor_like_with_shape<T>(t &Tensor<T>, shape []int) &Tensor<T> {
+	strides := strides_from_shape(shape, t.memory)
+	size := size_from_shape(shape)
+	storage := storage.storage_like_with_len<T>(t.data, size)
+	return &Tensor{
+		shape: shape.clone()
+		strides: strides
+		memory: t.memory
+		size: size
+		data: storage
+	}
+}
+

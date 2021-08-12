@@ -62,6 +62,15 @@ fn (cpu &CpuStorage<T>) like() &CpuStorage<T> {
 	}
 }
 
+// like_with_len returns an independent copy of a given CpuStorage
+[inline]
+fn (cpu &CpuStorage<T>) like_with_len(len int) &CpuStorage<T> {
+	mut capacity := if cpu.data.cap < len { len } else { cpu.data.cap }
+	return &CpuStorage<T>{
+		data: []T{len: len, cap: capacity}
+	}
+}
+
 fn (cpu &CpuStorage<T>) offset(start int) &CpuStorage<T> {
 	return &CpuStorage<T>{
 		data: cpu.data[start..cpu.data.len]

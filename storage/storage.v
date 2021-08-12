@@ -45,6 +45,17 @@ pub fn storage_like<T>(s Storage) Storage {
 	}
 }
 
+pub fn storage_like_with_len<T>(s Storage, len int) Storage {
+	match s {
+		CpuStorage<T> {
+			return s.like_with_len(len)
+		}
+		else {
+			panic('unsupported storage type')
+		}
+	}
+}
+
 pub fn storage_get<T>(s Storage, index int) T {
 	match s {
 		CpuStorage<T> {
@@ -60,6 +71,17 @@ pub fn storage_fill<T>(s Storage, val T) {
 	match mut s {
 		CpuStorage<T> {
 			s.fill(val)
+		}
+		else {
+			panic('unsupported storage type')
+		}
+	}
+}
+
+pub fn storage_offset<T>(s Storage, start int) Storage {
+	match s {
+		CpuStorage<T> {
+			return s.offset(start)
 		}
 		else {
 			panic('unsupported storage type')
