@@ -29,4 +29,9 @@ fn main() {
 	println(res)
 	println(expected2)
 	println(res.equal(expected2))
+
+	a_ := vtl.from_array([0., 1, 2, 3, 4, 5, 6, 7, 8], [3, 3])
+	slice := a_.slice([0])
+	expected3 := vtl.from_array([0., 1, 2], [3])
+	println(slice.equal(expected3))
 }
