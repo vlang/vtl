@@ -48,7 +48,7 @@ fn (mut cpu CpuStorage<T>) fill<T>(val T) {
 
 // clone returns an independent copy of a given CpuStorage
 [inline]
-fn (cpu &CpuStorage<T>) clone() &CpuStorage<T> {
+fn (cpu &CpuStorage<T>) clone<T>() &CpuStorage<T> {
 	return &CpuStorage<T>{
 		data: cpu.data.clone()
 	}
@@ -56,7 +56,7 @@ fn (cpu &CpuStorage<T>) clone() &CpuStorage<T> {
 
 // like returns an independent copy of a given CpuStorage
 [inline]
-fn (cpu &CpuStorage<T>) like() &CpuStorage<T> {
+fn (cpu &CpuStorage<T>) like<T>() &CpuStorage<T> {
 	return &CpuStorage<T>{
 		data: []T{len: cpu.data.len, cap: cpu.data.cap}
 	}
@@ -64,21 +64,21 @@ fn (cpu &CpuStorage<T>) like() &CpuStorage<T> {
 
 // like_with_len returns an independent copy of a given CpuStorage
 [inline]
-fn (cpu &CpuStorage<T>) like_with_len(len int) &CpuStorage<T> {
+fn (cpu &CpuStorage<T>) like_with_len<T>(len int) &CpuStorage<T> {
 	mut capacity := if cpu.data.cap < len { len } else { cpu.data.cap }
 	return &CpuStorage<T>{
 		data: []T{len: len, cap: capacity}
 	}
 }
 
-fn (cpu &CpuStorage<T>) offset(start int) &CpuStorage<T> {
+fn (cpu &CpuStorage<T>) offset<T>(start int) &CpuStorage<T> {
 	return &CpuStorage<T>{
 		data: cpu.data[start..cpu.data.len]
 	}
 }
 
 [inline]
-fn (cpu &CpuStorage<T>) to_array() []T {
+fn (cpu &CpuStorage<T>) to_array<T>() []T {
 	return cpu.data.clone()
 }
 

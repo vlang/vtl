@@ -3,17 +3,17 @@ module vtl
 import math
 import storage
 
-pub type MapFn<T, U> = fn (x T, i int) U
+pub type MapFn = fn (x T, i int) U
 
-pub type ApplyFn<T> = fn (x T, i int) T
+pub type ApplyFn = fn (x T, i int) T
 
-pub type NMapFn<T, U> = fn (x []T, i int) U
+pub type NMapFn = fn (x []T, i int) U
 
-pub type NApplyFn<T> = fn (x []T, i int)
+pub type NApplyFn = fn (x []T, i int)
 
 // map maps a function to a given Tensor retuning a new Tensor with same shape
 pub fn (t &Tensor<T>) map<T, U>(f MapFn<T, U>) &Tensor<U> {
-	mut ret := new_tensor_like<T>(t).as_type<U>()
+	mut ret := new_tensor_like<T>(t).as_type<T, U>()
 	mut iter := t.iterator()
 	mut pos := iter.pos
 	for {
@@ -27,7 +27,7 @@ pub fn (t &Tensor<T>) map<T, U>(f MapFn<T, U>) &Tensor<U> {
 
 // map maps a function to a given list of Tensor retuning a new Tensor with same shape
 pub fn (t &Tensor<T>) nmap<T, U>(f NMapFn<T, U>, ts ...Tensor<T>) &Tensor<U> {
-	mut ret := new_tensor_like<T>(t).as_type<U>()
+	mut ret := new_tensor_like<T>(t).as_type<T, U>()
 	mut iters := t.iterators(ts)
 	mut i := 0
 	for {

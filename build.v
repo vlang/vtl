@@ -86,7 +86,7 @@ fn new_tensor<T>(init T, data TensorBuildDataWithShape) &Tensor<T> {
 // as the Tensor t
 fn new_tensor_like<T>(t &Tensor<T>) &Tensor<T> {
 	storage := storage.storage_like<T>(t.data)
-	return &Tensor{
+	return &Tensor<T>{
 		shape: t.shape.clone()
 		strides: t.strides.clone()
 		memory: t.memory
@@ -101,7 +101,7 @@ fn new_tensor_like_with_shape<T>(t &Tensor<T>, shape []int) &Tensor<T> {
 	strides := strides_from_shape(shape, t.memory)
 	size := size_from_shape(shape)
 	storage := storage.storage_like_with_len<T>(t.data, size)
-	return &Tensor{
+	return &Tensor<T>{
 		shape: shape.clone()
 		strides: strides
 		memory: t.memory
@@ -109,4 +109,3 @@ fn new_tensor_like_with_shape<T>(t &Tensor<T>, shape []int) &Tensor<T> {
 		data: storage
 	}
 }
-

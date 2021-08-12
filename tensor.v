@@ -115,8 +115,9 @@ pub fn (t &Tensor<T>) is_contiguous() bool {
 pub fn (t &Tensor<T>) to_array() []T {
 	mut arr := []T{cap: t.size}
 	mut iter := t.iterator()
-	for _ in 0 .. t.size {
-		arr << iter.next() ?
+	for {
+		val := iter.next() or { break }
+		arr << val
 	}
 	return arr
 }
@@ -150,7 +151,7 @@ pub fn (t &Tensor<T>) view() &Tensor<T> {
 }
 
 // as_type returns a new Tensor with a cast to a given type
-pub fn (t &Tensor<T>) as_type<N>() &Tensor<N> {
+pub fn (t &Tensor<T>) as_type<T, N>() &Tensor<N> {
 	arr := t.to_array()
-	return from_array<T>(arr, shape: t.shape, memory: t.memory)
+	return from_array<T>(arr, t.shape, memory: t.memory)
 }
