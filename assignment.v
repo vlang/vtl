@@ -20,7 +20,7 @@ pub fn (t Tensor<T>) fill<T>(val T) {
 pub fn (mut t Tensor<T>) assign<T>(other &Tensor<T>) {
 	mut iters := t.iterators<T>([other])
 	mut pos := iters[0].pos
-	for _ in 0 .. t.size {
+	for {
 		vals := iterators_next<T>(mut iters) or { break }
 		storage.storage_set<T>(t.data, pos, vals[1])
 		pos = iters[0].pos

@@ -46,4 +46,10 @@ fn main() {
 	println(result_.str())
 	println(expected_.str())
 	println(result_.equal(expected_))
+
+	a3 := vtl.ones<f64>([3])
+	b3 := vtl.zeros<f64>([2])
+	result3_ := vtl.concatenate<f64>([a3, b3], axis: 0)
+	expected3_ := vtl.from_1d<f64>([1., 1, 1, 0, 0])
+	println(result3_.equal(expected3_))
 }
