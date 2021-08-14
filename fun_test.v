@@ -20,7 +20,7 @@ fn test_ones_t() {
 
 fn test_transpose() {
 	t := vtl.ones<f64>([2, 3])
-	order := irange(0, t.rank())
+	order := vtl.irange(0, t.rank())
 	tt := t.transpose(order.reverse())
 	assert t.shape == [2, 3]
 	assert tt.shape == [3, 2]
