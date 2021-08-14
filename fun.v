@@ -56,7 +56,7 @@ pub fn (t &Tensor<T>) equal<T>(other &Tensor<T>) bool {
 	if t.shape != other.shape {
 		return false
 	}
-	mut iters := t.iterators<T>([other])
+	mut iters := iterators<T>([t, other])
 	for {
 		vals := iterators_next<T>(mut iters) or { break }
 		if vals[0] != vals[1] {
