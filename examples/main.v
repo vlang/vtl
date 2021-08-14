@@ -15,8 +15,9 @@ fn main() {
 	expected := vtl.from_array<f64>([1., 1., 1., 2., 2., 2., 3., 3., 3.], [3, 3])
 	println(expected)
 	mut iter := expected.iterator()
-	for _ in 0 .. expected.size {
-		println(iter.next() ?)
+	for {
+		val := iter.next() or { break }
+		println(val)
 	}
 	println('')
 	println('')
@@ -30,10 +31,19 @@ fn main() {
 	println(expected2)
 	println(res.equal(expected2))
 
-	a_ := vtl.from_array([0., 1, 2, 3, 4, 5, 6, 7, 8], [3, 3])
-	slice := a_.slice([0])
+	a1 := vtl.from_array([0., 1, 2, 3, 4, 5, 6, 7, 8], [3, 3])
+	slice := a1.slice([0])
 	expected3 := vtl.from_array([0., 1, 2], [3])
 	println(slice.equal(expected3))
 	mat := vtl.from_2d([[2., 3, 4], [1., 2, 3]])
 	println(mat.str())
+
+	// @todo: FIX THIS
+	a2 := vtl.ones<f64>([2, 2])
+	b2 := vtl.zeros<f64>([2, 2])
+	result_ := vtl.hstack<f64>([a2, b2])
+	expected_ := vtl.from_array<f64>([1., 1, 0, 0, 1, 1, 0, 0], [2, 4])
+	println(result_.str())
+	println(expected_.str())
+	println(result_.equal(expected_))
 }
