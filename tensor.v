@@ -22,7 +22,7 @@ pub mut:
 // str returns the string representation of a Tensor
 [inline]
 pub fn (t &Tensor<T>) str() string {
-	return '' // tensor_str(t, ', ', '')
+	return tensor_str<T>(t, ', ', '')
 }
 
 // rank returns the number of dimensions of a given Tensor

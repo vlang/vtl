@@ -4,7 +4,7 @@ import vtl
 
 fn main() {
 	mut t := vtl.seq<f64>(10)
-	println(t)
+	println(t.str())
 	t = vtl.from_array<f64>([1., 2, 3, 4, 5], [5])
 	println(t.copy(.colmajor))
 	println(t.view())
@@ -34,4 +34,6 @@ fn main() {
 	slice := a_.slice([0])
 	expected3 := vtl.from_array([0., 1, 2], [3])
 	println(slice.equal(expected3))
+	mat := vtl.from_2d([[2., 3, 4], [1., 2, 3]])
+	println(mat.str())
 }
