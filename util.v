@@ -158,7 +158,7 @@ pub fn ensure_memory<T>(mut t Tensor<T>) {
 }
 
 // irange returns an array between start and stop, incremented by 1
-pub fn irange(start int, stop int) []int {
+fn irange(start int, stop int) []int {
 	mut ret := []int{cap: stop - start}
 	for i in start .. stop {
 		ret << i
@@ -169,12 +169,12 @@ pub fn irange(start int, stop int) []int {
 // iarray_min returns the minimum value of a given array of int values
 // the use of arrays.min give us an optimizad version of this function
 [inline]
-pub fn iarray_min(arr []int) int {
+fn iarray_min(arr []int) int {
 	return arrays.min<int>(arr)
 }
 
 // iarray_sum returns the sum value of a given array of int values
-pub fn iarray_sum(arr []int) int {
+fn iarray_sum(arr []int) int {
 	mut ret := 0
 	for i in arr {
 		ret += i
