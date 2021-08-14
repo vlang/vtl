@@ -28,7 +28,7 @@ pub fn dstack<T>(ts []&Tensor<T>) &Tensor<T> {
 		next_ts := ts.map(it.reshape<T>([1, it.size, 1]))
 		return concatenate<T>(next_ts, axis: 2)
 	} else {
-		mut next_ts := []&Tensor{cap: ts.len}
+		mut next_ts := []&Tensor<T>{cap: ts.len}
 		for t in ts {
 			mut newshape := t.shape.clone()
 			newshape << 1
