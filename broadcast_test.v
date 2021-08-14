@@ -4,7 +4,7 @@ fn test_broadcast_column() {
 	m := from_array<f64>([1., 2., 3.], [3, 1])
 	b := m.broadcast_to([3, 3])
 	expected := from_array<f64>([1., 1., 1., 2., 2., 2., 3., 3., 3.], [3, 3])
-	// assert b.equal(expected)
+	assert b.equal(expected)
 }
 
 fn test_broadcastable_same_shape() {

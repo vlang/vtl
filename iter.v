@@ -23,20 +23,20 @@ pub mut:
 }
 
 // iterator creates an iterator through a Tensor
-pub fn (t &Tensor<T>) iterator<T>() &TensorIterator<T> {
+pub fn (t &Tensor<T>) iterator<T>() TensorIterator<T> {
 	if t.is_rowmajor_contiguous() {
 		return t.rowmajor_contiguous_iterator()
 	}
 	return t.strided_iterator()
 }
 
-fn (t &Tensor<T>) rowmajor_contiguous_iterator<T>() &TensorIterator<T> {
+fn (t &Tensor<T>) rowmajor_contiguous_iterator<T>() TensorIterator<T> {
 	return t.custom_iterator<T>(
 		next_handler: .flatten_iteration
 	)
 }
 
-fn (t &Tensor<T>) strided_iterator<T>() &TensorIterator<T> {
+fn (t &Tensor<T>) strided_iterator<T>() TensorIterator<T> {
 	coord := []int{len: t.rank()}
 	return t.custom_iterator<T>(
 		coord: coord
@@ -54,8 +54,8 @@ pub struct IteratorBuildData<T> {
 }
 
 // iterator creates an iterator through a Tensor with custom data
-pub fn (t &Tensor<T>) custom_iterator<T>(data IteratorBuildData<T>) &TensorIterator<T> {
-	return &TensorIterator<T>{
+pub fn (t &Tensor<T>) custom_iterator<T>(data IteratorBuildData<T>) TensorIterator<T> {
+	return TensorIterator<T>{
 		coord: data.coord
 		backstrides: data.backstrides
 		tensor: t
@@ -81,7 +81,7 @@ fn handle_strided_iteration<T>(mut s TensorIterator<T>) T {
 		} else {
 			if k == 0 {
 				// this will make the iterator finish
-				s.iteration = s.tensor.size
+				s.iteration = s.tensor.size()
 			}
 			s.coord[k] = 0
 			s.pos -= s.backstrides[k]
@@ -103,8 +103,15 @@ pub fn handle_flatten_iteration<T>(mut s TensorIterator<T>) T {
 
 // next calls the iteration type for a given iterator
 // which is either flat or strided and returns a Num containing the current value
+[inline]
 pub fn (mut s TensorIterator<T>) next<T>() ?T {
-	if s.iteration >= s.tensor.size {
+	return iterator_next<T>(mut s)
+}
+
+// iterator_next calls the iteration type for a given iterator
+// which is either flat or strided and returns a Num containing the current value
+pub fn iterator_next<T>(mut s TensorIterator<T>) ?T {
+	if s.iteration >= s.tensor.size() {
 		return none
 	}
 	defer {
@@ -129,46 +136,46 @@ fn tensor_backstrides<T>(t &Tensor<T>) []int {
 }
 
 // iterators creates an array of iterators through a list of tensors
-pub fn (t &Tensor<T>) iterators<T>(ts []&Tensor<T>) []&TensorIterator<T> {
-	mut iters := []&TensorIterator<T>{cap: ts.len + 1}
-	iters << t.iterator()
-	for i in 0 .. ts.len {
-		tib := ts[i].broadcast_to(t.shape)
-		iters << tib.iterator()
+pub fn (t &Tensor<T>) iterators<T>(ts []&Tensor<T>) []TensorIterator<T> {
+	mut next_ts := [t]
+	for t_ in ts {
+		next_ts << t_
 	}
-	return iters
+	return iterators<T>(next_ts)
 }
 
 // iterators creates an array of iterators through a list of tensors
-pub fn (ts []&Tensor<T>) iterators<T>() []&TensorIterator<T> {
+[inline]
+pub fn (ts []&Tensor<T>) iterators<T>() []TensorIterator<T> {
+	return iterators<T>(ts)
+}
+
+// iterators creates an array of iterators through a list of tensors
+pub fn iterators<T>(ts []&Tensor<T>) []TensorIterator<T> {
 	if ts.len == 0 {
-		return []&TensorIterator<T>{}
+		return []TensorIterator<T>{}
 	}
-	mut iters := []&TensorIterator<T>{cap: ts.len}
+	mut iters := []TensorIterator<T>{cap: ts.len}
 	for i in 0 .. ts.len {
-		tib := ts[i].broadcast_to(ts[0].shape)
-		iters << tib.iterator()
+		tib := ts[i].broadcast_to<T>(ts[0].shape)
+		iters << tib.iterator<T>()
 	}
 	return iters
 }
 
 // next calls the iteration type for a given list of iterators
 // which is either flat or strided and returns a list of Nums containing the current values
-pub fn (mut its []&TensorIterator<T>) next<T>() ?[]T {
-	mut nums := []T{cap: its.len}
-	for mut iter in its {
-		val := iter.next() ?
-		nums << val
-	}
-	return nums
+[inline]
+pub fn (mut its []TensorIterator<T>) next<T>() ?[]T {
+	return iterators_next<T>(mut its)
 }
 
-// next calls the iteration type for a given list of iterators
+// iterators_next calls the iteration type for a given list of iterators
 // which is either flat or strided and returns a list of Nums containing the current values
-pub fn iterators_next<T>(mut its []&TensorIterator<T>) ?[]T {
+pub fn iterators_next<T>(mut its []TensorIterator<T>) ?[]T {
 	mut nums := []T{cap: its.len}
 	for mut iter in its {
-		val := iter.next() ?
+		val := iterator_next<T>(mut iter) ?
 		nums << val
 	}
 	return nums

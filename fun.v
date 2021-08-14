@@ -28,7 +28,7 @@ pub fn (t &Tensor<T>) map<T, U>(f MapFn<T, U>) &Tensor<U> {
 // map maps a function to a given list of Tensor retuning a new Tensor with same shape
 pub fn (t &Tensor<T>) nmap<T, U>(f NMapFn<T, U>, ts ...Tensor<T>) &Tensor<U> {
 	mut ret := new_tensor_like<T>(t).as_type<T, U>()
-	mut iters := t.iterators(ts)
+	mut iters := t.iterators<T>(ts)
 	mut i := 0
 	for {
 		vals := iterators_next<T>(mut iters) or { break }
@@ -41,7 +41,7 @@ pub fn (t &Tensor<T>) nmap<T, U>(f NMapFn<T, U>, ts ...Tensor<T>) &Tensor<U> {
 
 // napply applies a function to each element of a given Tensor
 pub fn (t &Tensor<T>) napply<T>(f NApplyFn<T>, ts ...Tensor<T>) {
-	mut iters := t.iterators(ts)
+	mut iters := t.iterators<T>(ts)
 	mut i := 0
 	for {
 		vals := iterators_next<T>(mut iters) or { break }
@@ -56,7 +56,7 @@ pub fn (t &Tensor<T>) equal<T>(other &Tensor<T>) bool {
 	if t.shape != other.shape {
 		return false
 	}
-	mut iters := t.iterators([other])
+	mut iters := t.iterators<T>([other])
 	for {
 		vals := iterators_next<T>(mut iters) or { break }
 		if vals[0] != vals[1] {
@@ -224,7 +224,7 @@ pub fn (t &Tensor<T>) slice<T>(idx ...[]int) &Tensor<T> {
 		data: storage.storage_offset<T>(t.data, offset)
 		memory: .colmajor
 	}
-	ensure_memory(mut ret)
+	ensure_memory<T>(mut ret)
 	return ret
 }
 
@@ -268,6 +268,6 @@ pub fn (t &Tensor<T>) slice_hilo<T>(idx1 []int, idx2 []int) &Tensor<T> {
 		data: storage.storage_offset<T>(t.data, offset)
 		memory: .colmajor
 	}
-	ensure_memory(mut ret)
+	ensure_memory<T>(mut ret)
 	return ret
 }

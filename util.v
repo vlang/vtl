@@ -144,7 +144,7 @@ fn pad_with_max(pad []int, shape []int, ndims int) []int {
 
 // ensure_memory sets a correct memory layout to a given tensor
 [inline]
-fn ensure_memory<T>(mut t Tensor<T>) {
+pub fn ensure_memory<T>(mut t Tensor<T>) {
 	if t.is_colmajor() {
 		if !t.is_colmajor_contiguous() {
 			t.memory = .rowmajor
