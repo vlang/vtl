@@ -52,7 +52,7 @@ pub fn (t &Tensor<T>) napply<T>(f NApplyFn<T>, ts ...Tensor<T>) {
 }
 
 // equal checks if two Tensors are equal
-pub fn (t &Tensor<T>) equal<T>(other &Tensor<T>) bool {
+pub fn equal<T>(t &Tensor<T>, other &Tensor<T>) bool {
 	if t.shape != other.shape {
 		return false
 	}
@@ -64,6 +64,11 @@ pub fn (t &Tensor<T>) equal<T>(other &Tensor<T>) bool {
 		}
 	}
 	return true
+}
+
+// equal checks if two Tensors are equal
+pub fn (t &Tensor<T>) equal<T>(other &Tensor<T>) bool {
+	return equal<T>(t, other)
 }
 
 // diagonal returns a view of the diagonal entries
