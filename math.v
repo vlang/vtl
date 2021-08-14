@@ -61,6 +61,7 @@ pub fn handle_atan<T, U>(x T, _ int) U {
 pub fn atan<T, U>(t &Tensor<T>) &Tensor<U> {
 	return t.map<T, U>(handle_atan)
 }
+
 pub fn handle_atan2<T, U>(xs []T, _ int) U {
 	x := f64(xs[0])
 	y := f64(xs[1])
@@ -252,6 +253,7 @@ pub fn handle_floor<T, U>(x T, _ int) U {
 pub fn floor<T, U>(t &Tensor<T>) &Tensor<U> {
 	return t.map<T, U>(handle_floor)
 }
+
 pub fn handle_fmod<T, U>(xs []T, _ int) U {
 	x := f64(xs[0])
 	y := f64(xs[1])
@@ -273,6 +275,7 @@ pub fn handle_gamma<T, U>(x T, _ int) U {
 pub fn gamma<T, U>(t &Tensor<T>) &Tensor<U> {
 	return t.map<T, U>(handle_gamma)
 }
+
 pub fn handle_gcd<T, U>(xs []T, _ int) U {
 	x := i64(xs[0])
 	y := i64(xs[1])
@@ -284,6 +287,7 @@ pub fn handle_gcd<T, U>(xs []T, _ int) U {
 pub fn gcd<T, U>(a &Tensor<T>, b &Tensor<T>) &Tensor {
 	return a.nmap<T, U>(handle_gcd, b)
 }
+
 pub fn handle_hypot<T, U>(xs []T, _ int) U {
 	x := f64(xs[0])
 	y := f64(xs[1])
@@ -295,6 +299,7 @@ pub fn handle_hypot<T, U>(xs []T, _ int) U {
 pub fn hypot<T, U>(a &Tensor<T>, b &Tensor<T>) &Tensor {
 	return a.nmap<T, U>(handle_hypot, b)
 }
+
 pub fn handle_lcm<T, U>(xs []T, _ int) U {
 	x := i64(xs[0])
 	y := i64(xs[1])
@@ -366,6 +371,7 @@ pub fn handle_log_gamma<T, U>(x T, _ int) U {
 pub fn log_gamma<T, U>(t &Tensor<T>) &Tensor<U> {
 	return t.map<T, U>(handle_log_gamma)
 }
+
 pub fn handle_log_n<T, U>(xs []T, _ int) U {
 	x := f64(xs[0])
 	y := f64(xs[1])
@@ -377,6 +383,7 @@ pub fn handle_log_n<T, U>(xs []T, _ int) U {
 pub fn log_n<T, U>(a &Tensor<T>, b &Tensor<T>) &Tensor {
 	return a.nmap<T, U>(handle_log_n, b)
 }
+
 pub fn handle_max<T, U>(xs []T, _ int) U {
 	x := f64(xs[0])
 	y := f64(xs[1])
@@ -388,6 +395,7 @@ pub fn handle_max<T, U>(xs []T, _ int) U {
 pub fn max<T, U>(a &Tensor<T>, b &Tensor<T>) &Tensor {
 	return a.nmap<T, U>(handle_max, b)
 }
+
 pub fn handle_min<T, U>(xs []T, _ int) U {
 	x := f64(xs[0])
 	y := f64(xs[1])
@@ -399,6 +407,7 @@ pub fn handle_min<T, U>(xs []T, _ int) U {
 pub fn min<T, U>(a &Tensor<T>, b &Tensor<T>) &Tensor {
 	return a.nmap<T, U>(handle_min, b)
 }
+
 pub fn handle_nextafter<T, U>(xs []T, _ int) U {
 	x := f64(xs[0])
 	y := f64(xs[1])
@@ -410,6 +419,7 @@ pub fn handle_nextafter<T, U>(xs []T, _ int) U {
 pub fn nextafter<T, U>(a &Tensor<T>, b &Tensor<T>) &Tensor {
 	return a.nmap<T, U>(handle_nextafter, b)
 }
+
 pub fn handle_nextafterf32<T, U>(xs []T, _ int) U {
 	x := f32(xs[0])
 	y := f32(xs[1])
@@ -421,6 +431,7 @@ pub fn handle_nextafterf32<T, U>(xs []T, _ int) U {
 pub fn nextafter32<T, U>(a &Tensor<T>, b &Tensor<T>) &Tensor {
 	return a.nmap<T, U>(handle_nextafterf32, b)
 }
+
 pub fn handle_pow<T, U>(xs []T, _ int) U {
 	x := f64(xs[0])
 	y := f64(xs[1])

@@ -70,8 +70,8 @@ fn rprint<T>(t &Tensor<T>, index []int, hanging_indent string, curr_width int, s
 		for lii < leading_items {
 			mut nidx := index.clone()
 			nidx << lii
-			word := rprint<T>(t, nidx, next_hanging_indent, next_width, summary_insert, edge_items,
-				separator, max_len)
+			word := rprint<T>(t, nidx, next_hanging_indent, next_width, summary_insert,
+				edge_items, separator, max_len)
 			ret := extend_line(s, line, word, elem_width, hanging_indent)
 			s = ret[0]
 			line = ret[1]
@@ -88,8 +88,8 @@ fn rprint<T>(t &Tensor<T>, index []int, hanging_indent string, curr_width int, s
 		for tii >= 2 {
 			mut tidx := index.clone()
 			tidx << -1 * tii
-			word := rprint<T>(t, tidx, next_hanging_indent, next_width, summary_insert, edge_items,
-				separator, max_len)
+			word := rprint<T>(t, tidx, next_hanging_indent, next_width, summary_insert,
+				edge_items, separator, max_len)
 			ret := extend_line(s, line, word, elem_width, hanging_indent)
 			s = ret[0]
 			line = ret[1]
@@ -132,8 +132,8 @@ fn rprint<T>(t &Tensor<T>, index []int, hanging_indent string, curr_width int, s
 		}
 		mut lidx := index.clone()
 		lidx << -1
-		nested := rprint<T>(t, lidx, next_hanging_indent, next_width, summary_insert, edge_items,
-			separator, max_len)
+		nested := rprint<T>(t, lidx, next_hanging_indent, next_width, summary_insert,
+			edge_items, separator, max_len)
 		s += hanging_indent + nested
 	}
 	return '[' + s[hanging_indent.len..] + ']'
@@ -141,8 +141,8 @@ fn rprint<T>(t &Tensor<T>, index []int, hanging_indent string, curr_width int, s
 
 // format an array, tensor_str is just a wrapper around this
 fn format_array<T>(t &Tensor<T>, line_width int, next_line_prefix string, separator string, edge_items int, summary_insert string, max_len int) string {
-	return rprint<T>(t, [], next_line_prefix, line_width, summary_insert, edge_items, separator,
-		max_len)
+	return rprint<T>(t, [], next_line_prefix, line_width, summary_insert, edge_items,
+		separator, max_len)
 }
 
 // public method for printing arrays, if custom behavior is needed
