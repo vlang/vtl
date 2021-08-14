@@ -1,7 +1,7 @@
-module vtl
+import vtl
 
 fn test_t() {
-	t := from_2d([[6., 4, 24], [1., -9, 8]])
+	t := vtl.from_2d([[6., 4, 24], [1., -9, 8]])
 	tt := t.t()
 	assert t.shape == [2, 3]
 	assert tt.shape == [3, 2]
@@ -11,7 +11,7 @@ fn test_t() {
 }
 
 fn test_ones_t() {
-	t := ones<f64>([2, 3])
+	t := vtl.ones<f64>([2, 3])
 	tt := t.t()
 	assert t.shape == [2, 3]
 	assert tt.shape == [3, 2]
@@ -19,7 +19,7 @@ fn test_ones_t() {
 }
 
 fn test_transpose() {
-	t := ones<f64>([2, 3])
+	t := vtl.ones<f64>([2, 3])
 	order := irange(0, t.rank())
 	tt := t.transpose(order.reverse())
 	assert t.shape == [2, 3]
@@ -27,28 +27,28 @@ fn test_transpose() {
 }
 
 fn test_slice() {
-	a := from_array([0., 1, 2, 3, 4, 5, 6, 7, 8], [3, 3])
+	a := vtl.from_array([0., 1, 2, 3, 4, 5, 6, 7, 8], [3, 3])
 	slice := a.slice([0])
-	expected := from_array([0., 1, 2], [3])
+	expected := vtl.from_array([0., 1, 2], [3])
 	assert slice.equal(expected)
 }
 
 fn test_slice_implicit() {
-	a := from_array([0., 1, 2, 3], [2, 2])
+	a := vtl.from_array([0., 1, 2, 3], [2, 2])
 	slice := a.slice([]int{}, [1])
-	expected := from_array([1., 3], [2])
+	expected := vtl.from_array([1., 3], [2])
 	assert slice.equal(expected)
 }
 
 fn test_negative_slice() {
-	a := from_array([1., 2, 3], [3])
+	a := vtl.from_array([1., 2, 3], [3])
 	slice := a.slice([0, 3, -1])
-	expected := from_array([3., 2, 1], [3])
+	expected := vtl.from_array([3., 2, 1], [3])
 	assert slice.equal(expected)
 }
 
 fn test_slice_hilo() {
-	t := from_array([1., 2, 3, 4], [2, 2])
+	t := vtl.from_array([1., 2, 3, 4], [2, 2])
 	slice := t.slice_hilo([0], [2])
 	assert t.equal(slice)
 }
