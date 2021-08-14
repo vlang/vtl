@@ -8,7 +8,7 @@ fn test_concatenate_flat() {
 	// assert result.equal(expected)
 }
 
-fn test_concatenate<f64>() {
+fn test_concatenate() {
 	a := ones<f64>([2, 2])
 	b := zeros<f64>([2, 2])
 	result := concatenate<f64>([a, b], axis: 0)
