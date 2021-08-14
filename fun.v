@@ -67,7 +67,7 @@ pub fn equal<T>(t &Tensor<T>, other &Tensor<T>) bool {
 }
 
 // equal checks if two Tensors are equal
-pub fn (t &Tensor<T>) equal<T>(other &Tensor<T>) bool {
+fn (t &Tensor<T>) equal<T>(other &Tensor<T>) bool {
 	return equal<T>(t, other)
 }
 
