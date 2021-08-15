@@ -151,7 +151,11 @@ pub fn (t &Tensor<T>) view() &Tensor<T> {
 }
 
 // as_type returns a new Tensor with a cast to a given type
-pub fn (t &Tensor<T>) as_type<T, N>() &Tensor<N> {
-	arr := t.to_array()
-	return from_array<T>(arr, t.shape, memory: t.memory)
+pub fn (t &Tensor<T>) as_type<T, U>() &Tensor<U> {
+	t_arr := t.to_array()
+	mut arr := []U{cap: t_arr.len}
+	for a in t_arr {
+		arr << U(a)
+	}
+	return from_array<U>(arr, t.shape, memory: t.memory)
 }

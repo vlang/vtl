@@ -37,6 +37,8 @@ fn main() {
 	println(slice.equal(expected3))
 	mat := vtl.from_2d([[2., 3, 4], [1., 2, 3]])
 	println(mat.str())
+	println(vtl.sin<f64, f64>(a1).str())
+	println(vtl.pow<f64, f64>(a1, a1).str())
 
 	// @todo: FIX THIS
 	a2 := vtl.ones<f64>([2, 2])
@@ -52,4 +54,5 @@ fn main() {
 	result3_ := vtl.concatenate<f64>([a3, b3], axis: 0)
 	expected3_ := vtl.from_1d<f64>([1., 1, 1, 0, 0])
 	println(result3_.equal(expected3_))
+
 }
