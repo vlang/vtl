@@ -17,7 +17,7 @@ pub fn (t Tensor<T>) fill<T>(val T) {
 
 // assign sets the values of an Tensor equal to the values of another
 // Tensor of the same shape
-pub fn (mut t Tensor<T>) assign<T>(other &Tensor<T>) {
+pub fn (t &Tensor<T>) assign<T>(other &Tensor<T>) {
 	mut iters := iterators<T>([t, other])
 	mut t_iter := iters[0]
 	mut pos := t_iter.pos
