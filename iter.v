@@ -50,7 +50,7 @@ pub struct IteratorBuildData<T> {
 	next_handler IteratorStrategy
 	coord        []int
 	backstrides  []int
-	pos          int
+	pos          int = 0
 }
 
 // iterator creates an iterator through a Tensor with custom data
@@ -60,6 +60,7 @@ pub fn (t &Tensor<T>) custom_iterator<T>(data IteratorBuildData<T>) TensorIterat
 		backstrides: data.backstrides
 		tensor: t
 		pos: data.pos
+		iteration: 0
 		next_handler: data.next_handler
 	}
 }
