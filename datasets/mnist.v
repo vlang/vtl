@@ -70,7 +70,6 @@ pub fn (mut ds MnistDataset) next() ?MnistBatch {
 	mut pos := iter.pos
 	for {
 		el := iter.next() or { break }
-		println([pos, int(el)])
 		lft.set([pos, int(el)], 1)
 		pos = iter.pos
 	}
