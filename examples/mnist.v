@@ -1,7 +1,11 @@
 module main
 
-import vtl.datasets { load_mnist }
+import vtl.datasets
 
 fn main() {
-	load_mnist() or { panic(err) }
+	mut mnist_loader := datasets.load_mnist(.train, 32) or { panic(err) }
+
+	for batch in mnist_loader {
+		println(batch.str())
+	}
 }

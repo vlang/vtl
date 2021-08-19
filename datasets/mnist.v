@@ -8,38 +8,48 @@ pub const (
 	mnist_train_url = 'https://pjreddie.com/media/files/mnist_train.csv'
 )
 
-[heap]
-pub struct MnistDataset {
-pub:
-	train_features &vtl.Tensor<f32>
-	train_labels   &vtl.Tensor<int>
-	test_features  &vtl.Tensor<f32>
-	test_labels    &vtl.Tensor<int>
+pub enum DatasetType {
+	train
+	test
 }
 
-pub fn load_mnist() ?&MnistDataset {
-	train_features, train_labels := load_mnist_from_url(datasets.mnist_train_url) ?
-	test_features, test_labels := load_mnist_from_url(datasets.mnist_test_url) ?
+pub struct MnistDataset {
+pub:
+	batch_size int
+mut:
+	parser &csv.Reader
+}
+
+pub struct MnistBatch {
+pub:
+	features &vtl.Tensor<f32>
+	labels   &vtl.Tensor<int>
+}
+
+pub fn load_mnist(set DatasetType, batch_size int) ?&MnistDataset {
+	url := if set == .train { datasets.mnist_train_url } else { datasets.mnist_test_url }
+	content := load_dataset_from_url(url) ?
 
 	return &MnistDataset{
-		train_features: train_features
-		train_labels: train_labels
-		test_features: test_features
-		test_labels: test_labels
+		batch_size: batch_size
+		parser: csv.new_reader(content)
 	}
 }
 
-pub fn load_mnist_from_url(url string) ?(&vtl.Tensor<f32>, &vtl.Tensor<int>) {
-	mut labels := []int{}
-	mut features := []f32{}
+pub fn (mut ds MnistDataset) next() ?MnistBatch {
+	batch_size := ds.batch_size
 
-	content := load_dataset_from_url(url) ?
+	mut labels := []int{cap: batch_size}
+	mut features := []f32{cap: batch_size}
 
-	mut parser := csv.new_reader(content)
-	for {
-		items := parser.read() or { break }
+	for _ in 0 .. batch_size {
+		items := ds.parser.read() or { break }
 		labels << items[0].int()
 		features << items[1..].map(it.f32())
+	}
+
+	if labels.len == 0 {
+		return none
 	}
 
 	mut lt := vtl.from_array(labels, [labels.len])
@@ -49,9 +59,12 @@ pub fn load_mnist_from_url(url string) ?(&vtl.Tensor<f32>, &vtl.Tensor<int>) {
 	mut pos := iter.pos
 	for {
 		el := iter.next() or { break }
-		lft.set([pos, el as int], 1)
+		lft.set([pos, el], 1)
 		pos = iter.pos
 	}
 
-	return vtl.from_array(features, [lt.shape[0], 10]), lft
+	return MnistBatch{
+		labels: lft
+		features: vtl.from_array(features, [lt.shape[0], 10])
+	}
 }
