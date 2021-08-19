@@ -15,6 +15,7 @@ pub enum DatasetType {
 
 pub struct MnistDataset {
 pub:
+	@type DatasetType
 	batch_size int
 mut:
 	parser &csv.Reader
@@ -26,14 +27,24 @@ pub:
 	labels   &vtl.Tensor<int>
 }
 
-pub fn load_mnist(set DatasetType, batch_size int) ?&MnistDataset {
-	url := if set == .train { datasets.mnist_train_url } else { datasets.mnist_test_url }
+pub fn load_mnist(set_type DatasetType, batch_size int) ?&MnistDataset {
+	url := if set_type == .train { datasets.mnist_train_url } else { datasets.mnist_test_url }
 	content := load_dataset_from_url(url) ?
 
 	return &MnistDataset{
+		@type: set_type
 		batch_size: batch_size
 		parser: csv.new_reader(content)
 	}
+}
+
+pub fn (ds &MnistDataset) str() string {
+	mut res := []string{}
+	res << 'vtl.datasets.MnistDataset{'
+	res << '    @type: ${ds.@type}'
+	res << '    batch_size: ${ds.batch_size}'
+	res << '}'
+	return res.join('\n')
 }
 
 pub fn (mut ds MnistDataset) next() ?MnistBatch {
