@@ -3,6 +3,23 @@ module datasets
 import os
 import crypto.sha1
 import net.http
+import vtl
+
+pub enum DatasetType {
+	train
+	test
+}
+
+pub interface DatasetLoader {
+	@type DatasetType
+	batch_size int
+	next() ?DatasetBatch
+}
+
+pub interface DatasetBatch {
+	features &vtl.Tensor<f32>
+	labels &vtl.Tensor<f32>
+}
 
 fn get_cache_dir(subdir string) string {
 	cache_dir := os.cache_dir()

@@ -8,11 +8,6 @@ pub const (
 	mnist_train_url = 'https://pjreddie.com/media/files/mnist_train.csv'
 )
 
-pub enum DatasetType {
-	train
-	test
-}
-
 pub struct MnistDataset {
 pub:
 	@type      DatasetType
@@ -27,15 +22,15 @@ pub:
 	labels   &vtl.Tensor<f32>
 }
 
-pub fn load_mnist(set_type DatasetType, batch_size int) ?&MnistDataset {
+pub fn load_mnist(set_type DatasetType, batch_size int) ?DatasetLoader {
 	url := if set_type == .train { datasets.mnist_train_url } else { datasets.mnist_test_url }
 	content := load_dataset_from_url(url) ?
 
-	return &MnistDataset{
+	return DatasetLoader(&MnistDataset{
 		@type: set_type
 		batch_size: batch_size
 		parser: csv.new_reader(content)
-	}
+	})
 }
 
 pub fn (ds &MnistDataset) str() string {
@@ -47,7 +42,7 @@ pub fn (ds &MnistDataset) str() string {
 	return res.join('\n')
 }
 
-pub fn (mut ds MnistDataset) next() ?MnistBatch {
+pub fn (mut ds MnistDataset) next() ?DatasetBatch {
 	batch_size := ds.batch_size
 
 	mut labels := []f32{cap: batch_size}
@@ -76,8 +71,8 @@ pub fn (mut ds MnistDataset) next() ?MnistBatch {
 
 	ft := vtl.from_array(features, [features.len]).reshape([lt.shape[0], -1])
 
-	return MnistBatch{
+	return DatasetBatch(&MnistBatch{
 		labels: lft
 		features: ft
-	}
+	})
 }
