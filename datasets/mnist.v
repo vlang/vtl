@@ -11,10 +11,10 @@ pub const (
 [heap]
 pub struct MnistDataset {
 pub:
-	train_features &vtl.Tensor
-	train_labels   &vtl.Tensor
-	test_features  &vtl.Tensor
-	test_labels    &vtl.Tensor
+	train_features &vtl.Tensor<f32>
+	train_labels   &vtl.Tensor<int>
+	test_features  &vtl.Tensor<f32>
+	test_labels    &vtl.Tensor<int>
 }
 
 pub fn load_mnist() ?&MnistDataset {
@@ -29,7 +29,7 @@ pub fn load_mnist() ?&MnistDataset {
 	}
 }
 
-pub fn load_mnist_from_url(url string) ?(&vtl.Tensor, &vtl.Tensor) {
+pub fn load_mnist_from_url(url string) ?(&vtl.Tensor<f32>, &vtl.Tensor<int>) {
 	mut labels := []int{}
 	mut features := []f32{}
 
@@ -42,17 +42,16 @@ pub fn load_mnist_from_url(url string) ?(&vtl.Tensor, &vtl.Tensor) {
 		features << items[1..].map(it.f32())
 	}
 
-	mut lt := vtl.from_varray(labels, [labels.len])
-	mut lft := vtl.zeros([lt.shape[0], 10])
+	mut lt := vtl.from_array(labels, [labels.len])
+	mut lft := vtl.zeros<int>([lt.shape[0], 10])
 
 	mut iter := lt.iterator()
 	mut pos := iter.pos
-	for _ in 0 .. lt.size() {
-		if el := iter.next() {
-			lft.set([pos, el as int], 1)
-			pos = iter.pos
-		}
+	for {
+		el := iter.next() or { break }
+		lft.set([pos, el as int], 1)
+		pos = iter.pos
 	}
 
-	return vtl.from_varray(features, [lt.shape[0], 10]), lft
+	return vtl.from_array(features, [lt.shape[0], 10]), lft
 }
