@@ -8,5 +8,6 @@ fn main() {
 
 	for batch in mnist_loader {
 		println(batch.str())
+		break
 	}
 }

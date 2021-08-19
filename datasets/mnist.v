@@ -24,7 +24,7 @@ mut:
 pub struct MnistBatch {
 pub:
 	features &vtl.Tensor<f32>
-	labels   &vtl.Tensor<int>
+	labels   &vtl.Tensor<f32>
 }
 
 pub fn load_mnist(set_type DatasetType, batch_size int) ?&MnistDataset {
@@ -50,12 +50,12 @@ pub fn (ds &MnistDataset) str() string {
 pub fn (mut ds MnistDataset) next() ?MnistBatch {
 	batch_size := ds.batch_size
 
-	mut labels := []int{cap: batch_size}
+	mut labels := []f32{cap: batch_size}
 	mut features := []f32{cap: batch_size}
 
 	for _ in 0 .. batch_size {
 		items := ds.parser.read() or { break }
-		labels << items[0].int()
+		labels << items[0].f32()
 		features << items[1..].map(it.f32())
 	}
 
@@ -64,18 +64,21 @@ pub fn (mut ds MnistDataset) next() ?MnistBatch {
 	}
 
 	mut lt := vtl.from_array(labels, [labels.len])
-	mut lft := vtl.zeros<int>([lt.shape[0], 10])
+	mut lft := vtl.zeros<f32>([lt.shape[0], 10])
 
 	mut iter := lt.iterator()
 	mut pos := iter.pos
 	for {
 		el := iter.next() or { break }
-		lft.set([pos, el], 1)
+		println([pos, int(el)])
+		lft.set([pos, int(el)], 1)
 		pos = iter.pos
 	}
 
+	ft := vtl.from_array(features, [features.len]).reshape([lt.shape[0], -1])
+
 	return MnistBatch{
 		labels: lft
-		features: vtl.from_array(features, [lt.shape[0], 10])
+		features: ft
 	}
 }
