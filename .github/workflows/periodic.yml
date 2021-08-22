@@ -29,10 +29,6 @@ jobs:
       run: mv ./vtl ~/.vmodules
     - name: Execute Tests using Pure V Backend with Vlib Math
       run: ~/.vmodules/vtl/bin/test
-    - name: Execute Tests using Pure V Backend with Pure V Math
-      run: ~/.vmodules/vtl/bin/test --use-vmath
     - name: Execute Tests using Open BLAS Backend
       run: ~/.vmodules/vtl/bin/test --use-cblas
-    - name: Execute Tests using Open BLAS Backend and Pure V Math
-      run: ~/.vmodules/vtl/bin/test --use-vmath --use-cblas
 
