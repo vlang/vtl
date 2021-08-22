@@ -31,4 +31,3 @@ jobs:
       run: ~/.vmodules/vtl/bin/test
     - name: Execute Tests using Open BLAS Backend
       run: ~/.vmodules/vtl/bin/test --use-cblas
-
