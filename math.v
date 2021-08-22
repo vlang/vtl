@@ -1,7 +1,7 @@
 module vtl
 
 import vtl.storage
-import vsl.vmath as math
+import math
 
 fn handle_abs<T, U>(x T, _ int) U {
 	return U(math.abs(f64(x)))
