@@ -4,7 +4,7 @@ import arrays
 
 // assert_rank ensures that a Tensor has a given rank
 [inline]
-fn assert_rank<T>(t Tensor<T>, n int) {
+fn assert_rank<T>(t &Tensor<T>, n int) {
 	if n != t.rank() {
 		panic('Bad number of dimensions')
 	}
