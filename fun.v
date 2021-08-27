@@ -3,13 +3,13 @@ module vtl
 import math
 import vtl.storage
 
-pub type MapFn = fn (x T, i int) U
+pub type MapFn<T, U> = fn (x T, i int) U
 
-pub type ApplyFn = fn (x T, i int) T
+pub type ApplyFn<T> = fn (x T, i int) T
 
-pub type NMapFn = fn (x []T, i int) U
+pub type NMapFn<T, U> = fn (x []T, i int) U
 
-pub type NApplyFn = fn (x []T, i int)
+pub type NApplyFn<T> = fn (x []T, i int)
 
 // map maps a function to a given Tensor retuning a new Tensor with same shape
 pub fn (t &Tensor<T>) map<T, U>(f MapFn<T, U>) &Tensor<U> {
