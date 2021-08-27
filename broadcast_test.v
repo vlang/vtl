@@ -1,14 +1,14 @@
 module vtl
 
 fn test_broadcast_column() {
-	m := from_array<f64>([1., 2., 3.], [3, 1])
+	m := from_array<f64>([1.0, 2.0, 3.0], [3, 1])
 	b := m.broadcast_to([3, 3])
-	expected := from_array<f64>([1., 1., 1., 2., 2., 2., 3., 3., 3.], [3, 3])
+	expected := from_array<f64>([1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 3.0, 3.0, 3.0], [3, 3])
 	// assert equal<f64>(b, expected)
 }
 
 fn test_broadcastable_same_shape() {
-	m := from_array<f64>([1., 2., 3., 4.], [2, 2])
+	m := from_array<f64>([1.0, 2.0, 3.0, 4.0], [2, 2])
 	shape := broadcastable<f64>(m, m)
 	assert m.shape == shape
 }

@@ -5,7 +5,7 @@ fn test_storage_with_default() {
 	match s {
 		CpuStorage<f64> {
 			array := s.to_array()
-			assert array == [1., 1]
+			assert array == [1.0, 1]
 		}
 		else {
 			panic('This should not happen')
@@ -19,7 +19,7 @@ fn test_storage_set() {
 	match s {
 		CpuStorage<f64> {
 			array := s.to_array()
-			assert array == [1., 2]
+			assert array == [1.0, 2]
 		}
 		else {
 			panic('This should not happen')
@@ -33,7 +33,7 @@ fn test_storage_fill() {
 	match s {
 		CpuStorage<f64> {
 			array := s.to_array()
-			assert array == [2., 2]
+			assert array == [2.0, 2]
 		}
 		else {
 			panic('This should not happen')
@@ -48,7 +48,7 @@ fn test_storage_offset() {
 	match offset {
 		CpuStorage<f64> {
 			array := offset.to_array()
-			assert array == [1., 2]
+			assert array == [1.0, 2]
 		}
 		else {
 			panic('This should not happen')
