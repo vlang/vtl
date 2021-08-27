@@ -9,7 +9,7 @@ pub type ApplyFn<T> = fn (x T, i int) T
 
 pub type NMapFn<T, U> = fn (x []T, i int) U
 
-pub type NApplyFn<T> = fn (x []T, i int)
+pub type NApplyFn<T> = fn (x []T, i int) T
 
 // map maps a function to a given Tensor retuning a new Tensor with same shape
 pub fn (t &Tensor<T>) map<T, U>(f MapFn<T, U>) &Tensor<U> {
@@ -17,7 +17,7 @@ pub fn (t &Tensor<T>) map<T, U>(f MapFn<T, U>) &Tensor<U> {
 	mut iter := t.iterator()
 	mut pos := iter.pos
 	for {
-		val := iter.next() or { break }
+		val := iterator_next<T>(mut iter) or { break }
 		next_val := f(val, pos)
 		storage.storage_set<U>(ret.data, pos, next_val)
 		pos = iter.pos
@@ -39,7 +39,19 @@ pub fn (t &Tensor<T>) nmap<T, U>(f NMapFn<T, U>, ts ...Tensor<T>) &Tensor<U> {
 	return ret
 }
 
-// napply applies a function to each element of a given Tensor
+// apply applies a function to each element of a given Tensor
+pub fn (t &Tensor<T>) apply<T>(f ApplyFn<T>) {
+	mut iter := t.iterator()
+	mut i := 0
+	for {
+		val := iterator_next<T>(mut iter) or { break }
+		next_val := f(val, i)
+		storage.storage_set<T>(t.data, i, next_val)
+		i++
+	}
+}
+
+// napply applies a function to each element of a given Tensor with params
 pub fn (t &Tensor<T>) napply<T>(f NApplyFn<T>, ts ...Tensor<T>) {
 	mut iters := t.iterators<T>(ts)
 	mut i := 0
