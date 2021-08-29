@@ -37,6 +37,7 @@ fn main() {
 	println(slice.equal(expected3))
 	mat := vtl.from_2d([[2.0, 3, 4], [1.0, 2, 3]])
 	println(mat.str())
+	println('MATH FOR $a1.str()')
 	println(vtl.sin<f64>(a1).str())
 	println(vtl.pow<f64>(a1, a1).str())
 

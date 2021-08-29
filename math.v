@@ -130,12 +130,10 @@ pub fn atan2<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	// return a.nmap<T>(handle_atan2, b)
 	mut ret := new_tensor_like<T>(a)
 	mut iters := iterators<T>([a, b])
-	mut i := 0
 	for {
-		vals, _ := iterators_next<T>(mut iters) or { break }
-		val := handle_atan2<T>(vals, i)
-		storage.storage_set<T>(ret.data, i, val)
-		i++
+		vals, pos := iterators_next<T>(mut iters) or { break }
+		val := handle_atan2<T>(vals, pos)
+		storage.storage_set<T>(ret.data, pos, val)
 	}
 	return ret
 }
@@ -495,12 +493,10 @@ pub fn fmod<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	// return a.nmap<T>(handle_fmod, b)
 	mut ret := new_tensor_like<T>(a)
 	mut iters := iterators<T>([a, b])
-	mut i := 0
 	for {
-		vals, _ := iterators_next<T>(mut iters) or { break }
-		val := handle_fmod<T>(vals, i)
-		storage.storage_set<T>(ret.data, i, val)
-		i++
+		vals, pos := iterators_next<T>(mut iters) or { break }
+		val := handle_fmod<T>(vals, pos)
+		storage.storage_set<T>(ret.data, pos, val)
 	}
 	return ret
 }
@@ -537,12 +533,10 @@ pub fn gcd<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	// return a.nmap<T>(handle_gcd, b)
 	mut ret := new_tensor_like<T>(a)
 	mut iters := iterators<T>([a, b])
-	mut i := 0
 	for {
-		vals, _ := iterators_next<T>(mut iters) or { break }
-		val := handle_gcd<T>(vals, i)
-		storage.storage_set<T>(ret.data, i, val)
-		i++
+		vals, pos := iterators_next<T>(mut iters) or { break }
+		val := handle_gcd<T>(vals, pos)
+		storage.storage_set<T>(ret.data, pos, val)
 	}
 	return ret
 }
@@ -560,12 +554,10 @@ pub fn hypot<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	// return a.nmap<T>(handle_hypot, b)
 	mut ret := new_tensor_like<T>(a)
 	mut iters := iterators<T>([a, b])
-	mut i := 0
 	for {
-		vals, _ := iterators_next<T>(mut iters) or { break }
-		val := handle_hypot<T>(vals, i)
-		storage.storage_set<T>(ret.data, i, val)
-		i++
+		vals, pos := iterators_next<T>(mut iters) or { break }
+		val := handle_hypot<T>(vals, pos)
+		storage.storage_set<T>(ret.data, pos, val)
 	}
 	return ret
 }
@@ -583,12 +575,10 @@ pub fn lcm<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	// return a.nmap<T>(handle_lcm, b)
 	mut ret := new_tensor_like<T>(a)
 	mut iters := iterators<T>([a, b])
-	mut i := 0
 	for {
-		vals, _ := iterators_next<T>(mut iters) or { break }
-		val := handle_lcm<T>(vals, i)
-		storage.storage_set<T>(ret.data, i, val)
-		i++
+		vals, pos := iterators_next<T>(mut iters) or { break }
+		val := handle_lcm<T>(vals, pos)
+		storage.storage_set<T>(ret.data, pos, val)
 	}
 	return ret
 }
@@ -720,12 +710,10 @@ pub fn log_n<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	// return a.nmap<T>(handle_log_n, b)
 	mut ret := new_tensor_like<T>(a)
 	mut iters := iterators<T>([a, b])
-	mut i := 0
 	for {
-		vals, _ := iterators_next<T>(mut iters) or { break }
-		val := handle_log_n<T>(vals, i)
-		storage.storage_set<T>(ret.data, i, val)
-		i++
+		vals, pos := iterators_next<T>(mut iters) or { break }
+		val := handle_log_n<T>(vals, pos)
+		storage.storage_set<T>(ret.data, pos, val)
 	}
 	return ret
 }
@@ -743,12 +731,10 @@ pub fn max<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	// return a.nmap<T>(handle_max, b)
 	mut ret := new_tensor_like<T>(a)
 	mut iters := iterators<T>([a, b])
-	mut i := 0
 	for {
-		vals, _ := iterators_next<T>(mut iters) or { break }
-		val := handle_max<T>(vals, i)
-		storage.storage_set<T>(ret.data, i, val)
-		i++
+		vals, pos := iterators_next<T>(mut iters) or { break }
+		val := handle_max<T>(vals, pos)
+		storage.storage_set<T>(ret.data, pos, val)
 	}
 	return ret
 }
@@ -766,12 +752,10 @@ pub fn min<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	// return a.nmap<T>(handle_min, b)
 	mut ret := new_tensor_like<T>(a)
 	mut iters := iterators<T>([a, b])
-	mut i := 0
 	for {
-		vals, _ := iterators_next<T>(mut iters) or { break }
-		val := handle_min<T>(vals, i)
-		storage.storage_set<T>(ret.data, i, val)
-		i++
+		vals, pos := iterators_next<T>(mut iters) or { break }
+		val := handle_min<T>(vals, pos)
+		storage.storage_set<T>(ret.data, pos, val)
 	}
 	return ret
 }
@@ -789,12 +773,10 @@ pub fn nextafter<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	// return a.nmap<T>(handle_nextafter, b)
 	mut ret := new_tensor_like<T>(a)
 	mut iters := iterators<T>([a, b])
-	mut i := 0
 	for {
-		vals, _ := iterators_next<T>(mut iters) or { break }
-		val := handle_nextafter<T>(vals, i)
-		storage.storage_set<T>(ret.data, i, val)
-		i++
+		vals, pos := iterators_next<T>(mut iters) or { break }
+		val := handle_nextafter<T>(vals, pos)
+		storage.storage_set<T>(ret.data, pos, val)
 	}
 	return ret
 }
@@ -812,12 +794,10 @@ pub fn nextafter32<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	// return a.nmap<T>(handle_nextafterf32, b)
 	mut ret := new_tensor_like<T>(a)
 	mut iters := iterators<T>([a, b])
-	mut i := 0
 	for {
-		vals, _ := iterators_next<T>(mut iters) or { break }
-		val := handle_nextafterf32<T>(vals, i)
-		storage.storage_set<T>(ret.data, i, val)
-		i++
+		vals, pos := iterators_next<T>(mut iters) or { break }
+		val := handle_nextafterf32<T>(valpos, i)
+		storage.storage_set<T>(ret.data, pos, val)
 	}
 	return ret
 }
@@ -835,12 +815,10 @@ pub fn pow<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	// return a.nmap<T>(handle_pow, b)
 	mut ret := new_tensor_like<T>(a)
 	mut iters := iterators<T>([a, b])
-	mut i := 0
 	for {
-		vals, _ := iterators_next<T>(mut iters) or { break }
-		val := handle_pow<T>(vals, i)
-		storage.storage_set<T>(ret.data, i, val)
-		i++
+		vals, pos := iterators_next<T>(mut iters) or { break }
+		val := handle_pow<T>(vals, pos)
+		storage.storage_set<T>(ret.data, pos, val)
 	}
 	return ret
 }

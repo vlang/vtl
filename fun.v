@@ -27,12 +27,10 @@ pub fn (t &Tensor<T>) map<T>(f MapFn<T>) &Tensor<T> {
 pub fn (t &Tensor<T>) nmap<T>(f NMapFn<T>, ts ...&Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iters := t.iterators<T>(ts)
-	mut i := 0
 	for {
-		vals, _ := iterators_next<T>(mut iters) or { break }
-		val := f(vals, i)
-		storage.storage_set<T>(ret.data, i, val)
-		i++
+		vals, pos := iterators_next<T>(mut iters) or { break }
+		val := f(vals, pos)
+		storage.storage_set<T>(ret.data, pos, val)
 	}
 	return ret
 }
@@ -40,24 +38,20 @@ pub fn (t &Tensor<T>) nmap<T>(f NMapFn<T>, ts ...&Tensor<T>) &Tensor<T> {
 // apply applies a function to each element of a given Tensor
 pub fn (t &Tensor<T>) apply<T>(f ApplyFn<T>) {
 	mut iter := t.iterator()
-	mut i := 0
 	for {
-		val, _ := iter.next() or { break }
-		next_val := f(val, i)
-		storage.storage_set<T>(t.data, i, next_val)
-		i++
+		val, pos := iter.next() or { break }
+		next_val := f(val, pos)
+		storage.storage_set<T>(t.data, pos, next_val)
 	}
 }
 
 // napply applies a function to each element of a given Tensor with params
 pub fn (t &Tensor<T>) napply<T>(f NApplyFn<T>, ts ...&Tensor<T>) {
 	mut iters := t.iterators<T>(ts)
-	mut i := 0
 	for {
-		vals, _ := iterators_next<T>(mut iters) or { break }
-		val := f(vals, i)
-		storage.storage_set<T>(t.data, i, val)
-		i++
+		vals, pos := iterators_next<T>(mut iters) or { break }
+		val := f(vals, pos)
+		storage.storage_set<T>(t.data, pos, val)
 	}
 }
 
