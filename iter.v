@@ -175,8 +175,8 @@ pub fn (mut its []TensorIterator<T>) next<T>() ?[]T {
 pub fn iterators_next<T>(mut its []TensorIterator<T>) ?[]T {
 	mut nums := []T{cap: its.len}
 	for mut iter in its {
-		val := iter.next() ?
-		nums << val
+		val := iter.next() or { return err }
+		nums << T(val)
 	}
 	return nums
 }

@@ -37,8 +37,8 @@ fn main() {
 	println(slice.equal(expected3))
 	mat := vtl.from_2d([[2.0, 3, 4], [1.0, 2, 3]])
 	println(mat.str())
-	println(vtl.sin<f64, f64>(a1).str())
-	println(vtl.pow<f64, f64>(a1, a1).str())
+	println(vtl.sin<f64>(a1).str())
+	println(vtl.pow<f64>(a1, a1).str())
 
 	// @todo: FIX THIS
 	a2 := vtl.ones<f64>([2, 2])

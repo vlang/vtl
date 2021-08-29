@@ -116,8 +116,11 @@ pub fn (t &Tensor<T>) to_array() []T {
 	mut arr := []T{cap: t.size}
 	mut iter := t.iterator()
 	for {
-		val := iter.next() or { break }
-		arr << val
+		if val := iter.next() {
+			arr << T(val)
+		} else {
+			break
+		}
 	}
 	return arr
 }

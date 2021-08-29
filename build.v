@@ -59,34 +59,34 @@ pub fn from_array<T>(arr []T, shape []int, data TensorBuildData) &Tensor<T> {
 }
 
 // as_type returns a new Tensor with a cast to a given type
-pub fn (t &Tensor<T>) as_type<T, U>() &Tensor<U> {
-	t_arr := t.to_array<T>()
-	arr := t_arr.map(U(it))
+// pub fn (t &Tensor<T>) as_type<T, U>() &Tensor<U> {
+// 	t_arr := t.to_array<T>()
+// 	arr := t_arr.map(U(it))
 
-	shape := t.shape
-	size := size_from_shape(shape)
-	if size != arr.len {
-		panic('Bad shape for array, shape [$arr.len] cannot fit into shape $shape')
-	}
-	data_storage := storage.from_array<U>(arr, .cpu)
-	if shape.len == 0 {
-		return &Tensor<U>{
-			memory: t.memory
-			strides: [1]
-			shape: []
-			size: size
-			data: data_storage
-		}
-	}
-	strides := strides_from_shape(shape, t.memory)
-	return &Tensor<U>{
-		shape: shape
-		strides: strides
-		memory: t.memory
-		size: size
-		data: data_storage
-	}
-}
+// 	shape := t.shape
+// 	size := size_from_shape(shape)
+// 	if size != arr.len {
+// 		panic('Bad shape for array, shape [$arr.len] cannot fit into shape $shape')
+// 	}
+// 	data_storage := storage.from_array<U>(arr, .cpu)
+// 	if shape.len == 0 {
+// 		return &Tensor<U>{
+// 			memory: t.memory
+// 			strides: [1]
+// 			shape: []
+// 			size: size
+// 			data: data_storage
+// 		}
+// 	}
+// 	strides := strides_from_shape(shape, t.memory)
+// 	return &Tensor<U>{
+// 		shape: shape
+// 		strides: strides
+// 		memory: t.memory
+// 		size: size
+// 		data: data_storage
+// 	}
+// }
 
 // new_tensor allocates a Tensor onto specified device with a given data
 fn new_tensor<T>(init T, data TensorBuildDataWithShape) &Tensor<T> {

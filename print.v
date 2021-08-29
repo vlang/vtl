@@ -167,10 +167,13 @@ fn max_str_len<T>(t &Tensor<T>) int {
 	mut mx := 0
 	mut iter := t.iterator()
 	for {
-		val := iter.next() or { break }
-		val_str := val.str()
-		if val_str.len > mx {
-			mx = val_str.len
+		if val := iter.next() {
+			val_str := val.str()
+			if val_str.len > mx {
+				mx = val_str.len
+			}
+		} else {
+			break
 		}
 	}
 	return mx

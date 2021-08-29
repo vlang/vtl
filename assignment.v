@@ -21,8 +21,11 @@ pub fn (mut t Tensor<T>) assign<T>(other &Tensor<T>) {
 	mut iters := t.iterators<T>([other])
 	mut pos := iters[0].pos
 	for {
-		vals := iters.next() or { break }
-		storage.storage_set<T>(t.data, pos, vals[1])
-		pos = iters[0].pos
+		if vals := iterators_next<T>(mut iters) {
+			storage.storage_set<T>(t.data, pos, vals[1])
+			pos = iters[0].pos
+		} else {
+			break
+		}
 	}
 }

@@ -3,37 +3,40 @@ module vtl
 import math
 import vtl.storage
 
-pub type MapFn<T, U> = fn (x T, i int) U
+pub type MapFn<T> = fn (x T, i int) T
 
 pub type ApplyFn<T> = fn (x T, i int) T
 
-pub type NMapFn<T, U> = fn (x []T, i int) U
+pub type NMapFn<T> = fn (x []T, i int) T
 
 pub type NApplyFn<T> = fn (x []T, i int) T
 
 // map maps a function to a given Tensor retuning a new Tensor with same shape
-pub fn (t &Tensor<T>) map<T, U>(f MapFn<T, U>) &Tensor<U> {
-	mut ret := new_tensor_like<T>(t).as_type<T, U>()
+pub fn (t &Tensor<T>) map<T>(f MapFn<T>) &Tensor<T> {
+	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	mut pos := iter.pos
 	for {
-		val := iter.next() or { break }
-		next_val := f(val, pos)
-		storage.storage_set<U>(ret.data, pos, next_val)
-		pos = iter.pos
+		if val := iter.next() {
+			next_val := f(val, pos)
+			storage.storage_set<T>(ret.data, pos, next_val)
+			pos = iter.pos
+		} else {
+			break
+		}
 	}
 	return ret
 }
 
 // map maps a function to a given list of Tensor retuning a new Tensor with same shape
-pub fn (t &Tensor<T>) nmap<T, U>(f NMapFn<T, U>, ts ...Tensor<T>) &Tensor<U> {
-	mut ret := new_tensor_like<T>(t).as_type<T, U>()
+pub fn (t &Tensor<T>) nmap<T>(f NMapFn<T>, ts ...&Tensor<T>) &Tensor<T> {
+	mut ret := new_tensor_like<T>(t)
 	mut iters := t.iterators<T>(ts)
 	mut i := 0
 	for {
 		vals := iterators_next<T>(mut iters) or { break }
 		val := f(vals, i)
-		storage.storage_set<U>(ret.data, i, val)
+		storage.storage_set<T>(ret.data, i, val)
 		i++
 	}
 	return ret
@@ -44,15 +47,18 @@ pub fn (t &Tensor<T>) apply<T>(f ApplyFn<T>) {
 	mut iter := t.iterator()
 	mut i := 0
 	for {
-		val := iter.next() or { break }
-		next_val := f(val, i)
-		storage.storage_set<T>(t.data, i, next_val)
-		i++
+		if val := iter.next() {
+			next_val := f(val, i)
+			storage.storage_set<T>(t.data, i, next_val)
+			i++
+		} else {
+			break
+		}
 	}
 }
 
 // napply applies a function to each element of a given Tensor with params
-pub fn (t &Tensor<T>) napply<T>(f NApplyFn<T>, ts ...Tensor<T>) {
+pub fn (t &Tensor<T>) napply<T>(f NApplyFn<T>, ts ...&Tensor<T>) {
 	mut iters := t.iterators<T>(ts)
 	mut i := 0
 	for {
