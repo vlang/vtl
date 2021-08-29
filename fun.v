@@ -17,7 +17,7 @@ pub fn (t &Tensor<T>) map<T, U>(f MapFn<T, U>) &Tensor<U> {
 	mut iter := t.iterator()
 	mut pos := iter.pos
 	for {
-		val := iterator_next<T>(mut iter) or { break }
+		val := iter.next() or { break }
 		next_val := f(val, pos)
 		storage.storage_set<U>(ret.data, pos, next_val)
 		pos = iter.pos
@@ -44,7 +44,7 @@ pub fn (t &Tensor<T>) apply<T>(f ApplyFn<T>) {
 	mut iter := t.iterator()
 	mut i := 0
 	for {
-		val := iterator_next<T>(mut iter) or { break }
+		val := iter.next() or { break }
 		next_val := f(val, i)
 		storage.storage_set<T>(t.data, i, next_val)
 		i++
