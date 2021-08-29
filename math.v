@@ -1,6 +1,6 @@
 module vtl
 
-import storage
+import vtl.storage
 import math
 
 fn handle_abs<T>(x T, _ int) T {
