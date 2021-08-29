@@ -1,6 +1,6 @@
 module vtl
 
-import vtl.storage
+import storage
 
 // IteratorStrategy defines a function to use in order to mutate
 // iteration position
@@ -104,24 +104,26 @@ pub fn handle_flatten_iteration<T>(mut s TensorIterator<T>) T {
 // next calls the iteration type for a given iterator
 // which is either flat or strided and returns a Num containing the current value
 [inline]
-pub fn (mut s TensorIterator<T>) next<T>() ?T {
+pub fn (mut s TensorIterator<T>) next<T>() ?(T, int) {
 	return iterator_next<T>(mut s)
 }
 
 // iterator_next calls the iteration type for a given iterator
 // which is either flat or strided and returns a Num containing the current value
-pub fn iterator_next<T>(mut s TensorIterator<T>) ?T {
+pub fn iterator_next<T>(mut s TensorIterator<T>) ?(T, int) {
 	if s.iteration >= s.tensor.size() {
 		return none
 	}
 	defer {
 		s.iteration++
 	}
-	return if s.next_handler == .flatten_iteration {
+	pos := s.pos
+	val := if s.next_handler == .flatten_iteration {
 		handle_flatten_iteration<T>(mut s)
 	} else {
 		handle_strided_iteration<T>(mut s)
 	}
+	return val, pos
 }
 
 fn tensor_backstrides<T>(t &Tensor<T>) []int {
@@ -166,17 +168,21 @@ pub fn iterators<T>(ts []&Tensor<T>) []TensorIterator<T> {
 // next calls the iteration type for a given list of iterators
 // which is either flat or strided and returns a list of Nums containing the current values
 [inline]
-pub fn (mut its []TensorIterator<T>) next<T>() ?[]T {
+pub fn (mut its []TensorIterator<T>) next<T>() ?([]T, int) {
 	return iterators_next<T>(mut its)
 }
 
 // iterators_next calls the iteration type for a given list of iterators
 // which is either flat or strided and returns a list of Nums containing the current values
-pub fn iterators_next<T>(mut its []TensorIterator<T>) ?[]T {
+pub fn iterators_next<T>(mut its []TensorIterator<T>) ?([]T, int) {
 	mut nums := []T{cap: its.len}
-	for mut iter in its {
-		val := iter.next() or { return err }
+	mut pos := -1
+	for i, mut iter in its {
+		val, pos_ := iter.next() or { return err }
+		if i == 0 {
+			pos = pos_
+		}
 		nums << T(val)
 	}
-	return nums
+	return nums, pos
 }

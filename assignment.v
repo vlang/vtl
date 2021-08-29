@@ -1,6 +1,6 @@
 module vtl
 
-import vtl.storage
+import storage
 
 // set copies a scalar value into a Tensor at the provided index
 [inline]
@@ -19,13 +19,8 @@ pub fn (t &Tensor<T>) fill<T>(val T) {
 // Tensor of the same shape
 pub fn (mut t Tensor<T>) assign<T>(other &Tensor<T>) {
 	mut iters := t.iterators<T>([other])
-	mut pos := iters[0].pos
 	for {
-		if vals := iterators_next<T>(mut iters) {
-			storage.storage_set<T>(t.data, pos, vals[1])
-			pos = iters[0].pos
-		} else {
-			break
-		}
+		vals, pos := iterators_next<T>(mut iters) or { break }
+		storage.storage_set<T>(t.data, pos, vals[1])
 	}
 }

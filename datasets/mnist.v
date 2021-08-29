@@ -62,11 +62,9 @@ pub fn (mut ds MnistDataset) next() ?DatasetBatch {
 	mut lft := vtl.zeros<f32>([lt.shape[0], 10])
 
 	mut iter := lt.iterator()
-	mut pos := iter.pos
 	for {
-		el := iter.next() or { break }
-		lft.set([pos, int(el)], 1)
-		pos = iter.pos
+		elem, pos := iter.next() or { break }
+		lft.set([pos, int(elem)], 1)
 	}
 
 	ft := vtl.from_array(features, [features.len]).reshape([lt.shape[0], -1])

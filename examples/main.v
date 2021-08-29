@@ -16,7 +16,7 @@ fn main() {
 	println(expected)
 	mut iter := expected.iterator()
 	for {
-		val := iter.next() or { break }
+		val, _ := iter.next() or { break }
 		println(val)
 	}
 	println('')

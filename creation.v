@@ -1,6 +1,6 @@
 module vtl
 
-import vtl.storage
+import storage
 
 // empty returns a new Tensor of given shape and type, without initializing entries
 [inline]

@@ -152,7 +152,7 @@ fn tensor_str<T>(t &Tensor<T>, separator string, prefix string) string {
 	}
 	mut summary_insert := ''
 	mut data := t
-	if t.size > vtl.max_printable_size {
+	if t.size > .max_printable_size {
 		summary_insert = '...'
 		data = leading_trailing<T>(t, 3, [], [])
 	}
@@ -167,13 +167,10 @@ fn max_str_len<T>(t &Tensor<T>) int {
 	mut mx := 0
 	mut iter := t.iterator()
 	for {
-		if val := iter.next() {
-			val_str := val.str()
-			if val_str.len > mx {
-				mx = val_str.len
-			}
-		} else {
-			break
+		val, _ := iter.next() or { break }
+		val_str := val.str()
+		if val_str.len > mx {
+			mx = val_str.len
 		}
 	}
 	return mx

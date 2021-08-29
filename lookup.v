@@ -1,6 +1,6 @@
 module vtl
 
-import vtl.storage
+import storage
 import math
 
 // get returns a scalar value from a Tensor at the provided index

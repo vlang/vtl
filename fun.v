@@ -1,29 +1,24 @@
 module vtl
 
 import math
-import vtl.storage
+import storage
 
-pub type MapFn<T> = fn (x T, i int) T
+pub type MapFn = fn (x T, i int) T
 
-pub type ApplyFn<T> = fn (x T, i int) T
+pub type ApplyFn = fn (x T, i int) T
 
-pub type NMapFn<T> = fn (x []T, i int) T
+pub type NMapFn = fn (x []T, i int) T
 
-pub type NApplyFn<T> = fn (x []T, i int) T
+pub type NApplyFn = fn (x []T, i int) T
 
 // map maps a function to a given Tensor retuning a new Tensor with same shape
 pub fn (t &Tensor<T>) map<T>(f MapFn<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
-	mut pos := iter.pos
 	for {
-		if val := iter.next() {
-			next_val := f(val, pos)
-			storage.storage_set<T>(ret.data, pos, next_val)
-			pos = iter.pos
-		} else {
-			break
-		}
+		val, pos := iter.next() or { break }
+		next_val := f(val, pos)
+		storage.storage_set<T>(ret.data, pos, next_val)
 	}
 	return ret
 }
@@ -34,7 +29,7 @@ pub fn (t &Tensor<T>) nmap<T>(f NMapFn<T>, ts ...&Tensor<T>) &Tensor<T> {
 	mut iters := t.iterators<T>(ts)
 	mut i := 0
 	for {
-		vals := iterators_next<T>(mut iters) or { break }
+		vals, _ := iterators_next<T>(mut iters) or { break }
 		val := f(vals, i)
 		storage.storage_set<T>(ret.data, i, val)
 		i++
@@ -47,13 +42,10 @@ pub fn (t &Tensor<T>) apply<T>(f ApplyFn<T>) {
 	mut iter := t.iterator()
 	mut i := 0
 	for {
-		if val := iter.next() {
-			next_val := f(val, i)
-			storage.storage_set<T>(t.data, i, next_val)
-			i++
-		} else {
-			break
-		}
+		val, _ := iter.next() or { break }
+		next_val := f(val, i)
+		storage.storage_set<T>(t.data, i, next_val)
+		i++
 	}
 }
 
@@ -62,7 +54,7 @@ pub fn (t &Tensor<T>) napply<T>(f NApplyFn<T>, ts ...&Tensor<T>) {
 	mut iters := t.iterators<T>(ts)
 	mut i := 0
 	for {
-		vals := iterators_next<T>(mut iters) or { break }
+		vals, _ := iterators_next<T>(mut iters) or { break }
 		val := f(vals, i)
 		storage.storage_set<T>(t.data, i, val)
 		i++
@@ -76,7 +68,7 @@ fn equal<T>(t &Tensor<T>, other &Tensor<T>) bool {
 	}
 	mut iters := iterators<T>([t, other])
 	for {
-		vals := iterators_next<T>(mut iters) or { break }
+		vals, _ := iterators_next<T>(mut iters) or { break }
 		if vals[0] != vals[1] {
 			return false
 		}
