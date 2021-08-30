@@ -1,6 +1,6 @@
 module vtl
 
-import vtl.storage
+import storage
 
 // set copies a scalar value into a Tensor at the provided index
 [inline]

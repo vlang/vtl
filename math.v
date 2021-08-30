@@ -1,6 +1,6 @@
 module vtl
 
-import vtl.storage
+import storage
 import math
 
 fn handle_abs<T>(x T, _ int) T {
@@ -796,7 +796,7 @@ pub fn nextafter32<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	mut iters := iterators<T>([a, b])
 	for {
 		vals, pos := iterators_next<T>(mut iters) or { break }
-		val := handle_nextafterf32<T>(valpos, i)
+		val := handle_nextafterf32<T>(vals, pos)
 		storage.storage_set<T>(ret.data, pos, val)
 	}
 	return ret

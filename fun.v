@@ -1,7 +1,7 @@
 module vtl
 
 import math
-import vtl.storage
+import storage
 
 pub type MapFn = fn (x T, i int) T
 

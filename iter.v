@@ -1,6 +1,6 @@
 module vtl
 
-import vtl.storage
+import storage
 
 // IteratorStrategy defines a function to use in order to mutate
 // iteration position
