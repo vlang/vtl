@@ -63,29 +63,7 @@ pub fn from_array<T>(arr []T, shape []int, data TensorBuildData) &Tensor<T> {
 // 	t_arr := t.to_array<T>()
 // 	arr := t_arr.map(U(it))
 
-// 	shape := t.shape
-// 	size := size_from_shape(shape)
-// 	if size != arr.len {
-// 		panic('Bad shape for array, shape [$arr.len] cannot fit into shape $shape')
-// 	}
-// 	data_storage := storage.from_array<U>(arr, .cpu)
-// 	if shape.len == 0 {
-// 		return &Tensor<U>{
-// 			memory: t.memory
-// 			strides: [1]
-// 			shape: []
-// 			size: size
-// 			data: data_storage
-// 		}
-// 	}
-// 	strides := strides_from_shape(shape, t.memory)
-// 	return &Tensor<U>{
-// 		shape: shape
-// 		strides: strides
-// 		memory: t.memory
-// 		size: size
-// 		data: data_storage
-// 	}
+// 	return from_array<U>(arr, t.shape, memory: t.memory)
 // }
 
 // new_tensor allocates a Tensor onto specified device with a given data
