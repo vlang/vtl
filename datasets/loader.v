@@ -21,28 +21,74 @@ pub interface DatasetBatch {
 	labels &vtl.Tensor<f32>
 }
 
-fn get_cache_dir(subdir string) string {
-	cache_dir := os.cache_dir()
-	return os.join_path(cache_dir, subdir)
+fn get_cache_dir(subdir ...string) string {
+	mut cache_dir := os.cache_dir()
+	$if datasets_dir ? {
+		cache_dir = datasets_dir
+	}
+	return os.join_path(cache_dir, ...subdir)
 }
 
-fn load_dataset_from_url(url string) ?string {
+struct RawDownload {
+	url    string
+	target string
+}
+
+fn load_from_url(data RawDownload) ?string {
 	datasets_cache_dir := get_cache_dir('datasets')
 
 	if !os.is_dir(datasets_cache_dir) {
 		os.mkdir_all(datasets_cache_dir) ?
 	}
-	cache_file_name := sha1.hexhash(url)
+	cache_file_name := if data.target == '' { sha1.hexhash(data.url) } else { data.target }
 	cache_file_path := os.join_path(datasets_cache_dir, cache_file_name)
 
 	if os.is_file(cache_file_path) {
 		return os.read_file(cache_file_path)
 	}
 
-	res := http.get(url) ?
+	res := http.get(data.url) ?
 	content := res.text
 
 	os.write_file(cache_file_path, content) ?
 
 	return content
+}
+
+struct DatasetDownload {
+	dataset    string
+	baseurl    string
+	extract    bool
+	urls_names map[string]string
+}
+
+fn download_dataset(data DatasetDownload) ? {
+	for path, filename in data.urls_names {
+		dataset_dir := get_cache_dir('datasets', data.dataset)
+
+		if !os.is_dir(dataset_dir) {
+			os.mkdir_all(dataset_dir) ?
+		}
+
+		target := os.join_path(dataset_dir, filename)
+
+		if os.exists(target) {
+			$if debug ? {
+				// we assume that the correct extraction process was done
+				// before
+				// @todo: check for extraction...
+				println('$filename already exists')
+			}
+		} else {
+			$if debug ? {
+				println('Downloading $filename')
+			}
+			load_from_url(url: '$data.baseurl$path', target: target) ?
+			if data.extract {
+				$if debug ? {
+					println('Extracting $target')
+				}
+			}
+		}
+	}
 }

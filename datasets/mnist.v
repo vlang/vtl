@@ -24,7 +24,7 @@ pub:
 
 pub fn load_mnist(set_type DatasetType, batch_size int) ?DatasetLoader {
 	url := if set_type == .train { datasets.mnist_train_url } else { datasets.mnist_test_url }
-	content := load_dataset_from_url(url) ?
+	content := load_from_url(url: url) ?
 
 	return DatasetLoader(&MnistDataset{
 		@type: set_type
