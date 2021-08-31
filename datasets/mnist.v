@@ -67,7 +67,7 @@ pub fn (mut ds MnistDataset) next() ?DatasetBatch {
 		lft.set([pos, int(elem)], 1)
 	}
 
-	ft := vtl.from_array(features, [features.len]).reshape([lt.shape[0], -1])
+	ft := vtl.from_array(features, [features.len]).reshape([-1, 1, 32, 32])
 
 	return DatasetBatch(&MnistBatch{
 		labels: lft

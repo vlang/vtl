@@ -3,6 +3,7 @@ module datasets
 import os
 import crypto.sha1
 import net.http
+import szip
 import vtl
 
 pub enum DatasetType {
@@ -40,8 +41,12 @@ fn load_from_url(data RawDownload) ?string {
 	if !os.is_dir(datasets_cache_dir) {
 		os.mkdir_all(datasets_cache_dir) ?
 	}
-	cache_file_name := if data.target == '' { sha1.hexhash(data.url) } else { data.target }
-	cache_file_path := os.join_path(datasets_cache_dir, cache_file_name)
+	cache_file_name := sha1.hexhash(data.url)
+	cache_file_path := if data.target == '' {
+		os.join_path(datasets_cache_dir, cache_file_name)
+	} else {
+		data.target
+	}
 
 	if os.is_file(cache_file_path) {
 		return os.read_file(cache_file_path)
@@ -81,13 +86,14 @@ fn download_dataset(data DatasetDownload) ? {
 			}
 		} else {
 			$if debug ? {
-				println('Downloading $filename')
+				println('Downloading $filename from $data.baseurl$path')
 			}
 			load_from_url(url: '$data.baseurl$path', target: target) ?
 			if data.extract {
 				$if debug ? {
 					println('Extracting $target')
 				}
+				szip.extract_zip_to_dir(target, dataset_dir) ?
 			}
 		}
 	}

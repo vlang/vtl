@@ -10,6 +10,6 @@ fn main() {
 	for {
 		batch := ds.next() or { break }
 		println('Batch number: ${i++}')
-		// println(batch.str())
+		// println(batch)
 	}
 }
