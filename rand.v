@@ -23,11 +23,20 @@ pub fn random_seed(i int) {
 }
 
 fn random_beetween<T>(min T, max T) T {
+	$if T is byte {
+		return byte(rand.int_in_range(int(min), int(max)))
+	}
+	$if T is u16 {
+		return u16(rand.int_in_range(int(min), int(max)))
+	}
 	$if T is u32 {
 		return rand.u32_in_range(min, max)
 	}
 	$if T is u64 {
 		return rand.u64_in_range(min, max)
+	}
+	$if T is i8 {
+		return i8(rand.int_in_range(int(min), int(max)))
 	}
 	$if T is int {
 		return rand.int_in_range(min, max)
@@ -41,7 +50,7 @@ fn random_beetween<T>(min T, max T) T {
 	$if T is f64 {
 		return rand.f64_in_range(min, max)
 	}
-	return T(rand.int_in_range(int(min), int(max)))
+	return T(0)
 }
 
 fn init() {
