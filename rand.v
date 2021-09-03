@@ -41,7 +41,7 @@ fn random_beetween<T>(min T, max T) T {
 	$if T is f64 {
 		return rand.f64_in_range(min, max)
 	}
-	return T(0)
+	return T(rand.int_in_range(int(min), int(max)))
 }
 
 fn init() {
