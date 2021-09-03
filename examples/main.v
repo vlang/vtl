@@ -58,4 +58,6 @@ fn main() {
 	b4 := vtl.ones<f64>([2])
 	b3.assign(b4)
 	println(b3.str())
+
+	println(vtl.random<f64>(-1.0, 2.0, [2, 2]))
 }
