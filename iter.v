@@ -11,6 +11,7 @@ pub enum IteratorStrategy {
 
 // TensorIterator is a struct to hold a Tensors
 // iteration state while iterating through a Tensor
+[heap]
 pub struct TensorIterator<T> {
 pub:
 	tensor       &Tensor<T>
@@ -23,20 +24,20 @@ pub mut:
 }
 
 // iterator creates an iterator through a Tensor
-pub fn (t &Tensor<T>) iterator<T>() TensorIterator<T> {
+pub fn (t &Tensor<T>) iterator<T>() &TensorIterator<T> {
 	if t.is_rowmajor_contiguous() {
 		return t.rowmajor_contiguous_iterator()
 	}
 	return t.strided_iterator()
 }
 
-fn (t &Tensor<T>) rowmajor_contiguous_iterator<T>() TensorIterator<T> {
+fn (t &Tensor<T>) rowmajor_contiguous_iterator<T>() &TensorIterator<T> {
 	return t.custom_iterator<T>(
 		next_handler: .flatten_iteration
 	)
 }
 
-fn (t &Tensor<T>) strided_iterator<T>() TensorIterator<T> {
+fn (t &Tensor<T>) strided_iterator<T>() &TensorIterator<T> {
 	coord := []int{len: t.rank()}
 	return t.custom_iterator<T>(
 		coord: coord
@@ -54,8 +55,8 @@ pub struct IteratorBuildData<T> {
 }
 
 // iterator creates an iterator through a Tensor with custom data
-pub fn (t &Tensor<T>) custom_iterator<T>(data IteratorBuildData<T>) TensorIterator<T> {
-	return TensorIterator<T>{
+pub fn (t &Tensor<T>) custom_iterator<T>(data IteratorBuildData<T>) &TensorIterator<T> {
+	return &TensorIterator<T>{
 		coord: data.coord
 		backstrides: data.backstrides
 		tensor: t
@@ -138,7 +139,7 @@ fn tensor_backstrides<T>(t &Tensor<T>) []int {
 }
 
 // iterators creates an array of iterators through a list of tensors
-pub fn (t &Tensor<T>) iterators<T>(ts []&Tensor<T>) []TensorIterator<T> {
+pub fn (t &Tensor<T>) iterators<T>(ts []&Tensor<T>) []&TensorIterator<T> {
 	mut next_ts := [t]
 	for t_ in ts {
 		next_ts << t_
@@ -148,16 +149,16 @@ pub fn (t &Tensor<T>) iterators<T>(ts []&Tensor<T>) []TensorIterator<T> {
 
 // iterators creates an array of iterators through a list of tensors
 [inline]
-pub fn (ts []&Tensor<T>) iterators<T>() []TensorIterator<T> {
+pub fn (ts []&Tensor<T>) iterators<T>() []&TensorIterator<T> {
 	return iterators<T>(ts)
 }
 
 // iterators creates an array of iterators through a list of tensors
-pub fn iterators<T>(ts []&Tensor<T>) []TensorIterator<T> {
+pub fn iterators<T>(ts []&Tensor<T>) []&TensorIterator<T> {
 	if ts.len == 0 {
-		return []TensorIterator<T>{}
+		return []&TensorIterator<T>{}
 	}
-	mut iters := []TensorIterator<T>{cap: ts.len}
+	mut iters := []&TensorIterator<T>{cap: ts.len}
 	for i in 0 .. ts.len {
 		tib := ts[i].broadcast_to<T>(ts[0].shape)
 		iters << tib.iterator<T>()
@@ -168,13 +169,13 @@ pub fn iterators<T>(ts []&Tensor<T>) []TensorIterator<T> {
 // next calls the iteration type for a given list of iterators
 // which is either flat or strided and returns a list of Nums containing the current values
 [inline]
-pub fn (mut its []TensorIterator<T>) next<T>() ?([]T, int) {
+pub fn (mut its []&TensorIterator<T>) next<T>() ?([]T, int) {
 	return iterators_next<T>(mut its)
 }
 
 // iterators_next calls the iteration type for a given list of iterators
 // which is either flat or strided and returns a list of Nums containing the current values
-pub fn iterators_next<T>(mut its []TensorIterator<T>) ?([]T, int) {
+pub fn iterators_next<T>(mut its []&TensorIterator<T>) ?([]T, int) {
 	mut nums := []T{cap: its.len}
 	mut pos := -1
 	for i, mut iter in its {
