@@ -12,7 +12,7 @@ pub fn random<T>(min T, max T, shape []int, data TensorBuildData) &Tensor<T> {
 	mut iter := t.iterator()
 	for {
 		_, pos := iter.next() or { break }
-		rand_value := random_beetween<T>(min, max)
+		rand_value := random_in_range<T>(min, max)
 		storage.storage_set<T>(t.data, pos, rand_value)
 	}
 	return t
@@ -22,7 +22,7 @@ pub fn random_seed(i int) {
 	rand.seed([u32(i), u32(i)])
 }
 
-fn random_beetween<T>(min T, max T) T {
+fn random_in_range<T>(min T, max T) T {
 	$if T is byte {
 		return byte(rand.int_in_range(int(min), int(max)))
 	}
