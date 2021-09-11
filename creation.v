@@ -1,7 +1,5 @@
 module vtl
 
-import storage
-
 // empty returns a new Tensor of given shape and type, without initializing entries
 [inline]
 pub fn empty<T>(shape []int, data TensorBuildData) &Tensor<T> {
@@ -74,14 +72,12 @@ pub struct BuildRangeData {
 	from    int
 	to      int
 	memory  MemoryFormat = .rowmajor
-	storage storage.StorageStrategy = .cpu
 }
 
 [inline]
 fn (d BuildRangeData) without_range() TensorBuildData {
 	return TensorBuildData{
 		memory: d.memory
-		storage: d.storage
 	}
 }
 
@@ -97,7 +93,7 @@ pub fn range<T>(data BuildRangeData) &Tensor<T> {
 // seq returns a Tensor containing values ranging from [0, to)
 [inline]
 pub fn seq<T>(n int, data TensorBuildData) &Tensor<T> {
-	return range<T>(to: n, memory: data.memory, storage: data.storage)
+	return range<T>(to: n, memory: data.memory)
 }
 
 // from_1d takes a one dimensional array of floating point values

@@ -1,13 +1,12 @@
 module vtl
 
-import storage
 import math
 
 // get returns a scalar value from a Tensor at the provided index
 [inline]
 pub fn (t &Tensor<T>) get<T>(index []int) T {
 	offset := t.offset_index(index)
-	return storage.storage_get<T>(t.data, offset)
+	return t.data.get<T>(offset)
 }
 
 // offset_index returns the index to a Tensor's data at

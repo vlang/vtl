@@ -12,7 +12,7 @@ pub enum MemoryFormat {
 [heap]
 pub struct Tensor<T> {
 pub mut:
-	data    storage.Storage
+	data    &storage.Storage<T>
 	memory  MemoryFormat
 	size    int
 	shape   []int
@@ -129,7 +129,7 @@ pub fn (t &Tensor<T>) copy(memory MemoryFormat) &Tensor<T> {
 	strides := strides_from_shape(t.shape, memory)
 	size := size_from_shape(t.shape)
 	return &Tensor<T>{
-		data: storage.storage_clone<T>(t.data)
+		data: t.data.clone()
 		memory: memory
 		shape: t.shape
 		strides: strides

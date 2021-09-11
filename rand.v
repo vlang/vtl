@@ -2,7 +2,6 @@ module vtl
 
 import rand
 import time
-import storage
 
 // random returns a new Tensor of given shape and type, initialized
 // with random numbers between a given min and max value
@@ -13,7 +12,7 @@ pub fn random<T>(min T, max T, shape []int, data TensorBuildData) &Tensor<T> {
 	for {
 		_, pos := iter.next() or { break }
 		rand_value := random_in_range<T>(min, max)
-		storage.storage_set<T>(t.data, pos, rand_value)
+		t.data.set<T>(pos, rand_value)
 	}
 	return t
 }

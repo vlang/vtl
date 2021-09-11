@@ -1,7 +1,6 @@
 module vtl
 
 import math
-import storage
 
 pub type MapFn = fn (x T, i int) T
 
@@ -18,7 +17,7 @@ pub fn (t &Tensor<T>) map<T>(f MapFn<T>) &Tensor<T> {
 	for {
 		val, pos := iter.next() or { break }
 		next_val := f(val, pos)
-		storage.storage_set<T>(ret.data, pos, next_val)
+		ret.data.set<T>(pos, next_val)
 	}
 	return ret
 }
@@ -30,28 +29,28 @@ pub fn (t &Tensor<T>) nmap<T>(f NMapFn<T>, ts ...&Tensor<T>) &Tensor<T> {
 	for {
 		vals, pos := iterators_next<T>(mut iters) or { break }
 		val := f(vals, pos)
-		storage.storage_set<T>(ret.data, pos, val)
+		ret.data.set<T>(pos, val)
 	}
 	return ret
 }
 
 // apply applies a function to each element of a given Tensor
-pub fn (t &Tensor<T>) apply<T>(f ApplyFn<T>) {
+pub fn (mut t Tensor<T>) apply<T>(f ApplyFn<T>) {
 	mut iter := t.iterator()
 	for {
 		val, pos := iter.next() or { break }
 		next_val := f(val, pos)
-		storage.storage_set<T>(t.data, pos, next_val)
+		t.data.set<T>(pos, next_val)
 	}
 }
 
 // napply applies a function to each element of a given Tensor with params
-pub fn (t &Tensor<T>) napply<T>(f NApplyFn<T>, ts ...&Tensor<T>) {
+pub fn (mut t Tensor<T>) napply<T>(f NApplyFn<T>, ts ...&Tensor<T>) {
 	mut iters := t.iterators<T>(ts)
 	for {
 		vals, pos := iterators_next<T>(mut iters) or { break }
 		val := f(vals, pos)
-		storage.storage_set<T>(t.data, pos, val)
+		t.data.set<T>(pos, val)
 	}
 }
 
@@ -230,7 +229,7 @@ pub fn (t &Tensor<T>) slice<T>(idx ...[]int) &Tensor<T> {
 		shape: newshape_.clone()
 		strides: newstrides_.clone()
 		size: size_from_shape(newshape_)
-		data: storage.storage_offset<T>(t.data, offset)
+		data: t.data.offset<T>(offset)
 		memory: .colmajor
 	}
 	ensure_memory<T>(mut ret)
@@ -274,7 +273,7 @@ pub fn (t &Tensor<T>) slice_hilo<T>(idx1 []int, idx2 []int) &Tensor<T> {
 		shape: newshape_.clone()
 		strides: newstrides_.clone()
 		size: size_from_shape(newshape_)
-		data: storage.storage_offset<T>(t.data, offset)
+		data: t.data.offset<T>(offset)
 		memory: .colmajor
 	}
 	ensure_memory<T>(mut ret)

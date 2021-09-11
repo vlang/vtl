@@ -1,7 +1,5 @@
 module vtl
 
-import storage
-
 // IteratorStrategy defines a function to use in order to mutate
 // iteration position
 pub enum IteratorStrategy {
@@ -138,7 +136,7 @@ fn (t &Tensor<T>) strided_iterator<T>() &TensorIterator<T> {
 // Tensor in Row-Major order
 fn handle_strided_iteration<T>(mut s TensorIterator<T>) T {
 	// get current value after update new position
-	val := storage.storage_get<T>(s.tensor.data, s.pos)
+	val := s.tensor.data.get<T>(s.pos)
 	rank := s.tensor.rank()
 	shape := s.tensor.shape
 	strides := s.tensor.strides
@@ -164,7 +162,7 @@ fn handle_strided_iteration<T>(mut s TensorIterator<T>) T {
 // in Row-Major order
 fn handle_flatten_iteration<T>(mut s TensorIterator<T>) T {
 	// get current value after update new position
-	val := storage.storage_get<T>(s.tensor.data, s.pos)
+	val := s.tensor.data.get<T>(s.pos)
 	defer {
 		s.pos++
 	}
