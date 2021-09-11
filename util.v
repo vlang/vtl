@@ -57,7 +57,7 @@ fn clip_axis(axis int, size int) int {
 fn strides_from_shape(shape []int, memory MemoryFormat) []int {
 	mut accum := 1
 	mut result := []int{len: shape.len}
-	if memory == .rowmajor {
+	if memory == .row_major {
 		for i := shape.len - 1; i >= 0; i-- {
 			result[i] = accum
 			accum *= shape[i]
@@ -145,14 +145,14 @@ fn pad_with_max(pad []int, shape []int, ndims int) []int {
 // ensure_memory sets a correct memory layout to a given tensor
 [inline]
 pub fn ensure_memory<T>(mut t Tensor<T>) {
-	if t.is_colmajor() {
-		if !t.is_colmajor_contiguous() {
-			t.memory = .rowmajor
+	if t.is_col_major() {
+		if !t.is_col_major_contiguous() {
+			t.memory = .row_major
 		}
 	}
 	if t.is_contiguous() {
 		if t.rank() > 1 {
-			t.memory = .rowmajor
+			t.memory = .row_major
 		}
 	}
 }

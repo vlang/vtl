@@ -76,7 +76,7 @@ pub fn (t &Tensor<T>) broadcast_to<T>(shape []int) &Tensor<T> {
 		return t
 	}
 	size := size_from_shape(shape)
-	strides := strides_from_shape(shape, .rowmajor)
+	strides := strides_from_shape(shape, .row_major)
 	result_strides := broadcast_strides(shape, t.shape, strides, t.strides)
 	return &Tensor<T>{
 		data: t.data

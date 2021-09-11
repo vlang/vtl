@@ -23,8 +23,8 @@ pub mut:
 
 // iterator creates an iterator through a Tensor
 pub fn (t &Tensor<T>) iterator<T>() &TensorIterator<T> {
-	if t.is_rowmajor_contiguous() {
-		return t.rowmajor_contiguous_iterator()
+	if t.is_row_major_contiguous() {
+		return t.row_major_contiguous_iterator()
 	}
 	return t.strided_iterator()
 }
@@ -116,7 +116,7 @@ fn iterators_next<T>(mut its []&TensorIterator<T>) ?([]T, int) {
 	return nums, pos
 }
 
-fn (t &Tensor<T>) rowmajor_contiguous_iterator<T>() &TensorIterator<T> {
+fn (t &Tensor<T>) row_major_contiguous_iterator<T>() &TensorIterator<T> {
 	return t.custom_iterator<T>(
 		next_handler: .flatten_iteration
 	)
@@ -132,7 +132,7 @@ fn (t &Tensor<T>) strided_iterator<T>() &TensorIterator<T> {
 	)
 }
 
-// handle_strided_iteration advances through a non-rowmajor-contiguous
+// handle_strided_iteration advances through a non-row_major-contiguous
 // Tensor in Row-Major order
 fn handle_strided_iteration<T>(mut s TensorIterator<T>) T {
 	// get current value after update new position
@@ -158,7 +158,7 @@ fn handle_strided_iteration<T>(mut s TensorIterator<T>) T {
 	return val
 }
 
-// handle_flatten_iteration advances through a rowmajor-contiguous Tensor
+// handle_flatten_iteration advances through a row_major-contiguous Tensor
 // in Row-Major order
 fn handle_flatten_iteration<T>(mut s TensorIterator<T>) T {
 	// get current value after update new position

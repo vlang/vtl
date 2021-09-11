@@ -6,7 +6,7 @@ fn main() {
 	mut t := vtl.seq<f64>(10)
 	println(t.str())
 	t = vtl.from_array<f64>([1.0, 2, 3, 4, 5], [5])
-	println(t.copy(.colmajor))
+	println(t.copy(.col_major))
 	println(t.view())
 	m := vtl.from_array<f64>([1.0, 2.0, 3.0], [3, 1])
 	println(m)

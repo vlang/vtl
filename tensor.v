@@ -4,8 +4,8 @@ import storage
 
 // MemoryFormat is a sum type that lists the possible memory layouts
 pub enum MemoryFormat {
-	rowmajor
-	colmajor
+	row_major
+	col_major
 }
 
 // Tensor is the main structure defined by VTL to manage N Dimensional data
@@ -53,26 +53,26 @@ pub fn (t &Tensor<T>) is_vector() bool {
 	return t.rank() == 1
 }
 
-// is_rowmajor returns if a Tensor is supposed to store its data in Row-Major
+// is_row_major returns if a Tensor is supposed to store its data in Row-Major
 // order
 [inline]
-pub fn (t &Tensor<T>) is_rowmajor() bool {
+pub fn (t &Tensor<T>) is_row_major() bool {
 	// @todo: we need to ensure that t.memory is the source of truth
-	return t.memory == .rowmajor
+	return t.memory == .row_major
 }
 
-// is_colmajor returns if a Tensor is supposed to store its data in Col-Major
+// is_col_major returns if a Tensor is supposed to store its data in Col-Major
 // order
 [inline]
-pub fn (t &Tensor<T>) is_colmajor() bool {
+pub fn (t &Tensor<T>) is_col_major() bool {
 	// @todo: we need to ensure that t.memory is the source of truth
-	return t.memory == .colmajor
+	return t.memory == .col_major
 }
 
-// is_rowmajor verifies if a Tensor stores its data in Row-Major
+// is_row_major verifies if a Tensor stores its data in Row-Major
 // order
 [inline]
-pub fn (t &Tensor<T>) is_rowmajor_contiguous() bool {
+pub fn (t &Tensor<T>) is_row_major_contiguous() bool {
 	if t.rank() == 1 && t.strides[0] != 1 {
 		return false
 	}
@@ -86,10 +86,10 @@ pub fn (t &Tensor<T>) is_rowmajor_contiguous() bool {
 	return true
 }
 
-// is_colmajor verifies if a Tensor stores its data in Col-Major
+// is_col_major verifies if a Tensor stores its data in Col-Major
 // order
 [inline]
-pub fn (t &Tensor<T>) is_colmajor_contiguous() bool {
+pub fn (t &Tensor<T>) is_col_major_contiguous() bool {
 	if t.rank() == 1 && t.strides[0] != 1 {
 		return false
 	}
@@ -107,7 +107,7 @@ pub fn (t &Tensor<T>) is_colmajor_contiguous() bool {
 // memory layout
 [inline]
 pub fn (t &Tensor<T>) is_contiguous() bool {
-	return t.is_rowmajor_contiguous() || t.is_colmajor_contiguous()
+	return t.is_row_major_contiguous() || t.is_col_major_contiguous()
 }
 
 // to_array returns the flatten representation of a tensor in a v array storing
@@ -123,7 +123,7 @@ pub fn (t &Tensor<T>) to_array() []T {
 }
 
 // copy returns a copy of a Tensor with a particular memory
-// layout, either rowmajor-contiguous or colmajor-contiguous
+// layout, either row_major-contiguous or col_major-contiguous
 [inline]
 pub fn (t &Tensor<T>) copy(memory MemoryFormat) &Tensor<T> {
 	strides := strides_from_shape(t.shape, memory)

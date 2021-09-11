@@ -22,7 +22,7 @@ pub fn diag_flat<T>(t &Tensor<T>) &Tensor<T> {
 // tril computes the lower triangle of an array.
 // returns a copy of an array with elements above the diagonal zeroed
 pub fn tril<T>(t &Tensor<T>) &Tensor<T> {
-	mut ret := t.copy(.rowmajor)
+	mut ret := t.copy(.row_major)
 	tril_inplace_offset<T>(mut ret, 0)
 	return ret
 }
@@ -30,7 +30,7 @@ pub fn tril<T>(t &Tensor<T>) &Tensor<T> {
 // tril_inpl computes the lower triangle of an array.
 // returns a copy of an array with elements above the kth diagonal zeroed
 pub fn tril_offset<T>(t &Tensor<T>, offset int) &Tensor<T> {
-	mut ret := t.copy(.rowmajor)
+	mut ret := t.copy(.row_major)
 	tril_inplace_offset<T>(mut ret, offset)
 	return ret
 }
@@ -50,7 +50,7 @@ pub fn tril_inpl_offset<T>(mut t Tensor<T>, offset int) {
 // triu computes the Upper triangle of an array.
 // returns a copy of an array with elements below the diagonal zeroed
 pub fn triu<T>(t &Tensor<T>) &Tensor<T> {
-	mut ret := t.copy(.rowmajor)
+	mut ret := t.copy(.row_major)
 	triu_inplace_offset<T>(mut ret, 0)
 	return ret
 }
@@ -58,7 +58,7 @@ pub fn triu<T>(t &Tensor<T>) &Tensor<T> {
 // triu_offset computes the upper triangle of an array.
 // returns a copy of an array with elements below the kth diagonal zeroed
 pub fn triu_offset<T>(t &Tensor<T>, offset int) &Tensor<T> {
-	mut ret := t.copy(.rowmajor)
+	mut ret := t.copy(.row_major)
 	triu_inplace_offset<T>(mut ret, offset)
 	return ret
 }
