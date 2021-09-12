@@ -83,7 +83,7 @@ pub fn (mut v Variable<T>) backprop() {
 		for i, diff in diffs {
 			mut parent_i := cur_node.parents[i]
 			if parent_i.requires_grad {
-				parent_i.grad += diff
+				parent_i.grad = vtl.add(parent_i.grad, diff)
 			}
 		}
 	}
