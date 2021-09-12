@@ -20,7 +20,7 @@ pub fn add<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 }
 
 fn handle_substract<T>(xs []T, _ int) T {
-	return xs[0] + xs[1]
+	return xs[0] - xs[1]
 }
 
 // substract substracts two tensors elementwise
@@ -39,7 +39,7 @@ pub fn substract<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 }
 
 fn handle_divide<T>(xs []T, _ int) T {
-	return xs[0] + xs[1]
+	return xs[0] / xs[1]
 }
 
 // divide divides two tensors elementwise
@@ -58,7 +58,7 @@ pub fn divide<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 }
 
 fn handle_multiply<T>(xs []T, _ int) T {
-	return xs[0] + xs[1]
+	return xs[0] * xs[1]
 }
 
 // multiply multiplies two tensors elementwise
