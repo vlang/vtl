@@ -3,7 +3,7 @@ module vtl
 import storage
 
 pub struct TensorBuildData {
-	memory  MemoryFormat = .row_major
+	memory MemoryFormat = .row_major
 }
 
 [inline]
@@ -15,8 +15,8 @@ fn (d TensorBuildData) with_shape(shape []int) TensorBuildDataWithShape {
 }
 
 pub struct TensorBuildDataWithShape {
-	shape   []int
-	memory  MemoryFormat = .row_major
+	shape  []int
+	memory MemoryFormat = .row_major
 }
 
 [inline]

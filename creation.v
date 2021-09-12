@@ -69,9 +69,9 @@ pub fn full_like<T>(t &Tensor<T>, val T) &Tensor<T> {
 }
 
 pub struct BuildRangeData {
-	from    int
-	to      int
-	memory  MemoryFormat = .row_major
+	from   int
+	to     int
+	memory MemoryFormat = .row_major
 }
 
 [inline]
