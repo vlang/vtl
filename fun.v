@@ -2,13 +2,27 @@ module vtl
 
 import math
 
-pub type MapFn = fn (x T, i int) T
+pub type MapFn<T> = fn (x T, i int) T
 
-pub type ApplyFn = fn (x T, i int) T
+pub type ApplyFn<T> = fn (x T, i int) T
 
-pub type NMapFn = fn (x []T, i int) T
+pub type ReducerFn<T> = fn (acc T, x T, i int) T
 
-pub type NApplyFn = fn (x []T, i int) T
+pub type NMapFn<T> = fn (x []T, i int) T
+
+pub type NApplyFn<T> = fn (x []T, i int) T
+
+pub type NReducerFn<T> = fn (acc T, x []T, i int) T
+
+// apply applies a function to each element of a given Tensor
+pub fn (mut t Tensor<T>) apply<T>(f ApplyFn<T>) {
+	mut iter := t.iterator()
+	for {
+		val, pos := iter.next() or { break }
+		next_val := f(val, pos)
+		t.data.set<T>(pos, next_val)
+	}
+}
 
 // map maps a function to a given Tensor retuning a new Tensor with same shape
 pub fn (t &Tensor<T>) map<T>(f MapFn<T>) &Tensor<T> {
@@ -22,26 +36,15 @@ pub fn (t &Tensor<T>) map<T>(f MapFn<T>) &Tensor<T> {
 	return ret
 }
 
-// map maps a function to a given list of Tensor retuning a new Tensor with same shape
-pub fn (t &Tensor<T>) nmap<T>(f NMapFn<T>, ts ...&Tensor<T>) &Tensor<T> {
-	mut ret := new_tensor_like<T>(t)
-	mut iters := t.iterators<T>(ts)
-	for {
-		vals, pos := iterators_next<T>(mut iters) or { break }
-		val := f(vals, pos)
-		ret.data.set<T>(pos, val)
-	}
-	return ret
-}
-
-// apply applies a function to each element of a given Tensor
-pub fn (mut t Tensor<T>) apply<T>(f ApplyFn<T>) {
+// reduce reduces a function to a given Tensor retuning a new agregatted value
+pub fn (t &Tensor<T>) reduce<T>(f ReducerFn<T>, init T) T {
+	mut ret := init
 	mut iter := t.iterator()
 	for {
 		val, pos := iter.next() or { break }
-		next_val := f(val, pos)
-		t.data.set<T>(pos, next_val)
+		ret = f(ret, val, pos)
 	}
+	return ret
 }
 
 // napply applies a function to each element of a given Tensor with params
@@ -53,6 +56,30 @@ pub fn (mut t Tensor<T>) napply<T>(f NApplyFn<T>, ts ...&Tensor<T>) {
 		t.data.set<T>(pos, val)
 	}
 }
+
+// nmap maps a function to a given list of Tensor retuning a new Tensor with same shape
+pub fn (t &Tensor<T>) nmap<T>(f NMapFn<T>, ts ...&Tensor<T>) &Tensor<T> {
+	mut ret := new_tensor_like<T>(t)
+	mut iters := t.iterators<T>(ts)
+	for {
+		vals, pos := iterators_next<T>(mut iters) or { break }
+		val := f(vals, pos)
+		ret.data.set<T>(pos, val)
+	}
+	return ret
+}
+
+// nreduce reduces a function to a given list of Tensor retuning a new agregatted value
+pub fn (t &Tensor<T>) nreduce<T>(f NReducerFn<T>, init T, ts ...&Tensor<T>) T {
+	mut ret := init
+	mut iters := t.iterators<T>(ts)
+	for {
+		vals, pos := iterators_next<T>(mut iters) or { break }
+		ret = f(ret, vals, pos)
+	}
+	return ret
+}
+
 
 // equal checks if two Tensors are equal
 fn equal<T>(t &Tensor<T>, other &Tensor<T>) bool {
