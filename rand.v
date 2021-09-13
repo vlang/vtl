@@ -1,6 +1,7 @@
 module vtl
 
 import rand
+import rand.seed
 import time
 
 // random returns a new Tensor of given shape and type, initialized
@@ -18,7 +19,7 @@ pub fn random<T>(min T, max T, shape []int, data TensorBuildData) &Tensor<T> {
 }
 
 pub fn random_seed(i int) {
-	rand.seed([u32(i), u32(i)])
+	rand.seed(seed.time_seed_array(2))
 }
 
 fn random_in_range<T>(min T, max T) T {
