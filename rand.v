@@ -7,8 +7,8 @@ import time
 // random returns a new Tensor of given shape and type, initialized
 // with random numbers between a given min and max value
 [inline]
-pub fn random<T>(min T, max T, shape []int, data TensorBuildData) &Tensor<T> {
-	mut t := empty<T>(shape, data)
+pub fn random<T>(min T, max T, shape []int, memory MemoryFormat) &Tensor<T> {
+	mut t := empty<T>(shape, memory)
 	mut iter := t.iterator()
 	for {
 		_, pos := iter.next() or { break }

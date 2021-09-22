@@ -62,20 +62,20 @@ pub fn (ctx &Context<T>) str() string {
 	mut str := ''
 	for i, node in ctx.nodes {
 		if node.parents.len <= 1 {
-			str = '${str}${node.parents[0].value.shape}'
+			str = '$str${node.parents[0].value.shape}'
 		} else {
 			str = '${str}('
 			for pi, parent in node.parents {
 				if pi != 0 {
-					str = '${str}, '
+					str = '$str, '
 				}
-				str = '${str}${parent.value.shape}'
+				str = '$str$parent.value.shape'
 			}
-			str = '${str})'
+			str = '$str)'
 		}
-		str = '${str}${node.payload.variable.value.shape}'
+		str = '$str$node.payload.variable.value.shape'
 		if i != ctx.nodes.len - 1 {
-			str = '${str}\n'
+			str = '$str\n'
 		}
 	}
 	return str

@@ -170,7 +170,7 @@ fn irange(start int, stop int) []int {
 // the use of arrays.min give us an optimizad version of this function
 [inline]
 fn iarray_min(arr []int) int {
-	return arrays.min<int>(arr)
+	return arrays.min<int>(arr) or { 0 }
 }
 
 // iarray_sum returns the sum value of a given array of int values

@@ -58,8 +58,8 @@ pub fn (mut ds MnistDataset) next() ?DatasetBatch {
 		return none
 	}
 
-	mut lt := vtl.from_array(labels, [labels.len])
-	mut lft := vtl.zeros<f32>([lt.shape[0], 10])
+	mut lt := vtl.from_array(labels, [labels.len], .row_major)
+	mut lft := vtl.zeros<f32>([lt.shape[0], 10], .row_major)
 
 	mut iter := lt.iterator()
 	for {
@@ -67,7 +67,7 @@ pub fn (mut ds MnistDataset) next() ?DatasetBatch {
 		lft.set([pos, int(elem)], 1)
 	}
 
-	ft := vtl.from_array(features, [features.len]).reshape([-1, 1, 32, 32])
+	ft := vtl.from_array(features, [features.len], .row_major).reshape([-1, 1, 32, 32])
 
 	return DatasetBatch(&MnistBatch{
 		labels: lft
