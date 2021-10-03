@@ -4,7 +4,7 @@ import vtl
 
 fn main() {
 	mut t := vtl.seq<f64>(10, .row_major)
-	println(t.str())
+	println(t)
 	t = vtl.from_array<f64>([1.0, 2, 3, 4, 5], [5], .row_major)
 	println(t.copy(.col_major))
 	println(t.view())
@@ -38,18 +38,18 @@ fn main() {
 	expected3 := vtl.from_array([0.0, 1, 2], [3], .row_major)
 	println(slice.equal(expected3))
 	mat := vtl.from_2d([[2.0, 3, 4], [1.0, 2, 3]], .row_major)
-	println(mat.str())
-	println('MATH FOR $a1.str()')
-	println(vtl.sin<f64>(a1).str())
-	println(vtl.pow<f64>(a1, a1).str())
+	println(mat)
+	println('MATH FOR $a1')
+	println(vtl.sin<f64>(a1))
+	println(vtl.pow<f64>(a1, a1))
 
 	// @todo: FIX THIS
 	a2 := vtl.ones<f64>([2, 2], .row_major)
 	b2 := vtl.zeros<f64>([2, 2], .row_major)
 	result_ := vtl.hstack<f64>([a2, b2])
 	expected_ := vtl.from_array<f64>([1.0, 1, 0, 0, 1, 1, 0, 0], [2, 4], .row_major)
-	println(result_.str())
-	println(expected_.str())
+	println(result_)
+	println(expected_)
 	println(result_.equal(expected_))
 
 	a3 := vtl.ones<f64>([3], .row_major)
@@ -59,7 +59,7 @@ fn main() {
 	println(result3_.equal(expected3_))
 	b4 := vtl.ones<f64>([2], .row_major)
 	b3.assign(b4)
-	println(b3.str())
+	println(b3)
 
 	println(vtl.random<f64>(-1.0, 2.0, [2, 2], .row_major))
 }
