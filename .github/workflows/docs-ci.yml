@@ -20,8 +20,9 @@ jobs:
         sudo ./v symlink
     - name: V doctor
       run: v doctor
+    - name: Copy VTL source code to V Modules
+      run: cp -rf ./vtl ~/.vmodules
     - name: Validate docs
       run: |
-        v install vtl
-        cd vtl
+        cd ~/.vmodules/vtl
         v check-md .

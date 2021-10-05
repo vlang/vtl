@@ -1,99 +1,94 @@
 module vtl
 
 import math
-import vtl.etype
-import vtl.storage
 
-pub type MapFn = fn (x etype.Num, i int) etype.Num
+pub type MapFn<T> = fn (x T, i int) T
 
-pub type ApplyFn = fn (x etype.Num, i int) etype.Num
+pub type ApplyFn<T> = fn (x T, i int) T
 
-pub type NMapFn = fn (x []etype.Num, i int) etype.Num
+pub type ReducerFn<T> = fn (acc T, x T, i int) T
 
-pub type NApplyFn = fn (x []etype.Num, i int) etype.Num
+pub type NMapFn<T> = fn (x []T, i int) T
 
-// map maps a function to a given Tensor retuning a new Tensor with same shape
-pub fn (t &Tensor) map(f MapFn) &Tensor {
-	mut ret := new_tensor_like(t)
-	mut iter := t.iterator()
-	mut pos := iter.pos
-	for _ in 0 .. ret.size() {
-		if val := iter.next() {
-			next_val := f(val, pos)
-			storage.storage_set(ret.data, pos, next_val)
-			pos = iter.pos
-		}
-	}
-	return ret
-}
+pub type NApplyFn<T> = fn (x []T, i int) T
 
-// map_as maps a function to a given Tensor retuning a new Tensor with same shape
-pub fn (t &Tensor) map_as<T>(f MapFn) &Tensor {
-	mut ret := new_tensor_like_with_etype(t, T.name)
-	mut iter := t.iterator()
-	mut pos := iter.pos
-	for _ in 0 .. ret.size() {
-		if val := iter.next() {
-			next_val := f(val, pos)
-			storage.storage_set(ret.data, pos, next_val)
-			pos = iter.pos
-		}
-	}
-	return ret
-}
+pub type NReducerFn<T> = fn (acc T, x []T, i int) T
 
 // apply applies a function to each element of a given Tensor
-pub fn (t &Tensor) apply(f ApplyFn) {
+pub fn (mut t Tensor<T>) apply<T>(f ApplyFn<T>) {
 	mut iter := t.iterator()
-	mut pos := iter.pos
-	for _ in 0 .. t.size() {
-		if val := iter.next() {
-			next_val := f(val, pos)
-			storage.storage_set(t.data, pos, next_val)
-			pos = iter.pos
-		}
+	for {
+		val, pos := iter.next() or { break }
+		next_val := f(val, pos)
+		t.data.set<T>(pos, next_val)
+	}
+}
+
+// map maps a function to a given Tensor retuning a new Tensor with same shape
+pub fn (t &Tensor<T>) map<T>(f MapFn<T>) &Tensor<T> {
+	mut ret := new_tensor_like<T>(t)
+	mut iter := t.iterator()
+	for {
+		val, pos := iter.next() or { break }
+		next_val := f(val, pos)
+		ret.data.set<T>(pos, next_val)
+	}
+	return ret
+}
+
+// reduce reduces a function to a given Tensor retuning a new agregatted value
+pub fn (t &Tensor<T>) reduce<T>(f ReducerFn<T>, init T) T {
+	mut ret := init
+	mut iter := t.iterator()
+	for {
+		val, pos := iter.next() or { break }
+		ret = f(ret, val, pos)
+	}
+	return ret
+}
+
+// napply applies a function to each element of a given Tensor with params
+pub fn (mut t Tensor<T>) napply<T>(f NApplyFn<T>, ts ...&Tensor<T>) {
+	mut iters := t.iterators<T>(ts)
+	for {
+		vals, pos := iterators_next<T>(mut iters) or { break }
+		val := f(vals, pos)
+		t.data.set<T>(pos, val)
 	}
 }
 
 // nmap maps a function to a given list of Tensor retuning a new Tensor with same shape
-pub fn (t &Tensor) nmap(f NMapFn, ts ...Tensor) &Tensor {
-	mut ret := new_tensor_like(t)
-	mut iters := t.iterators(...ts)
-	for i in 0 .. t.size {
-		val := f(iters.next(), i)
-		storage.storage_set(ret.data, i, val)
+pub fn (t &Tensor<T>) nmap<T>(f NMapFn<T>, ts ...&Tensor<T>) &Tensor<T> {
+	mut ret := new_tensor_like<T>(t)
+	mut iters := t.iterators<T>(ts)
+	for {
+		vals, pos := iterators_next<T>(mut iters) or { break }
+		val := f(vals, pos)
+		ret.data.set<T>(pos, val)
 	}
 	return ret
 }
 
-// nmap_as maps a function to a given list of Tensor retuning a new Tensor with same shape
-pub fn (t &Tensor) nmap_as<T>(f NMapFn, ts ...Tensor) &Tensor {
-	mut ret := new_tensor_like_with_etype(t, T.name)
-	mut iters := t.iterators(...ts)
-	for i in 0 .. t.size {
-		val := f(iters.next(), i)
-		storage.storage_set(ret.data, i, val)
+// nreduce reduces a function to a given list of Tensor retuning a new agregatted value
+pub fn (t &Tensor<T>) nreduce<T>(f NReducerFn<T>, init T, ts ...&Tensor<T>) T {
+	mut ret := init
+	mut iters := t.iterators<T>(ts)
+	for {
+		vals, pos := iterators_next<T>(mut iters) or { break }
+		ret = f(ret, vals, pos)
 	}
 	return ret
 }
 
-// apply applies a function to each element of a given Tensor
-pub fn (t &Tensor) napply(f NApplyFn, ts ...Tensor) {
-	mut iters := t.iterators(...ts)
-	for i in 0 .. t.size {
-		val := f(iters.next(), i)
-		storage.storage_set(t.data, i, val)
-	}
-}
 
-// checks if two Tensors are equal
-pub fn (t &Tensor) equal(other Tensor) bool {
+// equal checks if two Tensors are equal
+fn equal<T>(t &Tensor<T>, other &Tensor<T>) bool {
 	if t.shape != other.shape {
 		return false
 	}
-	mut iters := t.iterators(...[other])
-	for _ in 0 .. t.size {
-		vals := iters.next()
+	mut iters := iterators<T>([t, other])
+	for {
+		vals, _ := iterators_next<T>(mut iters) or { break }
 		if vals[0] != vals[1] {
 			return false
 		}
@@ -101,45 +96,51 @@ pub fn (t &Tensor) equal(other Tensor) bool {
 	return true
 }
 
+// equal checks if two Tensors are equal
+pub fn (t &Tensor<T>) equal<T>(other &Tensor<T>) bool {
+	return equal<T>(t, other)
+}
+
 // diagonal returns a view of the diagonal entries
 // of a two dimensional tensor
-pub fn (t &Tensor) diagonal() &Tensor {
+pub fn (t &Tensor<T>) diagonal<T>() &Tensor<T> {
 	nel := iarray_min(t.shape)
 	newshape := [nel]
 	newstrides := [iarray_sum(t.strides)]
-	return &Tensor{
+	return &Tensor<T>{
 		data: t.data
 		shape: newshape
 		strides: newstrides
 		size: nel
+		memory: t.memory
 	}
 }
 
 // ravel returns a flattened view of an Tensor if possible,
 // otherwise a flattened copy
 [inline]
-pub fn (t &Tensor) ravel() &Tensor {
+pub fn (t &Tensor<T>) ravel<T>() &Tensor<T> {
 	return t.reshape([-1])
 }
 
 // reshape returns an Tensor with a new shape
-pub fn (t &Tensor) reshape(shape []int) &Tensor {
+pub fn (t &Tensor<T>) reshape<T>(shape []int) &Tensor<T> {
 	size := size_from_shape(shape)
 	newshape, newsize := shape_with_autosize(shape, size)
 	if newsize != size {
-		panic('reshape: Cannot reshape')
+		panic('${@METHOD}: cannot reshape')
 	}
-	mut ret := new_tensor_like_with_shape(t, newshape)
+	mut ret := new_tensor_like_with_shape<T>(t, newshape)
 	ret.data = t.data
 	return ret
 }
 
 // transpose permutes the axes of an tensor in a specified
 // order and returns a view of the data
-pub fn (t &Tensor) transpose(order []int) &Tensor {
+pub fn (t &Tensor<T>) transpose<T>(order []int) &Tensor<T> {
 	mut ret := t.view()
 	n := order.len
-	assert_rank(t, n)
+	assert_rank<T>(t, n)
 	mut permutation := []int{len: 32}
 	mut reverse_permutation := []int{len: 32, init: -1}
 	mut i := 0
@@ -169,14 +170,14 @@ pub fn (t &Tensor) transpose(order []int) &Tensor {
 
 // t returns a ful transpose of an tensor, with the axes
 // reversed
-pub fn (t &Tensor) t() &Tensor {
+pub fn (t &Tensor<T>) t<T>() &Tensor<T> {
 	order := irange(0, t.rank())
 	return t.transpose(order.reverse())
 }
 
 // swapaxes returns a view of an tensor with two axes
 // swapped.
-pub fn (t &Tensor) swapaxes(a1 int, a2 int) &Tensor {
+pub fn (t &Tensor<T>) swapaxes<T>(a1 int, a2 int) &Tensor<T> {
 	mut order := irange(0, t.rank())
 	tmp := order[a1]
 	order[a1] = order[a2]
@@ -185,7 +186,7 @@ pub fn (t &Tensor) swapaxes(a1 int, a2 int) &Tensor {
 }
 
 // slice returns a tensor from a variadic list of indexing operations
-pub fn (t &Tensor) slice(idx ...[]int) &Tensor {
+pub fn (t &Tensor<T>) slice<T>(idx ...[]int) &Tensor<T> {
 	mut newshape := t.shape.clone()
 	mut newstrides := t.strides.clone()
 	mut indexer := []int{}
@@ -251,20 +252,20 @@ pub fn (t &Tensor) slice(idx ...[]int) &Tensor {
 	for i in 0 .. indexer.len {
 		offset += t.strides[i] * indexer[i]
 	}
-	mut ret := &Tensor{
+	mut ret := &Tensor<T>{
 		shape: newshape_.clone()
 		strides: newstrides_.clone()
 		size: size_from_shape(newshape_)
-		data: t.data.offset(offset)
-		memory: .colmajor
+		data: t.data.offset<T>(offset)
+		memory: .col_major
 	}
-	ensure_memory(mut ret)
+	ensure_memory<T>(mut ret)
 	return ret
 }
 
 // slice_hilo returns a view of an array from a list of starting
 // indices and a list of closing indices.
-pub fn (t &Tensor) slice_hilo(idx1 []int, idx2 []int) &Tensor {
+pub fn (t &Tensor<T>) slice_hilo<T>(idx1 []int, idx2 []int) &Tensor<T> {
 	mut newshape := t.shape.clone()
 	mut newstrides := t.strides.clone()
 	idx_start := pad_with_zeros(idx1, t.rank())
@@ -295,13 +296,13 @@ pub fn (t &Tensor) slice_hilo(idx1 []int, idx2 []int) &Tensor {
 	for i in 0 .. t.rank() {
 		offset += t.strides[i] * idx[i]
 	}
-	mut ret := &Tensor{
+	mut ret := &Tensor<T>{
 		shape: newshape_.clone()
 		strides: newstrides_.clone()
 		size: size_from_shape(newshape_)
-		data: t.data.offset(offset)
-		memory: .colmajor
+		data: t.data.offset<T>(offset)
+		memory: .col_major
 	}
-	ensure_memory(mut ret)
+	ensure_memory<T>(mut ret)
 	return ret
 }
