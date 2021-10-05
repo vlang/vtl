@@ -5,9 +5,10 @@
 		<meta http-equiv="x-ua-compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>datasets | vdoc</title>
-		<link rel="preconnect" href="https://fonts.gstatic.com">
-		<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-		<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
 		<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 		<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 		<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
@@ -42,7 +43,7 @@
 				<nav class="search hidden"></nav>
 				<nav class="content hidden">
 					<ul>
-						<li class="open"><div class="menu-row"><a href="./vtl.html">vtl</a></div></li><li class="open active"><div class="menu-row"><a href="./datasets.html">datasets</a></div></li><li class="open"><div class="menu-row"><a href="./etype.html">etype</a></div></li><li class="open"><div class="menu-row"><a href="./la.html">la</a></div></li><li class="open"><div class="menu-row"><a href="./storage.html">storage</a></div></li>
+						<li class="open"><div class="menu-row"><a href="./vtl.html">vtl</a></div></li><li class="open"><div class="menu-row"><a href="./autograd.html">autograd</a></div></li><li class="open active"><div class="menu-row"><a href="./datasets.html">datasets</a></div></li><li class="open"><div class="menu-row"><a href="./storage.html">storage</a></div></li>
 					</ul>
 				</nav>
 			</header>
@@ -70,29 +71,68 @@
 
 </section>
 						<section id="load_mnist" class="doc-node">
-							<div class="title"><h2>fn load_mnist <a href="#load_mnist">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/mnist.v#L20"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">load_mnist</span><span class="token punctuation">(</span><span class="token punctuation">)</span> ?<span class="token operator">&</span>MnistDataset</code></pre>
+							<div class="title"><h2>fn load_mnist <a href="#load_mnist">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/mnist.v#L25"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">load_mnist</span><span class="token punctuation">(</span>set_type DatasetType<span class="token punctuation">,</span> batch_size <span class="token builtin">int</span><span class="token punctuation">)</span> ?DatasetLoader</code></pre>
 
 
 </section>
-						<section id="load_mnist_from_url" class="doc-node">
-							<div class="title"><h2>fn load_mnist_from_url <a href="#load_mnist_from_url">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/mnist.v#L32"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">load_mnist_from_url</span><span class="token punctuation">(</span>url <span class="token builtin">string</span><span class="token punctuation">)</span> ?<span class="token punctuation">(</span><span class="token operator">&</span><span class="token punctuation">.</span>Tensor<span class="token punctuation">,</span> <span class="token operator">&</span><span class="token punctuation">.</span>Tensor<span class="token punctuation">)</span></code></pre>
+						<section id="DatasetBatch" class="doc-node">
+							<div class="title"><h2>interface DatasetBatch <a href="#DatasetBatch">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/loader.v#L20"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">interface</span> <span class="token symbol">DatasetBatch</span> <span class="token punctuation">{</span>
+	features <span class="token operator">&</span>vtl<span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">f32</span><span class="token operator">></span>
+	labels <span class="token operator">&</span>vtl<span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">f32</span><span class="token operator">></span>
+<span class="token punctuation">}</span></code></pre>
+
+
+</section>
+						<section id="DatasetLoader" class="doc-node">
+							<div class="title"><h2>interface DatasetLoader <a href="#DatasetLoader">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/loader.v#L14"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">interface</span> <span class="token symbol">DatasetLoader</span> <span class="token punctuation">{</span>
+	@type DatasetType
+	batch_size <span class="token builtin">int</span>
+	<span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span> ?DatasetBatch
+<span class="token punctuation">}</span></code></pre>
+
+
+</section>
+						<section id="DatasetType" class="doc-node">
+							<div class="title"><h2>enum DatasetType <a href="#DatasetType">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/loader.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">enum</span> <span class="token symbol">DatasetType</span> <span class="token punctuation">{</span>
+	train
+	test
+<span class="token punctuation">}</span></code></pre>
+
+
+</section>
+						<section id="MnistBatch" class="doc-node">
+							<div class="title"><h2>struct MnistBatch <a href="#MnistBatch">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/mnist.v#L19"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">MnistBatch</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	features <span class="token operator">&</span>vtl<span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">f32</span><span class="token operator">></span>
+	labels   <span class="token operator">&</span>vtl<span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">f32</span><span class="token operator">></span>
+<span class="token punctuation">}</span></code></pre>
 
 
 </section>
 						<section id="MnistDataset" class="doc-node">
-							<div class="title"><h2>struct MnistDataset <a href="#MnistDataset">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/mnist.v#L12"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">MnistDataset</span> <span class="token punctuation">{</span>
+							<div class="title"><h2>struct MnistDataset <a href="#MnistDataset">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/mnist.v#L11"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">MnistDataset</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
-	train_features <span class="token operator">&</span>vtl<span class="token punctuation">.</span>Tensor
-	train_labels   <span class="token operator">&</span>vtl<span class="token punctuation">.</span>Tensor
-	test_features  <span class="token operator">&</span>vtl<span class="token punctuation">.</span>Tensor
-	test_labels    <span class="token operator">&</span>vtl<span class="token punctuation">.</span>Tensor
+	@type      DatasetType
+	batch_size <span class="token builtin">int</span>
+<span class="token keyword">mut</span><span class="token punctuation">:</span>
+	parser <span class="token operator">&</span>csv<span class="token punctuation">.</span>Reader
 <span class="token punctuation">}</span></code></pre>
+
+
+</section>
+						<section id="MnistDataset.str" class="doc-node">
+							<div class="title"><h2>fn (MnistDataset) str <a href="#MnistDataset.str">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/mnist.v#L36"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>ds <span class="token operator">&</span>MnistDataset<span class="token punctuation">)</span> <span class="token function">str</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">string</span></code></pre>
+
+
+</section>
+						<section id="MnistDataset.next" class="doc-node">
+							<div class="title"><h2>fn (MnistDataset) next <a href="#MnistDataset.next">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/mnist.v#L45"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> ds MnistDataset<span class="token punctuation">)</span> <span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span> ?DatasetBatch</code></pre>
 
 
 </section>
 
 						<div class="footer">
-							Powered by vdoc. Generated on: 16 Jul 2021 15:09:25
+							Powered by vdoc. Generated on: 5 Oct 2021 22:51:12
 						</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_datasets">README</a></li>
@@ -100,10 +140,21 @@
 <li class="open"><a href="#load_mnist">fn load_mnist</a>        <ul>
 </ul>
 </li>
-<li class="open"><a href="#load_mnist_from_url">fn load_mnist_from_url</a>        <ul>
+<li class="open"><a href="#DatasetBatch">interface DatasetBatch</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#DatasetLoader">interface DatasetLoader</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#DatasetType">enum DatasetType</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#MnistBatch">struct MnistBatch</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#MnistDataset">struct MnistDataset</a>        <ul>
+<li><a href="#MnistDataset.str">fn str</a></li>
+<li><a href="#MnistDataset.next">fn next</a></li>
 </ul>
 </li>
 </ul></div>
