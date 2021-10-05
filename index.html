@@ -59,7 +59,7 @@
 <a href="https://github.com/vlang/vtl/blob/main/CONTRIBUTING.md">Contributing</a></p>
 </div>
 <pre><code class="language-v">&gt;&gt;&gt; import vtl
-&gt;&gt;&gt; t := vtl.from_array([1.0, 2, 3, 4], [2, 2])
+&gt;&gt;&gt; t := vtl.from_array&lt;f64&gt;([1.0, 2, 3, 4], [2, 2], .row_major)
 &gt;&gt;&gt; t.get([1, 1])
 4.0
 </code></pre>
@@ -957,7 +957,7 @@ swapped.</p>
 </section>
 
 						<div class="footer">
-							Powered by vdoc. Generated on: 5 Oct 2021 22:51:12
+							Powered by vdoc. Generated on: 5 Oct 2021 22:55:41
 						</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_vtl">README</a></li>
