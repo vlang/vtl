@@ -8,51 +8,69 @@ pub const (
 	mnist_train_url = 'https://pjreddie.com/media/files/mnist_train.csv'
 )
 
-[heap]
 pub struct MnistDataset {
 pub:
-	train_features &vtl.Tensor
-	train_labels   &vtl.Tensor
-	test_features  &vtl.Tensor
-	test_labels    &vtl.Tensor
+	@type      DatasetType
+	batch_size int
+mut:
+	parser &csv.Reader
 }
 
-pub fn load_mnist() ?&MnistDataset {
-	train_features, train_labels := load_mnist_from_url(datasets.mnist_train_url) ?
-	test_features, test_labels := load_mnist_from_url(datasets.mnist_test_url) ?
-
-	return &MnistDataset{
-		train_features: train_features
-		train_labels: train_labels
-		test_features: test_features
-		test_labels: test_labels
-	}
+pub struct MnistBatch {
+pub:
+	features &vtl.Tensor<f32>
+	labels   &vtl.Tensor<f32>
 }
 
-pub fn load_mnist_from_url(url string) ?(&vtl.Tensor, &vtl.Tensor) {
-	mut labels := []int{}
-	mut features := []f32{}
+pub fn load_mnist(set_type DatasetType, batch_size int) ?DatasetLoader {
+	url := if set_type == .train { datasets.mnist_train_url } else { datasets.mnist_test_url }
+	content := load_from_url(url: url) ?
 
-	content := load_dataset_from_url(url) ?
+	return DatasetLoader(&MnistDataset{
+		@type: set_type
+		batch_size: batch_size
+		parser: csv.new_reader(content)
+	})
+}
 
-	mut parser := csv.new_reader(content)
-	for {
-		items := parser.read() or { break }
-		labels << items[0].int()
+pub fn (ds &MnistDataset) str() string {
+	mut res := []string{}
+	res << 'vtl.datasets.MnistDataset{'
+	res << '    @type: ${ds.@type}'
+	res << '    batch_size: $ds.batch_size'
+	res << '}'
+	return res.join('\n')
+}
+
+pub fn (mut ds MnistDataset) next() ?DatasetBatch {
+	batch_size := ds.batch_size
+
+	mut labels := []f32{cap: batch_size}
+	mut features := []f32{cap: batch_size}
+
+	for _ in 0 .. batch_size {
+		items := ds.parser.read() or { break }
+		labels << items[0].f32()
 		features << items[1..].map(it.f32())
 	}
 
-	mut lt := vtl.from_varray(labels, [labels.len])
-	mut lft := vtl.zeros([lt.shape[0], 10])
-
-	mut iter := lt.iterator()
-	mut pos := iter.pos
-	for _ in 0 .. lt.size() {
-		if el := iter.next() {
-			lft.set([pos, el as int], 1)
-			pos = iter.pos
-		}
+	if labels.len == 0 {
+		return none
 	}
 
-	return vtl.from_varray(features, [lt.shape[0], 10]), lft
+	mut lt := vtl.from_array(labels, [labels.len], .row_major)
+	mut lft := vtl.zeros<f32>([lt.shape[0], 10], .row_major)
+
+	mut iter := lt.iterator()
+	for {
+		elem, pos := iter.next() or { break }
+		lft.set([pos, int(elem)], 1)
+	}
+
+	ft := vtl.from_array(features, [features.len], .row_major).reshape([-1, 1, 32, 32])
+
+	return DatasetBatch(&MnistBatch{
+		labels: lft
+		features: ft
+	})
 }

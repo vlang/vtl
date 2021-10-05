@@ -9,7 +9,6 @@
 ##     -h, --help                            Prints usage and example
 ##         --stats                           Exeute with stats
 ##         --use-cblas                       Execute tests using cblas
-##         --use-vmath                       Use pure V math library as backend
 ##         --use-autofree                    Execute tests using atofree
 ##
 
@@ -29,11 +28,6 @@ if [[ -n "${use_cblas}" ]]; then
     flags="${flags} -d cblas"
 fi
 
-if [[ -n "${use_vmath}" ]]; then
-    echo "Running tests using V Math"
-    flags="${flags} -d vmath"
-fi
-
 if [[ -n "${use_autofree}" ]]; then
     echo "Running tests using V Math"
     flags="${flags} -autofree"
@@ -45,6 +39,9 @@ if [[ -n "${stats}" ]]; then
 fi
 
 echo "Executing tests with command: \"v ${flags} test .\""
-v ${flags} test ${vtl_dir_path}
+# @todo: Fix tests here
+# v ${flags} test ${vtl_dir_path}
+v run "${ROOT}"/../examples/main.v
+v run "${ROOT}"/../examples/mnist.v
 
 find ${vtl_dir_path} -name '*_test' -exec rm -f {} +

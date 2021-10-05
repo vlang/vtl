@@ -6,7 +6,7 @@ const (
 
 // for arrays that are too large, calculate only the leading and trailing
 // items along each axis
-fn leading_trailing(t Tensor, edgeitems int, lo []int, hi []int) &Tensor {
+fn leading_trailing<T>(t &Tensor<T>, edgeitems int, lo []int, hi []int) &Tensor<T> {
 	axis := lo.len
 	if axis == t.rank() {
 		return t.slice_hilo(lo, hi)
@@ -20,15 +20,15 @@ fn leading_trailing(t Tensor, edgeitems int, lo []int, hi []int) &Tensor {
 		fhi << edgeitems
 		slo << t.shape[axis] + -1 * edgeitems
 		shi << t.shape[axis]
-		f := leading_trailing(t, edgeitems, flo, fhi)
-		l := leading_trailing(t, edgeitems, slo, shi)
-		return concatenate([f, l], axis: axis)
+		f := leading_trailing<T>(t, edgeitems, flo, fhi)
+		l := leading_trailing<T>(t, edgeitems, slo, shi)
+		return concatenate<T>([f, l], axis: axis)
 	} else {
 		mut nlo := lo.clone()
 		mut nhi := hi.clone()
 		nlo << 0
 		nhi << t.shape[axis]
-		return leading_trailing(t, edgeitems, nlo, nhi)
+		return leading_trailing<T>(t, edgeitems, nlo, nhi)
 	}
 }
 
@@ -46,11 +46,11 @@ fn extend_line(s string, line string, word string, line_width int, next_line_pre
 }
 
 // rprint will recursively generate a string representation of a Tensor with custom settings
-fn rprint(t Tensor, index []int, hanging_indent string, curr_width int, summary_insert string, edge_items int, separator string, max_len int) string {
+fn rprint<T>(t &Tensor<T>, index []int, hanging_indent string, curr_width int, summary_insert string, edge_items int, separator string, max_len int) string {
 	axis := index.len
 	axes_left := t.rank() - axis
 	if axes_left == 0 {
-		return rjust(t.get(index).prettify(false), max_len)
+		return rjust(t.get(index).str(), max_len)
 	}
 	next_hanging_indent := hanging_indent + ' '
 	next_width := curr_width - 1
@@ -70,8 +70,8 @@ fn rprint(t Tensor, index []int, hanging_indent string, curr_width int, summary_
 		for lii < leading_items {
 			mut nidx := index.clone()
 			nidx << lii
-			word := rprint(t, nidx, next_hanging_indent, next_width, summary_insert, edge_items,
-				separator, max_len)
+			word := rprint<T>(t, nidx, next_hanging_indent, next_width, summary_insert,
+				edge_items, separator, max_len)
 			ret := extend_line(s, line, word, elem_width, hanging_indent)
 			s = ret[0]
 			line = ret[1]
@@ -88,8 +88,8 @@ fn rprint(t Tensor, index []int, hanging_indent string, curr_width int, summary_
 		for tii >= 2 {
 			mut tidx := index.clone()
 			tidx << -1 * tii
-			word := rprint(t, tidx, next_hanging_indent, next_width, summary_insert, edge_items,
-				separator, max_len)
+			word := rprint<T>(t, tidx, next_hanging_indent, next_width, summary_insert,
+				edge_items, separator, max_len)
 			ret := extend_line(s, line, word, elem_width, hanging_indent)
 			s = ret[0]
 			line = ret[1]
@@ -98,7 +98,7 @@ fn rprint(t Tensor, index []int, hanging_indent string, curr_width int, summary_
 		}
 		mut lidx := index.clone()
 		lidx << -1
-		word := rprint(t, lidx, next_hanging_indent, next_width, summary_insert, edge_items,
+		word := rprint<T>(t, lidx, next_hanging_indent, next_width, summary_insert, edge_items,
 			separator, max_len)
 		ret := extend_line(s, line, word, elem_width, hanging_indent)
 		s = ret[0]
@@ -113,7 +113,7 @@ fn rprint(t Tensor, index []int, hanging_indent string, curr_width int, summary_
 		for lii < leading_items {
 			mut nidx := index.clone()
 			nidx << lii
-			nested := rprint(t, nidx, next_hanging_indent, next_width, summary_insert,
+			nested := rprint<T>(t, nidx, next_hanging_indent, next_width, summary_insert,
 				edge_items, separator, max_len)
 			lii++
 			s += hanging_indent + nested + line_sep
@@ -125,49 +125,50 @@ fn rprint(t Tensor, index []int, hanging_indent string, curr_width int, summary_
 		for tii >= 2 {
 			mut tidx := index.clone()
 			tidx << -1 * tii
-			nested := rprint(t, tidx, next_hanging_indent, next_width, summary_insert,
+			nested := rprint<T>(t, tidx, next_hanging_indent, next_width, summary_insert,
 				edge_items, separator, max_len)
 			s += hanging_indent + nested + line_sep
 			tii--
 		}
 		mut lidx := index.clone()
 		lidx << -1
-		nested := rprint(t, lidx, next_hanging_indent, next_width, summary_insert, edge_items,
-			separator, max_len)
+		nested := rprint<T>(t, lidx, next_hanging_indent, next_width, summary_insert,
+			edge_items, separator, max_len)
 		s += hanging_indent + nested
 	}
 	return '[' + s[hanging_indent.len..] + ']'
 }
 
 // format an array, tensor_str is just a wrapper around this
-fn format_array(t Tensor, line_width int, next_line_prefix string, separator string, edge_items int, summary_insert string, max_len int) string {
-	return rprint(t, [], next_line_prefix, line_width, summary_insert, edge_items, separator,
-		max_len)
+fn format_array<T>(t &Tensor<T>, line_width int, next_line_prefix string, separator string, edge_items int, summary_insert string, max_len int) string {
+	return rprint<T>(t, [], next_line_prefix, line_width, summary_insert, edge_items,
+		separator, max_len)
 }
 
 // public method for printing arrays, if custom behavior is needed
-pub fn tensor_str(t Tensor, separator string, prefix string) string {
+fn tensor_str<T>(t &Tensor<T>, separator string, prefix string) string {
 	if t.shape.len == 0 {
 		return '[]'
 	}
 	mut summary_insert := ''
 	mut data := t
-	if t.size > vtl.max_printable_size {
+	if t.size > max_printable_size {
 		summary_insert = '...'
-		data = leading_trailing(t, 3, [], [])
+		data = leading_trailing<T>(t, 3, [], [])
 	}
-	max_len := max_str_len(data)
+	max_len := max_str_len<T>(data)
 	mut next_line_prefix := ''
 	next_line_prefix += ' '.repeat(prefix.len)
-	return format_array(t, 75, next_line_prefix, separator, 3, summary_insert, max_len)
+	return format_array<T>(t, 75, next_line_prefix, separator, 3, summary_insert, max_len)
 }
 
 // finds the max string length of a Tensor
-fn max_str_len(t &Tensor) int {
+fn max_str_len<T>(t &Tensor<T>) int {
 	mut mx := 0
 	mut iter := t.iterator()
-	for val in iter {
-		val_str := val.prettify(false)
+	for {
+		val, _ := iter.next() or { break }
+		val_str := val.str()
 		if val_str.len > mx {
 			mx = val_str.len
 		}

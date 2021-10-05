@@ -2,7 +2,7 @@ module vtl
 
 // broadcastable takes two Tensors and either returns a valid
 // broadcastable shape or panics
-pub fn broadcastable(a Tensor, b Tensor) []int {
+pub fn broadcastable<T>(a &Tensor<T>, b &Tensor<T>) []int {
 	if a.rank() == b.rank() {
 		if broadcast_equal(a.shape, b.shape) {
 			return broadcastable_shape(a.shape, b.shape)
@@ -71,14 +71,14 @@ fn broadcast_strides(dshape []int, sshape []int, dstrides []int, sstrides []int)
 
 // broadcast_to broadcasts a Tensor to a compatible shape with no
 // data copy
-pub fn (t &Tensor) broadcast_to(shape []int) &Tensor {
+pub fn (t &Tensor<T>) broadcast_to<T>(shape []int) &Tensor<T> {
 	if t.shape == shape {
 		return t
 	}
 	size := size_from_shape(shape)
-	strides := strides_from_shape(shape, .rowmajor)
+	strides := strides_from_shape(shape, .row_major)
 	result_strides := broadcast_strides(shape, t.shape, strides, t.strides)
-	return &Tensor{
+	return &Tensor<T>{
 		data: t.data
 		shape: shape
 		size: size
@@ -120,14 +120,14 @@ fn broadcast_shapes(args ...[]int) []int {
 
 // broadcast2 broadcasts two Tensors against each other
 [inline]
-fn broadcast2(a &Tensor, b &Tensor) (&Tensor, &Tensor) {
+fn broadcast2<T>(a &Tensor<T>, b &Tensor<T>) (&Tensor<T>, &Tensor<T>) {
 	shape := broadcast_shapes(a.shape, b.shape)
 	return a.broadcast_to(shape), b.broadcast_to(shape)
 }
 
 // broadcast3 broadcasts three Tensors against each other
 [inline]
-fn broadcast3(a Tensor, b Tensor, c Tensor) (&Tensor, &Tensor, &Tensor) {
+fn broadcast3<T>(a &Tensor<T>, b &Tensor<T>, c &Tensor<T>) (&Tensor<T>, &Tensor<T>, &Tensor<T>) {
 	shape := broadcast_shapes(a.shape, b.shape, c.shape)
 	return a.broadcast_to(shape), b.broadcast_to(shape), c.broadcast_to(shape)
 }
