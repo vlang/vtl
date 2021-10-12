@@ -14,6 +14,7 @@ pub enum DatasetType {
 pub interface DatasetLoader {
 	@type DatasetType
 	batch_size int
+mut:
 	next() ?DatasetBatch
 }
 
