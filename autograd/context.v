@@ -44,18 +44,13 @@ pub fn (mut ctx Context<T>) pop() &Node<T> {
 	return ctx.nodes.pop()
 }
 
-pub struct ContextVariableData<T> {
+pub struct ContextVariableData {
 pub:
-	value         &vtl.Tensor<T>
 	requires_grad bool = true
 }
 
-pub fn (ctx &Context<T>) variable<T>(data ContextVariableData<T>) &Variable<T> {
-	return new_variable<T>(VariableData<T>{
-		context: ctx
-		value: data.value
-		requires_grad: data.requires_grad
-	})
+pub fn (ctx &Context<T>) variable<T>(value &vtl.Tensor<T>, data ContextVariableData) &Variable<T> {
+	return new_variable<T>(ctx, value, requires_grad: data.requires_grad)
 }
 
 pub fn (ctx &Context<T>) str() string {
@@ -79,4 +74,11 @@ pub fn (ctx &Context<T>) str() string {
 		}
 	}
 	return str
+}
+
+pub fn register<T>(name string, gate &Gate<T>, result &Variable<T>, parents ...&Variable<T>) {
+	assert parents.len >= 1
+	payload := new_payload(result)
+	node := new_node(gate, parents, payload, name)
+	parents[0].context.push(node)
 }

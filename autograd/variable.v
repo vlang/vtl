@@ -30,15 +30,13 @@ pub mut:
 	requires_grad bool
 }
 
-pub struct VariableData<T> {
+pub struct VariableData {
 pub:
-	context       &Context<T>
-	value         &vtl.Tensor<T>
 	requires_grad bool = true
 }
 
 // new_variable
-pub fn new_variable<T>(data VariableData<T>) &Variable<T> {
+pub fn new_variable<T>(context &Context<T>, value &vtl.Tensor<T>, data VariableData) &Variable<T> {
 	grad := if data.requires_grad { vtl.zeros_like<T>(data.value) } else { data.value }
 	return &Variable<T>{
 		context: data.context
