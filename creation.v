@@ -2,8 +2,8 @@ module vtl
 
 // empty returns a new Tensor of given shape and type, without initializing entries
 [inline]
-pub fn empty<T>(shape []int, memory MemoryFormat) &Tensor<T> {
-	return new_tensor<T>(T(0), shape, memory)
+pub fn empty<T>(shape []int, params TensorData) &Tensor<T> {
+	return new_tensor<T>(T(0), shape, params)
 }
 
 // empty_like returns a new Tensor of given shape and type as a given Tensor
@@ -14,13 +14,13 @@ pub fn empty_like<T>(t &Tensor<T>) &Tensor<T> {
 
 // identity returns an array is a square array with ones on the main diagonal
 [inline]
-pub fn identity<T>(n int, memory MemoryFormat) &Tensor<T> {
-	return eye<T>(n, n, 0, memory)
+pub fn identity<T>(n int, params TensorData) &Tensor<T> {
+	return eye<T>(n, n, 0, params)
 }
 
 // eye returns a 2D array with ones on the diagonal and zeros elsewhere
-pub fn eye<T>(m int, n int, k int, memory MemoryFormat) &Tensor<T> {
-	mut ret := zeros<T>([m, n], memory)
+pub fn eye<T>(m int, n int, k int, params TensorData) &Tensor<T> {
+	mut ret := zeros<T>([m, n], params)
 	for i in 0 .. m {
 		for j in 0 .. n {
 			if i == j - k {
@@ -33,8 +33,8 @@ pub fn eye<T>(m int, n int, k int, memory MemoryFormat) &Tensor<T> {
 
 // zeros returns a new tensor of a given shape and type, filled with zeros
 [inline]
-pub fn zeros<T>(shape []int, memory MemoryFormat) &Tensor<T> {
-	return new_tensor<T>(T(0), shape, memory)
+pub fn zeros<T>(shape []int, params TensorData) &Tensor<T> {
+	return new_tensor<T>(T(0), shape, params)
 }
 
 // zeros_like returns a new Tensor of given shape and type as a given Tensor, filled with zeros
@@ -45,8 +45,8 @@ pub fn zeros_like<T>(t &Tensor<T>) &Tensor<T> {
 
 // ones returns a new tensor of a given shape and type, filled with ones
 [inline]
-pub fn ones<T>(shape []int, memory MemoryFormat) &Tensor<T> {
-	return full<T>(shape, T(1), memory)
+pub fn ones<T>(shape []int, params TensorData) &Tensor<T> {
+	return full<T>(shape, T(1), params)
 }
 
 // ones_like returns a new tensor of a given shape and type, filled with ones
@@ -57,8 +57,8 @@ pub fn ones_like<T>(t &Tensor<T>) &Tensor<T> {
 
 // full returns a new tensor of a given shape and type, filled with the given value
 [inline]
-pub fn full<T>(shape []int, val T, memory MemoryFormat) &Tensor<T> {
-	return new_tensor<T>(val, shape, memory)
+pub fn full<T>(shape []int, val T, params TensorData) &Tensor<T> {
+	return new_tensor<T>(val, shape, params)
 }
 
 // full_like returns a new tensor of the same shape and type as a given Tensor filled with a given val
@@ -69,8 +69,8 @@ pub fn full_like<T>(t &Tensor<T>, val T) &Tensor<T> {
 }
 
 // range returns a Tensor containing values ranging from [from, to)
-pub fn range<T>(from int, to int, memory MemoryFormat) &Tensor<T> {
-	mut res := empty<T>([to - from], memory)
+pub fn range<T>(from int, to int, params TensorData) &Tensor<T> {
+	mut res := empty<T>([to - from], params)
 	for i := from; i < to; i++ {
 		res.set([i], T(i))
 	}
@@ -79,19 +79,19 @@ pub fn range<T>(from int, to int, memory MemoryFormat) &Tensor<T> {
 
 // seq returns a Tensor containing values ranging from [0, to)
 [inline]
-pub fn seq<T>(n int, memory MemoryFormat) &Tensor<T> {
-	return range<T>(0, n, memory)
+pub fn seq<T>(n int, params TensorData) &Tensor<T> {
+	return range<T>(0, n, params)
 }
 
 // from_1d takes a one dimensional array of floating point values
 // and returns a one dimensional Tensor if possible
-pub fn from_1d<T>(arr []T, memory MemoryFormat) &Tensor<T> {
-	return from_array<T>(arr, [arr.len], memory)
+pub fn from_1d<T>(arr []T, params TensorData) &Tensor<T> {
+	return from_array<T>(arr, [arr.len], params)
 }
 
 // from_2d takes a two dimensional array of floating point values
 // and returns a two-dimensional Tensor if possible
-pub fn from_2d<T>(a [][]T, memory MemoryFormat) &Tensor<T> {
+pub fn from_2d<T>(a [][]T, params TensorData) &Tensor<T> {
 	mut arr := []T{cap: a.len * a[0].len}
 	for i in 0 .. a.len {
 		for j in 0 .. a[0].len {
@@ -99,5 +99,5 @@ pub fn from_2d<T>(a [][]T, memory MemoryFormat) &Tensor<T> {
 		}
 	}
 	shape := [a.len, a[0].len]
-	return from_array<T>(arr, shape, memory)
+	return from_array<T>(arr, shape, params)
 }

@@ -7,8 +7,8 @@ import time
 // random returns a new Tensor of given shape and type, initialized
 // with random numbers between a given min and max value
 [inline]
-pub fn random<T>(min T, max T, shape []int, memory MemoryFormat) &Tensor<T> {
-	mut t := empty<T>(shape, memory)
+pub fn random<T>(min T, max T, shape []int, params TensorData) &Tensor<T> {
+	mut t := empty<T>(shape, params)
 	mut iter := t.iterator()
 	for {
 		_, pos := iter.next() or { break }
@@ -55,5 +55,5 @@ fn random_in_range<T>(min T, max T) T {
 
 fn init() {
 	unix_time := u32(time.now().unix)
-	rand.seed([unix_time, unix_time])
+	rand.seed([unix_time, 0])
 }
