@@ -2,15 +2,10 @@ module autograd
 
 import vtl
 
-// A Context keeps track of the computational graph for
-// a number of operations.  Variables that interact with each
+// Context keeps track of the computational graph for
+// a number of operations. Variables that interact with each
 // other must belong to the same context, or state will be
 // lost while tracking operations done.
-// The generic type of a context is always going to be a specific
-// class of `NdArray`, to allow easy creation of gradients on the
-// fly.  Unlike standard `NdArray` operations, a `Context` cannot
-// shift it's generic type, and operations resulting in a different
-// data type will raise.
 [heap]
 pub struct Context<T> {
 pub mut:
@@ -76,8 +71,12 @@ pub fn (ctx &Context<T>) str() string {
 	return str
 }
 
-pub fn register<T>(name string, gate &Gate<T>, result &Variable<T>, parents ...&Variable<T>) {
+pub fn register<T>(name string, gate &Gate<T>, result &Variable<T>, parents ...&Variable<T>) ? {
 	assert parents.len >= 1
+	if parents.len == 0 {
+		return error('@FN: it is needed to specify at least one parent')
+	}
+
 	payload := new_payload(result)
 	node := new_node(gate, parents, payload, name)
 	parents[0].context.push(node)
