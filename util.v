@@ -2,6 +2,31 @@ module vtl
 
 import arrays
 
+// assert_square_matrix panics if the given tensor is not a square matrix
+[inline]
+fn assert_square_matrix<T>(t &Tensor<T>) {
+	if t.is_square_matrix() {
+		panic('Matrix is not square')
+	}
+}
+
+// assert_square_matrix panics if the given tensor is not a matrix
+[inline]
+fn assert_matrix<T>(t &Tensor<T>) {
+	if t.is_matrix() {
+		panic('Tensor is not two-dimensional')
+	}
+}
+
+// irange returns an array between start and stop, incremented by 1
+fn irange(start int, stop int) []int {
+	mut ret := []int{cap: stop - start}
+	for i in start .. stop {
+		ret << i
+	}
+	return ret
+}
+
 // assert_rank ensures that a Tensor has a given rank
 [inline]
 fn assert_rank<T>(t &Tensor<T>, n int) {
@@ -157,15 +182,6 @@ pub fn ensure_memory<T>(mut t Tensor<T>) {
 	}
 }
 
-// irange returns an array between start and stop, incremented by 1
-fn irange(start int, stop int) []int {
-	mut ret := []int{cap: stop - start}
-	for i in start .. stop {
-		ret << i
-	}
-	return ret
-}
-
 // iarray_min returns the minimum value of a given array of int values
 // the use of arrays.min give us an optimizad version of this function
 [inline]
@@ -178,6 +194,15 @@ fn iarray_sum(arr []int) int {
 	mut ret := 0
 	for i in arr {
 		ret += i
+	}
+	return ret
+}
+
+// iarray_prod returns the prod value of a given array of int values
+fn iarray_prod(arr []int) int {
+	mut ret := 0
+	for i in arr {
+		ret *= i
 	}
 	return ret
 }
