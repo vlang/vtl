@@ -64,9 +64,9 @@ pub fn new_multiply_gate<T>(a &Variable<T>, b &Variable<T>) &MultiplyGate<T> {
 
 pub fn (g &MultiplyGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
 	gradient := payload.variable.grad
-	gradient_a := vtl.multiply<T>(gradient, g.a.value)
-	gradient_b := vtl.multiply<T>(gradient, g.b.value)
-	return [b, a]
+	r0 := vtl.multiply<T>(gradient, g.b.value)
+	r1 := vtl.multiply<T>(gradient, g.a.value)
+	return [r0, r1]
 }
 
 pub fn (g &MultiplyGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) {
