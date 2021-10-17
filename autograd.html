@@ -164,6 +164,16 @@
 
 
 </section>
+						<section id="MatMulGate<T>.backward" class="doc-node">
+							<div class="title"><h2>fn (MatMulGate<T>) backward <a href="#MatMulGate<T>.backward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/gates_blas.v#L18"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&</span>MatMulGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> backward<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>payload <span class="token operator">&</span>Payload<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&</span><span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+
+
+</section>
+						<section id="MatMulGate<T>.cache" class="doc-node">
+							<div class="title"><h2>fn (MatMulGate<T>) cache <a href="#MatMulGate<T>.cache">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/gates_blas.v#L26"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&</span>MatMulGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> cache<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token keyword">mut</span> result Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> args ...CacheParam<span class="token punctuation">)</span></code></pre>
+
+
+</section>
 						<section id="MultiplyGate<T>.backward" class="doc-node">
 							<div class="title"><h2>fn (MultiplyGate<T>) backward <a href="#MultiplyGate<T>.backward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/gates_basic.v#L65"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&</span>MultiplyGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> backward<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>payload <span class="token operator">&</span>Payload<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&</span><span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
 
@@ -235,6 +245,15 @@ lost while tracking operations done.</p>
 
 
 </section>
+						<section id="MatMulGate" class="doc-node">
+							<div class="title"><h2>struct MatMulGate <a href="#MatMulGate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/gates_blas.v#L5"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> MatMulGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	a <span class="token operator">&</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span>
+	b <span class="token operator">&</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span>
+<span class="token punctuation">}</span></code></pre>
+
+
+</section>
 						<section id="MultiplyGate" class="doc-node">
 							<div class="title"><h2>struct MultiplyGate <a href="#MultiplyGate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/gates_basic.v#L52"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> MultiplyGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
@@ -297,7 +316,7 @@ This is the fundamental object used in automatic differentiation, as well as the
 </section>
 
 						<div class="footer">
-							Powered by vdoc. Generated on: 17 Oct 2021 01:43:53
+							Powered by vdoc. Generated on: 17 Oct 2021 05:05:50
 						</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#new_add_gate">fn new_add_gate</a>        <ul>
@@ -352,6 +371,11 @@ This is the fundamental object used in automatic differentiation, as well as the
 <li><a href="#DivideGate<T>.cache">fn cache</a></li>
 </ul>
 </li>
+<li class="open"><a href="#MatMulGate<T>.backward">type MatMulGate<T></a>        <ul>
+<li><a href="#MatMulGate<T>.backward">fn backward</a></li>
+<li><a href="#MatMulGate<T>.cache">fn cache</a></li>
+</ul>
+</li>
 <li class="open"><a href="#MultiplyGate<T>.backward">type MultiplyGate<T></a>        <ul>
 <li><a href="#MultiplyGate<T>.backward">fn backward</a></li>
 <li><a href="#MultiplyGate<T>.cache">fn cache</a></li>
@@ -378,6 +402,9 @@ This is the fundamental object used in automatic differentiation, as well as the
 </ul>
 </li>
 <li class="open"><a href="#DivideGate">struct DivideGate</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#MatMulGate">struct MatMulGate</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#MultiplyGate">struct MultiplyGate</a>        <ul>
