@@ -2,6 +2,8 @@ module autograd
 
 import vtl
 
+pub interface CacheParam {}
+
 // Gate is an object that can cache the result of an operation,
 // as well as backpropogate a payload backwards along the
 // computational graph
@@ -10,9 +12,6 @@ import vtl
 // variables if additional caching is needed, and these need
 // to be populated when writing the cached operation
 pub interface Gate<T> {
-	// Propogates an operation backwards, transforming a payload
-	// and returning an array of Tensors
-	backward(payload Payload) []&vtl.Tensor<T>
-	// Caches the result of an operation on a context
-	cache(result Variable, args ...any)
+	backward(payload &Payload<T>) []&vtl.Tensor<T>
+	cache(result &Variable<T>, args ...CacheParam)
 }
