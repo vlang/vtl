@@ -1,6 +1,7 @@
 module autograd
 
 import vtl
+import vtl.la
 
 pub struct MatMulGate<T> {
 pub:
@@ -17,10 +18,9 @@ pub fn new_multiply_gate<T>(a &Variable<T>, b &Variable<T>) &MatMulGate<T> {
 
 pub fn (g &MatMulGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
 	gradient := payload.variable.grad
-	// r0 := gradient.matmul(g.b.value.t())
-        // r1 := g.a.value.t().matmul(gradient)
-	// return [r0, r1]
-        return [gradient, gradient]
+	r0 := la.matmul(gradient, g.b.value.t())
+	r1 := la.matmul(g.a.value.t(), gradient)
+	return [r0, r1]
 }
 
 pub fn (g &MatMulGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) {
