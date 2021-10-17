@@ -9,7 +9,7 @@ pub:
 	b &Variable<T>
 }
 
-pub fn new_multiply_gate<T>(a &Variable<T>, b &Variable<T>) &MatMulGate<T> {
+pub fn new_mutmul_gate<T>(a &Variable<T>, b &Variable<T>) &MatMulGate<T> {
 	return &MatMulGate<T>{
 		a: a
 		b: b
