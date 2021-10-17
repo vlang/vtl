@@ -9,6 +9,8 @@ import vtl
 // This is the fundamental object used in automatic
 // differentiation, as well as the neural network aspects
 // of VTL
+//
+// @todo: add operator overloads for all the gates
 [heap]
 pub struct Variable<T> {
 	// The value of the Variable.  This should not be edited outside
