@@ -13,5 +13,5 @@ pub interface CacheParam {}
 // to be populated when writing the cached operation
 pub interface Gate<T> {
 	backward(payload &Payload<T>) []&vtl.Tensor<T>
-	cache(result &Variable<T>, args ...CacheParam)
+	cache(mut result Variable<T>, args ...CacheParam)
 }

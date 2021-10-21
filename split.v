@@ -126,9 +126,9 @@ pub fn dsplit_expl<T>(t &Tensor<T>, ind []int) []&Tensor<T> {
 // Generic splitting function that contains the underlying functionality
 // for all split operations, should not be made public.
 fn splitter<T>(t &Tensor<T>, axis int, n int, div_points []int) []&Tensor<T> {
-	mut subary := []&Tensor{}
+	mut subary := []&Tensor<T>{}
 	sary := t.swapaxes(axis, 0)
-	for i := 0; i < n; i++ {
+	for i in 0 .. n {
 		st := div_points[i]
 		en := div_points[i + 1]
 		subary << sary.slice([st], [en]).swapaxes(axis, 0)

@@ -69,7 +69,7 @@ pub fn concatenate<T>(ts []&Tensor<T>, data AxisData) &Tensor<T> {
 	axis := clip_axis(data.axis, newshape.len)
 	newshape[axis] = 0
 	newshape = assert_shape_off_axis<T>(ts, axis, newshape)
-	mut ret := new_tensor_like_with_shape<T>(ts[0], newshape)
+	mut ret := new_tensor<T>(T(0), newshape, memory: .row_major)
 	mut lo := []int{len: newshape.len}
 	mut hi := newshape.clone()
 	hi[axis] = 0
