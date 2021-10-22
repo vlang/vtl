@@ -43,7 +43,7 @@
 				<nav class="search hidden"></nav>
 				<nav class="content hidden">
 					<ul>
-						<li class="open active"><div class="menu-row"><a href="./vtl.html">vtl</a></div></li><li class="open"><div class="menu-row"><a href="./autograd.html">autograd</a></div></li><li class="open"><div class="menu-row"><a href="./datasets.html">datasets</a></div></li><li class="open"><div class="menu-row"><a href="./la.html">la</a></div></li><li class="open"><div class="menu-row"><a href="./storage.html">storage</a></div></li>
+						<li class="open active"><div class="menu-row"><a href="./vtl.html">vtl</a></div></li><li class="open"><div class="menu-row"><a href="./autograd.html">autograd</a></div></li><li class="open"><div class="menu-row"><a href="./datasets.html">datasets</a></div></li><li class="open"><div class="menu-row"><a href="./la.html">la</a></div></li><li class="open"><div class="menu-row"><svg xmlns="http://www.w3.org/2000/svg" class="dropdown-arrow" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M7 10l5 5 5-5z"/></svg><a href="#">nn</a></div><ul><li><a href="./nn.layers.html">layers</a></li></ul></li><li class="open"><div class="menu-row"><a href="./stats.html">stats</a></div></li><li class="open"><div class="menu-row"><a href="./storage.html">storage</a></div></li>
 					</ul>
 				</nav>
 			</header>
@@ -282,7 +282,7 @@ provided the array dimension is greater than or equal to 3.</p>
 
 </section>
 						<section id="ensure_memory" class="doc-node">
-							<div class="title"><h2>fn ensure_memory <a href="#ensure_memory">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/util.v#L172"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> ensure_memory<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token keyword">mut</span> t Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span></code></pre>
+							<div class="title"><h2>fn ensure_memory <a href="#ensure_memory">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/util.v#L222"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> ensure_memory<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token keyword">mut</span> t Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span></code></pre>
 <p>ensure_memory sets a correct memory layout to a given tensor</p>
 
 </section>
@@ -719,13 +719,24 @@ first axis regardless of the array dimension.</p>
 <p>assign sets the values of an Tensor equal to the values of another Tensor of the same shape</p>
 
 </section>
+						<section id="Tensor<T>.axis_iterator" class="doc-node">
+							<div class="title"><h2>fn (Tensor<T>) axis_iterator <a href="#Tensor<T>.axis_iterator">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/iter_axis.v#L20"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> axis_iterator<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>axis <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">&</span>TensorAxisIterator<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+<p>axis_iterator returns an iterator over the axis of a Tensor, commonly
+used for reduction operations along an axis.</p>
+
+</section>
+						<section id="Tensor<T>.axis_with_dims_iterator" class="doc-node">
+							<div class="title"><h2>fn (Tensor<T>) axis_with_dims_iterator <a href="#Tensor<T>.axis_with_dims_iterator">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/iter_axis.v#L39"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> axis_with_dims_iterator<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>axis <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">&</span>TensorAxisIterator<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+<p>axis returns an iterator over the axis of a Tensor, commonly used for reduction operations along an axis. This iterator keeps the axis dimension as size 1 instead of removing it</p>
+
+</section>
 						<section id="Tensor<T>.broadcast_to" class="doc-node">
 							<div class="title"><h2>fn (Tensor<T>) broadcast_to <a href="#Tensor<T>.broadcast_to">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/broadcast.v#L74"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> broadcast_to<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
 <p>broadcast_to broadcasts a Tensor to a compatible shape with no data copy</p>
 
 </section>
 						<section id="Tensor<T>.copy" class="doc-node">
-							<div class="title"><h2>fn (Tensor<T>) copy <a href="#Tensor<T>.copy">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/tensor.v#L136"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">copy</span><span class="token punctuation">(</span>memory MemoryFormat<span class="token punctuation">)</span> <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+							<div class="title"><h2>fn (Tensor<T>) copy <a href="#Tensor<T>.copy">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/tensor.v#L116"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">copy</span><span class="token punctuation">(</span>memory MemoryFormat<span class="token punctuation">)</span> <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
 <p>copy returns a copy of a Tensor with a particular memory layout, either row_major-contiguous or col_major-contiguous</p>
 
 </section>
@@ -760,12 +771,12 @@ first axis regardless of the array dimension.</p>
 
 </section>
 						<section id="Tensor<T>.is_col_major_contiguous" class="doc-node">
-							<div class="title"><h2>fn (Tensor<T>) is_col_major_contiguous <a href="#Tensor<T>.is_col_major_contiguous">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/tensor.v#L92"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">is_col_major_contiguous</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">bool</span></code></pre>
+							<div class="title"><h2>fn (Tensor<T>) is_col_major_contiguous <a href="#Tensor<T>.is_col_major_contiguous">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/tensor.v#L82"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">is_col_major_contiguous</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">bool</span></code></pre>
 <p>is_col_major verifies if a Tensor stores its data in Col-Major order</p>
 
 </section>
 						<section id="Tensor<T>.is_contiguous" class="doc-node">
-							<div class="title"><h2>fn (Tensor<T>) is_contiguous <a href="#Tensor<T>.is_contiguous">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/tensor.v#L109"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">is_contiguous</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">bool</span></code></pre>
+							<div class="title"><h2>fn (Tensor<T>) is_contiguous <a href="#Tensor<T>.is_contiguous">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/tensor.v#L89"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">is_contiguous</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">bool</span></code></pre>
 <p>is_contiguous verifies that a Tensor is contiguous independent of memory layout</p>
 
 </section>
@@ -897,7 +908,7 @@ swapped.</p>
 
 </section>
 						<section id="Tensor<T>.to_array" class="doc-node">
-							<div class="title"><h2>fn (Tensor<T>) to_array <a href="#Tensor<T>.to_array">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/tensor.v#L115"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">to_array</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">T</span></code></pre>
+							<div class="title"><h2>fn (Tensor<T>) to_array <a href="#Tensor<T>.to_array">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/tensor.v#L95"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">to_array</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">T</span></code></pre>
 <p>to_array returns the flatten representation of a tensor in a v array storing elements of type T</p>
 
 </section>
@@ -907,8 +918,13 @@ swapped.</p>
 
 </section>
 						<section id="Tensor<T>.view" class="doc-node">
-							<div class="title"><h2>fn (Tensor<T>) view <a href="#Tensor<T>.view">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/tensor.v#L151"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">view</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+							<div class="title"><h2>fn (Tensor<T>) view <a href="#Tensor<T>.view">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/tensor.v#L131"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">view</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
 <p>view returns a view of a Tensor, identical to the parent but not owning its own data</p>
+
+</section>
+						<section id="TensorAxisIterator<T>.next" class="doc-node">
+							<div class="title"><h2>fn (TensorAxisIterator<T>) next <a href="#TensorAxisIterator<T>.next">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/iter_axis.v#L58"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> s TensorAxisIterator<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> next<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span> ?<span class="token punctuation">(</span><span class="token builtin">T</span><span class="token punctuation">,</span> <span class="token builtin">int</span><span class="token punctuation">)</span></code></pre>
+<p>next calls the iteration type for a given iterator which is either flat or strided and returns a Num containing the current value</p>
 
 </section>
 						<section id="TensorIterator<T>.next" class="doc-node">
@@ -961,6 +977,22 @@ swapped.</p>
 <p>Tensor is the main structure defined by VTL to manage N Dimensional data</p>
 
 </section>
+						<section id="TensorAxisIterator" class="doc-node">
+							<div class="title"><h2>struct TensorAxisIterator <a href="#TensorAxisIterator">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/iter_axis.v#L6"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> TensorAxisIterator<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	tensor <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span>
+<span class="token keyword">pub</span> <span class="token keyword">mut</span><span class="token punctuation">:</span>
+	shape     <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
+	strides   <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
+	axis      <span class="token builtin">int</span>
+	inc       <span class="token builtin">int</span>
+	iteration <span class="token builtin">int</span>
+	pos       <span class="token builtin">int</span>
+<span class="token punctuation">}</span></code></pre>
+<p>TensorAxisIterator is the core iterator for axis-wise operations.<br>
+Stores a copy of the shape and strides reduced along a given axis</p>
+
+</section>
 						<section id="TensorData" class="doc-node">
 							<div class="title"><h2>struct TensorData <a href="#TensorData">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/build.v#L6"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">TensorData</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
@@ -985,7 +1017,7 @@ swapped.</p>
 </section>
 
 						<div class="footer">
-							Powered by vdoc. Generated on: 17 Oct 2021 14:42:47
+							Powered by vdoc. Generated on: 22 Oct 2021 04:43:23
 						</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_vtl">README</a></li>
@@ -1330,6 +1362,8 @@ swapped.</p>
 <li class="open"><a href="#Tensor<T>.apply">type Tensor<T></a>        <ul>
 <li><a href="#Tensor<T>.apply">fn apply</a></li>
 <li><a href="#Tensor<T>.assign">fn assign</a></li>
+<li><a href="#Tensor<T>.axis_iterator">fn axis_iterator</a></li>
+<li><a href="#Tensor<T>.axis_with_dims_iterator">fn axis_with_dims_iterator</a></li>
 <li><a href="#Tensor<T>.broadcast_to">fn broadcast_to</a></li>
 <li><a href="#Tensor<T>.copy">fn copy</a></li>
 <li><a href="#Tensor<T>.custom_iterator">fn custom_iterator</a></li>
@@ -1370,6 +1404,10 @@ swapped.</p>
 <li><a href="#Tensor<T>.view">fn view</a></li>
 </ul>
 </li>
+<li class="open"><a href="#TensorAxisIterator<T>.next">type TensorAxisIterator<T></a>        <ul>
+<li><a href="#TensorAxisIterator<T>.next">fn next</a></li>
+</ul>
+</li>
 <li class="open"><a href="#TensorIterator<T>.next">type TensorIterator<T></a>        <ul>
 <li><a href="#TensorIterator<T>.next">fn next</a></li>
 </ul>
@@ -1387,6 +1425,9 @@ swapped.</p>
 </ul>
 </li>
 <li class="open"><a href="#Tensor">struct Tensor</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#TensorAxisIterator">struct TensorAxisIterator</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#TensorData">struct TensorData</a>        <ul>
