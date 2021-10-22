@@ -66,6 +66,8 @@ pub fn prod_axis<T>(t &vtl.Tensor<T>, data AxisData) T {
 	return acc
 }
 
+// prod_axis_dims returns the product of a Tensor along a provided
+// axis with the reduced dimension intact
 pub fn prod_axis_with_dims<T>(t &vtl.Tensor<T>, data AxisData) T {
         mut iter := t.axis_with_dims_iterator(data.axis)
         mut acc := T(0)
