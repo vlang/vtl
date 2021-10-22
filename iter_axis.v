@@ -15,9 +15,9 @@ pub mut:
 	pos       int
 }
 
-// axis returns an iterator over the axis of a Tensor, commonly
+// axis_iterator returns an iterator over the axis of a Tensor, commonly
 // used for reduction operations along an axis.
-pub fn (t &Tensor<T>) axis<T>(axis int) &TensorAxisIterator<T> {
+pub fn (t &Tensor<T>) axis_iterator<T>(axis int) &TensorAxisIterator<T> {
 	mut shape := t.shape.clone()
 	mut strides := t.strides.clone()
 
@@ -36,7 +36,7 @@ pub fn (t &Tensor<T>) axis<T>(axis int) &TensorAxisIterator<T> {
 // axis returns an iterator over the axis of a Tensor, commonly
 // used for reduction operations along an axis. This iterator
 // keeps the axis dimension as size 1 instead of removing it
-pub fn (t &Tensor<T>) axis_with_dims<T>(axis int) &TensorAxisIterator<T> {
+pub fn (t &Tensor<T>) axis_with_dims_iterator<T>(axis int) &TensorAxisIterator<T> {
 	mut shape := t.shape.clone()
 	mut strides := t.strides.clone()
 

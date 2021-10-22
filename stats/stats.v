@@ -3,6 +3,79 @@ module stats
 import vtl
 import math.stats
 
+pub struct AxisData {
+	axis int
+}
+
+// sum returns the sum of all elements of the given tensor
+pub fn sum<T>(t &vtl.Tensor<T>) T {
+        mut iter := t.iterator(data.axis)
+        mut acc := T(0)
+	for {
+		val, pos := iter.next() or { break }
+                acc += val
+	}
+	return acc
+}
+
+// sum_axis returns the sum of a given Tensor along a provided
+// axis
+pub fn sum_axis<T>(t &vtl.Tensor<T>, data AxisData) T {
+        mut iter := t.axis_iterator(data.axis)
+        mut acc := T(0)
+	for {
+		val, pos := iter.next() or { break }
+                acc += val
+	}
+	return acc
+}
+
+// sum_axis_dims returns the sum of a given Tensor along a provided
+// axis with the reduced dimension intact
+pub fn sum_axis_with_dims<T>(t &vtl.Tensor<T>, data AxisData) T {
+        mut iter := t.axis_with_dims_iterator(data.axis)
+        mut acc := T(0)
+	for {
+		val, pos := iter.next() or { break }
+                acc += val
+	}
+	return acc
+}
+
+// prod_axis returns the product of a given Tensor along a provided
+// axis
+pub fn prod<T>(t &vtl.Tensor<T>) T {
+        mut iter := t.iterator(data.axis)
+        mut acc := T(0)
+	for {
+		val, pos := iter.next() or { break }
+                acc *= val
+	}
+	return acc
+}
+
+// prod_axis_dims returns the product of a given Tensor along a provided
+// axis with the reduced dimension intact
+pub fn prod_axis<T>(t &vtl.Tensor<T>, data AxisData) T {
+        mut iter := t.axis_iterator(data.axis)
+        mut acc := T(0)
+	for {
+		val, pos := iter.next() or { break }
+                acc *= val
+	}
+	return acc
+}
+
+pub fn prod_axis_with_dims<T>(t &vtl.Tensor<T>, data AxisData) T {
+        mut iter := t.axis_with_dims_iterator(data.axis)
+        mut acc := T(0)
+	for {
+		val, pos := iter.next() or { break }
+                acc *= val
+	}
+	return acc
+}
+
 // Measure of Occurance
 // Frequency of a given number
 // Based on

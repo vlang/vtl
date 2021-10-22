@@ -1,8 +1,9 @@
 module layers
 
 import vtl
-import vtl.la
 import vtl.autograd
+import vtl.la
+import vtl.stats
 
 pub struct LinearGate<T> {
 pub:
@@ -24,7 +25,7 @@ pub fn (g &LinearGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
 	}
 
 	if bias.requires_grad {
-		result[2] = la.sum(grad, 0)
+		result[2] = stats.sum_with_axis(grad, axis: 0)
 	}
 
 	return result
