@@ -73,34 +73,14 @@ pub fn (t &Tensor<T>) is_col_major() bool {
 // order
 [inline]
 pub fn (t &Tensor<T>) is_row_major_contiguous() bool {
-	if t.rank() == 1 && t.strides[0] != 1 {
-		return false
-	}
-	mut z := 1
-	for i := t.shape.len - 1; i > 0; i-- {
-		if t.shape[i] != 1 && t.strides[i] != z {
-			return false
-		}
-		z *= t.shape[i]
-	}
-	return true
+	return is_row_major_contiguous(t.shape, t.strides, t.rank())
 }
 
 // is_col_major verifies if a Tensor stores its data in Col-Major
 // order
 [inline]
 pub fn (t &Tensor<T>) is_col_major_contiguous() bool {
-	if t.rank() == 1 && t.strides[0] != 1 {
-		return false
-	}
-	mut z := 1
-	for i := 0; i < t.shape.len; i++ {
-		if t.shape[i] != 1 && t.strides[i] != z {
-			return false
-		}
-		z *= t.shape[i]
-	}
-	return true
+	return is_col_major_contiguous(t.shape, t.strides, t.rank())
 }
 
 // is_contiguous verifies that a Tensor is contiguous independent of
