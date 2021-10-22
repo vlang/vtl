@@ -257,7 +257,7 @@ pub fn (t &Tensor<T>) slice<T>(idx ...[]int) &Tensor<T> {
 		strides: newstrides_.clone()
 		size: size_from_shape(newshape_)
 		data: t.data.offset<T>(offset)
-		memory: .col_major
+		memory: .row_major
 	}
 	ensure_memory<T>(mut ret)
 	return ret
@@ -301,7 +301,7 @@ pub fn (t &Tensor<T>) slice_hilo<T>(idx1 []int, idx2 []int) &Tensor<T> {
 		strides: newstrides_.clone()
 		size: size_from_shape(newshape_)
 		data: t.data.offset<T>(offset)
-		memory: .col_major
+		memory: .row_major
 	}
 	ensure_memory<T>(mut ret)
 	return ret

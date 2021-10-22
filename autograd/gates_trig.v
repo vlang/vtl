@@ -71,7 +71,7 @@ pub fn new_tan_gate<T>(a &Variable<T>) &TanGate<T> {
 
 pub fn (g &TanGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
 	gradient := payload.variable.grad
-        cos := vtl.cos(g.a.value)
+	cos := vtl.cos(g.a.value)
 	r0 := vtl.divide(gradient, vtl.multiply(cos, cos))
 	return [r0]
 }

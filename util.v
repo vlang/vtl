@@ -66,6 +66,56 @@ fn assert_shape<T>(shape []int, ts []&Tensor<T>) {
 	}
 }
 
+// is_col_major_contiguous checks if an array is contiguous with a col-major
+// memory layout
+fn is_col_major_contiguous(shape []int, strides []int, ndims int) bool {
+	if ndims == 0 {
+		return true
+	}
+	if ndims == 1 {
+		return shape[0] == 1 || strides[0] == 1
+	}
+	mut sd := 1
+	mut i := 0
+	for i < ndims {
+		dim := shape[i]
+		if dim == 0 {
+			return true
+		}
+		if strides[i] != sd {
+			return false
+		}
+		sd *= dim
+		i++
+	}
+	return true
+}
+
+// is_row_major_contiguous checks if an array is contiguous with a row-major
+// memory layout
+fn is_row_major_contiguous(shape []int, strides []int, ndims int) bool {
+	if ndims == 0 {
+		return true
+	}
+	if ndims == 1 {
+		return shape[0] == 1 || strides[0] == 1
+	}
+	mut sd := 1
+	mut i := ndims - 1
+	for i > 0 {
+		dim := shape[i]
+		if dim == 0 {
+			return true
+		}
+		if strides[i] != sd {
+			return false
+		}
+		sd *= dim
+		i--
+	}
+	return true
+}
+
 // clip_axis is just a check for negative axes, so that negative axes can be inferred
 fn clip_axis(axis int, size int) int {
 	mut next_axis := axis
