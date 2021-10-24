@@ -32,13 +32,14 @@ pub fn (g &LinearGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
 }
 
 pub fn (g &LinearGate<T>) cache<T>(mut result Variable<T>, args ...autograd.CacheParam) {
-	a := args[0]
-	b := args[1]
+	input := args[0]
+	weight := args[1]
+	bias := args[1]
 
-	if a is Variable<T> && b is Variable<T> {
+	if input is Variable<T> && weight is Variable<T> && bias is Variable<T> {
 		result.grad = vtl.zeros_like<T>(result.value)
 		result.requires_grad = true
 
-		register<T>('Divide', g, result, a, b)
+		register<T>('Linear', g, result, input, weight, bias)
 	}
 }
