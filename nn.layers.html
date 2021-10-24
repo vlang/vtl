@@ -55,6 +55,16 @@
 
 </section>
 
+						<section id="InputGate<T>.backward" class="doc-node">
+							<div class="title"><h2>fn (InputGate<T>) backward <a href="#InputGate<T>.backward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/input.v#L8"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&</span>InputGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> backward<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>payload <span class="token operator">&</span>Payload<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&</span><span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+
+
+</section>
+						<section id="InputGate<T>.cache" class="doc-node">
+							<div class="title"><h2>fn (InputGate<T>) cache <a href="#InputGate<T>.cache">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/input.v#L13"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&</span>InputGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> cache<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token keyword">mut</span> result Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> args ...autograd<span class="token punctuation">.</span>CacheParam<span class="token punctuation">)</span></code></pre>
+
+
+</section>
 						<section id="LinearGate<T>.backward" class="doc-node">
 							<div class="title"><h2>fn (LinearGate<T>) backward <a href="#LinearGate<T>.backward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/linear.v#L15"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&</span>LinearGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> backward<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>payload <span class="token operator">&</span>Payload<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&</span><span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
 
@@ -62,6 +72,11 @@
 </section>
 						<section id="LinearGate<T>.cache" class="doc-node">
 							<div class="title"><h2>fn (LinearGate<T>) cache <a href="#LinearGate<T>.cache">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/linear.v#L34"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&</span>LinearGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> cache<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token keyword">mut</span> result Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> args ...autograd<span class="token punctuation">.</span>CacheParam<span class="token punctuation">)</span></code></pre>
+
+
+</section>
+						<section id="InputGate" class="doc-node">
+							<div class="title"><h2>struct InputGate <a href="#InputGate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/input.v#L6"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> InputGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span> <span class="token punctuation">{</span><span class="token punctuation">}</span></code></pre>
 
 
 </section>
@@ -77,12 +92,20 @@
 </section>
 
 						<div class="footer">
-							Powered by vdoc. Generated on: 24 Oct 2021 18:49:26
+							Powered by vdoc. Generated on: 24 Oct 2021 19:19:30
 						</div>
 					</div>
-					<div class="doc-toc"><ul><li class="open"><a href="#LinearGate<T>.backward">type LinearGate<T></a>        <ul>
+					<div class="doc-toc"><ul><li class="open"><a href="#InputGate<T>.backward">type InputGate<T></a>        <ul>
+<li><a href="#InputGate<T>.backward">fn backward</a></li>
+<li><a href="#InputGate<T>.cache">fn cache</a></li>
+</ul>
+</li>
+<li class="open"><a href="#LinearGate<T>.backward">type LinearGate<T></a>        <ul>
 <li><a href="#LinearGate<T>.backward">fn backward</a></li>
 <li><a href="#LinearGate<T>.cache">fn cache</a></li>
+</ul>
+</li>
+<li class="open"><a href="#InputGate">struct InputGate</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#LinearGate">struct LinearGate</a>        <ul>
