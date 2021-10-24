@@ -9,11 +9,11 @@ pub struct AxisData {
 
 // sum returns the sum of all elements of the given tensor
 pub fn sum<T>(t &vtl.Tensor<T>) T {
-        mut iter := t.iterator(data.axis)
-        mut acc := T(0)
+	mut iter := t.iterator(data.axis)
+	mut acc := T(0)
 	for {
 		val, pos := iter.next() or { break }
-                acc += val
+		acc += val
 	}
 	return acc
 }
@@ -21,11 +21,11 @@ pub fn sum<T>(t &vtl.Tensor<T>) T {
 // sum_axis returns the sum of a given Tensor along a provided
 // axis
 pub fn sum_axis<T>(t &vtl.Tensor<T>, data AxisData) T {
-        mut iter := t.axis_iterator(data.axis)
-        mut acc := T(0)
+	mut iter := t.axis_iterator(data.axis)
+	mut acc := T(0)
 	for {
 		val, pos := iter.next() or { break }
-                acc += val
+		acc += val
 	}
 	return acc
 }
@@ -33,11 +33,11 @@ pub fn sum_axis<T>(t &vtl.Tensor<T>, data AxisData) T {
 // sum_axis_dims returns the sum of a given Tensor along a provided
 // axis with the reduced dimension intact
 pub fn sum_axis_with_dims<T>(t &vtl.Tensor<T>, data AxisData) T {
-        mut iter := t.axis_with_dims_iterator(data.axis)
-        mut acc := T(0)
+	mut iter := t.axis_with_dims_iterator(data.axis)
+	mut acc := T(0)
 	for {
 		val, pos := iter.next() or { break }
-                acc += val
+		acc += val
 	}
 	return acc
 }
@@ -45,11 +45,11 @@ pub fn sum_axis_with_dims<T>(t &vtl.Tensor<T>, data AxisData) T {
 // prod_axis returns the product of a given Tensor along a provided
 // axis
 pub fn prod<T>(t &vtl.Tensor<T>) T {
-        mut iter := t.iterator(data.axis)
-        mut acc := T(0)
+	mut iter := t.iterator(data.axis)
+	mut acc := T(0)
 	for {
 		val, pos := iter.next() or { break }
-                acc *= val
+		acc *= val
 	}
 	return acc
 }
@@ -57,11 +57,11 @@ pub fn prod<T>(t &vtl.Tensor<T>) T {
 // prod_axis_dims returns the product of a given Tensor along a provided
 // axis with the reduced dimension intact
 pub fn prod_axis<T>(t &vtl.Tensor<T>, data AxisData) T {
-        mut iter := t.axis_iterator(data.axis)
-        mut acc := T(0)
+	mut iter := t.axis_iterator(data.axis)
+	mut acc := T(0)
 	for {
 		val, pos := iter.next() or { break }
-                acc *= val
+		acc *= val
 	}
 	return acc
 }
@@ -69,11 +69,11 @@ pub fn prod_axis<T>(t &vtl.Tensor<T>, data AxisData) T {
 // prod_axis_dims returns the product of a Tensor along a provided
 // axis with the reduced dimension intact
 pub fn prod_axis_with_dims<T>(t &vtl.Tensor<T>, data AxisData) T {
-        mut iter := t.axis_with_dims_iterator(data.axis)
-        mut acc := T(0)
+	mut iter := t.axis_with_dims_iterator(data.axis)
+	mut acc := T(0)
 	for {
 		val, pos := iter.next() or { break }
-                acc *= val
+		acc *= val
 	}
 	return acc
 }
