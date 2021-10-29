@@ -1,4 +1,4 @@
-module layers
+module activation
 
 import vtl
 import vtl.autograd
@@ -7,6 +7,12 @@ import vtl.nn.internal
 pub struct SigmoidGate<T> {
 pub:
 	cache &vtl.Tensor<T>
+}
+
+pub fn new_sigmoid_gate<T>(cache &vtl.Tensor<T>) &SigmoidGate<T> {
+	return &SigmoidGate<T>{
+		cache: cache
+	}
 }
 
 pub fn (g &SigmoidGate<T>) backward<T>(payload &autograd.Payload<T>) []&vtl.Tensor<T> {

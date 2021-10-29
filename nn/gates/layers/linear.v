@@ -12,6 +12,14 @@ pub:
 	bias   &autograd.Variable<T>
 }
 
+pub fn new_linear_gate<T>(input &autograd.Variable<T>, weight &autograd.Variable<T>, bias &autograd.Variable<T>) &LinearGate<T> {
+	return &LinearGate<T>{
+		input: input
+		weight: weight
+		bias: bias
+	}
+}
+
 pub fn (g &LinearGate<T>) backward<T>(payload &autograd.Payload<T>) []&vtl.Tensor<T> {
 	grad := payload.variable.grad
 	mut result := [grad, grad, grad]

@@ -1,4 +1,4 @@
-module layers
+module activation
 
 import vtl
 import vtl.autograd
@@ -7,6 +7,12 @@ import vtl.nn.internal
 pub struct EluGate<T> {
 pub:
 	cache &vtl.Tensor<T>
+}
+
+pub fn new_elu_gate<T>(cache &vtl.Tensor<T>) &EluGate<T> {
+	return &EluGate<T>{
+		cache: cache
+	}
 }
 
 pub fn (g &EluGate<T>) backward<T>(payload &autograd.Payload<T>) []&vtl.Tensor<T> {

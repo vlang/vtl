@@ -8,6 +8,12 @@ pub:
 	mask &vtl.Tensor<T>
 }
 
+pub fn new_dropout_gate<T>(mask &vtl.Tensor<T>) &DropoutGate<T> {
+	return &DropoutGate<T>{
+		mask: mask
+	}
+}
+
 pub fn (g &DropoutGate<T>) backward<T>(payload &autograd.Payload<T>) []&vtl.Tensor<T> {
 	gradient := payload.variable.grad
 	return [vtl.multiply(gradient, g.mask)]

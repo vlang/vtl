@@ -5,6 +5,10 @@ import vtl.autograd
 
 pub struct InputGate<T> {}
 
+pub fn new_input_gate<T>() &InputGate<T> {
+	return InputGate<T>{}
+}
+
 pub fn (g &InputGate<T>) backward<T>(payload &autograd.Payload<T>) []&vtl.Tensor<T> {
 	gradient := payload.variable.grad
 	return [gradient]
