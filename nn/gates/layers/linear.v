@@ -12,7 +12,7 @@ pub:
 	bias   &autograd.Variable<T>
 }
 
-pub fn (g &LinearGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
+pub fn (g &LinearGate<T>) backward<T>(payload &autograd.Payload<T>) []&vtl.Tensor<T> {
 	grad := payload.variable.grad
 	mut result := [grad, grad, grad]
 
@@ -31,7 +31,7 @@ pub fn (g &LinearGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
 	return result
 }
 
-pub fn (g &LinearGate<T>) cache<T>(mut result Variable<T>, args ...autograd.CacheParam) {
+pub fn (g &LinearGate<T>) cache<T>(mut result autograd.Variable<T>, args ...autograd.CacheParam) {
 	input := args[0]
 	weight := args[1]
 	bias := args[1]
