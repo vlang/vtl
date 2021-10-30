@@ -1,6 +1,6 @@
 module vtl
 
-// Split an array into multiple sub-arrays.
+// array_split splits an array into multiple sub-arrays.
 // Please refer to the split documentation. The only difference between
 // these functions is that array_split allows indices_or_sections to be an
 // integer that does not equally divide the axis. For an array of length
@@ -22,7 +22,7 @@ pub fn array_split<T>(t &Tensor<T>, ind int, axis int) []&Tensor<T> {
 	return splitter<T>(t, axis, ind, sizes)
 }
 
-// Split an array into multiple sub-arrays.
+// array_split_expl splits an array into multiple sub-arrays.
 // Please refer to the split documentation. The only difference between
 // these functions is that array_split allows indices_or_sections to be an
 // integer that does not equally divide the axis. For an array of length
@@ -36,7 +36,7 @@ pub fn array_split_expl<T>(t &Tensor<T>, ind []int, axis int) []&Tensor<T> {
 	return splitter<T>(t, axis, nsections, div_points)
 }
 
-// Split an array into multiple sub-arrays. The array will be divided into
+// split splits an array into multiple sub-arrays. The array will be divided into
 // N equal arrays along axis. If such a split is not possible,
 // panic
 pub fn split<T>(t &Tensor<T>, ind int, axis int) []&Tensor<T> {
@@ -47,7 +47,7 @@ pub fn split<T>(t &Tensor<T>, ind int, axis int) []&Tensor<T> {
 	return array_split<T>(t, ind, axis)
 }
 
-// Split an array into multiple sub-arrays. The array will be divided into
+// split_expl splits an array into multiple sub-arrays. The array will be divided into
 // The entries of ind indicate where along axis the array is split.
 // For example, [2, 3] would, for axis=0, result in:
 // ary[:2]
@@ -57,7 +57,7 @@ pub fn split_expl<T>(t &Tensor<T>, ind []int, axis int) []&Tensor<T> {
 	return array_split_expl<T>(t, ind, axis)
 }
 
-// Split an array into multiple sub-arrays horizontally (column-wise).
+// hsplit splits an array into multiple sub-arrays horizontally (column-wise).
 // Please refer to the split documentation. hsplit is equivalent to
 // split with axis=1, the array is always split along the second axis
 // regardless of the array dimension.
@@ -68,7 +68,7 @@ pub fn hsplit<T>(t &Tensor<T>, ind int) []&Tensor<T> {
 	}
 }
 
-// Split an array into multiple sub-arrays horizontally (column-wise)
+// hsplit_expl splits an array into multiple sub-arrays horizontally (column-wise)
 // Please refer to the split documentation. hsplit is equivalent to
 // split with axis=1, the array is always split along the second axis
 // regardless of the array dimension.
@@ -79,7 +79,7 @@ pub fn hsplit_expl<T>(t &Tensor<T>, ind []int) []&Tensor<T> {
 	}
 }
 
-// Split an array into multiple sub-arrays vertically (row-wise).
+// vsplit splits an array into multiple sub-arrays vertically (row-wise).
 // Please refer to the split documentation. vsplit is equivalent to
 // split with axis=0 (default), the array is always split along the
 // first axis regardless of the array dimension.
@@ -90,7 +90,7 @@ pub fn vsplit<T>(t &Tensor<T>, ind int) []&Tensor<T> {
 	return split<T>(t, ind, 0)
 }
 
-// Split an array into multiple sub-arrays vertically (row-wise).
+// vsplit_expl splits an array into multiple sub-arrays vertically (row-wise).
 // Please refer to the split documentation. vsplit is equivalent to
 // split with axis=0 (default), the array is always split along the
 // first axis regardless of the array dimension.
@@ -101,7 +101,7 @@ pub fn vsplit_expl<T>(t &Tensor<T>, ind []int) []&Tensor<T> {
 	return split_expl<T>(t, ind, 0)
 }
 
-// Split array into multiple sub-arrays along the 3rd axis (depth).
+// dsplit splits array into multiple sub-arrays along the 3rd axis (depth).
 // Please refer to the split documentation. dsplit is equivalent to
 // split with axis=2, the array is always split along the third axis
 // provided the array dimension is greater than or equal to 3.
@@ -112,7 +112,7 @@ pub fn dsplit<T>(t &Tensor<T>, ind int) []&Tensor<T> {
 	return split<T>(t, ind, 2)
 }
 
-// Split array into multiple sub-arrays along the 3rd axis (depth).
+// dsplit_expl splits array into multiple sub-arrays along the 3rd axis (depth).
 // Please refer to the split documentation. dsplit is equivalent to
 // split with axis=2, the array is always split along the third axis
 // provided the array dimension is greater than or equal to 3.
@@ -123,8 +123,8 @@ pub fn dsplit_expl<T>(t &Tensor<T>, ind []int) []&Tensor<T> {
 	return split_expl<T>(t, ind, 2)
 }
 
-// Generic splitting function that contains the underlying functionality
-// for all split operations, should not be made public.
+// splitter implements a generic splitting function that contains the underlying functionality
+// for all split operations
 fn splitter<T>(t &Tensor<T>, axis int, n int, div_points []int) []&Tensor<T> {
 	mut subary := []&Tensor<T>{}
 	sary := t.swapaxes(axis, 0)
