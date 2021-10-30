@@ -14,7 +14,7 @@ pub fn array_split<T>(t &Tensor<T>, ind int, axis int) []&Tensor<T> {
 	sizes << []int{len: extras, init: neach + 1}
 	sizes << []int{len: ind - extras, init: neach}
 	mut rt := 0
-	for i := 0; i < sizes.len; i++ {
+	for i in 0 .. sizes.len {
 		tmp := rt
 		rt += sizes[i]
 		sizes[i] += tmp
@@ -131,7 +131,7 @@ fn splitter<T>(t &Tensor<T>, axis int, n int, div_points []int) []&Tensor<T> {
 	for i in 0 .. n {
 		st := div_points[i]
 		en := div_points[i + 1]
-		subary << sary.slice([st], [en]).swapaxes(axis, 0)
+		subary << sary.slice_hilo([st], [en]).swapaxes(axis, 0)
 	}
 	return subary
 }
