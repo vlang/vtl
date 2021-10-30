@@ -72,32 +72,23 @@ pub fn triu_inpl<T>(mut t Tensor<T>) {
 // triu_inplace_offset computes the uriu_inplace_offset computes the lower triangle of an array.
 // modifies an array inplace with elements above the k-th diagonal zeroed.
 fn tril_inplace_offset<T>(mut t Tensor<T>, offset int) {
-	mut i := 0
-	for i < t.shape[0] {
-		mut j := 0
-		for j < t.shape[1] {
+	for i in 0 .. t.shape[0] {
+		for j in 0 .. t.shape[1] {
 			if i < j - offset {
-				val := 0
-				t.set([i, j], &val)
+				t.set([i, j], T(0))
 			}
-			j++
 		}
-		i++
 	}
 }
 
 // triu_inplace_offset computes the upper triangle of an array.
 // modifies an array inplace with elements below the k-th diagonal zeroed.
 fn triu_inplace_offset<T>(mut t Tensor<T>, offset int) {
-	mut i := 0
-	for i < t.shape[0] {
-		mut j := 0
-		for j < t.shape[1] {
+	for i in 0 .. t.shape[0] {
+		for j in 0 .. t.shape[1] {
 			if i > j - offset {
 				t.set([i, j], T(0))
 			}
-			j++
 		}
-		i++
 	}
 }
