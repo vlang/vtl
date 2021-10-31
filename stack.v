@@ -4,12 +4,12 @@ pub struct AxisData {
 	axis int
 }
 
-// Stack arrays in sequence vertically (row wise)
+// vstack stack arrays in sequence vertically (row wise)
 pub fn vstack<T>(ts []&Tensor<T>) &Tensor<T> {
 	return concatenate<T>(ts, axis: 0)
 }
 
-// Stack arrays in sequence horizontally (column wise)
+// hstack stacks arrays in sequence horizontally (column wise)
 pub fn hstack<T>(ts []&Tensor<T>) &Tensor<T> {
 	if ts[0].rank() == 1 {
 		return concatenate<T>(ts, axis: 0)
@@ -17,7 +17,7 @@ pub fn hstack<T>(ts []&Tensor<T>) &Tensor<T> {
 	return concatenate<T>(ts, axis: 1)
 }
 
-// Stack arrays in sequence depth wise (along third axis)
+// dstack stacks arrays in sequence depth wise (along third axis)
 pub fn dstack<T>(ts []&Tensor<T>) &Tensor<T> {
 	first_tensor := ts[0]
 	assert_shape<T>(first_tensor.shape, ts)
@@ -38,7 +38,7 @@ pub fn dstack<T>(ts []&Tensor<T>) &Tensor<T> {
 	}
 }
 
-// Stack 1-D arrays as columns into a 2-D array.
+// column_stack stacks 1-D arrays as columns into a 2-D array.
 pub fn column_stack<T>(ts []&Tensor<T>) &Tensor<T> {
 	first_tensor := ts[0]
 	assert_shape<T>(first_tensor.shape, ts)
@@ -55,23 +55,23 @@ pub fn column_stack<T>(ts []&Tensor<T>) &Tensor<T> {
 	return concatenate<T>(ts, axis: 1)
 }
 
-// Join a sequence of arrays along a new axis.
+// stack join a sequence of arrays along a new axis.
 pub fn stack<T>(ts []&Tensor<T>, data AxisData) &Tensor<T> {
 	assert_shape<T>(ts[0].shape, ts)
 	expanded := ts.map(expand_dims<T>(it, data))
 	return concatenate<T>(expanded, data)
 }
 
-// concatenates two Tensors together
+// concatenate concatenates two Tensors together
 pub fn concatenate<T>(ts []&Tensor<T>, data AxisData) &Tensor<T> {
 	mut newshape := ts[0].shape.clone()
 	// just a check for negative axes, so that negative axes can be inferred.
 	axis := clip_axis(data.axis, newshape.len)
 	newshape[axis] = 0
-	newshape = assert_shape_off_axis<T>(ts, axis, newshape)
-	mut ret := new_tensor<T>(T(0), newshape, memory: .row_major)
-	mut lo := []int{len: newshape.len}
-	mut hi := newshape.clone()
+	shape := assert_shape_off_axis<T>(ts, axis, newshape)
+	mut ret := new_tensor<T>(T(0), shape)
+	mut lo := []int{len: shape.len}
+	mut hi := shape.clone()
 	hi[axis] = 0
 	for t in ts {
 		if t.shape[axis] != 0 {

@@ -87,3 +87,17 @@ fn new_tensor_like_with_shape<T>(t &Tensor<T>, shape []int) &Tensor<T> {
 		data: storage
 	}
 }
+
+// new_tensor_like_with_shape_and_strides returns a new tensor created with similar storage properties
+// as the Tensor `t` with a given shape and strides
+fn new_tensor_like_with_shape_and_strides<T>(t &Tensor<T>, shape []int, strides []int) &Tensor<T> {
+	size := size_from_shape(shape)
+	storage := t.data.like_with_len<T>(size)
+	return &Tensor<T>{
+		shape: shape.clone()
+		strides: strides.clone()
+		memory: t.memory
+		size: size
+		data: storage
+	}
+}
