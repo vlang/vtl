@@ -45,7 +45,7 @@ fn assert_shape_off_axis<T>(ts []&Tensor<T>, axis int, shape []int) []int {
 		}
 		mut i := 0
 		for i < shape.len {
-			if (i != axis) && (t.shape[i] != shape[i]) {
+			if i != axis && t.shape[i] != shape[i] {
 				panic('All inputs must share a shape off axis')
 			}
 			i++
