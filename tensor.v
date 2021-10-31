@@ -116,13 +116,15 @@ pub fn (t &Tensor<T>) to_array() []T {
 pub fn (t &Tensor<T>) copy(memory MemoryFormat) &Tensor<T> {
 	strides := strides_from_shape(t.shape, memory)
 	size := size_from_shape(t.shape)
-	return &Tensor<T>{
+	mut ret := &Tensor<T>{
 		data: t.data.clone()
 		memory: memory
 		shape: t.shape
 		strides: strides
 		size: size
 	}
+        ensure_memory<T>(mut ret)
+        return ret
 }
 
 // view returns a view of a Tensor, identical to the
