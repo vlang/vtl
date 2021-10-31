@@ -76,8 +76,7 @@ fn is_col_major_contiguous(shape []int, strides []int, ndims int) bool {
 		return shape[0] == 1 || strides[0] == 1
 	}
 	mut sd := 1
-	mut i := 0
-	for i < ndims {
+	for i in 0 .. ndims {
 		dim := shape[i]
 		if dim == 0 {
 			return true
@@ -86,7 +85,6 @@ fn is_col_major_contiguous(shape []int, strides []int, ndims int) bool {
 			return false
 		}
 		sd *= dim
-		i++
 	}
 	return true
 }
