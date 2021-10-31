@@ -107,13 +107,15 @@ pub fn (t &Tensor<T>) diagonal<T>() &Tensor<T> {
 	nel := iarray_min(t.shape)
 	newshape := [nel]
 	newstrides := [iarray_sum(t.strides)]
-	return &Tensor<T>{
+	mut ret := &Tensor<T>{
 		data: t.data
 		shape: newshape
 		strides: newstrides
 		size: nel
 		memory: t.memory
 	}
+        ensure_memory<T>(mut ret)
+        return ret
 }
 
 // ravel returns a flattened view of an Tensor if possible,
@@ -132,6 +134,7 @@ pub fn (t &Tensor<T>) reshape<T>(shape []int) &Tensor<T> {
 	}
 	mut ret := new_tensor_like_with_shape<T>(t, newshape)
 	ret.data = t.data
+        ensure_memory<T>(mut ret)
 	return ret
 }
 
@@ -165,6 +168,7 @@ pub fn (t &Tensor<T>) transpose<T>(order []int) &Tensor<T> {
 		ret.strides[ii] = t.strides[permutation[ii]]
 		ii++
 	}
+        ensure_memory<T>(mut ret)
 	return ret
 }
 
