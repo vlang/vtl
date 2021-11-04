@@ -35,6 +35,14 @@ fn assert_rank<T>(t &Tensor<T>, n int) {
 	}
 }
 
+// assert_min_rank ensures that a Tensor has at least a given rank
+[inline]
+fn assert_min_rank<T>(t &Tensor<T>, n int) {
+	if n > t.rank() {
+		panic('Bad number of dimensions')
+	}
+}
+
 // assert_shape_off_axis ensures that the shapes of Tensors match
 // for concatenation, except along the axis being joined
 fn assert_shape_off_axis<T>(ts []&Tensor<T>, axis int, shape []int) []int {
