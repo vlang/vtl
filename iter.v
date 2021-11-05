@@ -58,12 +58,10 @@ pub fn (mut s TensorIterator<T>) next<T>() ?(T, int) {
 		s.iteration++
 	}
 	pos := s.pos
-	val := if s.next_handler == .flatten_iteration {
-		handle_flatten_iteration<T>(mut s)
-	} else {
-		handle_strided_iteration<T>(mut s)
+	if s.next_handler == .flatten_iteration {
+		return handle_flatten_iteration<T>(mut s), pos
 	}
-	return val, pos
+	return handle_strided_iteration<T>(mut s), pos
 }
 
 // iterators creates an array of iterators through a list of tensors
