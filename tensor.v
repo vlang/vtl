@@ -123,8 +123,8 @@ pub fn (t &Tensor<T>) copy(memory MemoryFormat) &Tensor<T> {
 		strides: strides
 		size: size
 	}
-        ensure_memory<T>(mut ret)
-        return ret
+	ensure_memory<T>(mut ret)
+	return ret
 }
 
 // view returns a view of a Tensor, identical to the

@@ -16,7 +16,7 @@ fn test_array_split_expl() {
 	e1 := from_array([0.0, 3, 6], [3, 1])
 	e2 := from_array([1.0, 2, 4, 5, 7, 8], [3, 2])
 	result := array_split_expl(a, [1], 1)
-        // @todo: The split is working but for some reason the equal function is not
+	// @todo: The split is working but for some reason the equal function is not
 	// assert e1.equal(result[0])
 	// assert e2.equal(result[1])
 }
