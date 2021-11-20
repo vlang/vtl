@@ -1,6 +1,7 @@
 module autograd
 
 import vtl
+import vtl.la
 
 // Variable is an abstraction of a vtl.Tensor that tracks
 // the operations done to the vtl.Tensor. It also keeps
@@ -84,4 +85,124 @@ pub fn (mut v Variable<T>) backprop() {
 			}
 		}
 	}
+}
+
+// add Adds two variables together.
+pub fn (v &Variable<T>) add<T>(other &Variable<T>) &Variable<T> {
+        result := v.context.variable<T>(vtl.add<T>(v.value, other.value))
+
+        if v.requires_grad || other.requires_grad {
+                gate := new_add_gate()
+                gate.cache(result, v, other)
+        }
+
+        return result
+}
+
+// substract Subtracts two variables.
+pub fn (v &Variable<T>) substract<T>(other &Variable<T>) &Variable<T> {
+        result := v.context.variable<T>(vtl.substract<T>(v.value, other.value))
+
+        if v.requires_grad || other.requires_grad {
+                gate := new_substract_gate()
+                gate.cache(result, v, other)
+        }
+
+        return result
+}
+
+// multiply Multiplies two variables.
+pub fn (v &Variable<T>) multiply<T>(other &Variable<T>) &Variable<T> {
+        result := v.context.variable<T>(vtl.multiply<T>(v.value, other.value))
+
+        if v.requires_grad || other.requires_grad {
+                gate := new_multiply_gate(v, other)
+                gate.cache(result, v, other)
+        }
+
+        return result
+}
+
+// divide Divides two variables.
+pub fn (v &Variable<T>) divide<T>(other &Variable<T>) &Variable<T> {
+        result := v.context.variable<T>(vtl.divide<T>(v.value, other.value))
+
+        if v.requires_grad || other.requires_grad {
+                gate := new_divide_gate(v, other)
+                gate.cache(result, v, other)
+        }
+
+        return result
+}
+
+// pow raises a variable to a power.
+pub fn (v &Variable<T>) pow<T>(other &Variable<T>) &Variable<T> {
+        result := v.context.variable<T>(vtl.pow<T>(v.value, other.value))
+
+        if v.requires_grad || other.requires_grad {
+                gate := new_pow_gate(v, other)
+                gate.cache(result, v, other)
+        }
+
+        return result
+}
+
+// exp Exponentiates a variable.
+pub fn (v &Variable<T>) exp<T>() &Variable<T> {
+        result := v.context.variable<T>(vtl.exp<T>(v.value))
+
+        if v.requires_grad {
+                gate := new_exp_gate(v)
+                gate.cache(result, v)
+        }
+
+        return result
+}
+
+// matmul Multiplies two matrices.
+pub fn (v &Variable<T>) matmul<T>(other &Variable<T>) &Variable<T> {
+        result := v.context.variable<T>(la.matmul<T>(v.value, other.value))
+
+        if v.requires_grad || other.requires_grad {
+                gate := new_matmul_gate(v, other)
+                gate.cache(result, v, other)
+        }
+
+        return result
+}
+
+// sin Sine of a variable.
+pub fn (v &Variable<T>) sin<T>(other &Variable<T>) &Variable<T> {
+        result := v.context.variable<T>(vtl.sin<T>(v.value))
+
+        if v.requires_grad || other.requires_grad {
+                gate := new_sin_gate(v, other)
+                gate.cache(result, v, other)
+        }
+
+        return result
+}
+
+// cos Cosine of a variable.
+pub fn (v &Variable<T>) cos<T>(other &Variable<T>) &Variable<T> {
+        result := v.context.variable<T>(vtl.cos<T>(v.value))
+
+        if v.requires_grad || other.requires_grad {
+                gate := new_cos_gate(v, other)
+                gate.cache(result, v, other)
+        }
+
+        return result
+}
+
+// tan Tan of a variable.
+pub fn (v &Variable<T>) tan<T>(other &Variable<T>) &Variable<T> {
+        result := v.context.variable<T>(vtl.tan<T>(v.value))
+
+        if v.requires_grad || other.requires_grad {
+                gate := new_tan_gate(v, other)
+                gate.cache(result, v, other)
+        }
+
+        return result
 }
