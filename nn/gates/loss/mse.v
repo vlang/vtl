@@ -19,19 +19,7 @@ pub fn new_mse_gate<T>(cache &autograd.Variable<T>, target &vtl.Tensor<T>) &MseG
 
 pub fn (g &MseGate<T>) backward<T>(payload &autograd.Payload<T>) []&vtl.Tensor<T> {
 	gradient := payload.variable.grad
-
-	grad := gradient.value
-	norm := vtl.divide_scalar(vtl.multiply_scalar(grad, T(2)), T(gradient.size))
-
-	mut ret := vtl.new_tensor_like<T>(g.cache)
-	// mut iter := vtl.iterators<T>([g.cache, g.target])
-	// for {
-	// 	vals, pos := vtl.iterators_next<T>(mut iter) or { break }
-	// 	val := norm
-	// 	ret.data.set<T>(pos, val)
-	// }
-
-	return [res]
+	return internal.mse_backward<T>(gradient, cache.value, g.target)
 }
 
 pub fn (g &MseGate<T>) cache<T>(mut result autograd.Variable<T>, args ...autograd.CacheParam) {
