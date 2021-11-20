@@ -60,13 +60,43 @@
 
 
 </section>
+						<section id="new_sigmoid_cross_entropy_gate" class="doc-node">
+							<div class="title"><h2>fn new_sigmoid_cross_entropy_gate <a href="#new_sigmoid_cross_entropy_gate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/gates/loss/sigmoid_cross_entropy.v#L13"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> new_sigmoid_cross_entropy_gate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>cache <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> target <span class="token operator">&</span><span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token operator">&</span>SigmoidCrossEntropyGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+
+
+</section>
+						<section id="new_softmax_cross_entropy_gate" class="doc-node">
+							<div class="title"><h2>fn new_softmax_cross_entropy_gate <a href="#new_softmax_cross_entropy_gate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/gates/loss/softmax_cross_entropy.v#L13"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> new_softmax_cross_entropy_gate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>cache <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> target <span class="token operator">&</span><span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token operator">&</span>SoftmaxCrossEntropyGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+
+
+</section>
 						<section id="MseGate<T>.backward" class="doc-node">
 							<div class="title"><h2>fn (MseGate<T>) backward <a href="#MseGate<T>.backward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/gates/loss/mse.v#L20"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&</span>MseGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> backward<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>payload <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Payload<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&</span><span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
 
 
 </section>
 						<section id="MseGate<T>.cache" class="doc-node">
-							<div class="title"><h2>fn (MseGate<T>) cache <a href="#MseGate<T>.cache">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/gates/loss/mse.v#L37"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&</span>MseGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> cache<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token keyword">mut</span> result autograd<span class="token punctuation">.</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> args ...autograd<span class="token punctuation">.</span>CacheParam<span class="token punctuation">)</span></code></pre>
+							<div class="title"><h2>fn (MseGate<T>) cache <a href="#MseGate<T>.cache">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/gates/loss/mse.v#L25"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&</span>MseGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> cache<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token keyword">mut</span> result autograd<span class="token punctuation">.</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> args ...autograd<span class="token punctuation">.</span>CacheParam<span class="token punctuation">)</span></code></pre>
+
+
+</section>
+						<section id="SigmoidCrossEntropyGate<T>.backward" class="doc-node">
+							<div class="title"><h2>fn (SigmoidCrossEntropyGate<T>) backward <a href="#SigmoidCrossEntropyGate<T>.backward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/gates/loss/sigmoid_cross_entropy.v#L20"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&</span>SigmoidCrossEntropyGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> backward<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>payload <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Payload<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&</span><span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+
+
+</section>
+						<section id="SigmoidCrossEntropyGate<T>.cache" class="doc-node">
+							<div class="title"><h2>fn (SigmoidCrossEntropyGate<T>) cache <a href="#SigmoidCrossEntropyGate<T>.cache">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/gates/loss/sigmoid_cross_entropy.v#L25"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&</span>SigmoidCrossEntropyGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> cache<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token keyword">mut</span> result autograd<span class="token punctuation">.</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> args ...autograd<span class="token punctuation">.</span>CacheParam<span class="token punctuation">)</span></code></pre>
+
+
+</section>
+						<section id="SoftmaxCrossEntropyGate<T>.backward" class="doc-node">
+							<div class="title"><h2>fn (SoftmaxCrossEntropyGate<T>) backward <a href="#SoftmaxCrossEntropyGate<T>.backward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/gates/loss/softmax_cross_entropy.v#L20"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&</span>SoftmaxCrossEntropyGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> backward<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>payload <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Payload<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&</span><span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+
+
+</section>
+						<section id="SoftmaxCrossEntropyGate<T>.cache" class="doc-node">
+							<div class="title"><h2>fn (SoftmaxCrossEntropyGate<T>) cache <a href="#SoftmaxCrossEntropyGate<T>.cache">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/gates/loss/softmax_cross_entropy.v#L25"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&</span>SoftmaxCrossEntropyGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> cache<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token keyword">mut</span> result autograd<span class="token punctuation">.</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> args ...autograd<span class="token punctuation">.</span>CacheParam<span class="token punctuation">)</span></code></pre>
 
 
 </section>
@@ -79,12 +109,36 @@
 
 
 </section>
+						<section id="SigmoidCrossEntropyGate" class="doc-node">
+							<div class="title"><h2>struct SigmoidCrossEntropyGate <a href="#SigmoidCrossEntropyGate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/gates/loss/sigmoid_cross_entropy.v#L7"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> SigmoidCrossEntropyGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	cache  <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span>
+	target <span class="token operator">&</span>vtl<span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span>
+<span class="token punctuation">}</span></code></pre>
+
+
+</section>
+						<section id="SoftmaxCrossEntropyGate" class="doc-node">
+							<div class="title"><h2>struct SoftmaxCrossEntropyGate <a href="#SoftmaxCrossEntropyGate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/gates/loss/softmax_cross_entropy.v#L7"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> SoftmaxCrossEntropyGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	cache  <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span>
+	target <span class="token operator">&</span>vtl<span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span>
+<span class="token punctuation">}</span></code></pre>
+
+
+</section>
 
 						<div class="footer">
-							Powered by vdoc. Generated on: 5 Nov 2021 04:57:21
+							Powered by vdoc. Generated on: 20 Nov 2021 08:12:39
 						</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#new_mse_gate">fn new_mse_gate</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#new_sigmoid_cross_entropy_gate">fn new_sigmoid_cross_entropy_gate</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#new_softmax_cross_entropy_gate">fn new_softmax_cross_entropy_gate</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#MseGate<T>.backward">type MseGate<T></a>        <ul>
@@ -92,7 +146,23 @@
 <li><a href="#MseGate<T>.cache">fn cache</a></li>
 </ul>
 </li>
+<li class="open"><a href="#SigmoidCrossEntropyGate<T>.backward">type SigmoidCrossEntropyGate<T></a>        <ul>
+<li><a href="#SigmoidCrossEntropyGate<T>.backward">fn backward</a></li>
+<li><a href="#SigmoidCrossEntropyGate<T>.cache">fn cache</a></li>
+</ul>
+</li>
+<li class="open"><a href="#SoftmaxCrossEntropyGate<T>.backward">type SoftmaxCrossEntropyGate<T></a>        <ul>
+<li><a href="#SoftmaxCrossEntropyGate<T>.backward">fn backward</a></li>
+<li><a href="#SoftmaxCrossEntropyGate<T>.cache">fn cache</a></li>
+</ul>
+</li>
 <li class="open"><a href="#MseGate">struct MseGate</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#SigmoidCrossEntropyGate">struct SigmoidCrossEntropyGate</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#SoftmaxCrossEntropyGate">struct SoftmaxCrossEntropyGate</a>        <ul>
 </ul>
 </li>
 </ul></div>
