@@ -10,9 +10,6 @@ import vtl.la
 // This is the fundamental object used in automatic
 // differentiation, as well as the neural network aspects
 // of VTL
-//
-// @todo: add operator overloads for all the gates
-[heap]
 pub struct Variable<T> {
 	// The value of the Variable.  This should not be edited outside
 	// of Variable operations, as other edits will not be tracked
@@ -40,10 +37,10 @@ pub:
 
 // new_variable
 pub fn new_variable<T>(context &Context<T>, value &vtl.Tensor<T>, data VariableData) &Variable<T> {
-	grad := if data.requires_grad { vtl.zeros_like<T>(data.value) } else { data.value }
+	grad := if data.requires_grad { vtl.zeros_like<T>(value) } else { value }
 	return &Variable<T>{
-		context: data.context
-		value: data.value
+		context: context
+		value: value
 		grad: grad
 		requires_grad: data.requires_grad
 	}
@@ -75,15 +72,15 @@ pub fn (mut v Variable<T>) backprop() {
 	for v.context.len() > 0 {
 		cur_node := v.context.pop()
 		$if debug {
-			print(node.name)
+			print(cur_node.name)
 		}
-		diffs := cur_node.gate.backward(cur_node.payload)
-		for i, diff in diffs {
-			mut parent_i := cur_node.parents[i]
-			if parent_i.requires_grad {
-				parent_i.grad = vtl.add(parent_i.grad, diff)
-			}
-		}
+		// diffs := cur_node.gate.backward(cur_node.payload)
+		// for i, diff in diffs {
+		// 	mut parent_i := cur_node.parents[i]
+		// 	if parent_i.requires_grad {
+		// 		parent_i.grad = vtl.add<T>(parent_i.grad, diff)
+		// 	}
+		// }
 	}
 }
 
@@ -92,7 +89,7 @@ pub fn (v &Variable<T>) add<T>(other &Variable<T>) &Variable<T> {
         result := v.context.variable<T>(vtl.add<T>(v.value, other.value))
 
         if v.requires_grad || other.requires_grad {
-                gate := new_add_gate()
+                gate := new_add_gate<T>()
                 gate.cache(result, v, other)
         }
 
@@ -104,7 +101,7 @@ pub fn (v &Variable<T>) substract<T>(other &Variable<T>) &Variable<T> {
         result := v.context.variable<T>(vtl.substract<T>(v.value, other.value))
 
         if v.requires_grad || other.requires_grad {
-                gate := new_substract_gate()
+                gate := new_substract_gate<T>()
                 gate.cache(result, v, other)
         }
 
@@ -116,7 +113,7 @@ pub fn (v &Variable<T>) multiply<T>(other &Variable<T>) &Variable<T> {
         result := v.context.variable<T>(vtl.multiply<T>(v.value, other.value))
 
         if v.requires_grad || other.requires_grad {
-                gate := new_multiply_gate(v, other)
+                gate := new_multiply_gate<T>(v, other)
                 gate.cache(result, v, other)
         }
 
@@ -128,7 +125,7 @@ pub fn (v &Variable<T>) divide<T>(other &Variable<T>) &Variable<T> {
         result := v.context.variable<T>(vtl.divide<T>(v.value, other.value))
 
         if v.requires_grad || other.requires_grad {
-                gate := new_divide_gate(v, other)
+                gate := new_divide_gate<T>(v, other)
                 gate.cache(result, v, other)
         }
 
@@ -140,7 +137,7 @@ pub fn (v &Variable<T>) pow<T>(other &Variable<T>) &Variable<T> {
         result := v.context.variable<T>(vtl.pow<T>(v.value, other.value))
 
         if v.requires_grad || other.requires_grad {
-                gate := new_pow_gate(v, other)
+                gate := new_pow_gate<T>(v, other)
                 gate.cache(result, v, other)
         }
 
@@ -152,7 +149,7 @@ pub fn (v &Variable<T>) exp<T>() &Variable<T> {
         result := v.context.variable<T>(vtl.exp<T>(v.value))
 
         if v.requires_grad {
-                gate := new_exp_gate(v)
+                gate := new_exp_gate<T>(v)
                 gate.cache(result, v)
         }
 
@@ -164,7 +161,7 @@ pub fn (v &Variable<T>) matmul<T>(other &Variable<T>) &Variable<T> {
         result := v.context.variable<T>(la.matmul<T>(v.value, other.value))
 
         if v.requires_grad || other.requires_grad {
-                gate := new_matmul_gate(v, other)
+                gate := new_matmul_gate<T>(v, other)
                 gate.cache(result, v, other)
         }
 
@@ -176,7 +173,7 @@ pub fn (v &Variable<T>) sin<T>(other &Variable<T>) &Variable<T> {
         result := v.context.variable<T>(vtl.sin<T>(v.value))
 
         if v.requires_grad || other.requires_grad {
-                gate := new_sin_gate(v, other)
+                gate := new_sin_gate<T>(v, other)
                 gate.cache(result, v, other)
         }
 
@@ -188,7 +185,7 @@ pub fn (v &Variable<T>) cos<T>(other &Variable<T>) &Variable<T> {
         result := v.context.variable<T>(vtl.cos<T>(v.value))
 
         if v.requires_grad || other.requires_grad {
-                gate := new_cos_gate(v, other)
+                gate := new_cos_gate<T>(v, other)
                 gate.cache(result, v, other)
         }
 
@@ -200,7 +197,7 @@ pub fn (v &Variable<T>) tan<T>(other &Variable<T>) &Variable<T> {
         result := v.context.variable<T>(vtl.tan<T>(v.value))
 
         if v.requires_grad || other.requires_grad {
-                gate := new_tan_gate(v, other)
+                gate := new_tan_gate<T>(v, other)
                 gate.cache(result, v, other)
         }
 

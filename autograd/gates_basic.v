@@ -100,7 +100,7 @@ pub fn (g &DivideGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
 	bx2 := vtl.multiply_scalar<T>(g.b.value, T(2))
 	oposite := vtl.multiply_scalar<T>(gradient, T(-1))
 	mut r1 := vtl.multiply<T>(oposite, g.a.value)
-	r1 = vtl.divide(r1, bx2)
+	r1 = vtl.divide<T>(r1, bx2)
 	return [r0, r1]
 }
 

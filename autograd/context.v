@@ -27,15 +27,15 @@ pub fn (ctx &Context<T>) len() int {
 	return ctx.nodes.len
 }
 
-pub fn (mut ctx Context<T>) push(node &Node<T>) {
+pub fn (mut ctx Context<T>) push<T>(node &Node<T>) {
 	ctx.nodes << node
 }
 
-pub fn (ctx &Context<T>) last() &Node<T> {
+pub fn (ctx &Context<T>) last<T>() &Node<T> {
 	return ctx.nodes.last()
 }
 
-pub fn (mut ctx Context<T>) pop() &Node<T> {
+pub fn (mut ctx Context<T>) pop<T>() &Node<T> {
 	return ctx.nodes.pop()
 }
 
