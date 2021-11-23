@@ -27,7 +27,11 @@ jobs:
         v install vsl
     - name: Move VTL source code to V Modules
       run: mv ./vtl ~/.vmodules
-    - name: Execute Tests using Pure V Backend with Vlib Math
+    - name: Execute Tests using Pure V Backend
       run: ~/.vmodules/vtl/bin/test
-    - name: Execute Tests using Open BLAS Backend
+    - name: Execute Tests using Pure V Backend with Pure V Math
       run: ~/.vmodules/vtl/bin/test --use-cblas
+    - name: Execute Tests using Pure V Backend and Garbage Collection enabled
+      run: ~/.vmodules/vtl/bin/test --use-gc boehm
+    - name: Execute Tests using Pure V Backend with Pure V Math and Garbage Collection enabled
+      run: ~/.vmodules/vtl/bin/test --use-cblas --use-gc boehm
