@@ -10,6 +10,7 @@
 ##         --stats                           Exeute with stats
 ##         --use-cblas                       Execute tests using cblas
 ##         --use-autofree                    Execute tests using atofree
+##         --use-gc=STRATEGY                 Execute tests using garbage collector
 ##
 
 ROOT=$(dirname "$0")
@@ -33,13 +34,22 @@ if [[ -n "${use_autofree}" ]]; then
     flags="${flags} -autofree"
 fi
 
+if [[ -n "${use_gc}" ]]; then
+    echo "Running tests using V Math"
+    flags="${flags} -gc ${use_gc}"
+fi
+
 if [[ -n "${stats}" ]]; then
     echo "Running tests with stats"
     flags="${flags} -stats"
 fi
 
+if [[ -n "${prod}" ]]; then
+    echo "Running tests with prod"
+    flags="${flags} -prod"
+fi
+
 echo "Executing tests with command: \"v ${flags} test .\""
 v ${flags} test ${vtl_dir_path}
-v ${flags} run "${ROOT}"/../examples/mnist.v
 
 find ${vtl_dir_path} -name '*_test' -exec rm -f {} +
