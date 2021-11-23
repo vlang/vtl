@@ -10,6 +10,7 @@ import vtl.la
 // This is the fundamental object used in automatic
 // differentiation, as well as the neural network aspects
 // of VTL
+[heap]
 pub struct Variable<T> {
 	// The value of the Variable.  This should not be edited outside
 	// of Variable operations, as other edits will not be tracked
