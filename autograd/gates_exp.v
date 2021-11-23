@@ -15,7 +15,7 @@ pub fn new_exp_gate<T>(a &Variable<T>) &ExpGate<T> {
 
 pub fn (g &ExpGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
 	gradient := payload.variable.grad
-	r0 := vtl.multiply(gradient, vtl.exp(g.a.value))
+	r0 := vtl.multiply<T>(gradient, vtl.exp<T>(g.a.value))
 	return [r0]
 }
 

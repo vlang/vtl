@@ -3,16 +3,15 @@ module autograd
 // Node is a member of a computational graph that contains
 // a reference to a gate, as well as the parents of the operation
 // and the payload that resulted from the operation.
-[heap]
 pub struct Node<T> {
-pub:
+pub mut:
 	// A Gate containing a backwards and cache function for
 	// a node
 	gate Gate<T>
 	// The variables that created this node
 	parents []&Variable<T>
 	// Wrapper around a Tensor, contains operation data
-	payload &Payload
+	payload &Payload<T>
 	// Debug use only, contains a name for a node
 	name string
 }
