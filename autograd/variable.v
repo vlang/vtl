@@ -31,8 +31,8 @@ pub mut:
 	requires_grad bool
 }
 
+[params]
 pub struct VariableData {
-pub:
 	requires_grad bool = true
 }
 
