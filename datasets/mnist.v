@@ -19,7 +19,7 @@ mut:
 pub struct MnistBatch {
 pub:
 	features &vtl.Tensor<f32>
-	labels   &vtl.Tensor<f32>
+	labels   &vtl.Tensor<int>
 }
 
 pub struct MnistDatasetConfig {
@@ -49,12 +49,12 @@ pub fn (ds &MnistDataset) str() string {
 pub fn (mut ds MnistDataset) next() ?DatasetBatch {
 	batch_size := ds.batch_size
 
-	mut labels := []f32{cap: batch_size}
+	mut labels := []int{cap: batch_size}
 	mut features := []f32{cap: batch_size}
 
 	for _ in 0 .. batch_size {
 		items := ds.parser.read() or { break }
-		labels << items[0].f32()
+		labels << items[0].int()
 		features << items[1..].map(it.f32())
 	}
 
@@ -63,7 +63,7 @@ pub fn (mut ds MnistDataset) next() ?DatasetBatch {
 	}
 
 	mut lt := vtl.from_array(labels, [labels.len])
-	mut lft := vtl.zeros<f32>([lt.shape[0], 10])
+	mut lft := vtl.zeros<int>([lt.shape[0], 10])
 
 	mut iter := lt.iterator()
 	for {

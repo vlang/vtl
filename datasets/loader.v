@@ -20,7 +20,7 @@ mut:
 
 pub interface DatasetBatch {
 	features &vtl.Tensor<f32>
-	labels &vtl.Tensor<f32>
+	labels &vtl.Tensor<int>
 }
 
 fn get_cache_dir(subdir ...string) string {
