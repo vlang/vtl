@@ -63,7 +63,8 @@ fn main() {
     mut i := 0
     for {
         batch := train_ds.next() or { break }
-        println('Labels Batch #${i++}:\n${*batch.labels}')
+        println('Labels Batch #${i++}')
+        println(*batch.labels)
         println('')
 
         if i == 10 {
@@ -157,7 +158,7 @@ fn main() {
 </section>
 
 						<div class="footer">
-							Powered by vdoc. Generated on: 24 Nov 2021 02:21:38
+							Powered by vdoc. Generated on: 24 Nov 2021 02:22:43
 						</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_datasets">README</a></li>
