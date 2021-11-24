@@ -8,7 +8,8 @@ fn main() {
 	mut i := 0
 	for {
 		batch := train_ds.next() or { break }
-		println('Labels Batch #${i++}:\n${*batch.labels}')
+		println('Labels Batch #${i++}')
+		println(*batch.labels)
 		println('')
 
 		if i == 10 {
