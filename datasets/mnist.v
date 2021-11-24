@@ -22,13 +22,17 @@ pub:
 	labels   &vtl.Tensor<f32>
 }
 
-pub fn load_mnist(set_type DatasetType, batch_size int) ?DatasetLoader {
+pub struct MnistDatasetConfig {
+	batch_size int = 32
+}
+
+pub fn load_mnist(set_type DatasetType, data MnistDatasetConfig) ?DatasetLoader {
 	url := if set_type == .train { datasets.mnist_train_url } else { datasets.mnist_test_url }
 	content := load_from_url(url: url) ?
 
 	return DatasetLoader(&MnistDataset{
 		@type: set_type
-		batch_size: batch_size
+		batch_size: data.batch_size
 		parser: csv.new_reader(content)
 	})
 }

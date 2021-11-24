@@ -31,6 +31,7 @@ fn get_cache_dir(subdir ...string) string {
 	return os.join_path(cache_dir, ...subdir)
 }
 
+[params]
 struct RawDownload {
 	url    string
 	target string
@@ -61,6 +62,7 @@ fn load_from_url(data RawDownload) ?string {
 	return content
 }
 
+[params]
 struct DatasetDownload {
 	dataset    string
 	baseurl    string
