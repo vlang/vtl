@@ -5,10 +5,11 @@ module autograd
 // and the payload that resulted from the operation.
 [heap]
 pub struct Node<T> {
-pub mut:
+pub:
 	// A Gate containing a backwards and cache function for
 	// a node
 	gate Gate<T>
+pub mut:
 	// The variables that created this node
 	parents []&Variable<T>
 	// Wrapper around a Tensor, contains operation data

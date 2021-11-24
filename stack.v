@@ -1,5 +1,6 @@
 module vtl
 
+[params]
 pub struct AxisData {
 	axis int
 }
