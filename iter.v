@@ -80,7 +80,7 @@ pub fn (ts []&Tensor<T>) iterators<T>() []&TensorIterator<T> {
 }
 
 // iterators creates an array of iterators through a list of tensors
-fn iterators<T>(ts []&Tensor<T>) []&TensorIterator<T> {
+pub fn iterators<T>(ts []&Tensor<T>) []&TensorIterator<T> {
 	if ts.len == 0 {
 		return []&TensorIterator<T>{}
 	}
@@ -101,7 +101,7 @@ pub fn (mut its []&TensorIterator<T>) next<T>() ?([]T, int) {
 
 // iterators_next calls the iteration type for a given list of iterators
 // which is either flat or strided and returns a list of Nums containing the current values
-fn iterators_next<T>(mut its []&TensorIterator<T>) ?([]T, int) {
+pub fn iterators_next<T>(mut its []&TensorIterator<T>) ?([]T, int) {
 	mut nums := []T{cap: its.len}
 	mut pos := -1
 	for i, mut iter in its {

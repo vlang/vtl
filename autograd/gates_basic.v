@@ -27,8 +27,8 @@ pub fn (g &AddGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) {
 
 pub struct SubstractGate<T> {}
 
-pub fn new_substract_gate<T>() &AddGate<T> {
-	return &AddGate<T>{}
+pub fn new_substract_gate<T>() &SubstractGate<T> {
+	return &SubstractGate<T>{}
 }
 
 pub fn (g &SubstractGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {

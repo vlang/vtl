@@ -9,7 +9,10 @@ fn main() {
         x := ctx.variable(vtl.from_1d([3.0]))
         y := ctx.variable(vtl.from_1d([2.0]))
 
-        // mut f := x.pow(y)
+        println(x)
+        println(y)
+
+        mut f := autograd.pow(x, y)
 
         // f.backprop()
 
