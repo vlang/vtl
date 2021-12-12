@@ -71,13 +71,15 @@ pub fn (ctx &Context<T>) str() string {
 	return str
 }
 
-pub fn register<T>(name string, gate &Gate<T>, result &Variable<T>, parents ...&Variable<T>) ? {
+pub fn register<T>(name string, gate Gate<T>, result &Variable<T>, parents ...&Variable<T>) {
 	assert parents.len >= 1
 	if parents.len == 0 {
-		return error('@FN: it is needed to specify at least one parent')
+		panic('@FN: it is needed to specify at least one parent')
 	}
 
-	payload := new_payload(result)
-	node := new_node(gate, parents, payload, name)
-	parents[0].context.push(node)
+	payload := new_payload<T>(result)
+        parents_arr := *parents
+	node := new_node<T>(gate, parents_arr, payload, name)
+	mut ctx := parents_arr[0].context
+        ctx.push(node)
 }
