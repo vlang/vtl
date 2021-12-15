@@ -12,7 +12,7 @@ fn main() {
         println(x)
         println(y)
 
-        mut f := autograd.pow(x, y)
+        // mut f := autograd.pow(x, y)
 
         // f.backprop()
 
