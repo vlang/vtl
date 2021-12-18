@@ -78,8 +78,8 @@ pub fn register<T>(name string, gate Gate<T>, result &Variable<T>, parents ...&V
 	}
 
 	payload := new_payload<T>(result)
-        parents_arr := *parents
+	parents_arr := *parents
 	node := new_node<T>(gate, parents_arr, payload, name)
 	mut ctx := parents_arr[0].context
-        ctx.push(node)
+	ctx.push(node)
 }

@@ -80,7 +80,6 @@ import math
 // 	return ret
 // }
 
-
 // equal checks if two Tensors are equal
 fn equal<T>(t &Tensor<T>, other &Tensor<T>) bool {
 	if t.shape != other.shape {
@@ -104,25 +103,25 @@ pub fn (t &Tensor<T>) equal<T>(other &Tensor<T>) bool {
 // with_dims returns a new Tensor adding dimensions so that it has
 // at least `n` dimensions
 pub fn (t &Tensor<T>) with_dims<T>(n int) &Tensor<T> {
-        if t.rank() >= n {
-                return t.view()
-        }
-        d := n - t.rank()
-        mut newshape := []int{init: 1, len: d}
-        newshape << t.shape
-        return t.reshape(newshape)
+	if t.rank() >= n {
+		return t.view()
+	}
+	d := n - t.rank()
+	mut newshape := []int{len: d, init: 1}
+	newshape << t.shape
+	return t.reshape(newshape)
 }
 
 // with_broadcast expands a `Tensor`s dimensions n times by broadcasting
 // the shape and strides
 pub fn (t &Tensor<T>) with_broadcast<T>(n int) &Tensor<T> {
-        mut newshape := []int{}
-        newshape << t.shape
-        newshape << []int{init: 1, len: n}
-        mut newstrides := []int{}
-        newstrides << t.strides
-        newstrides << []int{len: n}
-        return t.as_strided(newshape, newstrides)
+	mut newshape := []int{}
+	newshape << t.shape
+	newshape << []int{len: n, init: 1}
+	mut newstrides := []int{}
+	newstrides << t.strides
+	newstrides << []int{len: n}
+	return t.as_strided(newshape, newstrides)
 }
 
 // diagonal returns a view of the diagonal entries
@@ -138,8 +137,8 @@ pub fn (t &Tensor<T>) diagonal<T>() &Tensor<T> {
 		size: nel
 		memory: t.memory
 	}
-        ensure_memory<T>(mut ret)
-        return ret
+	ensure_memory<T>(mut ret)
+	return ret
 }
 
 // ravel returns a flattened view of an Tensor if possible,
@@ -158,20 +157,20 @@ pub fn (t &Tensor<T>) reshape<T>(shape []int) &Tensor<T> {
 	}
 	mut ret := new_tensor_like_with_shape<T>(t, newshape)
 	ret.data = t.data
-        ensure_memory<T>(mut ret)
+	ensure_memory<T>(mut ret)
 	return ret
 }
 
 // as_strided returns a view of the Tensor with new shape and strides
 pub fn (t &Tensor<T>) as_strided<T>(shape []int, strides []int) &Tensor<T> {
-        newshape, newsize := shape_with_autosize(shape, t.size)
-        if newsize != t.size {
-                panic('${@METHOD}: cannot reshape')
-        }
-        mut ret := new_tensor_like_with_shape_and_strides<T>(t, newshape, strides)
-        ret.data = t.data
-        ensure_memory<T>(mut ret)
-        return ret
+	newshape, newsize := shape_with_autosize(shape, t.size)
+	if newsize != t.size {
+		panic('${@METHOD}: cannot reshape')
+	}
+	mut ret := new_tensor_like_with_shape_and_strides<T>(t, newshape, strides)
+	ret.data = t.data
+	ensure_memory<T>(mut ret)
+	return ret
 }
 
 // transpose permutes the axes of an tensor in a specified
@@ -204,7 +203,7 @@ pub fn (t &Tensor<T>) transpose<T>(order []int) &Tensor<T> {
 		ret.strides[ii] = t.strides[permutation[ii]]
 		ii++
 	}
-        ensure_memory<T>(mut ret)
+	ensure_memory<T>(mut ret)
 	return ret
 }
 

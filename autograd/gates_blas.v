@@ -21,7 +21,7 @@ pub fn (g &MatMulGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
 	// r0 := la.matmul<T>(gradient, g.b.value.t())
 	// r1 := la.matmul<T>(g.a.value.t(), gradient)
 	// return [r0, r1]
-        return []&vtl.Tensor<T>{}
+	return []&vtl.Tensor<T>{}
 }
 
 pub fn (g &MatMulGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) {

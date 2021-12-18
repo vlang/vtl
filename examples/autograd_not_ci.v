@@ -4,17 +4,17 @@ import vtl
 import vtl.autograd
 
 fn main() {
-        ctx := autograd.new_ctx<f64>()
-        
-        x := ctx.variable(vtl.from_1d([3.0]))
-        y := ctx.variable(vtl.from_1d([2.0]))
+	ctx := autograd.new_ctx<f64>()
 
-        println(x)
-        println(y)
+	x := ctx.variable(vtl.from_1d([3.0]))
+	y := ctx.variable(vtl.from_1d([2.0]))
 
-        // mut f := autograd.pow(x, y)
+	println(x)
+	println(y)
 
-        // f.backprop()
+	// mut f := autograd.pow(x, y)
 
-        println(x.grad)
+	// f.backprop()
+
+	println(x.grad)
 }
