@@ -67,10 +67,13 @@ struct DatasetDownload {
 	dataset    string
 	baseurl    string
 	extract    bool
+	tar        bool
 	urls_names map[string]string
 }
 
-fn download_dataset(data DatasetDownload) ? {
+fn download_dataset(data DatasetDownload) ?map[string]string {
+	mut loaded_paths := map[string]string{}
+
 	for path, filename in data.urls_names {
 		dataset_dir := get_cache_dir('datasets', data.dataset)
 
@@ -96,8 +99,24 @@ fn download_dataset(data DatasetDownload) ? {
 				$if debug ? {
 					println('Extracting $target')
 				}
-				szip.extract_zip_to_dir(target, dataset_dir) ?
+				if data.tar {
+					result := os.execute('tar -xvzf $target -C $dataset_dir')
+					if result.exit_code != 0 {
+						$if debug ? {
+							println('Error extracting $target')
+							println('Exit code: $result.exit_code')
+							println('Output: $result.output')
+						}
+						return error_with_code('Error extracting $target', result.exit_code)
+					}
+				} else {
+					szip.extract_zip_to_dir(target, dataset_dir) ?
+				}
 			}
 		}
+
+		loaded_paths[path] = target
 	}
+
+	return loaded_paths
 }
