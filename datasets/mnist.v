@@ -1,11 +1,13 @@
 module datasets
 
 import encoding.csv
+import os
 import vtl
 
 pub const (
-	mnist_test_url  = 'https://pjreddie.com/media/files/mnist_test.csv'
-	mnist_train_url = 'https://pjreddie.com/media/files/mnist_train.csv'
+	mnist_base_url   = 'https://pjreddie.com/media/files'
+	mnist_test_file  = 'mnist_test.csv'
+	mnist_train_file = 'mnist_train.csv'
 )
 
 pub struct MnistDataset {
@@ -26,15 +28,25 @@ pub struct MnistDatasetConfig {
 	batch_size int = 32
 }
 
-pub fn load_mnist(set_type DatasetType, data MnistDatasetConfig) ?DatasetLoader {
-	url := if set_type == .train { datasets.mnist_train_url } else { datasets.mnist_test_url }
-	content := load_from_url(url: url) ?
+pub fn load_mnist(set_type DatasetType, data MnistDatasetConfig) ?&MnistDataset {
+	filename := if set_type == .train { datasets.mnist_train_file } else { datasets.mnist_test_file }
 
-	return DatasetLoader(&MnistDataset{
+	paths := download_dataset(
+		dataset: 'mnist'
+		baseurl: datasets.mnist_base_url
+		urls_names: {
+			'/$filename': filename
+		}
+	) ?
+
+	path := paths['/$filename']
+	content := os.read_file(path) ?
+
+	return &MnistDataset{
 		@type: set_type
 		batch_size: data.batch_size
 		parser: csv.new_reader(content)
-	})
+	}
 }
 
 pub fn (ds &MnistDataset) str() string {
