@@ -32,7 +32,7 @@ pub struct ImdbDatasetConfig {
 	batch_size int = 32
 }
 
-// load_imdb_dataset loads the IMDB dataset iterator for a given split type.
+// load_imdb loads the IMDB dataset iterator for a given split type.
 pub fn load_imdb(set_type DatasetType, data ImdbDatasetConfig) ?&ImdbDataset {
 	split := if set_type == .train { 'train' } else { 'test' }
 
