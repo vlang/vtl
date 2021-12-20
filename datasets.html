@@ -52,7 +52,14 @@
 				<div class="doc-container">
 					<div class="doc-content">
 						<section id="readme_datasets" class="doc-node">
-							<div class="title"><h1> datasets <a href="#readme_datasets">#</a></h1></div>
+							<div class="title"><h1> datasets <a href="#readme_datasets">#</a></h1></div><h1>VTL Datasets</h1>
+<p>This module exposes some functionalities to download and use the VTL datasets.
+For this we created some batch based iterators to load the datasets.
+We expose the following datasets:</p>
+<ul>
+<li><strong>Mnist</strong>: A dataset of handwritten digits.</li>
+<li><strong>Imdb</strong>: A dataset of IMDB reviews for sentiment analysis.</li>
+</ul>
 
 </section>
 
@@ -64,14 +71,14 @@
 <pre class="signature"><code><span class="token keyword">const</span> <span class="token punctuation">(</span>
 	imdb_folder_name <span class="token operator">=</span> <span class="token string">'aclImdb'</span>
 	imdb_file_name   <span class="token operator">=</span><span class="token string">''</span>$2{imdb_folder_name<span class="token string">'_v1.tar.gz'</span>
-	imdb_base_url    <span class="token operator">=</span> <span class="token string">'http://ai.stanford.edu/~amaas/data/sentiment'</span>
+	imdb_base_url    <span class="token operator">=</span> <span class="token string">'http://ai.stanford.edu/~amaas/data/sentiment/'</span>
 <span class="token punctuation">)</span></code></pre>
 
 
 </section>
 						<section id="" class="doc-node const">
 <pre class="signature"><code><span class="token keyword">const</span> <span class="token punctuation">(</span>
-	mnist_base_url   <span class="token operator">=</span> <span class="token string">'https://pjreddie.com/media/files'</span>
+	mnist_base_url   <span class="token operator">=</span> <span class="token string">'https://pjreddie.com/media/files/'</span>
 	mnist_test_file  <span class="token operator">=</span> <span class="token string">'mnist_test.csv'</span>
 	mnist_train_file <span class="token operator">=</span> <span class="token string">'mnist_train.csv'</span>
 <span class="token punctuation">)</span></code></pre>
@@ -79,98 +86,111 @@
 
 </section>
 						<section id="load_imdb" class="doc-node">
-							<div class="title"><h2>fn load_imdb <a href="#load_imdb">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/imdb.v#L27"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">load_imdb</span><span class="token punctuation">(</span>set_type DatasetType<span class="token punctuation">,</span> data ImdbDatasetConfig<span class="token punctuation">)</span> ?<span class="token operator">&</span>ImdbDataset</code></pre>
-
+							<div class="title"><h2>fn load_imdb <a href="#load_imdb">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/imdb.v#L36"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">load_imdb</span><span class="token punctuation">(</span>set_type DatasetType<span class="token punctuation">,</span> data ImdbDatasetConfig<span class="token punctuation">)</span> ?<span class="token operator">&</span>ImdbDataset</code></pre>
+<p>load_imdb_dataset loads the IMDB dataset iterator for a given split type.</p>
 
 </section>
 						<section id="load_mnist" class="doc-node">
-							<div class="title"><h2>fn load_mnist <a href="#load_mnist">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/mnist.v#L31"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">load_mnist</span><span class="token punctuation">(</span>set_type DatasetType<span class="token punctuation">,</span> data MnistDatasetConfig<span class="token punctuation">)</span> ?<span class="token operator">&</span>MnistDataset</code></pre>
-
+							<div class="title"><h2>fn load_mnist <a href="#load_mnist">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/mnist.v#L35"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">load_mnist</span><span class="token punctuation">(</span>set_type DatasetType<span class="token punctuation">,</span> data MnistDatasetConfig<span class="token punctuation">)</span> ?<span class="token operator">&</span>MnistDataset</code></pre>
+<p>load_mnist returns a new MNIST iterator.</p>
 
 </section>
 						<section id="DatasetBatch" class="doc-node">
-							<div class="title"><h2>interface DatasetBatch <a href="#DatasetBatch">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/loader.v#L21"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">interface</span> <span class="token symbol">DatasetBatch</span> <span class="token punctuation">{</span>
-	features <span class="token operator">&</span>vtl<span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">f32</span><span class="token operator">></span>
+							<div class="title"><h2>interface DatasetBatch <a href="#DatasetBatch">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/loader.v#L24"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">interface</span> <span class="token symbol">DatasetBatch</span> <span class="token punctuation">{</span>
 	labels <span class="token operator">&</span>vtl<span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">int</span><span class="token operator">></span>
+	features <span class="token operator">&</span>vtl<span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">string</span><span class="token operator">></span>
 <span class="token punctuation">}</span></code></pre>
-
+<p>@todo: Use generic type for DatasetBatch</p>
 
 </section>
 						<section id="DatasetLoader" class="doc-node">
-							<div class="title"><h2>interface DatasetLoader <a href="#DatasetLoader">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/loader.v#L14"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">interface</span> <span class="token symbol">DatasetLoader</span> <span class="token punctuation">{</span>
+							<div class="title"><h2>interface DatasetLoader <a href="#DatasetLoader">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/loader.v#L16"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">interface</span> <span class="token symbol">DatasetLoader</span> <span class="token punctuation">{</span>
 	@type DatasetType
 	batch_size <span class="token builtin">int</span>
 <span class="token keyword">mut</span><span class="token punctuation">:</span>
 	<span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span> ?DatasetBatch
 <span class="token punctuation">}</span></code></pre>
-
+<p>DatasetLoader is an interface for loading datasets.</p>
 
 </section>
 						<section id="DatasetType" class="doc-node">
-							<div class="title"><h2>enum DatasetType <a href="#DatasetType">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/loader.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">enum</span> <span class="token symbol">DatasetType</span> <span class="token punctuation">{</span>
+							<div class="title"><h2>enum DatasetType <a href="#DatasetType">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/loader.v#L10"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">enum</span> <span class="token symbol">DatasetType</span> <span class="token punctuation">{</span>
 	train
 	test
 <span class="token punctuation">}</span></code></pre>
-
+<p>DatasetType is the type of a dataset.</p>
 
 </section>
 						<section id="ImdbBatch" class="doc-node">
-							<div class="title"><h2>struct ImdbBatch <a href="#ImdbBatch">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/imdb.v#L17"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">ImdbBatch</span> <span class="token punctuation">{</span>
+							<div class="title"><h2>struct ImdbBatch <a href="#ImdbBatch">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/imdb.v#L24"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">ImdbBatch</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
-	features <span class="token operator">&</span>vtl<span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">f32</span><span class="token operator">></span>
+	features <span class="token operator">&</span>vtl<span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">string</span><span class="token operator">></span>
 	labels   <span class="token operator">&</span>vtl<span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">int</span><span class="token operator">></span>
 <span class="token punctuation">}</span></code></pre>
-
+<p>ImdbBatch is a batch of ImdbDataset.</p>
 
 </section>
 						<section id="ImdbDataset" class="doc-node">
-							<div class="title"><h2>struct ImdbDataset <a href="#ImdbDataset">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/imdb.v#L11"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">ImdbDataset</span> <span class="token punctuation">{</span>
+							<div class="title"><h2>struct ImdbDataset <a href="#ImdbDataset">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/imdb.v#L14"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">ImdbDataset</span> <span class="token punctuation">{</span>
+	paths <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">string</span>
+<span class="token keyword">mut</span><span class="token punctuation">:</span>
+	batch_pos <span class="token builtin">int</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
 	@type      DatasetType
 	batch_size <span class="token builtin">int</span>
 <span class="token punctuation">}</span></code></pre>
+<p>ImdbDataset is a dataset for sentiment analysis.</p>
 
+</section>
+						<section id="ImdbDataset.str" class="doc-node">
+							<div class="title"><h2>fn (ImdbDataset) str <a href="#ImdbDataset.str">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/imdb.v#L69"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>ds <span class="token operator">&</span>ImdbDataset<span class="token punctuation">)</span> <span class="token function">str</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">string</span></code></pre>
+<p>str is a string representation of the ImdbDataset.</p>
+
+</section>
+						<section id="ImdbDataset.next" class="doc-node">
+							<div class="title"><h2>fn (ImdbDataset) next <a href="#ImdbDataset.next">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/imdb.v#L79"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> ds ImdbDataset<span class="token punctuation">)</span> <span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span> ?ImdbBatch</code></pre>
+<p>next returns the next batch of the ImdbDataset.</p>
 
 </section>
 						<section id="ImdbDatasetConfig" class="doc-node">
-							<div class="title"><h2>struct ImdbDatasetConfig <a href="#ImdbDatasetConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/imdb.v#L23"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">ImdbDatasetConfig</span> <span class="token punctuation">{</span>
+							<div class="title"><h2>struct ImdbDatasetConfig <a href="#ImdbDatasetConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/imdb.v#L31"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">ImdbDatasetConfig</span> <span class="token punctuation">{</span>
 	batch_size <span class="token builtin">int</span> <span class="token operator">=</span> <span class="token number">32</span>
 <span class="token punctuation">}</span></code></pre>
 
 
 </section>
 						<section id="MnistBatch" class="doc-node">
-							<div class="title"><h2>struct MnistBatch <a href="#MnistBatch">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/mnist.v#L21"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">MnistBatch</span> <span class="token punctuation">{</span>
+							<div class="title"><h2>struct MnistBatch <a href="#MnistBatch">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/mnist.v#L23"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">MnistBatch</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
 	features <span class="token operator">&</span>vtl<span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">f32</span><span class="token operator">></span>
 	labels   <span class="token operator">&</span>vtl<span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">int</span><span class="token operator">></span>
 <span class="token punctuation">}</span></code></pre>
-
+<p>MnistBatch is a batch of MNIST handwritten digits.</p>
 
 </section>
 						<section id="MnistDataset" class="doc-node">
-							<div class="title"><h2>struct MnistDataset <a href="#MnistDataset">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/mnist.v#L13"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">MnistDataset</span> <span class="token punctuation">{</span>
+							<div class="title"><h2>struct MnistDataset <a href="#MnistDataset">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/mnist.v#L14"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">MnistDataset</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
 	@type      DatasetType
 	batch_size <span class="token builtin">int</span>
 <span class="token keyword">mut</span><span class="token punctuation">:</span>
 	parser <span class="token operator">&</span>csv<span class="token punctuation">.</span>Reader
 <span class="token punctuation">}</span></code></pre>
-
+<p>MnistDataset is a dataset of MNIST handwritten digits.</p>
 
 </section>
 						<section id="MnistDataset.str" class="doc-node">
-							<div class="title"><h2>fn (MnistDataset) str <a href="#MnistDataset.str">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/mnist.v#L52"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>ds <span class="token operator">&</span>MnistDataset<span class="token punctuation">)</span> <span class="token function">str</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">string</span></code></pre>
-
+							<div class="title"><h2>fn (MnistDataset) str <a href="#MnistDataset.str">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/mnist.v#L57"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>ds <span class="token operator">&</span>MnistDataset<span class="token punctuation">)</span> <span class="token function">str</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">string</span></code></pre>
+<p>str is a string representation of the MnistDataset.</p>
 
 </section>
 						<section id="MnistDataset.next" class="doc-node">
-							<div class="title"><h2>fn (MnistDataset) next <a href="#MnistDataset.next">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/mnist.v#L61"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> ds MnistDataset<span class="token punctuation">)</span> <span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span> ?DatasetBatch</code></pre>
-
+							<div class="title"><h2>fn (MnistDataset) next <a href="#MnistDataset.next">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/mnist.v#L67"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> ds MnistDataset<span class="token punctuation">)</span> <span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span> ?MnistBatch</code></pre>
+<p>next returns the next batch of MNIST handwritten digits.</p>
 
 </section>
 						<section id="MnistDatasetConfig" class="doc-node">
-							<div class="title"><h2>struct MnistDatasetConfig <a href="#MnistDatasetConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/mnist.v#L27"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">MnistDatasetConfig</span> <span class="token punctuation">{</span>
+							<div class="title"><h2>struct MnistDatasetConfig <a href="#MnistDatasetConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/mnist.v#L30"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> <span class="token symbol">MnistDatasetConfig</span> <span class="token punctuation">{</span>
 	batch_size <span class="token builtin">int</span> <span class="token operator">=</span> <span class="token number">32</span>
 <span class="token punctuation">}</span></code></pre>
 
@@ -178,10 +198,11 @@
 </section>
 
 						<div class="footer">
-							Powered by vdoc. Generated on: 19 Dec 2021 05:21:20
+							Powered by vdoc. Generated on: 20 Dec 2021 05:50:41
 						</div>
 					</div>
-					<div class="doc-toc"><ul><li class="open"><a href="#Constants">Constants</a></li>
+					<div class="doc-toc"><ul><li class="open"><a href="#readme_datasets">README</a></li>
+<li class="open"><a href="#Constants">Constants</a></li>
 <li class="open"><a href="#load_imdb">fn load_imdb</a>        <ul>
 </ul>
 </li>
@@ -201,6 +222,8 @@
 </ul>
 </li>
 <li class="open"><a href="#ImdbDataset">struct ImdbDataset</a>        <ul>
+<li><a href="#ImdbDataset.str">fn str</a></li>
+<li><a href="#ImdbDataset.next">fn next</a></li>
 </ul>
 </li>
 <li class="open"><a href="#ImdbDatasetConfig">struct ImdbDatasetConfig</a>        <ul>
