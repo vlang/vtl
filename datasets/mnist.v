@@ -5,11 +5,12 @@ import os
 import vtl
 
 pub const (
-	mnist_base_url   = 'https://pjreddie.com/media/files'
+	mnist_base_url   = 'https://pjreddie.com/media/files/'
 	mnist_test_file  = 'mnist_test.csv'
 	mnist_train_file = 'mnist_train.csv'
 )
 
+// MnistDataset is a dataset of MNIST handwritten digits.
 pub struct MnistDataset {
 pub:
 	@type      DatasetType
@@ -18,16 +19,19 @@ mut:
 	parser &csv.Reader
 }
 
+// MnistBatch is a batch of MNIST handwritten digits.
 pub struct MnistBatch {
 pub:
 	features &vtl.Tensor<f32>
 	labels   &vtl.Tensor<int>
 }
 
+[params]
 pub struct MnistDatasetConfig {
 	batch_size int = 32
 }
 
+// load_mnist returns a new MNIST iterator.
 pub fn load_mnist(set_type DatasetType, data MnistDatasetConfig) ?&MnistDataset {
 	filename := if set_type == .train { datasets.mnist_train_file } else { datasets.mnist_test_file }
 
@@ -35,11 +39,11 @@ pub fn load_mnist(set_type DatasetType, data MnistDatasetConfig) ?&MnistDataset 
 		dataset: 'mnist'
 		baseurl: datasets.mnist_base_url
 		urls_names: {
-			'/$filename': filename
+			filename: filename
 		}
 	) ?
 
-	path := paths['/$filename']
+	path := paths[filename]
 	content := os.read_file(path) ?
 
 	return &MnistDataset{
@@ -49,6 +53,7 @@ pub fn load_mnist(set_type DatasetType, data MnistDatasetConfig) ?&MnistDataset 
 	}
 }
 
+// str is a string representation of the MnistDataset.
 pub fn (ds &MnistDataset) str() string {
 	mut res := []string{}
 	res << 'vtl.datasets.MnistDataset{'
@@ -58,7 +63,8 @@ pub fn (ds &MnistDataset) str() string {
 	return res.join('\n')
 }
 
-pub fn (mut ds MnistDataset) next() ?DatasetBatch {
+// next returns the next batch of MNIST handwritten digits.
+pub fn (mut ds MnistDataset) next() ?MnistBatch {
 	batch_size := ds.batch_size
 
 	mut labels := []int{cap: batch_size}
@@ -74,7 +80,7 @@ pub fn (mut ds MnistDataset) next() ?DatasetBatch {
 		return none
 	}
 
-	mut lt := vtl.from_array(labels, [labels.len])
+	mut lt := vtl.from_1d(labels)
 	mut lft := vtl.zeros<int>([lt.shape[0], 10])
 
 	mut iter := lt.iterator()
@@ -85,8 +91,8 @@ pub fn (mut ds MnistDataset) next() ?DatasetBatch {
 
 	ft := vtl.from_array(features, [features.len]).reshape([-1, 1, 32, 32])
 
-	return DatasetBatch(&MnistBatch{
+	return MnistBatch{
 		labels: lft
 		features: ft
-	})
+	}
 }

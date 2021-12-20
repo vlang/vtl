@@ -6,11 +6,13 @@ import net.http
 import szip
 import vtl
 
+// DatasetType is the type of a dataset.
 pub enum DatasetType {
 	train
 	test
 }
 
+// DatasetLoader is an interface for loading datasets.
 pub interface DatasetLoader {
 	@type DatasetType
 	batch_size int
@@ -18,9 +20,10 @@ mut:
 	next() ?DatasetBatch
 }
 
+// @todo: Use generic type for DatasetBatch
 pub interface DatasetBatch {
-	features &vtl.Tensor<f32>
 	labels &vtl.Tensor<int>
+	features &vtl.Tensor<string>
 }
 
 fn get_cache_dir(subdir ...string) string {
