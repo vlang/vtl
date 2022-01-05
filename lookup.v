@@ -1,7 +1,5 @@
 module vtl
 
-import math
-
 // get returns a scalar value from a Tensor at the provided index
 [inline]
 pub fn (t &Tensor<T>) get<T>(index []int) T {
@@ -30,7 +28,7 @@ pub fn (t &Tensor<T>) strided_offset_index<T>() int {
 	mut offset := 0
 	for i in 0 .. t.rank() {
 		if t.strides[i] < 0 {
-			offset += (t.shape[i] - 1) * int(math.abs(t.strides[i]))
+			offset += (t.shape[i] - 1) * int(fabs(t.strides[i]))
 		}
 	}
 	return offset
