@@ -8,11 +8,12 @@ import vtl.autograd
 //
 // This layer is used as the first layer in a model.
 pub struct InputLayer<T> {
-	shape        []int
+	shape []int
+pub:
 	output_shape []int
 }
 
-pub fn new_input_layer(ctx &autograd.Context<T>, shape []int) &InputLayer<T> {
+pub fn new_input_layer<T>(ctx &autograd.Context<T>, shape []int) &InputLayer<T> {
 	return &InputLayer<T>{
 		shape: shape.clone()
 		output_shape: shape.clone()
