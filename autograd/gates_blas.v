@@ -28,10 +28,22 @@ pub fn (g &MatMulGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) {
 	a := args[0]
 	b := args[1]
 
-	if a is Variable<T> && b is Variable<T> {
-		result.grad = vtl.zeros_like<T>(result.value)
-		result.requires_grad = true
+	match a {
+		Variable<T> {
+			match b {
+				Variable<T> {
+					result.grad = vtl.zeros_like<T>(result.value)
+					result.requires_grad = true
 
-		register<T>('MatMul', g, result, a, b)
+					register<T>('MatMul', g, result, a, b)
+				}
+				else {
+					panic('MatMulGate: b must be a Variable')
+				}
+			}
+		}
+		else {
+			panic('MatMulGate: a must be a Variable')
+		}
 	}
 }

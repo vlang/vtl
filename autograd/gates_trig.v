@@ -22,11 +22,16 @@ pub fn (g &SinGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
 pub fn (g &SinGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) {
 	a := args[0]
 
-	if a is Variable<T> {
-		result.grad = vtl.zeros_like<T>(result.value)
-		result.requires_grad = true
+	match a {
+		Variable<T> {
+			result.grad = vtl.zeros_like<T>(result.value)
+			result.requires_grad = true
 
-		register<T>('Sin', g, result, a)
+			register<T>('Sin', g, result, a)
+		}
+		else {
+			panic('SinGate: a must be a Variable')
+		}
 	}
 }
 
@@ -50,11 +55,16 @@ pub fn (g &CosGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
 pub fn (g &CosGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) {
 	a := args[0]
 
-	if a is Variable<T> {
-		result.grad = vtl.zeros_like<T>(result.value)
-		result.requires_grad = true
+	match a {
+		Variable<T> {
+			result.grad = vtl.zeros_like<T>(result.value)
+			result.requires_grad = true
 
-		register<T>('Cos', g, result, a)
+			register<T>('Cos', g, result, a)
+		}
+		else {
+			panic('CosGate: a must be a Variable')
+		}
 	}
 }
 
@@ -79,10 +89,15 @@ pub fn (g &TanGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
 pub fn (g &TanGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) {
 	a := args[0]
 
-	if a is Variable<T> {
-		result.grad = vtl.zeros_like<T>(result.value)
-		result.requires_grad = true
+	match a {
+		Variable<T> {
+			result.grad = vtl.zeros_like<T>(result.value)
+			result.requires_grad = true
 
-		register<T>('Tan', g, result, a)
+			register<T>('Tan', g, result, a)
+		}
+		else {
+			panic('TanGate: a must be a Variable')
+		}
 	}
 }

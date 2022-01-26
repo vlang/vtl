@@ -17,11 +17,23 @@ pub fn (g &AddGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) {
 	a := args[0]
 	b := args[1]
 
-	if a is Variable<T> && b is Variable<T> {
-		result.grad = vtl.zeros_like<T>(result.value)
-		result.requires_grad = true
+	match a {
+		Variable<T> {
+			match b {
+				Variable<T> {
+					result.grad = vtl.zeros_like<T>(result.value)
+					result.requires_grad = true
 
-		register<T>('Add', g, result, a, b)
+					register<T>('Add', g, result, a, b)
+				}
+				else {
+					panic('AddGate: b must be a Variable')
+				}
+			}
+		}
+		else {
+			panic('AddGate: a must be a Variable')
+		}
 	}
 }
 
@@ -41,11 +53,23 @@ pub fn (g &SubstractGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam
 	a := args[0]
 	b := args[1]
 
-	if a is Variable<T> && b is Variable<T> {
-		result.grad = vtl.zeros_like<T>(result.value)
-		result.requires_grad = true
+	match a {
+		Variable<T> {
+			match b {
+				Variable<T> {
+					result.grad = vtl.zeros_like<T>(result.value)
+					result.requires_grad = true
 
-		register<T>('Sub', g, result, a, b)
+					register<T>('Sub', g, result, a, b)
+				}
+				else {
+					panic('SubGate: b must be a Variable')
+				}
+			}
+		}
+		else {
+			panic('SubGate: a must be a Variable')
+		}
 	}
 }
 
@@ -73,11 +97,23 @@ pub fn (g &MultiplyGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam)
 	a := args[0]
 	b := args[1]
 
-	if a is Variable<T> && b is Variable<T> {
-		result.grad = vtl.zeros_like<T>(result.value)
-		result.requires_grad = true
+	match a {
+		Variable<T> {
+			match b {
+				Variable<T> {
+					result.grad = vtl.zeros_like<T>(result.value)
+					result.requires_grad = true
 
-		register<T>('Multiply', g, result, a, b)
+					register<T>('Multiply', g, result, a, b)
+				}
+				else {
+					panic('MultiplyGate: b must be a Variable')
+				}
+			}
+		}
+		else {
+			panic('MultiplyGate: a must be a Variable')
+		}
 	}
 }
 
@@ -108,10 +144,22 @@ pub fn (g &DivideGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) {
 	a := args[0]
 	b := args[1]
 
-	if a is Variable<T> && b is Variable<T> {
-		result.grad = vtl.zeros_like<T>(result.value)
-		result.requires_grad = true
+	match a {
+		Variable<T> {
+			match b {
+				Variable<T> {
+					result.grad = vtl.zeros_like<T>(result.value)
+					result.requires_grad = true
 
-		register<T>('Divide', g, result, a, b)
+					register<T>('Divide', g, result, a, b)
+				}
+				else {
+					panic('DivideGate: b must be a Variable')
+				}
+			}
+		}
+		else {
+			panic('DivideGate: a must be a Variable')
+		}
 	}
 }
