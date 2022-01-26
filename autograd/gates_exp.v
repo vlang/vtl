@@ -22,10 +22,12 @@ pub fn (g &ExpGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
 pub fn (g &ExpGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) {
 	a := args[0]
 
-	if a is Variable<T> {
-		result.grad = vtl.zeros_like<T>(result.value)
-		result.requires_grad = true
+	match a {
+		Variable<T> {
+			result.grad = vtl.zeros_like<T>(result.value)
+			result.requires_grad = true
 
-		register<T>('Exp', g, result, a)
+			register<T>('Exp', g, result, a)
+		}
 	}
 }

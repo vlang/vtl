@@ -8,7 +8,7 @@ pub struct Node<T> {
 pub:
 	// A Gate containing a backwards and cache function for
 	// a node
-	gate Gate<T>
+	gate Gate
 pub mut:
 	// The variables that created this node
 	parents []&Variable<T>
@@ -19,7 +19,7 @@ pub mut:
 }
 
 // new_node
-pub fn new_node<T>(gate Gate<T>, parents []&Variable<T>, payload &Payload<T>, name string) &Node<T> {
+pub fn new_node<T>(gate Gate, parents []&Variable<T>, payload &Payload<T>, name string) &Node<T> {
 	return &Node<T>{
 		gate: gate
 		parents: parents

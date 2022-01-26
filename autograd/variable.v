@@ -74,12 +74,12 @@ pub fn (mut v Variable<T>) backprop<T>() {
 		$if debug {
 			print(cur_node.name)
 		}
-		// diffs := cur_node.gate.backward(cur_node.payload)
-		// for i, diff in diffs {
-		// 	mut parent_i := cur_node.parents[i]
-		// 	if parent_i.requires_grad {
-		// 		parent_i.grad = vtl.add<T>(parent_i.grad, diff)
-		// 	}
-		// }
+		diffs := gate_backward<T>(cur_node.gate, cur_node.payload)
+		for i, diff in diffs {
+			mut parent_i := cur_node.parents[i]
+			if parent_i.requires_grad {
+				parent_i.grad = vtl.add<T>(parent_i.grad, diff)
+			}
+		}
 	}
 }
