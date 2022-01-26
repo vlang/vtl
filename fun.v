@@ -1,7 +1,5 @@
 module vtl
 
-import math
-
 // pub type MapFn<T> = fn (x T, i int) T
 
 // pub type ApplyFn<T> = fn (x T, i int) T
@@ -224,6 +222,10 @@ pub fn (t &Tensor<T>) swapaxes<T>(a1 int, a2 int) &Tensor<T> {
 	return t.transpose(order)
 }
 
+fn fabs(x f64) f64 {
+	return if x > 0.0 { x } else { -x }
+}
+
 // slice returns a tensor from a variadic list of indexing operations
 pub fn (t &Tensor<T>) slice<T>(idx ...[]int) &Tensor<T> {
 	mut newshape := t.shape.clone()
@@ -272,7 +274,7 @@ pub fn (t &Tensor<T>) slice<T>(idx ...[]int) &Tensor<T> {
 			fi = dex[0]
 			li = dex[1]
 			step := dex[2]
-			abstep := int(math.abs(step))
+			abstep := int(fabs(step))
 			if fi < 0 {
 				fi += t.shape[i]
 			}
