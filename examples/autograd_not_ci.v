@@ -17,4 +17,5 @@ fn main() {
 	f.backprop()
 
 	println(f)
+        println(x.grad)
 }

@@ -62,7 +62,7 @@ pub fn (v &Variable<T>) str() string {
 // destroy all descendents of this variable stored by the
 // Context
 pub fn (mut v Variable<T>) backprop<T>() {
-	grad := vtl.ones_like<T>(v.value)
+	v.grad = vtl.ones_like<T>(v.value)
 	for v.context.len() > 0 && v.context.last().payload.variable != v {
 		node := v.context.pop()
 		$if debug {
