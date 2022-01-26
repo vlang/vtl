@@ -79,7 +79,6 @@ pub fn register<T>(name string, gate Gate, result &Variable<T>, parents []&Varia
 
 	payload := new_payload<T>(result)
 	node := new_node<T>(gate, parents, payload, name)
-	first_parent := parents[0]
 	mut ctx := parents[0].context
 	ctx.push(node)
 }
