@@ -24,16 +24,16 @@ pub fn (g &LinearGate<T>) backward<T>(payload &autograd.Payload<T>) []&vtl.Tenso
 	grad := payload.variable.grad
 	mut result := [grad, grad, grad]
 
-	if input.requires_grad {
-		result[0] = la.matmul(grad, weight.value)
+	if g.input.requires_grad {
+		result[0] = la.matmul(grad, g.weight.value)
 	}
 
-	if weight.requires_grad {
-		result[1] = la.matmul(grad.t(), input.value)
+	if g.weight.requires_grad {
+		result[1] = la.matmul(grad.t(), g.input.value)
 	}
 
-	if bias.requires_grad {
-		result[2] = stats.sum_with_axis(grad, axis: 0)
+	if g.bias.requires_grad {
+		result[2] = vtl.from_1d<T>([stats.sum_axis(grad, axis: 0)])
 	}
 
 	return result
@@ -53,7 +53,7 @@ pub fn (g &LinearGate<T>) cache<T>(mut result autograd.Variable<T>, args ...auto
 							result.grad = vtl.zeros_like<T>(result.value)
 							result.requires_grad = true
 
-							autograd.register<T>('Linear', g, result, input, weight, bias)
+							autograd.register<T>('Linear', g, result, [input, weight, bias])
 						}
 						else {
 							panic('LinearGate: bias must be a Variable')
