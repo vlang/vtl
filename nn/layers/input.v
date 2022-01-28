@@ -2,7 +2,7 @@ module layers
 
 import vtl
 import vtl.autograd
-import vtl.nn.gates.layers as glayers
+import vtl.nn.gates.layers
 
 // InputLayer is a layer that takes a single input tensor and returns the same
 // tensor.
@@ -26,9 +26,10 @@ pub fn (_ InputLayer<T>) variables() []&autograd.Variable<T> {
 	return []&autograd.Variable<T>{}
 }
 
-pub fn (layer InputLayer<T>) forward(mut input autograd.Variable<T>) {
+pub fn (layer InputLayer<T>) forward(mut input autograd.Variable<T>) &autograd.Variable<T> {
 	if input.requires_grad {
-		gate := glayers.new_input_gate<T>()
+		gate := layers.new_input_gate<T>()
 		gate.cache(mut input, input)
 	}
+	return input
 }
