@@ -11,6 +11,7 @@ import vtl
 // of VTL
 [heap]
 pub struct Variable<T> {
+pub:
 	// The value of the Variable.  This should not be edited outside
 	// of Variable operations, as other edits will not be tracked
 	// and will lead to incorrect results

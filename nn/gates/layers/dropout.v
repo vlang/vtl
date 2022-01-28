@@ -20,8 +20,17 @@ pub fn (g &DropoutGate<T>) backward<T>(payload &autograd.Payload<T>) []&vtl.Tens
 }
 
 pub fn (g &DropoutGate<T>) cache<T>(mut result autograd.Variable<T>, args ...autograd.CacheParam) {
-	result.grad = vtl.zeros_like<T>(result.value)
-	result.requires_grad = true
+	a := args[0]
 
-	register<T>('Dropout', g, result, ...args)
+	match a {
+		autograd.Variable<T> {
+			result.grad = vtl.zeros_like<T>(result.value)
+			result.requires_grad = true
+
+			autograd.register<T>('Dropout', g, result, [a])
+		}
+		else {
+			panic('DropoutGate: cache: invalid argument')
+		}
+	}
 }

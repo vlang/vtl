@@ -32,8 +32,17 @@ pub fn (g &MaxpoolGate<T>) backward<T>(payload &autograd.Payload<T>) []&vtl.Tens
 }
 
 pub fn (g &MaxpoolGate<T>) cache<T>(mut result autograd.Variable<T>, args ...autograd.CacheParam) {
-	result.grad = vtl.zeros_like<T>(result.value)
-	result.requires_grad = true
+	a := args[0]
 
-	register<T>('Maxpool', g, result, ...args)
+	match a {
+		autograd.Variable<T> {
+			result.grad = vtl.zeros_like<T>(result.value)
+			result.requires_grad = true
+
+			autograd.register<T>('Maxpool', g, result, [a])
+		}
+		else {
+			panic('MaxpoolGate: cache: invalid argument')
+		}
+	}
 }

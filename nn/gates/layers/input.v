@@ -6,7 +6,7 @@ import vtl.autograd
 pub struct InputGate<T> {}
 
 pub fn new_input_gate<T>() &InputGate<T> {
-	return InputGate<T>{}
+	return &InputGate<T>{}
 }
 
 pub fn (g &InputGate<T>) backward<T>(payload &autograd.Payload<T>) []&vtl.Tensor<T> {
@@ -15,8 +15,17 @@ pub fn (g &InputGate<T>) backward<T>(payload &autograd.Payload<T>) []&vtl.Tensor
 }
 
 pub fn (g &InputGate<T>) cache<T>(mut result autograd.Variable<T>, args ...autograd.CacheParam) {
-	result.grad = vtl.zeros_like<T>(result.value)
-	result.requires_grad = true
+	a := args[0]
 
-	register<T>('Input', g, result, ...args)
+	match a {
+		autograd.Variable<T> {
+			result.grad = vtl.zeros_like<T>(result.value)
+			result.requires_grad = true
+
+			autograd.register<T>('Input', g, result, [a])
+		}
+		else {
+			panic('InputGate: cache: invalid argument')
+		}
+	}
 }

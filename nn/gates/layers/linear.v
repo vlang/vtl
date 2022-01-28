@@ -45,28 +45,28 @@ pub fn (g &LinearGate<T>) cache<T>(mut result autograd.Variable<T>, args ...auto
 	bias := args[1]
 
 	match input {
-		Variable<T> {
+		autograd.Variable<T> {
 			match weight {
-				Variable<T> {
+				autograd.Variable<T> {
 					match bias {
-						Variable<T> {
+						autograd.Variable<T> {
 							result.grad = vtl.zeros_like<T>(result.value)
 							result.requires_grad = true
 
-							register<T>('Linear', g, result, input, weight, bias)
+							autograd.register<T>('Linear', g, result, input, weight, bias)
 						}
 						else {
-							panic('MatMulGate: bias must be a Variable')
+							panic('LinearGate: bias must be a Variable')
 						}
 					}
 				}
 				else {
-					panic('MatMulGate: weight must be a Variable')
+					panic('LinearGate: weight must be a Variable')
 				}
 			}
 		}
 		else {
-			panic('MatMulGate: input must be a Variable')
+			panic('LinearGate: input must be a Variable')
 		}
 	}
 }
