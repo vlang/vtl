@@ -76,9 +76,14 @@ with an empty list of layers.</p>
 
 </section>
 						<section id="NNLayers<T>.input" class="doc-node">
-							<div class="title"><h2>fn (NNLayers<T>) input <a href="#NNLayers<T>.input">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/nn.v#L22"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> nncon NNLayers<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">input</span><span class="token punctuation">(</span>shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span></code></pre>
+							<div class="title"><h2>fn (NNLayers<T>) input <a href="#NNLayers<T>.input">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/nn.v#L22"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> ls NNLayers<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">input</span><span class="token punctuation">(</span>shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span></code></pre>
 <p>input adds a new input layer to the network
 with the given shape.</p>
+
+</section>
+						<section id="NNLayers<T>.linear" class="doc-node">
+							<div class="title"><h2>fn (NNLayers<T>) linear <a href="#NNLayers<T>.linear">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/nn.v#L28"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> ls NNLayers<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">linear</span><span class="token punctuation">(</span>output_size <span class="token builtin">int</span><span class="token punctuation">)</span></code></pre>
+<p>linear adds a new linear layer to the network with the given output size</p>
 
 </section>
 						<section id="NNLayers" class="doc-node">
@@ -92,7 +97,7 @@ with the given shape.</p>
 </section>
 
 						<div class="footer">
-							Powered by vdoc. Generated on: 28 Jan 2022 04:12:36
+							Powered by vdoc. Generated on: 28 Jan 2022 05:08:33
 						</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#new_nn_layers">fn new_nn_layers</a>        <ul>
@@ -106,6 +111,7 @@ with the given shape.</p>
 </li>
 <li class="open"><a href="#NNLayers<T>.input">type NNLayers<T></a>        <ul>
 <li><a href="#NNLayers<T>.input">fn input</a></li>
+<li><a href="#NNLayers<T>.linear">fn linear</a></li>
 </ul>
 </li>
 <li class="open"><a href="#NNLayers">struct NNLayers</a>        <ul>
