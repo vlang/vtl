@@ -48,9 +48,9 @@ pub fn matmul<T>(a &vtl.Tensor<T>, b &vtl.Tensor<T>) &vtl.Tensor<T> {
 }
 
 fn arr_to_f64arr<T>(a []T) []f64 {
-        mut ret := []f64{cap: a.len}
-        for val in a {
-                ret << f64(val)
-        }
-        return ret
+	mut ret := []f64{cap: a.len}
+	for val in a {
+		ret << f64(val)
+	}
+	return ret
 }
