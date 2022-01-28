@@ -27,8 +27,15 @@ pub fn (g &FlattenGate<T>) backward<T>(payload &autograd.Payload<T>) []&vtl.Tens
 pub fn (g &FlattenGate<T>) cache<T>(mut result autograd.Variable<T>, args ...autograd.CacheParam) {
 	a := args[0]
 
-	result.grad = vtl.zeros_like<T>(result.value)
-	result.requires_grad = true
+	match a {
+		autograd.Variable<T> {
+			result.grad = vtl.zeros_like<T>(result.value)
+			result.requires_grad = true
 
-	register<T>('Reshape', g, result, a)
+			autograd.register<T>('Reshape', g, result, [a])
+		}
+		else {
+			panic('ReshapeGate: cache: invalid argument')
+		}
+	}
 }
