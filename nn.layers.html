@@ -57,15 +57,28 @@
 </section>
 
 						<section id="new_input_layer" class="doc-node">
-							<div class="title"><h2>fn new_input_layer <a href="#new_input_layer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/input.v#L16"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> new_input_layer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>ctx <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Context<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">&</span>InputLayer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+							<div class="title"><h2>fn new_input_layer <a href="#new_input_layer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/input.v#L15"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> new_input_layer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>ctx <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Context<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">&</span>InputLayer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+
+
+</section>
+						<section id="InputLayer<T>.output_shape" class="doc-node">
+							<div class="title"><h2>fn (InputLayer<T>) output_shape <a href="#InputLayer<T>.output_shape">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/input.v#L21"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer InputLayer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">output_shape</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span></code></pre>
+
+
+</section>
+						<section id="InputLayer<T>.variables" class="doc-node">
+							<div class="title"><h2>fn (InputLayer<T>) variables <a href="#InputLayer<T>.variables">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/input.v#L25"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>_ InputLayer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">variables</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&</span>autograd<span class="token punctuation">.</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+
+
+</section>
+						<section id="InputLayer<T>.forward" class="doc-node">
+							<div class="title"><h2>fn (InputLayer<T>) forward <a href="#InputLayer<T>.forward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/input.v#L29"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer InputLayer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">forward</span><span class="token punctuation">(</span><span class="token keyword">mut</span> input autograd<span class="token punctuation">.</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span></code></pre>
 
 
 </section>
 						<section id="InputLayer" class="doc-node">
-							<div class="title"><h2>struct InputLayer <a href="#InputLayer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/input.v#L10"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> InputLayer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span> <span class="token punctuation">{</span>
+							<div class="title"><h2>struct InputLayer <a href="#InputLayer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/input.v#L11"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> InputLayer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span> <span class="token punctuation">{</span>
 	shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
-<span class="token keyword">pub</span><span class="token punctuation">:</span>
-	output_shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
 <span class="token punctuation">}</span></code></pre>
 <p>InputLayer is a layer that takes a single input tensor and returns the same
 tensor.</p>
@@ -74,10 +87,16 @@ tensor.</p>
 </section>
 
 						<div class="footer">
-							Powered by vdoc. Generated on: 26 Jan 2022 04:15:04
+							Powered by vdoc. Generated on: 28 Jan 2022 03:54:31
 						</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#new_input_layer">fn new_input_layer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#InputLayer<T>.output_shape">type InputLayer<T></a>        <ul>
+<li><a href="#InputLayer<T>.output_shape">fn output_shape</a></li>
+<li><a href="#InputLayer<T>.variables">fn variables</a></li>
+<li><a href="#InputLayer<T>.forward">fn forward</a></li>
 </ul>
 </li>
 <li class="open"><a href="#InputLayer">struct InputLayer</a>        <ul>
