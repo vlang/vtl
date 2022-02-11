@@ -1,7 +1,6 @@
 module autograd
 
 import vtl
-import vtl.autograd
 
 fn test_pow() {
 	ctx := new_ctx<f64>()
