@@ -22,7 +22,7 @@ pub fn compute_fans(shape []int) (int, int) {
 	f0 := shape[0]
 	f1 := shape[1]
 
-	if shape.size == 1 {
+	if shape.len == 1 {
 		return f0, f1
 	}
 
