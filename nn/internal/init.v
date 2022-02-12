@@ -1,4 +1,4 @@
-module nn
+module internal
 
 import math
 import vtl
@@ -35,13 +35,13 @@ pub fn variant_scaled<T>(shape []int, scale T, fan_mode FanMode, distribution Di
 
 	std := match fan_mode {
 		.fan_in {
-			return T(math.sqrt(f64(scale) / f64(f0)))
+			T(math.sqrt(f64(scale) / f64(f0)))
 		}
 		.fan_out {
-			return T(math.sqrt(f64(scale) / f64(f1)))
+			T(math.sqrt(f64(scale) / f64(f1)))
 		}
 		.fan_avg {
-			return T(math.sqrt(f64(scale * T(2)) / f64(f0 + f1)))
+			T(math.sqrt(f64(scale * T(2)) / f64(f0 + f1)))
 		}
 	}
 
