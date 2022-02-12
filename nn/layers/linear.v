@@ -3,6 +3,7 @@ module layers
 import vtl
 import vtl.la
 import vtl.autograd
+import vtl.nn.internal
 import vtl.nn.gates.layers
 
 // LinearLayer is a layer that applies a linear transformation to its input.
@@ -12,10 +13,8 @@ pub struct LinearLayer<T> {
 }
 
 pub fn new_linear_layer<T>(ctx &autograd.Context<T>, input_dim int, output_dim int) &LinearLayer<T> {
-	// @todo: FIX THIS
-	// weight := vtl.nn.kaiming_normal<T>(output_dim, input_dim)
+	weights := internal.kaiming_normal<T>([output_dim, input_dim])
 	bias := vtl.zeros<T>([1, output_dim])
-	weights := bias
 	return &LinearLayer<T>{
 		weights: ctx.variable(weights)
 		bias: ctx.variable(bias)
