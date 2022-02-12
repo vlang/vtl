@@ -2,6 +2,28 @@ module internal
 
 import vtl
 
+pub fn dropout<T>(input &vtl.Tensor<T>, mask &vtl.Tensor<T>, prob f64) &vtl.Tensor<T> {
+        mut ret := vtl.new_tensor_like<T>(input)
+	mut iters := vtl.iterators<T>([input, mask])
+	for {
+		vals, pos := vtl.iterators_next<T>(mut iters) or { break }
+		val := vals[0] * vals[1] / T(prob)
+		ret.data.set<T>(pos, val)
+	}
+	return ret
+}
+
+pub fn dropout_backwards<T>(gradient &vtl.Tensor<T>, mask &vtl.Tensor<T>, prob f64) &vtl.Tensor<T> {
+        mut ret := vtl.new_tensor_like<T>(gradient)
+	mut iters := vtl.iterators<T>([gradient, mask])
+	for {
+		vals, pos := vtl.iterators_next<T>(mut iters) or { break }
+		val := vals[0] * vals[1] / T(prob)
+		ret.data.set<T>(pos, val)
+	}
+	return ret
+}
+
 pub fn maxpool<T>(input &vtl.Tensor<T>, kernel []int, padding []int, stride []int) (&vtl.Tensor<int>, &vtl.Tensor<T>) {
 	nn := input.shape[0]
 	cc := input.shape[1]
