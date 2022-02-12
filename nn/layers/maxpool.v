@@ -24,7 +24,17 @@ pub fn new_maxpool_layer<T>(ctx &autograd.Context<T>, input_shape []int, kernel 
 }
 
 pub fn (layer MaxpoolLayer<T>) output_shape() []int {
-	return [layer.weights.value.shape[0]]
+	c := layer.input_shape[0]
+	h := layer.input_shape[1]
+	w := layer.input_shape[2]
+	kh := layer.kernel[0]
+	kw := layer.kernel[1]
+	ph := layer.padding[0]
+	pw := layer.padding[1]
+	sh := layer.stride[0]
+	sw := layer.stride[1]
+
+	return [c, (h - kh + 2 * ph) / sh + 1, (w - kw + 2 * pw) / sw + 1]
 }
 
 pub fn (layer MaxpoolLayer<T>) variables() []&autograd.Variable<T> {
