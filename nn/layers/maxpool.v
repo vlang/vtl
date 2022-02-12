@@ -16,10 +16,10 @@ pub struct MaxpoolLayer<T> {
 
 pub fn new_maxpool_layer<T>(ctx &autograd.Context<T>, input_shape []int, kernel []int, padding []int, stride []int) &MaxpoolLayer<T> {
 	return &MaxpoolLayer<T>{
-		input_shape: input_shape
-		kernel: kernel
-		padding: padding
-		stride: stride
+		input_shape: input_shape.clone()
+		kernel: kernel.clone()
+		padding: padding.clone()
+		stride: stride.clone()
 	}
 }
 
