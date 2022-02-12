@@ -18,15 +18,15 @@ pub fn new_input_layer<T>(ctx &autograd.Context<T>, shape []int) &InputLayer<T> 
 	}
 }
 
-pub fn (layer InputLayer<T>) output_shape() []int {
+pub fn (layer &InputLayer<T>) output_shape() []int {
 	return layer.shape
 }
 
-pub fn (_ InputLayer<T>) variables() []&autograd.Variable<T> {
+pub fn (_ &InputLayer<T>) variables() []&autograd.Variable<T> {
 	return []&autograd.Variable<T>{}
 }
 
-pub fn (layer InputLayer<T>) forward(mut input autograd.Variable<T>) &autograd.Variable<T> {
+pub fn (layer &InputLayer<T>) forward(mut input autograd.Variable<T>) &autograd.Variable<T> {
 	if input.requires_grad {
 		gate := layers.new_input_gate<T>()
 		gate.cache(mut input, input)

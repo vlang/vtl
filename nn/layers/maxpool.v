@@ -23,7 +23,7 @@ pub fn new_maxpool_layer<T>(ctx &autograd.Context<T>, input_shape []int, kernel 
 	}
 }
 
-pub fn (layer MaxpoolLayer<T>) output_shape() []int {
+pub fn (layer &MaxpoolLayer<T>) output_shape() []int {
 	c := layer.input_shape[0]
 	h := layer.input_shape[1]
 	w := layer.input_shape[2]
@@ -37,11 +37,11 @@ pub fn (layer MaxpoolLayer<T>) output_shape() []int {
 	return [c, (h - kh + 2 * ph) / sh + 1, (w - kw + 2 * pw) / sw + 1]
 }
 
-pub fn (layer MaxpoolLayer<T>) variables() []&autograd.Variable<T> {
+pub fn (layer &MaxpoolLayer<T>) variables() []&autograd.Variable<T> {
 	return []&autograd.Variable<T>{}
 }
 
-pub fn (layer MaxpoolLayer<T>) forward(mut input autograd.Variable<T>) &autograd.Variable<T> {
+pub fn (layer &MaxpoolLayer<T>) forward(mut input autograd.Variable<T>) &autograd.Variable<T> {
 	max_indices, output := internal.maxpool(input.value, layer.kernel, layer.padding,
 		layer.stride)
 	mut result := input.context.variable(output)

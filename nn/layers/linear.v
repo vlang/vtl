@@ -21,15 +21,15 @@ pub fn new_linear_layer<T>(ctx &autograd.Context<T>, input_dim int, output_dim i
 	}
 }
 
-pub fn (layer LinearLayer<T>) output_shape() []int {
+pub fn (layer &LinearLayer<T>) output_shape() []int {
 	return [layer.weights.value.shape[0]]
 }
 
-pub fn (layer LinearLayer<T>) variables() []&autograd.Variable<T> {
+pub fn (layer &LinearLayer<T>) variables() []&autograd.Variable<T> {
 	return [layer.weights, layer.bias]
 }
 
-pub fn (layer LinearLayer<T>) forward(mut input autograd.Variable<T>) &autograd.Variable<T> {
+pub fn (layer &LinearLayer<T>) forward(mut input autograd.Variable<T>) &autograd.Variable<T> {
 	output := vtl.add(la.matmul(input.value, layer.weights.value), layer.bias.value)
 	mut result := input.context.variable(output)
 
