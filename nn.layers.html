@@ -106,8 +106,18 @@
 
 
 </section>
+						<section id="new_sigmoid_layer" class="doc-node">
+							<div class="title"><h2>fn new_sigmoid_layer <a href="#new_sigmoid_layer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/sigmoid.v#L13"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> new_sigmoid_layer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>ctx <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Context<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> output_shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">&</span>SigmoidLayer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+
+
+</section>
 						<section id="relu" class="doc-node">
 							<div class="title"><h2>fn relu <a href="#relu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/relu.v#L38"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> relu<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>v <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+
+
+</section>
+						<section id="sigmoid" class="doc-node">
+							<div class="title"><h2>fn sigmoid <a href="#sigmoid">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/sigmoid.v#L38"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> sigmoid<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>v <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
 
 
 </section>
@@ -231,6 +241,21 @@
 
 
 </section>
+						<section id="SigmoidLayer<T>.output_shape" class="doc-node">
+							<div class="title"><h2>fn (SigmoidLayer<T>) output_shape <a href="#SigmoidLayer<T>.output_shape">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/sigmoid.v#L19"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&</span>SigmoidLayer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">output_shape</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span></code></pre>
+
+
+</section>
+						<section id="SigmoidLayer<T>.variables" class="doc-node">
+							<div class="title"><h2>fn (SigmoidLayer<T>) variables <a href="#SigmoidLayer<T>.variables">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/sigmoid.v#L23"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>_ <span class="token operator">&</span>SigmoidLayer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">variables</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&</span>autograd<span class="token punctuation">.</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+
+
+</section>
+						<section id="SigmoidLayer<T>.forward" class="doc-node">
+							<div class="title"><h2>fn (SigmoidLayer<T>) forward <a href="#SigmoidLayer<T>.forward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/sigmoid.v#L27"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&</span>SigmoidLayer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">forward</span><span class="token punctuation">(</span><span class="token keyword">mut</span> input autograd<span class="token punctuation">.</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+
+
+</section>
 						<section id="DropoutLayer" class="doc-node">
 							<div class="title"><h2>struct DropoutLayer <a href="#DropoutLayer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/dropout.v#L14"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> DropoutLayer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span> <span class="token punctuation">{</span>
 	output_shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
@@ -309,9 +334,16 @@ tensor.</p>
 <p>ReluLayer is a layer that applies the rectified linear unit function element-wise.</p>
 
 </section>
+						<section id="SigmoidLayer" class="doc-node">
+							<div class="title"><h2>struct SigmoidLayer <a href="#SigmoidLayer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/sigmoid.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> SigmoidLayer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span> <span class="token punctuation">{</span>
+	output_shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
+<span class="token punctuation">}</span></code></pre>
+<p>SigmoidLayer is a layer that applies the sigmoid function to its input.</p>
+
+</section>
 
 						<div class="footer">
-							Powered by vdoc. Generated on: 13 Feb 2022 20:36:51
+							Powered by vdoc. Generated on: 13 Feb 2022 20:38:17
 						</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#elu">fn elu</a>        <ul>
@@ -344,7 +376,13 @@ tensor.</p>
 <li class="open"><a href="#new_relu_layer">fn new_relu_layer</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#new_sigmoid_layer">fn new_sigmoid_layer</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#relu">fn relu</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#sigmoid">fn sigmoid</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#DropoutLayer<T>.output_shape">type DropoutLayer<T></a>        <ul>
@@ -395,6 +433,12 @@ tensor.</p>
 <li><a href="#ReluLayer<T>.forward">fn forward</a></li>
 </ul>
 </li>
+<li class="open"><a href="#SigmoidLayer<T>.output_shape">type SigmoidLayer<T></a>        <ul>
+<li><a href="#SigmoidLayer<T>.output_shape">fn output_shape</a></li>
+<li><a href="#SigmoidLayer<T>.variables">fn variables</a></li>
+<li><a href="#SigmoidLayer<T>.forward">fn forward</a></li>
+</ul>
+</li>
 <li class="open"><a href="#DropoutLayer">struct DropoutLayer</a>        <ul>
 </ul>
 </li>
@@ -423,6 +467,9 @@ tensor.</p>
 </ul>
 </li>
 <li class="open"><a href="#ReluLayer">struct ReluLayer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#SigmoidLayer">struct SigmoidLayer</a>        <ul>
 </ul>
 </li>
 </ul></div>
