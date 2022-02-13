@@ -52,7 +52,7 @@ pub fn relu<T>(x &vtl.Tensor<T>) &vtl.Tensor<T> {
 	for {
 		val, pos := iter.next() or { break }
 		next_val := if val < 0 { 0 } else { val }
-		ret.data.set<T>(pos, val)
+		ret.data.set<T>(pos, next_val)
 	}
 	return ret
 }
@@ -78,7 +78,7 @@ pub fn leaky_relu<T>(x &vtl.Tensor<T>, alpha T) &vtl.Tensor<T> {
 	for {
 		val, pos := iter.next() or { break }
 		next_val := if val < 0 { alpha * val } else { val }
-		ret.data.set<T>(pos, val)
+		ret.data.set<T>(pos, next_val)
 	}
 	return ret
 }
@@ -104,7 +104,7 @@ pub fn elu<T>(x &vtl.Tensor<T>, alpha T) &vtl.Tensor<T> {
 	for {
 		val, pos := iter.next() or { break }
 		next_val := if val < 0 { alpha * (T(math.exp(f64(val))) - T(1)) } else { val }
-		ret.data.set<T>(pos, val)
+		ret.data.set<T>(pos, next_val)
 	}
 	return ret
 }
