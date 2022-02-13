@@ -5,14 +5,14 @@ import vtl.autograd
 
 pub struct DropoutGate<T> {
 pub:
-        prob f64
+	prob f64
 	mask &vtl.Tensor<T>
 }
 
 pub fn new_dropout_gate<T>(mask &vtl.Tensor<T>, prob f64) &DropoutGate<T> {
 	return &DropoutGate<T>{
 		mask: mask
-                prob: prob
+		prob: prob
 	}
 }
 
