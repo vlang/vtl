@@ -61,6 +61,11 @@
 
 
 </section>
+						<section id="leaky_elu" class="doc-node">
+							<div class="title"><h2>fn leaky_elu <a href="#leaky_elu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/leaky_elu.v#L38"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> leaky_elu<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>v <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+
+
+</section>
 						<section id="new_dropout_layer" class="doc-node">
 							<div class="title"><h2>fn new_dropout_layer <a href="#new_dropout_layer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/dropout.v#L19"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> new_dropout_layer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>ctx <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Context<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> output_shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> data DropoutLayerConfig<span class="token punctuation">)</span> <span class="token operator">&</span>DropoutLayer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
 
@@ -78,6 +83,11 @@
 </section>
 						<section id="new_input_layer" class="doc-node">
 							<div class="title"><h2>fn new_input_layer <a href="#new_input_layer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/input.v#L15"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> new_input_layer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>ctx <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Context<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">&</span>InputLayer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+
+
+</section>
+						<section id="new_leaky_elu_layer" class="doc-node">
+							<div class="title"><h2>fn new_leaky_elu_layer <a href="#new_leaky_elu_layer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/leaky_elu.v#L13"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> new_leaky_elu_layer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>ctx <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Context<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> output_shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">&</span>LeakyEluLayer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
 
 
 </section>
@@ -148,6 +158,21 @@
 </section>
 						<section id="InputLayer<T>.forward" class="doc-node">
 							<div class="title"><h2>fn (InputLayer<T>) forward <a href="#InputLayer<T>.forward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/input.v#L29"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&</span>InputLayer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">forward</span><span class="token punctuation">(</span><span class="token keyword">mut</span> input autograd<span class="token punctuation">.</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+
+
+</section>
+						<section id="LeakyEluLayer<T>.output_shape" class="doc-node">
+							<div class="title"><h2>fn (LeakyEluLayer<T>) output_shape <a href="#LeakyEluLayer<T>.output_shape">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/leaky_elu.v#L19"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&</span>LeakyEluLayer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">output_shape</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span></code></pre>
+
+
+</section>
+						<section id="LeakyEluLayer<T>.variables" class="doc-node">
+							<div class="title"><h2>fn (LeakyEluLayer<T>) variables <a href="#LeakyEluLayer<T>.variables">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/leaky_elu.v#L23"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>_ <span class="token operator">&</span>LeakyEluLayer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">variables</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&</span>autograd<span class="token punctuation">.</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+
+
+</section>
+						<section id="LeakyEluLayer<T>.forward" class="doc-node">
+							<div class="title"><h2>fn (LeakyEluLayer<T>) forward <a href="#LeakyEluLayer<T>.forward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/leaky_elu.v#L27"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&</span>LeakyEluLayer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">forward</span><span class="token punctuation">(</span><span class="token keyword">mut</span> input autograd<span class="token punctuation">.</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
 
 
 </section>
@@ -227,6 +252,13 @@ tensor.</p>
 <p>This layer is used as the first layer in a model.</p>
 
 </section>
+						<section id="LeakyEluLayer" class="doc-node">
+							<div class="title"><h2>struct LeakyEluLayer <a href="#LeakyEluLayer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/leaky_elu.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> LeakyEluLayer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span> <span class="token punctuation">{</span>
+	output_shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
+<span class="token punctuation">}</span></code></pre>
+<p>LeakyEluLayer is an activation layer that applies the leaky elu function to the input.</p>
+
+</section>
 						<section id="LinearLayer" class="doc-node">
 							<div class="title"><h2>struct LinearLayer <a href="#LinearLayer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/linear.v#L10"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> LinearLayer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span> <span class="token punctuation">{</span>
 	weights <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span>
@@ -247,10 +279,13 @@ tensor.</p>
 </section>
 
 						<div class="footer">
-							Powered by vdoc. Generated on: 13 Feb 2022 20:26:25
+							Powered by vdoc. Generated on: 13 Feb 2022 20:33:35
 						</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#elu">fn elu</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#leaky_elu">fn leaky_elu</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#new_dropout_layer">fn new_dropout_layer</a>        <ul>
@@ -263,6 +298,9 @@ tensor.</p>
 </ul>
 </li>
 <li class="open"><a href="#new_input_layer">fn new_input_layer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#new_leaky_elu_layer">fn new_leaky_elu_layer</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#new_linear_layer">fn new_linear_layer</a>        <ul>
@@ -295,6 +333,12 @@ tensor.</p>
 <li><a href="#InputLayer<T>.forward">fn forward</a></li>
 </ul>
 </li>
+<li class="open"><a href="#LeakyEluLayer<T>.output_shape">type LeakyEluLayer<T></a>        <ul>
+<li><a href="#LeakyEluLayer<T>.output_shape">fn output_shape</a></li>
+<li><a href="#LeakyEluLayer<T>.variables">fn variables</a></li>
+<li><a href="#LeakyEluLayer<T>.forward">fn forward</a></li>
+</ul>
+</li>
 <li class="open"><a href="#LinearLayer<T>.output_shape">type LinearLayer<T></a>        <ul>
 <li><a href="#LinearLayer<T>.output_shape">fn output_shape</a></li>
 <li><a href="#LinearLayer<T>.variables">fn variables</a></li>
@@ -323,6 +367,9 @@ tensor.</p>
 </ul>
 </li>
 <li class="open"><a href="#InputLayer">struct InputLayer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#LeakyEluLayer">struct LeakyEluLayer</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#LinearLayer">struct LinearLayer</a>        <ul>
