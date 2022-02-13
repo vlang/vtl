@@ -76,8 +76,8 @@
 
 
 </section>
-						<section id="new_maxpool_gate" class="doc-node">
-							<div class="title"><h2>fn new_maxpool_gate <a href="#new_maxpool_gate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/gates/layers/maxpool.v#L16"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> new_maxpool_gate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>max_indices <span class="token operator">&</span><span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">int</span><span class="token operator">></span><span class="token punctuation">,</span> kernel <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> stride <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> padding <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">&</span>MaxpoolGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+						<section id="new_maxpool2d_gate" class="doc-node">
+							<div class="title"><h2>fn new_maxpool2d_gate <a href="#new_maxpool2d_gate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/gates/layers/maxpool.v#L16"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> new_maxpool2d_gate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>max_indices <span class="token operator">&</span><span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">int</span><span class="token operator">></span><span class="token punctuation">,</span> kernel <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> stride <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> padding <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">&</span>MaxPool2DGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
 
 
 </section>
@@ -121,13 +121,13 @@
 
 
 </section>
-						<section id="MaxpoolGate<T>.backward" class="doc-node">
-							<div class="title"><h2>fn (MaxpoolGate<T>) backward <a href="#MaxpoolGate<T>.backward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/gates/layers/maxpool.v#L26"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&</span>MaxpoolGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> backward<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>payload <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Payload<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&</span><span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+						<section id="MaxPool2DGate<T>.backward" class="doc-node">
+							<div class="title"><h2>fn (MaxPool2DGate<T>) backward <a href="#MaxPool2DGate<T>.backward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/gates/layers/maxpool.v#L26"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&</span>MaxPool2DGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> backward<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>payload <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Payload<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&</span><span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
 
 
 </section>
-						<section id="MaxpoolGate<T>.cache" class="doc-node">
-							<div class="title"><h2>fn (MaxpoolGate<T>) cache <a href="#MaxpoolGate<T>.cache">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/gates/layers/maxpool.v#L34"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&</span>MaxpoolGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> cache<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token keyword">mut</span> result autograd<span class="token punctuation">.</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> args ...autograd<span class="token punctuation">.</span>CacheParam<span class="token punctuation">)</span></code></pre>
+						<section id="MaxPool2DGate<T>.cache" class="doc-node">
+							<div class="title"><h2>fn (MaxPool2DGate<T>) cache <a href="#MaxPool2DGate<T>.cache">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/gates/layers/maxpool.v#L34"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&</span>MaxPool2DGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> cache<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token keyword">mut</span> result autograd<span class="token punctuation">.</span>Variable<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> args ...autograd<span class="token punctuation">.</span>CacheParam<span class="token punctuation">)</span></code></pre>
 
 
 </section>
@@ -164,8 +164,8 @@
 
 
 </section>
-						<section id="MaxpoolGate" class="doc-node">
-							<div class="title"><h2>struct MaxpoolGate <a href="#MaxpoolGate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/gates/layers/maxpool.v#L7"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> MaxpoolGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span> <span class="token punctuation">{</span>
+						<section id="MaxPool2DGate" class="doc-node">
+							<div class="title"><h2>struct MaxPool2DGate <a href="#MaxPool2DGate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/gates/layers/maxpool.v#L7"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> MaxPool2DGate<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
 	max_indices <span class="token operator">&</span>vtl<span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">int</span><span class="token operator">></span>
 	kernel      <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
@@ -178,7 +178,7 @@
 </section>
 
 						<div class="footer">
-							Powered by vdoc. Generated on: 13 Feb 2022 20:45:04
+							Powered by vdoc. Generated on: 13 Feb 2022 21:03:03
 						</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#new_dropout_gate">fn new_dropout_gate</a>        <ul>
@@ -193,7 +193,7 @@
 <li class="open"><a href="#new_linear_gate">fn new_linear_gate</a>        <ul>
 </ul>
 </li>
-<li class="open"><a href="#new_maxpool_gate">fn new_maxpool_gate</a>        <ul>
+<li class="open"><a href="#new_maxpool2d_gate">fn new_maxpool2d_gate</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#DropoutGate<T>.backward">type DropoutGate<T></a>        <ul>
@@ -216,9 +216,9 @@
 <li><a href="#LinearGate<T>.cache">fn cache</a></li>
 </ul>
 </li>
-<li class="open"><a href="#MaxpoolGate<T>.backward">type MaxpoolGate<T></a>        <ul>
-<li><a href="#MaxpoolGate<T>.backward">fn backward</a></li>
-<li><a href="#MaxpoolGate<T>.cache">fn cache</a></li>
+<li class="open"><a href="#MaxPool2DGate<T>.backward">type MaxPool2DGate<T></a>        <ul>
+<li><a href="#MaxPool2DGate<T>.backward">fn backward</a></li>
+<li><a href="#MaxPool2DGate<T>.cache">fn cache</a></li>
 </ul>
 </li>
 <li class="open"><a href="#DropoutGate">struct DropoutGate</a>        <ul>
@@ -233,7 +233,7 @@
 <li class="open"><a href="#LinearGate">struct LinearGate</a>        <ul>
 </ul>
 </li>
-<li class="open"><a href="#MaxpoolGate">struct MaxpoolGate</a>        <ul>
+<li class="open"><a href="#MaxPool2DGate">struct MaxPool2DGate</a>        <ul>
 </ul>
 </li>
 </ul></div>
