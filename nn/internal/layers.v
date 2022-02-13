@@ -44,9 +44,9 @@ pub fn maxpool<T>(input &vtl.Tensor<T>, kernel []int, padding []int, stride []in
 	return max_indices, output
 }
 
-pub fn maxpool_backward<T>(shape []int, max_indices &vtl.Tensor<int>, grad_output &vtl.Tensor<T>) {
+pub fn maxpool2d_backward<T>(shape []int, max_indices &vtl.Tensor<int>, grad_output &vtl.Tensor<T>) {
 	if grad_output.size != max_indices.size {
-		panic('maxpool_backward: grad_output and max_indices must have the same size')
+		panic('maxpool2d_backward: grad_output and max_indices must have the same size')
 	}
 
 	mut ret := vtl.zeros<T>(shape)
