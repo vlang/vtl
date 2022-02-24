@@ -91,5 +91,5 @@ fn random_in_range<T>(min T, max T) T {
 	$if T is f64 {
 		return rand.f64_in_range(min, max) or { min }
 	}
-	return T(min)
+	return min
 }
