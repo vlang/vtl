@@ -1,0 +1,36 @@
+name: Deploy Documentation
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout vtl
+        uses: actions/checkout@v2
+        with:
+          path: vtl
+
+      - name: Setup V
+        uses: vlang/setup-v@v1
+        with:
+          check-latest: true
+
+      - name: V doctor
+        run: v doctor
+
+      - name: Build docs
+        run: |
+          rm -f ./vtl/README.md
+          mv ./vtl/static/DOCS.md ./vtl/README.md
+          v doc -m -f html ./vtl
+          mv ./vtl/_docs/vtl.html ./vtl/_docs/index.html
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./vtl/_docs/

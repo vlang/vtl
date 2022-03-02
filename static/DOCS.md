@@ -80,10 +80,6 @@ $ ./bin/test # execute `./bin/test -h` to know more about the test command
 Made with [contributors-img](https://contrib.rocks).
 
 [awesomevbadge]: https://awesome.re/mentioned-badge.svg
-[workflowbadge]: https://github.com/vlang/vtl/workflows/Build%20and%20Test%20with%20deps/badge.svg
-[validatedocsbadge]: https://github.com/vlang/vtl/workflows/Validate%20Docs/badge.svg
 [licensebadge]: https://img.shields.io/badge/License-MIT-blue.svg
 [awesomevurl]: https://github.com/vlang/awesome-v/blob/master/README.md#scientific-computing
-[workflowurl]: https://github.com/vlang/vtl/commits/main
-[validatedocsurl]: https://github.com/vlang/vtl/commits/main
 [licenseurl]: https://github.com/vlang/vtl/blob/main/LICENSE
