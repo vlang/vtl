@@ -7,7 +7,7 @@ import time
 
 // bernoulli returns a tensor of bernoulli random variables.
 pub fn bernoulli<T>(prob f64, shape []int, params TensorData) &Tensor<T> {
-        mut t := zeros<T>(shape, params)
+	mut t := zeros<T>(shape, params)
 	mut iter := t.iterator()
 	for {
 		_, pos := iter.next() or { break }
@@ -19,7 +19,7 @@ pub fn bernoulli<T>(prob f64, shape []int, params TensorData) &Tensor<T> {
 
 // binomial returns a tensor of binomial random variables.
 pub fn binomial<T>(n int, prob f64, shape []int, params TensorData) &Tensor<T> {
-        mut t := zeros<T>(shape, params)
+	mut t := zeros<T>(shape, params)
 	mut iter := t.iterator()
 	for {
 		_, pos := iter.next() or { break }
@@ -31,7 +31,7 @@ pub fn binomial<T>(n int, prob f64, shape []int, params TensorData) &Tensor<T> {
 
 // exponential returns a tensor of exponential random variables.
 pub fn exponential<T>(lambda f64, shape []int, params TensorData) &Tensor<T> {
-        mut t := zeros<T>(shape, params)
+	mut t := zeros<T>(shape, params)
 	mut iter := t.iterator()
 	for {
 		_, pos := iter.next() or { break }
@@ -65,31 +65,31 @@ fn init() {
 
 fn random_in_range<T>(min T, max T) T {
 	$if T is byte {
-		return byte(rand.int_in_range(int(min), int(max)))
+		return byte(rand.int_in_range(int(min), int(max)) or { int(min) })
 	}
 	$if T is u16 {
-		return u16(rand.int_in_range(int(min), int(max)))
+		return u16(rand.int_in_range(int(min), int(max)) or { u16(min) })
 	}
 	$if T is u32 {
-		return rand.u32_in_range(min, max)
+		return rand.u32_in_range(min, max) or { min }
 	}
 	$if T is u64 {
-		return rand.u64_in_range(min, max)
+		return rand.u64_in_range(min, max) or { min }
 	}
 	$if T is i8 {
-		return i8(rand.int_in_range(int(min), int(max)))
+		return i8(rand.int_in_range(int(min), int(max)) or { i8(min) })
 	}
 	$if T is int {
-		return rand.int_in_range(min, max)
+		return rand.int_in_range(min, max) or { min }
 	}
 	$if T is i64 {
-		return rand.i64_in_range(min, max)
+		return rand.i64_in_range(min, max) or { min }
 	}
 	$if T is f32 {
-		return rand.f32_in_range(min, max)
+		return rand.f32_in_range(min, max) or { min }
 	}
 	$if T is f64 {
-		return rand.f64_in_range(min, max)
+		return rand.f64_in_range(min, max) or { min }
 	}
-	return T(0)
+	return min
 }
