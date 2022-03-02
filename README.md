@@ -10,8 +10,8 @@
 <div align="center">
 
 [![Mentioned in Awesome V][awesomevbadge]][awesomevurl]
-[![Build Status][workflowbadge]][workflowurl]
-[![Docs Validation][validatedocsbadge]][validatedocsurl]
+[![VSL Continuous Integration][workflowbadge]][workflowurl]
+[![Deploy Documentation][deploydocsbadge]][deploydocsurl]
 [![License: MIT][licensebadge]][licenseurl]
 
 </div>
@@ -88,10 +88,10 @@ $ v test .
 Made with [contributors-img](https://contrib.rocks).
 
 [awesomevbadge]: https://awesome.re/mentioned-badge.svg
-[workflowbadge]: https://github.com/vlang/vtl/workflows/Build%20and%20Test%20with%20deps/badge.svg
-[validatedocsbadge]: https://github.com/vlang/vtl/workflows/Validate%20Docs/badge.svg
+[workflowbadge]: https://github.com/vlang/vtl/actions/workflows/ci.yml/badge.svg
+[deploydocsbadge]: https://github.com/vlang/vtl/actions/workflows/deploy-docs.yml/badge.svg
 [licensebadge]: https://img.shields.io/badge/License-MIT-blue.svg
 [awesomevurl]: https://github.com/vlang/awesome-v/blob/master/README.md#scientific-computing
-[workflowurl]: https://github.com/vlang/vtl/commits/main
-[validatedocsurl]: https://github.com/vlang/vtl/commits/main
+[workflowurl]: https://github.com/vlang/vtl/actions/workflows/ci.yml
+[deploydocsurl]: https://github.com/vlang/vtl/actions/workflows/deploy-docs.yml
 [licenseurl]: https://github.com/vlang/vtl/blob/main/LICENSE
