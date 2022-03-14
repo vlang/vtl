@@ -1,18 +1,20 @@
 module optimizers
 
 import vtl.autograd
+import vtl.nn
 import vtl
 
 pub struct AdamOptimizer<T> {
-	params        []&autograd.Variable<T>
 	learning_rate f64
-	beta1         f64
-	beta2         f64
 	epsilon       f64
-	beta1_t       f64
-	beta2_t       f64
-	first_moment  []&vtl.Tensor<T>
-	second_moment []&vtl.Tensor<T>
+pub mut:
+	beta1          f64
+	beta2          f64
+	beta1_t        f64
+	beta2_t        f64
+	params         []&autograd.Variable<T>
+	first_moments  []&vtl.Tensor<T>
+	second_moments []&vtl.Tensor<T>
 }
 
 [params]
@@ -30,4 +32,18 @@ pub fn new_adam_optimizer<T>(config AdamOptimizerConfig) &AdamOptimizer<T> {
 		beta2: config.beta2
 		epsilon: config.epsilon
 	}
+}
+
+pub fn (mut o AdamOptimizer<T>) build_params(layes []nn.Layer) {
+	for layer in layers {
+		for v in layer.variables() {
+			o.params << v
+			o.first_moments << vtl.zeros_like<T>(v.grad)
+			o.second_moments << vtl.zeros_like<T>(v.grad)
+		}
+	}
+}
+
+pub fn (mut o AdamOptimizer<T>) update() {
+	// @todo: @ulises-jeremias to implement this
 }
