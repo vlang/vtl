@@ -7,7 +7,7 @@ pub struct NeuralNetworkContainer<T> {
 	ctx &autograd.Context<T>
 pub mut:
 	layers []Layer
-        loss Loss
+	loss   Loss
 }
 
 // new_nnc creates a new neural network container
