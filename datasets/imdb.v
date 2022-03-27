@@ -1,6 +1,6 @@
 module datasets
 
-import rand.util
+import rand
 import vtl
 import os
 
@@ -56,7 +56,7 @@ pub fn load_imdb(set_type DatasetType, data ImdbDatasetConfig) ?&ImdbDataset {
 	split_paths << os.walk_ext(pos_dir, '.txt')
 	split_paths << os.walk_ext(neg_dir, '.txt')
 
-	util.shuffle(mut split_paths, split_paths.len)
+	rand.shuffle(mut split_paths)
 
 	return &ImdbDataset{
 		@type: set_type
