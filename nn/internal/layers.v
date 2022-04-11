@@ -24,7 +24,7 @@ pub fn dropout_backwards<T>(gradient &vtl.Tensor<T>, mask &vtl.Tensor<T>, prob f
 	return ret
 }
 
-pub fn maxpool<T>(input &vtl.Tensor<T>, kernel []int, padding []int, stride []int) (&vtl.Tensor<int>, &vtl.Tensor<T>) {
+pub fn maxpool2d<T>(input &vtl.Tensor<T>, kernel []int, padding []int, stride []int) (&vtl.Tensor<int>, &vtl.Tensor<T>) {
 	nn := input.shape[0]
 	cc := input.shape[1]
 	hh := input.shape[2]
@@ -36,23 +36,24 @@ pub fn maxpool<T>(input &vtl.Tensor<T>, kernel []int, padding []int, stride []in
 	outh := (hh + 2 * padding[0] - kk) / stride[0] + 1
 	outw := (ww + 2 * padding[1] - kw) / stride[1] + 1
 
-	max_indices := vtl.zeros<int>([n, cc, outh, outw])
-	output := vtl.zeros<T>([n, cc, outh, outw])
+	max_indices := vtl.zeros<int>([nn, cc, outh, outw])
+	output := vtl.zeros<T>([nn, cc, outh, outw])
 
 	// @todo: Implement maxpool here
 
 	return max_indices, output
 }
 
-pub fn maxpool2d_backward<T>(shape []int, max_indices &vtl.Tensor<int>, grad_output &vtl.Tensor<T>) {
+pub fn maxpool2d_backward<T>(shape []int, max_indices &vtl.Tensor<int>, grad_output &vtl.Tensor<T>) &vtl.Tensor<T> {
 	if grad_output.size != max_indices.size {
 		panic('maxpool2d_backward: grad_output and max_indices must have the same size')
 	}
 
+	// @todo: @ulises-jeremias to override this on other backends
 	mut ret := vtl.zeros<T>(shape)
 	for i in 0 .. grad_output.size {
-		idx := max_indices.data[i]
-		ret.data.set<T>(idx, grad_output.data[i])
+		idx := max_indices.data.get(i)
+		ret.data.set<T>(idx, grad_output.data.get(i))
 	}
 	return ret
 }
