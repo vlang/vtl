@@ -31,3 +31,11 @@ pub fn (mut ls NeuralNetworkContainer<T>) linear(output_size int) {
 	input_size := output_size
 	ls.layers << layers.new_linear_layer<T>(ls.ctx, input_size, output_size)
 }
+
+// maxpool2d adds a new maxpool2d layer to the network
+// with the given kernel size and stride.
+pub fn (mut ls NeuralNetworkContainer<T>) maxpool2d(kernel []int, padding []int, stride []int) {
+	// shape := ls.layers[ls.layers.len - 1].output_shape()
+	shape := []int{}
+	ls.layers << layers.new_maxpool2d_layer<T>(ls.ctx, shape, kernel, padding, stride)
+}
