@@ -3,7 +3,7 @@ module layers
 import vtl
 import vtl.autograd
 import vtl.nn.internal
-import vtl.nn.gates.layers
+import vtl.nn.gates.activation
 
 // SigmoidLayer is a layer that applies the sigmoid function to its input.
 pub struct SigmoidLayer<T> {
@@ -29,7 +29,7 @@ pub fn (layer &SigmoidLayer<T>) forward(mut input autograd.Variable<T>) &autogra
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {
-		gate := layers.new_sigmoid_gate<T>(input.value)
+		gate := activation.new_sigmoid_gate<T>(input.value)
 		gate.cache(mut result, input)
 	}
 	return result
@@ -40,7 +40,7 @@ pub fn sigmoid<T>(v &autograd.Variable<T>) &autograd.Variable<T> {
 	mut result := v.context.variable(output)
 
 	if v.requires_grad {
-		gate := layers.new_sigmoid_gate<T>(v.value)
+		gate := activation.new_sigmoid_gate<T>(v.value)
 		gate.cache(mut result, v)
 	}
 	return result
