@@ -72,3 +72,10 @@ pub fn (mut ls NeuralNetworkContainer<T>) elu() {
 	shape := []int{}
 	ls.layers << layers.new_elu_layer<T>(ls.ctx, shape)
 }
+
+// sigmod adds a new sigmod layer to the network.
+pub fn (mut ls NeuralNetworkContainer<T>) sigmod() {
+	// shape := ls.layers[ls.layers.len - 1].output_shape()
+	shape := []int{}
+	ls.layers << layers.new_sigmoid_layer<T>(ls.ctx, shape)
+}

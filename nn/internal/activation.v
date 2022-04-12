@@ -22,7 +22,7 @@ pub fn deriv_tanh<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>) &vtl.Tensor
 [inline]
 pub fn sigmoid<T>(x &vtl.Tensor<T>) &vtl.Tensor<T> {
 	mut ret := vtl.new_tensor_like<T>(x)
-	mut iter := t.iterator()
+	mut iter := x.iterator()
 	for {
 		val, pos := iter.next() or { break }
 		next_val := T(1) / T(1) + T(math.exp(f64(val)))
