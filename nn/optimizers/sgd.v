@@ -1,7 +1,7 @@
 module optimizers
 
 import vtl.autograd
-import vtl.nn
+import vtl.nn.types
 import vtl
 
 pub struct SgdOptimizer<T> {
@@ -15,13 +15,13 @@ pub struct SgdOptimizerConfig {
 	learning_rate f64 = 0.001
 }
 
-pub fn new_adam_optimizer<T>(config SgdOptimizerConfig) &SgdOptimizer<T> {
+pub fn new_sgd_optimizer<T>(config SgdOptimizerConfig) &SgdOptimizer<T> {
 	return &SgdOptimizer<T>{
 		learning_rate: config.learning_rate
 	}
 }
 
-pub fn (mut o SgdOptimizer<T>) build_params(layes []nn.Layer) {
+pub fn (mut o SgdOptimizer<T>) build_params(layes []types.Layer) {
 	for layer in layers {
 		for v in layer.variables() {
 			o.params << v

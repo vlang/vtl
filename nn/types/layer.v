@@ -1,4 +1,4 @@
-module nn
+module types
 
 import vtl.autograd
 import vtl.nn.layers
