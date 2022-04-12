@@ -1,7 +1,7 @@
 module optimizers
 
 import vtl.autograd
-import vtl.nn
+import vtl.nn.types
 import vtl
 
 pub struct AdamOptimizer<T> {
@@ -34,7 +34,7 @@ pub fn new_adam_optimizer<T>(config AdamOptimizerConfig) &AdamOptimizer<T> {
 	}
 }
 
-pub fn (mut o AdamOptimizer<T>) build_params(layes []nn.Layer) {
+pub fn (mut o AdamOptimizer<T>) build_params(layes []types.Layer) {
 	for layer in layers {
 		for v in layer.variables() {
 			o.params << v

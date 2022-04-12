@@ -2,12 +2,15 @@ module nn
 
 import vtl.autograd
 import vtl.nn.layers
+import vtl.nn.optimizers
+import vtl.nn.types
 
 pub struct NeuralNetworkContainer<T> {
 	ctx &autograd.Context<T>
 pub mut:
-	layers []Layer
-	loss   Loss
+	layers    []types.Layer
+	loss      types.Loss
+	optimizer types.Optimizer
 }
 
 // new_nnc creates a new neural network container
@@ -78,4 +81,14 @@ pub fn (mut ls NeuralNetworkContainer<T>) sigmod() {
 	// shape := ls.layers[ls.layers.len - 1].output_shape()
 	shape := []int{}
 	ls.layers << layers.new_sigmoid_layer<T>(ls.ctx, shape)
+}
+
+// sgd adds a new sgd optimizer to the network.
+pub fn (mut ls NeuralNetworkContainer<T>) sgd(config optimizers.SgdOptimizerConfig) {
+	// ls.optimizer = optimizers.new_sgd_optimizer(config)
+}
+
+// adam adds a new adam optimizer to the network.
+pub fn (mut ls NeuralNetworkContainer<T>) adam(config optimizers.AdamOptimizerConfig) {
+	// ls.optimizer = optimizers.new_adam_optimizer(config)
 }
