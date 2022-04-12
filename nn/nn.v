@@ -85,10 +85,12 @@ pub fn (mut ls NeuralNetworkContainer<T>) sigmod() {
 
 // sgd adds a new sgd optimizer to the network.
 pub fn (mut ls NeuralNetworkContainer<T>) sgd(config optimizers.SgdOptimizerConfig) {
-	// ls.optimizer = optimizers.new_sgd_optimizer(config)
+	// @todo: @ulises-jeremias to uncomment this
+	// ls.optimizer = optimizers.new_sgd_optimizer<T>(config)
 }
 
 // adam adds a new adam optimizer to the network.
 pub fn (mut ls NeuralNetworkContainer<T>) adam(config optimizers.AdamOptimizerConfig) {
-	// ls.optimizer = optimizers.new_adam_optimizer(config)
+	// @todo: @ulises-jeremias to uncomment this
+	// ls.optimizer = optimizers.new_adam_optimizer<T>(config)
 }

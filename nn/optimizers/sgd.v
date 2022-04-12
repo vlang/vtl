@@ -21,7 +21,7 @@ pub fn new_sgd_optimizer<T>(config SgdOptimizerConfig) &SgdOptimizer<T> {
 	}
 }
 
-pub fn (mut o SgdOptimizer<T>) build_params(layes []types.Layer) {
+pub fn (mut o SgdOptimizer<T>) build_params(layers []types.Layer) {
 	for layer in layers {
 		for v in layer.variables() {
 			o.params << v
