@@ -51,7 +51,10 @@ pub fn relu<T>(x &vtl.Tensor<T>) &vtl.Tensor<T> {
 	mut iter := x.iterator()
 	for {
 		val, pos := iter.next() or { break }
-		next_val := if val < 0 { 0 } else { val }
+		mut next_val := val
+		if val < 0 {
+			next_val = T(0)
+		}
 		ret.data.set<T>(pos, next_val)
 	}
 	return ret
@@ -64,7 +67,10 @@ pub fn deriv_relu<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>) &vtl.Tensor
 	mut iters := vtl.iterators<T>([gradient, cached])
 	for {
 		vals, pos := vtl.iterators_next<T>(mut iters) or { break }
-		val := if vals[0] < 0 { 0 } else { vals[1] }
+		mut val := vals[0]
+		if vals[1] < 0 {
+			val = T(0)
+		}
 		ret.data.set<T>(pos, val)
 	}
 	return ret
@@ -109,7 +115,10 @@ pub fn elu<T>(x &vtl.Tensor<T>, alpha T) &vtl.Tensor<T> {
 	mut iter := x.iterator()
 	for {
 		val, pos := iter.next() or { break }
-		next_val := if val < 0 { alpha * (T(math.exp(f64(val))) - T(1)) } else { val }
+		mut next_val := val
+		if val < 0 {
+			next_val = alpha * (T(math.exp(f64(val))) - T(1))
+		}
 		ret.data.set<T>(pos, next_val)
 	}
 	return ret
@@ -122,7 +131,10 @@ pub fn deriv_elu<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>, alpha T) &vt
 	mut iters := vtl.iterators<T>([gradient, cached])
 	for {
 		vals, pos := vtl.iterators_next<T>(mut iters) or { break }
-		val := if vals[0] <= 0 { T(math.exp(f64(vals[1]))) } else { T(1) }
+		mut val := T(1)
+		if vals[0] < 0 {
+			val = T(math.exp(f64(vals[1])))
+		}
 		ret.data.set<T>(pos, val)
 	}
 	return ret

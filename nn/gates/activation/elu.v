@@ -17,7 +17,7 @@ pub fn new_elu_gate<T>(cache &vtl.Tensor<T>) &EluGate<T> {
 
 pub fn (g &EluGate<T>) backward<T>(payload &autograd.Payload<T>) []&vtl.Tensor<T> {
 	gradient := payload.variable.grad
-	return [internal.deriv_elu(gradient, g.cache)]
+	return [internal.deriv_elu(gradient, g.cache, T(0))]
 }
 
 pub fn (g &EluGate<T>) cache<T>(mut result autograd.Variable<T>, args ...autograd.CacheParam) {
