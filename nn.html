@@ -58,6 +58,11 @@
 
 </section>
 
+						<section id="new_nn" class="doc-node">
+							<div class="title"><h2>fn new_nn <a href="#new_nn">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/nn.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">new_nn</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>ctx <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Context<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token operator">&</span>NeuralNetwork<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+
+
+</section>
 						<section id="new_nnc" class="doc-node">
 							<div class="title"><h2>fn new_nnc <a href="#new_nnc">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/nnc.v#L18"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">new_nnc</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>ctx <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Context<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token operator">&</span>NeuralNetworkContainer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
 <p>new_nnc creates a new neural network container
@@ -121,6 +126,13 @@ with the given kernel size and stride.</p>
 <p>adam adds a new adam optimizer to the network.</p>
 
 </section>
+						<section id="NeuralNetwork" class="doc-node">
+							<div class="title"><h2>struct NeuralNetwork <a href="#NeuralNetwork">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/nn.v#L5"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> NeuralNetwork<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span> <span class="token punctuation">{</span>
+	info <span class="token operator">&</span>NeuralNetworkContainer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span>
+<span class="token punctuation">}</span></code></pre>
+
+
+</section>
 						<section id="NeuralNetworkContainer" class="doc-node">
 							<div class="title"><h2>struct NeuralNetworkContainer <a href="#NeuralNetworkContainer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/nnc.v#L8"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> NeuralNetworkContainer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span> <span class="token punctuation">{</span>
 	ctx <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Context<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span>
@@ -134,10 +146,13 @@ with the given kernel size and stride.</p>
 </section>
 
           <div class="footer">
-            Powered by vdoc. Generated on: 12 Apr 2022 04:31:00
+            Powered by vdoc. Generated on: 12 Apr 2022 04:47:13
           </div>
         </div>
-        <div class="doc-toc"><ul><li class="open"><a href="#new_nnc">fn new_nnc</a>        <ul>
+        <div class="doc-toc"><ul><li class="open"><a href="#new_nn">fn new_nn</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#new_nnc">fn new_nnc</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#NeuralNetworkContainer<T>.input">type NeuralNetworkContainer<T></a>        <ul>
@@ -152,6 +167,9 @@ with the given kernel size and stride.</p>
 <li><a href="#NeuralNetworkContainer<T>.sigmod">fn sigmod</a></li>
 <li><a href="#NeuralNetworkContainer<T>.sgd">fn sgd</a></li>
 <li><a href="#NeuralNetworkContainer<T>.adam">fn adam</a></li>
+</ul>
+</li>
+<li class="open"><a href="#NeuralNetwork">struct NeuralNetwork</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#NeuralNetworkContainer">struct NeuralNetworkContainer</a>        <ul>
