@@ -65,3 +65,10 @@ pub fn (mut ls NeuralNetworkContainer<T>) leaky_relu() {
 	shape := []int{}
 	ls.layers << layers.new_leaky_relu_layer<T>(ls.ctx, shape)
 }
+
+// elu adds a new elu layer to the network.
+pub fn (mut ls NeuralNetworkContainer<T>) elu() {
+	// shape := ls.layers[ls.layers.len - 1].output_shape()
+	shape := []int{}
+	ls.layers << layers.new_elu_layer<T>(ls.ctx, shape)
+}

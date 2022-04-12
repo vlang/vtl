@@ -3,7 +3,7 @@ module layers
 import vtl
 import vtl.autograd
 import vtl.nn.internal
-import vtl.nn.gates.layers
+import vtl.nn.gates.activation
 
 [params]
 pub struct EluLayerConfig {
@@ -37,7 +37,7 @@ pub fn (layer &EluLayer<T>) forward(mut input autograd.Variable<T>) &autograd.Va
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {
-		gate := layers.new_elu_gate<T>(input.value)
+		gate := activation.new_elu_gate<T>(input.value)
 		gate.cache(mut result, input)
 	}
 	return result
@@ -48,7 +48,7 @@ pub fn elu<T>(v &autograd.Variable<T>, data EluLayerConfig) &autograd.Variable<T
 	mut result := v.context.variable(output)
 
 	if v.requires_grad {
-		gate := layers.new_elu_gate<T>(v.value)
+		gate := activation.new_elu_gate<T>(v.value)
 		gate.cache(mut result, v)
 	}
 	return result
