@@ -46,7 +46,7 @@
       <nav class="search hidden"></nav>
       <nav class="content hidden">
         <ul>
-          <li class="open"><div class="menu-row"><a href="./vtl.html">vtl</a></div></li><li class="open"><div class="menu-row"><a href="./autograd.html">autograd</a></div></li><li class="open"><div class="menu-row"><a href="./datasets.html">datasets</a></div></li><li class="open"><div class="menu-row"><a href="./la.html">la</a></div></li><li class="open"><div class="menu-row"><svg xmlns="http://www.w3.org/2000/svg" class="dropdown-arrow" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M7 10l5 5 5-5z"/></svg><a href="./nn.html">nn</a></div><ul><li><a href="./nn.gates.activation.html">gates.activation</a></li><li><a href="./nn.gates.layers.html">gates.layers</a></li><li><a href="./nn.gates.loss.html">gates.loss</a></li><li><a href="./nn.internal.html">internal</a></li><li><a href="./nn.layers.html">layers</a></li><li class="active"><a href="./nn.optimizers.html">optimizers</a></li></ul></li><li class="open"><div class="menu-row"><a href="./stats.html">stats</a></div></li><li class="open"><div class="menu-row"><a href="./storage.html">storage</a></div></li>
+          <li class="open"><div class="menu-row"><a href="./vtl.html">vtl</a></div></li><li class="open"><div class="menu-row"><a href="./autograd.html">autograd</a></div></li><li class="open"><div class="menu-row"><a href="./datasets.html">datasets</a></div></li><li class="open"><div class="menu-row"><a href="./la.html">la</a></div></li><li class="open"><div class="menu-row"><svg xmlns="http://www.w3.org/2000/svg" class="dropdown-arrow" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M7 10l5 5 5-5z"/></svg><a href="./nn.html">nn</a></div><ul><li><a href="./nn.gates.activation.html">gates.activation</a></li><li><a href="./nn.gates.layers.html">gates.layers</a></li><li><a href="./nn.gates.loss.html">gates.loss</a></li><li><a href="./nn.internal.html">internal</a></li><li><a href="./nn.layers.html">layers</a></li><li class="active"><a href="./nn.optimizers.html">optimizers</a></li><li><a href="./nn.types.html">types</a></li></ul></li><li class="open"><div class="menu-row"><a href="./stats.html">stats</a></div></li><li class="open"><div class="menu-row"><a href="./storage.html">storage</a></div></li>
         </ul>
       </nav>
     </header>
@@ -63,8 +63,13 @@
 
 
 </section>
+						<section id="new_sgd_optimizer" class="doc-node">
+							<div class="title"><h2>fn new_sgd_optimizer <a href="#new_sgd_optimizer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/optimizers/sgd.v#L18"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">new_sgd_optimizer</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>config SgdOptimizerConfig<span class="token punctuation">)</span> <span class="token operator">&</span>SgdOptimizer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+
+
+</section>
 						<section id="AdamOptimizer<T>.build_params" class="doc-node">
-							<div class="title"><h2>fn (AdamOptimizer<T>) build_params <a href="#AdamOptimizer<T>.build_params">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/optimizers/adam.v#L37"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o AdamOptimizer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">build_params</span><span class="token punctuation">(</span>layes <span class="token punctuation">[</span><span class="token punctuation">]</span>nn<span class="token punctuation">.</span>Layer<span class="token punctuation">)</span></code></pre>
+							<div class="title"><h2>fn (AdamOptimizer<T>) build_params <a href="#AdamOptimizer<T>.build_params">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/optimizers/adam.v#L37"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o AdamOptimizer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">build_params</span><span class="token punctuation">(</span>layes <span class="token punctuation">[</span><span class="token punctuation">]</span>types<span class="token punctuation">.</span>Layer<span class="token punctuation">)</span></code></pre>
 
 
 </section>
@@ -74,7 +79,7 @@
 
 </section>
 						<section id="SgdOptimizer<T>.build_params" class="doc-node">
-							<div class="title"><h2>fn (SgdOptimizer<T>) build_params <a href="#SgdOptimizer<T>.build_params">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/optimizers/sgd.v#L24"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o SgdOptimizer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">build_params</span><span class="token punctuation">(</span>layes <span class="token punctuation">[</span><span class="token punctuation">]</span>nn<span class="token punctuation">.</span>Layer<span class="token punctuation">)</span></code></pre>
+							<div class="title"><h2>fn (SgdOptimizer<T>) build_params <a href="#SgdOptimizer<T>.build_params">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/optimizers/sgd.v#L24"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o SgdOptimizer<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">build_params</span><span class="token punctuation">(</span>layes <span class="token punctuation">[</span><span class="token punctuation">]</span>types<span class="token punctuation">.</span>Layer<span class="token punctuation">)</span></code></pre>
 
 
 </section>
@@ -127,10 +132,13 @@
 </section>
 
           <div class="footer">
-            Powered by vdoc. Generated on: 12 Apr 2022 04:03:30
+            Powered by vdoc. Generated on: 12 Apr 2022 04:16:19
           </div>
         </div>
         <div class="doc-toc"><ul><li class="open"><a href="#new_adam_optimizer">fn new_adam_optimizer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#new_sgd_optimizer">fn new_sgd_optimizer</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#AdamOptimizer<T>.build_params">type AdamOptimizer<T></a>        <ul>
