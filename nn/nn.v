@@ -39,3 +39,29 @@ pub fn (mut ls NeuralNetworkContainer<T>) maxpool2d(kernel []int, padding []int,
 	shape := []int{}
 	ls.layers << layers.new_maxpool2d_layer<T>(ls.ctx, shape, kernel, padding, stride)
 }
+
+// @todo: softmax_cross_entropy_loss
+pub fn (mut ls NeuralNetworkContainer<T>) softmax_cross_entropy_loss() {
+	// ls.loss =
+}
+
+// flatten adds a new flatten layer to the network.
+pub fn (mut ls NeuralNetworkContainer<T>) flatten() {
+	// shape := ls.layers[ls.layers.len - 1].output_shape()
+	shape := []int{}
+	ls.layers << layers.new_flatten_layer<T>(ls.ctx, shape)
+}
+
+// relu adds a new relu layer to the network.
+pub fn (mut ls NeuralNetworkContainer<T>) relu() {
+	// shape := ls.layers[ls.layers.len - 1].output_shape()
+	shape := []int{}
+	ls.layers << layers.new_relu_layer<T>(ls.ctx, shape)
+}
+
+// leaky_relu adds a new leaky_relu layer to the network.
+pub fn (mut ls NeuralNetworkContainer<T>) leaky_relu() {
+	// shape := ls.layers[ls.layers.len - 1].output_shape()
+	shape := []int{}
+	ls.layers << layers.new_leaky_relu_layer<T>(ls.ctx, shape)
+}

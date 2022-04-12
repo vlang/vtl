@@ -26,5 +26,5 @@ pub fn (g &SigmoidCrossEntropyGate<T>) cache<T>(mut result autograd.Variable<T>,
 	result.grad = vtl.zeros_like<T>(result.value)
 	result.requires_grad = true
 
-	register<T>('SigmoidCrossEntropy', g, result, ...args)
+	register<T>('SigmoidCrossEntropy', g, result, []&autograd.Variable<T>{})
 }
