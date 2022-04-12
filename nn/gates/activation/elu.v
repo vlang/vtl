@@ -24,5 +24,5 @@ pub fn (g &EluGate<T>) cache<T>(mut result autograd.Variable<T>, args ...autogra
 	result.grad = vtl.zeros_like<T>(result.value)
 	result.requires_grad = true
 
-	register<T>('Elu', g, result, ...args)
+	autograd.register<T>('Elu', g, result, []&autograd.Variable<T>{})
 }

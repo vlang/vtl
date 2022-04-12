@@ -24,5 +24,5 @@ pub fn (g &SigmoidGate<T>) cache<T>(mut result autograd.Variable<T>, args ...aut
 	result.grad = vtl.zeros_like<T>(result.value)
 	result.requires_grad = true
 
-	register<T>('Sigmoid', g, result, ...args)
+	autograd.register<T>('Sigmoid', g, result, []&autograd.Variable<T>{})
 }

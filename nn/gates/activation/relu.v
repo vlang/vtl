@@ -24,5 +24,5 @@ pub fn (g &ReLUGate<T>) cache<T>(mut result autograd.Variable<T>, args ...autogr
 	result.grad = vtl.zeros_like<T>(result.value)
 	result.requires_grad = true
 
-	register<T>('Softmax', g, result, ...args)
+	autograd.register<T>('Softmax', g, result, []&autograd.Variable<T>{})
 }

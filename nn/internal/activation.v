@@ -11,11 +11,11 @@ pub fn tanh<T>(x &vtl.Tensor<T>) &vtl.Tensor<T> {
 
 // deriv_tanh computes the derivative of tanh
 [inline]
-pub fn deriv_tanh<T>(grandient &vtl.Tensor<T>, cached &vtl.Tensor<T>) &vtl.Tensor<T> {
+pub fn deriv_tanh<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>) &vtl.Tensor<T> {
 	// gradient * (1 - cached * cached)
 	// gradient * (- (cached * cached) + 1)
 	x := vtl.add_scalar(vtl.multiply(cached, cached), T(1))
-	return vtl.multiply(grandient, vtl.multiply_scalar(x, T(-1)))
+	return vtl.multiply(gradient, vtl.multiply_scalar(x, T(-1)))
 }
 
 // sigmoid takes a real-valued number and squashes it to the range [0, 1]
@@ -33,7 +33,7 @@ pub fn sigmoid<T>(x &vtl.Tensor<T>) &vtl.Tensor<T> {
 
 // deriv_sigmoid computes the derivative of sigmoid
 [inline]
-pub fn deriv_sigmoid<T>(grandient &vtl.Tensor<T>, cached &vtl.Tensor<T>) &vtl.Tensor<T> {
+pub fn deriv_sigmoid<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>) &vtl.Tensor<T> {
 	mut ret := vtl.new_tensor_like<T>(gradient)
 	mut iters := vtl.iterators<T>([gradient, cached])
 	for {
@@ -59,7 +59,7 @@ pub fn relu<T>(x &vtl.Tensor<T>) &vtl.Tensor<T> {
 
 // deriv_relu computes the derivate of relu
 [inline]
-pub fn deriv_relu<T>(grandient &vtl.Tensor<T>, cached &vtl.Tensor<T>) &vtl.Tensor<T> {
+pub fn deriv_relu<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>) &vtl.Tensor<T> {
 	mut ret := vtl.new_tensor_like<T>(gradient)
 	mut iters := vtl.iterators<T>([gradient, cached])
 	for {
@@ -77,7 +77,10 @@ pub fn leaky_relu<T>(x &vtl.Tensor<T>, alpha T) &vtl.Tensor<T> {
 	mut iter := x.iterator()
 	for {
 		val, pos := iter.next() or { break }
-		next_val := if val < 0 { alpha * val } else { val }
+		mut next_val := val
+		if val < 0 {
+			next_val = alpha * val
+		}
 		ret.data.set<T>(pos, next_val)
 	}
 	return ret
@@ -85,12 +88,15 @@ pub fn leaky_relu<T>(x &vtl.Tensor<T>, alpha T) &vtl.Tensor<T> {
 
 // deriv_leaky_relu computes the derivative of leaky_relu
 [inline]
-pub fn deriv_leaky_relu<T>(grandient &vtl.Tensor<T>, cached &vtl.Tensor<T>, alpha T) &vtl.Tensor<T> {
+pub fn deriv_leaky_relu<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>, alpha T) &vtl.Tensor<T> {
 	mut ret := vtl.new_tensor_like<T>(gradient)
 	mut iters := vtl.iterators<T>([gradient, cached])
 	for {
 		vals, pos := vtl.iterators_next<T>(mut iters) or { break }
-		val := if vals[0] <= 0 { alpha * vals[1] } else { vals[1] }
+		mut val := vals[1]
+		if vals[0] < 0 {
+			val = alpha * vals[1]
+		}
 		ret.data.set<T>(pos, val)
 	}
 	return ret
@@ -111,7 +117,7 @@ pub fn elu<T>(x &vtl.Tensor<T>, alpha T) &vtl.Tensor<T> {
 
 // deriv_elu computes the derivative of elu
 [inline]
-pub fn deriv_elu<T>(grandient &vtl.Tensor<T>, cached &vtl.Tensor<T>, alpha T) &vtl.Tensor<T> {
+pub fn deriv_elu<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>, alpha T) &vtl.Tensor<T> {
 	mut ret := vtl.new_tensor_like<T>(gradient)
 	mut iters := vtl.iterators<T>([gradient, cached])
 	for {

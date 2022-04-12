@@ -3,7 +3,7 @@ module layers
 import vtl
 import vtl.autograd
 import vtl.nn.internal
-import vtl.nn.gates.layers
+import vtl.nn.gates.activation
 
 // ReLULayer is a layer that applies the rectified linear unit function element-wise.
 pub struct ReLULayer<T> {
@@ -29,7 +29,7 @@ pub fn (layer &ReLULayer<T>) forward(mut input autograd.Variable<T>) &autograd.V
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {
-		gate := layers.new_relu_gate<T>(input.value)
+		gate := activation.new_relu_gate<T>(input.value)
 		gate.cache(mut result, input)
 	}
 	return result
@@ -40,7 +40,7 @@ pub fn relu<T>(v &autograd.Variable<T>) &autograd.Variable<T> {
 	mut result := v.context.variable(output)
 
 	if v.requires_grad {
-		gate := layers.new_relu_gate<T>(v.value)
+		gate := activation.new_relu_gate<T>(v.value)
 		gate.cache(mut result, v)
 	}
 	return result
