@@ -1,7 +1,5 @@
 module types
 
-import vtl.autograd
-
 // Optimizer is a generic interface for all optimizers.
 pub interface Optimizer {
 	// mut:

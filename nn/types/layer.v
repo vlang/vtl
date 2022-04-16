@@ -1,7 +1,6 @@
 module types
 
-import vtl.autograd
-import vtl.nn.layers
+// import vtl.nn.layers
 
 // Layer is a generic interface for a neural network layer.
 pub interface Layer {
