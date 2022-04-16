@@ -40,7 +40,7 @@ pub fn inv<T>(t &vtl.Tensor<T>) &vtl.Tensor<T> {
 pub fn matmul<T>(a &vtl.Tensor<T>, b &vtl.Tensor<T>) &vtl.Tensor<T> {
 	ma := a.copy(.row_major)
 	mb := b.copy(.row_major)
-	mut dm := la.new_matrix(a.shape[0], b.shape[1])
+	mut dm := la.new_matrix<f64>(a.shape[0], b.shape[1])
 	mam := la.matrix_raw(a.shape[0], a.shape[1], arr_to_f64arr(ma.to_array()))
 	mbm := la.matrix_raw(b.shape[0], b.shape[1], arr_to_f64arr(mb.to_array()))
 	la.matrix_matrix_mul(mut dm, 1.0, mam, mbm)
