@@ -2,7 +2,6 @@ module layers
 
 import vtl
 import vtl.autograd
-import vtl.nn.internal
 
 pub struct FlattenGate<T> {
 pub:

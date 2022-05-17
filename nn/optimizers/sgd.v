@@ -2,7 +2,7 @@ module optimizers
 
 import vtl.autograd
 import vtl.nn.types
-import vtl
+// import vtl
 
 pub struct SgdOptimizer<T> {
 	learning_rate f64
