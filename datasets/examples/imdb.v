@@ -3,7 +3,7 @@ module main
 import vtl.datasets
 
 fn main() {
-	mut train_ds := datasets.load_imdb(.train, batch_size: 6) ?
+	mut train_ds := datasets.load_imdb(.train, batch_size: 6)?
 
 	mut i := 0
 	for {
