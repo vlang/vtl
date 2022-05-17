@@ -41,10 +41,10 @@ pub fn load_mnist(set_type DatasetType, data MnistDatasetConfig) ?&MnistDataset 
 		urls_names: {
 			filename: filename
 		}
-	) ?
+	)?
 
 	path := paths[filename]
-	content := os.read_file(path) ?
+	content := os.read_file(path)?
 
 	return &MnistDataset{
 		@type: set_type
