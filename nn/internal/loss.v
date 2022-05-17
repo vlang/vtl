@@ -2,7 +2,6 @@ module internal
 
 import math
 import vtl
-import vtl.stats
 
 pub fn mse_backward<T>(gradient &vtl.Tensor<T>, cache &vtl.Tensor<T>, target &vtl.Tensor<T>) []&vtl.Tensor<T> {
 	dup := vtl.add(gradient, gradient)
@@ -24,7 +23,7 @@ pub fn sigmoid_cross_entropy_backward<T>(gradient &vtl.Tensor<T>, cache &vtl.Ten
 }
 
 pub fn softmax_cross_entropy_backward<T>(gradient &vtl.Tensor<T>, cache &vtl.Tensor<T>, target &vtl.Tensor<T>) []&vtl.Tensor<T> {
-	batch_size := cache.shape[0]
+	// batch_size := cache.shape[0]
 	mut ret := vtl.new_tensor_like<T>(cache)
 	// @todo: implement softmax_cross_entropy_backward
 	return [ret]
