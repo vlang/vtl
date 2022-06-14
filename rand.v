@@ -1,7 +1,6 @@
 module vtl
 
 import rand
-import rand.dist
 import rand.seed
 import time
 
@@ -11,7 +10,7 @@ pub fn bernoulli<T>(prob f64, shape []int, params TensorData) &Tensor<T> {
 	mut iter := t.iterator()
 	for {
 		_, pos := iter.next() or { break }
-		rand_value := T(dist.bernoulli(prob))
+		rand_value := T(rand.bernoulli(prob))
 		t.data.set<T>(pos, rand_value)
 	}
 	return t
@@ -23,7 +22,7 @@ pub fn binomial<T>(n int, prob f64, shape []int, params TensorData) &Tensor<T> {
 	mut iter := t.iterator()
 	for {
 		_, pos := iter.next() or { break }
-		rand_value := T(dist.binomial(n, prob))
+		rand_value := T(rand.binomial(n, prob))
 		t.data.set<T>(pos, rand_value)
 	}
 	return t
@@ -35,7 +34,7 @@ pub fn exponential<T>(lambda f64, shape []int, params TensorData) &Tensor<T> {
 	mut iter := t.iterator()
 	for {
 		_, pos := iter.next() or { break }
-		rand_value := T(dist.exponential(lambda))
+		rand_value := T(rand.exponential(lambda))
 		t.data.set<T>(pos, rand_value)
 	}
 	return t
