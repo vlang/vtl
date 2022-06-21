@@ -151,8 +151,8 @@ fn tensor_str<T>(t &Tensor<T>, separator string, prefix string) string {
 		return '[]'
 	}
 	mut summary_insert := ''
-	mut data := t
-	if t.size > max_printable_size {
+	mut data := unsafe { t }
+	if t.size > vtl.max_printable_size {
 		summary_insert = '...'
 		data = leading_trailing<T>(t, 3, [], [])
 	}
