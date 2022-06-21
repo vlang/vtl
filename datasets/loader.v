@@ -37,7 +37,7 @@ fn load_from_url(data RawDownload) ?string {
 	}
 
 	res := http.get(data.url)?
-	content := res.text
+	content := res.body
 
 	os.write_file(cache_file_path, content)?
 

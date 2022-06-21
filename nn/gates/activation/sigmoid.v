@@ -17,7 +17,8 @@ pub fn new_sigmoid_gate<T>(cache &vtl.Tensor<T>) &SigmoidGate<T> {
 
 pub fn (g &SigmoidGate<T>) backward<T>(payload &autograd.Payload<T>) []&vtl.Tensor<T> {
 	gradient := payload.variable.grad
-	return [internal.deriv_sigmoid(gradient, g.cache)]
+        r0 := internal.deriv_sigmoid<T>(gradient, g.cache)
+	return [r0]
 }
 
 pub fn (g &SigmoidGate<T>) cache<T>(mut result autograd.Variable<T>, args ...autograd.CacheParam) {
