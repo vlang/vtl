@@ -18,8 +18,8 @@ pub mut:
 pub fn new_nnc<T>(ctx &autograd.Context<T>) &NeuralNetworkContainer<T> {
 	return &NeuralNetworkContainer<T>{
 		ctx: ctx
-                loss: voidptr(0)
-                optimizer: voidptr(0)
+		loss: voidptr(0)
+		optimizer: voidptr(0)
 	}
 }
 

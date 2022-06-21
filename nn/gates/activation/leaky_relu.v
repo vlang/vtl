@@ -17,7 +17,7 @@ pub fn new_leaky_relu_gate<T>(cache &vtl.Tensor<T>) &LeakyReluGate<T> {
 
 pub fn (g &LeakyReluGate<T>) backward<T>(payload &autograd.Payload<T>) []&vtl.Tensor<T> {
 	gradient := payload.variable.grad
-        r0 := internal.deriv_leaky_relu<T>(gradient, g.cache, T(0))
+	r0 := internal.deriv_leaky_relu<T>(gradient, g.cache, T(0))
 	return [r0]
 }
 
