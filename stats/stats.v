@@ -9,7 +9,7 @@ pub struct AxisData {
 
 // sum returns the sum of all elements of the given tensor
 pub fn sum<T>(t &vtl.Tensor<T>) T {
-	mut iter := t.iterator(data.axis)
+	mut iter := t.iterator()
 	mut acc := T(0)
 	for {
 		val, _ := iter.next() or { break }
