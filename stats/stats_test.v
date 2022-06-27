@@ -251,6 +251,38 @@ fn test_range() {
 	assert o == f64(68.242)
 }
 
+fn test_sum() {
+	// Tests were also verified on Wolfram Alpha
+	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)])
+	mut o := sum(data)
+	// Some issue with precision comparison in f64 using == operator hence serializing to string
+	assert tst_res(o.str(), '23.05')
+	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)])
+	o = sum(data)
+	// Some issue with precision comparison in f64 using == operator hence serializing to string
+	assert tst_res(o.str(), '70.6')
+	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)])
+	o = sum(data)
+	// Some issue with precision comparison in f64 using == operator hence serializing to string
+	assert tst_res(o.str(), '150.832')
+}
+
+fn test_prod() {
+	// Tests were also verified on Wolfram Alpha
+	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)])
+	mut o := prod(data)
+	// Some issue with precision comparison in f64 using == operator hence serializing to string
+	assert tst_res(o.str(), '708.885')
+	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)])
+	o = prod(data)
+	// Some issue with precision comparison in f64 using == operator hence serializing to string
+	assert tst_res(o.str(), '-1679.24988')
+	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)])
+	o = prod(data)
+	// Some issue with precision comparison in f64 using == operator hence serializing to string
+	assert tst_res(o.str(), '394671.621226')
+}
+
 fn test_passing_empty() {
 	data := vtl.from_1d([]f64{})
 	assert freq(data, 0) == 0
@@ -268,4 +300,6 @@ fn test_passing_empty() {
 	assert min(data) == f64(0)
 	assert max(data) == f64(0)
 	assert range(data) == f64(0)
+	assert sum(data) == f64(0)
+	assert prod(data) == f64(0)
 }

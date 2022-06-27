@@ -9,7 +9,7 @@ pub struct AxisData {
 
 // sum returns the sum of all elements of the given tensor
 pub fn sum<T>(t &vtl.Tensor<T>) T {
-	mut iter := t.iterator(data.axis)
+	mut iter := t.iterator()
 	mut acc := T(0)
 	for {
 		val, _ := iter.next() or { break }
@@ -42,11 +42,19 @@ pub fn sum_axis_with_dims<T>(t &vtl.Tensor<T>, data AxisData) T {
 	return acc
 }
 
-// prod_axis returns the product of a given Tensor along a provided
-// axis
+// prod returns the product of all elements of the given tensor
 pub fn prod<T>(t &vtl.Tensor<T>) T {
-	mut iter := t.iterator(data.axis)
-	mut acc := T(0)
+
+	/*
+	If the tensor is empty, his product is zero
+	We are returning it right way otherwise it will be set to 1
+	*/
+	if t.size == 0{
+		return f64(0)
+	}
+
+	mut iter := t.iterator()
+	mut acc := T(1)
 	for {
 		val, _ := iter.next() or { break }
 		acc *= val
