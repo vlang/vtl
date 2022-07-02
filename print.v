@@ -1,9 +1,5 @@
 module vtl
 
-const (
-	max_printable_size = 1000
-)
-
 // for arrays that are too large, calculate only the leading and trailing
 // items along each axis
 fn leading_trailing<T>(t &Tensor<T>, edgeitems int, lo []int, hi []int) &Tensor<T> {
@@ -147,6 +143,8 @@ fn format_array<T>(t &Tensor<T>, line_width int, next_line_prefix string, separa
 
 // public method for printing arrays, if custom behavior is needed
 fn tensor_str<T>(t &Tensor<T>, separator string, prefix string) string {
+	max_printable_size := 1000
+
 	if t.shape.len == 0 {
 		return '[]'
 	}
