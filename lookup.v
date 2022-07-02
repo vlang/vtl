@@ -22,6 +22,34 @@ pub fn (t &Tensor<T>) offset_index<T>(index []int) int {
 	return offset
 }
 
+// nth_index returns the nth index of a Tensor's shape
+[inline]
+pub fn (t &Tensor<T>) nth_index<T>(n int) []int {
+        rank := t.rank()
+        mut index := []int{len: rank}
+        for i in 0 .. rank {
+                index[i] = 0
+        }
+        mut i := 0
+        for {
+                if i == n {
+                        return index
+                }
+                i += 1
+                index[0] += 1
+                for j := 0; j < rank; j++ {
+                        if index[j] == t.shape[j] {
+                                index[j] = 0
+                                if j < rank - 1 {
+                                        index[j + 1] += 1
+                                }
+                        }
+                }
+        }
+
+        return index
+}
+
 // strided_offset_index returns the index of the starting offset
 // for arrays that may be negatively strided
 pub fn (t &Tensor<T>) strided_offset_index<T>() int {
