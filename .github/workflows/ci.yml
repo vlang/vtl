@@ -50,11 +50,7 @@ jobs:
           v check-md .
 
   fmt-check:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [ubuntu-20.04, ubuntu-18.04]
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout VTL
