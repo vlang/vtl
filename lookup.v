@@ -11,8 +11,7 @@ pub fn (t &Tensor<T>) get<T>(index []int) T {
 [inline]
 pub fn (t &Tensor<T>) get_nth<T>(n int) T {
 	index := t.nth_index(n)
-	offset := t.offset_index(index)
-	return t.data.get<T>(offset)
+	return t.get<T>(index)
 }
 
 // offset_index returns the index to a Tensor's data at
