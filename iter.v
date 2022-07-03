@@ -15,10 +15,7 @@ pub:
 	tensor       &Tensor<T>
 	next_handler IteratorStrategy
 pub mut:
-	coord       []int
-	backstrides []int
-	iteration   int
-	pos         int
+	iteration int
 }
 
 // iterator creates an iterator through a Tensor
@@ -31,18 +28,14 @@ pub fn (t &Tensor<T>) iterator<T>() &TensorIterator<T> {
 
 pub struct IteratorBuildData<T> {
 	next_handler IteratorStrategy
-	coord        []int
-	backstrides  []int
-	pos          int
+	start        int
 }
 
 // iterator creates an iterator through a Tensor with custom data
 pub fn (t &Tensor<T>) custom_iterator<T>(data IteratorBuildData<T>) &TensorIterator<T> {
 	return &TensorIterator<T>{
-		coord: data.coord
-		backstrides: data.backstrides
 		tensor: t
-		pos: data.pos
+		iteration: data.start
 		next_handler: data.next_handler
 	}
 }
@@ -57,11 +50,10 @@ pub fn (mut s TensorIterator<T>) next<T>() ?(T, int) {
 	defer {
 		s.iteration++
 	}
-	pos := s.pos
 	if s.next_handler == .flatten_iteration {
-		return handle_flatten_iteration<T>(mut s), pos
+		return handle_flatten_iteration<T>(mut s), s.iteration
 	}
-	return handle_strided_iteration<T>(mut s), pos
+	return handle_strided_iteration<T>(mut s), s.iteration
 }
 
 // iterators creates an array of iterators through a list of tensors
@@ -103,15 +95,15 @@ pub fn (mut its []&TensorIterator<T>) next<T>() ?([]T, int) {
 // which is either flat or strided and returns a list of Nums containing the current values
 pub fn iterators_next<T>(mut its []&TensorIterator<T>) ?([]T, int) {
 	mut nums := []T{cap: its.len}
-	mut pos := -1
+	mut n := -1
 	for i, mut iter in its {
-		val, pos_ := iter.next() or { return err }
+		val, n_ := iter.next() or { return err }
 		if i == 0 {
-			pos = pos_
+			n = n_
 		}
 		nums << T(val)
 	}
-	return nums, pos
+	return nums, n
 }
 
 fn (t &Tensor<T>) row_major_contiguous_iterator<T>() &TensorIterator<T> {
@@ -121,12 +113,8 @@ fn (t &Tensor<T>) row_major_contiguous_iterator<T>() &TensorIterator<T> {
 }
 
 fn (t &Tensor<T>) strided_iterator<T>() &TensorIterator<T> {
-	coord := []int{len: t.rank()}
 	return t.custom_iterator<T>(
-		coord: coord
-		backstrides: tensor_backstrides<T>(t)
 		next_handler: .strided_iteration
-		pos: t.strided_offset_index()
 	)
 }
 
@@ -134,25 +122,7 @@ fn (t &Tensor<T>) strided_iterator<T>() &TensorIterator<T> {
 // Tensor in Row-Major order
 fn handle_strided_iteration<T>(mut s TensorIterator<T>) T {
 	// get current value after update new position
-	val := s.tensor.data.get<T>(s.pos)
-	rank := s.tensor.rank()
-	shape := s.tensor.shape
-	strides := s.tensor.strides
-
-	for k := rank - 1; k >= 0; k-- {
-		if s.coord[k] < shape[k] - 1 {
-			s.coord[k]++
-			s.pos += strides[k]
-			break
-		} else {
-			if k == 0 {
-				// this will make the iterator finish
-				s.iteration = s.tensor.size()
-			}
-			s.coord[k] = 0
-			s.pos -= s.backstrides[k]
-		}
-	}
+	val := s.tensor.get_nth(s.iteration)
 	return val
 }
 
@@ -160,10 +130,7 @@ fn handle_strided_iteration<T>(mut s TensorIterator<T>) T {
 // in Row-Major order
 fn handle_flatten_iteration<T>(mut s TensorIterator<T>) T {
 	// get current value after update new position
-	val := s.tensor.data.get<T>(s.pos)
-	defer {
-		s.pos++
-	}
+	val := s.tensor.get_nth(s.iteration)
 	return val
 }
 

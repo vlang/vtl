@@ -24,9 +24,9 @@ pub fn sigmoid<T>(x &vtl.Tensor<T>) &vtl.Tensor<T> {
 	mut ret := vtl.new_tensor_like<T>(x)
 	mut iter := x.iterator()
 	for {
-		val, pos := iter.next() or { break }
+		val, i := iter.next() or { break }
 		next_val := T(1) / T(1) + T(math.exp(f64(val)))
-		ret.data.set<T>(pos, next_val)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -37,9 +37,9 @@ pub fn deriv_sigmoid<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>) &vtl.Ten
 	mut ret := vtl.new_tensor_like<T>(gradient)
 	mut iters := vtl.iterators<T>([gradient, cached])
 	for {
-		vals, pos := vtl.iterators_next<T>(mut iters) or { break }
+		vals, i := vtl.iterators_next<T>(mut iters) or { break }
 		val := vals[0] * (T(1) - vals[0]) * vals[1]
-		ret.data.set<T>(pos, val)
+		ret.set_nth(i, val)
 	}
 	return ret
 }
@@ -50,12 +50,12 @@ pub fn relu<T>(x &vtl.Tensor<T>) &vtl.Tensor<T> {
 	mut ret := vtl.new_tensor_like<T>(x)
 	mut iter := x.iterator()
 	for {
-		val, pos := iter.next() or { break }
+		val, i := iter.next() or { break }
 		mut next_val := val
 		if val < 0 {
 			next_val = T(0)
 		}
-		ret.data.set<T>(pos, next_val)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -66,12 +66,12 @@ pub fn deriv_relu<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>) &vtl.Tensor
 	mut ret := vtl.new_tensor_like<T>(gradient)
 	mut iters := vtl.iterators<T>([gradient, cached])
 	for {
-		vals, pos := vtl.iterators_next<T>(mut iters) or { break }
+		vals, i := vtl.iterators_next<T>(mut iters) or { break }
 		mut val := vals[0]
 		if vals[1] < 0 {
 			val = T(0)
 		}
-		ret.data.set<T>(pos, val)
+		ret.set_nth(i, val)
 	}
 	return ret
 }
@@ -82,12 +82,12 @@ pub fn leaky_relu<T>(x &vtl.Tensor<T>, alpha T) &vtl.Tensor<T> {
 	mut ret := vtl.new_tensor_like<T>(x)
 	mut iter := x.iterator()
 	for {
-		val, pos := iter.next() or { break }
+		val, i := iter.next() or { break }
 		mut next_val := val
 		if val < 0 {
 			next_val = alpha * val
 		}
-		ret.data.set<T>(pos, next_val)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -98,12 +98,12 @@ pub fn deriv_leaky_relu<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>, alpha
 	mut ret := vtl.new_tensor_like<T>(gradient)
 	mut iters := vtl.iterators<T>([gradient, cached])
 	for {
-		vals, pos := vtl.iterators_next<T>(mut iters) or { break }
+		vals, i := vtl.iterators_next<T>(mut iters) or { break }
 		mut val := vals[1]
 		if vals[0] < 0 {
 			val = alpha * vals[1]
 		}
-		ret.data.set<T>(pos, val)
+		ret.set_nth(i, val)
 	}
 	return ret
 }
@@ -114,12 +114,12 @@ pub fn elu<T>(x &vtl.Tensor<T>, alpha T) &vtl.Tensor<T> {
 	mut ret := vtl.new_tensor_like<T>(x)
 	mut iter := x.iterator()
 	for {
-		val, pos := iter.next() or { break }
+		val, i := iter.next() or { break }
 		mut next_val := val
 		if val < 0 {
 			next_val = alpha * (T(math.exp(f64(val))) - T(1))
 		}
-		ret.data.set<T>(pos, next_val)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -130,12 +130,12 @@ pub fn deriv_elu<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>, alpha T) &vt
 	mut ret := vtl.new_tensor_like<T>(gradient)
 	mut iters := vtl.iterators<T>([gradient, cached])
 	for {
-		vals, pos := vtl.iterators_next<T>(mut iters) or { break }
+		vals, i := vtl.iterators_next<T>(mut iters) or { break }
 		mut val := T(1)
 		if vals[0] < 0 {
 			val = T(math.exp(f64(vals[1])))
 		}
-		ret.data.set<T>(pos, val)
+		ret.set_nth(i, val)
 	}
 	return ret
 }
@@ -148,10 +148,10 @@ pub fn sigmoid_cross_entropy_with_logits<T>(input &vtl.Tensor<T>, target &vtl.Te
 	mut ret := vtl.new_tensor_like<T>(input)
 	mut iter := vtl.iterators<T>([input, target])
 	for {
-		vals, pos := vtl.iterators_next<T>(mut iter) or { break }
+		vals, i := vtl.iterators_next<T>(mut iter) or { break }
 		val := -(vals[1] * T(math.max(f64(0), f64(vals[0])))) - T(math.log(T(1) +
 			T(math.exp(f64(vals[0])))))
-		ret.data.set<T>(pos, val)
+		ret.set_nth(i, val)
 	}
 	return vtl.sum(ret) / T(batch_size)
 }
@@ -162,9 +162,9 @@ pub fn mse<T>(input &vtl.Tensor<T>, target &vtl.Tensor<T>) &vtl.Tensor<T> {
 	mut ret := vtl.new_tensor_like<T>(input)
 	mut iter := vtl.iterators<T>([input, target])
 	for {
-		vals, pos := vtl.iterators_next<T>(mut iter) or { break }
+		vals, i := vtl.iterators_next<T>(mut iter) or { break }
 		val := T(math.pow(f64(vals[0] - vals[1]), 2.0))
-		ret.data.set<T>(pos, val)
+		ret.set_nth(i, val)
 	}
 	return vtl.from_1d([vtl.mean(ret)])
 }
