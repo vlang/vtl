@@ -25,10 +25,13 @@ pub fn (t &Tensor<T>) offset_index<T>(index []int) int {
 			j += t.shape[i]
 		}
 		offset += j * t.strides[i]
+		if t.strides[i] < 0 {
+			offset += t.shape[i] - 1
+		}
 	}
 
 	if offset < 0 {
-		return t.size - 1 + offset
+		offset = t.size - 1 + offset
 	}
 
 	return offset

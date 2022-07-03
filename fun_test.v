@@ -44,8 +44,7 @@ fn test_negative_slice() {
 	a := from_array([1.0, 2, 3], [3])
 	slice := a.slice([0, 3, -1])
 	expected := from_array([3.0, 2, 1], [3])
-	// @todo: @ulises-jeremias to fix this
-	// assert equal(slice, expected)
+	assert equal(slice, expected)
 }
 
 fn test_slice_hilo() {
