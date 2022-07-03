@@ -10,8 +10,8 @@ pub fn (mut t Tensor<T>) set<T>(index []int, val T) {
 // set_nth copies a scalar value into a Tensor at the provided offset
 [inline]
 pub fn (mut t Tensor<T>) set_nth<T>(n int, val T) {
-        index := t.nth_index(n)
-        t.set<T>(index, val)
+	index := t.nth_index(n)
+	t.set<T>(index, val)
 }
 
 // fill fills an entire Tensor with a given value
@@ -25,7 +25,7 @@ pub fn (mut t Tensor<T>) fill<T>(val T) {
 pub fn (mut t Tensor<T>) assign<T>(other &Tensor<T>) {
 	mut iters := t.iterators<T>([other])
 	for {
-		vals, pos := iterators_next<T>(mut iters) or { break }
-		t.set_nth<T>(pos, vals[1])
+		vals, i := iterators_next<T>(mut iters) or { break }
+		t.set_nth<T>(i, vals[1])
 	}
 }

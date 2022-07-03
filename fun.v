@@ -16,9 +16,9 @@ module vtl
 // pub fn (mut t Tensor<T>) apply<T>(f ApplyFn<T>) {
 // 	mut iter := t.iterator()
 // 	for {
-// 		val, pos := iter.next() or { break }
-// 		next_val := f(val, pos)
-// 		t.data.set<T>(pos, next_val)
+// 		val, i := iter.next() or { break }
+// 		next_val := f(val, i)
+// 		t.data.set<T>(i, next_val)
 // 	}
 // }
 
@@ -27,9 +27,9 @@ module vtl
 // 	mut ret := new_tensor_like<T>(t)
 // 	mut iter := t.iterator()
 // 	for {
-// 		val, pos := iter.next() or { break }
-// 		next_val := f(val, pos)
-// 		ret.data.set<T>(pos, next_val)
+// 		val, i := iter.next() or { break }
+// 		next_val := f(val, i)
+// 		ret.data.set<T>(i, next_val)
 // 	}
 // 	return ret
 // }
@@ -39,8 +39,8 @@ module vtl
 // 	mut ret := init
 // 	mut iter := t.iterator()
 // 	for {
-// 		val, pos := iter.next() or { break }
-// 		ret = f(ret, val, pos)
+// 		val, i := iter.next() or { break }
+// 		ret = f(ret, val, i)
 // 	}
 // 	return ret
 // }
@@ -49,9 +49,9 @@ module vtl
 // pub fn (mut t Tensor<T>) napply<T>(f NApplyFn<T>, ts ...&Tensor<T>) {
 // 	mut iters := t.iterators<T>(ts)
 // 	for {
-// 		vals, pos := iterators_next<T>(mut iters) or { break }
-// 		val := f(vals, pos)
-// 		t.data.set<T>(pos, val)
+// 		vals, i := iterators_next<T>(mut iters) or { break }
+// 		val := f(vals, i)
+// 		t.data.set<T>(i, val)
 // 	}
 // }
 
@@ -60,9 +60,9 @@ module vtl
 // 	mut ret := new_tensor_like<T>(t)
 // 	mut iters := t.iterators<T>(ts)
 // 	for {
-// 		vals, pos := iterators_next<T>(mut iters) or { break }
-// 		val := f(vals, pos)
-// 		ret.data.set<T>(pos, val)
+// 		vals, i := iterators_next<T>(mut iters) or { break }
+// 		val := f(vals, i)
+// 		ret.data.set<T>(i, val)
 // 	}
 // 	return ret
 // }
@@ -72,8 +72,8 @@ module vtl
 // 	mut ret := init
 // 	mut iters := t.iterators<T>(ts)
 // 	for {
-// 		vals, pos := iterators_next<T>(mut iters) or { break }
-// 		ret = f(ret, vals, pos)
+// 		vals, i := iterators_next<T>(mut iters) or { break }
+// 		ret = f(ret, vals, i)
 // 	}
 // 	return ret
 // }

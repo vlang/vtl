@@ -24,8 +24,8 @@ pub fn (g &PowGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
 		vals, pos := vtl.iterators_next<T>(mut iters) or { break }
 		val0 := vals[0] * vals[2] * T(math.pow(f64(vals[1]), f64(vals[2]) - 1))
 		val1 := vals[0] * T(math.pow(f64(vals[1]), f64(vals[2]))) * T(math.log(f64(vals[1])))
-		r0.data.set<T>(pos, val0)
-		r1.data.set<T>(pos, val1)
+		r0.set_nth(pos, val0)
+		r1.set_nth(pos, val1)
 	}
 	return [r0, r1]
 }

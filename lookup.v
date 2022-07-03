@@ -7,6 +7,14 @@ pub fn (t &Tensor<T>) get<T>(index []int) T {
 	return t.data.get<T>(offset)
 }
 
+// get_nth returns a scalar value from a Tensor at the provided index
+[inline]
+pub fn (t &Tensor<T>) get_nth<T>(n int) T {
+	index := t.nth_index(n)
+	offset := t.offset_index(index)
+	return t.data.get<T>(offset)
+}
+
 // offset_index returns the index to a Tensor's data at
 // a given index
 [inline]
@@ -19,35 +27,40 @@ pub fn (t &Tensor<T>) offset_index<T>(index []int) int {
 		}
 		offset += j * t.strides[i]
 	}
+
+	if offset < 0 {
+		return t.size - 1 + offset
+	}
+
 	return offset
 }
 
 // nth_index returns the nth index of a Tensor's shape
-[inline]
+// for `n == 2` and a `shape` of `[2, 2]` the _nth index_ is `[1, 0]`
+// and for a `shape` of `[2, 3]` and `n == 3` the _nth index_ is `[0, 1, 1]`
+// in sorted order.
 pub fn (t &Tensor<T>) nth_index<T>(n int) []int {
-        rank := t.rank()
-        mut index := []int{len: rank}
-        for i in 0 .. rank {
-                index[i] = 0
-        }
-        mut i := 0
-        for {
-                if i == n {
-                        return index
-                }
-                i += 1
-                index[0] += 1
-                for j := 0; j < rank; j++ {
-                        if index[j] == t.shape[j] {
-                                index[j] = 0
-                                if j < rank - 1 {
-                                        index[j + 1] += 1
-                                }
-                        }
-                }
-        }
+	rank := t.rank()
+	mut index := []int{len: rank}
+	for i in 0 .. rank {
+		index[i] = 0
+	}
+	mut i := 0
+	for {
+		if i == n {
+			return index
+		}
+		i += 1
+		for j := rank - 1; j >= 0; j -= 1 {
+			if index[j] < t.shape[j] - 1 {
+				index[j] += 1
+				break
+			}
+			index[j] = 0
+		}
+	}
 
-        return index
+	return index
 }
 
 // strided_offset_index returns the index of the starting offset
