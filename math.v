@@ -14,9 +14,9 @@ pub fn abs<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_abs<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_abs<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -33,9 +33,9 @@ pub fn acos<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_acos<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_acos<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -52,9 +52,9 @@ pub fn acosh<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_acosh<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_acosh<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -71,9 +71,9 @@ pub fn asin<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_asin<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_asin<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -90,9 +90,9 @@ pub fn asinh<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_asinh<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_asinh<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -109,9 +109,9 @@ pub fn atan<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_atan<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_atan<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -130,9 +130,9 @@ pub fn atan2<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(a)
 	mut iters := iterators<T>([a, b])
 	for {
-		vals, pos := iterators_next<T>(mut iters) or { break }
-		val := handle_atan2<T>(vals, pos)
-		ret.data.set<T>(pos, val)
+		vals, i := iterators_next<T>(mut iters) or { break }
+		val := handle_atan2<T>(vals, i)
+		ret.set_nth(i, val)
 	}
 	return ret
 }
@@ -149,9 +149,9 @@ pub fn atanh<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_atanh<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_atanh<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -168,9 +168,9 @@ pub fn cbrt<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_cbrt<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_cbrt<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -187,9 +187,9 @@ pub fn ceil<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_ceil<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_ceil<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -206,9 +206,9 @@ pub fn cos<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_cos<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_cos<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -225,9 +225,9 @@ pub fn cosh<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_cosh<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_cosh<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -244,9 +244,9 @@ pub fn cot<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_cot<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_cot<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -263,9 +263,9 @@ pub fn degrees<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_degrees<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_degrees<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -282,9 +282,9 @@ pub fn erf<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_erf<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_erf<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -301,9 +301,9 @@ pub fn erfc<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_erfc<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_erfc<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -320,9 +320,9 @@ pub fn exp<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_exp<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_exp<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -339,9 +339,9 @@ pub fn exp2<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_exp2<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_exp2<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -358,9 +358,9 @@ pub fn expm1<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_expm1<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_expm1<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -377,9 +377,9 @@ pub fn f32_bits<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_f32_bits<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_f32_bits<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -396,9 +396,9 @@ pub fn f32_from_bits<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_f32_from_bits<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_f32_from_bits<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -415,9 +415,9 @@ pub fn f64_bits<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_f64_bits<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_f64_bits<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -434,9 +434,9 @@ pub fn f64_from_bits<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_f64_from_bits<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_f64_from_bits<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -453,9 +453,9 @@ pub fn factorial<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_factorial<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_factorial<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -472,9 +472,9 @@ pub fn floor<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_floor<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_floor<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -493,9 +493,9 @@ pub fn fmod<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(a)
 	mut iters := iterators<T>([a, b])
 	for {
-		vals, pos := iterators_next<T>(mut iters) or { break }
-		val := handle_fmod<T>(vals, pos)
-		ret.data.set<T>(pos, val)
+		vals, i := iterators_next<T>(mut iters) or { break }
+		val := handle_fmod<T>(vals, i)
+		ret.set_nth(i, val)
 	}
 	return ret
 }
@@ -512,9 +512,9 @@ pub fn gamma<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_gamma<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_gamma<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -533,9 +533,9 @@ pub fn gcd<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(a)
 	mut iters := iterators<T>([a, b])
 	for {
-		vals, pos := iterators_next<T>(mut iters) or { break }
-		val := handle_gcd<T>(vals, pos)
-		ret.data.set<T>(pos, val)
+		vals, i := iterators_next<T>(mut iters) or { break }
+		val := handle_gcd<T>(vals, i)
+		ret.set_nth(i, val)
 	}
 	return ret
 }
@@ -554,9 +554,9 @@ pub fn hypot<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(a)
 	mut iters := iterators<T>([a, b])
 	for {
-		vals, pos := iterators_next<T>(mut iters) or { break }
-		val := handle_hypot<T>(vals, pos)
-		ret.data.set<T>(pos, val)
+		vals, i := iterators_next<T>(mut iters) or { break }
+		val := handle_hypot<T>(vals, i)
+		ret.set_nth(i, val)
 	}
 	return ret
 }
@@ -575,9 +575,9 @@ pub fn lcm<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(a)
 	mut iters := iterators<T>([a, b])
 	for {
-		vals, pos := iterators_next<T>(mut iters) or { break }
-		val := handle_lcm<T>(vals, pos)
-		ret.data.set<T>(pos, val)
+		vals, i := iterators_next<T>(mut iters) or { break }
+		val := handle_lcm<T>(vals, i)
+		ret.set_nth(i, val)
 	}
 	return ret
 }
@@ -594,9 +594,9 @@ pub fn log<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_log<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_log<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -613,9 +613,9 @@ pub fn log10<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_log10<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_log10<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -632,9 +632,9 @@ pub fn log1p<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_log1p<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_log1p<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -651,9 +651,9 @@ pub fn log2<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_log2<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_log2<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -670,9 +670,9 @@ pub fn log_factorial<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_log_factorial<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_log_factorial<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -689,9 +689,9 @@ pub fn log_gamma<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_log_gamma<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_log_gamma<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -710,9 +710,9 @@ pub fn log_n<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(a)
 	mut iters := iterators<T>([a, b])
 	for {
-		vals, pos := iterators_next<T>(mut iters) or { break }
-		val := handle_log_n<T>(vals, pos)
-		ret.data.set<T>(pos, val)
+		vals, i := iterators_next<T>(mut iters) or { break }
+		val := handle_log_n<T>(vals, i)
+		ret.set_nth(i, val)
 	}
 	return ret
 }
@@ -731,9 +731,9 @@ pub fn max<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(a)
 	mut iters := iterators<T>([a, b])
 	for {
-		vals, pos := iterators_next<T>(mut iters) or { break }
-		val := handle_max<T>(vals, pos)
-		ret.data.set<T>(pos, val)
+		vals, i := iterators_next<T>(mut iters) or { break }
+		val := handle_max<T>(vals, i)
+		ret.set_nth(i, val)
 	}
 	return ret
 }
@@ -752,9 +752,9 @@ pub fn min<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(a)
 	mut iters := iterators<T>([a, b])
 	for {
-		vals, pos := iterators_next<T>(mut iters) or { break }
-		val := handle_min<T>(vals, pos)
-		ret.data.set<T>(pos, val)
+		vals, i := iterators_next<T>(mut iters) or { break }
+		val := handle_min<T>(vals, i)
+		ret.set_nth(i, val)
 	}
 	return ret
 }
@@ -773,9 +773,9 @@ pub fn nextafter<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(a)
 	mut iters := iterators<T>([a, b])
 	for {
-		vals, pos := iterators_next<T>(mut iters) or { break }
-		val := handle_nextafter<T>(vals, pos)
-		ret.data.set<T>(pos, val)
+		vals, i := iterators_next<T>(mut iters) or { break }
+		val := handle_nextafter<T>(vals, i)
+		ret.set_nth(i, val)
 	}
 	return ret
 }
@@ -794,9 +794,9 @@ pub fn nextafter32<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(a)
 	mut iters := iterators<T>([a, b])
 	for {
-		vals, pos := iterators_next<T>(mut iters) or { break }
-		val := handle_nextafterf32<T>(vals, pos)
-		ret.data.set<T>(pos, val)
+		vals, i := iterators_next<T>(mut iters) or { break }
+		val := handle_nextafterf32<T>(vals, i)
+		ret.set_nth(i, val)
 	}
 	return ret
 }
@@ -815,9 +815,9 @@ pub fn pow<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(a)
 	mut iters := iterators<T>([a, b])
 	for {
-		vals, pos := iterators_next<T>(mut iters) or { break }
-		val := handle_pow<T>(vals, pos)
-		ret.data.set<T>(pos, val)
+		vals, i := iterators_next<T>(mut iters) or { break }
+		val := handle_pow<T>(vals, i)
+		ret.set_nth(i, val)
 	}
 	return ret
 }
@@ -834,9 +834,9 @@ pub fn pow10<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_pow10<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_pow10<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -853,9 +853,9 @@ pub fn radians<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_radians<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_radians<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -872,9 +872,9 @@ pub fn round<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_round<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_round<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -891,9 +891,9 @@ pub fn round_to_even<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_round_to_even<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_round_to_even<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -910,9 +910,9 @@ pub fn sin<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_sin<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_sin<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -929,9 +929,9 @@ pub fn sinh<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_sinh<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_sinh<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -948,9 +948,9 @@ pub fn sqrt<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_sqrt<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_sqrt<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -967,9 +967,9 @@ pub fn tan<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_tan<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_tan<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -986,9 +986,9 @@ pub fn tanh<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_tanh<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_tanh<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -1005,9 +1005,9 @@ pub fn trunc<T>(t &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_trunc<T>(val, pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_trunc<T>(val, i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }

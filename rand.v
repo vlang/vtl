@@ -9,9 +9,9 @@ pub fn bernoulli<T>(prob f64, shape []int, params TensorData) &Tensor<T> {
 	mut t := zeros<T>(shape, params)
 	mut iter := t.iterator()
 	for {
-		_, pos := iter.next() or { break }
+		_, i := iter.next() or { break }
 		rand_value := T(rand.bernoulli(prob))
-		t.data.set<T>(pos, rand_value)
+		t.set_nth(i, rand_value)
 	}
 	return t
 }
@@ -21,9 +21,9 @@ pub fn binomial<T>(n int, prob f64, shape []int, params TensorData) &Tensor<T> {
 	mut t := zeros<T>(shape, params)
 	mut iter := t.iterator()
 	for {
-		_, pos := iter.next() or { break }
+		_, i := iter.next() or { break }
 		rand_value := T(rand.binomial(n, prob))
-		t.data.set<T>(pos, rand_value)
+		t.set_nth(i, rand_value)
 	}
 	return t
 }
@@ -33,9 +33,9 @@ pub fn exponential<T>(lambda f64, shape []int, params TensorData) &Tensor<T> {
 	mut t := zeros<T>(shape, params)
 	mut iter := t.iterator()
 	for {
-		_, pos := iter.next() or { break }
+		_, i := iter.next() or { break }
 		rand_value := T(rand.exponential(lambda))
-		t.data.set<T>(pos, rand_value)
+		t.set_nth(i, rand_value)
 	}
 	return t
 }
@@ -46,9 +46,9 @@ pub fn random<T>(min T, max T, shape []int, params TensorData) &Tensor<T> {
 	mut t := zeros<T>(shape, params)
 	mut iter := t.iterator()
 	for {
-		_, pos := iter.next() or { break }
+		_, i := iter.next() or { break }
 		rand_value := random_in_range<T>(min, max)
-		t.data.set<T>(pos, rand_value)
+		t.set_nth(i, rand_value)
 	}
 	return t
 }

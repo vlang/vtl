@@ -63,6 +63,6 @@ pub fn (mut s TensorAxisIterator<T>) next<T>() ?(T, int) {
 		s.iteration++
 		s.pos += s.inc
 	}
-	val := s.tensor.data.get<T>(s.pos)
+	val := s.tensor.get_nth(s.pos)
 	return val, s.pos
 }

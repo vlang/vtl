@@ -6,9 +6,9 @@ pub fn dropout<T>(input &vtl.Tensor<T>, mask &vtl.Tensor<T>, prob f64) &vtl.Tens
 	mut ret := vtl.new_tensor_like<T>(input)
 	mut iters := vtl.iterators<T>([input, mask])
 	for {
-		vals, pos := vtl.iterators_next<T>(mut iters) or { break }
+		vals, i := vtl.iterators_next<T>(mut iters) or { break }
 		val := vals[0] * vals[1] / T(prob)
-		ret.data.set<T>(pos, val)
+		ret.set_nth(i, val)
 	}
 	return ret
 }
@@ -17,9 +17,9 @@ pub fn dropout_backwards<T>(gradient &vtl.Tensor<T>, mask &vtl.Tensor<T>, prob f
 	mut ret := vtl.new_tensor_like<T>(gradient)
 	mut iters := vtl.iterators<T>([gradient, mask])
 	for {
-		vals, pos := vtl.iterators_next<T>(mut iters) or { break }
+		vals, i := vtl.iterators_next<T>(mut iters) or { break }
 		val := vals[0] * vals[1] / T(prob)
-		ret.data.set<T>(pos, val)
+		ret.set_nth(i, val)
 	}
 	return ret
 }
@@ -53,7 +53,7 @@ pub fn maxpool2d_backward<T>(shape []int, max_indices &vtl.Tensor<int>, grad_out
 	mut ret := vtl.zeros<T>(shape)
 	for i in 0 .. grad_output.size {
 		idx := max_indices.data.get(i)
-		ret.data.set<T>(idx, grad_output.data.get(i))
+		ret.set_nth(idx, grad_output.data.get(i))
 	}
 	return ret
 }

@@ -12,9 +12,9 @@ pub fn add<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(a)
 	mut iters := iterators<T>([a, b])
 	for {
-		vals, pos := iterators_next<T>(mut iters) or { break }
-		val := handle_add<T>(vals, pos)
-		ret.data.set<T>(pos, val)
+		vals, i := iterators_next<T>(mut iters) or { break }
+		val := handle_add<T>(vals, i)
+		ret.set_nth(i, val)
 	}
 	return ret
 }
@@ -26,9 +26,9 @@ pub fn add_scalar<T>(a &Tensor<T>, scalar T) &Tensor<T> {
 	mut ret := new_tensor_like<T>(a)
 	mut iter := a.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_add<T>([val, scalar], pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_add<T>([val, scalar], i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -45,9 +45,9 @@ pub fn substract<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(a)
 	mut iters := iterators<T>([a, b])
 	for {
-		vals, pos := iterators_next<T>(mut iters) or { break }
-		val := handle_substract<T>(vals, pos)
-		ret.data.set<T>(pos, val)
+		vals, i := iterators_next<T>(mut iters) or { break }
+		val := handle_substract<T>(vals, i)
+		ret.set_nth(i, val)
 	}
 	return ret
 }
@@ -59,9 +59,9 @@ pub fn substract_scalar<T>(a &Tensor<T>, scalar T) &Tensor<T> {
 	mut ret := new_tensor_like<T>(a)
 	mut iter := a.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_substract<T>([val, scalar], pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_substract<T>([val, scalar], i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -78,9 +78,9 @@ pub fn divide<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(a)
 	mut iters := iterators<T>([a, b])
 	for {
-		vals, pos := iterators_next<T>(mut iters) or { break }
-		val := handle_divide<T>(vals, pos)
-		ret.data.set<T>(pos, val)
+		vals, i := iterators_next<T>(mut iters) or { break }
+		val := handle_divide<T>(vals, i)
+		ret.set_nth(i, val)
 	}
 	return ret
 }
@@ -92,9 +92,9 @@ pub fn divide_scalar<T>(a &Tensor<T>, scalar T) &Tensor<T> {
 	mut ret := new_tensor_like<T>(a)
 	mut iter := a.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_divide<T>([val, scalar], pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_divide<T>([val, scalar], i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }
@@ -111,9 +111,9 @@ pub fn multiply<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	mut ret := new_tensor_like<T>(a)
 	mut iters := iterators<T>([a, b])
 	for {
-		vals, pos := iterators_next<T>(mut iters) or { break }
-		val := handle_multiply<T>(vals, pos)
-		ret.data.set<T>(pos, val)
+		vals, i := iterators_next<T>(mut iters) or { break }
+		val := handle_multiply<T>(vals, i)
+		ret.set_nth(i, val)
 	}
 	return ret
 }
@@ -125,9 +125,9 @@ pub fn multiply_scalar<T>(a &Tensor<T>, scalar T) &Tensor<T> {
 	mut ret := new_tensor_like<T>(a)
 	mut iter := a.iterator()
 	for {
-		val, pos := iter.next() or { break }
-		next_val := handle_multiply<T>([val, scalar], pos)
-		ret.data.set<T>(pos, next_val)
+		val, i := iter.next() or { break }
+		next_val := handle_multiply<T>([val, scalar], i)
+		ret.set_nth(i, next_val)
 	}
 	return ret
 }

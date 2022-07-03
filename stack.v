@@ -90,7 +90,7 @@ pub fn concatenate<T>(ts []&Tensor<T>, data AxisData) &Tensor<T> {
 pub fn expand_dims<T>(t &Tensor<T>, data AxisData) &Tensor<T> {
 	axis := data.axis
 	mut newshape := []int{}
-	newaxis := match (axis < 0) {
+	newaxis := match axis < 0 {
 		true { axis + t.rank() + 1 }
 		else { axis }
 	}
