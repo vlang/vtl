@@ -1,3 +1,0 @@
-# V Tensor Library
-
-- TODO

@@ -37,7 +37,7 @@ pub fn from_array<T>(arr []T, shape []int, params TensorData) &Tensor<T> {
 }
 
 // new_tensor allocates a Tensor onto specified device with a given data
-fn new_tensor<T>(init T, shape []int, params TensorData) &Tensor<T> {
+pub fn new_tensor<T>(init T, shape []int, params TensorData) &Tensor<T> {
 	if shape.len == 0 {
 		data_storage := storage.new_storage<T>(1, 0, init)
 		return &Tensor<T>{
