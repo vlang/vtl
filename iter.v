@@ -43,7 +43,7 @@ pub fn (t &Tensor<T>) custom_iterator<T>(data IteratorBuildData<T>) &TensorItera
 // next calls the iteration type for a given iterator
 // which is either flat or strided and returns a Num containing the current value
 [inline]
-pub fn (mut s TensorIterator<T>) next<T>() ?(T, int) {
+pub fn (mut s TensorIterator<T>) next<T>() ?(T, []int) {
 	if s.iteration >= s.tensor.size() {
 		return none
 	}
@@ -51,9 +51,9 @@ pub fn (mut s TensorIterator<T>) next<T>() ?(T, int) {
 		s.iteration++
 	}
 	if s.next_handler == .flatten_iteration {
-		return handle_flatten_iteration<T>(mut s), s.iteration
+		return handle_flatten_iteration<T>(mut s), s.tensor.nth_index(s.iteration)
 	}
-	return handle_strided_iteration<T>(mut s), s.iteration
+	return handle_strided_iteration<T>(mut s), s.tensor.nth_index(s.iteration)
 }
 
 // iterators creates an array of iterators through a list of tensors
@@ -87,23 +87,23 @@ pub fn iterators<T>(ts []&Tensor<T>) []&TensorIterator<T> {
 // next calls the iteration type for a given list of iterators
 // which is either flat or strided and returns a list of Nums containing the current values
 [inline]
-pub fn (mut its []&TensorIterator<T>) next<T>() ?([]T, int) {
+pub fn (mut its []&TensorIterator<T>) next<T>() ?([]T, []int) {
 	return iterators_next<T>(mut its)
 }
 
 // iterators_next calls the iteration type for a given list of iterators
 // which is either flat or strided and returns a list of Nums containing the current values
-pub fn iterators_next<T>(mut its []&TensorIterator<T>) ?([]T, int) {
+pub fn iterators_next<T>(mut its []&TensorIterator<T>) ?([]T, []int) {
 	mut nums := []T{cap: its.len}
-	mut n := -1
+	mut index := []int{}
 	for i, mut iter in its {
-		val, n_ := iter.next() or { return err }
+		val, index_ := iter.next() or { return err }
 		if i == 0 {
-			n = n_
+			index = index_.clone()
 		}
 		nums << T(val)
 	}
-	return nums, n
+	return nums, index
 }
 
 fn (t &Tensor<T>) row_major_contiguous_iterator<T>() &TensorIterator<T> {

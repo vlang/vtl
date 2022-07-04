@@ -1,16 +1,16 @@
 module vtl
 
-// pub type MapFn<T> = fn (x T, i int) T
+// pub type MapFn<T> = fn (x T, i []int) T
 
-// pub type ApplyFn<T> = fn (x T, i int) T
+// pub type ApplyFn<T> = fn (x T, i []int) T
 
-// pub type ReducerFn<T> = fn (acc T, x T, i int) T
+// pub type ReducerFn<T> = fn (acc T, x T, i []int) T
 
-// pub type NMapFn<T> = fn (x []T, i int) T
+// pub type NMapFn<T> = fn (x []T, i []int) T
 
-// pub type NApplyFn<T> = fn (x []T, i int) T
+// pub type NApplyFn<T> = fn (x []T, i []int) T
 
-// pub type NReducerFn<T> = fn (acc T, x []T, i int) T
+// pub type NReducerFn<T> = fn (acc T, x []T, i []int) T
 
 // // apply applies a function to each element of a given Tensor
 // pub fn (mut t Tensor<T>) apply<T>(f ApplyFn<T>) {

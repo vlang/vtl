@@ -1,6 +1,6 @@
 module vtl
 
-fn handle_add<T>(xs []T, _ int) T {
+fn handle_add<T>(xs []T, _ []int) T {
 	return xs[0] + xs[1]
 }
 
@@ -14,7 +14,7 @@ pub fn add<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
 		val := handle_add<T>(vals, i)
-		ret.set_nth(i, val)
+		ret.set(i, val)
 	}
 	return ret
 }
@@ -28,12 +28,12 @@ pub fn add_scalar<T>(a &Tensor<T>, scalar T) &Tensor<T> {
 	for {
 		val, i := iter.next() or { break }
 		next_val := handle_add<T>([val, scalar], i)
-		ret.set_nth(i, next_val)
+		ret.set(i, next_val)
 	}
 	return ret
 }
 
-fn handle_substract<T>(xs []T, _ int) T {
+fn handle_substract<T>(xs []T, _ []int) T {
 	return xs[0] - xs[1]
 }
 
@@ -47,7 +47,7 @@ pub fn substract<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
 		val := handle_substract<T>(vals, i)
-		ret.set_nth(i, val)
+		ret.set(i, val)
 	}
 	return ret
 }
@@ -61,12 +61,12 @@ pub fn substract_scalar<T>(a &Tensor<T>, scalar T) &Tensor<T> {
 	for {
 		val, i := iter.next() or { break }
 		next_val := handle_substract<T>([val, scalar], i)
-		ret.set_nth(i, next_val)
+		ret.set(i, next_val)
 	}
 	return ret
 }
 
-fn handle_divide<T>(xs []T, _ int) T {
+fn handle_divide<T>(xs []T, _ []int) T {
 	return xs[0] / xs[1]
 }
 
@@ -80,7 +80,7 @@ pub fn divide<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
 		val := handle_divide<T>(vals, i)
-		ret.set_nth(i, val)
+		ret.set(i, val)
 	}
 	return ret
 }
@@ -94,12 +94,12 @@ pub fn divide_scalar<T>(a &Tensor<T>, scalar T) &Tensor<T> {
 	for {
 		val, i := iter.next() or { break }
 		next_val := handle_divide<T>([val, scalar], i)
-		ret.set_nth(i, next_val)
+		ret.set(i, next_val)
 	}
 	return ret
 }
 
-fn handle_multiply<T>(xs []T, _ int) T {
+fn handle_multiply<T>(xs []T, _ []int) T {
 	return xs[0] * xs[1]
 }
 
@@ -113,7 +113,7 @@ pub fn multiply<T>(a &Tensor<T>, b &Tensor<T>) &Tensor<T> {
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
 		val := handle_multiply<T>(vals, i)
-		ret.set_nth(i, val)
+		ret.set(i, val)
 	}
 	return ret
 }
@@ -127,7 +127,7 @@ pub fn multiply_scalar<T>(a &Tensor<T>, scalar T) &Tensor<T> {
 	for {
 		val, i := iter.next() or { break }
 		next_val := handle_multiply<T>([val, scalar], i)
-		ret.set_nth(i, next_val)
+		ret.set(i, next_val)
 	}
 	return ret
 }

@@ -55,7 +55,7 @@ pub fn (t &Tensor<T>) axis_with_dims_iterator<T>(axis int) &TensorAxisIterator<T
 // next calls the iteration type for a given iterator
 // which is either flat or strided and returns a Num containing the current value
 [inline]
-pub fn (mut s TensorAxisIterator<T>) next<T>() ?(T, int) {
+pub fn (mut s TensorAxisIterator<T>) next<T>() ?(T, []int) {
 	if s.iteration >= s.tensor.shape[s.axis] {
 		return none
 	}
@@ -64,5 +64,5 @@ pub fn (mut s TensorAxisIterator<T>) next<T>() ?(T, int) {
 		s.pos += s.inc
 	}
 	val := s.tensor.get_nth(s.pos)
-	return val, s.pos
+	return val, s.tensor.nth_index(s.pos)
 }

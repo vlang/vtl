@@ -17,7 +17,7 @@ pub fn sigmoid_cross_entropy_backward<T>(gradient &vtl.Tensor<T>, cache &vtl.Ten
 	for {
 		vals, i := vtl.iterators_next<T>(mut iter) or { break }
 		val := vals[0] * (T(1) / T(1) + T(math.exp(-f64(vals[1]))) - vals[1]) / T(batch_size)
-		ret.set_nth(i, val)
+		ret.set(i, val)
 	}
 	return [ret]
 }
