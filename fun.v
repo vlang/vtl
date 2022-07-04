@@ -1,16 +1,16 @@
 module vtl
 
-pub type MapFn<T> = fn (x T, i int) T
+pub type MapFn<T> = fn (x T, i []int) T
 
-pub type ApplyFn<T> = fn (x T, i int) T
+pub type ApplyFn<T> = fn (x T, i []int) T
 
-pub type ReducerFn<T> = fn (acc T, x T, i int) T
+pub type ReducerFn<T> = fn (acc T, x T, i []int) T
 
-pub type NMapFn<T> = fn (x []T, i int) T
+pub type NMapFn<T> = fn (x []T, i []int) T
 
-pub type NApplyFn<T> = fn (x []T, i int) T
+pub type NApplyFn<T> = fn (x []T, i []int) T
 
-pub type NReducerFn<T> = fn (acc T, x []T, i int) T
+pub type NReducerFn<T> = fn (acc T, x []T, i []int) T
 
 // // apply applies a function to each element of a given Tensor
 pub fn (mut t Tensor<T>) apply<T>(f ApplyFn<T>) {
@@ -18,7 +18,7 @@ pub fn (mut t Tensor<T>) apply<T>(f ApplyFn<T>) {
 	for {
 		val, i := iter.next() or { break }
 		next_val := f(val, i)
-		t.data.set<T>(i, next_val)
+		t.set(i, next_val)
 	}
 }
 
@@ -29,7 +29,7 @@ pub fn (t &Tensor<T>) map<T>(f MapFn<T>) &Tensor<T> {
 	for {
 		val, i := iter.next() or { break }
 		next_val := f(val, i)
-		ret.data.set<T>(i, next_val)
+		ret.set(i, next_val)
 	}
 	return ret
 }
@@ -51,7 +51,7 @@ pub fn (mut t Tensor<T>) napply<T>(f NApplyFn<T>, ts []&Tensor<T>) {
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
 		val := f(vals, i)
-		t.data.set<T>(i, val)
+		t.set(i, val)
 	}
 }
 
@@ -62,7 +62,7 @@ pub fn (t &Tensor<T>) nmap<T>(f NMapFn<T>, ts []&Tensor<T>) &Tensor<T> {
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
 		val := f(vals, i)
-		ret.data.set<T>(i, val)
+		ret.set(i, val)
 	}
 	return ret
 }

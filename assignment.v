@@ -26,6 +26,6 @@ pub fn (mut t Tensor<T>) assign<T>(other &Tensor<T>) {
 	mut iters := t.iterators<T>([other])
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
-		t.set_nth<T>(i, vals[1])
+		t.set(i, vals[1])
 	}
 }
