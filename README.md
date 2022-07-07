@@ -3,6 +3,7 @@
 
 [vlang.io](https://vlang.io) |
 [Docs](https://vlang.github.io/vtl) |
+[Tutorials](https://github.com/vlang/vtl/blob/main/docs/TUTORIAL.md) |
 [Changelog](#) |
 [Contributing](https://github.com/vlang/vtl/blob/main/CONTRIBUTING.md)
 
