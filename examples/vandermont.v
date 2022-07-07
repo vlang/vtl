@@ -15,7 +15,7 @@ for i, x in xs {
 	}
 }
 
-t := vtl.from_2d(vandermont)
+mut t := vtl.from_2d(vandermont)
 
 println(t)
 // [[   1,    1,    1,    1,    1],
@@ -27,7 +27,7 @@ println(t)
 println(t.shape) // [5, 5]
 
 println('slice: ')
-slice1 := t.slice_hilo([2, 3], [4, 5])
+mut slice1 := t.slice_hilo([1, 3], [3, 5])
 
 println(slice1)
 // [[16, 32], [81, 243]]
@@ -52,3 +52,15 @@ println(slice3)
 // [  3,   9,  27,  81, 243]]
 
 println(slice3.shape) // [3, 5]
+
+t999 := vtl.new_tensor(999, [2, 2])
+
+slice1.assign(t999)
+
+println('assign: ')
+println(t)
+// [[   1,    1,    1,    1,    1],
+// [   2,    4,    8,  999,  999],
+// [   3,    9,   27,  999,  999],
+// [   4,   16,   64,  256, 1024],
+// [   5,   25,  125,  625, 3125]]
