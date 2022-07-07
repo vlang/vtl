@@ -23,10 +23,7 @@ jobs:
         run: v doctor
 
       - name: Build docs
-        run: |
-          rm -f ./vtl/README.md
-          mv ./vtl/static/DOCS.md ./vtl/README.md
-          v doc -readme -m -f html vtl/
+        run: v doc -readme -m -f html vtl/
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3
