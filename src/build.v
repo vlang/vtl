@@ -1,6 +1,6 @@
 module vtl
 
-import storage
+import vtl.storage
 
 [params]
 pub struct TensorData {
