@@ -30,7 +30,7 @@ pub fn (layer &LinearLayer<T>) variables() []&autograd.Variable<T> {
 }
 
 pub fn (layer &LinearLayer<T>) forward(mut input autograd.Variable<T>) &autograd.Variable<T> {
-	output := vtl.add(la.matmul(input.value, layer.weights.value), layer.bias.value)
+	output := vtl.add<T>(la.matmul<T>(input.value, layer.weights.value), layer.bias.value)
 	mut result := input.context.variable(output)
 
 	if input.requires_grad || layer.weights.requires_grad || layer.bias.requires_grad {
