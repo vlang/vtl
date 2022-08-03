@@ -26,7 +26,7 @@ pub fn new_nnc<T>(ctx &autograd.Context<T>) &NeuralNetworkContainer<T> {
 // input adds a new input layer to the network
 // with the given shape.
 pub fn (mut ls NeuralNetworkContainer<T>) input(shape []int) {
-	ls.layers << layers.new_input_layer(ls.ctx, shape)
+	ls.layers << layers.new_input_layer<T>(ls.ctx, shape)
 }
 
 // linear adds a new linear layer to the network

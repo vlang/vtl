@@ -25,15 +25,15 @@ pub fn (g &LinearGate<T>) backward<T>(payload &autograd.Payload<T>) []&vtl.Tenso
 	mut result := [grad, grad, grad]
 
 	if g.input.requires_grad {
-		result[0] = la.matmul(grad, g.weight.value)
+		result[0] = la.matmul<T>(grad, g.weight.value)
 	}
 
 	if g.weight.requires_grad {
-		result[1] = la.matmul(grad.t(), g.input.value)
+		result[1] = la.matmul<T>(grad.t(), g.input.value)
 	}
 
 	if g.bias.requires_grad {
-		result[2] = vtl.from_1d<T>([stats.sum_axis(grad, axis: 0)])
+		result[2] = vtl.from_1d<T>([stats.sum_axis<T>(grad, axis: 0)])
 	}
 
 	return result

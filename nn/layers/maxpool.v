@@ -42,7 +42,7 @@ pub fn (layer &MaxPool2DLayer<T>) variables() []&autograd.Variable<T> {
 }
 
 pub fn (layer &MaxPool2DLayer<T>) forward(mut input autograd.Variable<T>) &autograd.Variable<T> {
-	max_indices, output := internal.maxpool2d(input.value, layer.kernel, layer.padding,
+	max_indices, output := internal.maxpool2d<T>(input.value, layer.kernel, layer.padding,
 		layer.stride)
 	mut result := input.context.variable(output)
 
