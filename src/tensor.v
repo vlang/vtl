@@ -12,7 +12,7 @@ pub enum MemoryFormat {
 [heap]
 pub struct Tensor<T> {
 pub mut:
-	data    &storage.Storage<T>
+	data    &storage.CpuStorage<T>
 	memory  MemoryFormat
 	size    int
 	shape   []int
