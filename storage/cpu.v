@@ -6,7 +6,7 @@ pub const (
 	vector_shrink_threshold = 1.0 / 4.0
 )
 
-// Storage
+// CpuStorage
 [heap]
 pub struct CpuStorage<T> {
 pub mut:
