@@ -3,7 +3,7 @@ module storage
 import vsl.vcl
 
 fn test_vcl_with_default() {
-        // get all devices if you want
+	// get all devices if you want
 	devices := vcl.get_devices(vcl.device_cpu) or { panic(err) }
 	println('Devices: $devices')
 
