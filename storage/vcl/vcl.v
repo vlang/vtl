@@ -1,4 +1,4 @@
-module storage
+module vcl
 
 import vsl.vcl
 
@@ -20,8 +20,8 @@ pub fn new_storage<T>(device &vcl.Device, len int, init T) ?&VclStorage<T> {
 	}
 }
 
-pub fn from_array<T>(device &vcl.Device, arr []T) &VclStorage<T> {
-	mut data := device.vector<T>(len)
+pub fn from_array<T>(device &vcl.Device, arr []T) ?&VclStorage<T> {
+	mut data := device.vector<T>(len)?
 	data.load(arr.clone())
 	return &VclStorage<T>{
 		data: data

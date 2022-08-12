@@ -1,4 +1,4 @@
-module storage
+module vcl
 
 import vsl.vcl
 
