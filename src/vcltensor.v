@@ -13,7 +13,7 @@ pub mut:
 	strides []int
 }
 
-// vcl
+// vcl returns a VclTensor from a Tensor
 pub fn (t &Tensor<T>) vcl(params storage.VclStorageParams) ?&VclTensor<T> {
 	row_tensor := t.copy(.row_major)
 	cldata := row_tensor.data.vcl(params)?
