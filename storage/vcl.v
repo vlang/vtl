@@ -29,7 +29,14 @@ pub fn (cpu &CpuStorage<T>) vcl(params VclStorageParams) ?&VclStorage<T> {
 	}
 }
 
+pub fn (storage &VclStorage<T>) cpu() ?&CpuStorage<T> {
+	arr := storage.to_array()?
+	return &CpuStorage<T>{
+		data: arr
+	}
+}
+
 [inline]
-pub fn (storage &VclStorage<T>) to_array<T>() []T {
-	return storage.data.data() or { []T{} }
+pub fn (storage &VclStorage<T>) to_array<T>() ?[]T {
+	return storage.data.data()
 }
