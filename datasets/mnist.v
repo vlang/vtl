@@ -81,7 +81,7 @@ pub fn (mut ds MnistDataset) next() ?MnistBatch {
 	}
 
 	mut lt := vtl.from_1d(labels)
-	mut lft := vtl.zeros<int>([lt.shape[0], 10])
+	mut lft := vtl.zeros<int>([10])
 
 	mut iter := lt.iterator()
 	for {
