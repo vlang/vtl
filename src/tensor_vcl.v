@@ -38,6 +38,11 @@ pub fn (t &VclTensor<T>) cpu() ?&Tensor<T> {
 	}
 }
 
+// release releases the VclTensor's data
+pub fn (t &VclTensor<T>) release() ? {
+	return t.data.release()
+}
+
 // str returns the string representation of a VclTensor
 [inline]
 pub fn (t &VclTensor<T>) str() string {

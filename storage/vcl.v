@@ -40,3 +40,8 @@ pub fn (storage &VclStorage<T>) cpu() ?&CpuStorage<T> {
 pub fn (storage &VclStorage<T>) to_array<T>() ?[]T {
 	return storage.data.data()
 }
+
+[inline]
+pub fn (storage &VclStorage<T>) release() ? {
+	return storage.data.release()
+}
