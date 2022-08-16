@@ -26,5 +26,7 @@ fn test_vcl_with_default() {
 		array := s.to_array() or { panic(err) }
 		assert array.len == 2
 		assert array[0] == 1.0
+	} $else {
+		assert true
 	}
 }
