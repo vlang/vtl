@@ -25,7 +25,7 @@ jobs:
       - name: Build docs
         run: |
           pushd vtl
-          v doc -readme -m -f html .
+          v -d vcl doc -readme -m -f html .
           popd
 
       - name: Deploy to gh-pages
