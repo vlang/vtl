@@ -4,7 +4,7 @@ module vtl
 pub type TensorDataType = byte | f32 | f64 | i16 | i64 | i8 | int | u16 | u32 | u64
 
 // AnyTensor is an interface that allows for any tensor to be used in the vtl library
-pub interface AnyTensor {
+pub interface AnyTensor<T> {
 	shape []int
 	strides []int
 	str() string

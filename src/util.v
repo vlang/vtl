@@ -4,7 +4,7 @@ import arrays
 
 // assert_square_matrix panics if the given tensor is not a square matrix
 [inline]
-fn assert_square_matrix<T>(t AnyTensor) {
+fn assert_square_matrix<T>(t AnyTensor<T>) {
 	if t.is_square_matrix() {
 		panic('Matrix is not square')
 	}
@@ -12,7 +12,7 @@ fn assert_square_matrix<T>(t AnyTensor) {
 
 // assert_square_matrix panics if the given tensor is not a matrix
 [inline]
-fn assert_matrix<T>(t AnyTensor) {
+fn assert_matrix<T>(t AnyTensor<T>) {
 	if t.is_matrix() {
 		panic('Tensor is not two-dimensional')
 	}
@@ -29,7 +29,7 @@ fn irange(start int, stop int) []int {
 
 // assert_rank ensures that a Tensor has a given rank
 [inline]
-fn assert_rank<T>(t AnyTensor, n int) {
+fn assert_rank<T>(t AnyTensor<T>, n int) {
 	if n != t.rank() {
 		panic('Bad number of dimensions')
 	}
@@ -37,7 +37,7 @@ fn assert_rank<T>(t AnyTensor, n int) {
 
 // assert_min_rank ensures that a Tensor has at least a given rank
 [inline]
-fn assert_min_rank<T>(t AnyTensor, n int) {
+fn assert_min_rank<T>(t AnyTensor<T>, n int) {
 	if n > t.rank() {
 		panic('Bad number of dimensions')
 	}
