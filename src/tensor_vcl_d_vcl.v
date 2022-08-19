@@ -26,6 +26,12 @@ pub fn (t &Tensor<T>) vcl(params storage.VclStorageParams) ?&VclTensor<T> {
 	}
 }
 
+// opencl returns a VclTensor from a Tensor
+[inline]
+pub fn (t &Tensor<T>) opencl(params storage.VclStorageParams) ?&VclTensor<T> {
+	return t.vcl(params)
+}
+
 // cpu returns a Tensor from a VclTensor
 pub fn (t &VclTensor<T>) cpu() ?&Tensor<T> {
 	data := t.data.cpu()?
