@@ -176,7 +176,8 @@ pub fn (t &Tensor<T>) as_strided<T>(shape []int, strides []int) &Tensor<T> {
 pub fn (t &Tensor<T>) transpose<T>(order []int) &Tensor<T> {
 	mut ret := t.view()
 	n := order.len
-	assert_rank<T>(t, n)
+	// @todo: @ulises-jeremias to fix this
+	// assert_rank<T>(t, n)
 	mut permutation := []int{len: 32}
 	mut reverse_permutation := []int{len: 32, init: -1}
 	mut i := 0
