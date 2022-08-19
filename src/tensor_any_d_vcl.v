@@ -8,8 +8,8 @@ pub interface AnyTensor<T> {
 	shape []int
 	strides []int
 	cpu() &Tensor<T>
-	vcl() &VclTensor<T>
-	opencl() &VclTensor<T>
+	vcl() ?&VclTensor<T>
+	opencl() ?&VclTensor<T>
 	str() string
 	rank() int
 	size() int
