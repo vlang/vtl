@@ -19,6 +19,12 @@ pub mut:
 	strides []int
 }
 
+// cpu returns a Tensor from a Tensor
+[inline]
+pub fn (t &Tensor<T>) cpu() ?&Tensor<T> {
+	return t
+}
+
 // str returns the string representation of a Tensor
 [inline]
 pub fn (t &Tensor<T>) str() string {

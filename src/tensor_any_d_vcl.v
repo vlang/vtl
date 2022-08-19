@@ -7,6 +7,9 @@ pub type TensorDataType = byte | f32 | f64 | i16 | i64 | i8 | int | u16 | u32 | 
 pub interface AnyTensor<T> {
 	shape []int
 	strides []int
+	cpu() &Tensor<T>
+	vcl() &VclTensor<T>
+	opencl() &VclTensor<T>
 	str() string
 	rank() int
 	size() int

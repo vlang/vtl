@@ -26,12 +26,6 @@ pub fn (t &Tensor<T>) vcl(params storage.VclStorageParams) ?&VclTensor<T> {
 	}
 }
 
-// opencl returns a VclTensor from a Tensor
-[inline]
-pub fn (t &Tensor<T>) opencl(params storage.VclStorageParams) ?&VclTensor<T> {
-	return t.vcl(params)
-}
-
 // cpu returns a Tensor from a VclTensor
 pub fn (t &VclTensor<T>) cpu() ?&Tensor<T> {
 	data := t.data.cpu()?
@@ -42,6 +36,12 @@ pub fn (t &VclTensor<T>) cpu() ?&Tensor<T> {
 		shape: t.shape
 		strides: t.strides
 	}
+}
+
+// vcl returns a VclTensor from a VclTensor
+[inline]
+pub fn (t &VclTensor<T>) vcl() ?&VclTensor<T> {
+	return t
 }
 
 // release releases the VclTensor's data
