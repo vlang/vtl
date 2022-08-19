@@ -9,7 +9,6 @@ pub interface AnyTensor<T> {
 	strides []int
 	cpu() &Tensor<T>
 	vcl() ?&Tensor<T>
-	opencl() ?&Tensor<T>
 	str() string
 	rank() int
 	size() int
@@ -21,4 +20,6 @@ pub interface AnyTensor<T> {
 	is_row_major_contiguous() bool
 	is_col_major_contiguous() bool
 	is_contiguous() bool
+mut:
+	memory MemoryFormat
 }

@@ -9,7 +9,6 @@ pub interface AnyTensor<T> {
 	strides []int
 	cpu() &Tensor<T>
 	vcl() ?&VclTensor<T>
-	opencl() ?&VclTensor<T>
 	str() string
 	rank() int
 	size() int
