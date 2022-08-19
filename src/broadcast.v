@@ -2,7 +2,7 @@ module vtl
 
 // broadcastable takes two Tensors and either returns a valid
 // broadcastable shape or panics
-pub fn broadcastable<T>(a &Tensor<T>, b &Tensor<T>) []int {
+pub fn broadcastable(a AnyTensor, b AnyTensor) []int {
 	if a.rank() == b.rank() {
 		if broadcast_equal(a.shape, b.shape) {
 			return broadcastable_shape(a.shape, b.shape)
@@ -120,14 +120,14 @@ fn broadcast_shapes(args ...[]int) []int {
 
 // broadcast2 broadcasts two Tensors against each other
 [inline]
-fn broadcast2<T>(a &Tensor<T>, b &Tensor<T>) (&Tensor<T>, &Tensor<T>) {
+fn broadcast2<T>(a AnyTensor, b AnyTensor) (AnyTensor, AnyTensor) {
 	shape := broadcast_shapes(a.shape, b.shape)
 	return a.broadcast_to(shape), b.broadcast_to(shape)
 }
 
 // broadcast3 broadcasts three Tensors against each other
 [inline]
-fn broadcast3<T>(a &Tensor<T>, b &Tensor<T>, c &Tensor<T>) (&Tensor<T>, &Tensor<T>, &Tensor<T>) {
+fn broadcast3<T>(a AnyTensor, b AnyTensor, c AnyTensor) (AnyTensor, AnyTensor, AnyTensor) {
 	shape := broadcast_shapes(a.shape, b.shape, c.shape)
 	return a.broadcast_to(shape), b.broadcast_to(shape), c.broadcast_to(shape)
 }
