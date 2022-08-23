@@ -6,7 +6,7 @@ module vtl
 // integer that does not equally divide the axis. For an array of length
 // l that should be split into n sections, it returns l % n sub-arrays of
 // size l//n + 1 and the rest of size l//n.
-pub fn array_split<T>(t &Tensor<T>, ind int, axis int) []&Tensor<T> {
+pub fn array_split<T>(t &Tensor<T>, ind int, axis int) ?[]&Tensor<T> {
 	ntotal := t.shape[axis]
 	neach := ntotal / ind
 	extras := ntotal % ind
@@ -28,7 +28,7 @@ pub fn array_split<T>(t &Tensor<T>, ind int, axis int) []&Tensor<T> {
 // integer that does not equally divide the axis. For an array of length
 // l that should be split into n sections, it returns l % n sub-arrays of
 // size l//n + 1 and the rest of size l//n.
-pub fn array_split_expl<T>(t &Tensor<T>, ind []int, axis int) []&Tensor<T> {
+pub fn array_split_expl<T>(t &Tensor<T>, ind []int, axis int) ?[]&Tensor<T> {
 	nsections := ind.len + 1
 	mut div_points := [0]
 	div_points << ind
@@ -39,10 +39,10 @@ pub fn array_split_expl<T>(t &Tensor<T>, ind []int, axis int) []&Tensor<T> {
 // split splits an array into multiple sub-arrays. The array will be divided into
 // N equal arrays along axis. If such a split is not possible,
 // panic
-pub fn split<T>(t &Tensor<T>, ind int, axis int) []&Tensor<T> {
+pub fn split<T>(t &Tensor<T>, ind int, axis int) ?[]&Tensor<T> {
 	n := t.shape[axis]
 	if n % ind != 0 {
-		panic('Array split does not result in an equal division')
+		return error('Array split does not result in an equal division')
 	}
 	return array_split<T>(t, ind, axis)
 }
@@ -83,9 +83,9 @@ pub fn hsplit_expl<T>(t &Tensor<T>, ind []int) []&Tensor<T> {
 // Please refer to the split documentation. vsplit is equivalent to
 // split with axis=0 (default), the array is always split along the
 // first axis regardless of the array dimension.
-pub fn vsplit<T>(t &Tensor<T>, ind int) []&Tensor<T> {
+pub fn vsplit<T>(t &Tensor<T>, ind int) ?[]&Tensor<T> {
 	if t.rank() < 2 {
-		panic('vsplit only works on tensors of >= 2 dimensions')
+		return error('vsplit only works on tensors of >= 2 dimensions')
 	}
 	return split<T>(t, ind, 0)
 }
@@ -94,9 +94,9 @@ pub fn vsplit<T>(t &Tensor<T>, ind int) []&Tensor<T> {
 // Please refer to the split documentation. vsplit is equivalent to
 // split with axis=0 (default), the array is always split along the
 // first axis regardless of the array dimension.
-pub fn vsplit_expl<T>(t &Tensor<T>, ind []int) []&Tensor<T> {
+pub fn vsplit_expl<T>(t &Tensor<T>, ind []int) ?[]&Tensor<T> {
 	if t.rank() < 2 {
-		panic('vsplit only works on tensors of >= 2 dimensions')
+		return error('vsplit only works on tensors of >= 2 dimensions')
 	}
 	return split_expl<T>(t, ind, 0)
 }
@@ -105,9 +105,9 @@ pub fn vsplit_expl<T>(t &Tensor<T>, ind []int) []&Tensor<T> {
 // Please refer to the split documentation. dsplit is equivalent to
 // split with axis=2, the array is always split along the third axis
 // provided the array dimension is greater than or equal to 3.
-pub fn dsplit<T>(t &Tensor<T>, ind int) []&Tensor<T> {
+pub fn dsplit<T>(t &Tensor<T>, ind int) ?[]&Tensor<T> {
 	if t.rank() < 3 {
-		panic('dsplit only works on arrays of 3 or more dimensions')
+		return error('dsplit only works on arrays of 3 or more dimensions')
 	}
 	return split<T>(t, ind, 2)
 }
@@ -116,22 +116,22 @@ pub fn dsplit<T>(t &Tensor<T>, ind int) []&Tensor<T> {
 // Please refer to the split documentation. dsplit is equivalent to
 // split with axis=2, the array is always split along the third axis
 // provided the array dimension is greater than or equal to 3.
-pub fn dsplit_expl<T>(t &Tensor<T>, ind []int) []&Tensor<T> {
+pub fn dsplit_expl<T>(t &Tensor<T>, ind []int) ?[]&Tensor<T> {
 	if t.rank() < 3 {
-		panic('dsplit only works on arrays of 3 or more dimensions')
+		return error('dsplit only works on arrays of 3 or more dimensions')
 	}
 	return split_expl<T>(t, ind, 2)
 }
 
 // splitter implements a generic splitting function that contains the underlying functionality
 // for all split operations
-fn splitter<T>(t &Tensor<T>, axis int, n int, div_points []int) []&Tensor<T> {
+fn splitter<T>(t &Tensor<T>, axis int, n int, div_points []int) ?[]&Tensor<T> {
 	mut subary := []&Tensor<T>{}
-	sary := t.swapaxes(axis, 0)
+	sary := t.swapaxes(axis, 0)?
 	for i in 0 .. n {
 		st := div_points[i]
 		en := div_points[i + 1]
-		subary << sary.slice_hilo([st], [en]).swapaxes(axis, 0)
+		subary << sary.slice_hilo([st], [en])?.swapaxes(axis, 0)?
 	}
 	return subary
 }
