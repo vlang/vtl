@@ -10,7 +10,7 @@ pub fn add<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using a.nmap
 	// return a.nmap<T>(handle_add, b)
 	mut ret := new_tensor_like<T>(a)
-	mut iters := iterators<T>([a, b])?
+	mut iters := a.iterators<T>([b])?
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
 		val := handle_add<T>(vals, i)
@@ -43,7 +43,7 @@ pub fn substract<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using a.nmap
 	// return a.nmap<T>(handle_substract, b)
 	mut ret := new_tensor_like<T>(a)
-	mut iters := iterators<T>([a, b])?
+	mut iters := a.iterators<T>([b])?
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
 		val := handle_substract<T>(vals, i)
@@ -76,7 +76,7 @@ pub fn divide<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using a.nmap
 	// return a.nmap<T>(handle_divide, b)
 	mut ret := new_tensor_like<T>(a)
-	mut iters := iterators<T>([a, b])?
+	mut iters := a.iterators<T>([b])?
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
 		val := handle_divide<T>(vals, i)
@@ -109,7 +109,7 @@ pub fn multiply<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using a.nmap
 	// return a.nmap<T>(handle_multiply, b)
 	mut ret := new_tensor_like<T>(a)
-	mut iters := iterators<T>([a, b])?
+	mut iters := a.iterators<T>([b])?
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
 		val := handle_multiply<T>(vals, i)

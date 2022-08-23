@@ -83,7 +83,7 @@ fn equal<T>(t &Tensor<T>, other &Tensor<T>) bool {
 	if t.shape != other.shape {
 		return false
 	}
-	mut iters := iterators<T>([t, other]) or { return false }
+	mut iters := t.iterators<T>([other]) or { return false }
 	for {
 		vals, _ := iterators_next<T>(mut iters) or { break }
 		if vals[0] != vals[1] {
