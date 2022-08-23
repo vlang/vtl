@@ -24,24 +24,24 @@ pub fn (_ &ReLULayer<T>) variables() []&autograd.Variable<T> {
 	return []&autograd.Variable<T>{}
 }
 
-pub fn (layer &ReLULayer<T>) forward(mut input autograd.Variable<T>) &autograd.Variable<T> {
+pub fn (layer &ReLULayer<T>) forward(mut input autograd.Variable<T>) ?&autograd.Variable<T> {
 	output := internal.relu<T>(input.value)
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {
 		gate := activation.new_relu_gate<T>(input.value)
-		gate.cache(mut result, input)
+		gate.cache(mut result, input)?
 	}
 	return result
 }
 
-pub fn relu<T>(v &autograd.Variable<T>) &autograd.Variable<T> {
+pub fn relu<T>(v &autograd.Variable<T>) ?&autograd.Variable<T> {
 	output := internal.relu<T>(v.value)
 	mut result := v.context.variable(output)
 
 	if v.requires_grad {
 		gate := activation.new_relu_gate<T>(v.value)
-		gate.cache(mut result, v)
+		gate.cache(mut result, v)?
 	}
 	return result
 }

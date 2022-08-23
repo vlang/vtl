@@ -22,7 +22,7 @@ pub fn (g &MseGate<T>) backward<T>(payload &autograd.Payload<T>) []&vtl.Tensor<T
 	return internal.mse_backward<T>(gradient, cache.value, g.target)
 }
 
-pub fn (g &MseGate<T>) cache<T>(mut result autograd.Variable<T>, args ...autograd.CacheParam) {
+pub fn (g &MseGate<T>) cache<T>(mut result autograd.Variable<T>, args ...autograd.CacheParam) ? {
 	result.grad = vtl.zeros_like<T>(result.value)
 	result.requires_grad = true
 

@@ -24,24 +24,24 @@ pub fn (_ &SigmoidLayer<T>) variables() []&autograd.Variable<T> {
 	return []&autograd.Variable<T>{}
 }
 
-pub fn (layer &SigmoidLayer<T>) forward(mut input autograd.Variable<T>) &autograd.Variable<T> {
+pub fn (layer &SigmoidLayer<T>) forward(mut input autograd.Variable<T>) ?&autograd.Variable<T> {
 	output := internal.sigmoid<T>(input.value)
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {
 		gate := activation.new_sigmoid_gate<T>(input.value)
-		gate.cache(mut result, input)
+		gate.cache(mut result, input)?
 	}
 	return result
 }
 
-pub fn sigmoid<T>(v &autograd.Variable<T>) &autograd.Variable<T> {
+pub fn sigmoid<T>(v &autograd.Variable<T>) ?&autograd.Variable<T> {
 	output := internal.sigmoid<T>(v.value)
 	mut result := v.context.variable(output)
 
 	if v.requires_grad {
 		gate := activation.new_sigmoid_gate<T>(v.value)
-		gate.cache(mut result, v)
+		gate.cache(mut result, v)?
 	}
 	return result
 }

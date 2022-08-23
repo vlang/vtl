@@ -13,13 +13,13 @@ pub fn new_sin_gate<T>(a &Variable<T>) &SinGate<T> {
 	}
 }
 
-pub fn (g &SinGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
+pub fn (g &SinGate<T>) backward<T>(payload &Payload<T>) ?[]&vtl.Tensor<T> {
 	gradient := payload.variable.grad
 	r0 := vtl.multiply<T>(gradient, vtl.cos<T>(g.a.value))
 	return [r0]
 }
 
-pub fn (g &SinGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) {
+pub fn (g &SinGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) ? {
 	a := args[0]
 
 	match a {
@@ -27,10 +27,10 @@ pub fn (g &SinGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) {
 			result.grad = vtl.zeros_like<T>(result.value)
 			result.requires_grad = true
 
-			register<T>('Sin', g, result, a)
+			register<T>('Sin', g, result, a)?
 		}
 		else {
-			panic('SinGate: a must be a Variable')
+			return error('SinGate: a must be a Variable')
 		}
 	}
 }
@@ -46,13 +46,13 @@ pub fn new_cos_gate<T>(a &Variable<T>) &CosGate<T> {
 	}
 }
 
-pub fn (g &CosGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
+pub fn (g &CosGate<T>) backward<T>(payload &Payload<T>) ?[]&vtl.Tensor<T> {
 	gradient := payload.variable.grad
 	r0 := vtl.multiply<T>(gradient, vtl.multiply_scalar<T>(vtl.sin<T>(g.a.value), T(-1)))
 	return [r0]
 }
 
-pub fn (g &CosGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) {
+pub fn (g &CosGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) ? {
 	a := args[0]
 
 	match a {
@@ -60,10 +60,10 @@ pub fn (g &CosGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) {
 			result.grad = vtl.zeros_like<T>(result.value)
 			result.requires_grad = true
 
-			register<T>('Cos', g, result, a)
+			register<T>('Cos', g, result, a)?
 		}
 		else {
-			panic('CosGate: a must be a Variable')
+			return error('CosGate: a must be a Variable')
 		}
 	}
 }
@@ -79,14 +79,14 @@ pub fn new_tan_gate<T>(a &Variable<T>) &TanGate<T> {
 	}
 }
 
-pub fn (g &TanGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
+pub fn (g &TanGate<T>) backward<T>(payload &Payload<T>) ?[]&vtl.Tensor<T> {
 	gradient := payload.variable.grad
 	cos := vtl.cos<T>(g.a.value)
 	r0 := vtl.divide<T>(gradient, vtl.multiply<T>(cos, cos))
 	return [r0]
 }
 
-pub fn (g &TanGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) {
+pub fn (g &TanGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) ? {
 	a := args[0]
 
 	match a {
@@ -94,10 +94,10 @@ pub fn (g &TanGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) {
 			result.grad = vtl.zeros_like<T>(result.value)
 			result.requires_grad = true
 
-			register<T>('Tan', g, result, a)
+			register<T>('Tan', g, result, a)?
 		}
 		else {
-			panic('TanGate: a must be a Variable')
+			return error('TanGate: a must be a Variable')
 		}
 	}
 }
