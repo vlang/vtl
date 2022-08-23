@@ -22,10 +22,11 @@ pub fn new_sgd_optimizer<T>(config SgdOptimizerConfig) &SgdOptimizer<T> {
 }
 
 pub fn (mut o SgdOptimizer<T>) build_params(layers []types.Layer) {
+	// @todo: @ulises-jeremias to uncomment this
 	for layer in layers {
-		for v in layer.variables() {
-			o.params << v
-		}
+		// for v in layer.variables() {
+		// 	o.params << v
+		// }
 	}
 }
 
