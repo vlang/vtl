@@ -35,7 +35,7 @@ pub fn sigmoid<T>(x &vtl.Tensor<T>) &vtl.Tensor<T> {
 [inline]
 pub fn deriv_sigmoid<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>) ?&vtl.Tensor<T> {
 	mut ret := vtl.new_tensor_like<T>(gradient)
-	mut iters := vtl.iterators<T>([gradient, cached])?
+	mut iters := gradient.iterators<T>([cached])?
 	for {
 		vals, i := vtl.iterators_next<T>(mut iters) or { break }
 		val := vals[0] * (T(1) - vals[0]) * vals[1]
@@ -64,7 +64,7 @@ pub fn relu<T>(x &vtl.Tensor<T>) &vtl.Tensor<T> {
 [inline]
 pub fn deriv_relu<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>) ?&vtl.Tensor<T> {
 	mut ret := vtl.new_tensor_like<T>(gradient)
-	mut iters := vtl.iterators<T>([gradient, cached])?
+	mut iters := gradient.iterators<T>([cached])?
 	for {
 		vals, i := vtl.iterators_next<T>(mut iters) or { break }
 		mut val := vals[0]
@@ -96,7 +96,7 @@ pub fn leaky_relu<T>(x &vtl.Tensor<T>, alpha T) &vtl.Tensor<T> {
 [inline]
 pub fn deriv_leaky_relu<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>, alpha T) ?&vtl.Tensor<T> {
 	mut ret := vtl.new_tensor_like<T>(gradient)
-	mut iters := vtl.iterators<T>([gradient, cached])?
+	mut iters := gradient.iterators<T>([cached])?
 	for {
 		vals, i := vtl.iterators_next<T>(mut iters) or { break }
 		mut val := vals[1]
@@ -128,7 +128,7 @@ pub fn elu<T>(x &vtl.Tensor<T>, alpha T) &vtl.Tensor<T> {
 [inline]
 pub fn deriv_elu<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>, alpha T) ?&vtl.Tensor<T> {
 	mut ret := vtl.new_tensor_like<T>(gradient)
-	mut iters := vtl.iterators<T>([gradient, cached])?
+	mut iters := gradient.iterators<T>([cached])?
 	for {
 		vals, i := vtl.iterators_next<T>(mut iters) or { break }
 		mut val := T(1)
@@ -146,7 +146,7 @@ pub fn deriv_elu<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>, alpha T) ?&v
 pub fn sigmoid_cross_entropy_with_logits<T>(input &vtl.Tensor<T>, target &vtl.Tensor<T>) T {
 	batch_size := input.shape[0]
 	mut ret := vtl.new_tensor_like<T>(input)
-	mut iter := vtl.iterators<T>([input, target])?
+	mut iter := input.iterators<T>([target])?
 	for {
 		vals, i := vtl.iterators_next<T>(mut iter) or { break }
 		val := -(vals[1] * T(math.max(f64(0), f64(vals[0])))) - T(math.log(T(1) +
@@ -160,7 +160,7 @@ pub fn sigmoid_cross_entropy_with_logits<T>(input &vtl.Tensor<T>, target &vtl.Te
 [inline]
 pub fn mse<T>(input &vtl.Tensor<T>, target &vtl.Tensor<T>) &vtl.Tensor<T> {
 	mut ret := vtl.new_tensor_like<T>(input)
-	mut iter := vtl.iterators<T>([input, target])?
+	mut iter := input.iterators<T>([target])?
 	for {
 		vals, i := vtl.iterators_next<T>(mut iter) or { break }
 		val := T(math.pow(f64(vals[0] - vals[1]), 2.0))

@@ -4,7 +4,7 @@ import vtl
 
 pub fn dropout<T>(input &vtl.Tensor<T>, mask &vtl.Tensor<T>, prob f64) &vtl.Tensor<T> {
 	mut ret := vtl.new_tensor_like<T>(input)
-	mut iters := vtl.iterators<T>([input, mask])
+	mut iters := input.iterators<T>([mask])
 	for {
 		vals, i := vtl.iterators_next<T>(mut iters) or { break }
 		val := vals[0] * vals[1] / T(prob)
@@ -15,7 +15,7 @@ pub fn dropout<T>(input &vtl.Tensor<T>, mask &vtl.Tensor<T>, prob f64) &vtl.Tens
 
 pub fn dropout_backwards<T>(gradient &vtl.Tensor<T>, mask &vtl.Tensor<T>, prob f64) &vtl.Tensor<T> {
 	mut ret := vtl.new_tensor_like<T>(gradient)
-	mut iters := vtl.iterators<T>([gradient, mask])
+	mut iters := gradient.iterators<T>([mask])
 	for {
 		vals, i := vtl.iterators_next<T>(mut iters) or { break }
 		val := vals[0] * vals[1] / T(prob)

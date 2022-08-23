@@ -19,7 +19,7 @@ pub fn (g &PowGate<T>) backward<T>(payload &Payload<T>) ?[]&vtl.Tensor<T> {
 	gradient := payload.variable.grad
 	mut r0 := vtl.new_tensor_like<T>(gradient)
 	mut r1 := vtl.new_tensor_like<T>(gradient)
-	mut iters := vtl.iterators<T>([gradient, g.a.value, g.b.value])?
+	mut iters := gradient.iterators<T>([g.a.value, g.b.value])?
 	for {
 		vals, i := vtl.iterators_next<T>(mut iters) or { break }
 		val0 := vals[0] * vals[2] * T(math.pow(f64(vals[1]), f64(vals[2]) - 1))
