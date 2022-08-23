@@ -4,16 +4,17 @@ import vtl
 import vtl.autograd
 import vtl.nn.internal
 import vtl.nn.gates.activation
+import vtl.nn.types
 
 // LeakyReluLayer is an activation layer that applies the leaky elu function to the input.
 pub struct LeakyReluLayer<T> {
 	output_shape []int
 }
 
-pub fn new_leaky_relu_layer<T>(ctx &autograd.Context<T>, output_shape []int) &LeakyReluLayer<T> {
-	return &LeakyReluLayer<T>{
+pub fn new_leaky_relu_layer<T>(ctx &autograd.Context<T>, output_shape []int) types.Layer {
+	return types.Layer(&LeakyReluLayer<T>{
 		output_shape: output_shape.clone()
-	}
+	})
 }
 
 pub fn (layer &LeakyReluLayer<T>) output_shape() []int {

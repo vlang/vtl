@@ -4,16 +4,17 @@ import vtl
 import vtl.autograd
 import vtl.nn.internal
 import vtl.nn.gates.activation
+import vtl.nn.types
 
 // ReLULayer is a layer that applies the rectified linear unit function element-wise.
 pub struct ReLULayer<T> {
 	output_shape []int
 }
 
-pub fn new_relu_layer<T>(ctx &autograd.Context<T>, output_shape []int) &ReLULayer<T> {
-	return &ReLULayer<T>{
+pub fn new_relu_layer<T>(ctx &autograd.Context<T>, output_shape []int) types.Layer {
+	return types.Layer(&ReLULayer<T>{
 		output_shape: output_shape.clone()
-	}
+	})
 }
 
 pub fn (layer &ReLULayer<T>) output_shape() []int {

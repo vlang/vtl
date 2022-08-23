@@ -5,6 +5,7 @@ import vtl
 import vtl.autograd
 import vtl.nn.internal
 import vtl.nn.gates.layers
+import vtl.nn.types
 
 // MaxPool2DLayer is a layer that implements the maxpooling operation.
 pub struct MaxPool2DLayer<T> {
@@ -14,13 +15,13 @@ pub struct MaxPool2DLayer<T> {
 	stride      []int
 }
 
-pub fn new_maxpool2d_layer<T>(ctx &autograd.Context<T>, input_shape []int, kernel []int, padding []int, stride []int) &MaxPool2DLayer<T> {
-	return &MaxPool2DLayer<T>{
+pub fn new_maxpool2d_layer<T>(ctx &autograd.Context<T>, input_shape []int, kernel []int, padding []int, stride []int) types.Layer {
+	return types.Layer(&MaxPool2DLayer<T>{
 		input_shape: input_shape.clone()
 		kernel: kernel.clone()
 		padding: padding.clone()
 		stride: stride.clone()
-	}
+	})
 }
 
 pub fn (layer &MaxPool2DLayer<T>) output_shape() []int {
