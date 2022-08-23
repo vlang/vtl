@@ -3,6 +3,7 @@ module layers
 import vtl
 import vtl.autograd
 import vtl.nn.gates.layers
+import vtl.nn.types
 
 // InputLayer is a layer that takes a single input tensor and returns the same
 // tensor.
@@ -12,10 +13,10 @@ pub struct InputLayer<T> {
 	shape []int
 }
 
-pub fn new_input_layer<T>(ctx &autograd.Context<T>, shape []int) &InputLayer<T> {
-	return &InputLayer<T>{
+pub fn new_input_layer<T>(ctx &autograd.Context<T>, shape []int) types.Layer {
+	return types.Layer(&InputLayer<T>{
 		shape: shape.clone()
-	}
+	})
 }
 
 pub fn (layer &InputLayer<T>) output_shape() []int {

@@ -3,16 +3,17 @@ module layers
 import vtl
 import vtl.autograd
 import vtl.nn.gates.layers
+import vtl.nn.types
 
 // FlattenLayer is a layer
 pub struct FlattenLayer<T> {
 	shape []int
 }
 
-pub fn new_flatten_layer<T>(ctx &autograd.Context<T>, shape []int) &FlattenLayer<T> {
-	return &FlattenLayer<T>{
+pub fn new_flatten_layer<T>(ctx &autograd.Context<T>, shape []int) types.Layer {
+	return types.Layer(&FlattenLayer<T>{
 		shape: shape.clone()
-	}
+	})
 }
 
 pub fn (layer &FlattenLayer<T>) output_shape() []int {

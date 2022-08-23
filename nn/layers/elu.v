@@ -4,6 +4,7 @@ import vtl
 import vtl.autograd
 import vtl.nn.internal
 import vtl.nn.gates.activation
+import vtl.nn.types
 
 [params]
 pub struct EluLayerConfig {
@@ -17,11 +18,11 @@ pub struct EluLayer<T> {
 	alpha        f64
 }
 
-pub fn new_elu_layer<T>(ctx &autograd.Context<T>, output_shape []int, data EluLayerConfig) &EluLayer<T> {
-	return &EluLayer<T>{
+pub fn new_elu_layer<T>(ctx &autograd.Context<T>, output_shape []int, data EluLayerConfig) types.Layer {
+	return types.Layer(&EluLayer<T>{
 		output_shape: output_shape.clone()
 		alpha: data.alpha
-	}
+	})
 }
 
 pub fn (layer &EluLayer<T>) output_shape() []int {
