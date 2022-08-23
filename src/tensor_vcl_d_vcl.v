@@ -49,11 +49,11 @@ pub fn (t &VclTensor<T>) release() ? {
 	return t.data.release()
 }
 
-// str returns the string representation of a VclTensor
-[inline]
-pub fn (t &VclTensor<T>) str() string {
-	return t.data.str()
-}
+// // str returns the string representation of a VclTensor
+// [inline]
+// pub fn (t &VclTensor<T>) str() string {
+// 	return t.data.str()
+// }
 
 // rank returns the number of dimensions of a given VclTensor
 pub fn (t &VclTensor<T>) rank() int {
