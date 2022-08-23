@@ -11,12 +11,11 @@ import vtl
 // of VTL
 [heap]
 pub struct Variable<T> {
-pub:
+pub mut:
 	// The value of the Variable.  This should not be edited outside
 	// of Variable operations, as other edits will not be tracked
 	// and will lead to incorrect results
 	value &vtl.Tensor<T>
-pub mut:
 	// The graph the variable is associated with.  This is a reference,
 	// as a variable does not own its context
 	context &Context<T>
