@@ -52,7 +52,7 @@ fn broadcastable_shape(a []int, b []int) []int {
 
 // broadcast strides broadcasts the strides of an existing array to
 // allow it to be viewed as a compatible shape
-fn broadcast_strides(dshape []int, sshape []int, dstrides []int, sstrides []int) []int {
+fn broadcast_strides(dshape []int, sshape []int, dstrides []int, sstrides []int) ?[]int {
 	d := dshape.len
 	s := d - sshape.len
 	mut result := []int{len: d, init: 0}
@@ -63,7 +63,7 @@ fn broadcast_strides(dshape []int, sshape []int, dstrides []int, sstrides []int)
 		} else if t == dshape[i] {
 			result[i] = sstrides[i - s]
 		} else {
-			panic('Cannot broadcast from $sshape to $dshape')
+			return error('Cannot broadcast from $sshape to $dshape')
 		}
 	}
 	return result
@@ -71,13 +71,13 @@ fn broadcast_strides(dshape []int, sshape []int, dstrides []int, sstrides []int)
 
 // broadcast_to broadcasts a Tensor to a compatible shape with no
 // data copy
-pub fn (t &Tensor<T>) broadcast_to<T>(shape []int) &Tensor<T> {
+pub fn (t &Tensor<T>) broadcast_to<T>(shape []int) ?&Tensor<T> {
 	if t.shape == shape {
 		return t
 	}
 	size := size_from_shape(shape)
 	strides := strides_from_shape(shape, .row_major)
-	result_strides := broadcast_strides(shape, t.shape, strides, t.strides)
+	result_strides := broadcast_strides(shape, t.shape, strides, t.strides)?
 	return &Tensor<T>{
 		data: t.data
 		shape: shape
@@ -120,14 +120,19 @@ fn broadcast_shapes(args ...[]int) []int {
 
 // broadcast2 broadcasts two Tensors against each other
 [inline]
-fn broadcast2<T>(a AnyTensor<T>, b AnyTensor<T>) (AnyTensor<T>, AnyTensor<T>) {
+fn broadcast2<T>(a AnyTensor<T>, b AnyTensor<T>) ?(AnyTensor<T>, AnyTensor<T>) {
 	shape := broadcast_shapes(a.shape, b.shape)
-	return a.broadcast_to(shape), b.broadcast_to(shape)
+	r1 := a.broadcast_to(shape)?
+	r2 := b.broadcast_to(shape)?
+	return r1, r2
 }
 
 // broadcast3 broadcasts three Tensors against each other
 [inline]
-fn broadcast3<T>(a AnyTensor<T>, b AnyTensor<T>, c AnyTensor<T>) (AnyTensor<T>, AnyTensor<T>, AnyTensor<T>) {
+fn broadcast3<T>(a AnyTensor<T>, b AnyTensor<T>, c AnyTensor<T>) ?(AnyTensor<T>, AnyTensor<T>, AnyTensor<T>) {
 	shape := broadcast_shapes(a.shape, b.shape, c.shape)
-	return a.broadcast_to(shape), b.broadcast_to(shape), c.broadcast_to(shape)
+	r1 := a.broadcast_to(shape)?
+	r2 := b.broadcast_to(shape)?
+	r3 := c.broadcast_to(shape)?
+	return r1, r2, r3
 }

@@ -28,7 +28,7 @@ pub fn (t &Tensor<T>) cpu() ?&Tensor<T> {
 // str returns the string representation of a Tensor
 [inline]
 pub fn (t &Tensor<T>) str() string {
-	return tensor_str<T>(t, ', ', '')
+	return tensor_str<T>(t, ', ', '') or { '' }
 }
 
 // rank returns the number of dimensions of a given Tensor

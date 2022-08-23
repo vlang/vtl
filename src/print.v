@@ -2,7 +2,7 @@ module vtl
 
 // for arrays that are too large, calculate only the leading and trailing
 // items along each axis
-fn leading_trailing<T>(t &Tensor<T>, edgeitems int, lo []int, hi []int) &Tensor<T> {
+fn leading_trailing<T>(t &Tensor<T>, edgeitems int, lo []int, hi []int) ?&Tensor<T> {
 	axis := lo.len
 	if axis == t.rank() {
 		return t.slice_hilo(lo, hi)
@@ -16,8 +16,8 @@ fn leading_trailing<T>(t &Tensor<T>, edgeitems int, lo []int, hi []int) &Tensor<
 		fhi << edgeitems
 		slo << t.shape[axis] + -1 * edgeitems
 		shi << t.shape[axis]
-		f := leading_trailing<T>(t, edgeitems, flo, fhi)
-		l := leading_trailing<T>(t, edgeitems, slo, shi)
+		f := leading_trailing<T>(t, edgeitems, flo, fhi)?
+		l := leading_trailing<T>(t, edgeitems, slo, shi)?
 		return concatenate<T>([f, l], axis: axis)
 	} else {
 		mut nlo := lo.clone()
@@ -142,7 +142,7 @@ fn format_array<T>(t &Tensor<T>, line_width int, next_line_prefix string, separa
 }
 
 // public method for printing arrays, if custom behavior is needed
-fn tensor_str<T>(t &Tensor<T>, separator string, prefix string) string {
+fn tensor_str<T>(t &Tensor<T>, separator string, prefix string) ?string {
 	max_printable_size := 1000
 
 	if t.shape.len == 0 {
@@ -152,7 +152,7 @@ fn tensor_str<T>(t &Tensor<T>, separator string, prefix string) string {
 	mut data := unsafe { t }
 	if t.size > max_printable_size {
 		summary_insert = '...'
-		data = leading_trailing<T>(t, 3, [], [])
+		data = leading_trailing<T>(t, 3, [], [])?
 	}
 	max_len := max_str_len<T>(data)
 	mut next_line_prefix := ''

@@ -85,13 +85,13 @@ pub fn seq<T>(n int, params TensorData) &Tensor<T> {
 
 // from_1d takes a one dimensional array of floating point values
 // and returns a one dimensional Tensor if possible
-pub fn from_1d<T>(arr []T, params TensorData) &Tensor<T> {
+pub fn from_1d<T>(arr []T, params TensorData) ?&Tensor<T> {
 	return from_array<T>(arr, [arr.len], params)
 }
 
 // from_2d takes a two dimensional array of floating point values
 // and returns a two-dimensional Tensor if possible
-pub fn from_2d<T>(a [][]T, params TensorData) &Tensor<T> {
+pub fn from_2d<T>(a [][]T, params TensorData) ?&Tensor<T> {
 	mut arr := []T{cap: a.len * a[0].len}
 	for i in 0 .. a.len {
 		for j in 0 .. a[0].len {

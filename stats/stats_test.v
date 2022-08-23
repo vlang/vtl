@@ -5,7 +5,7 @@ import math
 
 fn test_freq() {
 	// Tests were also verified on Wolfram Alpha
-	data := vtl.from_1d([10.0, 10.0, 5.9, 2.7])
+	data := vtl.from_1d([10.0, 10.0, 5.9, 2.7]) or { panic(@FN + ' failed') }
 	mut o := freq(data, 10.0)
 	assert o == 2
 	o = freq(data, 2.7)
@@ -23,15 +23,19 @@ fn tst_res(str1 string, str2 string) bool {
 
 fn test_mean() {
 	// Tests were also verified on Wolfram Alpha
-	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)])
+	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)]) or {
+		panic(@FN + ' failed')
+	}
 	mut o := mean(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '5.762500')
-	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)])
+	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)]) or { panic(@FN + ' failed') }
 	o = mean(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '17.650000')
-	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)])
+	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)]) or {
+		panic(@FN + ' failed')
+	}
 	o = mean(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '37.708000')
@@ -39,17 +43,21 @@ fn test_mean() {
 
 fn test_geometric_mean() {
 	// Tests were also verified on Wolfram Alpha
-	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)])
+	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)]) or {
+		panic(@FN + ' failed')
+	}
 	mut o := geometric_mean(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '5.15993')
-	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)])
+	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)]) or { panic(@FN + ' failed') }
 	o = geometric_mean(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	ok := o.str() == 'nan' || o.str() == '-nan' || o.str() == '-1.#IND00' || o == f64(0)
 		|| o.str() == '-nan(ind)'
 	assert ok // Because in math it yields a complex number
-	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)])
+	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)]) or {
+		panic(@FN + ' failed')
+	}
 	o = geometric_mean(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '25.064496')
@@ -57,15 +65,19 @@ fn test_geometric_mean() {
 
 fn test_harmonic_mean() {
 	// Tests were also verified on Wolfram Alpha
-	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)])
+	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)]) or {
+		panic(@FN + ' failed')
+	}
 	mut o := harmonic_mean(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '4.626519')
-	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)])
+	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)]) or { panic(@FN + ' failed') }
 	o = harmonic_mean(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '9.134577')
-	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)])
+	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)]) or {
+		panic(@FN + ' failed')
+	}
 	o = harmonic_mean(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '16.555477')
@@ -76,57 +88,73 @@ fn test_median() {
 	// Assumes sorted array
 
 	// Even
-	mut data := vtl.from_1d([f64(2.7), f64(4.45), f64(5.9), f64(10.0)])
+	mut data := vtl.from_1d([f64(2.7), f64(4.45), f64(5.9), f64(10.0)]) or {
+		panic(@FN + ' failed')
+	}
 	mut o := median(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '5.175000')
-	data = vtl.from_1d([f64(-3.0), f64(1.89), f64(4.4), f64(67.31)])
+	data = vtl.from_1d([f64(-3.0), f64(1.89), f64(4.4), f64(67.31)]) or { panic(@FN + ' failed') }
 	o = median(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '3.145000')
-	data = vtl.from_1d([f64(7.88), f64(12.0), f64(54.83), f64(76.122)])
+	data = vtl.from_1d([f64(7.88), f64(12.0), f64(54.83), f64(76.122)]) or {
+		panic(@FN + ' failed')
+	}
 	o = median(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '33.415000')
 
 	// Odd
-	data = vtl.from_1d([f64(2.7), f64(4.45), f64(5.9), f64(10.0), f64(22)])
+	data = vtl.from_1d([f64(2.7), f64(4.45), f64(5.9), f64(10.0), f64(22)]) or {
+		panic(@FN + ' failed')
+	}
 	o = median(data)
 	assert o == f64(5.9)
-	data = vtl.from_1d([f64(-3.0), f64(1.89), f64(4.4), f64(9), f64(67.31)])
+	data = vtl.from_1d([f64(-3.0), f64(1.89), f64(4.4), f64(9), f64(67.31)]) or {
+		panic(@FN + ' failed')
+	}
 	o = median(data)
 	assert o == f64(4.4)
-	data = vtl.from_1d([f64(7.88), f64(3.3), f64(12.0), f64(54.83), f64(76.122)])
+	data = vtl.from_1d([f64(7.88), f64(3.3), f64(12.0), f64(54.83), f64(76.122)]) or {
+		panic(@FN + ' failed')
+	}
 	o = median(data)
 	assert o == f64(12.0)
 }
 
 fn test_mode() {
 	// Tests were also verified on Wolfram Alpha
-	mut data := vtl.from_1d([f64(2.7), f64(2.7), f64(4.45), f64(5.9), f64(10.0)])
+	mut data := vtl.from_1d([f64(2.7), f64(2.7), f64(4.45), f64(5.9), f64(10.0)]) or {
+		panic(@FN + ' failed')
+	}
 	mut o := mode(data)
 	assert o == f64(2.7)
 	data = vtl.from_1d([f64(-3.0), f64(1.89), f64(1.89), f64(1.89), f64(9), f64(4.4), f64(4.4),
-		f64(9), f64(67.31)])
+		f64(9), f64(67.31)]) or { panic(@FN + ' failed') }
 	o = mode(data)
 	assert o == f64(1.89)
 	// Testing greedy nature
-	data = vtl.from_1d([f64(2.0), f64(4.0), f64(2.0), f64(4.0)])
+	data = vtl.from_1d([f64(2.0), f64(4.0), f64(2.0), f64(4.0)]) or { panic(@FN + ' failed') }
 	o = mode(data)
 	assert o == f64(2.0)
 }
 
 fn test_rms() {
 	// Tests were also verified on Wolfram Alpha
-	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)])
+	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)]) or {
+		panic(@FN + ' failed')
+	}
 	mut o := rms(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '6.362046')
-	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)])
+	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)]) or { panic(@FN + ' failed') }
 	o = rms(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '33.773393')
-	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)])
+	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)]) or {
+		panic(@FN + ' failed')
+	}
 	o = rms(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '47.452561')
@@ -134,15 +162,19 @@ fn test_rms() {
 
 fn test_population_variance() {
 	// Tests were also verified on Wolfram Alpha
-	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)])
+	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)]) or {
+		panic(@FN + ' failed')
+	}
 	mut o := population_variance(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '7.269219')
-	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)])
+	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)]) or { panic(@FN + ' failed') }
 	o = population_variance(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '829.119550')
-	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)])
+	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)]) or {
+		panic(@FN + ' failed')
+	}
 	o = population_variance(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '829.852282')
@@ -150,15 +182,19 @@ fn test_population_variance() {
 
 fn test_sample_variance() {
 	// Tests were also verified on Wolfram Alpha
-	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)])
+	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)]) or {
+		panic(@FN + ' failed')
+	}
 	mut o := sample_variance(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '9.692292')
-	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)])
+	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)]) or { panic(@FN + ' failed') }
 	o = sample_variance(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '1105.492733')
-	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)])
+	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)]) or {
+		panic(@FN + ' failed')
+	}
 	o = sample_variance(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '1106.469709')
@@ -166,15 +202,19 @@ fn test_sample_variance() {
 
 fn test_population_stddev() {
 	// Tests were also verified on Wolfram Alpha
-	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)])
+	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)]) or {
+		panic(@FN + ' failed')
+	}
 	mut o := population_stddev(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '2.696149')
-	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)])
+	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)]) or { panic(@FN + ' failed') }
 	o = population_stddev(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '28.794436')
-	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)])
+	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)]) or {
+		panic(@FN + ' failed')
+	}
 	o = population_stddev(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '28.807157')
@@ -182,15 +222,19 @@ fn test_population_stddev() {
 
 fn test_sample_stddev() {
 	// Tests were also verified on Wolfram Alpha
-	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)])
+	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)]) or {
+		panic(@FN + ' failed')
+	}
 	mut o := sample_stddev(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '3.113245')
-	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)])
+	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)]) or { panic(@FN + ' failed') }
 	o = sample_stddev(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '33.248951')
-	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)])
+	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)]) or {
+		panic(@FN + ' failed')
+	}
 	o = sample_stddev(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '33.263639')
@@ -198,15 +242,19 @@ fn test_sample_stddev() {
 
 fn test_absdev() {
 	// Tests were also verified on Wolfram Alpha
-	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)])
+	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)]) or {
+		panic(@FN + ' failed')
+	}
 	mut o := absdev(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '2.187500')
-	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)])
+	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)]) or { panic(@FN + ' failed') }
 	o = absdev(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '24.830000')
-	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)])
+	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)]) or {
+		panic(@FN + ' failed')
+	}
 	o = absdev(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '27.768000')
@@ -214,54 +262,70 @@ fn test_absdev() {
 
 fn test_min() {
 	// Tests were also verified on Wolfram Alpha
-	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)])
+	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)]) or {
+		panic(@FN + ' failed')
+	}
 	mut o := min(data)
 	assert o == f64(2.7)
-	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)])
+	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)]) or { panic(@FN + ' failed') }
 	o = min(data)
 	assert o == f64(-3.0)
-	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)])
+	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)]) or {
+		panic(@FN + ' failed')
+	}
 	o = min(data)
 	assert o == f64(7.88)
 }
 
 fn test_max() {
 	// Tests were also verified on Wolfram Alpha
-	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)])
+	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)]) or {
+		panic(@FN + ' failed')
+	}
 	mut o := max(data)
 	assert o == f64(10.0)
-	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)])
+	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)]) or { panic(@FN + ' failed') }
 	o = max(data)
 	assert o == f64(67.31)
-	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)])
+	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)]) or {
+		panic(@FN + ' failed')
+	}
 	o = max(data)
 	assert o == f64(76.122)
 }
 
 fn test_range() {
 	// Tests were also verified on Wolfram Alpha
-	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)])
+	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)]) or {
+		panic(@FN + ' failed')
+	}
 	mut o := range(data)
 	assert o == f64(7.3)
-	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)])
+	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)]) or { panic(@FN + ' failed') }
 	o = range(data)
 	assert o == f64(70.31)
-	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)])
+	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)]) or {
+		panic(@FN + ' failed')
+	}
 	o = range(data)
 	assert o == f64(68.242)
 }
 
 fn test_sum() {
 	// Tests were also verified on Wolfram Alpha
-	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)])
+	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)]) or {
+		panic(@FN + ' failed')
+	}
 	mut o := sum(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '23.05')
-	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)])
+	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)]) or { panic(@FN + ' failed') }
 	o = sum(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '70.6')
-	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)])
+	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)]) or {
+		panic(@FN + ' failed')
+	}
 	o = sum(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '150.832')
@@ -269,22 +333,26 @@ fn test_sum() {
 
 fn test_prod() {
 	// Tests were also verified on Wolfram Alpha
-	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)])
+	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)]) or {
+		panic(@FN + ' failed')
+	}
 	mut o := prod(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '708.885')
-	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)])
+	data = vtl.from_1d([f64(-3.0), f64(67.31), f64(4.4), f64(1.89)]) or { panic(@FN + ' failed') }
 	o = prod(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '-1679.24988')
-	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)])
+	data = vtl.from_1d([f64(12.0), f64(7.88), f64(76.122), f64(54.83)]) or {
+		panic(@FN + ' failed')
+	}
 	o = prod(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '394671.621226')
 }
 
 fn test_passing_empty() {
-	data := vtl.from_1d([]f64{})
+	data := vtl.from_1d([]f64{}) or { panic(@FN + ' failed') }
 	assert freq(data, 0) == 0
 	assert mean(data) == f64(0)
 	assert geometric_mean(data) == f64(0)

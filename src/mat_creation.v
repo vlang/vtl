@@ -2,9 +2,9 @@ module vtl
 
 // diag constructs a diagonal array.
 // input must be one dimensional and will be placed along the resulting diagonal
-pub fn diag<T>(t &Tensor<T>) &Tensor<T> {
+pub fn diag<T>(t &Tensor<T>) ?&Tensor<T> {
 	if t.rank() != 1 {
-		panic('Input array must be 1D. Use diag_flat for higher dimensional arrays')
+		return error('Input array must be 1D. Use diag_flat for higher dimensional arrays')
 	}
 	mut ret := zeros<T>([t.size, t.size]).diagonal()
 	ret.assign(t)

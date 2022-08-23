@@ -103,8 +103,8 @@ pub fn (mut ds ImdbDataset) next() ?ImdbBatch {
 
 	ds.batch_pos += batch_size
 
-	mut lt := vtl.from_1d(labels)
-	mut tt := vtl.from_1d(texts)
+	mut lt := vtl.from_1d(labels)?
+	mut tt := vtl.from_1d(texts)?
 
 	return ImdbBatch{
 		labels: lt
