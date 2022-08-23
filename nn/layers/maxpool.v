@@ -41,7 +41,7 @@ pub fn (layer &MaxPool2DLayer<T>) variables() []&autograd.Variable<T> {
 	return []&autograd.Variable<T>{}
 }
 
-pub fn (layer &MaxPool2DLayer<T>) forward(mut input autograd.Variable<T>) &autograd.Variable<T> {
+pub fn (layer &MaxPool2DLayer<T>) forward(mut input autograd.Variable<T>) ?&autograd.Variable<T> {
 	max_indices, output := internal.maxpool2d<T>(input.value, layer.kernel, layer.padding,
 		layer.stride)
 	mut result := input.context.variable(output)
@@ -49,7 +49,7 @@ pub fn (layer &MaxPool2DLayer<T>) forward(mut input autograd.Variable<T>) &autog
 	if input.requires_grad {
 		gate := layers.new_maxpool2d_gate<T>(max_indices, layer.kernel, input.value.shape,
 			layer.padding, layer.stride)
-		gate.cache(mut result, input, layer.kernel, layer.padding, layer.stride)
+		gate.cache(mut result, input, layer.kernel, layer.padding, layer.stride)?
 	}
 
 	return result

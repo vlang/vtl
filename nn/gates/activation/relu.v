@@ -15,15 +15,15 @@ pub fn new_relu_gate<T>(cache &vtl.Tensor<T>) &ReLUGate<T> {
 	}
 }
 
-pub fn (g &ReLUGate<T>) backward<T>(payload &autograd.Payload<T>) []&vtl.Tensor<T> {
+pub fn (g &ReLUGate<T>) backward<T>(payload &autograd.Payload<T>) ?[]&vtl.Tensor<T> {
 	gradient := payload.variable.grad
-	r0 := internal.deriv_relu<T>(gradient, g.cache)
+	r0 := internal.deriv_relu<T>(gradient, g.cache)?
 	return [r0]
 }
 
-pub fn (g &ReLUGate<T>) cache<T>(mut result autograd.Variable<T>, args ...autograd.CacheParam) {
+pub fn (g &ReLUGate<T>) cache<T>(mut result autograd.Variable<T>, args ...autograd.CacheParam) ? {
 	result.grad = vtl.zeros_like<T>(result.value)
 	result.requires_grad = true
 
-	autograd.register<T>('Softmax', g, result, []&autograd.Variable<T>{})
+	autograd.register<T>('Softmax', g, result, []&autograd.Variable<T>{})?
 }

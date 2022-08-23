@@ -22,7 +22,7 @@ pub fn (g &SoftmaxCrossEntropyGate<T>) backward<T>(payload &autograd.Payload<T>)
 	return internal.softmax_cross_entropy_backward<T>(gradient, g.cache.value, g.target)
 }
 
-pub fn (g &SoftmaxCrossEntropyGate<T>) cache<T>(mut result autograd.Variable<T>, args ...autograd.CacheParam) {
+pub fn (g &SoftmaxCrossEntropyGate<T>) cache<T>(mut result autograd.Variable<T>, args ...autograd.CacheParam) ? {
 	result.grad = vtl.zeros_like<T>(result.value)
 	result.requires_grad = true
 

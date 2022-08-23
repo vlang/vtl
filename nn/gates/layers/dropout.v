@@ -16,12 +16,12 @@ pub fn new_dropout_gate<T>(mask &vtl.Tensor<T>, prob f64) &DropoutGate<T> {
 	}
 }
 
-pub fn (g &DropoutGate<T>) backward<T>(payload &autograd.Payload<T>) []&vtl.Tensor<T> {
+pub fn (g &DropoutGate<T>) backward<T>(payload &autograd.Payload<T>) ?[]&vtl.Tensor<T> {
 	gradient := payload.variable.grad
 	return [vtl.divide_scalar(vtl.multiply(gradient, g.mask), T(g.prob))]
 }
 
-pub fn (g &DropoutGate<T>) cache<T>(mut result autograd.Variable<T>, args ...autograd.CacheParam) {
+pub fn (g &DropoutGate<T>) cache<T>(mut result autograd.Variable<T>, args ...autograd.CacheParam) ? {
 	a := args[0]
 
 	match a {
@@ -29,10 +29,10 @@ pub fn (g &DropoutGate<T>) cache<T>(mut result autograd.Variable<T>, args ...aut
 			result.grad = vtl.zeros_like<T>(result.value)
 			result.requires_grad = true
 
-			autograd.register<T>('Dropout', g, result, [a])
+			autograd.register<T>('Dropout', g, result, [a])?
 		}
 		else {
-			panic('DropoutGate: cache: invalid argument')
+			return error('DropoutGate: cache: invalid argument')
 		}
 	}
 }
