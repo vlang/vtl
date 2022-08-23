@@ -23,7 +23,10 @@ pub fn (cpu &CpuStorage<T>) vcl(params VclStorageParams) ?&VclStorage<T> {
 
 	arr := cpu.data.clone()
 	mut data := device.vector<T>(arr.len)?
-	data.load(arr)
+        err := <-data.load(arr)
+	if err !is none {
+		return err
+	}
 	return &VclStorage<T>{
 		data: data
 	}
