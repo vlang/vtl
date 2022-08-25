@@ -17,9 +17,9 @@ pub fn new_pow_gate<T>(a &Variable<T>, b &Variable<T>) &PowGate<T> {
 
 pub fn (g &PowGate<T>) backward<T>(payload &Payload<T>) ?[]&vtl.Tensor<T> {
 	gradient := payload.variable.grad
-	mut r0 := vtl.new_tensor_like<T>(gradient)
-	mut r1 := vtl.new_tensor_like<T>(gradient)
-	mut iters := gradient.iterators<T>([g.a.value, g.b.value])?
+	mut iters, shape := gradient.iterators<T>([g.a.value, g.b.value])?
+	mut r0 := vtl.new_tensor_like_with_shape<T>(gradient, shape)
+	mut r1 := vtl.new_tensor_like_with_shape<T>(gradient, shape)
 	for {
 		vals, i := vtl.iterators_next<T>(mut iters) or { break }
 		val0 := vals[0] * vals[2] * T(math.pow(f64(vals[1]), f64(vals[2]) - 1))

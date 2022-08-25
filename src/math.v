@@ -127,8 +127,8 @@ fn handle_atan2<T>(xs []T, _ []int) T {
 pub fn atan2<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using a.nmap
 	// return a.nmap<T>(handle_atan2, b)
-	mut ret := new_tensor_like<T>(a)
-	mut iters := a.iterators<T>([b])?
+	mut iters, shape := a.iterators<T>([b])?
+	mut ret := new_tensor_like_with_shape<T>(a, shape)
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
 		val := handle_atan2<T>(vals, i)
@@ -490,8 +490,8 @@ fn handle_fmod<T>(xs []T, _ []int) T {
 pub fn fmod<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using a.nmap
 	// return a.nmap<T>(handle_fmod, b)
-	mut ret := new_tensor_like<T>(a)
-	mut iters := a.iterators<T>([b])?
+	mut iters, shape := a.iterators<T>([b])?
+	mut ret := new_tensor_like_with_shape<T>(a, shape)
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
 		val := handle_fmod<T>(vals, i)
@@ -530,8 +530,8 @@ fn handle_gcd<T>(xs []T, _ []int) T {
 pub fn gcd<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using a.nmap
 	// return a.nmap<T>(handle_gcd, b)
-	mut ret := new_tensor_like<T>(a)
-	mut iters := a.iterators<T>([b])?
+	mut iters, shape := a.iterators<T>([b])?
+	mut ret := new_tensor_like_with_shape<T>(a, shape)
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
 		val := handle_gcd<T>(vals, i)
@@ -551,8 +551,8 @@ fn handle_hypot<T>(xs []T, _ []int) T {
 pub fn hypot<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using a.nmap
 	// return a.nmap<T>(handle_hypot, b)
-	mut ret := new_tensor_like<T>(a)
-	mut iters := a.iterators<T>([b])?
+	mut iters, shape := a.iterators<T>([b])?
+	mut ret := new_tensor_like_with_shape<T>(a, shape)
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
 		val := handle_hypot<T>(vals, i)
@@ -572,8 +572,8 @@ fn handle_lcm<T>(xs []T, _ []int) T {
 pub fn lcm<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using a.nmap
 	// return a.nmap<T>(handle_lcm, b)
-	mut ret := new_tensor_like<T>(a)
-	mut iters := a.iterators<T>([b])?
+	mut iters, shape := a.iterators<T>([b])?
+	mut ret := new_tensor_like_with_shape<T>(a, shape)
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
 		val := handle_lcm<T>(vals, i)
@@ -707,8 +707,8 @@ fn handle_log_n<T>(xs []T, _ []int) T {
 pub fn log_n<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using a.nmap
 	// return a.nmap<T>(handle_log_n, b)
-	mut ret := new_tensor_like<T>(a)
-	mut iters := a.iterators<T>([b])?
+	mut iters, shape := a.iterators<T>([b])?
+	mut ret := new_tensor_like_with_shape<T>(a, shape)
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
 		val := handle_log_n<T>(vals, i)
@@ -728,8 +728,8 @@ fn handle_max<T>(xs []T, _ []int) T {
 pub fn max<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using a.nmap
 	// return a.nmap<T>(handle_max, b)
-	mut ret := new_tensor_like<T>(a)
-	mut iters := a.iterators<T>([b])?
+	mut iters, shape := a.iterators<T>([b])?
+	mut ret := new_tensor_like_with_shape<T>(a, shape)
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
 		val := handle_max<T>(vals, i)
@@ -749,8 +749,8 @@ fn handle_min<T>(xs []T, _ []int) T {
 pub fn min<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using a.nmap
 	// return a.nmap<T>(handle_min, b)
-	mut ret := new_tensor_like<T>(a)
-	mut iters := a.iterators<T>([b])?
+	mut iters, shape := a.iterators<T>([b])?
+	mut ret := new_tensor_like_with_shape<T>(a, shape)
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
 		val := handle_min<T>(vals, i)
@@ -770,8 +770,8 @@ fn handle_nextafter<T>(xs []T, _ []int) T {
 pub fn nextafter<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using a.nmap
 	// return a.nmap<T>(handle_nextafter, b)
-	mut ret := new_tensor_like<T>(a)
-	mut iters := a.iterators<T>([b])?
+	mut iters, shape := a.iterators<T>([b])?
+	mut ret := new_tensor_like_with_shape<T>(a, shape)
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
 		val := handle_nextafter<T>(vals, i)
@@ -791,8 +791,8 @@ fn handle_nextafterf32<T>(xs []T, _ []int) T {
 pub fn nextafter32<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using a.nmap
 	// return a.nmap<T>(handle_nextafterf32, b)
-	mut ret := new_tensor_like<T>(a)
-	mut iters := a.iterators<T>([b])?
+	mut iters, shape := a.iterators<T>([b])?
+	mut ret := new_tensor_like_with_shape<T>(a, shape)
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
 		val := handle_nextafterf32<T>(vals, i)
@@ -812,8 +812,8 @@ fn handle_pow<T>(xs []T, _ []int) T {
 pub fn pow<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using a.nmap
 	// return a.nmap<T>(handle_pow, b)
-	mut ret := new_tensor_like<T>(a)
-	mut iters := a.iterators<T>([b])?
+	mut iters, shape := a.iterators<T>([b])?
+	mut ret := new_tensor_like_with_shape<T>(a, shape)
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
 		val := handle_pow<T>(vals, i)
