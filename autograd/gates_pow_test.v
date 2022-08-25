@@ -12,5 +12,5 @@ fn test_pow() {
 
 	f.backprop() or { panic(@FN + ' failed') }
 
-	assert x.grad.equal(vtl.from_1d([6.0]) or { panic(@FN + ' failed') })
+	assert x.grad.array_equiv(vtl.from_1d([6.0]) or { panic(@FN + ' failed') })
 }
