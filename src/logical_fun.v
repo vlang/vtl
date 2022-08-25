@@ -1,7 +1,5 @@
 module vtl
 
-import arrays
-
 // array_equal returns true if input arrays have the same shape and all elements equal.
 pub fn (t &Tensor<T>) array_equal<T>(other &Tensor<T>) bool {
 	if t.shape != other.shape {
