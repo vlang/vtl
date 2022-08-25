@@ -78,8 +78,10 @@ module vtl
 // 	return ret
 // }
 
-// equal checks if two Tensors are equal
-fn equal<T>(t &Tensor<T>, other &Tensor<T>) bool {
+// array_equiv returns true if input arrays are shape consistent and all elements equal.
+// Shape consistent means they are either the same shape,
+// or one input array can be broadcasted to create the same shape as the other one.
+pub fn (t &Tensor<T>) array_equiv<T>(other &Tensor<T>) bool {
 	if t.shape != other.shape {
 		return false
 	}
@@ -91,11 +93,6 @@ fn equal<T>(t &Tensor<T>, other &Tensor<T>) bool {
 		}
 	}
 	return true
-}
-
-// equal checks if two Tensors are equal
-pub fn (t &Tensor<T>) equal<T>(other &Tensor<T>) bool {
-	return equal<T>(t, other)
 }
 
 // with_dims returns a new Tensor adding dimensions so that it has

@@ -6,7 +6,7 @@ fn test_broadcast_column() {
 	expected := from_array([1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 3.0, 3.0, 3.0], [3, 3]) or {
 		panic(@FN + ' failed')
 	}
-	assert equal(b, expected)
+	assert b.array_equiv(expected)
 }
 
 fn test_broadcastable_same_shape() {
