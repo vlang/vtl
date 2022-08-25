@@ -65,12 +65,7 @@ pub fn (t &Tensor<T>) iterators<T>(ts []&Tensor<T>) ?[]&TensorIterator<T> {
 	if next_ts.len == 0 {
 		return []&TensorIterator<T>{}
 	}
-	mut iters := []&TensorIterator<T>{cap: next_ts.len}
-	for i in 0 .. next_ts.len {
-		tib := next_ts[i].broadcast_to<T>(next_ts[0].shape)?
-		iters << tib.iterator<T>()
-	}
-	return iters
+	return broadcast_n<T>(next_ts)?.map(it.iterator<T>())
 }
 
 // next calls the iteration type for a given list of iterators
