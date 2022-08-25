@@ -57,15 +57,21 @@ pub fn (mut s TensorIterator<T>) next<T>() ?(T, []int) {
 }
 
 // iterators creates an array of iterators through a list of tensors
-pub fn (t &Tensor<T>) iterators<T>(ts []&Tensor<T>) ?[]&TensorIterator<T> {
+pub fn (t &Tensor<T>) iterators<T>(ts []&Tensor<T>) ?([]&TensorIterator<T>, []int) {
 	mut next_ts := [t]
 	for t_ in ts {
 		next_ts << t_
 	}
-	if next_ts.len == 0 {
-		return []&TensorIterator<T>{}
+	if next_ts.len == 1 {
+		return [t.iterator<T>()], t.shape
 	}
-	return broadcast_n<T>(next_ts)?.map(it.iterator<T>())
+	broadcasted_ts := broadcast_n<T>(next_ts)?
+	shape := broadcasted_ts[0].shape
+	mut iters := []&TensorIterator<T>{cap: broadcasted_ts.len}
+	for t_ in broadcasted_ts {
+		iters << t_.iterator<T>()
+	}
+	return iters, shape
 }
 
 // next calls the iteration type for a given list of iterators

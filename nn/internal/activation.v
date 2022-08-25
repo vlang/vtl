@@ -34,8 +34,8 @@ pub fn sigmoid<T>(x &vtl.Tensor<T>) &vtl.Tensor<T> {
 // deriv_sigmoid computes the derivative of sigmoid
 [inline]
 pub fn deriv_sigmoid<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>) ?&vtl.Tensor<T> {
-	mut ret := vtl.new_tensor_like<T>(gradient)
-	mut iters := gradient.iterators<T>([cached])?
+	mut iters, shape := gradient.iterators<T>([cached])?
+	mut ret := vtl.new_tensor_like_with_shape<T>(gradient, shape)
 	for {
 		vals, i := vtl.iterators_next<T>(mut iters) or { break }
 		val := vals[0] * (T(1) - vals[0]) * vals[1]
@@ -63,8 +63,8 @@ pub fn relu<T>(x &vtl.Tensor<T>) &vtl.Tensor<T> {
 // deriv_relu computes the derivate of relu
 [inline]
 pub fn deriv_relu<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>) ?&vtl.Tensor<T> {
-	mut ret := vtl.new_tensor_like<T>(gradient)
-	mut iters := gradient.iterators<T>([cached])?
+	mut iters, shape := gradient.iterators<T>([cached])?
+	mut ret := vtl.new_tensor_like_with_shape<T>(gradient, shape)
 	for {
 		vals, i := vtl.iterators_next<T>(mut iters) or { break }
 		mut val := vals[0]
@@ -95,8 +95,8 @@ pub fn leaky_relu<T>(x &vtl.Tensor<T>, alpha T) &vtl.Tensor<T> {
 // deriv_leaky_relu computes the derivative of leaky_relu
 [inline]
 pub fn deriv_leaky_relu<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>, alpha T) ?&vtl.Tensor<T> {
-	mut ret := vtl.new_tensor_like<T>(gradient)
-	mut iters := gradient.iterators<T>([cached])?
+	mut iters, shape := gradient.iterators<T>([cached])?
+	mut ret := vtl.new_tensor_like_with_shape<T>(gradient, shape)
 	for {
 		vals, i := vtl.iterators_next<T>(mut iters) or { break }
 		mut val := vals[1]
@@ -127,8 +127,8 @@ pub fn elu<T>(x &vtl.Tensor<T>, alpha T) &vtl.Tensor<T> {
 // deriv_elu computes the derivative of elu
 [inline]
 pub fn deriv_elu<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>, alpha T) ?&vtl.Tensor<T> {
-	mut ret := vtl.new_tensor_like<T>(gradient)
-	mut iters := gradient.iterators<T>([cached])?
+	mut iters, shape := gradient.iterators<T>([cached])?
+	mut ret := vtl.new_tensor_like_with_shape<T>(gradient, shape)
 	for {
 		vals, i := vtl.iterators_next<T>(mut iters) or { break }
 		mut val := T(1)
@@ -145,8 +145,8 @@ pub fn deriv_elu<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>, alpha T) ?&v
 [inline]
 pub fn sigmoid_cross_entropy_with_logits<T>(input &vtl.Tensor<T>, target &vtl.Tensor<T>) T {
 	batch_size := input.shape[0]
-	mut ret := vtl.new_tensor_like<T>(input)
-	mut iter := input.iterators<T>([target])?
+	mut iter, shape := input.iterators<T>([target])?
+	mut ret := vtl.new_tensor_like_with_shape<T>(input, shape)
 	for {
 		vals, i := vtl.iterators_next<T>(mut iter) or { break }
 		val := -(vals[1] * T(math.max(f64(0), f64(vals[0])))) - T(math.log(T(1) +
@@ -159,8 +159,8 @@ pub fn sigmoid_cross_entropy_with_logits<T>(input &vtl.Tensor<T>, target &vtl.Te
 // mse squared error between the labels and the predictions
 [inline]
 pub fn mse<T>(input &vtl.Tensor<T>, target &vtl.Tensor<T>) &vtl.Tensor<T> {
-	mut ret := vtl.new_tensor_like<T>(input)
-	mut iter := input.iterators<T>([target])?
+	mut iter, shape := input.iterators<T>([target])?
+	mut ret := vtl.new_tensor_like_with_shape<T>(input, shape)
 	for {
 		vals, i := vtl.iterators_next<T>(mut iter) or { break }
 		val := T(math.pow(f64(vals[0] - vals[1]), 2.0))
