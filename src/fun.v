@@ -78,23 +78,6 @@ module vtl
 // 	return ret
 // }
 
-// array_equiv returns true if input arrays are shape consistent and all elements equal.
-// Shape consistent means they are either the same shape,
-// or one input array can be broadcasted to create the same shape as the other one.
-pub fn (t &Tensor<T>) array_equiv<T>(other &Tensor<T>) bool {
-	if t.shape != other.shape {
-		return false
-	}
-	mut iters := t.iterators<T>([other]) or { return false }
-	for {
-		vals, _ := iterators_next<T>(mut iters) or { break }
-		if vals[0] != vals[1] {
-			return false
-		}
-	}
-	return true
-}
-
 // with_dims returns a new Tensor adding dimensions so that it has
 // at least `n` dimensions
 pub fn (t &Tensor<T>) with_dims<T>(n int) ?&Tensor<T> {

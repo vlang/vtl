@@ -30,25 +30,25 @@ fn test_slice() {
 	a := from_array([0.0, 1, 2, 3, 4, 5, 6, 7, 8], [3, 3]) or { panic(@FN + ' failed') }
 	slice := a.slice([0]) or { panic(@FN + ' failed') }
 	expected := from_array([0.0, 1, 2], [3]) or { panic(@FN + ' failed') }
-	assert slice.array_equiv(expected)
+	assert slice.array_equal(expected)
 }
 
 fn test_slice_implicit() {
 	a := from_array([0.0, 1, 2, 3], [2, 2]) or { panic(@FN + ' failed') }
 	slice := a.slice([]int{}, [1]) or { panic(@FN + ' failed') }
 	expected := from_array([1.0, 3], [2]) or { panic(@FN + ' failed') }
-	assert slice.array_equiv(expected)
+	assert slice.array_equal(expected)
 }
 
 fn test_negative_slice() {
 	a := from_array([1.0, 2, 3], [3]) or { panic(@FN + ' failed') }
 	slice := a.slice([0, 3, -1]) or { panic(@FN + ' failed') }
 	expected := from_array([3.0, 2, 1], [3]) or { panic(@FN + ' failed') }
-	assert slice.array_equiv(expected)
+	assert slice.array_equal(expected)
 }
 
 fn test_slice_hilo() {
 	t := from_array([1.0, 2, 3, 4], [2, 2]) or { panic(@FN + ' failed') }
 	slice := t.slice_hilo([0], [2]) or { panic(@FN + ' failed') }
-	assert t.array_equiv(slice)
+	assert t.array_equal(slice)
 }
