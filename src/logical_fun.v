@@ -41,8 +41,7 @@ fn handle_equal<T>(vals []T, _ []int) bool {
 // equal adds two tensors elementwise
 [inline]
 pub fn (t &Tensor<T>) equal<T>(other &Tensor<T>) ?&Tensor<bool> {
-	// @todo: Implement using t.nmap
-	// return t.nmap<T>(handle_equal, other)
+	// @todo: Implement using nmap
 	mut iters, shape := t.iterators<T>([other])?
 	mut ret := empty<bool>(shape)
 	for {

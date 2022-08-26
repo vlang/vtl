@@ -4,7 +4,7 @@ import math
 import vtl
 
 pub fn mse_backward<T>(gradient &vtl.Tensor<T>, cache &vtl.Tensor<T>, target &vtl.Tensor<T>) []&vtl.Tensor<T> {
-	dup := vtl.add(gradient, gradient)
+	dup := vtl.add<T>(gradient, gradient)
 	norm := vtl.divide_scalar(dup, T(gradient.size))
 	subs := vtl.substract(cache, target)
 	return [vtl.multiply(norm, subs)]
