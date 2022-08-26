@@ -1,82 +1,70 @@
 module vtl
 
-// pub type MapFn<T> = fn (x T, i []int) T
+// apply applies a function to each element of a given Tensor
+pub fn apply<T>(mut t Tensor<T>, f fn (x T, i []int) T) {
+	mut iter := t.iterator()
+	for {
+		val, i := iter.next() or { break }
+		next_val := f(val, i)
+		t.set(i, next_val)
+	}
+}
 
-// pub type ApplyFn<T> = fn (x T, i []int) T
+// map maps a function to a given Tensor retuning a new Tensor with same shape
+pub fn map<T>(t &Tensor<T>, f fn (x T, i []int) T) &Tensor<T> {
+	mut ret := new_tensor_like<T>(t)
+	mut iter := t.iterator()
+	for {
+		val, i := iter.next() or { break }
+		next_val := f(val, i)
+		ret.set(i, next_val)
+	}
+	return ret
+}
 
-// pub type ReducerFn<T> = fn (acc T, x T, i []int) T
+// reduce reduces a function to a given Tensor retuning a new agregatted value
+pub fn reduce<T>(t &Tensor<T>, init T, f fn (acc T, x T, i []int) T) T {
+	mut ret := init
+	mut iter := t.iterator()
+	for {
+		val, i := iter.next() or { break }
+		ret = f(ret, val, i)
+	}
+	return ret
+}
 
-// pub type NMapFn<T> = fn (x []T, i []int) T
+// napply applies a function to each element of a given Tensor with params
+pub fn napply<T>(mut t Tensor<T>, ts []&Tensor<T>, f fn (xs []T, i []int) T) ? {
+	mut iters, _ := t.iterators<T>(ts)?
+	for {
+		vals, i := iterators_next<T>(mut iters) or { break }
+		val := f(vals, i)
+		t.set(i, val)
+	}
+}
 
-// pub type NApplyFn<T> = fn (x []T, i []int) T
+// nmap maps a function to a given list of Tensor retuning a new Tensor with same shape
+pub fn nmap<T>(t &Tensor<T>, ts []&Tensor<T>, f fn (xs []T, i []int) T) ?&Tensor<T> {
+	mut iters, shape := t.iterators<T>(ts)?
+	mut ret := new_tensor_like_with_shape<T>(t, shape)
+	for {
+		vals, i := iterators_next<T>(mut iters) or { break }
+		val := f(vals, i)
+		ret.set(i, val)
+	}
+	return ret
+}
 
-// pub type NReducerFn<T> = fn (acc T, x []T, i []int) T
-
-// // apply applies a function to each element of a given Tensor
-// pub fn (mut t Tensor<T>) apply<T>(f ApplyFn<T>) {
-// 	mut iter := t.iterator()
-// 	for {
-// 		val, i := iter.next() or { break }
-// 		next_val := f(val, i)
-// 		t.data.set<T>(i, next_val)
-// 	}
-// }
-
-// // map maps a function to a given Tensor retuning a new Tensor with same shape
-// pub fn (t &Tensor<T>) map<T>(f MapFn<T>) &Tensor<T> {
-// 	mut ret := new_tensor_like<T>(t)
-// 	mut iter := t.iterator()
-// 	for {
-// 		val, i := iter.next() or { break }
-// 		next_val := f(val, i)
-// 		ret.data.set<T>(i, next_val)
-// 	}
-// 	return ret
-// }
-
-// // reduce reduces a function to a given Tensor retuning a new agregatted value
-// pub fn (t &Tensor<T>) reduce<T>(f ReducerFn<T>, init T) T {
-// 	mut ret := init
-// 	mut iter := t.iterator()
-// 	for {
-// 		val, i := iter.next() or { break }
-// 		ret = f(ret, val, i)
-// 	}
-// 	return ret
-// }
-
-// // napply applies a function to each element of a given Tensor with params
-// pub fn (mut t Tensor<T>) napply<T>(f NApplyFn<T>, ts ...&Tensor<T>) {
-// 	mut iters := t.iterators<T>(ts)
-// 	for {
-// 		vals, i := iterators_next<T>(mut iters) or { break }
-// 		val := f(vals, i)
-// 		t.data.set<T>(i, val)
-// 	}
-// }
-
-// // nmap maps a function to a given list of Tensor retuning a new Tensor with same shape
-// pub fn (t &Tensor<T>) nmap<T>(f NMapFn<T>, ts ...&Tensor<T>) &Tensor<T> {
-// 	mut ret := new_tensor_like<T>(t)
-// 	mut iters := t.iterators<T>(ts)
-// 	for {
-// 		vals, i := iterators_next<T>(mut iters) or { break }
-// 		val := f(vals, i)
-// 		ret.data.set<T>(i, val)
-// 	}
-// 	return ret
-// }
-
-// // nreduce reduces a function to a given list of Tensor retuning a new agregatted value
-// pub fn (t &Tensor<T>) nreduce<T>(f NReducerFn<T>, init T, ts ...&Tensor<T>) T {
-// 	mut ret := init
-// 	mut iters := t.iterators<T>(ts)
-// 	for {
-// 		vals, i := iterators_next<T>(mut iters) or { break }
-// 		ret = f(ret, vals, i)
-// 	}
-// 	return ret
-// }
+// nreduce reduces a function to a given list of Tensor retuning a new agregatted value
+pub fn nreduce<T>(t &Tensor<T>, ts []&Tensor<T>, init T, f fn (acc T, xs []T, i []int) T) ?T {
+	mut ret := init
+	mut iters, _ := t.iterators<T>(ts)?
+	for {
+		vals, i := iterators_next<T>(mut iters) or { break }
+		ret = f(ret, vals, i)
+	}
+	return ret
+}
 
 // with_dims returns a new Tensor adding dimensions so that it has
 // at least `n` dimensions
