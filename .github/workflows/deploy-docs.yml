@@ -24,10 +24,9 @@ jobs:
 
       - name: Build docs
         run: |
-          rm -f ./vtl/README.md
-          mv ./vtl/static/DOCS.md ./vtl/README.md
-          v doc -m -f html ./vtl
-          mv ./vtl/_docs/vtl.html ./vtl/_docs/index.html
+          pushd vtl
+          v doc -readme -m -f html .
+          popd
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3

@@ -11,12 +11,11 @@ import vtl
 // of VTL
 [heap]
 pub struct Variable<T> {
-pub:
+pub mut:
 	// The value of the Variable.  This should not be edited outside
 	// of Variable operations, as other edits will not be tracked
 	// and will lead to incorrect results
 	value &vtl.Tensor<T>
-pub mut:
 	// The graph the variable is associated with.  This is a reference,
 	// as a variable does not own its context
 	context &Context<T>
@@ -62,7 +61,7 @@ pub fn (v &Variable<T>) str() string {
 // Even if this is called on the first node in a graph, it will
 // destroy all descendents of this variable stored by the
 // Context
-pub fn (mut v Variable<T>) backprop<T>() {
+pub fn (mut v Variable<T>) backprop<T>() ? {
 	v.grad = vtl.ones_like<T>(v.value)
 	for v.context.len() > 0 && v.context.last().payload.variable != v {
 		node := v.context.pop()
@@ -75,11 +74,11 @@ pub fn (mut v Variable<T>) backprop<T>() {
 		$if debug {
 			print(cur_node.name)
 		}
-		diffs := gate_backward<T>(cur_node.gate, cur_node.payload)
+		diffs := gate_backward<T>(cur_node.gate, cur_node.payload)?
 		for i, diff in diffs {
 			mut parent_i := cur_node.parents[i]
 			if parent_i.requires_grad {
-				parent_i.grad = vtl.add<T>(parent_i.grad, diff)
+				parent_i.grad = vtl.add<T>(parent_i.grad, diff)?
 			}
 		}
 	}

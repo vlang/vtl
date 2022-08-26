@@ -4,17 +4,17 @@ import arrays
 
 // assert_square_matrix panics if the given tensor is not a square matrix
 [inline]
-fn assert_square_matrix<T>(t &Tensor<T>) {
+fn assert_square_matrix<T>(t AnyTensor<T>) ? {
 	if t.is_square_matrix() {
-		panic('Matrix is not square')
+		return error('Matrix is not square')
 	}
 }
 
 // assert_square_matrix panics if the given tensor is not a matrix
 [inline]
-fn assert_matrix<T>(t &Tensor<T>) {
+fn assert_matrix<T>(t AnyTensor<T>) ? {
 	if t.is_matrix() {
-		panic('Tensor is not two-dimensional')
+		return error('Tensor is not two-dimensional')
 	}
 }
 
@@ -29,32 +29,32 @@ fn irange(start int, stop int) []int {
 
 // assert_rank ensures that a Tensor has a given rank
 [inline]
-fn assert_rank<T>(t &Tensor<T>, n int) {
+fn assert_rank<T>(t AnyTensor<T>, n int) ? {
 	if n != t.rank() {
-		panic('Bad number of dimensions')
+		return error('Bad number of dimensions')
 	}
 }
 
 // assert_min_rank ensures that a Tensor has at least a given rank
 [inline]
-fn assert_min_rank<T>(t &Tensor<T>, n int) {
+fn assert_min_rank<T>(t AnyTensor<T>, n int) ? {
 	if n > t.rank() {
-		panic('Bad number of dimensions')
+		return error('Bad number of dimensions')
 	}
 }
 
 // assert_shape_off_axis ensures that the shapes of Tensors match
 // for concatenation, except along the axis being joined
-fn assert_shape_off_axis<T>(ts []&Tensor<T>, axis int, shape []int) []int {
+fn assert_shape_off_axis<T>(ts []&Tensor<T>, axis int, shape []int) ?[]int {
 	mut retshape := shape.clone()
 	for t in ts {
 		if t.shape.len != retshape.len {
-			panic('All inputs must share the same number of axes')
+			return error('All inputs must share the same number of axes')
 		}
 		mut i := 0
 		for i < shape.len {
 			if i != axis && t.shape[i] != shape[i] {
-				panic('All inputs must share a shape off axis')
+				return error('All inputs must share a shape off axis')
 			}
 			i++
 		}
@@ -66,10 +66,10 @@ fn assert_shape_off_axis<T>(ts []&Tensor<T>, axis int, shape []int) []int {
 // assert_shape ensures that the shapes of Tensors match
 // for each tensor given list of tensors
 [inline]
-fn assert_shape<T>(shape []int, ts []&Tensor<T>) {
+fn assert_shape<T>(shape []int, ts []&Tensor<T>) ? {
 	for t in ts {
 		if shape != t.shape {
-			panic('All shapes must be equal')
+			return error('All shapes must be equal')
 		}
 	}
 }
@@ -123,13 +123,13 @@ fn is_row_major_contiguous(shape []int, strides []int, ndims int) bool {
 }
 
 // clip_axis is just a check for negative axes, so that negative axes can be inferred
-fn clip_axis(axis int, size int) int {
+fn clip_axis(axis int, size int) ?int {
 	mut next_axis := axis
 	if next_axis < 0 {
 		next_axis += size
 	}
 	if next_axis < 0 || next_axis > size {
-		panic('axis out of range')
+		return error('axis out of range')
 	}
 	return next_axis
 }
@@ -163,14 +163,14 @@ fn size_from_shape(shape []int) int {
 
 // shape_with_autosize returns a new shape and size with autosize
 // applied if needed
-fn shape_with_autosize(shape []int, size int) ([]int, int) {
+fn shape_with_autosize(shape []int, size int) ?([]int, int) {
 	mut newshape := shape.clone()
 	mut newsize := 1
 	mut autosize := -1
 	for i, val in newshape {
 		if val < 0 {
 			if autosize >= 0 {
-				panic('Only one dimension can be autosized')
+				return error('Only one dimension can be autosized')
 			}
 			autosize = i
 		} else {
@@ -187,7 +187,7 @@ fn shape_with_autosize(shape []int, size int) ([]int, int) {
 
 // filter_shape_not_strides removes 0 size dimensions from the shape
 // and strides of an array
-fn filter_shape_not_strides(shape []int, strides []int) ([]int, []int) {
+fn filter_shape_not_strides(shape []int, strides []int) ?([]int, []int) {
 	mut newshape := []int{}
 	mut newstrides := []int{}
 	for i := 0; i < shape.len; i++ {

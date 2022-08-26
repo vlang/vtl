@@ -5,6 +5,7 @@ import vtl
 import vtl.autograd
 import vtl.nn.internal
 import vtl.nn.gates.layers
+import vtl.nn.types
 
 // MaxPool2DLayer is a layer that implements the maxpooling operation.
 pub struct MaxPool2DLayer<T> {
@@ -14,13 +15,13 @@ pub struct MaxPool2DLayer<T> {
 	stride      []int
 }
 
-pub fn new_maxpool2d_layer<T>(ctx &autograd.Context<T>, input_shape []int, kernel []int, padding []int, stride []int) &MaxPool2DLayer<T> {
-	return &MaxPool2DLayer<T>{
+pub fn new_maxpool2d_layer<T>(ctx &autograd.Context<T>, input_shape []int, kernel []int, padding []int, stride []int) types.Layer {
+	return types.Layer(&MaxPool2DLayer<T>{
 		input_shape: input_shape.clone()
 		kernel: kernel.clone()
 		padding: padding.clone()
 		stride: stride.clone()
-	}
+	})
 }
 
 pub fn (layer &MaxPool2DLayer<T>) output_shape() []int {
@@ -41,15 +42,15 @@ pub fn (layer &MaxPool2DLayer<T>) variables() []&autograd.Variable<T> {
 	return []&autograd.Variable<T>{}
 }
 
-pub fn (layer &MaxPool2DLayer<T>) forward(mut input autograd.Variable<T>) &autograd.Variable<T> {
-	max_indices, output := internal.maxpool2d(input.value, layer.kernel, layer.padding,
+pub fn (layer &MaxPool2DLayer<T>) forward(mut input autograd.Variable<T>) ?&autograd.Variable<T> {
+	max_indices, output := internal.maxpool2d<T>(input.value, layer.kernel, layer.padding,
 		layer.stride)
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {
 		gate := layers.new_maxpool2d_gate<T>(max_indices, layer.kernel, input.value.shape,
 			layer.padding, layer.stride)
-		gate.cache(mut result, input, layer.kernel, layer.padding, layer.stride)
+		gate.cache(mut result, input, layer.kernel, layer.padding, layer.stride)?
 	}
 
 	return result

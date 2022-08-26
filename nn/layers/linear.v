@@ -5,6 +5,7 @@ import vtl.la
 import vtl.autograd
 import vtl.nn.internal
 import vtl.nn.gates.layers
+import vtl.nn.types
 
 // LinearLayer is a layer that applies a linear transformation to its input.
 pub struct LinearLayer<T> {
@@ -12,13 +13,13 @@ pub struct LinearLayer<T> {
 	bias    &autograd.Variable<T>
 }
 
-pub fn new_linear_layer<T>(ctx &autograd.Context<T>, input_dim int, output_dim int) &LinearLayer<T> {
+pub fn new_linear_layer<T>(ctx &autograd.Context<T>, input_dim int, output_dim int) types.Layer {
 	weights := internal.kaiming_normal<T>([output_dim, input_dim])
 	bias := vtl.zeros<T>([1, output_dim])
-	return &LinearLayer<T>{
+	return types.Layer(&LinearLayer<T>{
 		weights: ctx.variable(weights)
 		bias: ctx.variable(bias)
-	}
+	})
 }
 
 pub fn (layer &LinearLayer<T>) output_shape() []int {
@@ -29,13 +30,13 @@ pub fn (layer &LinearLayer<T>) variables() []&autograd.Variable<T> {
 	return [layer.weights, layer.bias]
 }
 
-pub fn (layer &LinearLayer<T>) forward(mut input autograd.Variable<T>) &autograd.Variable<T> {
-	output := vtl.add(la.matmul(input.value, layer.weights.value), layer.bias.value)
+pub fn (layer &LinearLayer<T>) forward(mut input autograd.Variable<T>) ?&autograd.Variable<T> {
+	output := vtl.add<T>(la.matmul<T>(input.value, layer.weights.value)?, layer.bias.value)?
 	mut result := input.context.variable(output)
 
 	if input.requires_grad || layer.weights.requires_grad || layer.bias.requires_grad {
 		gate := layers.new_linear_gate<T>(input, layer.weights, layer.bias)
-		gate.cache(mut result, input, layer.weights, layer.bias)
+		gate.cache(mut result, input, layer.weights, layer.bias)?
 	}
 
 	return result

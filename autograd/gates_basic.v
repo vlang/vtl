@@ -13,7 +13,7 @@ pub fn (g &AddGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
 	return [gradient, gradient]
 }
 
-pub fn (g &AddGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) {
+pub fn (g &AddGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) ? {
 	a := args[0]
 	b := args[1]
 
@@ -24,15 +24,15 @@ pub fn (g &AddGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) {
 					result.grad = vtl.zeros_like<T>(result.value)
 					result.requires_grad = true
 
-					register<T>('Add', g, result, a, b)
+					register<T>('Add', g, result, a, b)?
 				}
 				else {
-					panic('AddGate: b must be a Variable')
+					return error('AddGate: b must be a Variable')
 				}
 			}
 		}
 		else {
-			panic('AddGate: a must be a Variable')
+			return error('AddGate: a must be a Variable')
 		}
 	}
 }
@@ -49,7 +49,7 @@ pub fn (g &SubstractGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
 	return [gradient, oposite]
 }
 
-pub fn (g &SubstractGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) {
+pub fn (g &SubstractGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) ? {
 	a := args[0]
 	b := args[1]
 
@@ -93,7 +93,7 @@ pub fn (g &MultiplyGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
 	return [r0, r1]
 }
 
-pub fn (g &MultiplyGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) {
+pub fn (g &MultiplyGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) ? {
 	a := args[0]
 	b := args[1]
 
@@ -140,7 +140,7 @@ pub fn (g &DivideGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
 	return [r0, r1]
 }
 
-pub fn (g &DivideGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) {
+pub fn (g &DivideGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) ? {
 	a := args[0]
 	b := args[1]
 

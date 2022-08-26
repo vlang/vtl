@@ -1,6 +1,6 @@
 module vtl
 
-import storage
+import vtl.storage
 
 // MemoryFormat is a sum type that lists the possible memory layouts
 pub enum MemoryFormat {
@@ -12,17 +12,23 @@ pub enum MemoryFormat {
 [heap]
 pub struct Tensor<T> {
 pub mut:
-	data    &storage.Storage<T>
+	data    &storage.CpuStorage<T>
 	memory  MemoryFormat
 	size    int
 	shape   []int
 	strides []int
 }
 
+// cpu returns a Tensor from a Tensor
+[inline]
+pub fn (t &Tensor<T>) cpu() ?&Tensor<T> {
+	return t
+}
+
 // str returns the string representation of a Tensor
 [inline]
 pub fn (t &Tensor<T>) str() string {
-	return tensor_str<T>(t, ', ', '')
+	return tensor_str<T>(t, ', ', '') or { '' }
 }
 
 // rank returns the number of dimensions of a given Tensor

@@ -3,6 +3,7 @@
 
 [vlang.io](https://vlang.io) |
 [Docs](https://vlang.github.io/vtl) |
+[Tutorials](https://github.com/vlang/vtl/blob/main/docs/TUTORIAL.md) |
 [Changelog](#) |
 [Contributing](https://github.com/vlang/vtl/blob/main/CONTRIBUTING.md)
 
@@ -10,7 +11,7 @@
 
 ```v ignore
 >>> import vtl
->>> t := vtl.from_array([1.0, 2, 3, 4], [2, 2])
+>>> t := vtl.from_array([1.0, 2, 3, 4], [2, 2])?
 >>> t.get([1, 1])
 4.0
 ```

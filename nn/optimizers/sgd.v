@@ -2,7 +2,8 @@ module optimizers
 
 import vtl.autograd
 import vtl.nn.types
-// import vtl
+import vtl.nn.internal
+import vtl
 
 pub struct SgdOptimizer<T> {
 	learning_rate f64
@@ -22,13 +23,19 @@ pub fn new_sgd_optimizer<T>(config SgdOptimizerConfig) &SgdOptimizer<T> {
 }
 
 pub fn (mut o SgdOptimizer<T>) build_params(layers []types.Layer) {
+	// @todo: @ulises-jeremias to uncomment this
 	for layer in layers {
-		for v in layer.variables() {
-			o.params << v
-		}
+		// for v in layer.variables() {
+		// 	o.params << v
+		// }
 	}
 }
 
-pub fn (mut o SgdOptimizer<T>) update() {
-	// @todo: @ulises-jeremias to implement this
+pub fn (mut o SgdOptimizer<T>) update() ? {
+	for mut v in o.params {
+		if v.requires_grad {
+			internal.sgd_optimize<T>(mut v.value, v.grad, o.learning_rate)?
+			v.grad = vtl.zeros_like<T>(v.value)
+		}
+	}
 }

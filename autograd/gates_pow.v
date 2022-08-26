@@ -15,11 +15,11 @@ pub fn new_pow_gate<T>(a &Variable<T>, b &Variable<T>) &PowGate<T> {
 	}
 }
 
-pub fn (g &PowGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
+pub fn (g &PowGate<T>) backward<T>(payload &Payload<T>) ?[]&vtl.Tensor<T> {
 	gradient := payload.variable.grad
-	mut r0 := vtl.new_tensor_like<T>(gradient)
-	mut r1 := vtl.new_tensor_like<T>(gradient)
-	mut iters := vtl.iterators<T>([gradient, g.a.value, g.b.value])
+	mut iters, shape := gradient.iterators<T>([g.a.value, g.b.value])?
+	mut r0 := vtl.new_tensor_like_with_shape<T>(gradient, shape)
+	mut r1 := vtl.new_tensor_like_with_shape<T>(gradient, shape)
 	for {
 		vals, i := vtl.iterators_next<T>(mut iters) or { break }
 		val0 := vals[0] * vals[2] * T(math.pow(f64(vals[1]), f64(vals[2]) - 1))
@@ -30,7 +30,7 @@ pub fn (g &PowGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
 	return [r0, r1]
 }
 
-pub fn (g &PowGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) {
+pub fn (g &PowGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) ? {
 	a := args[0]
 	b := args[1]
 
@@ -41,15 +41,15 @@ pub fn (g &PowGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) {
 					result.grad = vtl.zeros_like<T>(result.value)
 					result.requires_grad = true
 
-					register<T>('Pow', g, result, [a, b])
+					register<T>('Pow', g, result, [a, b])?
 				}
 				else {
-					panic('PowGate: b must be a Variable')
+					return error('PowGate: b must be a Variable')
 				}
 			}
 		}
 		else {
-			panic('PowGate: a must be a Variable')
+			return error('PowGate: a must be a Variable')
 		}
 	}
 }

@@ -18,30 +18,28 @@ pub mut:
 pub fn new_nnc<T>(ctx &autograd.Context<T>) &NeuralNetworkContainer<T> {
 	return &NeuralNetworkContainer<T>{
 		ctx: ctx
-		loss: voidptr(0)
-		optimizer: voidptr(0)
+		loss: unsafe { nil }
+		optimizer: unsafe { nil }
 	}
 }
 
 // input adds a new input layer to the network
 // with the given shape.
 pub fn (mut ls NeuralNetworkContainer<T>) input(shape []int) {
-	ls.layers << layers.new_input_layer(ls.ctx, shape)
+	ls.layers << layers.new_input_layer<T>(ls.ctx, shape)
 }
 
 // linear adds a new linear layer to the network
 // with the given output size
 pub fn (mut ls NeuralNetworkContainer<T>) linear(output_size int) {
-	// input_size := ls.layers[ls.layers.len - 1].output_shape()[0]
-	input_size := output_size
+	input_size := ls.layers[ls.layers.len - 1].output_shape()[0]
 	ls.layers << layers.new_linear_layer<T>(ls.ctx, input_size, output_size)
 }
 
 // maxpool2d adds a new maxpool2d layer to the network
 // with the given kernel size and stride.
 pub fn (mut ls NeuralNetworkContainer<T>) maxpool2d(kernel []int, padding []int, stride []int) {
-	// shape := ls.layers[ls.layers.len - 1].output_shape()
-	shape := []int{}
+	shape := ls.layers[ls.layers.len - 1].output_shape()
 	ls.layers << layers.new_maxpool2d_layer<T>(ls.ctx, shape, kernel, padding, stride)
 }
 
@@ -52,47 +50,40 @@ pub fn (mut ls NeuralNetworkContainer<T>) softmax_cross_entropy_loss() {
 
 // flatten adds a new flatten layer to the network.
 pub fn (mut ls NeuralNetworkContainer<T>) flatten() {
-	// shape := ls.layers[ls.layers.len - 1].output_shape()
-	shape := []int{}
+	shape := ls.layers[ls.layers.len - 1].output_shape()
 	ls.layers << layers.new_flatten_layer<T>(ls.ctx, shape)
 }
 
 // relu adds a new relu layer to the network.
 pub fn (mut ls NeuralNetworkContainer<T>) relu() {
-	// shape := ls.layers[ls.layers.len - 1].output_shape()
-	shape := []int{}
+	shape := ls.layers[ls.layers.len - 1].output_shape()
 	ls.layers << layers.new_relu_layer<T>(ls.ctx, shape)
 }
 
 // leaky_relu adds a new leaky_relu layer to the network.
 pub fn (mut ls NeuralNetworkContainer<T>) leaky_relu() {
-	// shape := ls.layers[ls.layers.len - 1].output_shape()
-	shape := []int{}
+	shape := ls.layers[ls.layers.len - 1].output_shape()
 	ls.layers << layers.new_leaky_relu_layer<T>(ls.ctx, shape)
 }
 
 // elu adds a new elu layer to the network.
 pub fn (mut ls NeuralNetworkContainer<T>) elu() {
-	// shape := ls.layers[ls.layers.len - 1].output_shape()
-	shape := []int{}
+	shape := ls.layers[ls.layers.len - 1].output_shape()
 	ls.layers << layers.new_elu_layer<T>(ls.ctx, shape)
 }
 
 // sigmod adds a new sigmod layer to the network.
 pub fn (mut ls NeuralNetworkContainer<T>) sigmod() {
-	// shape := ls.layers[ls.layers.len - 1].output_shape()
-	shape := []int{}
+	shape := ls.layers[ls.layers.len - 1].output_shape()
 	ls.layers << layers.new_sigmoid_layer<T>(ls.ctx, shape)
 }
 
 // sgd adds a new sgd optimizer to the network.
 pub fn (mut ls NeuralNetworkContainer<T>) sgd(config optimizers.SgdOptimizerConfig) {
-	// @todo: @ulises-jeremias to uncomment this
-	// ls.optimizer = optimizers.new_sgd_optimizer<T>(config)
+	ls.optimizer = optimizers.new_sgd_optimizer<T>(config)
 }
 
 // adam adds a new adam optimizer to the network.
 pub fn (mut ls NeuralNetworkContainer<T>) adam(config optimizers.AdamOptimizerConfig) {
-	// @todo: @ulises-jeremias to uncomment this
-	// ls.optimizer = optimizers.new_adam_optimizer<T>(config)
+	ls.optimizer = optimizers.new_adam_optimizer<T>(config)
 }

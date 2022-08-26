@@ -23,7 +23,7 @@ pub fn new_maxpool2d_gate<T>(max_indices &vtl.Tensor<int>, kernel []int, shape [
 	}
 }
 
-pub fn (g &MaxPool2DGate<T>) backward<T>(payload &autograd.Payload<T>) []&vtl.Tensor<T> {
+pub fn (g &MaxPool2DGate<T>) backward<T>(payload &autograd.Payload<T>) ?[]&vtl.Tensor<T> {
 	gradient := payload.variable.grad
 
 	r0 := internal.maxpool2d_backward<T>(g.shape, g.max_indices, gradient)
@@ -31,7 +31,7 @@ pub fn (g &MaxPool2DGate<T>) backward<T>(payload &autograd.Payload<T>) []&vtl.Te
 	return [r0]
 }
 
-pub fn (g &MaxPool2DGate<T>) cache<T>(mut result autograd.Variable<T>, args ...autograd.CacheParam) {
+pub fn (g &MaxPool2DGate<T>) cache<T>(mut result autograd.Variable<T>, args ...autograd.CacheParam) ? {
 	a := args[0]
 
 	match a {
@@ -39,10 +39,10 @@ pub fn (g &MaxPool2DGate<T>) cache<T>(mut result autograd.Variable<T>, args ...a
 			result.grad = vtl.zeros_like<T>(result.value)
 			result.requires_grad = true
 
-			autograd.register<T>('MaxPool2D', g, result, [a])
+			autograd.register<T>('MaxPool2D', g, result, [a])?
 		}
 		else {
-			panic('MaxPool2DGate: cache: invalid argument')
+			return error('MaxPool2DGate: cache: invalid argument')
 		}
 	}
 }

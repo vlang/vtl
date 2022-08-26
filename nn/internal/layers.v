@@ -3,8 +3,8 @@ module internal
 import vtl
 
 pub fn dropout<T>(input &vtl.Tensor<T>, mask &vtl.Tensor<T>, prob f64) &vtl.Tensor<T> {
-	mut ret := vtl.new_tensor_like<T>(input)
-	mut iters := vtl.iterators<T>([input, mask])
+	mut iters, shape := input.iterators<T>([mask])
+	mut ret := vtl.new_tensor_like_with_shape<T>(input, shape)
 	for {
 		vals, i := vtl.iterators_next<T>(mut iters) or { break }
 		val := vals[0] * vals[1] / T(prob)
@@ -14,8 +14,8 @@ pub fn dropout<T>(input &vtl.Tensor<T>, mask &vtl.Tensor<T>, prob f64) &vtl.Tens
 }
 
 pub fn dropout_backwards<T>(gradient &vtl.Tensor<T>, mask &vtl.Tensor<T>, prob f64) &vtl.Tensor<T> {
-	mut ret := vtl.new_tensor_like<T>(gradient)
-	mut iters := vtl.iterators<T>([gradient, mask])
+	mut iters, shape := gradient.iterators<T>([mask])
+	mut ret := vtl.new_tensor_like_with_shape<T>(gradient, shape)
 	for {
 		vals, i := vtl.iterators_next<T>(mut iters) or { break }
 		val := vals[0] * vals[1] / T(prob)
@@ -52,7 +52,7 @@ pub fn maxpool2d_backward<T>(shape []int, max_indices &vtl.Tensor<int>, grad_out
 	// @todo: @ulises-jeremias to override this on other backends
 	mut ret := vtl.zeros<T>(shape)
 	for i in 0 .. grad_output.size {
-		idx := max_indices.data.get(i)
+		idx := max_indices.data.get<int>(i)
 		ret.set_nth(idx, grad_output.data.get(i))
 	}
 	return ret

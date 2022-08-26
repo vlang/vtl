@@ -18,7 +18,7 @@ pub interface Gate {
 }
 
 // @todo: Implement this somehow :D
-pub fn gate_backward<T>(gate Gate, payload &Payload<T>) []&vtl.Tensor<T> {
+pub fn gate_backward<T>(gate Gate, payload &Payload<T>) ?[]&vtl.Tensor<T> {
 	match gate {
 		PowGate<T> {
 			return gate.backward(payload)
@@ -30,7 +30,7 @@ pub fn gate_backward<T>(gate Gate, payload &Payload<T>) []&vtl.Tensor<T> {
 }
 
 // @todo: Implement this somehow :D
-pub fn gate_cache<T>(gate Gate, mut result Variable<T>, args ...CacheParam) {
+pub fn gate_cache<T>(gate Gate, mut result Variable<T>, args ...CacheParam) ? {
 	match gate {
 		PowGate<T> {
 			return gate.cache(mut result, ...args)
