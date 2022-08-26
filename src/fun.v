@@ -46,8 +46,8 @@ pub fn (t &Tensor<T>) reduce<T>(f ReducerFn<T>, init T) T {
 }
 
 // // napply applies a function to each element of a given Tensor with params
-pub fn (mut t Tensor<T>) napply<T>(f NApplyFn<T>, ts []&Tensor<T>) {
-	mut iters := t.iterators<T>(ts)
+pub fn (mut t Tensor<T>) napply<T>(f NApplyFn<T>, ts []&Tensor<T>) ? {
+	mut iters, _ := t.iterators<T>(ts)?
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
 		val := f(vals, i)
@@ -56,9 +56,9 @@ pub fn (mut t Tensor<T>) napply<T>(f NApplyFn<T>, ts []&Tensor<T>) {
 }
 
 // // nmap maps a function to a given list of Tensor retuning a new Tensor with same shape
-pub fn (t &Tensor<T>) nmap<T>(f NMapFn<T>, ts []&Tensor<T>) &Tensor<T> {
-	mut ret := new_tensor_like<T>(t)
-	mut iters := t.iterators<T>(ts)
+pub fn (t &Tensor<T>) nmap<T>(f NMapFn<T>, ts []&Tensor<T>) ?&Tensor<T> {
+	mut iters, shape := t.iterators<T>(ts)?
+	mut ret := new_tensor_like_with_shape<T>(t, shape)
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
 		val := f(vals, i)
@@ -68,9 +68,9 @@ pub fn (t &Tensor<T>) nmap<T>(f NMapFn<T>, ts []&Tensor<T>) &Tensor<T> {
 }
 
 // // nreduce reduces a function to a given list of Tensor retuning a new agregatted value
-pub fn (t &Tensor<T>) nreduce<T>(f NReducerFn<T>, init T, ts []&Tensor<T>) T {
+pub fn (t &Tensor<T>) nreduce<T>(f NReducerFn<T>, init T, ts []&Tensor<T>) ?T {
 	mut ret := init
-	mut iters := t.iterators<T>(ts)
+	mut iters, _ := t.iterators<T>(ts)?
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
 		ret = f(ret, vals, i)
