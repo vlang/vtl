@@ -43,6 +43,21 @@ fn (t &Tensor<T>) assert_min_rank<T>(n int) ? {
 	}
 }
 
+// ensure_memory sets a correct memory layout to a given tensor
+[inline]
+pub fn (mut t Tensor<T>) ensure_memory<T>() {
+	if t.is_col_major() {
+		if !t.is_col_major_contiguous() {
+			t.memory = .row_major
+		}
+	}
+	if t.is_contiguous() {
+		if t.rank() > 1 {
+			t.memory = .row_major
+		}
+	}
+}
+
 // assert_shape_off_axis ensures that the shapes of Tensors match
 // for concatenation, except along the axis being joined
 fn assert_shape_off_axis<T>(ts []&Tensor<T>, axis int, shape []int) ?[]int {
@@ -221,21 +236,6 @@ fn pad_with_max(pad []int, shape []int, ndims int) []int {
 		newpad << shape[pad.len..]
 	}
 	return newpad
-}
-
-// ensure_memory sets a correct memory layout to a given tensor
-[inline]
-pub fn ensure_memory<T>(mut t Tensor<T>) {
-	if t.is_col_major() {
-		if !t.is_col_major_contiguous() {
-			t.memory = .row_major
-		}
-	}
-	if t.is_contiguous() {
-		if t.rank() > 1 {
-			t.memory = .row_major
-		}
-	}
 }
 
 // iarray_min returns the minimum value of a given array of int values

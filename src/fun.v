@@ -103,7 +103,7 @@ pub fn (t &Tensor<T>) diagonal<T>() &Tensor<T> {
 		size: nel
 		memory: t.memory
 	}
-	ensure_memory<T>(mut ret)
+	ret.ensure_memory()
 	return ret
 }
 
@@ -123,7 +123,7 @@ pub fn (t &Tensor<T>) reshape<T>(shape []int) ?&Tensor<T> {
 	}
 	mut ret := new_tensor_like_with_shape<T>(t, newshape)
 	ret.data = t.data
-	ensure_memory<T>(mut ret)
+	ret.ensure_memory()
 	return ret
 }
 
@@ -135,7 +135,7 @@ pub fn (t &Tensor<T>) as_strided<T>(shape []int, strides []int) ?&Tensor<T> {
 	}
 	mut ret := new_tensor_like_with_shape_and_strides<T>(t, newshape, strides)
 	ret.data = t.data
-	ensure_memory<T>(mut ret)
+	ret.ensure_memory()
 	return ret
 }
 
@@ -170,7 +170,7 @@ pub fn (t &Tensor<T>) transpose<T>(order []int) ?&Tensor<T> {
 		ret.strides[ii] = t.strides[permutation[ii]]
 		ii++
 	}
-	ensure_memory<T>(mut ret)
+	ret.ensure_memory()
 	return ret
 }
 
@@ -269,7 +269,7 @@ pub fn (t &Tensor<T>) slice<T>(idx ...[]int) ?&Tensor<T> {
 		data: t.data.offset<T>(offset)
 		memory: .row_major
 	}
-	ensure_memory<T>(mut ret)
+	ret.ensure_memory()
 	return ret
 }
 
@@ -313,6 +313,6 @@ pub fn (t &Tensor<T>) slice_hilo<T>(idx1 []int, idx2 []int) ?&Tensor<T> {
 		data: t.data.offset<T>(offset)
 		memory: .row_major
 	}
-	ensure_memory<T>(mut ret)
+	ret.ensure_memory()
 	return ret
 }
