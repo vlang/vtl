@@ -160,11 +160,6 @@ the work and inspiration that the library done by Christopher has given.</p>
 <p>empty_like returns a new Tensor of given shape and type as a given Tensor</p>
 
 </section>
-						<section id="ensure_memory" class="doc-node">
-							<div class="title"><h2>fn ensure_memory <a href="#ensure_memory">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/util.v#L228"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">ensure_memory</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token keyword">mut</span> t Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span></code></pre>
-<p>ensure_memory sets a correct memory layout to a given tensor</p>
-
-</section>
 						<section id="exponential" class="doc-node">
 							<div class="title"><h2>fn exponential <a href="#exponential">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/rand.v#L32"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">exponential</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>lambda <span class="token builtin">f64</span><span class="token punctuation">,</span> shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> params TensorData<span class="token punctuation">)</span> <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
 <p>exponential returns a tensor of exponential random variables.</p>
@@ -506,6 +501,11 @@ provided the array dimension is greater than or equal to 3.</p>
 <p>dsplit_expl splits array into multiple sub-arrays along the 3rd axis (depth).<br>
 Please refer to the split documentation. dsplit is equivalent to split with axis=2, the array is always split along the third axis
 provided the array dimension is greater than or equal to 3.</p>
+
+</section>
+						<section id="Tensor<T>.ensure_memory" class="doc-node">
+							<div class="title"><h2>fn (Tensor<T>) ensure_memory <a href="#Tensor<T>.ensure_memory">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/util.v#L48"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> t Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">ensure_memory</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<p>ensure_memory sets a correct memory layout to a given tensor</p>
 
 </section>
 						<section id="Tensor<T>.equal" class="doc-node">
@@ -1171,7 +1171,7 @@ Stores a copy of the shape and strides reduced along a given axis</p>
 </section>
 
           <div class="footer">
-            Powered by vdoc. Generated on: 27 Aug 2022 17:29:24
+            Powered by vdoc. Generated on: 27 Aug 2022 18:36:11
           </div>
         </div>
         <div class="doc-toc"><ul><li class="open"><a href="#readme_">README</a></li>
@@ -1195,9 +1195,6 @@ Stores a copy of the shape and strides reduced along a given axis</p>
 </ul>
 </li>
 <li class="open"><a href="#empty_like">fn empty_like</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#ensure_memory">fn ensure_memory</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#exponential">fn exponential</a>        <ul>
@@ -1313,6 +1310,7 @@ Stores a copy of the shape and strides reduced along a given axis</p>
 <li><a href="#Tensor<T>.divide_scalar">fn divide_scalar</a></li>
 <li><a href="#Tensor<T>.dsplit">fn dsplit</a></li>
 <li><a href="#Tensor<T>.dsplit_expl">fn dsplit_expl</a></li>
+<li><a href="#Tensor<T>.ensure_memory">fn ensure_memory</a></li>
 <li><a href="#Tensor<T>.equal">fn equal</a></li>
 <li><a href="#Tensor<T>.erf">fn erf</a></li>
 <li><a href="#Tensor<T>.erfc">fn erfc</a></li>
