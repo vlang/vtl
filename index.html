@@ -287,11 +287,6 @@ the flattened input is placed along the diagonal of the resulting matrix</p>
 <p>exp2 returns the elementwise exp2 of an tensor</p>
 
 </section>
-						<section id="expand_dims" class="doc-node">
-							<div class="title"><h2>fn expand_dims <a href="#expand_dims">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/stack.v#L90"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">expand_dims</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> data AxisData<span class="token punctuation">)</span> <span class="token operator">?</span><span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
-<p>expand_dims adds an axis to a Tensor in order to support broadcasting operations</p>
-
-</section>
 						<section id="expm1" class="doc-node">
 							<div class="title"><h2>fn expm1 <a href="#expm1">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/math.v#L338"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">expm1</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
 <p>expm1 returns the elementwise expm1 of an tensor</p>
@@ -770,6 +765,11 @@ provided the array dimension is greater than or equal to 3.</p>
 <p>equal adds two tensors elementwise</p>
 
 </section>
+						<section id="Tensor<T>.expand_dims" class="doc-node">
+							<div class="title"><h2>fn (Tensor<T>) expand_dims <a href="#Tensor<T>.expand_dims">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/stack.v#L90"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">expand_dims</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>data AxisData<span class="token punctuation">)</span> <span class="token operator">?</span><span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+<p>expand_dims adds an axis to a Tensor in order to support broadcasting operations</p>
+
+</section>
 						<section id="Tensor<T>.fill" class="doc-node">
 							<div class="title"><h2>fn (Tensor<T>) fill <a href="#Tensor<T>.fill">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/assignment.v#L19"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> t Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">fill</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>val <span class="token builtin">T</span><span class="token punctuation">)</span></code></pre>
 <p>fill fills an entire Tensor with a given value</p>
@@ -1102,7 +1102,7 @@ Stores a copy of the shape and strides reduced along a given axis</p>
 </section>
 
           <div class="footer">
-            Powered by vdoc. Generated on: 27 Aug 2022 04:35:36
+            Powered by vdoc. Generated on: 27 Aug 2022 04:40:12
           </div>
         </div>
         <div class="doc-toc"><ul><li class="open"><a href="#readme_">README</a></li>
@@ -1201,9 +1201,6 @@ Stores a copy of the shape and strides reduced along a given axis</p>
 </ul>
 </li>
 <li class="open"><a href="#exp2">fn exp2</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#expand_dims">fn expand_dims</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#expm1">fn expm1</a>        <ul>
@@ -1436,6 +1433,7 @@ Stores a copy of the shape and strides reduced along a given axis</p>
 <li><a href="#Tensor<T>.dsplit">fn dsplit</a></li>
 <li><a href="#Tensor<T>.dsplit_expl">fn dsplit_expl</a></li>
 <li><a href="#Tensor<T>.equal">fn equal</a></li>
+<li><a href="#Tensor<T>.expand_dims">fn expand_dims</a></li>
 <li><a href="#Tensor<T>.fill">fn fill</a></li>
 <li><a href="#Tensor<T>.get">fn get</a></li>
 <li><a href="#Tensor<T>.get_nth">fn get_nth</a></li>
