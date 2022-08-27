@@ -7,7 +7,7 @@ pub fn (t &Tensor<T>) array_equal<T>(other &Tensor<T>) bool {
 	}
 	mut iters, _ := t.iterators<T>([other]) or { return false }
 	for {
-		vals, _ := iterators_next<T>(mut iters) or { break }
+		vals, _ := iters.next() or { break }
 		if vals[0] != vals[1] {
 			return false
 		}
@@ -21,7 +21,7 @@ pub fn (t &Tensor<T>) array_equal<T>(other &Tensor<T>) bool {
 pub fn (t &Tensor<T>) array_equiv<T>(other &Tensor<T>) bool {
 	mut iters, _ := t.iterators<T>([other]) or { return false }
 	for {
-		vals, _ := iterators_next<T>(mut iters) or { break }
+		vals, _ := iters.next() or { break }
 		if vals[0] != vals[1] {
 			return false
 		}
@@ -45,7 +45,7 @@ pub fn (t &Tensor<T>) equal<T>(other &Tensor<T>) ?&Tensor<bool> {
 	mut iters, shape := t.iterators<T>([other])?
 	mut ret := empty<bool>(shape)
 	for {
-		vals, i := iterators_next<T>(mut iters) or { break }
+		vals, i := iters.next() or { break }
 		val := handle_equal<T>(vals, i)
 		ret.set(i, val)
 	}
@@ -59,7 +59,7 @@ pub fn (t &Tensor<T>) not_equal<T>(other &Tensor<T>) ?&Tensor<bool> {
 	mut iters, shape := t.iterators<T>([other])?
 	mut ret := empty<bool>(shape)
 	for {
-		vals, i := iterators_next<T>(mut iters) or { break }
+		vals, i := iters.next() or { break }
 		val := !handle_equal<T>(vals, i)
 		ret.set(i, val)
 	}

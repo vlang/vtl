@@ -56,14 +56,22 @@ pub fn (mut s TensorIterator<T>) next<T>() ?(T, []int) {
 	return handle_strided_iteration<T>(mut s), s.tensor.nth_index(s.iteration)
 }
 
+pub struct TensorsIterator<T> {
+mut:
+	iters []&TensorIterator<T>
+}
+
 // iterators creates an array of iterators through a list of tensors
-pub fn (t &Tensor<T>) iterators<T>(ts []&Tensor<T>) ?([]&TensorIterator<T>, []int) {
+pub fn (t &Tensor<T>) iterators<T>(ts []&Tensor<T>) ?(&TensorsIterator<T>, []int) {
 	mut next_ts := [t]
 	for t_ in ts {
 		next_ts << t_
 	}
 	if next_ts.len == 1 {
-		return [t.iterator<T>()], t.shape
+		its := &TensorsIterator<T>{
+			iters: [t.iterator<T>()]
+		}
+		return its, t.shape
 	}
 	broadcasted_ts := broadcast_n<T>(next_ts)?
 	shape := broadcasted_ts[0].shape
@@ -71,22 +79,19 @@ pub fn (t &Tensor<T>) iterators<T>(ts []&Tensor<T>) ?([]&TensorIterator<T>, []in
 	for t_ in broadcasted_ts {
 		iters << t_.iterator<T>()
 	}
-	return iters, shape
+	its := &TensorsIterator<T>{
+		iters: iters
+	}
+	return its, shape
 }
 
 // next calls the iteration type for a given list of iterators
 // which is either flat or strided and returns a list of Nums containing the current values
 [inline]
-pub fn (mut its []&TensorIterator<T>) next<T>() ?([]T, []int) {
-	return iterators_next<T>(mut its)
-}
-
-// iterators_next calls the iteration type for a given list of iterators
-// which is either flat or strided and returns a list of Nums containing the current values
-pub fn iterators_next<T>(mut its []&TensorIterator<T>) ?([]T, []int) {
-	mut nums := []T{cap: its.len}
+pub fn (mut its TensorsIterator<T>) next<T>() ?([]T, []int) {
+	mut nums := []T{cap: its.iters.len}
 	mut index := []int{}
-	for i, mut iter in its {
+	for i, mut iter in its.iters {
 		val, index_ := iter.next() or { return err }
 		if i == 0 {
 			index = index_.clone()

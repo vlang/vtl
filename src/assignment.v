@@ -26,7 +26,7 @@ pub fn (mut t Tensor<T>) fill<T>(val T) &Tensor<T> {
 pub fn (mut t Tensor<T>) assign<T>(other &Tensor<T>) ?&Tensor<T> {
 	mut iters, _ := t.iterators<T>([other])?
 	for {
-		vals, i := iterators_next<T>(mut iters) or { break }
+		vals, i := iters.next() or { break }
 		t.set(i, vals[1])
 	}
 	return t

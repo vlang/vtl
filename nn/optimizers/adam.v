@@ -56,21 +56,21 @@ pub fn (mut o AdamOptimizer<T>) update() ? {
 		if v.requires_grad {
 			mut fm_iters, _ := o.first_moments[i].iterators([v.grad])?
 			for {
-				vals, idx := vtl.iterators_next<T>(mut fm_iters) or { break }
+				vals, idx := fm_iters.next() or { break }
 				val := o.beta1 * vals[0] + (1.0 - o.beta1) * vals[1]
 				o.first_moments[i].set(idx, vtl.new_t<T>(val))
 			}
 
 			mut sm_iters, _ := o.second_moments[i].iterators([v.grad])?
 			for {
-				vals, idx := vtl.iterators_next<T>(mut sm_iters) or { break }
+				vals, idx := sm_iters.next() or { break }
 				val := o.beta2 * vals[0] + (1.0 - o.beta2) * vals[1] * vals[1]
 				o.second_moments[i].set(idx, vtl.new_t<T>(val))
 			}
 
 			mut val_iters, _ := v.value.iterators([o.first_moments[i], o.second_moments[i]])?
 			for {
-				vals, idx := vtl.iterators_next<T>(mut val_iters) or { break }
+				vals, idx := val_iters.next() or { break }
 				val := vals[0] - lr_t * vals[1] / (math.sqrt(vals[3]) + o.epsilon)
 				v.value.set(idx, vtl.new_t<T>(val))
 			}
