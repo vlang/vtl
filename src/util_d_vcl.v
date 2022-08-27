@@ -31,3 +31,18 @@ fn (t &VclTensor<T>) assert_min_rank<T>(n int) ? {
 		return error('Bad number of dimensions')
 	}
 }
+
+// ensure_memory sets a correct memory layout to a given tensor
+[inline]
+pub fn (mut t VclTensor<T>) ensure_memory<T>() {
+	if t.is_col_major() {
+		if !t.is_col_major_contiguous() {
+			t.memory = .row_major
+		}
+	}
+	if t.is_contiguous() {
+		if t.rank() > 1 {
+			t.memory = .row_major
+		}
+	}
+}

@@ -129,7 +129,7 @@ pub fn (t &Tensor<T>) copy(memory MemoryFormat) &Tensor<T> {
 		strides: strides
 		size: size
 	}
-	ensure_memory<T>(mut ret)
+	ret.ensure_memory()
 	return ret
 }
 
