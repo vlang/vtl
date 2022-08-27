@@ -14,8 +14,8 @@ pub fn tanh<T>(x &vtl.Tensor<T>) &vtl.Tensor<T> {
 pub fn deriv_tanh<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>) ?&vtl.Tensor<T> {
 	// gradient * (1 - cached * cached)
 	// gradient * (- (cached * cached) + 1)
-	x := vtl.add_scalar(vtl.multiply(cached, cached), T(1))
-	return vtl.multiply(gradient, vtl.multiply_scalar(x, T(-1)))
+	x := cached.multiply(cached).add_scalar(T(1))
+	return gradient.multiply(x.multiply_scalar(T(-1)))
 }
 
 // sigmoid takes a real-valued number and squashes it to the range [0, 1]
