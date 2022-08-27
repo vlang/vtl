@@ -1,7 +1,7 @@
 module vtl
 
 // apply applies a function to each element of a given Tensor
-pub fn apply<T>(mut t Tensor<T>, f fn (x T, i []int) T) {
+pub fn (mut t Tensor<T>) apply<T>(f fn (x T, i []int) T) {
 	mut iter := t.iterator()
 	for {
 		val, i := iter.next() or { break }
@@ -11,7 +11,7 @@ pub fn apply<T>(mut t Tensor<T>, f fn (x T, i []int) T) {
 }
 
 // map maps a function to a given Tensor retuning a new Tensor with same shape
-pub fn map<T>(t &Tensor<T>, f fn (x T, i []int) T) &Tensor<T> {
+pub fn (t &Tensor<T>) map<T>(f fn (x T, i []int) T) &Tensor<T> {
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
@@ -23,7 +23,7 @@ pub fn map<T>(t &Tensor<T>, f fn (x T, i []int) T) &Tensor<T> {
 }
 
 // reduce reduces a function to a given Tensor retuning a new agregatted value
-pub fn reduce<T>(t &Tensor<T>, init T, f fn (acc T, x T, i []int) T) T {
+pub fn (t &Tensor<T>) reduce<T>(init T, f fn (acc T, x T, i []int) T) T {
 	mut ret := init
 	mut iter := t.iterator()
 	for {
@@ -34,7 +34,7 @@ pub fn reduce<T>(t &Tensor<T>, init T, f fn (acc T, x T, i []int) T) T {
 }
 
 // napply applies a function to each element of a given Tensor with params
-pub fn napply<T>(mut t Tensor<T>, ts []&Tensor<T>, f fn (xs []T, i []int) T) ? {
+pub fn (mut t Tensor<T>) napply<T>(ts []&Tensor<T>, f fn (xs []T, i []int) T) ? {
 	mut iters, _ := t.iterators<T>(ts)?
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
@@ -44,7 +44,7 @@ pub fn napply<T>(mut t Tensor<T>, ts []&Tensor<T>, f fn (xs []T, i []int) T) ? {
 }
 
 // nmap maps a function to a given list of Tensor retuning a new Tensor with same shape
-pub fn nmap<T>(t &Tensor<T>, ts []&Tensor<T>, f fn (xs []T, i []int) T) ?&Tensor<T> {
+pub fn (t &Tensor<T>) nmap<T>(ts []&Tensor<T>, f fn (xs []T, i []int) T) ?&Tensor<T> {
 	mut iters, shape := t.iterators<T>(ts)?
 	mut ret := new_tensor_like_with_shape<T>(t, shape)
 	for {
@@ -56,7 +56,7 @@ pub fn nmap<T>(t &Tensor<T>, ts []&Tensor<T>, f fn (xs []T, i []int) T) ?&Tensor
 }
 
 // nreduce reduces a function to a given list of Tensor retuning a new agregatted value
-pub fn nreduce<T>(t &Tensor<T>, ts []&Tensor<T>, init T, f fn (acc T, xs []T, i []int) T) ?T {
+pub fn (t &Tensor<T>) nreduce<T>(ts []&Tensor<T>, init T, f fn (acc T, xs []T, i []int) T) ?T {
 	mut ret := init
 	mut iters, _ := t.iterators<T>(ts)?
 	for {
