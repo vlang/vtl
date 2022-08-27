@@ -103,7 +103,7 @@ pub fn (t &Tensor<T>) to_array() []T {
 	mut iter := t.iterator()
 	for {
 		val, _ := iter.next() or { break }
-		arr << T(val)
+		arr << new_t<T>(val)
 	}
 	return arr
 }

@@ -1,8 +1,5 @@
 module vtl
 
-// TensorDataType is a sum type that lists the possible types to be used to define storage
-pub type TensorDataType = byte | f32 | f64 | i16 | i64 | i8 | int | u16 | u32 | u64
-
 // AnyTensor is an interface that allows for any tensor to be used in the vtl library
 pub interface AnyTensor<T> {
 	shape []int

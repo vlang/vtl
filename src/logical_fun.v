@@ -51,3 +51,17 @@ pub fn (t &Tensor<T>) equal<T>(other &Tensor<T>) ?&Tensor<bool> {
 	}
 	return ret
 }
+
+// not_equal adds two tensors elementwise
+[inline]
+pub fn (t &Tensor<T>) not_equal<T>(other &Tensor<T>) ?&Tensor<bool> {
+	// @todo: Implement using nmap
+	mut iters, shape := t.iterators<T>([other])?
+	mut ret := empty<bool>(shape)
+	for {
+		vals, i := iterators_next<T>(mut iters) or { break }
+		val := !handle_equal<T>(vals, i)
+		ret.set(i, val)
+	}
+	return ret
+}

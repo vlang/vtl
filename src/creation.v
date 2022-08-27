@@ -3,7 +3,7 @@ module vtl
 // empty returns a new Tensor of given shape and type, without initializing entries
 [inline]
 pub fn empty<T>(shape []int, params TensorData) &Tensor<T> {
-	return new_tensor<T>(T(0), shape, params)
+	return new_tensor<T>(new_t<T>(0), shape, params)
 }
 
 // empty_like returns a new Tensor of given shape and type as a given Tensor
@@ -24,7 +24,7 @@ pub fn eye<T>(m int, n int, k int, params TensorData) &Tensor<T> {
 	for i in 0 .. m {
 		for j in 0 .. n {
 			if i == j - k {
-				ret.set([i, j], T(1))
+				ret.set([i, j], new_t<T>(1))
 			}
 		}
 	}
@@ -34,7 +34,7 @@ pub fn eye<T>(m int, n int, k int, params TensorData) &Tensor<T> {
 // zeros returns a new tensor of a given shape and type, filled with zeros
 [inline]
 pub fn zeros<T>(shape []int, params TensorData) &Tensor<T> {
-	return new_tensor<T>(T(0), shape, params)
+	return new_tensor<T>(new_t<T>(0), shape, params)
 }
 
 // zeros_like returns a new Tensor of given shape and type as a given Tensor, filled with zeros
@@ -46,13 +46,13 @@ pub fn zeros_like<T>(t &Tensor<T>) &Tensor<T> {
 // ones returns a new tensor of a given shape and type, filled with ones
 [inline]
 pub fn ones<T>(shape []int, params TensorData) &Tensor<T> {
-	return full<T>(shape, T(1), params)
+	return full<T>(shape, new_t<T>(1), params)
 }
 
 // ones_like returns a new tensor of a given shape and type, filled with ones
 [inline]
 pub fn ones_like<T>(t &Tensor<T>) &Tensor<T> {
-	return full_like<T>(t, T(1))
+	return full_like<T>(t, new_t<T>(1))
 }
 
 // full returns a new tensor of a given shape and type, filled with the given value
@@ -72,7 +72,7 @@ pub fn full_like<T>(t &Tensor<T>, val T) &Tensor<T> {
 pub fn range<T>(from int, to int, params TensorData) &Tensor<T> {
 	mut res := empty<T>([to - from], params)
 	for i := from; i < to; i++ {
-		res.set([i], T(i))
+		res.set([i], new_t<T>(i))
 	}
 	return res
 }

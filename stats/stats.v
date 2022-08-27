@@ -10,7 +10,7 @@ pub struct AxisData {
 // sum returns the sum of all elements of the given tensor
 pub fn sum<T>(t &vtl.Tensor<T>) T {
 	mut iter := t.iterator()
-	mut acc := T(0)
+	mut acc := vtl.new_t<T>(0)
 	for {
 		val, _ := iter.next() or { break }
 		acc += val
@@ -22,7 +22,7 @@ pub fn sum<T>(t &vtl.Tensor<T>) T {
 // axis
 pub fn sum_axis<T>(t &vtl.Tensor<T>, data AxisData) T {
 	mut iter := t.axis_iterator(data.axis)
-	mut acc := T(0)
+	mut acc := vtl.new_t<T>(0)
 	for {
 		val, _ := iter.next() or { break }
 		acc += val
@@ -34,7 +34,7 @@ pub fn sum_axis<T>(t &vtl.Tensor<T>, data AxisData) T {
 // axis with the reduced dimension intact
 pub fn sum_axis_with_dims<T>(t &vtl.Tensor<T>, data AxisData) T {
 	mut iter := t.axis_with_dims_iterator(data.axis)
-	mut acc := T(0)
+	mut acc := vtl.new_t<T>(0)
 	for {
 		val, _ := iter.next() or { break }
 		acc += val
@@ -53,7 +53,7 @@ pub fn prod<T>(t &vtl.Tensor<T>) T {
 	}
 
 	mut iter := t.iterator()
-	mut acc := T(1)
+	mut acc := vtl.new_t<T>(1)
 	for {
 		val, _ := iter.next() or { break }
 		acc *= val
@@ -65,7 +65,7 @@ pub fn prod<T>(t &vtl.Tensor<T>) T {
 // axis with the reduced dimension intact
 pub fn prod_axis<T>(t &vtl.Tensor<T>, data AxisData) T {
 	mut iter := t.axis_iterator(data.axis)
-	mut acc := T(0)
+	mut acc := vtl.new_t<T>(0)
 	for {
 		val, _ := iter.next() or { break }
 		acc *= val
@@ -77,7 +77,7 @@ pub fn prod_axis<T>(t &vtl.Tensor<T>, data AxisData) T {
 // axis with the reduced dimension intact
 pub fn prod_axis_with_dims<T>(t &vtl.Tensor<T>, data AxisData) T {
 	mut iter := t.axis_with_dims_iterator(data.axis)
-	mut acc := T(0)
+	mut acc := vtl.new_t<T>(0)
 	for {
 		val, _ := iter.next() or { break }
 		acc *= val

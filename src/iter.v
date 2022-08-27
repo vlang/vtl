@@ -91,7 +91,7 @@ pub fn iterators_next<T>(mut its []&TensorIterator<T>) ?([]T, []int) {
 		if i == 0 {
 			index = index_.clone()
 		}
-		nums << T(val)
+		nums << new_t<T>(val)
 	}
 	return nums, index
 }
