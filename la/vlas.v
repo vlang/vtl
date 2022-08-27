@@ -21,7 +21,7 @@ pub fn dger<T>(a &vtl.Tensor<T>, b &vtl.Tensor<T>) ?&vtl.Tensor<T> {
 }
 
 pub fn det<T>(t &vtl.Tensor<T>) ?f64 {
-	vtl.assert_square_matrix(t)?
+	t.assert_square_matrix()?
 	m := t.shape[0]
 	n := t.shape[1]
 	mat := la.matrix_raw(m, n, arr_to_f64arr(t.to_array()))
@@ -29,7 +29,7 @@ pub fn det<T>(t &vtl.Tensor<T>) ?f64 {
 }
 
 pub fn inv<T>(t &vtl.Tensor<T>) ?&vtl.Tensor<T> {
-	vtl.assert_square_matrix(t)
+	t.assert_square_matrix()
 	mut colmajort := t.copy(.colmajor)
 	mut ret_m := la.new_matrix<f64>(colmajort.shape[0], colmajort.shape[1])
 	mut colmajorm := la.matrix_raw(colmajort.shape[0], colmajort.shape[1], arr_to_f64arr(colmajort.to_array()))

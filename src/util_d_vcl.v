@@ -16,15 +16,6 @@ fn (t &VclTensor<T>) assert_matrix<T>() ? {
 	}
 }
 
-// irange returns an array between start and stop, incremented by 1
-fn irange(start int, stop int) []int {
-	mut ret := []int{cap: stop - start}
-	for i in start .. stop {
-		ret << i
-	}
-	return ret
-}
-
 // assert_rank ensures that a Tensor has a given rank
 [inline]
 fn (t &VclTensor<T>) assert_rank<T>(n int) ? {
