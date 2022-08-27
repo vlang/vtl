@@ -20,4 +20,6 @@ pub interface AnyTensor<T> {
 	is_row_major_contiguous() bool
 	is_col_major_contiguous() bool
 	is_contiguous() bool
+mut:
+	memory MemoryFormat
 }
