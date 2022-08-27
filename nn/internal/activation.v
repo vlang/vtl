@@ -14,8 +14,8 @@ pub fn tanh<T>(x &vtl.Tensor<T>) &vtl.Tensor<T> {
 pub fn deriv_tanh<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>) ?&vtl.Tensor<T> {
 	// gradient * (1 - cached * cached)
 	// gradient * (- (cached * cached) + 1)
-	x := cached.multiply(cached).add_scalar(T(1))
-	return gradient.multiply(x.multiply_scalar(T(-1)))
+	x := cached.multiply(cached).add_scalar(vtl.new_t<T>(1))
+	return gradient.multiply(x.multiply_scalar(vtl.new_t<T>(-1)))
 }
 
 // sigmoid takes a real-valued number and squashes it to the range [0, 1]
@@ -25,7 +25,7 @@ pub fn sigmoid<T>(x &vtl.Tensor<T>) &vtl.Tensor<T> {
 	mut iter := x.iterator()
 	for {
 		val, i := iter.next() or { break }
-		next_val := T(1) / T(1) + T(math.exp(f64(val)))
+		next_val := vtl.new_t<T>(1) / vtl.new_t<T>(1) + vtl.new_t<T>(math.exp(f64(val)))
 		ret.set(i, next_val)
 	}
 	return ret
@@ -38,7 +38,7 @@ pub fn deriv_sigmoid<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>) ?&vtl.Te
 	mut ret := vtl.new_tensor_like_with_shape<T>(gradient, shape)
 	for {
 		vals, i := vtl.iterators_next<T>(mut iters) or { break }
-		val := vals[0] * (T(1) - vals[0]) * vals[1]
+		val := vals[0] * (vtl.new_t<T>(1) - vals[0]) * vals[1]
 		ret.set(i, val)
 	}
 	return ret
@@ -53,7 +53,7 @@ pub fn relu<T>(x &vtl.Tensor<T>) &vtl.Tensor<T> {
 		val, i := iter.next() or { break }
 		mut next_val := val
 		if val < 0 {
-			next_val = T(0)
+			next_val = vtl.new_t<T>(0)
 		}
 		ret.set(i, next_val)
 	}
@@ -69,7 +69,7 @@ pub fn deriv_relu<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>) ?&vtl.Tenso
 		vals, i := vtl.iterators_next<T>(mut iters) or { break }
 		mut val := vals[0]
 		if vals[1] < 0 {
-			val = T(0)
+			val = vtl.new_t<T>(0)
 		}
 		ret.set(i, val)
 	}
@@ -117,7 +117,7 @@ pub fn elu<T>(x &vtl.Tensor<T>, alpha T) &vtl.Tensor<T> {
 		val, i := iter.next() or { break }
 		mut next_val := val
 		if val < 0 {
-			next_val = alpha * (T(math.exp(f64(val))) - T(1))
+			next_val = alpha * (vtl.new_t<T>(math.exp(f64(val))) - vtl.new_t<T>(1))
 		}
 		ret.set(i, next_val)
 	}
@@ -131,9 +131,9 @@ pub fn deriv_elu<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>, alpha T) ?&v
 	mut ret := vtl.new_tensor_like_with_shape<T>(gradient, shape)
 	for {
 		vals, i := vtl.iterators_next<T>(mut iters) or { break }
-		mut val := T(1)
+		mut val := vtl.new_t<T>(1)
 		if vals[0] < 0 {
-			val = T(math.exp(f64(vals[1])))
+			val = vtl.new_t<T>(math.exp(f64(vals[1])))
 		}
 		ret.set(i, val)
 	}
@@ -149,11 +149,11 @@ pub fn sigmoid_cross_entropy_with_logits<T>(input &vtl.Tensor<T>, target &vtl.Te
 	mut ret := vtl.new_tensor_like_with_shape<T>(input, shape)
 	for {
 		vals, i := vtl.iterators_next<T>(mut iter) or { break }
-		val := -(vals[1] * T(math.max(f64(0), f64(vals[0])))) - T(math.log(T(1) +
-			T(math.exp(f64(vals[0])))))
+		val := -(vals[1] * vtl.new_t<T>(math.max(f64(0), f64(vals[0])))) - vtl.new_t<T>(math.log(
+			vtl.new_t<T>(1) + vtl.new_t<T>(math.exp(f64(vals[0])))))
 		ret.set(i, val)
 	}
-	return vtl.sum(ret) / T(batch_size)
+	return vtl.sum(ret) / vtl.new_t<T>(batch_size)
 }
 
 // mse squared error between the labels and the predictions
@@ -163,7 +163,7 @@ pub fn mse<T>(input &vtl.Tensor<T>, target &vtl.Tensor<T>) &vtl.Tensor<T> {
 	mut ret := vtl.new_tensor_like_with_shape<T>(input, shape)
 	for {
 		vals, i := vtl.iterators_next<T>(mut iter) or { break }
-		val := T(math.pow(f64(vals[0] - vals[1]), 2.0))
+		val := vtl.new_t<T>(math.pow(f64(vals[0] - vals[1]), 2.0))
 		ret.set(i, val)
 	}
 	return vtl.from_1d([vtl.mean(ret)])

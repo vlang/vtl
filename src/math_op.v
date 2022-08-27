@@ -1,15 +1,25 @@
 module vtl
 
+fn handle_add<T>(a T, b T) T {
+	$if T is bool {
+		false
+	} $else $if T is string {
+		return ''
+	} $else {
+		return a + b
+	}
+	panic('this part of the code is never reached. just a workaround')
+}
+
 // add adds two tensors elementwise
 [inline]
 pub fn (a &Tensor<T>) add<T>(b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using nmap
-	// return a.nmap<T>(handle_add, b)
 	mut iters, shape := a.iterators<T>([b])?
 	mut ret := new_tensor_like_with_shape<T>(a, shape)
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
-		val := vals[0] + vals[1]
+		val := handle_add<T>(vals[0], vals[1])
 		ret.set(i, val)
 	}
 	return ret
@@ -23,10 +33,21 @@ pub fn (a &Tensor<T>) add_scalar<T>(scalar T) &Tensor<T> {
 	mut iter := a.iterator()
 	for {
 		val, i := iter.next() or { break }
-		next_val := val + scalar
+		next_val := handle_add<T>(val, scalar)
 		ret.set(i, next_val)
 	}
 	return ret
+}
+
+fn handle_substract<T>(a T, b T) T {
+	$if T is bool {
+		false
+	} $else $if T is string {
+		return ''
+	} $else {
+		return a - b
+	}
+	panic('this part of the code is never reached. just a workaround')
 }
 
 // substract substracts two tensors elementwise
@@ -37,7 +58,7 @@ pub fn (a &Tensor<T>) substract<T>(b &Tensor<T>) ?&Tensor<T> {
 	mut ret := new_tensor_like_with_shape<T>(a, shape)
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
-		val := vals[0] - vals[1]
+		val := handle_substract<T>(vals[0], vals[1])
 		ret.set(i, val)
 	}
 	return ret
@@ -51,10 +72,21 @@ pub fn (a &Tensor<T>) substract_scalar<T>(scalar T) &Tensor<T> {
 	mut iter := a.iterator()
 	for {
 		val, i := iter.next() or { break }
-		next_val := val - scalar
+		next_val := handle_substract<T>(val, scalar)
 		ret.set(i, next_val)
 	}
 	return ret
+}
+
+fn handle_divide<T>(a T, b T) T {
+	$if T is bool {
+		false
+	} $else $if T is string {
+		return ''
+	} $else {
+		return a / b
+	}
+	panic('this part of the code is never reached. just a workaround')
 }
 
 // divide divides two tensors elementwise
@@ -65,7 +97,7 @@ pub fn (a &Tensor<T>) divide<T>(b &Tensor<T>) ?&Tensor<T> {
 	mut ret := new_tensor_like_with_shape<T>(a, shape)
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
-		val := vals[0] / vals[1]
+		val := handle_divide<T>(vals[0], vals[1])
 		ret.set(i, val)
 	}
 	return ret
@@ -79,22 +111,32 @@ pub fn (a &Tensor<T>) divide_scalar<T>(scalar T) &Tensor<T> {
 	mut iter := a.iterator()
 	for {
 		val, i := iter.next() or { break }
-		next_val := val / scalar
+		next_val := handle_divide<T>(val, scalar)
 		ret.set(i, next_val)
 	}
 	return ret
+}
+
+fn handle_multiply<T>(a T, b T) T {
+	$if T is bool {
+		false
+	} $else $if T is string {
+		return ''
+	} $else {
+		return a * b
+	}
+	panic('this part of the code is never reached. just a workaround')
 }
 
 // multiply multiplies two tensors elementwise
 [inline]
 pub fn (a &Tensor<T>) multiply<T>(b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using nmap
-	// return a.nmap<T>(handle_multiply, b)
 	mut iters, shape := a.iterators<T>([b])?
 	mut ret := new_tensor_like_with_shape<T>(a, shape)
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
-		val := vals[0] * vals[1]
+		val := handle_multiply<T>(vals[0], vals[1])
 		ret.set(i, val)
 	}
 	return ret
@@ -108,7 +150,7 @@ pub fn (a &Tensor<T>) multiply_scalar<T>(scalar T) &Tensor<T> {
 	mut iter := a.iterator()
 	for {
 		val, i := iter.next() or { break }
-		next_val := val * scalar
+		next_val := handle_multiply<T>(val, scalar)
 		ret.set(i, next_val)
 	}
 	return ret

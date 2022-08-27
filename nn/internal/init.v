@@ -35,19 +35,19 @@ pub fn variant_scaled<T>(shape []int, scale T, fan_mode FanMode, distribution Di
 
 	std := match fan_mode {
 		.fan_in {
-			T(math.sqrt(f64(scale) / f64(f0)))
+			vtl.new_t<T>(math.sqrt(f64(scale) / f64(f0)))
 		}
 		.fan_out {
-			T(math.sqrt(f64(scale) / f64(f1)))
+			vtl.new_t<T>(math.sqrt(f64(scale) / f64(f1)))
 		}
 		.fan_avg {
-			T(math.sqrt(f64(scale * T(2)) / f64(f0 + f1)))
+			vtl.new_t<T>(math.sqrt(f64(scale * vtl.new_t<T>(2)) / f64(f0 + f1)))
 		}
 	}
 
 	match distribution {
 		.uniform {
-			limit := T(math.sqrt(3.0) * std)
+			limit := vtl.new_t<T>(math.sqrt(3.0) * std)
 			return vtl.random<T>(-limit, limit, shape)
 		}
 		.normal {
@@ -57,9 +57,9 @@ pub fn variant_scaled<T>(shape []int, scale T, fan_mode FanMode, distribution Di
 }
 
 pub fn kaiming_uniform<T>(shape []int) &vtl.Tensor<T> {
-	return variant_scaled(shape, T(2), .fan_in, .uniform)
+	return variant_scaled(shape, vtl.new_t<T>(2), .fan_in, .uniform)
 }
 
 pub fn kaiming_normal<T>(shape []int) &vtl.Tensor<T> {
-	return variant_scaled(shape, T(2), .fan_in, .normal)
+	return variant_scaled(shape, vtl.new_t<T>(2), .fan_in, .normal)
 }

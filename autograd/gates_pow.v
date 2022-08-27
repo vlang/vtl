@@ -22,8 +22,8 @@ pub fn (g &PowGate<T>) backward<T>(payload &Payload<T>) ?[]&vtl.Tensor<T> {
 	mut r1 := vtl.new_tensor_like_with_shape<T>(gradient, shape)
 	for {
 		vals, i := vtl.iterators_next<T>(mut iters) or { break }
-		val0 := vals[0] * vals[2] * T(math.pow(f64(vals[1]), f64(vals[2]) - 1))
-		val1 := vals[0] * T(math.pow(f64(vals[1]), f64(vals[2]))) * T(math.log(f64(vals[1])))
+		val0 := vals[0] * vals[2] * vtl.new_t<T>(math.pow(f64(vals[1]), f64(vals[2]) - 1))
+		val1 := vals[0] * vtl.new_t<T>(math.pow(f64(vals[1]), f64(vals[2]))) * vtl.new_t<T>(math.log(f64(vals[1])))
 		r0.set(i, val0)
 		r1.set(i, val1)
 	}
