@@ -79,10 +79,8 @@ pub fn (a &Tensor<T>) substract_scalar<T>(scalar T) &Tensor<T> {
 }
 
 fn handle_divide<T>(a T, b T) T {
-	$if T is bool {
-		return false
-	} $else $if T is string {
-		return ''
+	$if T is bool || T is string {
+		panic(@FN + ' is not supported for type ${typeof(a).name}')
 	} $else {
 		return a / b
 	}
@@ -118,10 +116,8 @@ pub fn (a &Tensor<T>) divide_scalar<T>(scalar T) &Tensor<T> {
 }
 
 fn handle_multiply<T>(a T, b T) T {
-	$if T is bool {
-		return false
-	} $else $if T is string {
-		return ''
+	$if T is bool || T is string {
+		panic(@FN + ' is not supported for type ${typeof(a).name}')
 	} $else {
 		return a * b
 	}
