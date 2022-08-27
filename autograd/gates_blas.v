@@ -1,7 +1,6 @@
 module autograd
 
 import vtl
-import vtl.la
 
 pub struct MatMulGate<T> {
 pub:

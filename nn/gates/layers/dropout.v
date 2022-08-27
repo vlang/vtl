@@ -18,7 +18,7 @@ pub fn new_dropout_gate<T>(mask &vtl.Tensor<T>, prob f64) &DropoutGate<T> {
 
 pub fn (g &DropoutGate<T>) backward<T>(payload &autograd.Payload<T>) ?[]&vtl.Tensor<T> {
 	gradient := payload.variable.grad
-	return [vtl.divide_scalar(vtl.multiply(gradient, g.mask), T(g.prob))]
+	return [gradient.multiply(g.mask).divide_scalar(T(g.prob))]
 }
 
 pub fn (g &DropoutGate<T>) cache<T>(mut result autograd.Variable<T>, args ...autograd.CacheParam) ? {

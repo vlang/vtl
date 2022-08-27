@@ -4,10 +4,10 @@ import math
 import vtl
 
 pub fn mse_backward<T>(gradient &vtl.Tensor<T>, cache &vtl.Tensor<T>, target &vtl.Tensor<T>) []&vtl.Tensor<T> {
-	dup := vtl.add<T>(gradient, gradient)
-	norm := vtl.divide_scalar(dup, T(gradient.size))
-	subs := vtl.substract(cache, target)
-	return [vtl.multiply(norm, subs)]
+	dup := gradient.add<T>(gradient)
+	norm := dup.divide_scalar(T(gradient.size))
+	subs := cache.substract(target)
+	return [norm.multiply(subs)]
 }
 
 pub fn sigmoid_cross_entropy_backward<T>(gradient &vtl.Tensor<T>, cache &vtl.Tensor<T>, target &vtl.Tensor<T>) []&vtl.Tensor<T> {
