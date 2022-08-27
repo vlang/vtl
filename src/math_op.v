@@ -2,7 +2,7 @@ module vtl
 
 // add adds two tensors elementwise
 [inline]
-pub fn add<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
+pub fn (a &Tensor<T>) add<T>(b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using nmap
 	// return a.nmap<T>(handle_add, b)
 	mut iters, shape := a.iterators<T>([b])?
@@ -17,7 +17,7 @@ pub fn add<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
 
 // add adds a scalar to a tensor elementwise
 [inline]
-pub fn add_scalar<T>(a &Tensor<T>, scalar T) &Tensor<T> {
+pub fn (a &Tensor<T>) add_scalar<T>(scalar T) &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(a)
 	mut iter := a.iterator()
@@ -31,7 +31,7 @@ pub fn add_scalar<T>(a &Tensor<T>, scalar T) &Tensor<T> {
 
 // substract substracts two tensors elementwise
 [inline]
-pub fn substract<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
+pub fn (a &Tensor<T>) substract<T>(b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using nmap
 	mut iters, shape := a.iterators<T>([b])?
 	mut ret := new_tensor_like_with_shape<T>(a, shape)
@@ -45,7 +45,7 @@ pub fn substract<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
 
 // substract substracts a scalar to a tensor elementwise
 [inline]
-pub fn substract_scalar<T>(a &Tensor<T>, scalar T) &Tensor<T> {
+pub fn (a &Tensor<T>) substract_scalar<T>(scalar T) &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(a)
 	mut iter := a.iterator()
@@ -59,7 +59,7 @@ pub fn substract_scalar<T>(a &Tensor<T>, scalar T) &Tensor<T> {
 
 // divide divides two tensors elementwise
 [inline]
-pub fn divide<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
+pub fn (a &Tensor<T>) divide<T>(b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using nmap
 	mut iters, shape := a.iterators<T>([b])?
 	mut ret := new_tensor_like_with_shape<T>(a, shape)
@@ -73,7 +73,7 @@ pub fn divide<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
 
 // divide divides a scalar to a tensor elementwise
 [inline]
-pub fn divide_scalar<T>(a &Tensor<T>, scalar T) &Tensor<T> {
+pub fn (a &Tensor<T>) divide_scalar<T>(scalar T) &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(a)
 	mut iter := a.iterator()
@@ -87,7 +87,7 @@ pub fn divide_scalar<T>(a &Tensor<T>, scalar T) &Tensor<T> {
 
 // multiply multiplies two tensors elementwise
 [inline]
-pub fn multiply<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
+pub fn (a &Tensor<T>) multiply<T>(b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using nmap
 	// return a.nmap<T>(handle_multiply, b)
 	mut iters, shape := a.iterators<T>([b])?
@@ -102,7 +102,7 @@ pub fn multiply<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
 
 // multiply multiplies a scalar to a tensor elementwise
 [inline]
-pub fn multiply_scalar<T>(a &Tensor<T>, scalar T) &Tensor<T> {
+pub fn (a &Tensor<T>) multiply_scalar<T>(scalar T) &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(a)
 	mut iter := a.iterator()

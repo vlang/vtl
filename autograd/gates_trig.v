@@ -15,7 +15,7 @@ pub fn new_sin_gate<T>(a &Variable<T>) &SinGate<T> {
 
 pub fn (g &SinGate<T>) backward<T>(payload &Payload<T>) ?[]&vtl.Tensor<T> {
 	gradient := payload.variable.grad
-	r0 := vtl.multiply<T>(gradient, vtl.cos<T>(g.a.value))
+	r0 := gradient.multiply<T>(g.a.value.cos<T>())
 	return [r0]
 }
 
@@ -48,7 +48,7 @@ pub fn new_cos_gate<T>(a &Variable<T>) &CosGate<T> {
 
 pub fn (g &CosGate<T>) backward<T>(payload &Payload<T>) ?[]&vtl.Tensor<T> {
 	gradient := payload.variable.grad
-	r0 := vtl.multiply<T>(gradient, vtl.multiply_scalar<T>(vtl.sin<T>(g.a.value), T(-1)))
+	r0 := gradient.multiply<T>(g.a.value.sin<T>().multiply_scalar<T>(T(-1)))
 	return [r0]
 }
 
@@ -81,8 +81,8 @@ pub fn new_tan_gate<T>(a &Variable<T>) &TanGate<T> {
 
 pub fn (g &TanGate<T>) backward<T>(payload &Payload<T>) ?[]&vtl.Tensor<T> {
 	gradient := payload.variable.grad
-	cos := vtl.cos<T>(g.a.value)
-	r0 := vtl.divide<T>(gradient, vtl.multiply<T>(cos, cos))
+	cos := g.a.value.cos<T>()
+	r0 := gradient.divide<T>(cos.multiply<T>(cos))
 	return [r0]
 }
 

@@ -8,7 +8,7 @@ fn handle_abs<T>(x T, _ []int) T {
 
 // abs returns the elementwise abs of an tensor
 [inline]
-pub fn abs<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) abs<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -26,7 +26,7 @@ fn handle_acos<T>(x T, _ []int) T {
 
 // acos returns the elementwise acos of an tensor
 [inline]
-pub fn acos<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) acos<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -44,7 +44,7 @@ fn handle_acosh<T>(x T, _ []int) T {
 
 // acosh returns the elementwise acosh of an tensor
 [inline]
-pub fn acosh<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) acosh<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -62,7 +62,7 @@ fn handle_asin<T>(x T, _ []int) T {
 
 // asin returns the elementwise asin of an tensor
 [inline]
-pub fn asin<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) asin<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -80,7 +80,7 @@ fn handle_asinh<T>(x T, _ []int) T {
 
 // asinh returns the elementwise asinh of an tensor
 [inline]
-pub fn asinh<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) asinh<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -98,7 +98,7 @@ fn handle_atan<T>(x T, _ []int) T {
 
 // atan returns the elementwise atan of an tensor
 [inline]
-pub fn atan<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) atan<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -118,7 +118,7 @@ fn handle_atan2<T>(xs []T, _ []int) T {
 
 // atan2 returns the atan2 elementwise of two tensors
 [inline]
-pub fn atan2<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
+pub fn (a &Tensor<T>) atan2<T>(b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using a.nmap
 	// return a.nmap<T>(handle_atan2, b)
 	mut iters, shape := a.iterators<T>([b])?
@@ -137,7 +137,7 @@ fn handle_atanh<T>(x T, _ []int) T {
 
 // atanh returns the elementwise atanh of an tensor
 [inline]
-pub fn atanh<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) atanh<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -155,7 +155,7 @@ fn handle_cbrt<T>(x T, _ []int) T {
 
 // cbrt returns the elementwise cbrt of an tensor
 [inline]
-pub fn cbrt<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) cbrt<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -173,7 +173,7 @@ fn handle_ceil<T>(x T, _ []int) T {
 
 // ceil returns the elementwise ceil of an tensor
 [inline]
-pub fn ceil<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) ceil<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -191,7 +191,7 @@ fn handle_cos<T>(x T, _ []int) T {
 
 // cos returns the elementwise cos of an tensor
 [inline]
-pub fn cos<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) cos<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -209,7 +209,7 @@ fn handle_cosh<T>(x T, _ []int) T {
 
 // cosh returns the elementwise cosh of an tensor
 [inline]
-pub fn cosh<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) cosh<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -227,7 +227,7 @@ fn handle_cot<T>(x T, _ []int) T {
 
 // cot returns the elementwise cot of an tensor
 [inline]
-pub fn cot<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) cot<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -245,7 +245,7 @@ fn handle_degrees<T>(x T, _ []int) T {
 
 // degrees returns the elementwise degrees of an tensor
 [inline]
-pub fn degrees<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) degrees<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -263,7 +263,7 @@ fn handle_erf<T>(x T, _ []int) T {
 
 // erf returns the elementwise erf of an tensor
 [inline]
-pub fn erf<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) erf<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -281,7 +281,7 @@ fn handle_erfc<T>(x T, _ []int) T {
 
 // erfc returns the elementwise erfc of an tensor
 [inline]
-pub fn erfc<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) erfc<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -299,7 +299,7 @@ fn handle_exp<T>(x T, _ []int) T {
 
 // exp returns the elementwise exp of an tensor
 [inline]
-pub fn exp<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) exp<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -317,7 +317,7 @@ fn handle_exp2<T>(x T, _ []int) T {
 
 // exp2 returns the elementwise exp2 of an tensor
 [inline]
-pub fn exp2<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) exp2<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -335,7 +335,7 @@ fn handle_expm1<T>(x T, _ []int) T {
 
 // expm1 returns the elementwise expm1 of an tensor
 [inline]
-pub fn expm1<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) expm1<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -353,7 +353,7 @@ fn handle_f32_bits<T>(x T, _ []int) T {
 
 // f32_bits returns the elementwise f32_bits of an tensor
 [inline]
-pub fn f32_bits<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) f32_bits<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -371,7 +371,7 @@ fn handle_f32_from_bits<T>(x T, _ []int) T {
 
 // f32_from_bits returns the elementwise f32_from_bits of an tensor
 [inline]
-pub fn f32_from_bits<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) f32_from_bits<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -389,7 +389,7 @@ fn handle_f64_bits<T>(x T, _ []int) T {
 
 // f64_bits returns the elementwise f64_bits of an tensor
 [inline]
-pub fn f64_bits<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) f64_bits<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -407,7 +407,7 @@ fn handle_f64_from_bits<T>(x T, _ []int) T {
 
 // f64_from_bits returns the elementwise f64_from_bits of an tensor
 [inline]
-pub fn f64_from_bits<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) f64_from_bits<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -425,7 +425,7 @@ fn handle_factorial<T>(x T, _ []int) T {
 
 // factorial returns the elementwise factorial of an tensor
 [inline]
-pub fn factorial<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) factorial<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -443,7 +443,7 @@ fn handle_floor<T>(x T, _ []int) T {
 
 // floor returns the elementwise floor of an tensor
 [inline]
-pub fn floor<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) floor<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -463,7 +463,7 @@ fn handle_fmod<T>(xs []T, _ []int) T {
 
 // fmod returns the fmod elementwise of two tensors
 [inline]
-pub fn fmod<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
+pub fn (a &Tensor<T>) fmod<T>(b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using a.nmap
 	// return a.nmap<T>(handle_fmod, b)
 	mut iters, shape := a.iterators<T>([b])?
@@ -482,7 +482,7 @@ fn handle_gamma<T>(x T, _ []int) T {
 
 // gamma returns the elementwise gamma of an tensor
 [inline]
-pub fn gamma<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) gamma<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -502,7 +502,7 @@ fn handle_gcd<T>(xs []T, _ []int) T {
 
 // gcd returns the gcd elementwise of two tensors
 [inline]
-pub fn gcd<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
+pub fn (a &Tensor<T>) gcd<T>(b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using a.nmap
 	// return a.nmap<T>(handle_gcd, b)
 	mut iters, shape := a.iterators<T>([b])?
@@ -523,7 +523,7 @@ fn handle_hypot<T>(xs []T, _ []int) T {
 
 // hypot returns the hypot elementwise of two tensors
 [inline]
-pub fn hypot<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
+pub fn (a &Tensor<T>) hypot<T>(b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using a.nmap
 	// return a.nmap<T>(handle_hypot, b)
 	mut iters, shape := a.iterators<T>([b])?
@@ -544,7 +544,7 @@ fn handle_lcm<T>(xs []T, _ []int) T {
 
 // lcm returns the lcm elementwise of two tensors
 [inline]
-pub fn lcm<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
+pub fn (a &Tensor<T>) lcm<T>(b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using a.nmap
 	// return a.nmap<T>(handle_lcm, b)
 	mut iters, shape := a.iterators<T>([b])?
@@ -563,7 +563,7 @@ fn handle_log<T>(x T, _ []int) T {
 
 // log returns the elementwise log of an tensor
 [inline]
-pub fn log<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) log<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -581,7 +581,7 @@ fn handle_log10<T>(x T, _ []int) T {
 
 // log10 returns the elementwise log10 of an tensor
 [inline]
-pub fn log10<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) log10<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -599,7 +599,7 @@ fn handle_log1p<T>(x T, _ []int) T {
 
 // log1p returns the elementwise log1p of an tensor
 [inline]
-pub fn log1p<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) log1p<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -617,7 +617,7 @@ fn handle_log2<T>(x T, _ []int) T {
 
 // log2 returns the elementwise log2 of an tensor
 [inline]
-pub fn log2<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) log2<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -635,7 +635,7 @@ fn handle_log_factorial<T>(x T, _ []int) T {
 
 // log_factorial returns the elementwise log_factorial of an tensor
 [inline]
-pub fn log_factorial<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) log_factorial<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -653,7 +653,7 @@ fn handle_log_gamma<T>(x T, _ []int) T {
 
 // log_gamma returns the elementwise log_gamma of an tensor
 [inline]
-pub fn log_gamma<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) log_gamma<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -673,7 +673,7 @@ fn handle_log_n<T>(xs []T, _ []int) T {
 
 // log_n returns the log_n elementwise of two tensors
 [inline]
-pub fn log_n<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
+pub fn (a &Tensor<T>) log_n<T>(b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using a.nmap
 	// return a.nmap<T>(handle_log_n, b)
 	mut iters, shape := a.iterators<T>([b])?
@@ -694,7 +694,7 @@ fn handle_max<T>(xs []T, _ []int) T {
 
 // max returns the max elementwise of two tensors
 [inline]
-pub fn max<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
+pub fn (a &Tensor<T>) max<T>(b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using a.nmap
 	// return a.nmap<T>(handle_max, b)
 	mut iters, shape := a.iterators<T>([b])?
@@ -715,7 +715,7 @@ fn handle_min<T>(xs []T, _ []int) T {
 
 // min returns the min elementwise of two tensors
 [inline]
-pub fn min<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
+pub fn (a &Tensor<T>) min<T>(b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using a.nmap
 	// return a.nmap<T>(handle_min, b)
 	mut iters, shape := a.iterators<T>([b])?
@@ -736,7 +736,7 @@ fn handle_nextafter<T>(xs []T, _ []int) T {
 
 // nextafter returns the nextafter elementwise of two tensors
 [inline]
-pub fn nextafter<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
+pub fn (a &Tensor<T>) nextafter<T>(b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using a.nmap
 	// return a.nmap<T>(handle_nextafter, b)
 	mut iters, shape := a.iterators<T>([b])?
@@ -749,22 +749,22 @@ pub fn nextafter<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
 	return ret
 }
 
-fn handle_nextafterf32<T>(xs []T, _ []int) T {
+fn handle_nextafter32<T>(xs []T, _ []int) T {
 	x := f32(xs[0])
 	y := f32(xs[1])
-	return T(math.nextafterf32(x, y))
+	return T(math.nextafter32(x, y))
 }
 
 // nextafter32 returns the nextafter32 elementwise of two tensors
 [inline]
-pub fn nextafter32<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
+pub fn (a &Tensor<T>) nextafter32<T>(b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using a.nmap
-	// return a.nmap<T>(handle_nextafterf32, b)
+	// return a.nmap<T>(handle_nextafter32, b)
 	mut iters, shape := a.iterators<T>([b])?
 	mut ret := new_tensor_like_with_shape<T>(a, shape)
 	for {
 		vals, i := iterators_next<T>(mut iters) or { break }
-		val := handle_nextafterf32<T>(vals, i)
+		val := handle_nextafter32<T>(vals, i)
 		ret.set(i, val)
 	}
 	return ret
@@ -778,7 +778,7 @@ fn handle_pow<T>(xs []T, _ []int) T {
 
 // pow returns the pow elementwise of two tensors
 [inline]
-pub fn pow<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
+pub fn (a &Tensor<T>) pow<T>(b &Tensor<T>) ?&Tensor<T> {
 	// @todo: Implement using a.nmap
 	// return a.nmap<T>(handle_pow, b)
 	mut iters, shape := a.iterators<T>([b])?
@@ -792,12 +792,12 @@ pub fn pow<T>(a &Tensor<T>, b &Tensor<T>) ?&Tensor<T> {
 }
 
 fn handle_pow10<T>(x T, _ []int) T {
-	return T(math.pow10(f64(x)))
+	return T(math.pow10(int(x)))
 }
 
 // pow10 returns the elementwise pow10 of an tensor
 [inline]
-pub fn pow10<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) pow10<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -815,7 +815,7 @@ fn handle_radians<T>(x T, _ []int) T {
 
 // radians returns the elementwise deg2rad of an tensor
 [inline]
-pub fn radians<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) radians<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -833,7 +833,7 @@ fn handle_round<T>(x T, _ []int) T {
 
 // round rounds elements of an tensor elementwise
 [inline]
-pub fn round<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) round<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -851,7 +851,7 @@ fn handle_round_to_even<T>(x T, _ []int) T {
 
 // round_to_even round_to_evens elements of an tensor elementwise
 [inline]
-pub fn round_to_even<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) round_to_even<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -869,7 +869,7 @@ fn handle_sin<T>(x T, _ []int) T {
 
 // sin returns the elementwise sin of an tensor
 [inline]
-pub fn sin<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) sin<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -887,7 +887,7 @@ fn handle_sinh<T>(x T, _ []int) T {
 
 // sinh returns the elementwise sinh of an tensor
 [inline]
-pub fn sinh<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) sinh<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -905,7 +905,7 @@ fn handle_sqrt<T>(x T, _ []int) T {
 
 // sqrt returns the elementwise square root of an tensor
 [inline]
-pub fn sqrt<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) sqrt<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -923,7 +923,7 @@ fn handle_tan<T>(x T, _ []int) T {
 
 // tan returns the elementwise tan of an tensor
 [inline]
-pub fn tan<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) tan<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -941,7 +941,7 @@ fn handle_tanh<T>(x T, _ []int) T {
 
 // tanh returns the elementwise tanh of an tensor
 [inline]
-pub fn tanh<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) tanh<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
@@ -959,7 +959,7 @@ fn handle_trunc<T>(x T, _ []int) T {
 
 // trunc returns the elementwise trunc of an tensor
 [inline]
-pub fn trunc<T>(t &Tensor<T>) &Tensor<T> {
+pub fn (t &Tensor<T>) trunc<T>() &Tensor<T> {
 	// @todo: Implement using map
 	mut ret := new_tensor_like<T>(t)
 	mut iter := t.iterator()
