@@ -59,7 +59,7 @@ pub fn column_stack<T>(ts []&Tensor<T>) ?&Tensor<T> {
 // stack join a sequence of arrays along a new axis.
 pub fn stack<T>(ts []&Tensor<T>, data AxisData) ?&Tensor<T> {
 	assert_shape<T>(ts[0].shape, ts)?
-	expanded := ts.map(expand_dims<T>(it, data)?)
+	expanded := ts.map(it.expand_dims<T>(data)?)
 	return concatenate<T>(expanded, data)
 }
 
@@ -87,7 +87,7 @@ pub fn concatenate<T>(ts []&Tensor<T>, data AxisData) ?&Tensor<T> {
 
 // expand_dims adds an axis to a Tensor in order to support
 // broadcasting operations
-pub fn expand_dims<T>(t &Tensor<T>, data AxisData) ?&Tensor<T> {
+pub fn (t &Tensor<T>) expand_dims<T>(data AxisData) ?&Tensor<T> {
 	axis := data.axis
 	mut newshape := []int{}
 	newaxis := match axis < 0 {
