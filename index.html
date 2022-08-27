@@ -150,11 +150,6 @@ the work and inspiration that the library done by Christopher has given.</p>
 <p>add adds a scalar to a tensor elementwise</p>
 
 </section>
-						<section id="apply" class="doc-node">
-							<div class="title"><h2>fn apply <a href="#apply">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/fun.v#L4"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">apply</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token keyword">mut</span> t Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> f <span class="token keyword">fn</span> <span class="token punctuation">(</span>x <span class="token builtin">T</span><span class="token punctuation">,</span> i <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">T</span><span class="token punctuation">)</span></code></pre>
-<p>apply applies a function to each element of a given Tensor</p>
-
-</section>
 						<section id="array_split" class="doc-node">
 							<div class="title"><h2>fn array_split <a href="#array_split">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/split.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">array_split</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> ind <span class="token builtin">int</span><span class="token punctuation">,</span> axis <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">?</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
 <p>array_split splits an array into multiple sub-arrays.<br>
@@ -485,11 +480,6 @@ regardless of the array dimension.</p>
 <p>log_n returns the log_n elementwise of two tensors</p>
 
 </section>
-						<section id="map" class="doc-node">
-							<div class="title"><h2>fn map <a href="#map">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/fun.v#L14"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token builtin">map</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> f <span class="token keyword">fn</span> <span class="token punctuation">(</span>x <span class="token builtin">T</span><span class="token punctuation">,</span> i <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">T</span><span class="token punctuation">)</span> <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
-<p>map maps a function to a given Tensor retuning a new Tensor with same shape</p>
-
-</section>
 						<section id="max" class="doc-node">
 							<div class="title"><h2>fn max <a href="#max">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/math.v#L697"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">max</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>a <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> b <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token operator">?</span><span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
 <p>max returns the max elementwise of two tensors</p>
@@ -508,11 +498,6 @@ regardless of the array dimension.</p>
 						<section id="multiply_scalar" class="doc-node">
 							<div class="title"><h2>fn multiply_scalar <a href="#multiply_scalar">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/math_op.v#L105"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">multiply_scalar</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>a <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> scalar <span class="token builtin">T</span><span class="token punctuation">)</span> <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
 <p>multiply multiplies a scalar to a tensor elementwise</p>
-
-</section>
-						<section id="napply" class="doc-node">
-							<div class="title"><h2>fn napply <a href="#napply">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/fun.v#L37"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">napply</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token keyword">mut</span> t Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> ts <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> f <span class="token keyword">fn</span> <span class="token punctuation">(</span>xs <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">T</span><span class="token punctuation">,</span> i <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">T</span><span class="token punctuation">)</span> <span class="token operator">?</span></code></pre>
-<p>napply applies a function to each element of a given Tensor with params</p>
 
 </section>
 						<section id="new_tensor" class="doc-node">
@@ -538,16 +523,6 @@ regardless of the array dimension.</p>
 						<section id="nextafter32" class="doc-node">
 							<div class="title"><h2>fn nextafter32 <a href="#nextafter32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/math.v#L760"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">nextafter32</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>a <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> b <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token operator">?</span><span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
 <p>nextafter32 returns the nextafter32 elementwise of two tensors</p>
-
-</section>
-						<section id="nmap" class="doc-node">
-							<div class="title"><h2>fn nmap <a href="#nmap">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/fun.v#L47"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">nmap</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> ts <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> f <span class="token keyword">fn</span> <span class="token punctuation">(</span>xs <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">T</span><span class="token punctuation">,</span> i <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">T</span><span class="token punctuation">)</span> <span class="token operator">?</span><span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
-<p>nmap maps a function to a given list of Tensor retuning a new Tensor with same shape</p>
-
-</section>
-						<section id="nreduce" class="doc-node">
-							<div class="title"><h2>fn nreduce <a href="#nreduce">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/fun.v#L59"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">nreduce</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> ts <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> init <span class="token builtin">T</span><span class="token punctuation">,</span> f <span class="token keyword">fn</span> <span class="token punctuation">(</span>acc <span class="token builtin">T</span><span class="token punctuation">,</span> xs <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">T</span><span class="token punctuation">,</span> i <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">T</span><span class="token punctuation">)</span> <span class="token operator">?</span><span class="token builtin">T</span></code></pre>
-<p>nreduce reduces a function to a given list of Tensor retuning a new agregatted value</p>
 
 </section>
 						<section id="ones" class="doc-node">
@@ -588,11 +563,6 @@ regardless of the array dimension.</p>
 						<section id="range" class="doc-node">
 							<div class="title"><h2>fn range <a href="#range">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/creation.v#L72"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">range</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>from <span class="token builtin">int</span><span class="token punctuation">,</span> to <span class="token builtin">int</span><span class="token punctuation">,</span> params TensorData<span class="token punctuation">)</span> <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
 <p>range returns a Tensor containing values ranging from [from, to)</p>
-
-</section>
-						<section id="reduce" class="doc-node">
-							<div class="title"><h2>fn reduce <a href="#reduce">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/fun.v#L26"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">reduce</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> init <span class="token builtin">T</span><span class="token punctuation">,</span> f <span class="token keyword">fn</span> <span class="token punctuation">(</span>acc <span class="token builtin">T</span><span class="token punctuation">,</span> x <span class="token builtin">T</span><span class="token punctuation">,</span> i <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">T</span><span class="token punctuation">)</span> <span class="token builtin">T</span></code></pre>
-<p>reduce reduces a function to a given Tensor retuning a new agregatted value</p>
 
 </section>
 						<section id="round" class="doc-node">
@@ -766,6 +736,11 @@ first axis regardless of the array dimension.</p>
 <p>next calls the iteration type for a given list of iterators which is either flat or strided and returns a list of Nums containing the current values</p>
 
 </section>
+						<section id="Tensor<T>.apply" class="doc-node">
+							<div class="title"><h2>fn (Tensor<T>) apply <a href="#Tensor<T>.apply">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/fun.v#L4"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> t Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">apply</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>f <span class="token keyword">fn</span> <span class="token punctuation">(</span>x <span class="token builtin">T</span><span class="token punctuation">,</span> i <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">T</span><span class="token punctuation">)</span></code></pre>
+<p>apply applies a function to each element of a given Tensor</p>
+
+</section>
 						<section id="Tensor<T>.array_equal" class="doc-node">
 							<div class="title"><h2>fn (Tensor<T>) array_equal <a href="#Tensor<T>.array_equal">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/logical_fun.v#L4"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">array_equal</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>other <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token builtin">bool</span></code></pre>
 <p>array_equal returns true if input arrays have the same shape and all elements equal.</p>
@@ -899,6 +874,26 @@ used for reduction operations along an axis.</p>
 <p>iterators creates an array of iterators through a list of tensors</p>
 
 </section>
+						<section id="Tensor<T>.map" class="doc-node">
+							<div class="title"><h2>fn (Tensor<T>) map <a href="#Tensor<T>.map">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/fun.v#L14"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token builtin">map</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>f <span class="token keyword">fn</span> <span class="token punctuation">(</span>x <span class="token builtin">T</span><span class="token punctuation">,</span> i <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">T</span><span class="token punctuation">)</span> <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+<p>map maps a function to a given Tensor retuning a new Tensor with same shape</p>
+
+</section>
+						<section id="Tensor<T>.napply" class="doc-node">
+							<div class="title"><h2>fn (Tensor<T>) napply <a href="#Tensor<T>.napply">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/fun.v#L37"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> t Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">napply</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>ts <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> f <span class="token keyword">fn</span> <span class="token punctuation">(</span>xs <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">T</span><span class="token punctuation">,</span> i <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">T</span><span class="token punctuation">)</span> <span class="token operator">?</span></code></pre>
+<p>napply applies a function to each element of a given Tensor with params</p>
+
+</section>
+						<section id="Tensor<T>.nmap" class="doc-node">
+							<div class="title"><h2>fn (Tensor<T>) nmap <a href="#Tensor<T>.nmap">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/fun.v#L47"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">nmap</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>ts <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> f <span class="token keyword">fn</span> <span class="token punctuation">(</span>xs <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">T</span><span class="token punctuation">,</span> i <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">T</span><span class="token punctuation">)</span> <span class="token operator">?</span><span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+<p>nmap maps a function to a given list of Tensor retuning a new Tensor with same shape</p>
+
+</section>
+						<section id="Tensor<T>.nreduce" class="doc-node">
+							<div class="title"><h2>fn (Tensor<T>) nreduce <a href="#Tensor<T>.nreduce">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/fun.v#L59"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">nreduce</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>ts <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> init <span class="token builtin">T</span><span class="token punctuation">,</span> f <span class="token keyword">fn</span> <span class="token punctuation">(</span>acc <span class="token builtin">T</span><span class="token punctuation">,</span> xs <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">T</span><span class="token punctuation">,</span> i <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">T</span><span class="token punctuation">)</span> <span class="token operator">?</span><span class="token builtin">T</span></code></pre>
+<p>nreduce reduces a function to a given list of Tensor retuning a new agregatted value</p>
+
+</section>
 						<section id="Tensor<T>.nth_index" class="doc-node">
 							<div class="title"><h2>fn (Tensor<T>) nth_index <a href="#Tensor<T>.nth_index">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/lookup.v#L44"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">nth_index</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>n <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span></code></pre>
 <p>nth_index returns the nth index of a Tensor's shape for <code>n == 2</code> and a <code>shape</code> of <code>[2, 2]</code> the <em>nth index</em> is <code>[1, 0]</code> and for a <code>shape</code> of <code>[2, 3]</code> and <code>n == 3</code> the <em>nth index</em> is <code>[0, 1, 1]</code>
@@ -918,6 +913,11 @@ in sorted order.</p>
 						<section id="Tensor<T>.ravel" class="doc-node">
 							<div class="title"><h2>fn (Tensor<T>) ravel <a href="#Tensor<T>.ravel">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/fun.v#L113"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">ravel</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">?</span><span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
 <p>ravel returns a flattened view of an Tensor if possible, otherwise a flattened copy</p>
+
+</section>
+						<section id="Tensor<T>.reduce" class="doc-node">
+							<div class="title"><h2>fn (Tensor<T>) reduce <a href="#Tensor<T>.reduce">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/fun.v#L26"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token function">reduce</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>init <span class="token builtin">T</span><span class="token punctuation">,</span> f <span class="token keyword">fn</span> <span class="token punctuation">(</span>acc <span class="token builtin">T</span><span class="token punctuation">,</span> x <span class="token builtin">T</span><span class="token punctuation">,</span> i <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">T</span><span class="token punctuation">)</span> <span class="token builtin">T</span></code></pre>
+<p>reduce reduces a function to a given Tensor retuning a new agregatted value</p>
 
 </section>
 						<section id="Tensor<T>.reshape" class="doc-node">
@@ -1102,7 +1102,7 @@ Stores a copy of the shape and strides reduced along a given axis</p>
 </section>
 
           <div class="footer">
-            Powered by vdoc. Generated on: 27 Aug 2022 04:22:34
+            Powered by vdoc. Generated on: 27 Aug 2022 04:26:12
           </div>
         </div>
         <div class="doc-toc"><ul><li class="open"><a href="#readme_">README</a></li>
@@ -1120,9 +1120,6 @@ Stores a copy of the shape and strides reduced along a given axis</p>
 </ul>
 </li>
 <li class="open"><a href="#add_scalar">fn add_scalar</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#apply">fn apply</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#array_split">fn array_split</a>        <ul>
@@ -1314,9 +1311,6 @@ Stores a copy of the shape and strides reduced along a given axis</p>
 <li class="open"><a href="#log_n">fn log_n</a>        <ul>
 </ul>
 </li>
-<li class="open"><a href="#map">fn map</a>        <ul>
-</ul>
-</li>
 <li class="open"><a href="#max">fn max</a>        <ul>
 </ul>
 </li>
@@ -1327,9 +1321,6 @@ Stores a copy of the shape and strides reduced along a given axis</p>
 </ul>
 </li>
 <li class="open"><a href="#multiply_scalar">fn multiply_scalar</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#napply">fn napply</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#new_tensor">fn new_tensor</a>        <ul>
@@ -1345,12 +1336,6 @@ Stores a copy of the shape and strides reduced along a given axis</p>
 </ul>
 </li>
 <li class="open"><a href="#nextafter32">fn nextafter32</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#nmap">fn nmap</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#nreduce">fn nreduce</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#ones">fn ones</a>        <ul>
@@ -1375,9 +1360,6 @@ Stores a copy of the shape and strides reduced along a given axis</p>
 </ul>
 </li>
 <li class="open"><a href="#range">fn range</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#reduce">fn reduce</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#round">fn round</a>        <ul>
@@ -1465,7 +1447,8 @@ Stores a copy of the shape and strides reduced along a given axis</p>
 <li><a href="#[]&TensorIterator<T>.next">fn next</a></li>
 </ul>
 </li>
-<li class="open"><a href="#Tensor<T>.array_equal">type Tensor<T></a>        <ul>
+<li class="open"><a href="#Tensor<T>.apply">type Tensor<T></a>        <ul>
+<li><a href="#Tensor<T>.apply">fn apply</a></li>
 <li><a href="#Tensor<T>.array_equal">fn array_equal</a></li>
 <li><a href="#Tensor<T>.array_equiv">fn array_equiv</a></li>
 <li><a href="#Tensor<T>.as_strided">fn as_strided</a></li>
@@ -1492,10 +1475,15 @@ Stores a copy of the shape and strides reduced along a given axis</p>
 <li><a href="#Tensor<T>.is_vector">fn is_vector</a></li>
 <li><a href="#Tensor<T>.iterator">fn iterator</a></li>
 <li><a href="#Tensor<T>.iterators">fn iterators</a></li>
+<li><a href="#Tensor<T>.map">fn map</a></li>
+<li><a href="#Tensor<T>.napply">fn napply</a></li>
+<li><a href="#Tensor<T>.nmap">fn nmap</a></li>
+<li><a href="#Tensor<T>.nreduce">fn nreduce</a></li>
 <li><a href="#Tensor<T>.nth_index">fn nth_index</a></li>
 <li><a href="#Tensor<T>.offset_index">fn offset_index</a></li>
 <li><a href="#Tensor<T>.rank">fn rank</a></li>
 <li><a href="#Tensor<T>.ravel">fn ravel</a></li>
+<li><a href="#Tensor<T>.reduce">fn reduce</a></li>
 <li><a href="#Tensor<T>.reshape">fn reshape</a></li>
 <li><a href="#Tensor<T>.set">fn set</a></li>
 <li><a href="#Tensor<T>.set_nth">fn set_nth</a></li>
