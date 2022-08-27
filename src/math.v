@@ -3,7 +3,12 @@ module vtl
 import math
 
 fn handle_abs<T>(x T, _ []int) T {
-	return T(math.abs(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.abs(0))
 }
 
 // abs returns the elementwise abs of an tensor
@@ -21,7 +26,12 @@ pub fn (t &Tensor<T>) abs<T>() &Tensor<T> {
 }
 
 fn handle_acos<T>(x T, _ []int) T {
-	return T(math.acos(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.acos(x))
 }
 
 // acos returns the elementwise acos of an tensor
@@ -39,7 +49,12 @@ pub fn (t &Tensor<T>) acos<T>() &Tensor<T> {
 }
 
 fn handle_acosh<T>(x T, _ []int) T {
-	return T(math.acosh(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.acosh(x))
 }
 
 // acosh returns the elementwise acosh of an tensor
@@ -57,7 +72,12 @@ pub fn (t &Tensor<T>) acosh<T>() &Tensor<T> {
 }
 
 fn handle_asin<T>(x T, _ []int) T {
-	return T(math.asin(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.asin(x))
 }
 
 // asin returns the elementwise asin of an tensor
@@ -75,7 +95,12 @@ pub fn (t &Tensor<T>) asin<T>() &Tensor<T> {
 }
 
 fn handle_asinh<T>(x T, _ []int) T {
-	return T(math.asinh(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.asinh(x))
 }
 
 // asinh returns the elementwise asinh of an tensor
@@ -93,7 +118,12 @@ pub fn (t &Tensor<T>) asinh<T>() &Tensor<T> {
 }
 
 fn handle_atan<T>(x T, _ []int) T {
-	return T(math.atan(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.atan(x))
 }
 
 // atan returns the elementwise atan of an tensor
@@ -111,8 +141,13 @@ pub fn (t &Tensor<T>) atan<T>() &Tensor<T> {
 }
 
 fn handle_atan2<T>(xs []T, _ []int) T {
-	x := f64(xs[0])
-	y := f64(xs[1])
+	match typeof(xs) {
+		'[]bool' { return T(0) }
+		'[]string' { return T(0) }
+		else {}
+	}
+	x := xs[0]
+	y := xs[1]
 	return T(math.atan2(x, y))
 }
 
@@ -132,7 +167,12 @@ pub fn (a &Tensor<T>) atan2<T>(b &Tensor<T>) ?&Tensor<T> {
 }
 
 fn handle_atanh<T>(x T, _ []int) T {
-	return T(math.atanh(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.atanh(x))
 }
 
 // atanh returns the elementwise atanh of an tensor
@@ -150,7 +190,12 @@ pub fn (t &Tensor<T>) atanh<T>() &Tensor<T> {
 }
 
 fn handle_cbrt<T>(x T, _ []int) T {
-	return T(math.cbrt(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.cbrt(x))
 }
 
 // cbrt returns the elementwise cbrt of an tensor
@@ -168,7 +213,12 @@ pub fn (t &Tensor<T>) cbrt<T>() &Tensor<T> {
 }
 
 fn handle_ceil<T>(x T, _ []int) T {
-	return T(math.ceil(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.ceil(x))
 }
 
 // ceil returns the elementwise ceil of an tensor
@@ -186,7 +236,12 @@ pub fn (t &Tensor<T>) ceil<T>() &Tensor<T> {
 }
 
 fn handle_cos<T>(x T, _ []int) T {
-	return T(math.cos(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.cos(x))
 }
 
 // cos returns the elementwise cos of an tensor
@@ -204,7 +259,12 @@ pub fn (t &Tensor<T>) cos<T>() &Tensor<T> {
 }
 
 fn handle_cosh<T>(x T, _ []int) T {
-	return T(math.cosh(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.cosh(x))
 }
 
 // cosh returns the elementwise cosh of an tensor
@@ -222,7 +282,12 @@ pub fn (t &Tensor<T>) cosh<T>() &Tensor<T> {
 }
 
 fn handle_cot<T>(x T, _ []int) T {
-	return T(math.cot(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.cot(x))
 }
 
 // cot returns the elementwise cot of an tensor
@@ -240,7 +305,12 @@ pub fn (t &Tensor<T>) cot<T>() &Tensor<T> {
 }
 
 fn handle_degrees<T>(x T, _ []int) T {
-	return T(math.degrees(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.degrees(x))
 }
 
 // degrees returns the elementwise degrees of an tensor
@@ -258,7 +328,12 @@ pub fn (t &Tensor<T>) degrees<T>() &Tensor<T> {
 }
 
 fn handle_erf<T>(x T, _ []int) T {
-	return T(math.erf(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.erf(x))
 }
 
 // erf returns the elementwise erf of an tensor
@@ -276,7 +351,12 @@ pub fn (t &Tensor<T>) erf<T>() &Tensor<T> {
 }
 
 fn handle_erfc<T>(x T, _ []int) T {
-	return T(math.erfc(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.erfc(x))
 }
 
 // erfc returns the elementwise erfc of an tensor
@@ -294,7 +374,12 @@ pub fn (t &Tensor<T>) erfc<T>() &Tensor<T> {
 }
 
 fn handle_exp<T>(x T, _ []int) T {
-	return T(math.exp(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.exp(x))
 }
 
 // exp returns the elementwise exp of an tensor
@@ -312,7 +397,12 @@ pub fn (t &Tensor<T>) exp<T>() &Tensor<T> {
 }
 
 fn handle_exp2<T>(x T, _ []int) T {
-	return T(math.exp2(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.exp2(x))
 }
 
 // exp2 returns the elementwise exp2 of an tensor
@@ -330,7 +420,12 @@ pub fn (t &Tensor<T>) exp2<T>() &Tensor<T> {
 }
 
 fn handle_expm1<T>(x T, _ []int) T {
-	return T(math.expm1(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.expm1(x))
 }
 
 // expm1 returns the elementwise expm1 of an tensor
@@ -348,7 +443,12 @@ pub fn (t &Tensor<T>) expm1<T>() &Tensor<T> {
 }
 
 fn handle_f32_bits<T>(x T, _ []int) T {
-	return T(math.f32_bits(f32(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.f32_bits(x))
 }
 
 // f32_bits returns the elementwise f32_bits of an tensor
@@ -366,7 +466,12 @@ pub fn (t &Tensor<T>) f32_bits<T>() &Tensor<T> {
 }
 
 fn handle_f32_from_bits<T>(x T, _ []int) T {
-	return T(math.f32_from_bits(u32(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.f32_from_bits(x))
 }
 
 // f32_from_bits returns the elementwise f32_from_bits of an tensor
@@ -384,7 +489,12 @@ pub fn (t &Tensor<T>) f32_from_bits<T>() &Tensor<T> {
 }
 
 fn handle_f64_bits<T>(x T, _ []int) T {
-	return T(math.f64_bits(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.f64_bits(x))
 }
 
 // f64_bits returns the elementwise f64_bits of an tensor
@@ -402,7 +512,12 @@ pub fn (t &Tensor<T>) f64_bits<T>() &Tensor<T> {
 }
 
 fn handle_f64_from_bits<T>(x T, _ []int) T {
-	return T(math.f64_from_bits(u64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.f64_from_bits(x))
 }
 
 // f64_from_bits returns the elementwise f64_from_bits of an tensor
@@ -420,7 +535,12 @@ pub fn (t &Tensor<T>) f64_from_bits<T>() &Tensor<T> {
 }
 
 fn handle_factorial<T>(x T, _ []int) T {
-	return T(math.factorial(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.factorial(x))
 }
 
 // factorial returns the elementwise factorial of an tensor
@@ -438,7 +558,12 @@ pub fn (t &Tensor<T>) factorial<T>() &Tensor<T> {
 }
 
 fn handle_floor<T>(x T, _ []int) T {
-	return T(math.floor(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.floor(x))
 }
 
 // floor returns the elementwise floor of an tensor
@@ -456,8 +581,13 @@ pub fn (t &Tensor<T>) floor<T>() &Tensor<T> {
 }
 
 fn handle_fmod<T>(xs []T, _ []int) T {
-	x := f64(xs[0])
-	y := f64(xs[1])
+	match typeof(xs) {
+		'[]bool' { return T(0) }
+		'[]string' { return T(0) }
+		else {}
+	}
+	x := xs[0]
+	y := xs[1]
 	return T(math.fmod(x, y))
 }
 
@@ -477,7 +607,12 @@ pub fn (a &Tensor<T>) fmod<T>(b &Tensor<T>) ?&Tensor<T> {
 }
 
 fn handle_gamma<T>(x T, _ []int) T {
-	return T(math.gamma(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.gamma(x))
 }
 
 // gamma returns the elementwise gamma of an tensor
@@ -495,8 +630,13 @@ pub fn (t &Tensor<T>) gamma<T>() &Tensor<T> {
 }
 
 fn handle_gcd<T>(xs []T, _ []int) T {
-	x := i64(xs[0])
-	y := i64(xs[1])
+	match typeof(xs) {
+		'[]bool' { return T(0) }
+		'[]string' { return T(0) }
+		else {}
+	}
+	x := xs[0]
+	y := xs[1]
 	return T(math.gcd(x, y))
 }
 
@@ -516,8 +656,13 @@ pub fn (a &Tensor<T>) gcd<T>(b &Tensor<T>) ?&Tensor<T> {
 }
 
 fn handle_hypot<T>(xs []T, _ []int) T {
-	x := f64(xs[0])
-	y := f64(xs[1])
+	match typeof(xs) {
+		'[]bool' { return T(0) }
+		'[]string' { return T(0) }
+		else {}
+	}
+	x := xs[0]
+	y := xs[1]
 	return T(math.hypot(x, y))
 }
 
@@ -537,8 +682,13 @@ pub fn (a &Tensor<T>) hypot<T>(b &Tensor<T>) ?&Tensor<T> {
 }
 
 fn handle_lcm<T>(xs []T, _ []int) T {
-	x := i64(xs[0])
-	y := i64(xs[1])
+	match typeof(xs) {
+		'[]bool' { return T(0) }
+		'[]string' { return T(0) }
+		else {}
+	}
+	x := xs[0]
+	y := xs[1]
 	return T(math.lcm(x, y))
 }
 
@@ -558,7 +708,12 @@ pub fn (a &Tensor<T>) lcm<T>(b &Tensor<T>) ?&Tensor<T> {
 }
 
 fn handle_log<T>(x T, _ []int) T {
-	return T(math.log(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.log(x))
 }
 
 // log returns the elementwise log of an tensor
@@ -576,7 +731,12 @@ pub fn (t &Tensor<T>) log<T>() &Tensor<T> {
 }
 
 fn handle_log10<T>(x T, _ []int) T {
-	return T(math.log10(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.log10(x))
 }
 
 // log10 returns the elementwise log10 of an tensor
@@ -594,7 +754,12 @@ pub fn (t &Tensor<T>) log10<T>() &Tensor<T> {
 }
 
 fn handle_log1p<T>(x T, _ []int) T {
-	return T(math.log1p(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.log1p(x))
 }
 
 // log1p returns the elementwise log1p of an tensor
@@ -612,7 +777,12 @@ pub fn (t &Tensor<T>) log1p<T>() &Tensor<T> {
 }
 
 fn handle_log2<T>(x T, _ []int) T {
-	return T(math.log2(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.log2(x))
 }
 
 // log2 returns the elementwise log2 of an tensor
@@ -630,7 +800,12 @@ pub fn (t &Tensor<T>) log2<T>() &Tensor<T> {
 }
 
 fn handle_log_factorial<T>(x T, _ []int) T {
-	return T(math.log_factorial(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.log_factorial(x))
 }
 
 // log_factorial returns the elementwise log_factorial of an tensor
@@ -648,7 +823,12 @@ pub fn (t &Tensor<T>) log_factorial<T>() &Tensor<T> {
 }
 
 fn handle_log_gamma<T>(x T, _ []int) T {
-	return T(math.log_gamma(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.log_gamma(x))
 }
 
 // log_gamma returns the elementwise log_gamma of an tensor
@@ -666,8 +846,13 @@ pub fn (t &Tensor<T>) log_gamma<T>() &Tensor<T> {
 }
 
 fn handle_log_n<T>(xs []T, _ []int) T {
-	x := f64(xs[0])
-	y := f64(xs[1])
+	match typeof(xs) {
+		'[]bool' { return T(0) }
+		'[]string' { return T(0) }
+		else {}
+	}
+	x := xs[0]
+	y := xs[1]
 	return T(math.log_n(x, y))
 }
 
@@ -687,8 +872,13 @@ pub fn (a &Tensor<T>) log_n<T>(b &Tensor<T>) ?&Tensor<T> {
 }
 
 fn handle_max<T>(xs []T, _ []int) T {
-	x := f64(xs[0])
-	y := f64(xs[1])
+	match typeof(xs) {
+		'[]bool' { return T(0) }
+		'[]string' { return T(0) }
+		else {}
+	}
+	x := xs[0]
+	y := xs[1]
 	return T(math.max(x, y))
 }
 
@@ -708,8 +898,13 @@ pub fn (a &Tensor<T>) max<T>(b &Tensor<T>) ?&Tensor<T> {
 }
 
 fn handle_min<T>(xs []T, _ []int) T {
-	x := f64(xs[0])
-	y := f64(xs[1])
+	match typeof(xs) {
+		'[]bool' { return T(0) }
+		'[]string' { return T(0) }
+		else {}
+	}
+	x := xs[0]
+	y := xs[1]
 	return T(math.min(x, y))
 }
 
@@ -729,8 +924,13 @@ pub fn (a &Tensor<T>) min<T>(b &Tensor<T>) ?&Tensor<T> {
 }
 
 fn handle_nextafter<T>(xs []T, _ []int) T {
-	x := f64(xs[0])
-	y := f64(xs[1])
+	match typeof(xs) {
+		'[]bool' { return T(0) }
+		'[]string' { return T(0) }
+		else {}
+	}
+	x := xs[0]
+	y := xs[1]
 	return T(math.nextafter(x, y))
 }
 
@@ -750,8 +950,13 @@ pub fn (a &Tensor<T>) nextafter<T>(b &Tensor<T>) ?&Tensor<T> {
 }
 
 fn handle_nextafter32<T>(xs []T, _ []int) T {
-	x := f32(xs[0])
-	y := f32(xs[1])
+	match typeof(xs) {
+		'[]bool' { return T(0) }
+		'[]string' { return T(0) }
+		else {}
+	}
+	x := xs[0]
+	y := xs[1]
 	return T(math.nextafter32(x, y))
 }
 
@@ -771,8 +976,13 @@ pub fn (a &Tensor<T>) nextafter32<T>(b &Tensor<T>) ?&Tensor<T> {
 }
 
 fn handle_pow<T>(xs []T, _ []int) T {
-	x := f64(xs[0])
-	y := f64(xs[1])
+	match typeof(xs) {
+		'[]bool' { return T(0) }
+		'[]string' { return T(0) }
+		else {}
+	}
+	x := xs[0]
+	y := xs[1]
 	return T(math.pow(x, y))
 }
 
@@ -792,7 +1002,12 @@ pub fn (a &Tensor<T>) pow<T>(b &Tensor<T>) ?&Tensor<T> {
 }
 
 fn handle_pow10<T>(x T, _ []int) T {
-	return T(math.pow10(int(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.pow10(x))
 }
 
 // pow10 returns the elementwise pow10 of an tensor
@@ -810,7 +1025,12 @@ pub fn (t &Tensor<T>) pow10<T>() &Tensor<T> {
 }
 
 fn handle_radians<T>(x T, _ []int) T {
-	return T(math.radians(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.radians(x))
 }
 
 // radians returns the elementwise deg2rad of an tensor
@@ -828,7 +1048,12 @@ pub fn (t &Tensor<T>) radians<T>() &Tensor<T> {
 }
 
 fn handle_round<T>(x T, _ []int) T {
-	return T(math.round(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.round(x))
 }
 
 // round rounds elements of an tensor elementwise
@@ -846,7 +1071,12 @@ pub fn (t &Tensor<T>) round<T>() &Tensor<T> {
 }
 
 fn handle_round_to_even<T>(x T, _ []int) T {
-	return T(math.round_to_even(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.round_to_even(x))
 }
 
 // round_to_even round_to_evens elements of an tensor elementwise
@@ -864,7 +1094,12 @@ pub fn (t &Tensor<T>) round_to_even<T>() &Tensor<T> {
 }
 
 fn handle_sin<T>(x T, _ []int) T {
-	return T(math.sin(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.sin(x))
 }
 
 // sin returns the elementwise sin of an tensor
@@ -882,7 +1117,12 @@ pub fn (t &Tensor<T>) sin<T>() &Tensor<T> {
 }
 
 fn handle_sinh<T>(x T, _ []int) T {
-	return T(math.sinh(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.sinh(x))
 }
 
 // sinh returns the elementwise sinh of an tensor
@@ -900,7 +1140,12 @@ pub fn (t &Tensor<T>) sinh<T>() &Tensor<T> {
 }
 
 fn handle_sqrt<T>(x T, _ []int) T {
-	return T(math.sqrt(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.sqrt(x))
 }
 
 // sqrt returns the elementwise square root of an tensor
@@ -918,7 +1163,12 @@ pub fn (t &Tensor<T>) sqrt<T>() &Tensor<T> {
 }
 
 fn handle_tan<T>(x T, _ []int) T {
-	return T(math.tan(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.tan(x))
 }
 
 // tan returns the elementwise tan of an tensor
@@ -936,7 +1186,12 @@ pub fn (t &Tensor<T>) tan<T>() &Tensor<T> {
 }
 
 fn handle_tanh<T>(x T, _ []int) T {
-	return T(math.tanh(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.tanh(x))
 }
 
 // tanh returns the elementwise tanh of an tensor
@@ -954,7 +1209,12 @@ pub fn (t &Tensor<T>) tanh<T>() &Tensor<T> {
 }
 
 fn handle_trunc<T>(x T, _ []int) T {
-	return T(math.trunc(f64(x)))
+	match typeof(x) {
+		'bool' { return x }
+		'string' { return x }
+		else {}
+	}
+	return T(math.trunc(x))
 }
 
 // trunc returns the elementwise trunc of an tensor
