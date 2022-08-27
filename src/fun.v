@@ -37,7 +37,7 @@ pub fn (t &Tensor<T>) reduce<T>(init T, f fn (acc T, x T, i []int) T) T {
 pub fn (mut t Tensor<T>) napply<T>(ts []&Tensor<T>, f fn (xs []T, i []int) T) ? {
 	mut iters, _ := t.iterators<T>(ts)?
 	for {
-		vals, i := iterators_next<T>(mut iters) or { break }
+		vals, i := iters.next() or { break }
 		val := f(vals, i)
 		t.set(i, val)
 	}
@@ -48,7 +48,7 @@ pub fn (t &Tensor<T>) nmap<T>(ts []&Tensor<T>, f fn (xs []T, i []int) T) ?&Tenso
 	mut iters, shape := t.iterators<T>(ts)?
 	mut ret := new_tensor_like_with_shape<T>(t, shape)
 	for {
-		vals, i := iterators_next<T>(mut iters) or { break }
+		vals, i := iters.next() or { break }
 		val := f(vals, i)
 		ret.set(i, val)
 	}
@@ -60,7 +60,7 @@ pub fn (t &Tensor<T>) nreduce<T>(ts []&Tensor<T>, init T, f fn (acc T, xs []T, i
 	mut ret := init
 	mut iters, _ := t.iterators<T>(ts)?
 	for {
-		vals, i := iterators_next<T>(mut iters) or { break }
+		vals, i := iters.next() or { break }
 		ret = f(ret, vals, i)
 	}
 	return ret

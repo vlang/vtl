@@ -18,7 +18,7 @@ pub fn (a &Tensor<T>) add<T>(b &Tensor<T>) ?&Tensor<T> {
 	mut iters, shape := a.iterators<T>([b])?
 	mut ret := new_tensor_like_with_shape<T>(a, shape)
 	for {
-		vals, i := iterators_next<T>(mut iters) or { break }
+		vals, i := iters.next() or { break }
 		val := handle_add<T>(vals[0], vals[1])
 		ret.set(i, val)
 	}
@@ -57,7 +57,7 @@ pub fn (a &Tensor<T>) substract<T>(b &Tensor<T>) ?&Tensor<T> {
 	mut iters, shape := a.iterators<T>([b])?
 	mut ret := new_tensor_like_with_shape<T>(a, shape)
 	for {
-		vals, i := iterators_next<T>(mut iters) or { break }
+		vals, i := iters.next() or { break }
 		val := handle_substract<T>(vals[0], vals[1])
 		ret.set(i, val)
 	}
@@ -96,7 +96,7 @@ pub fn (a &Tensor<T>) divide<T>(b &Tensor<T>) ?&Tensor<T> {
 	mut iters, shape := a.iterators<T>([b])?
 	mut ret := new_tensor_like_with_shape<T>(a, shape)
 	for {
-		vals, i := iterators_next<T>(mut iters) or { break }
+		vals, i := iters.next() or { break }
 		val := handle_divide<T>(vals[0], vals[1])
 		ret.set(i, val)
 	}
@@ -135,7 +135,7 @@ pub fn (a &Tensor<T>) multiply<T>(b &Tensor<T>) ?&Tensor<T> {
 	mut iters, shape := a.iterators<T>([b])?
 	mut ret := new_tensor_like_with_shape<T>(a, shape)
 	for {
-		vals, i := iterators_next<T>(mut iters) or { break }
+		vals, i := iters.next() or { break }
 		val := handle_multiply<T>(vals[0], vals[1])
 		ret.set(i, val)
 	}

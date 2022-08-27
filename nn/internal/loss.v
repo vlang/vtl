@@ -12,10 +12,10 @@ pub fn mse_backward<T>(gradient &vtl.Tensor<T>, cache &vtl.Tensor<T>, target &vt
 
 pub fn sigmoid_cross_entropy_backward<T>(gradient &vtl.Tensor<T>, cache &vtl.Tensor<T>, target &vtl.Tensor<T>) []&vtl.Tensor<T> {
 	batch_size := cache.shape[0]
-	mut iter, shape := gradient.iterators<T>([cache, target])
+	mut iters, shape := gradient.iterators<T>([cache, target])
 	mut ret := vtl.new_tensor_like_with_shape<T>(cache, shape)
 	for {
-		vals, i := vtl.iterators_next<T>(mut iter) or { break }
+		vals, i := iters.next() or { break }
 		val := vals[0] * (vtl.new_t<T>(1) / vtl.new_t<T>(1) + vtl.new_t<T>(math.exp(-f64(vals[1]))) - vals[1]) / vtl.new_t<T>(batch_size)
 		ret.set(i, val)
 	}
