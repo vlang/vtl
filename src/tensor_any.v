@@ -13,6 +13,7 @@ pub type TensorDataType = bool
 	| u16
 	| u32
 	| u64
+	| u8
 
 pub fn new_td<T>(x T) TensorDataType {
 	$if T is bool {
@@ -32,6 +33,8 @@ pub fn new_td<T>(x T) TensorDataType {
 	} $else $if T is int {
 		return TensorDataType(x)
 	} $else $if T is string {
+		return TensorDataType(x)
+	} $else $if T is u8 {
 		return TensorDataType(x)
 	} $else $if T is u16 {
 		return TensorDataType(x)
@@ -63,6 +66,8 @@ pub fn new_t<T>(x TensorDataType) T {
 		return x.int()
 	} $else $if T is string {
 		return x.str()
+	} $else $if T is u8 {
+		return x.u8()
 	} $else $if T is u16 {
 		return x.u16()
 	} $else $if T is u32 {
@@ -96,6 +101,23 @@ pub fn (f TensorDataType) i64() i64 {
 	match f {
 		i64 { return f }
 		int, f32, f64, bool { return i64(f) }
+		else { return 0 }
+	}
+}
+
+// u8 uses `TensorDataType` as a 8-bit unsigned integer.
+pub fn (f TensorDataType) u8() u8 {
+	match f {
+		u8 { return f }
+		else { return 0 }
+	}
+}
+
+// u16 uses `TensorDataType` as a 16-bit unsigned integer.
+pub fn (f TensorDataType) u16() u16 {
+	match f {
+		u16 { return f }
+		u8 { return u16(f) }
 		else { return 0 }
 	}
 }

@@ -10,20 +10,25 @@ pub const (
 	mnist_train_file = 'mnist_train.csv'
 )
 
+interface Reader {
+mut:
+	read() ?[]string
+}
+
 // MnistDataset is a dataset of MNIST handwritten digits.
 pub struct MnistDataset {
 pub:
 	@type      DatasetType
 	batch_size int
 mut:
-	parser &csv.Reader
+	parser Reader
 }
 
 // MnistBatch is a batch of MNIST handwritten digits.
 pub struct MnistBatch {
 pub:
-	features &vtl.Tensor<f32>
-	labels   &vtl.Tensor<int>
+	features &vtl.Tensor<u8>
+	labels   &vtl.Tensor<u8>
 }
 
 [params]
@@ -49,7 +54,7 @@ pub fn load_mnist(set_type DatasetType, data MnistDatasetConfig) ?&MnistDataset 
 	return &MnistDataset{
 		@type: set_type
 		batch_size: data.batch_size
-		parser: csv.new_reader(content)
+		parser: Reader(csv.new_reader(content))
 	}
 }
 
@@ -67,13 +72,13 @@ pub fn (ds &MnistDataset) str() string {
 pub fn (mut ds MnistDataset) next() ?MnistBatch {
 	batch_size := ds.batch_size
 
-	mut labels := []int{cap: batch_size}
-	mut features := []f32{cap: batch_size}
+	mut labels := []u8{cap: batch_size}
+	mut features := []u8{cap: batch_size}
 
 	for _ in 0 .. batch_size {
 		items := ds.parser.read() or { break }
-		labels << items[0].int()
-		features << items[1..].map(it.f32())
+		labels << items[0].u8()
+		features << items[1..].map(it.u8())
 	}
 
 	if labels.len == 0 {
@@ -81,7 +86,7 @@ pub fn (mut ds MnistDataset) next() ?MnistBatch {
 	}
 
 	mut lt := vtl.from_1d(labels)?
-	mut lft := vtl.zeros<int>([10])
+	mut lft := vtl.zeros<u8>([10])
 
 	mut iter := lt.iterator()
 	for {
