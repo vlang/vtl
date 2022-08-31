@@ -15,6 +15,17 @@ pub fn mean_squared_error<T>(y &vtl.Tensor<T>, y_true &vtl.Tensor<T>) &vtl.Tenso
 }
 
 [inline]
+pub fn relative_error<T>(y &vtl.Tensor<T>, y_true &vtl.Tensor<T>) &vtl.Tensor<T> {
+	denom := y_true.abs().max(y.abs())
+	return y_true.substract(y).abs().divide(denom)
+}
+
+[inline]
+pub fn mean_relative_error<T>(y &vtl.Tensor<T>, y_true &vtl.Tensor<T>) &vtl.Tensor<T> {
+	return stats.mean(relative_error(y, y_true))
+}
+
+[inline]
 pub fn absolute_error<T>(y &vtl.Tensor<T>, y_true &vtl.Tensor<T>) &vtl.Tensor<T> {
 	return y_true.substract(y).abs()
 }
