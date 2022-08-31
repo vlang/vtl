@@ -58,9 +58,19 @@
 
 </section>
 
+						<section id="absolute_error" class="doc-node">
+							<div class="title"><h2>fn absolute_error <a href="#absolute_error">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/ml/metrics/common_error_functions.v#L18"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">absolute_error</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>y <span class="token operator">&</span><span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> y_true <span class="token operator">&</span><span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token operator">&</span><span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+
+
+</section>
 						<section id="accuracy_score" class="doc-node">
 							<div class="title"><h2>fn accuracy_score <a href="#accuracy_score">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/ml/metrics/accuracy_matrix.v#L7"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">accuracy_score</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>y_pred <span class="token operator">&</span><span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> y_true <span class="token operator">&</span><span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token operator">?</span><span class="token builtin">f64</span></code></pre>
 <p>accuracy_score returns the proportion of correctly classified samples (as f32)</p>
+
+</section>
+						<section id="mean_absolute_error" class="doc-node">
+							<div class="title"><h2>fn mean_absolute_error <a href="#mean_absolute_error">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/ml/metrics/common_error_functions.v#L23"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">mean_absolute_error</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>y <span class="token operator">&</span><span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> y_true <span class="token operator">&</span><span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token operator">&</span><span class="token punctuation">.</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+
 
 </section>
 						<section id="mean_squared_error" class="doc-node">
@@ -75,10 +85,16 @@
 </section>
 
           <div class="footer">
-            Powered by vdoc. Generated on: 31 Aug 2022 03:51:35
+            Powered by vdoc. Generated on: 31 Aug 2022 03:53:43
           </div>
         </div>
-        <div class="doc-toc"><ul><li class="open"><a href="#accuracy_score">fn accuracy_score</a>        <ul>
+        <div class="doc-toc"><ul><li class="open"><a href="#absolute_error">fn absolute_error</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#accuracy_score">fn accuracy_score</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#mean_absolute_error">fn mean_absolute_error</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#mean_squared_error">fn mean_squared_error</a>        <ul>
