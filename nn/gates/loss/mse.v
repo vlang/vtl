@@ -26,5 +26,5 @@ pub fn (g &MseGate<T>) cache<T>(mut result autograd.Variable<T>, args ...autogra
 	result.grad = vtl.zeros_like<T>(result.value)
 	result.requires_grad = true
 
-	register<T>('MSE', g, result, []&autograd.Variable<T>{})
+	autograd.register<T>('MSE', g, result, []&autograd.Variable<T>{})?
 }
