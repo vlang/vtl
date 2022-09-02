@@ -8,7 +8,7 @@ pub fn new_add_gate<T>() &AddGate<T> {
 	return &AddGate<T>{}
 }
 
-pub fn (g &AddGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
+pub fn (g &AddGate<T>) backward<T>(payload &Payload<T>) ?[]&vtl.Tensor<T> {
 	gradient := payload.variable.grad
 	return [gradient, gradient]
 }
@@ -43,7 +43,7 @@ pub fn new_substract_gate<T>() &SubstractGate<T> {
 	return &SubstractGate<T>{}
 }
 
-pub fn (g &SubstractGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
+pub fn (g &SubstractGate<T>) backward<T>(payload &Payload<T>) ?[]&vtl.Tensor<T> {
 	gradient := payload.variable.grad
 	oposite := gradient.multiply_scalar<T>(vtl.new_t<T>(-1))
 	return [gradient, oposite]
@@ -86,10 +86,10 @@ pub fn new_multiply_gate<T>(a &Variable<T>, b &Variable<T>) &MultiplyGate<T> {
 	}
 }
 
-pub fn (g &MultiplyGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
+pub fn (g &MultiplyGate<T>) backward<T>(payload &Payload<T>) ?[]&vtl.Tensor<T> {
 	gradient := payload.variable.grad
-	r0 := gradient.multiply<T>(g.b.value)
-	r1 := gradient.multiply<T>(g.a.value)
+	r0 := gradient.multiply<T>(g.b.value)?
+	r1 := gradient.multiply<T>(g.a.value)?
 	return [r0, r1]
 }
 
@@ -130,13 +130,13 @@ pub fn new_divide_gate<T>(a &Variable<T>, b &Variable<T>) &DivideGate<T> {
 	}
 }
 
-pub fn (g &DivideGate<T>) backward<T>(payload &Payload<T>) []&vtl.Tensor<T> {
+pub fn (g &DivideGate<T>) backward<T>(payload &Payload<T>) ?[]&vtl.Tensor<T> {
 	gradient := payload.variable.grad
-	r0 := gradient.divide<T>(g.b.value)
+	r0 := gradient.divide<T>(g.b.value)?
 	bx2 := g.b.value.multiply_scalar<T>(vtl.new_t<T>(2))
 	oposite := gradient.multiply_scalar<T>(vtl.new_t<T>(-1))
-	mut r1 := oposite.multiply<T>(g.a.value)
-	r1 = r1.divide<T>(bx2)
+	mut r1 := oposite.multiply<T>(g.a.value)?
+	r1 = r1.divide<T>(bx2)?
 	return [r0, r1]
 }
 

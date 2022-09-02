@@ -15,7 +15,7 @@ pub fn new_exp_gate<T>(a &Variable<T>) &ExpGate<T> {
 
 pub fn (g &ExpGate<T>) backward<T>(payload &Payload<T>) ?[]&vtl.Tensor<T> {
 	gradient := payload.variable.grad
-	r0 := gradient.multiply<T>(g.a.value.exp<T>())
+	r0 := gradient.multiply<T>(g.a.value.exp<T>())?
 	return [r0]
 }
 
@@ -28,6 +28,9 @@ pub fn (g &ExpGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) ? {
 			result.requires_grad = true
 
 			register<T>('Exp', g, result, [a])?
+		}
+		else {
+			return error('ExpGate: a must be a Variable')
 		}
 	}
 }
