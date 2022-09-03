@@ -80,89 +80,86 @@ pub fn new_t<T>(x TensorDataType) T {
 }
 
 // string returns `TensorDataType` as a string.
-pub fn (a TensorDataType) string() string {
-	match a {
-		string { return a as string }
-		else { return a.str() }
-	}
+pub fn (v TensorDataType) string() string {
+	return v.str()
 }
 
 // int uses `TensorDataType` as an integer.
-pub fn (f TensorDataType) int() int {
-	match f {
-		int { return f }
-		i64, f32, f64, bool { return int(f) }
+pub fn (v TensorDataType) int() int {
+	match v {
+		int { return v }
+		i64, f32, f64, bool { return int(v) }
 		else { return 0 }
 	}
 }
 
 // i64 uses `TensorDataType` as a 64-bit integer.
-pub fn (f TensorDataType) i64() i64 {
-	match f {
-		i64 { return f }
-		int, f32, f64, bool { return i64(f) }
+pub fn (v TensorDataType) i64() i64 {
+	match v {
+		i64 { return v }
+		int, f32, f64, bool { return i64(v) }
 		else { return 0 }
 	}
 }
 
 // u8 uses `TensorDataType` as a 8-bit unsigned integer.
-pub fn (f TensorDataType) u8() u8 {
-	match f {
-		u8 { return f }
+pub fn (v TensorDataType) u8() u8 {
+	match v {
+		u8 { return v }
 		else { return 0 }
 	}
 }
 
 // u16 uses `TensorDataType` as a 16-bit unsigned integer.
-pub fn (f TensorDataType) u16() u16 {
-	match f {
-		u16 { return f }
-		u8 { return u16(f) }
+pub fn (v TensorDataType) u16() u16 {
+	match v {
+		u16 { return v }
+		u8 { return u16(v) }
 		else { return 0 }
 	}
 }
 
 // u32 uses `TensorDataType` as a 32-bit unsigned integer.
-pub fn (f TensorDataType) u32() u32 {
-	match f {
-		u32 { return f }
-		int, f32, bool { return u32(f) }
+pub fn (v TensorDataType) u32() u32 {
+	match v {
+		u32 { return v }
+		int, f32, bool { return u32(v) }
 		else { return 0 }
 	}
 }
 
 // u64 uses `TensorDataType` as a 64-bit unsigned integer.
-pub fn (f TensorDataType) u64() u64 {
-	match f {
-		u64 { return f }
-		int, i64, f32, f64, bool { return u64(f) }
+pub fn (v TensorDataType) u64() u64 {
+	match v {
+		u64 { return v }
+		int, i64, f32, f64, bool { return u64(v) }
 		else { return 0 }
 	}
 }
 
 // f32 uses `TensorDataType` as a 32-bit float.
-pub fn (f TensorDataType) f32() f32 {
-	match f {
-		f32 { return f }
-		int, i64, f64 { return f32(f) }
+pub fn (v TensorDataType) f32() f32 {
+	match v {
+		f32 { return v }
+		int, i64, f64 { return f32(v) }
 		else { return 0.0 }
 	}
 }
 
 // f64 uses `TensorDataType` as a float.
-pub fn (f TensorDataType) f64() f64 {
-	match f {
-		f64 { return f }
-		int, i64, f32 { return f64(f) }
+pub fn (v TensorDataType) f64() f64 {
+	match v {
+		f64 { return v }
+		int, i64, f32 { return f64(v) }
 		else { return 0.0 }
 	}
 }
 
 // bool uses `TensorDataType` as a bool
-pub fn (f TensorDataType) bool() bool {
-	match f {
-		bool { return f }
-		string { return f.bool() }
+pub fn (v TensorDataType) bool() bool {
+	match v {
+		bool { return v }
+		string { return v.bool() }
 		else { return false }
 	}
 }
