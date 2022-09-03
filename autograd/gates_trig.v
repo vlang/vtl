@@ -48,7 +48,7 @@ pub fn new_cos_gate<T>(a &Variable<T>) &CosGate<T> {
 
 pub fn (g &CosGate<T>) backward<T>(payload &Payload<T>) ?[]&vtl.Tensor<T> {
 	gradient := payload.variable.grad
-	r0 := gradient.multiply<T>(g.a.value.sin<T>().multiply_scalar<T>(vtl.new_t<T>(-1)))?
+	r0 := gradient.multiply<T>(g.a.value.sin<T>().multiply_scalar<T>(vtl.new_t<T>(-1))?)?
 	return [r0]
 }
 
