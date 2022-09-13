@@ -6,7 +6,7 @@ import vtl.stats
 
 [inline]
 pub fn squared_error<T>(y &vtl.Tensor<T>, y_true &vtl.Tensor<T>) ?&vtl.Tensor<T> {
-	diff := y.substract(y_true)?
+	diff := y.subtract(y_true)?
 	return diff.multiply(diff)
 }
 
@@ -39,7 +39,7 @@ pub fn mean_relative_error<T>(y &vtl.Tensor<T>, y_true &vtl.Tensor<T>) ?T {
 
 [inline]
 pub fn absolute_error<T>(y &vtl.Tensor<T>, y_true &vtl.Tensor<T>) ?&vtl.Tensor<T> {
-	return y_true.substract(y)?.abs()
+	return y_true.subtract(y)?.abs()
 }
 
 [inline]

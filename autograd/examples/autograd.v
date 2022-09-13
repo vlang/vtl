@@ -12,10 +12,10 @@ fn main() {
 	println(x)
 	println(y)
 
-	mut f := autograd.pow(x, y)?
+	mut pow := x.pow(y)?
 
-	f.backprop()?
+	pow.backprop()?
 
-	println(f)
+	println(pow)
 	println(x.grad)
 }
