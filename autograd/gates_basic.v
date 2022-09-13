@@ -39,7 +39,7 @@ pub fn (g &AddGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) ? {
 
 pub struct SubstractGate<T> {}
 
-pub fn new_substract_gate<T>() &SubstractGate<T> {
+pub fn new_subtract_gate<T>() &SubstractGate<T> {
 	return &SubstractGate<T>{}
 }
 

@@ -4,7 +4,7 @@ The following linear algebra operations are supported for
 tensors of rank 1 (vectors) and 2 (matrices):
 
 - dot product (Vector to Vector) using `vtl.la.dot`
-- addition and substraction (any rank) using `vtl.add` and `vtl.substract`
+- addition and subtraction (any rank) using `vtl.add` and `vtl.subtract`
 - multiplication or division by a scalar using `vtl.multiply` and `vtl.divide`
 - matrix-matrix multiplication using `vtl.la.matmul`
 - . . .

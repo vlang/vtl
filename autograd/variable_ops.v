@@ -4,7 +4,7 @@ import vtl
 import vtl.la
 
 // add Adds two variables together.
-pub fn add<T>(v &Variable<T>, other &Variable<T>) ?&Variable<T> {
+pub fn (v &Variable<T>) add<T>(other &Variable<T>) ?&Variable<T> {
 	mut result := v.context.variable<T>(v.value.add<T>(other.value)?)
 
 	if v.requires_grad || other.requires_grad {
@@ -15,12 +15,12 @@ pub fn add<T>(v &Variable<T>, other &Variable<T>) ?&Variable<T> {
 	return result
 }
 
-// substract Subtracts two variables.
-pub fn substract<T>(v &Variable<T>, other &Variable<T>) ?&Variable<T> {
-	mut result := v.context.variable<T>(v.value.substract<T>(other.value)?)
+// subtract Subtracts two variables.
+pub fn (v &Variable<T>) subtract<T>(other &Variable<T>) ?&Variable<T> {
+	mut result := v.context.variable<T>(v.value.subtract<T>(other.value)?)
 
 	if v.requires_grad || other.requires_grad {
-		gate := new_substract_gate<T>()
+		gate := new_subtract_gate<T>()
 		gate.cache<T>(mut result, v, other)?
 	}
 
@@ -28,7 +28,7 @@ pub fn substract<T>(v &Variable<T>, other &Variable<T>) ?&Variable<T> {
 }
 
 // multiply Multiplies two variables.
-pub fn multiply<T>(v &Variable<T>, other &Variable<T>) ?&Variable<T> {
+pub fn (v &Variable<T>) multiply<T>(other &Variable<T>) ?&Variable<T> {
 	mut result := v.context.variable<T>(v.value.multiply<T>(other.value)?)
 
 	if v.requires_grad || other.requires_grad {
@@ -40,7 +40,7 @@ pub fn multiply<T>(v &Variable<T>, other &Variable<T>) ?&Variable<T> {
 }
 
 // divide Divides two variables.
-pub fn divide<T>(v &Variable<T>, other &Variable<T>) ?&Variable<T> {
+pub fn (v &Variable<T>) divide<T>(other &Variable<T>) ?&Variable<T> {
 	mut result := v.context.variable<T>(v.value.divide<T>(other.value)?)
 
 	if v.requires_grad || other.requires_grad {
@@ -52,7 +52,7 @@ pub fn divide<T>(v &Variable<T>, other &Variable<T>) ?&Variable<T> {
 }
 
 // pow raises a variable to a power.
-pub fn pow<T>(v &Variable<T>, other &Variable<T>) ?&Variable<T> {
+pub fn (v &Variable<T>) pow<T>(other &Variable<T>) ?&Variable<T> {
 	mut result := v.context.variable<T>(v.value.pow<T>(other.value)?)
 
 	if v.requires_grad || other.requires_grad {
@@ -64,7 +64,7 @@ pub fn pow<T>(v &Variable<T>, other &Variable<T>) ?&Variable<T> {
 }
 
 // exp Exponentiates a variable.
-pub fn exp<T>(v &Variable<T>, other &Variable<T>) ?&Variable<T> {
+pub fn (v &Variable<T>) exp<T>() ?&Variable<T> {
 	mut result := v.context.variable<T>(v.value.exp<T>())
 
 	if v.requires_grad {
@@ -76,7 +76,7 @@ pub fn exp<T>(v &Variable<T>, other &Variable<T>) ?&Variable<T> {
 }
 
 // matmul Multiplies two matrices.
-pub fn matmul<T>(v &Variable<T>, other &Variable<T>) ?&Variable<T> {
+pub fn (v &Variable<T>) matmul<T>(other &Variable<T>) ?&Variable<T> {
 	mut result := v.context.variable<T>(la.matmul<T>(v.value, other.value)?)
 
 	if v.requires_grad || other.requires_grad {
@@ -88,36 +88,36 @@ pub fn matmul<T>(v &Variable<T>, other &Variable<T>) ?&Variable<T> {
 }
 
 // sin Sine of a variable.
-pub fn sin<T>(v &Variable<T>, other &Variable<T>) ?&Variable<T> {
+pub fn (v &Variable<T>) sin<T>() ?&Variable<T> {
 	mut result := v.context.variable<T>(v.value.sin<T>())
 
-	if v.requires_grad || other.requires_grad {
-		gate := new_sin_gate<T>(v, other)
-		gate.cache<T>(mut result, v, other)?
+	if v.requires_grad {
+		gate := new_sin_gate<T>(v)
+		gate.cache<T>(mut result, v)?
 	}
 
 	return result
 }
 
 // cos Cosine of a variable.
-pub fn cos<T>(v &Variable<T>, other &Variable<T>) ?&Variable<T> {
+pub fn (v &Variable<T>) cos<T>() ?&Variable<T> {
 	mut result := v.context.variable<T>(v.value.cos<T>())
 
-	if v.requires_grad || other.requires_grad {
-		gate := new_cos_gate<T>(v, other)
-		gate.cache<T>(mut result, v, other)?
+	if v.requires_grad {
+		gate := new_cos_gate<T>(v)
+		gate.cache<T>(mut result, v)?
 	}
 
 	return result
 }
 
 // tan Tan of a variable.
-pub fn tan<T>(v &Variable<T>, other &Variable<T>) ?&Variable<T> {
+pub fn (v &Variable<T>) tan<T>() ?&Variable<T> {
 	mut result := v.context.variable<T>(v.value.tan<T>())
 
-	if v.requires_grad || other.requires_grad {
-		gate := new_tan_gate<T>(v, other)
-		gate.cache<T>(mut result, v, other)?
+	if v.requires_grad {
+		gate := new_tan_gate<T>(v)
+		gate.cache<T>(mut result, v)?
 	}
 
 	return result
