@@ -2,8 +2,8 @@ module internal
 
 import vtl
 
-pub fn dropout<T>(input &vtl.Tensor<T>, mask &vtl.Tensor<T>, prob f64) &vtl.Tensor<T> {
-	mut iters, shape := input.iterators<T>([mask])
+pub fn dropout<T>(input &vtl.Tensor<T>, mask &vtl.Tensor<T>, prob f64) ?&vtl.Tensor<T> {
+	mut iters, shape := input.iterators<T>([mask])?
 	mut ret := vtl.new_tensor_like_with_shape<T>(input, shape)
 	for {
 		vals, i := iters.next() or { break }
@@ -13,7 +13,7 @@ pub fn dropout<T>(input &vtl.Tensor<T>, mask &vtl.Tensor<T>, prob f64) &vtl.Tens
 	return ret
 }
 
-pub fn dropout_backwards<T>(gradient &vtl.Tensor<T>, mask &vtl.Tensor<T>, prob f64) &vtl.Tensor<T> {
+pub fn dropout_backwards<T>(gradient &vtl.Tensor<T>, mask &vtl.Tensor<T>, prob f64) ?&vtl.Tensor<T> {
 	mut iters, shape := gradient.iterators<T>([mask])
 	mut ret := vtl.new_tensor_like_with_shape<T>(gradient, shape)
 	for {
