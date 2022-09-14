@@ -1,7 +1,9 @@
 module nn
 
+import vtl
 import vtl.autograd
 import vtl.nn.layers
+import vtl.nn.loss
 import vtl.nn.optimizers
 
 pub struct NeuralNetwork<T> {
@@ -31,6 +33,11 @@ pub fn (mut nn NeuralNetwork<T>) linear(output_size int) {
 // with the given kernel size and stride.
 pub fn (mut nn NeuralNetwork<T>) maxpool2d(kernel []int, padding []int, stride []int) {
 	nn.info.maxpool2d(kernel, padding, stride)
+}
+
+// @todo: mse_loss
+pub fn (mut nn NeuralNetwork<T>) mse_loss() {
+	nn.info.mse_loss()
 }
 
 // @todo: softmax_cross_entropy_loss
@@ -78,4 +85,8 @@ pub fn (mut nn NeuralNetwork<T>) forward(mut train autograd.Variable<T>) ?&autog
 		train = layers.layer_forward<T>(layer, mut train)?
 	}
 	return train
+}
+
+pub fn (mut nn NeuralNetwork<T>) loss(output &autograd.Variable<T>, target &vtl.Tensor<T>) ?&autograd.Variable<T> {
+	return loss.loss_loss<T>(nn.info.loss, output, target)
 }

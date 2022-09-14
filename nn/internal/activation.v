@@ -2,6 +2,7 @@ module internal
 
 import math
 import vtl
+import vtl.stats
 
 // tanh squashes a real-valued number to the range [-1, 1]
 [inline]
@@ -143,7 +144,7 @@ pub fn deriv_elu<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>, alpha T) ?&v
 // sigmoid_cross_entropy_with_logits computes the sigmoid cross entropy between
 // the labels and the predictions
 [inline]
-pub fn sigmoid_cross_entropy_with_logits<T>(input &vtl.Tensor<T>, target &vtl.Tensor<T>) T {
+pub fn sigmoid_cross_entropy_with_logits<T>(input &vtl.Tensor<T>, target &vtl.Tensor<T>) ?T {
 	batch_size := input.shape[0]
 	mut iters, shape := input.iterators<T>([target])?
 	mut ret := vtl.new_tensor_like_with_shape<T>(input, shape)
@@ -158,7 +159,7 @@ pub fn sigmoid_cross_entropy_with_logits<T>(input &vtl.Tensor<T>, target &vtl.Te
 
 // mse squared error between the labels and the predictions
 [inline]
-pub fn mse<T>(input &vtl.Tensor<T>, target &vtl.Tensor<T>) &vtl.Tensor<T> {
+pub fn mse<T>(input &vtl.Tensor<T>, target &vtl.Tensor<T>) ?&vtl.Tensor<T> {
 	mut iters, shape := input.iterators<T>([target])?
 	mut ret := vtl.new_tensor_like_with_shape<T>(input, shape)
 	for {
@@ -166,5 +167,5 @@ pub fn mse<T>(input &vtl.Tensor<T>, target &vtl.Tensor<T>) &vtl.Tensor<T> {
 		val := vtl.new_t<T>(math.pow(f64(vals[0] - vals[1]), 2.0))
 		ret.set(i, val)
 	}
-	return vtl.from_1d([vtl.mean(ret)])
+	return vtl.from_1d([stats.mean<T>(ret)])
 }

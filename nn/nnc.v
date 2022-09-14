@@ -2,6 +2,7 @@ module nn
 
 import vtl.autograd
 import vtl.nn.layers
+import vtl.nn.loss
 import vtl.nn.optimizers
 import vtl.nn.types
 
@@ -41,6 +42,11 @@ pub fn (mut ls NeuralNetworkContainer<T>) linear(output_size int) {
 pub fn (mut ls NeuralNetworkContainer<T>) maxpool2d(kernel []int, padding []int, stride []int) {
 	shape := layers.layer_output_shape<T>(ls.layers[ls.layers.len - 1])
 	ls.layers << layers.new_maxpool2d_layer<T>(ls.ctx, shape, kernel, padding, stride)
+}
+
+// @todo: mse_loss
+pub fn (mut ls NeuralNetworkContainer<T>) mse_loss() {
+	ls.loss = loss.new_mse_loss<T>()
 }
 
 // @todo: softmax_cross_entropy_loss
