@@ -9,6 +9,12 @@ pub fn loss_loss<T>(loss types.Loss, input &autograd.Variable<T>, target &vtl.Te
 		MSELoss<T> {
 			return loss.loss(input, target)
 		}
+		SigmoidCrossEntropyLoss<T> {
+			return loss.loss(input, target)
+		}
+		SoftmaxCrossEntropyLoss<T> {
+			return loss.loss(input, target)
+		}
 		else {
 			return error('Loss not implemented for type ${typeof(loss).name}')
 		}

@@ -141,10 +141,10 @@ pub fn deriv_elu<T>(gradient &vtl.Tensor<T>, cached &vtl.Tensor<T>, alpha T) ?&v
 	return ret
 }
 
-// sigmoid_cross_entropy_with_logits computes the sigmoid cross entropy between
+// sigmoid_cross_entropy computes the sigmoid cross entropy between
 // the labels and the predictions
 [inline]
-pub fn sigmoid_cross_entropy_with_logits<T>(input &vtl.Tensor<T>, target &vtl.Tensor<T>) ?T {
+pub fn sigmoid_cross_entropy<T>(input &vtl.Tensor<T>, target &vtl.Tensor<T>) ?&vtl.Tensor<T> {
 	batch_size := input.shape[0]
 	mut iters, shape := input.iterators<T>([target])?
 	mut ret := vtl.new_tensor_like_with_shape<T>(input, shape)
@@ -154,7 +154,7 @@ pub fn sigmoid_cross_entropy_with_logits<T>(input &vtl.Tensor<T>, target &vtl.Te
 			vtl.new_t<T>(1) + vtl.new_t<T>(math.exp(f64(vals[0])))))
 		ret.set(i, val)
 	}
-	return vtl.sum(ret) / vtl.new_t<T>(batch_size)
+	return vtl.from_1d([stats.sum<T>(ret) / vtl.new_t<T>(batch_size)])
 }
 
 // mse squared error between the labels and the predictions
