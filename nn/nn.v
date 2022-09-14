@@ -35,12 +35,17 @@ pub fn (mut nn NeuralNetwork<T>) maxpool2d(kernel []int, padding []int, stride [
 	nn.info.maxpool2d(kernel, padding, stride)
 }
 
-// @todo: mse_loss
+// mse_loss sets the loss function to the mean squared error loss.
 pub fn (mut nn NeuralNetwork<T>) mse_loss() {
 	nn.info.mse_loss()
 }
 
-// @todo: softmax_cross_entropy_loss
+// sigmoid_cross_entropy_loss sets the loss function to the sigmoid cross entropy loss.
+pub fn (mut nn NeuralNetwork<T>) sigmoid_cross_entropy_loss() {
+	nn.info.sigmoid_cross_entropy_loss()
+}
+
+// softmax_cross_entropy_loss sets the loss function to the softmax cross entropy loss.
 pub fn (mut nn NeuralNetwork<T>) softmax_cross_entropy_loss() {
 	nn.info.softmax_cross_entropy_loss()
 }

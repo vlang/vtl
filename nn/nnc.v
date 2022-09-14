@@ -44,14 +44,19 @@ pub fn (mut ls NeuralNetworkContainer<T>) maxpool2d(kernel []int, padding []int,
 	ls.layers << layers.new_maxpool2d_layer<T>(ls.ctx, shape, kernel, padding, stride)
 }
 
-// @todo: mse_loss
+// mse_loss sets the loss function to the mean squared error loss.
 pub fn (mut ls NeuralNetworkContainer<T>) mse_loss() {
 	ls.loss = loss.new_mse_loss<T>()
 }
 
-// @todo: softmax_cross_entropy_loss
+// sigmoid_cross_entropy_loss sets the loss function to the sigmoid cross entropy loss.
+pub fn (mut ls NeuralNetworkContainer<T>) sigmoid_cross_entropy_loss() {
+	ls.loss = loss.new_sigmoid_cross_entropy_loss<T>()
+}
+
+// softmax_cross_entropy_loss sets the loss function to the softmax cross entropy loss.
 pub fn (mut ls NeuralNetworkContainer<T>) softmax_cross_entropy_loss() {
-	// ls.loss =
+	ls.loss = loss.new_softmax_cross_entropy_loss<T>()
 }
 
 // flatten adds a new flatten layer to the network.
