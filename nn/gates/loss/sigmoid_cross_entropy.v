@@ -17,7 +17,7 @@ pub fn new_sigmoid_cross_entropy_gate<T>(cache &autograd.Variable<T>, target &vt
 	}
 }
 
-pub fn (g &SigmoidCrossEntropyGate<T>) backward<T>(payload &autograd.Payload<T>) []&vtl.Tensor<T> {
+pub fn (g &SigmoidCrossEntropyGate<T>) backward<T>(payload &autograd.Payload<T>) ?[]&vtl.Tensor<T> {
 	gradient := payload.variable.grad
 	return internal.sigmoid_cross_entropy_backward<T>(gradient, g.cache.value, g.target)
 }

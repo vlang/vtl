@@ -17,9 +17,9 @@ pub fn new_mse_gate<T>(cache &autograd.Variable<T>, target &vtl.Tensor<T>) &MseG
 	}
 }
 
-pub fn (g &MseGate<T>) backward<T>(payload &autograd.Payload<T>) []&vtl.Tensor<T> {
+pub fn (g &MseGate<T>) backward<T>(payload &autograd.Payload<T>) ?[]&vtl.Tensor<T> {
 	gradient := payload.variable.grad
-	return internal.mse_backward<T>(gradient, cache.value, g.target)
+	return internal.mse_backward<T>(gradient, g.cache.value, g.target)
 }
 
 pub fn (g &MseGate<T>) cache<T>(mut result autograd.Variable<T>, args ...autograd.CacheParam) ? {
