@@ -73,10 +73,9 @@ pub fn (mut nn NeuralNetwork<T>) adam(config optimizers.AdamOptimizerConfig) {
 	nn.info.adam(config)
 }
 
-pub fn (mut nn NeuralNetwork<T>) forward(train &autograd.Variable<T>) ?&autograd.Variable<T> {
-	mut ret := unsafe { train }
+pub fn (mut nn NeuralNetwork<T>) forward(mut train autograd.Variable<T>) ?&autograd.Variable<T> {
 	for layer in nn.info.layers {
-		ret = layers.layer_forward<T>(layer, mut ret)?
+		train = layers.layer_forward<T>(layer, mut train)?
 	}
-	return ret
+	return train
 }
