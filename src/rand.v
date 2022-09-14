@@ -10,19 +10,19 @@ pub fn bernoulli<T>(prob f64, shape []int, params TensorData) &Tensor<T> {
 	mut iter := t.iterator()
 	for {
 		_, i := iter.next() or { break }
-		rand_value := new_t<T>(rand.bernoulli(prob))
+		rand_value := new_t<T>(rand.bernoulli(prob)?)
 		t.set(i, rand_value)
 	}
 	return t
 }
 
 // binomial returns a tensor of binomial random variables.
-pub fn binomial<T>(n int, prob f64, shape []int, params TensorData) &Tensor<T> {
+pub fn binomial<T>(n int, prob f64, shape []int, params TensorData) ?&Tensor<T> {
 	mut t := zeros<T>(shape, params)
 	mut iter := t.iterator()
 	for {
 		_, i := iter.next() or { break }
-		rand_value := new_t<T>(rand.binomial(n, prob))
+		rand_value := new_t<T>(rand.binomial(n, prob)?)
 		t.set(i, rand_value)
 	}
 	return t

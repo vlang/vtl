@@ -32,14 +32,14 @@ pub fn (mut ls NeuralNetworkContainer<T>) input(shape []int) {
 // linear adds a new linear layer to the network
 // with the given output size
 pub fn (mut ls NeuralNetworkContainer<T>) linear(output_size int) {
-	input_size := ls.layers[ls.layers.len - 1].output_shape()[0]
+	input_size := layers.layer_output_shape<T>(ls.layers[ls.layers.len - 1])[0]
 	ls.layers << layers.new_linear_layer<T>(ls.ctx, input_size, output_size)
 }
 
 // maxpool2d adds a new maxpool2d layer to the network
 // with the given kernel size and stride.
 pub fn (mut ls NeuralNetworkContainer<T>) maxpool2d(kernel []int, padding []int, stride []int) {
-	shape := ls.layers[ls.layers.len - 1].output_shape()
+	shape := layers.layer_output_shape<T>(ls.layers[ls.layers.len - 1])
 	ls.layers << layers.new_maxpool2d_layer<T>(ls.ctx, shape, kernel, padding, stride)
 }
 
@@ -50,31 +50,31 @@ pub fn (mut ls NeuralNetworkContainer<T>) softmax_cross_entropy_loss() {
 
 // flatten adds a new flatten layer to the network.
 pub fn (mut ls NeuralNetworkContainer<T>) flatten() {
-	shape := ls.layers[ls.layers.len - 1].output_shape()
+	shape := layers.layer_output_shape<T>(ls.layers[ls.layers.len - 1])
 	ls.layers << layers.new_flatten_layer<T>(ls.ctx, shape)
 }
 
 // relu adds a new relu layer to the network.
 pub fn (mut ls NeuralNetworkContainer<T>) relu() {
-	shape := ls.layers[ls.layers.len - 1].output_shape()
+	shape := layers.layer_output_shape<T>(ls.layers[ls.layers.len - 1])
 	ls.layers << layers.new_relu_layer<T>(ls.ctx, shape)
 }
 
 // leaky_relu adds a new leaky_relu layer to the network.
 pub fn (mut ls NeuralNetworkContainer<T>) leaky_relu() {
-	shape := ls.layers[ls.layers.len - 1].output_shape()
+	shape := layers.layer_output_shape<T>(ls.layers[ls.layers.len - 1])
 	ls.layers << layers.new_leaky_relu_layer<T>(ls.ctx, shape)
 }
 
 // elu adds a new elu layer to the network.
 pub fn (mut ls NeuralNetworkContainer<T>) elu() {
-	shape := ls.layers[ls.layers.len - 1].output_shape()
+	shape := layers.layer_output_shape<T>(ls.layers[ls.layers.len - 1])
 	ls.layers << layers.new_elu_layer<T>(ls.ctx, shape)
 }
 
 // sigmod adds a new sigmod layer to the network.
 pub fn (mut ls NeuralNetworkContainer<T>) sigmod() {
-	shape := ls.layers[ls.layers.len - 1].output_shape()
+	shape := layers.layer_output_shape<T>(ls.layers[ls.layers.len - 1])
 	ls.layers << layers.new_sigmoid_layer<T>(ls.ctx, shape)
 }
 
