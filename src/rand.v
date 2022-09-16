@@ -1,6 +1,8 @@
 module vtl
 
+import math
 import rand
+import rand.config
 import rand.seed
 import time
 
@@ -35,6 +37,25 @@ pub fn exponential<T>(lambda f64, shape []int, params TensorData) &Tensor<T> {
 	for {
 		_, i := iter.next() or { break }
 		rand_value := new_t<T>(rand.exponential(lambda))
+		t.set(i, rand_value)
+	}
+	return t
+}
+
+// NormalTensorData is the data for a normal distribution.
+[params]
+pub struct NormalTensorData {
+	TensorData
+	config.NormalConfigStruct
+}
+
+// normal returns a tensor of normal random variables.
+pub fn normal<T>(shape []int, params NormalTensorData) &Tensor<T> {
+	mut t := zeros<T>(shape, memory: params.memory)
+	mut iter := t.iterator()
+	for {
+		_, i := iter.next() or { break }
+		rand_value := new_t<T>(rand.normal(mu: params.mu, sigma: params.sigma) or { math.nan() })
 		t.set(i, rand_value)
 	}
 	return t
