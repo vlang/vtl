@@ -108,14 +108,6 @@ pub fn (t &Tensor<T>) to_array() []T {
 	return arr
 }
 
-// as_type returns a new Tensor with a cast to a given type
-// pub fn (t &Tensor<T>) as_type<T, U>() &Tensor<U> {
-// 	t_arr := t.to_array<T>()
-// 	arr := t_arr.map(U(it))
-
-// 	return from_array<U>(arr, t.shape, memory: t.memory)
-// }
-
 // copy returns a copy of a Tensor with a particular memory
 // layout, either row_major-contiguous or col_major-contiguous
 [inline]

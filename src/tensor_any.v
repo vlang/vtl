@@ -1,24 +1,10 @@
 module vtl
 
 // TensorDataType is a sum type that lists the possible types to be used to define storage
-pub type TensorDataType = bool
-	| byte
-	| f32
-	| f64
-	| i16
-	| i64
-	| i8
-	| int
-	| string
-	| u16
-	| u32
-	| u64
-	| u8
+pub type TensorDataType = bool | f32 | f64 | i16 | i64 | i8 | int | string | u16 | u32 | u64 | u8
 
 pub fn new_td<T>(x T) TensorDataType {
 	$if T is bool {
-		return TensorDataType(x)
-	} $else $if T is byte {
 		return TensorDataType(x)
 	} $else $if T is f32 {
 		return TensorDataType(x)
@@ -50,8 +36,6 @@ pub fn new_td<T>(x T) TensorDataType {
 pub fn new_t<T>(x TensorDataType) T {
 	$if T is bool {
 		return x.bool()
-	} $else $if T is byte {
-		return x.byte()
 	} $else $if T is f32 {
 		return x.f32()
 	} $else $if T is f64 {
@@ -98,6 +82,14 @@ pub fn (v TensorDataType) i64() i64 {
 	match v {
 		i64 { return v }
 		int, f32, f64, bool { return i64(v) }
+		else { return 0 }
+	}
+}
+
+// i8 uses `TensorDataType` as a 8-bit unsigned integer.
+pub fn (v TensorDataType) i8() i8 {
+	match v {
+		i8 { return v }
 		else { return 0 }
 	}
 }

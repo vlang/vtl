@@ -84,9 +84,6 @@ fn init() {
 }
 
 fn random_in_range<T>(min T, max T) T {
-	$if T is byte {
-		return byte(rand.int_in_range(int(min), int(max)) or { int(min) })
-	}
 	$if T is u16 {
 		return u16(rand.int_in_range(int(min), int(max)) or { u16(min) })
 	}
