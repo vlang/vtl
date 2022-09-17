@@ -52,7 +52,7 @@ fn main() {
 			// Running input through the network and Computing the loss
 			mut loss := model.forward(mut x)?
 
-			print('Epoch: $epoch, Batch id: $batch_id, Loss: $loss.value')
+			println('Epoch: $epoch, Batch id: $batch_id, Loss: $loss.value')
 
 			losses << loss.value
 
