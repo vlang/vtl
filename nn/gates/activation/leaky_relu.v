@@ -22,8 +22,17 @@ pub fn (g &LeakyReluGate<T>) backward<T>(payload &autograd.Payload<T>) ?[]&vtl.T
 }
 
 pub fn (g &LeakyReluGate<T>) cache<T>(mut result autograd.Variable<T>, args ...autograd.CacheParam) ? {
-	result.grad = vtl.zeros_like<T>(result.value)
-	result.requires_grad = true
+	a := args[0]
 
-	autograd.register<T>('LeakyRelu', g, result, []&autograd.Variable<T>{})?
+	match a {
+		autograd.Variable<T> {
+			result.grad = vtl.zeros_like<T>(result.value)
+			result.requires_grad = true
+
+			autograd.register<T>('LeakyRelu', g, result, [a])?
+		}
+		else {
+			return error('LeakyRelu: cache: invalid argument')
+		}
+	}
 }
