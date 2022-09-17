@@ -95,3 +95,7 @@ pub fn (mut nn NeuralNetwork<T>) forward(mut train autograd.Variable<T>) ?&autog
 pub fn (mut nn NeuralNetwork<T>) loss(output &autograd.Variable<T>, target &vtl.Tensor<T>) ?&autograd.Variable<T> {
 	return loss.loss_loss<T>(nn.info.loss, output, target)
 }
+
+pub fn (mut nn NeuralNetwork<T>) optimizer_update() ? {
+	return optimizers.optimizer_update<T>(mut nn.info.optimizer)
+}
