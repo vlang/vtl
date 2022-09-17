@@ -40,7 +40,7 @@ println(slice1)
 
 println(slice1.shape) // [2, 2]
 
-slice2 := t.slice_hilo([3], [])?
+slice2 := t.slice_hilo([3], []int{})?
 
 println('span slice: ')
 println(slice2)
@@ -49,7 +49,7 @@ println(slice2)
 
 println(slice2.shape) // [2, 5]
 
-slice3 := t.slice_hilo([], [-2])?
+slice3 := t.slice_hilo([]int{}, [-2])?
 
 println('slice until: ')
 println(slice3)
