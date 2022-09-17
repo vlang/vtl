@@ -46,6 +46,16 @@ pub fn new_variable<T>(context &Context<T>, value &vtl.Tensor<T>, data VariableD
 	}
 }
 
+pub fn (v &Variable<T>) slice<T>(idx ...[]int) ?&Variable<T> {
+	value := v.value.slice(...idx)?
+	return new_variable<T>(v.context, value, requires_grad: v.requires_grad)
+}
+
+pub fn (v &Variable<T>) slice_hilo<T>(idx1 []int, idx2 []int) ?&Variable<T> {
+	value := v.value.slice_hilo(idx1, idx2)?
+	return new_variable<T>(v.context, value, requires_grad: v.requires_grad)
+}
+
 pub fn (v &Variable<T>) is_grad_needed() bool {
 	return v.requires_grad && !v.context.no_grad
 }
