@@ -32,6 +32,8 @@ fn main() {
 	model.relu()
 	model.linear(1)
 	model.sigmoid_cross_entropy_loss()
+
+	// Stochastic Gradient Descent
 	model.sgd(learning_rate: 0.7)
 
 	epochs := 50
@@ -39,18 +41,25 @@ fn main() {
 
 	mut losses := []&vtl.Tensor<f64>{cap: epochs * batches}
 
+	// Learning loop
 	for epoch in 0 .. epochs {
 		for batch_id in 0 .. batches {
+			// minibatch offset in the Tensor
 			offset := batch_id * batch_size
-
 			mut x := x_train.slice([offset, offset + batch_size])?
 			target := y.slice([offset, offset + batch_size])?
 
+			// Running input through the network and Computing the loss
 			mut loss := model.forward(mut x)?
+
+			print('Epoch: $epoch, Batch id: $batch_id, Loss: $loss.value')
+
 			losses << loss.value
 
+			// Compute the gradient (i.e. contribution of each parameter to the loss)
 			loss.backprop()?
 
+			// Correct the weights now that we have the gradient information
 			model.optimizer_update()?
 		}
 	}
