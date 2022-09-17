@@ -120,7 +120,7 @@ fn broadcast_shapes(args ...[]int) []int {
 
 // broadcast2 broadcasts two Tensors against each other
 [inline]
-fn broadcast2<T>(a &Tensor<T>, b &Tensor<T>) ?(&Tensor<T>, &Tensor<T>) {
+pub fn broadcast2<T>(a &Tensor<T>, b &Tensor<T>) ?(&Tensor<T>, &Tensor<T>) {
 	shape := broadcast_shapes(a.shape, b.shape)
 	r1 := a.broadcast_to(shape)?
 	r2 := b.broadcast_to(shape)?
@@ -129,7 +129,7 @@ fn broadcast2<T>(a &Tensor<T>, b &Tensor<T>) ?(&Tensor<T>, &Tensor<T>) {
 
 // broadcast3 broadcasts three Tensors against each other
 [inline]
-fn broadcast3<T>(a &Tensor<T>, b &Tensor<T>, c &Tensor<T>) ?(&Tensor<T>, &Tensor<T>, &Tensor<T>) {
+pub fn broadcast3<T>(a &Tensor<T>, b &Tensor<T>, c &Tensor<T>) ?(&Tensor<T>, &Tensor<T>, &Tensor<T>) {
 	shape := broadcast_shapes(a.shape, b.shape, c.shape)
 	r1 := a.broadcast_to(shape)?
 	r2 := b.broadcast_to(shape)?
@@ -139,7 +139,7 @@ fn broadcast3<T>(a &Tensor<T>, b &Tensor<T>, c &Tensor<T>) ?(&Tensor<T>, &Tensor
 
 // broadcast_n broadcasts N Tensors against each other
 [inline]
-fn broadcast_n<T>(ts []&Tensor<T>) ?[]&Tensor<T> {
+pub fn broadcast_n<T>(ts []&Tensor<T>) ?[]&Tensor<T> {
 	shapes := ts.map(it.shape)
 	shape := broadcast_shapes(...shapes)
 	mut result := []&Tensor<T>{cap: ts.len}
