@@ -135,6 +135,21 @@ the work and inspiration that the library done by Christopher has given.</p>
 <p>binomial returns a tensor of binomial random variables.</p>
 
 </section>
+						<section id="broadcast2" class="doc-node">
+							<div class="title"><h2>fn broadcast2 <a href="#broadcast2">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/broadcast.v#L123"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">broadcast2</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>a <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> b <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token operator">?</span><span class="token punctuation">(</span><span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span></code></pre>
+<p>broadcast2 broadcasts two Tensors against each other</p>
+
+</section>
+						<section id="broadcast3" class="doc-node">
+							<div class="title"><h2>fn broadcast3 <a href="#broadcast3">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/broadcast.v#L132"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">broadcast3</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>a <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> b <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> c <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token operator">?</span><span class="token punctuation">(</span><span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">,</span> <span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span></code></pre>
+<p>broadcast3 broadcasts three Tensors against each other</p>
+
+</section>
+						<section id="broadcast_n" class="doc-node">
+							<div class="title"><h2>fn broadcast_n <a href="#broadcast_n">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/broadcast.v#L142"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">broadcast_n</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>ts <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token operator">?</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
+<p>broadcast_n broadcasts N Tensors against each other</p>
+
+</section>
 						<section id="column_stack" class="doc-node">
 							<div class="title"><h2>fn column_stack <a href="#column_stack">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/stack.v#L43"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token function">column_stack</span><span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">(</span>ts <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span><span class="token punctuation">)</span> <span class="token operator">?</span><span class="token operator">&</span>Tensor<span class="token operator"><</span><span class="token builtin">T</span><span class="token operator">></span></code></pre>
 <p>column_stack stacks 1-D arrays as columns into a 2-D array.</p>
@@ -1252,7 +1267,7 @@ Stores a copy of the shape and strides reduced along a given axis</p>
 </section>
 
           <div class="footer">
-            Powered by vdoc. Generated on: 17 Sep 2022 21:57:29
+            Powered by vdoc. Generated on: 17 Sep 2022 22:02:40
           </div>
         </div>
         <div class="doc-toc"><ul><li class="open"><a href="#readme_">README</a></li>
@@ -1261,6 +1276,15 @@ Stores a copy of the shape and strides reduced along a given axis</p>
 </ul>
 </li>
 <li class="open"><a href="#binomial">fn binomial</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#broadcast2">fn broadcast2</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#broadcast3">fn broadcast3</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#broadcast_n">fn broadcast_n</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#column_stack">fn column_stack</a>        <ul>
