@@ -4,13 +4,17 @@ import vtl
 import vtl.autograd
 import vtl.nn
 
+const (
+	batch_size = 32
+	epochs     = 50
+	batches    = 100
+)
+
 // Learning XOR function with a neural network.
 
 fn main() {
 	// Autograd context / neuralnet graph
 	ctx := autograd.new_ctx<f64>()
-
-	batch_size := 32
 
 	// We will create a tensor of size 3200 (100 batches of size 32)
 	// We create it as int between [0, 2[ and convert to bool
@@ -36,9 +40,6 @@ fn main() {
 
 	// Stochastic Gradient Descent
 	model.sgd(learning_rate: 0.7)
-
-	epochs := 50
-	batches := 100
 
 	mut losses := []&vtl.Tensor<f64>{cap: epochs * batches}
 
