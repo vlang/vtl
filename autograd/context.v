@@ -72,9 +72,9 @@ pub fn (ctx &Context<T>) str() string {
 }
 
 pub fn register<T>(name string, gate Gate, result &Variable<T>, parents []&Variable<T>) ? {
-	assert parents.len >= 1
+	assert parents.len > 0
 	if parents.len == 0 {
-		return error('@FN: it is needed to specify at least one parent')
+		return error(@FN + ': it is needed to specify at least one parent')
 	}
 
 	payload := new_payload<T>(result)

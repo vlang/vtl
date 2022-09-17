@@ -23,8 +23,25 @@ pub fn (g &SigmoidCrossEntropyGate<T>) backward<T>(payload &autograd.Payload<T>)
 }
 
 pub fn (g &SigmoidCrossEntropyGate<T>) cache<T>(mut result autograd.Variable<T>, args ...autograd.CacheParam) ? {
-	result.grad = vtl.zeros_like<T>(result.value)
-	result.requires_grad = true
+	a := args[0]
+	b := args[1]
 
-	autograd.register<T>('SigmoidCrossEntropy', g, result, []&autograd.Variable<T>{})?
+	match a {
+		autograd.Variable<T> {
+			match b {
+				autograd.Variable<T> {
+					result.grad = vtl.zeros_like<T>(result.value)
+					result.requires_grad = true
+
+					autograd.register<T>('SigmoidCrossEntropy', g, result, [a, b])?
+				}
+				else {
+					return error('SigmoidCrossEntropyGate: cache: invalid argument')
+				}
+			}
+		}
+		else {
+			return error('SigmoidCrossEntropyGate: cache: invalid argument')
+		}
+	}
 }

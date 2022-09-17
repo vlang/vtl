@@ -22,8 +22,17 @@ pub fn (g &ReLUGate<T>) backward<T>(payload &autograd.Payload<T>) ?[]&vtl.Tensor
 }
 
 pub fn (g &ReLUGate<T>) cache<T>(mut result autograd.Variable<T>, args ...autograd.CacheParam) ? {
-	result.grad = vtl.zeros_like<T>(result.value)
-	result.requires_grad = true
+	a := args[0]
 
-	autograd.register<T>('Softmax', g, result, []&autograd.Variable<T>{})?
+	match a {
+		autograd.Variable<T> {
+			result.grad = vtl.zeros_like<T>(result.value)
+			result.requires_grad = true
+
+			autograd.register<T>('Relu', g, result, [a])?
+		}
+		else {
+			return error('Relu: cache: invalid argument')
+		}
+	}
 }
