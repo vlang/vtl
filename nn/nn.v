@@ -7,7 +7,7 @@ import vtl.nn.loss
 import vtl.nn.optimizers
 
 fn init() {
-        println(@MOD + " module is a WIP and not yet functional")
+	println(@MOD + ' module is a WIP and not yet functional')
 }
 
 pub struct NeuralNetwork<T> {

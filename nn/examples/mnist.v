@@ -5,19 +5,24 @@ import vtl.autograd
 import vtl.datasets
 import vtl.nn
 
+const (
+	batch_size = 32
+	epochs     = 1
+	batches    = 100
+)
+
 fn main() {
 	ctx := autograd.new_ctx<f64>()
-	mut net := nn.new_nn<f64>(ctx)
-	net.input([1, 1, 28, 28])
-	net.mse_loss()
+	mut model := nn.new_nn<f64>(ctx)
+	model.input([1, 28, 28])
+	model.mse_loss()
 
-	epochs := 1
+	mut train_ds := datasets.load_mnist(.train, batch_size: batch_size)?
 
 	mut losses := []&vtl.Tensor<f64>{cap: epochs}
 
 	for epoch in 0 .. epochs {
-		mut train_ds := datasets.load_mnist(.train, batch_size: 6)?
-		mut i := 0
+		mut batch_id := 0
 		for {
 			batch := train_ds.next() or { break }
 
@@ -25,15 +30,23 @@ fn main() {
 			mut x := ctx.variable(xt)
 			target := batch.labels
 
-			output := net.forward(mut x)?
+			// Running input through the network
+			y_pred := model.forward(mut x)?
 
-			loss := net.loss(output, target)?
-			print(loss)
+			// Compute the loss
+			mut loss := model.loss(y_pred, target)?
 
-			i++
-			if i == 10 {
-				break
-			}
+			println('Epoch: $epoch, Batch id: $batch_id, Loss: $loss.value')
+
+			losses << loss.value
+
+			// Compute the gradient (i.e. contribution of each parameter to the loss)
+			loss.backprop()?
+
+			// Correct the weights now that we have the gradient information
+			model.optimizer_update()?
+
+			batch_id++
 		}
 	}
 }
