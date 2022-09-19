@@ -26,7 +26,7 @@ fn main() {
 	mut losses := []&vtl.Tensor<f64>{cap: epochs}
 
 	// Stochastic Gradient Descent
-	mut optimizer := optimizers.sgd<f64>(learning_rate: 0.1)
+	mut optimizer := optimizers.sgd<f64>(learning_rate: 0.01)
 
 	for epoch in 0 .. epochs {
 		mut batch_id := 0
