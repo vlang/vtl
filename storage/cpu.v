@@ -13,7 +13,7 @@ pub mut:
 	data []T
 }
 
-pub fn new_storage<T>(len int, cap int, init T) &CpuStorage<T> {
+pub fn storage<T>(len int, cap int, init T) &CpuStorage<T> {
 	mut capacity := if cap < len { len } else { cap }
 	capacity = imax(capacity, storage.vector_minimum_capacity)
 	return &CpuStorage<T>{

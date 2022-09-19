@@ -8,7 +8,7 @@ pub fn (t &Tensor<T>) as_bool<T>() &Tensor<bool> {
 	mut ret := empty<bool>(t.shape)
 	for {
 		val, i := iter.next() or { break }
-		bool_val := new_td<T>(val).bool()
+		bool_val := td<T>(val).bool()
 		ret.set(i, bool_val)
 	}
 	return ret
@@ -22,7 +22,7 @@ pub fn (t &Tensor<T>) as_f64<T>() &Tensor<f64> {
 	mut ret := empty<f64>(t.shape)
 	for {
 		val, i := iter.next() or { break }
-		f64_val := new_td<T>(val).f64()
+		f64_val := td<T>(val).f64()
 		ret.set(i, f64_val)
 	}
 	return ret
@@ -36,7 +36,7 @@ pub fn (t &Tensor<T>) as_int<T>() &Tensor<int> {
 	mut ret := empty<int>(t.shape)
 	for {
 		val, i := iter.next() or { break }
-		int_val := new_td<T>(val).int()
+		int_val := td<T>(val).int()
 		ret.set(i, int_val)
 	}
 	return ret

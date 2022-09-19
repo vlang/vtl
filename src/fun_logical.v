@@ -7,7 +7,7 @@ pub fn (t &Tensor<T>) all<T>() bool {
 	mut iter := t.iterator<T>()
 	for {
 		val, _ := iter.next() or { break }
-		bool_value := new_td<T>(val).bool()
+		bool_value := td<T>(val).bool()
 		if !bool_value {
 			return false
 		}
@@ -20,7 +20,7 @@ pub fn (t &Tensor<T>) any<T>() bool {
 	mut iter := t.iterator<T>()
 	for {
 		val, _ := iter.next() or { break }
-		bool_value := new_td<T>(val).bool()
+		bool_value := td<T>(val).bool()
 		if bool_value {
 			return true
 		}
@@ -35,7 +35,7 @@ pub fn (t &Tensor<T>) is_finite<T>() &Tensor<bool> {
 	mut ret := empty<bool>(t.shape)
 	for {
 		val, i := iter.next() or { break }
-		next_val := math.is_finite(new_td<T>(val).f64())
+		next_val := math.is_finite(td<T>(val).f64())
 		ret.set(i, next_val)
 	}
 	return ret
@@ -50,7 +50,7 @@ pub fn (t &Tensor<T>) is_inf<T>(sign int) &Tensor<bool> {
 	mut ret := empty<bool>(t.shape)
 	for {
 		val, i := iter.next() or { break }
-		next_val := math.is_inf(new_td<T>(val).f64(), sign)
+		next_val := math.is_inf(td<T>(val).f64(), sign)
 		ret.set(i, next_val)
 	}
 	return ret
@@ -62,7 +62,7 @@ pub fn (t &Tensor<T>) is_nan<T>() &Tensor<bool> {
 	mut ret := empty<bool>(t.shape)
 	for {
 		val, i := iter.next() or { break }
-		next_val := math.is_nan(new_td<T>(val).f64())
+		next_val := math.is_nan(td<T>(val).f64())
 		ret.set(i, next_val)
 	}
 	return ret
@@ -142,7 +142,7 @@ pub fn (t &Tensor<T>) tolerance<T>(other &Tensor<T>, tol T) ?&Tensor<bool> {
 	mut ret := empty<bool>(shape)
 	for {
 		vals, i := iters.next() or { break }
-		val := math.tolerance(new_td<T>(vals[0]).f64(), new_td<T>(vals[1]).f64(), new_td<T>(tol).f64())
+		val := math.tolerance(td<T>(vals[0]).f64(), td<T>(vals[1]).f64(), td<T>(tol).f64())
 		ret.set(i, val)
 	}
 	return ret
@@ -156,7 +156,7 @@ pub fn (t &Tensor<T>) close<T>(other &Tensor<T>) ?&Tensor<bool> {
 	mut ret := empty<bool>(shape)
 	for {
 		vals, i := iters.next() or { break }
-		val := math.close(new_td<T>(vals[0]).f64(), new_td<T>(vals[1]).f64())
+		val := math.close(td<T>(vals[0]).f64(), td<T>(vals[1]).f64())
 		ret.set(i, val)
 	}
 	return ret
@@ -170,7 +170,7 @@ pub fn (t &Tensor<T>) veryclose<T>(other &Tensor<T>) ?&Tensor<bool> {
 	mut ret := empty<bool>(shape)
 	for {
 		vals, i := iters.next() or { break }
-		val := math.veryclose(new_td<T>(vals[0]).f64(), new_td<T>(vals[1]).f64())
+		val := math.veryclose(td<T>(vals[0]).f64(), td<T>(vals[1]).f64())
 		ret.set(i, val)
 	}
 	return ret
@@ -184,7 +184,7 @@ pub fn (t &Tensor<T>) alike<T>(other &Tensor<T>) ?&Tensor<bool> {
 	mut ret := empty<bool>(shape)
 	for {
 		vals, i := iters.next() or { break }
-		val := math.alike(new_td<T>(vals[0]).f64(), new_td<T>(vals[1]).f64())
+		val := math.alike(td<T>(vals[0]).f64(), td<T>(vals[1]).f64())
 		ret.set(i, val)
 	}
 	return ret

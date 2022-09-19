@@ -36,10 +36,10 @@ pub fn from_array<T>(arr []T, shape []int, params TensorData) ?&Tensor<T> {
 	}
 }
 
-// new_tensor allocates a Tensor onto specified device with a given data
-pub fn new_tensor<T>(init T, shape []int, params TensorData) &Tensor<T> {
+// tensor allocates a Tensor onto specified device with a given data
+pub fn tensor<T>(init T, shape []int, params TensorData) &Tensor<T> {
 	if shape.len == 0 {
-		data_storage := storage.new_storage<T>(1, 0, init)
+		data_storage := storage.storage<T>(1, 0, init)
 		return &Tensor<T>{
 			memory: params.memory
 			strides: [1]
@@ -50,7 +50,7 @@ pub fn new_tensor<T>(init T, shape []int, params TensorData) &Tensor<T> {
 	}
 	strides := strides_from_shape(shape, params.memory)
 	size := size_from_shape(shape)
-	data_storage := storage.new_storage<T>(size, 0, init)
+	data_storage := storage.storage<T>(size, 0, init)
 	return &Tensor<T>{
 		shape: shape.clone()
 		memory: params.memory
@@ -60,9 +60,9 @@ pub fn new_tensor<T>(init T, shape []int, params TensorData) &Tensor<T> {
 	}
 }
 
-// new_tensor_like returns a new tensor created with similar storage properties
+// tensor_like returns a new tensor created with similar storage properties
 // as the Tensor t
-pub fn new_tensor_like<T>(t &Tensor<T>) &Tensor<T> {
+pub fn tensor_like<T>(t &Tensor<T>) &Tensor<T> {
 	storage := t.data.like<T>()
 	return &Tensor<T>{
 		shape: t.shape.clone()
@@ -73,9 +73,9 @@ pub fn new_tensor_like<T>(t &Tensor<T>) &Tensor<T> {
 	}
 }
 
-// new_tensor_like_with_shape returns a new tensor created with similar storage properties
+// tensor_like_with_shape returns a new tensor created with similar storage properties
 // as the Tensor `t` with a given shape
-pub fn new_tensor_like_with_shape<T>(t &Tensor<T>, shape []int) &Tensor<T> {
+pub fn tensor_like_with_shape<T>(t &Tensor<T>, shape []int) &Tensor<T> {
 	strides := strides_from_shape(shape, t.memory)
 	size := size_from_shape(shape)
 	storage := t.data.like_with_len<T>(size)
@@ -88,9 +88,9 @@ pub fn new_tensor_like_with_shape<T>(t &Tensor<T>, shape []int) &Tensor<T> {
 	}
 }
 
-// new_tensor_like_with_shape_and_strides returns a new tensor created with similar storage properties
+// tensor_like_with_shape_and_strides returns a new tensor created with similar storage properties
 // as the Tensor `t` with a given shape and strides
-fn new_tensor_like_with_shape_and_strides<T>(t &Tensor<T>, shape []int, strides []int) &Tensor<T> {
+fn tensor_like_with_shape_and_strides<T>(t &Tensor<T>, shape []int, strides []int) &Tensor<T> {
 	size := size_from_shape(shape)
 	storage := t.data.like_with_len<T>(size)
 	return &Tensor<T>{

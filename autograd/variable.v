@@ -35,8 +35,8 @@ pub struct VariableData {
 	requires_grad bool = true
 }
 
-// new_variable
-pub fn new_variable<T>(context &Context<T>, value &vtl.Tensor<T>, data VariableData) &Variable<T> {
+// variable
+pub fn variable<T>(context &Context<T>, value &vtl.Tensor<T>, data VariableData) &Variable<T> {
 	grad := if data.requires_grad { vtl.zeros_like<T>(value) } else { value }
 	return &Variable<T>{
 		context: context
@@ -48,12 +48,12 @@ pub fn new_variable<T>(context &Context<T>, value &vtl.Tensor<T>, data VariableD
 
 pub fn (v &Variable<T>) slice<T>(idx ...[]int) ?&Variable<T> {
 	value := v.value.slice(...idx)?
-	return new_variable<T>(v.context, value, requires_grad: v.requires_grad)
+	return variable<T>(v.context, value, requires_grad: v.requires_grad)
 }
 
 pub fn (v &Variable<T>) slice_hilo<T>(idx1 []int, idx2 []int) ?&Variable<T> {
 	value := v.value.slice_hilo(idx1, idx2)?
-	return new_variable<T>(v.context, value, requires_grad: v.requires_grad)
+	return variable<T>(v.context, value, requires_grad: v.requires_grad)
 }
 
 pub fn (v &Variable<T>) is_grad_needed() bool {

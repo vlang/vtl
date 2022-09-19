@@ -12,7 +12,7 @@ pub fn (mut t Tensor<T>) apply<T>(f fn (x T, i []int) T) {
 
 // map maps a function to a given Tensor retuning a new Tensor with same shape
 pub fn (t &Tensor<T>) map<T>(f fn (x T, i []int) T) &Tensor<T> {
-	mut ret := new_tensor_like<T>(t)
+	mut ret := tensor_like<T>(t)
 	mut iter := t.iterator()
 	for {
 		val, i := iter.next() or { break }
@@ -46,7 +46,7 @@ pub fn (mut t Tensor<T>) napply<T>(ts []&Tensor<T>, f fn (xs []T, i []int) T) ? 
 // nmap maps a function to a given list of Tensor retuning a new Tensor with same shape
 pub fn (t &Tensor<T>) nmap<T>(ts []&Tensor<T>, f fn (xs []T, i []int) T) ?&Tensor<T> {
 	mut iters, shape := t.iterators<T>(ts)?
-	mut ret := new_tensor_like_with_shape<T>(t, shape)
+	mut ret := tensor_like_with_shape<T>(t, shape)
 	for {
 		vals, i := iters.next() or { break }
 		val := f(vals, i)
@@ -121,7 +121,7 @@ pub fn (t &Tensor<T>) reshape<T>(shape []int) ?&Tensor<T> {
 	if newsize != size {
 		return error('${@METHOD}: cannot reshape')
 	}
-	mut ret := new_tensor_like_with_shape<T>(t, newshape)
+	mut ret := tensor_like_with_shape<T>(t, newshape)
 	ret.data = t.data
 	ret.ensure_memory()
 	return ret
@@ -133,7 +133,7 @@ pub fn (t &Tensor<T>) as_strided<T>(shape []int, strides []int) ?&Tensor<T> {
 	if newsize != t.size {
 		return error('${@METHOD}: cannot reshape')
 	}
-	mut ret := new_tensor_like_with_shape_and_strides<T>(t, newshape, strides)
+	mut ret := tensor_like_with_shape_and_strides<T>(t, newshape, strides)
 	ret.data = t.data
 	ret.ensure_memory()
 	return ret

@@ -12,7 +12,7 @@ pub fn bernoulli<T>(prob f64, shape []int, params TensorData) &Tensor<T> {
 	mut iter := t.iterator()
 	for {
 		_, i := iter.next() or { break }
-		rand_value := new_t<T>(rand.bernoulli(prob)?)
+		rand_value := cast<T>(rand.bernoulli(prob)?)
 		t.set(i, rand_value)
 	}
 	return t
@@ -24,7 +24,7 @@ pub fn binomial<T>(n int, prob f64, shape []int, params TensorData) ?&Tensor<T> 
 	mut iter := t.iterator()
 	for {
 		_, i := iter.next() or { break }
-		rand_value := new_t<T>(rand.binomial(n, prob)?)
+		rand_value := cast<T>(rand.binomial(n, prob)?)
 		t.set(i, rand_value)
 	}
 	return t
@@ -36,7 +36,7 @@ pub fn exponential<T>(lambda f64, shape []int, params TensorData) &Tensor<T> {
 	mut iter := t.iterator()
 	for {
 		_, i := iter.next() or { break }
-		rand_value := new_t<T>(rand.exponential(lambda))
+		rand_value := cast<T>(rand.exponential(lambda))
 		t.set(i, rand_value)
 	}
 	return t
@@ -55,7 +55,7 @@ pub fn normal<T>(shape []int, params NormalTensorData) &Tensor<T> {
 	mut iter := t.iterator()
 	for {
 		_, i := iter.next() or { break }
-		rand_value := new_t<T>(rand.normal(mu: params.mu, sigma: params.sigma) or { math.nan() })
+		rand_value := cast<T>(rand.normal(mu: params.mu, sigma: params.sigma) or { math.nan() })
 		t.set(i, rand_value)
 	}
 	return t

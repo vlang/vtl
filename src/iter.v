@@ -96,7 +96,7 @@ pub fn (mut its TensorsIterator<T>) next<T>() ?([]T, []int) {
 		if i == 0 {
 			index = index_.clone()
 		}
-		nums << new_t<T>(val)
+		nums << cast<T>(val)
 	}
 	return nums, index
 }

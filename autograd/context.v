@@ -45,7 +45,7 @@ pub struct ContextVariableData {
 }
 
 pub fn (ctx &Context<T>) variable<T>(value &vtl.Tensor<T>, data ContextVariableData) &Variable<T> {
-	return new_variable<T>(ctx, value, requires_grad: data.requires_grad)
+	return variable<T>(ctx, value, requires_grad: data.requires_grad)
 }
 
 pub fn (ctx &Context<T>) str() string {
@@ -77,8 +77,8 @@ pub fn register<T>(name string, gate Gate, result &Variable<T>, parents []&Varia
 		return error(@FN + ': it is needed to specify at least one parent')
 	}
 
-	payload := new_payload<T>(result)
-	node := new_node<T>(gate, parents, payload, name)
+	new_payload := payload<T>(result)
+	new_node := node<T>(gate, parents, new_payload, name)
 	mut ctx := parents[0].context
-	ctx.push(node)
+	ctx.push(new_node)
 }

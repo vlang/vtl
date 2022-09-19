@@ -8,7 +8,7 @@ pub struct PowGate<T> {
 	b &Variable<T>
 }
 
-pub fn new_pow_gate<T>(a &Variable<T>, b &Variable<T>) &PowGate<T> {
+pub fn pow_gate<T>(a &Variable<T>, b &Variable<T>) &PowGate<T> {
 	return &PowGate<T>{
 		a: a
 		b: b
@@ -18,12 +18,12 @@ pub fn new_pow_gate<T>(a &Variable<T>, b &Variable<T>) &PowGate<T> {
 pub fn (g &PowGate<T>) backward<T>(payload &Payload<T>) ?[]&vtl.Tensor<T> {
 	gradient := payload.variable.grad
 	mut iters, shape := gradient.iterators<T>([g.a.value, g.b.value])?
-	mut r0 := vtl.new_tensor_like_with_shape<T>(gradient, shape)
-	mut r1 := vtl.new_tensor_like_with_shape<T>(gradient, shape)
+	mut r0 := vtl.tensor_like_with_shape<T>(gradient, shape)
+	mut r1 := vtl.tensor_like_with_shape<T>(gradient, shape)
 	for {
 		vals, i := iters.next() or { break }
-		val0 := vals[0] * vals[2] * vtl.new_t<T>(math.pow(f64(vals[1]), f64(vals[2]) - 1))
-		val1 := vals[0] * vtl.new_t<T>(math.pow(f64(vals[1]), f64(vals[2]))) * vtl.new_t<T>(math.log(f64(vals[1])))
+		val0 := vals[0] * vals[2] * vtl.cast<T>(math.pow(f64(vals[1]), f64(vals[2]) - 1))
+		val1 := vals[0] * vtl.cast<T>(math.pow(f64(vals[1]), f64(vals[2]))) * vtl.cast<T>(math.log(f64(vals[1])))
 		r0.set(i, val0)
 		r1.set(i, val1)
 	}

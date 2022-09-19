@@ -7,7 +7,7 @@ pub:
 	a &Variable<T>
 }
 
-pub fn new_exp_gate<T>(a &Variable<T>) &ExpGate<T> {
+pub fn exp_gate<T>(a &Variable<T>) &ExpGate<T> {
 	return &ExpGate<T>{
 		a: a
 	}
