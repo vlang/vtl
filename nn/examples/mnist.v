@@ -3,7 +3,7 @@ module main
 import vtl
 import vtl.autograd
 import vtl.datasets
-import vtl.nn
+import vtl.nn.models
 
 const (
 	batch_size = 32
@@ -12,8 +12,11 @@ const (
 )
 
 fn main() {
+	// Autograd context / neuralnet graph
 	ctx := autograd.new_ctx<f64>()
-	mut model := nn.new_nn<f64>(ctx)
+
+	// We create a neural network
+	mut model := models.sequential_from_ctx<f64>(ctx)
 	model.input([1, 28, 28])
 	model.mse_loss()
 
@@ -26,7 +29,7 @@ fn main() {
 		for {
 			batch := train_ds.next() or { break }
 
-			xt := batch.features.divide_scalar(u8(255))?.reshape([-1, 1, 28, 28])?
+			xt := batch.features.divide_scalar(u8(255))? // .reshape([-1, 1, 28, 28])?
 			mut x := ctx.variable(xt)
 			target := batch.labels
 
@@ -44,7 +47,7 @@ fn main() {
 			loss.backprop()?
 
 			// Correct the weights now that we have the gradient information
-			model.optimizer_update()?
+			model.optimize()?
 
 			batch_id++
 		}

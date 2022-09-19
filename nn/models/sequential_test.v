@@ -1,11 +1,10 @@
-module nn
+module models
 
 import vtl.autograd
 import vtl.nn.layers
 
 fn test_nnc() {
-	ctx := autograd.new_ctx<f64>()
-	mut nn := new_nn<f64>(ctx)
+	mut nn := sequential<f64>()
 	nn.input([1, 2])
 	nn.sigmod()
 	assert nn.info.layers.len == 2
@@ -14,6 +13,5 @@ fn test_nnc() {
 }
 
 fn test_nn() {
-	ctx := autograd.new_ctx<f64>()
-	mut nn := new_nn<f64>(ctx)
+	mut nn := sequential<f64>()
 }
