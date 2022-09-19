@@ -8,7 +8,7 @@ import vtl.nn.internal
 // SoftmaxCrossEntropyLoss
 pub struct SoftmaxCrossEntropyLoss<T> {}
 
-pub fn new_softmax_cross_entropy_loss<T>() &SoftmaxCrossEntropyLoss<T> {
+pub fn softmax_cross_entropy_loss<T>() &SoftmaxCrossEntropyLoss<T> {
 	return &SoftmaxCrossEntropyLoss<T>{}
 }
 
@@ -20,7 +20,7 @@ pub fn (_ &SoftmaxCrossEntropyLoss<T>) loss(input &autograd.Variable<T>, target 
 	// mut result := input.context.variable(output)
 
 	// if input.requires_grad {
-	// 	gate := loss.new_softmax_cross_entropy_gate<T>(input, target)
+	// 	gate := loss.softmax_cross_entropy_gate<T>(input, target)
 	// 	gate.cache(mut result, input, target)?
 	// }
 

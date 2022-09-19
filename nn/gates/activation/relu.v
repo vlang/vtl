@@ -9,7 +9,7 @@ pub:
 	cache &vtl.Tensor<T>
 }
 
-pub fn new_relu_gate<T>(cache &vtl.Tensor<T>) &ReLUGate<T> {
+pub fn relu_gate<T>(cache &vtl.Tensor<T>) &ReLUGate<T> {
 	return &ReLUGate<T>{
 		cache: cache
 	}

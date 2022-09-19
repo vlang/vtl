@@ -10,7 +10,7 @@ pub:
 	target &vtl.Tensor<T>
 }
 
-pub fn new_sigmoid_cross_entropy_gate<T>(cache &autograd.Variable<T>, target &vtl.Tensor<T>) &SigmoidCrossEntropyGate<T> {
+pub fn sigmoid_cross_entropy_gate<T>(cache &autograd.Variable<T>, target &vtl.Tensor<T>) &SigmoidCrossEntropyGate<T> {
 	return &SigmoidCrossEntropyGate<T>{
 		cache: cache
 		target: target

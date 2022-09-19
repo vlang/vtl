@@ -8,7 +8,7 @@ import vtl.nn.internal
 // SigmoidCrossEntropyLoss
 pub struct SigmoidCrossEntropyLoss<T> {}
 
-pub fn new_sigmoid_cross_entropy_loss<T>() &SigmoidCrossEntropyLoss<T> {
+pub fn sigmoid_cross_entropy_loss<T>() &SigmoidCrossEntropyLoss<T> {
 	return &SigmoidCrossEntropyLoss<T>{}
 }
 
@@ -18,7 +18,7 @@ pub fn (_ &SigmoidCrossEntropyLoss<T>) loss(input &autograd.Variable<T>, target 
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {
-		gate := loss.new_sigmoid_cross_entropy_gate<T>(input, target)
+		gate := loss.sigmoid_cross_entropy_gate<T>(input, target)
 		gate.cache(mut result, input, target)?
 	}
 

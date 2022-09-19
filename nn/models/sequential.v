@@ -22,15 +22,15 @@ pub struct SequentialParams {
 }
 
 pub fn sequential<T>(params SequentialParams) &Sequential<T> {
-	ctx := autograd.new_ctx<T>()
+	ctx := autograd.ctx<T>()
 	return &Sequential<T>{
-		info: new_sequential_info<T>(ctx, params.layers)
+		info: sequential_info<T>(ctx, params.layers)
 	}
 }
 
 pub fn sequential_from_ctx<T>(ctx &autograd.Context<T>, params SequentialParams) &Sequential<T> {
 	return &Sequential<T>{
-		info: new_sequential_info<T>(ctx, params.layers)
+		info: sequential_info<T>(ctx, params.layers)
 	}
 }
 
@@ -92,16 +92,6 @@ pub fn (mut nn Sequential<T>) sigmod() {
 	nn.info.sigmod()
 }
 
-// sgd adds a new sgd optimizer to the network.
-pub fn (mut nn Sequential<T>) sgd(config optimizers.SgdOptimizerConfig) {
-	nn.info.sgd(config)
-}
-
-// adam adds a new adam optimizer to the network.
-pub fn (mut nn Sequential<T>) adam(config optimizers.AdamOptimizerConfig) {
-	nn.info.adam(config)
-}
-
 pub fn (mut nn Sequential<T>) forward(mut train autograd.Variable<T>) ?&autograd.Variable<T> {
 	for layer in nn.info.layers {
 		train = layers.layer_forward<T>(layer, mut train)?
@@ -111,8 +101,4 @@ pub fn (mut nn Sequential<T>) forward(mut train autograd.Variable<T>) ?&autograd
 
 pub fn (mut nn Sequential<T>) loss(output &autograd.Variable<T>, target &vtl.Tensor<T>) ?&autograd.Variable<T> {
 	return loss.loss_loss<T>(nn.info.loss, output, target)
-}
-
-pub fn (mut nn Sequential<T>) optimize() ? {
-	return optimizers.optimize<T>(mut nn.info.optimizer)
 }

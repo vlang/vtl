@@ -8,7 +8,7 @@ import vtl.nn.internal
 // MSELoss
 pub struct MSELoss<T> {}
 
-pub fn new_mse_loss<T>() &MSELoss<T> {
+pub fn mse_loss<T>() &MSELoss<T> {
 	return &MSELoss<T>{}
 }
 
@@ -18,7 +18,7 @@ pub fn (_ &MSELoss<T>) loss(input &autograd.Variable<T>, target &vtl.Tensor<T>) 
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {
-		gate := loss.new_mse_gate<T>(input, target)
+		gate := loss.mse_gate<T>(input, target)
 		gate.cache(mut result, input, target)?
 	}
 

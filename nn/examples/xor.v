@@ -3,6 +3,7 @@ module main
 import vtl
 import vtl.autograd
 import vtl.nn.models
+import vtl.nn.optimizers
 
 const (
 	batch_size = 32
@@ -14,7 +15,7 @@ const (
 
 fn main() {
 	// Autograd context / neuralnet graph
-	ctx := autograd.new_ctx<f64>()
+	ctx := autograd.ctx<f64>()
 
 	// We will create a tensor of size 3200 (100 batches of size 32)
 	// We create it as int between [0, 2[ and convert to bool
@@ -39,7 +40,7 @@ fn main() {
 	model.sigmoid_cross_entropy_loss()
 
 	// Stochastic Gradient Descent
-	model.sgd(learning_rate: 0.7)
+	mut optimizer := optimizers.sgd<f64>(learning_rate: 0.7)
 
 	mut losses := []&vtl.Tensor<f64>{cap: epochs * batches}
 
@@ -65,7 +66,7 @@ fn main() {
 			loss.backprop()?
 
 			// Correct the weights now that we have the gradient information
-			model.optimize()?
+			optimizer.update()?
 		}
 	}
 }

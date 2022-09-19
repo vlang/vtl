@@ -19,7 +19,7 @@ pub mut:
 
 // Contexts can only be initialized as empty, and
 // a generic type must be provided
-pub fn new_ctx<T>() &Context<T> {
+pub fn ctx<T>() &Context<T> {
 	return &Context<T>{}
 }
 

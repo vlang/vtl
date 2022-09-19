@@ -9,7 +9,7 @@ pub:
 	cache &vtl.Tensor<T>
 }
 
-pub fn new_elu_gate<T>(cache &vtl.Tensor<T>) &EluGate<T> {
+pub fn elu_gate<T>(cache &vtl.Tensor<T>) &EluGate<T> {
 	return &EluGate<T>{
 		cache: cache
 	}

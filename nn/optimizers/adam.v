@@ -26,7 +26,7 @@ pub struct AdamOptimizerConfig {
 	epsilon       f64 = 1e-8
 }
 
-pub fn new_adam_optimizer<T>(config AdamOptimizerConfig) &AdamOptimizer<T> {
+pub fn adam_optimizer<T>(config AdamOptimizerConfig) &AdamOptimizer<T> {
 	return &AdamOptimizer<T>{
 		learning_rate: config.learning_rate
 		beta1: config.beta1

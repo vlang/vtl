@@ -17,7 +17,7 @@ pub struct DropoutLayer<T> {
 	prob         f64
 }
 
-pub fn new_dropout_layer<T>(ctx &autograd.Context<T>, output_shape []int, data DropoutLayerConfig) types.Layer {
+pub fn dropout_layer<T>(ctx &autograd.Context<T>, output_shape []int, data DropoutLayerConfig) types.Layer {
 	return types.Layer(&DropoutLayer<T>{
 		output_shape: output_shape.clone()
 		prob: 1.0 - data.prob
@@ -38,7 +38,7 @@ pub fn (layer &DropoutLayer<T>) forward(mut input autograd.Variable<T>) ?&autogr
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {
-		gate := layers.new_dropout_gate<T>(mask, layer.prob)
+		gate := layers.dropout_gate<T>(mask, layer.prob)
 		gate.cache(mut result, input)?
 	}
 	return result

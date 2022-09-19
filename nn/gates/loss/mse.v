@@ -10,7 +10,7 @@ pub:
 	target &vtl.Tensor<T>
 }
 
-pub fn new_mse_gate<T>(cache &autograd.Variable<T>, target &vtl.Tensor<T>) &MseGate<T> {
+pub fn mse_gate<T>(cache &autograd.Variable<T>, target &vtl.Tensor<T>) &MseGate<T> {
 	return &MseGate<T>{
 		cache: cache
 		target: target

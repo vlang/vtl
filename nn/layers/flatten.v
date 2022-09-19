@@ -10,7 +10,7 @@ pub struct FlattenLayer<T> {
 	shape []int
 }
 
-pub fn new_flatten_layer<T>(ctx &autograd.Context<T>, shape []int) types.Layer {
+pub fn flatten_layer<T>(ctx &autograd.Context<T>, shape []int) types.Layer {
 	return types.Layer(&FlattenLayer<T>{
 		shape: shape.clone()
 	})
@@ -32,7 +32,7 @@ pub fn (layer &FlattenLayer<T>) forward(mut input autograd.Variable<T>) ?&autogr
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {
-		gate := layers.new_flatten_gate<T>(result, layer.shape)
+		gate := layers.flatten_gate<T>(result, layer.shape)
 		gate.cache(mut result, input)?
 	}
 	return result
