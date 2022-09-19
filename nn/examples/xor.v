@@ -2,7 +2,7 @@ module main
 
 import vtl
 import vtl.autograd
-import vtl.nn
+import vtl.nn.models
 
 const (
 	batch_size = 32
@@ -31,7 +31,7 @@ fn main() {
 
 	// We create a neural network with 2 inputs, 2 hidden layers of 4 neurons each and 1 output
 	// We use the sigmoid activation function
-	mut model := nn.new_nn<f64>(ctx)
+	mut model := models.sequential_from_ctx<f64>(ctx)
 	model.input([2])
 	model.linear(3)
 	model.relu()
@@ -65,7 +65,7 @@ fn main() {
 			loss.backprop()?
 
 			// Correct the weights now that we have the gradient information
-			model.optimizer_update()?
+			model.optimize()?
 		}
 	}
 }
