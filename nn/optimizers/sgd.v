@@ -16,7 +16,7 @@ pub struct SgdOptimizerConfig {
 	learning_rate f64 = 0.001
 }
 
-pub fn new_sgd_optimizer<T>(config SgdOptimizerConfig) &SgdOptimizer<T> {
+pub fn sgd<T>(config SgdOptimizerConfig) &SgdOptimizer<T> {
 	return &SgdOptimizer<T>{
 		learning_rate: config.learning_rate
 	}

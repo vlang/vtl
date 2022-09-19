@@ -11,7 +11,7 @@ pub struct ReLULayer<T> {
 	output_shape []int
 }
 
-pub fn new_relu_layer<T>(ctx &autograd.Context<T>, output_shape []int) types.Layer {
+pub fn relu_layer<T>(ctx &autograd.Context<T>, output_shape []int) types.Layer {
 	return types.Layer(&ReLULayer<T>{
 		output_shape: output_shape.clone()
 	})
@@ -30,19 +30,8 @@ pub fn (layer &ReLULayer<T>) forward(mut input autograd.Variable<T>) ?&autograd.
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {
-		gate := activation.new_relu_gate<T>(input.value)
+		gate := activation.relu_gate<T>(input.value)
 		gate.cache(mut result, input)?
-	}
-	return result
-}
-
-pub fn relu<T>(v &autograd.Variable<T>) ?&autograd.Variable<T> {
-	output := internal.relu<T>(v.value)
-	mut result := v.context.variable(output)
-
-	if v.requires_grad {
-		gate := activation.new_relu_gate<T>(v.value)
-		gate.cache(mut result, v)?
 	}
 	return result
 }

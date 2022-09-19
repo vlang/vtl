@@ -9,7 +9,7 @@ pub:
 	cache &vtl.Tensor<T>
 }
 
-pub fn new_leaky_relu_gate<T>(cache &vtl.Tensor<T>) &LeakyReluGate<T> {
+pub fn leaky_relu_gate<T>(cache &vtl.Tensor<T>) &LeakyReluGate<T> {
 	return &LeakyReluGate<T>{
 		cache: cache
 	}

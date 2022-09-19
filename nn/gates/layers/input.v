@@ -5,7 +5,7 @@ import vtl.autograd
 
 pub struct InputGate<T> {}
 
-pub fn new_input_gate<T>() &InputGate<T> {
+pub fn input_gate<T>() &InputGate<T> {
 	return &InputGate<T>{}
 }
 

@@ -11,7 +11,7 @@ pub struct SigmoidLayer<T> {
 	output_shape []int
 }
 
-pub fn new_sigmoid_layer<T>(ctx &autograd.Context<T>, output_shape []int) types.Layer {
+pub fn sigmoid_layer<T>(ctx &autograd.Context<T>, output_shape []int) types.Layer {
 	return types.Layer(&SigmoidLayer<T>{
 		output_shape: output_shape.clone()
 	})
@@ -30,19 +30,8 @@ pub fn (layer &SigmoidLayer<T>) forward(mut input autograd.Variable<T>) ?&autogr
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {
-		gate := activation.new_sigmoid_gate<T>(input.value)
+		gate := activation.sigmoid_gate<T>(input.value)
 		gate.cache(mut result, input)?
-	}
-	return result
-}
-
-pub fn sigmoid<T>(v &autograd.Variable<T>) ?&autograd.Variable<T> {
-	output := internal.sigmoid<T>(v.value)
-	mut result := v.context.variable(output)
-
-	if v.requires_grad {
-		gate := activation.new_sigmoid_gate<T>(v.value)
-		gate.cache(mut result, v)?
 	}
 	return result
 }

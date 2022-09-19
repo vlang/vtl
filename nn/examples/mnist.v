@@ -4,6 +4,7 @@ import vtl
 import vtl.autograd
 import vtl.datasets
 import vtl.nn.models
+import vtl.nn.optimizers
 
 const (
 	batch_size = 32
@@ -13,7 +14,7 @@ const (
 
 fn main() {
 	// Autograd context / neuralnet graph
-	ctx := autograd.new_ctx<f64>()
+	ctx := autograd.ctx<f64>()
 
 	// We create a neural network
 	mut model := models.sequential_from_ctx<f64>(ctx)
@@ -23,6 +24,9 @@ fn main() {
 	mut train_ds := datasets.load_mnist(.train, batch_size: batch_size)?
 
 	mut losses := []&vtl.Tensor<f64>{cap: epochs}
+
+	// Stochastic Gradient Descent
+	mut optimizer := optimizers.sgd<f64>(learning_rate: 0.1)
 
 	for epoch in 0 .. epochs {
 		mut batch_id := 0
@@ -47,7 +51,7 @@ fn main() {
 			loss.backprop()?
 
 			// Correct the weights now that we have the gradient information
-			model.optimize()?
+			optimizer.update()?
 
 			batch_id++
 		}

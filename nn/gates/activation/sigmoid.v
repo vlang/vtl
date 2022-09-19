@@ -9,7 +9,7 @@ pub:
 	cache &vtl.Tensor<T>
 }
 
-pub fn new_sigmoid_gate<T>(cache &vtl.Tensor<T>) &SigmoidGate<T> {
+pub fn sigmoid_gate<T>(cache &vtl.Tensor<T>) &SigmoidGate<T> {
 	return &SigmoidGate<T>{
 		cache: cache
 	}

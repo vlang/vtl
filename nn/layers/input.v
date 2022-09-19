@@ -13,7 +13,7 @@ pub struct InputLayer<T> {
 	shape []int
 }
 
-pub fn new_input_layer<T>(ctx &autograd.Context<T>, shape []int) types.Layer {
+pub fn input_layer<T>(ctx &autograd.Context<T>, shape []int) types.Layer {
 	return types.Layer(&InputLayer<T>{
 		shape: shape.clone()
 	})
@@ -29,7 +29,7 @@ pub fn (_ &InputLayer<T>) variables() []&autograd.Variable<T> {
 
 pub fn (layer &InputLayer<T>) forward(mut input autograd.Variable<T>) ?&autograd.Variable<T> {
 	if input.requires_grad {
-		gate := layers.new_input_gate<T>()
+		gate := layers.input_gate<T>()
 		gate.cache(mut input, input)?
 	}
 	return input
