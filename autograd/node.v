@@ -18,8 +18,8 @@ pub mut:
 	name string
 }
 
-// new_node
-pub fn new_node<T>(gate Gate, parents []&Variable<T>, payload &Payload<T>, name string) &Node<T> {
+// node
+pub fn node<T>(gate Gate, parents []&Variable<T>, payload &Payload<T>, name string) &Node<T> {
 	return &Node<T>{
 		gate: gate
 		parents: parents

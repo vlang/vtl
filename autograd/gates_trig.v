@@ -7,7 +7,7 @@ pub:
 	a &Variable<T>
 }
 
-pub fn new_sin_gate<T>(a &Variable<T>) &SinGate<T> {
+pub fn sin_gate<T>(a &Variable<T>) &SinGate<T> {
 	return &SinGate<T>{
 		a: a
 	}
@@ -40,7 +40,7 @@ pub:
 	a &Variable<T>
 }
 
-pub fn new_cos_gate<T>(a &Variable<T>) &CosGate<T> {
+pub fn cos_gate<T>(a &Variable<T>) &CosGate<T> {
 	return &CosGate<T>{
 		a: a
 	}
@@ -48,7 +48,7 @@ pub fn new_cos_gate<T>(a &Variable<T>) &CosGate<T> {
 
 pub fn (g &CosGate<T>) backward<T>(payload &Payload<T>) ?[]&vtl.Tensor<T> {
 	gradient := payload.variable.grad
-	r0 := gradient.multiply<T>(g.a.value.sin<T>().multiply_scalar<T>(vtl.new_t<T>(-1))?)?
+	r0 := gradient.multiply<T>(g.a.value.sin<T>().multiply_scalar<T>(vtl.cast<T>(-1))?)?
 	return [r0]
 }
 
@@ -73,7 +73,7 @@ pub:
 	a &Variable<T>
 }
 
-pub fn new_tan_gate<T>(a &Variable<T>) &TanGate<T> {
+pub fn tan_gate<T>(a &Variable<T>) &TanGate<T> {
 	return &TanGate<T>{
 		a: a
 	}

@@ -4,10 +4,10 @@ import vtl
 
 pub fn dropout<T>(input &vtl.Tensor<T>, mask &vtl.Tensor<T>, prob f64) ?&vtl.Tensor<T> {
 	mut iters, shape := input.iterators<T>([mask])?
-	mut ret := vtl.new_tensor_like_with_shape<T>(input, shape)
+	mut ret := vtl.tensor_like_with_shape<T>(input, shape)
 	for {
 		vals, i := iters.next() or { break }
-		val := vals[0] * vals[1] / vtl.new_t<T>(prob)
+		val := vals[0] * vals[1] / vtl.cast<T>(prob)
 		ret.set(i, val)
 	}
 	return ret
@@ -15,10 +15,10 @@ pub fn dropout<T>(input &vtl.Tensor<T>, mask &vtl.Tensor<T>, prob f64) ?&vtl.Ten
 
 pub fn dropout_backwards<T>(gradient &vtl.Tensor<T>, mask &vtl.Tensor<T>, prob f64) ?&vtl.Tensor<T> {
 	mut iters, shape := gradient.iterators<T>([mask])
-	mut ret := vtl.new_tensor_like_with_shape<T>(gradient, shape)
+	mut ret := vtl.tensor_like_with_shape<T>(gradient, shape)
 	for {
 		vals, i := iters.next() or { break }
-		val := vals[0] * vals[1] / vtl.new_t<T>(prob)
+		val := vals[0] * vals[1] / vtl.cast<T>(prob)
 		ret.set(i, val)
 	}
 	return ret

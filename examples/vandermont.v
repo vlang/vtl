@@ -53,7 +53,7 @@ println(slice3)
 
 println(slice3.shape) // [3, 5]
 
-t999 := vtl.new_tensor(999, [2, 2])
+t999 := vtl.tensor(999, [2, 2])
 
 slice1.assign(t999)?
 

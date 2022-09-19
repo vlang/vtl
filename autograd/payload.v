@@ -10,7 +10,7 @@ pub:
 	variable &Variable<T>
 }
 
-pub fn new_payload<T>(variable &Variable<T>) &Payload<T> {
+pub fn payload<T>(variable &Variable<T>) &Payload<T> {
 	return &Payload<T>{
 		variable: variable
 	}

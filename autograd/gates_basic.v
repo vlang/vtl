@@ -4,7 +4,7 @@ import vtl
 
 pub struct AddGate<T> {}
 
-pub fn new_add_gate<T>() &AddGate<T> {
+pub fn add_gate<T>() &AddGate<T> {
 	return &AddGate<T>{}
 }
 
@@ -39,13 +39,13 @@ pub fn (g &AddGate<T>) cache<T>(mut result Variable<T>, args ...CacheParam) ? {
 
 pub struct SubstractGate<T> {}
 
-pub fn new_subtract_gate<T>() &SubstractGate<T> {
+pub fn subtract_gate<T>() &SubstractGate<T> {
 	return &SubstractGate<T>{}
 }
 
 pub fn (g &SubstractGate<T>) backward<T>(payload &Payload<T>) ?[]&vtl.Tensor<T> {
 	gradient := payload.variable.grad
-	oposite := gradient.multiply_scalar<T>(vtl.new_t<T>(-1))?
+	oposite := gradient.multiply_scalar<T>(vtl.cast<T>(-1))?
 	return [gradient, oposite]
 }
 
@@ -79,7 +79,7 @@ pub:
 	b &Variable<T>
 }
 
-pub fn new_multiply_gate<T>(a &Variable<T>, b &Variable<T>) &MultiplyGate<T> {
+pub fn multiply_gate<T>(a &Variable<T>, b &Variable<T>) &MultiplyGate<T> {
 	return &MultiplyGate<T>{
 		a: a
 		b: b
@@ -123,7 +123,7 @@ pub:
 	b &Variable<T>
 }
 
-pub fn new_divide_gate<T>(a &Variable<T>, b &Variable<T>) &DivideGate<T> {
+pub fn divide_gate<T>(a &Variable<T>, b &Variable<T>) &DivideGate<T> {
 	return &DivideGate<T>{
 		a: a
 		b: b
@@ -133,8 +133,8 @@ pub fn new_divide_gate<T>(a &Variable<T>, b &Variable<T>) &DivideGate<T> {
 pub fn (g &DivideGate<T>) backward<T>(payload &Payload<T>) ?[]&vtl.Tensor<T> {
 	gradient := payload.variable.grad
 	r0 := gradient.divide<T>(g.b.value)?
-	bx2 := g.b.value.multiply_scalar<T>(vtl.new_t<T>(2))?
-	oposite := gradient.multiply_scalar<T>(vtl.new_t<T>(-1))?
+	bx2 := g.b.value.multiply_scalar<T>(vtl.cast<T>(2))?
+	oposite := gradient.multiply_scalar<T>(vtl.cast<T>(-1))?
 	mut r1 := oposite.multiply<T>(g.a.value)?
 	r1 = r1.divide<T>(bx2)?
 	return [r0, r1]

@@ -6,7 +6,7 @@ pub fn sgd_optimize<T>(mut value vtl.Tensor<T>, gradient &vtl.Tensor<T>, learnin
 	mut iters, _ := value.iterators([gradient])?
 	for {
 		vals, i := iters.next() or { break }
-		val := vals[0] - vtl.new_t<T>(learning_rate) * vals[1]
+		val := vals[0] - vtl.cast<T>(learning_rate) * vals[1]
 		value.set(i, val)
 	}
 }

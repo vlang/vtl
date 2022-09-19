@@ -69,7 +69,7 @@ fn (mut t Tensor<T>) tril_inplace_offset<T>(offset int) &Tensor<T> {
 	for i in 0 .. t.shape[0] {
 		for j in 0 .. t.shape[1] {
 			if i < j - offset {
-				t.set([i, j], new_t<T>(0))
+				t.set([i, j], cast<T>(0))
 			}
 		}
 	}
@@ -82,7 +82,7 @@ fn (mut t Tensor<T>) triu_inplace_offset<T>(offset int) &Tensor<T> {
 	for i in 0 .. t.shape[0] {
 		for j in 0 .. t.shape[1] {
 			if i > j - offset {
-				t.set([i, j], new_t<T>(0))
+				t.set([i, j], cast<T>(0))
 			}
 		}
 	}

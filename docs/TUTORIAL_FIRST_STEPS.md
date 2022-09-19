@@ -55,7 +55,7 @@ println(t.strides) // [4, 1] => next row is 4 elements away in memory while the 
 
 Other ways to create a tensor are:
 
-- `new_tensor` - creates a new tensor.
+- `tensor` - creates a new tensor.
   This can be used to initialize a tensor of a specific shape with a default value.
   (0 for numbers, false for bool, ...)
 - `zeros` - creates a tensor of zeros.
@@ -66,12 +66,12 @@ Other ways to create a tensor are:
 ```v
 import vtl
 
-t := vtl.new_tensor(0.0, [2, 3])
+t := vtl.tensor(0.0, [2, 3])
 
 println(t)
 // [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
 
-booleans := vtl.new_tensor(false, [2, 3])
+booleans := vtl.tensor(false, [2, 3])
 
 println(booleans)
 // [[false, false, false], [false, false, false]]
