@@ -6,6 +6,10 @@ import vtl.nn.layers
 import vtl.nn.loss
 import vtl.nn.optimizers
 
+fn init() {
+        println(@MOD + " module is a WIP and not yet functional")
+}
+
 pub struct NeuralNetwork<T> {
 pub mut:
 	info &NeuralNetworkContainer<T>
