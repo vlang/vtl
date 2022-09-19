@@ -51,8 +51,11 @@ fn main() {
 			mut x := x_train.slice([offset, offset + batch_size])?
 			target := y.slice([offset, offset + batch_size])?
 
-			// Running input through the network and Computing the loss
-			mut loss := model.forward(mut x)?
+			// Running input through the network
+			y_pred := model.forward(mut x)?
+
+			// Compute the loss
+			mut loss := model.loss(y_pred, target)?
 
 			println('Epoch: $epoch, Batch id: $batch_id, Loss: $loss.value')
 
