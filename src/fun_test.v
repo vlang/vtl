@@ -15,6 +15,17 @@ fn test_reshape_tensor_with_know_dim() ? {
 // 	assert c.array_equal(b)
 // }
 
+fn test_cant_reshape_tensor_with_know_dim() ? {
+	values := []int{len: 27, init: it}
+	a := from_array(values, [3, 3, 3])?
+        assert a.shape == [3, 3, 3]
+	if b := a.reshape([10, 10]) {
+                assert false
+        } else {
+                assert true
+        }
+}
+
 fn test_t() ? {
 	t := from_2d([[6.0, 4, 24], [1.0, -9, 8]])?
 	tt := t.t()?
