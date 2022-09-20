@@ -116,7 +116,7 @@ pub fn (t &Tensor<T>) ravel<T>() ?&Tensor<T> {
 
 // reshape returns an Tensor with a new shape
 pub fn (t &Tensor<T>) reshape<T>(shape []int) ?&Tensor<T> {
-	size := size_from_shape(shape)
+	size := size_from_shape(t.shape)
 	newshape, newsize := shape_with_autosize(shape, size)?
 	if newsize != size {
 		return error('${@METHOD}: cannot reshape')
