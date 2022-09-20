@@ -1,24 +1,29 @@
 module vtl
 
+import math
+
 // broadcastable takes two Tensors and either returns a valid
 // broadcastable shape or an error
 pub fn (a &Tensor<T>) broadcastable<T>(b &Tensor<T>) ?[]int {
-	if a.rank() == b.rank() {
+	a_size := a.rank()
+	b_size := b.rank()
+
+	if a_size == b_size {
 		if broadcast_equal(a.shape, b.shape) {
 			return broadcastable_shape(a.shape, b.shape)
 		}
 	} else {
-		if a.rank() > b.rank() {
-			mut b_shape := []int{len: a.rank() - b.rank(), init: int(1)}
-			b_shape << b.shape
-			if broadcast_equal(a.shape, b_shape) {
-				return broadcastable_shape(a.shape, b_shape)
+		if a_size > b_size {
+			mut shape := []int{len: a_size - b_size, init: 1}
+			shape << b.shape
+			if broadcast_equal(a.shape, shape) {
+				return broadcastable_shape(a.shape, shape)
 			}
 		} else {
-			mut a_shape := []int{len: b.rank() - a.rank(), init: int(1)}
-			a_shape << a.shape
-			if broadcast_equal(a_shape, b.shape) {
-				return broadcastable_shape(a_shape, b.shape)
+			mut shape := []int{len: b_size - a_size, init: 1}
+			shape << a.shape
+			if broadcast_equal(shape, b.shape) {
+				return broadcastable_shape(shape, b.shape)
 			}
 		}
 	}
@@ -41,29 +46,25 @@ fn broadcast_equal(a []int, b []int) bool {
 fn broadcastable_shape(a []int, b []int) []int {
 	mut result := []int{}
 	for i, av in a {
-		if av > b[i] {
-			result << av
-		} else {
-			result << b[i]
-		}
+		result << math.max(av, b[i])
 	}
 	return result
 }
 
 // broadcast strides broadcasts the strides of an existing array to
 // allow it to be viewed as a compatible shape
-fn broadcast_strides(dshape []int, sshape []int, dstrides []int, sstrides []int) ?[]int {
-	d := dshape.len
-	s := d - sshape.len
-	mut result := []int{len: d, init: 0}
-	for i := d - 1; i >= s; i-- {
-		t := sshape[i - s]
+fn broadcast_strides(dest_shape []int, src_shape []int, dest_strides []int, src_strides []int) ?[]int {
+	dims := dest_shape.len
+	start := dims - src_shape.len
+	mut result := []int{len: dims, init: 0}
+	for i := dims - 1; i >= start; i-- {
+		t := src_shape[i - start]
 		if t == 1 {
 			result[i] = 0
-		} else if t == dshape[i] {
-			result[i] = sstrides[i - s]
+		} else if t == dest_shape[i] {
+			result[i] = src_strides[i - start]
 		} else {
-			return error('Cannot broadcast from $sshape to $dshape')
+			return error('Cannot broadcast from $src_shape to $dest_shape')
 		}
 	}
 	return result
@@ -107,7 +108,7 @@ fn broadcast_shapes(args ...[]int) []int {
 	for i in 0 .. args.len {
 		ai := args[i]
 		d := nd - ai.len
-		mut shape := []int{len: d, init: int(1)}
+		mut shape := []int{len: d, init: 1}
 		shape << ai
 		for j := 0; j < shape.len; j++ {
 			if shape[j] > result[j] {
@@ -121,7 +122,7 @@ fn broadcast_shapes(args ...[]int) []int {
 // broadcast2 broadcasts two Tensors against each other
 [inline]
 pub fn broadcast2<T>(a &Tensor<T>, b &Tensor<T>) ?(&Tensor<T>, &Tensor<T>) {
-	shape := broadcast_shapes(a.shape, b.shape)
+	shape := a.broadcastable(b)?
 	r1 := a.broadcast_to(shape)?
 	r2 := b.broadcast_to(shape)?
 	return r1, r2
