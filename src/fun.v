@@ -118,9 +118,6 @@ pub fn (t &Tensor<T>) ravel<T>() ?&Tensor<T> {
 pub fn (t &Tensor<T>) reshape<T>(shape []int) ?&Tensor<T> {
 	size := size_from_shape(t.shape)
 	newshape, newsize := shape_with_autosize(shape, size)?
-	if newsize != size {
-		return error('${@METHOD}: cannot reshape')
-	}
 	mut ret := tensor_like_with_shape<T>(t, newshape)
 	ret.data = t.data
 	ret.ensure_memory()
@@ -130,9 +127,6 @@ pub fn (t &Tensor<T>) reshape<T>(shape []int) ?&Tensor<T> {
 // as_strided returns a view of the Tensor with new shape and strides
 pub fn (t &Tensor<T>) as_strided<T>(shape []int, strides []int) ?&Tensor<T> {
 	newshape, newsize := shape_with_autosize(shape, t.size)?
-	if newsize != t.size {
-		return error('${@METHOD}: cannot reshape')
-	}
 	mut ret := tensor_like_with_shape_and_strides<T>(t, newshape, strides)
 	ret.data = t.data
 	ret.ensure_memory()
@@ -144,8 +138,7 @@ pub fn (t &Tensor<T>) as_strided<T>(shape []int, strides []int) ?&Tensor<T> {
 pub fn (t &Tensor<T>) transpose<T>(order []int) ?&Tensor<T> {
 	mut ret := t.view()
 	n := order.len
-	// @todo: @ulises-jeremias to fix this
-	// assert_rank<T>(t, n)
+	t.assert_rank(n)?
 	mut permutation := []int{len: 32}
 	mut reverse_permutation := []int{len: 32, init: -1}
 	mut i := 0

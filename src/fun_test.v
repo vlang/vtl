@@ -7,23 +7,23 @@ fn test_reshape_tensor_with_know_dim() ? {
 	assert a.reshape(b.shape)?.array_equal(b)
 }
 
-// fn test_reshape_tensor_with_unknow_dim() ? {
-// 	values := []int{len: 27, init: it}
-// 	a := from_array(values, [3, 3, 3])?
-// 	b := from_array(values, [9, 3])?
-// 	c := a.reshape([-1, 3])?
-// 	assert c.array_equal(b)
-// }
+fn test_reshape_tensor_with_unknow_dim() ? {
+	values := []int{len: 27, init: it}
+	a := from_array(values, [3, 3, 3])?
+	b := from_array(values, [9, 3])?
+	c := a.reshape([-1, 3])?
+	assert c.array_equal(b)
+}
 
 fn test_cant_reshape_tensor_with_know_dim() ? {
 	values := []int{len: 27, init: it}
 	a := from_array(values, [3, 3, 3])?
-        assert a.shape == [3, 3, 3]
+	assert a.shape == [3, 3, 3]
 	if b := a.reshape([10, 10]) {
-                assert false
-        } else {
-                assert true
-        }
+		assert false
+	} else {
+		assert true
+	}
 }
 
 fn test_t() ? {

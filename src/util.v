@@ -197,6 +197,11 @@ fn shape_with_autosize(shape []int, size int) ?([]int, int) {
 		newshape[autosize] = size / newsize
 		newsize *= newshape[autosize]
 	}
+
+	if size != newsize {
+		return error("Shape and size don't match")
+	}
+
 	return newshape, newsize
 }
 
