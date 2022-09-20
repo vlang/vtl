@@ -33,7 +33,7 @@ fn main() {
 		for {
 			batch := train_ds.next() or { break }
 
-			xt := batch.features.divide_scalar(u8(255))? // .reshape([-1, 1, 28, 28])?
+			xt := batch.features.divide_scalar(u8(255))?.reshape([-1, 1, 28, 28])?
 			mut x := ctx.variable(xt)
 			target := batch.labels
 
