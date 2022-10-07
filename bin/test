@@ -13,6 +13,8 @@
 ##         --use-gc=STRATEGY                 Execute tests using garbage collector
 ##
 
+set -e
+
 ROOT=$(dirname "$0")
 
 source "${ROOT}/util/opts/opts.sh" || exit
