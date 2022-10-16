@@ -75,7 +75,6 @@ jobs:
         run: mv ./vtl ~/.vmodules
 
       - name: Verify Fmt
-        continue-on-error: true
         run: v fmt -verify ~/.vmodules/vtl
 
   run-tests:
