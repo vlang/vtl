@@ -1,6 +1,5 @@
 module models
 
-import vtl.autograd
 import vtl.nn.layers
 
 fn test_nnc() {
