@@ -33,7 +33,7 @@ pub struct ImdbDatasetConfig {
 }
 
 // load_imdb loads the IMDB dataset iterator for a given split type.
-pub fn load_imdb(set_type DatasetType, data ImdbDatasetConfig) ?&ImdbDataset {
+pub fn load_imdb(set_type DatasetType, data ImdbDatasetConfig) !&ImdbDataset {
 	split := if set_type == .train { 'train' } else { 'test' }
 
 	paths := download_dataset(
@@ -44,7 +44,7 @@ pub fn load_imdb(set_type DatasetType, data ImdbDatasetConfig) ?&ImdbDataset {
 		urls_names: {
 			datasets.imdb_file_name: datasets.imdb_folder_name
 		}
-	)?
+	)!
 
 	mut split_paths := []string{}
 
@@ -56,7 +56,7 @@ pub fn load_imdb(set_type DatasetType, data ImdbDatasetConfig) ?&ImdbDataset {
 	split_paths << os.walk_ext(pos_dir, '.txt')
 	split_paths << os.walk_ext(neg_dir, '.txt')
 
-	rand.shuffle(mut split_paths)?
+	rand.shuffle(mut split_paths) or { return error('shuffle failed') }
 
 	return &ImdbDataset{
 		@type: set_type
@@ -93,7 +93,7 @@ pub fn (mut ds ImdbDataset) next() ?ImdbBatch {
 			return none
 		}
 
-		content := os.read_file(path)?
+		content := os.read_file(path) or { return none }
 		file_name := os.file_name(path)
 		label := file_name.split('_')[1]
 

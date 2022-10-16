@@ -19,11 +19,11 @@ struct RawDownload {
 	target string
 }
 
-fn load_from_url(data RawDownload) ?string {
+fn load_from_url(data RawDownload) !string {
 	datasets_cache_dir := get_cache_dir('datasets')
 
 	if !os.is_dir(datasets_cache_dir) {
-		os.mkdir_all(datasets_cache_dir)?
+		os.mkdir_all(datasets_cache_dir)!
 	}
 	cache_file_name := sha1.hexhash(data.url)
 	cache_file_path := if data.target == '' {
@@ -36,10 +36,10 @@ fn load_from_url(data RawDownload) ?string {
 		return os.read_file(cache_file_path)
 	}
 
-	res := http.get(data.url)?
+	res := http.get(data.url)!
 	content := res.body
 
-	os.write_file(cache_file_path, content)?
+	os.write_file(cache_file_path, content)!
 
 	return content
 }
@@ -53,14 +53,14 @@ struct DatasetDownload {
 	urls_names map[string]string
 }
 
-fn download_dataset(data DatasetDownload) ?map[string]string {
+fn download_dataset(data DatasetDownload) !map[string]string {
 	mut loaded_paths := map[string]string{}
 
 	for path, filename in data.urls_names {
 		dataset_dir := get_cache_dir('datasets', data.dataset)
 
 		if !os.is_dir(dataset_dir) {
-			os.mkdir_all(dataset_dir)?
+			os.mkdir_all(dataset_dir)!
 		}
 
 		target := os.join_path(dataset_dir, filename)
@@ -76,7 +76,7 @@ fn download_dataset(data DatasetDownload) ?map[string]string {
 			$if debug ? {
 				println('Downloading $filename from $data.baseurl$path')
 			}
-			load_from_url(url: '$data.baseurl$path', target: target)?
+			load_from_url(url: '$data.baseurl$path', target: target)!
 			if data.extract {
 				$if debug ? {
 					println('Extracting $target')
@@ -92,7 +92,7 @@ fn download_dataset(data DatasetDownload) ?map[string]string {
 						return error_with_code('Error extracting $target', result.exit_code)
 					}
 				} else {
-					szip.extract_zip_to_dir(target, dataset_dir)?
+					szip.extract_zip_to_dir(target, dataset_dir)!
 				}
 			}
 		}
