@@ -117,7 +117,7 @@ pub fn (t &Tensor<T>) ravel<T>() ?&Tensor<T> {
 // reshape returns an Tensor with a new shape
 pub fn (t &Tensor<T>) reshape<T>(shape []int) ?&Tensor<T> {
 	size := size_from_shape(t.shape)
-	newshape, newsize := shape_with_autosize(shape, size)?
+	newshape, _ := shape_with_autosize(shape, size)?
 	mut ret := tensor_like_with_shape<T>(t, newshape)
 	ret.data = t.data
 	ret.ensure_memory()
@@ -126,7 +126,7 @@ pub fn (t &Tensor<T>) reshape<T>(shape []int) ?&Tensor<T> {
 
 // as_strided returns a view of the Tensor with new shape and strides
 pub fn (t &Tensor<T>) as_strided<T>(shape []int, strides []int) ?&Tensor<T> {
-	newshape, newsize := shape_with_autosize(shape, t.size)?
+	newshape, _ := shape_with_autosize(shape, t.size)?
 	mut ret := tensor_like_with_shape_and_strides<T>(t, newshape, strides)
 	ret.data = t.data
 	ret.ensure_memory()
