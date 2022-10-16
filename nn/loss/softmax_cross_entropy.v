@@ -2,8 +2,6 @@ module loss
 
 import vtl
 import vtl.autograd
-import vtl.nn.gates.loss
-import vtl.nn.internal
 
 // SoftmaxCrossEntropyLoss
 pub struct SoftmaxCrossEntropyLoss<T> {}

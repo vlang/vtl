@@ -4,7 +4,6 @@ import vtl
 import vtl.autograd
 import vtl.nn.layers
 import vtl.nn.loss
-import vtl.nn.optimizers
 import vtl.nn.types
 
 fn init() {
