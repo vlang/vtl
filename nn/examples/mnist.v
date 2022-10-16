@@ -20,7 +20,7 @@ mut model := models.sequential_from_ctx<f64>(ctx)
 model.input([1, 28, 28])
 model.mse_loss()
 
-mut train_ds := datasets.load_mnist(.train, batch_size: batch_size)?
+mut train_ds := datasets.load_mnist(.train, batch_size: batch_size)!
 
 mut losses := []&vtl.Tensor<f64>{cap: epochs}
 

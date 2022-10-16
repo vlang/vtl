@@ -37,7 +37,7 @@ pub struct MnistDatasetConfig {
 }
 
 // load_mnist returns a new MNIST iterator.
-pub fn load_mnist(set_type DatasetType, data MnistDatasetConfig) ?&MnistDataset {
+pub fn load_mnist(set_type DatasetType, data MnistDatasetConfig) !&MnistDataset {
 	filename := if set_type == .train { datasets.mnist_train_file } else { datasets.mnist_test_file }
 
 	paths := download_dataset(
@@ -46,10 +46,10 @@ pub fn load_mnist(set_type DatasetType, data MnistDatasetConfig) ?&MnistDataset 
 		urls_names: {
 			filename: filename
 		}
-	)?
+	)!
 
 	path := paths[filename]
-	content := os.read_file(path)?
+	content := os.read_file(path)!
 
 	return &MnistDataset{
 		@type: set_type
