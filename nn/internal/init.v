@@ -1,5 +1,6 @@
 module internal
 
+import arrays
 import math
 import vtl
 
@@ -14,10 +15,6 @@ pub enum Distribution {
 	normal
 }
 
-fn prod(prev int, curr int) int {
-	return prev * curr
-}
-
 pub fn compute_fans(shape []int) (int, int) {
 	f0 := shape[0]
 	f1 := shape[1]
@@ -26,7 +23,9 @@ pub fn compute_fans(shape []int) (int, int) {
 		return f0, f1
 	}
 
-	product := shape[1..].reduce(prod, 1)
+	product := arrays.fold(shape[1..], 1, fn (prev int, curr int) int {
+		return prev * curr
+	})
 	return f0 * product, f1 * product
 }
 
