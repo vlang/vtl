@@ -90,7 +90,7 @@ pub fn (mut ds MnistDataset) next() ?MnistBatch {
 
 	mut iter := lt.iterator()
 	for {
-		elem, i := iter.next() or { break }
+		_, i := iter.next() or { break }
 		lft.set(i, 1)
 	}
 
