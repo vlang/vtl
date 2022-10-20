@@ -24,7 +24,7 @@ pub fn binomial<T>(n int, prob f64, shape []int, params TensorData) ?&Tensor<T> 
 	mut iter := t.iterator()
 	for {
 		_, i := iter.next() or { break }
-		rand_value := cast<T>(rand.binomial(n, prob)?)
+		rand_value := cast<T>(rand.binomial(n, prob) or { return err })
 		t.set(i, rand_value)
 	}
 	return t
