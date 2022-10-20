@@ -12,7 +12,7 @@ pub const (
 
 interface Reader {
 mut:
-	read() ?[]string
+	read() ![]string
 }
 
 // MnistDataset is a dataset of MNIST handwritten digits.
