@@ -36,13 +36,14 @@ pub fn adam_optimizer<T>(config AdamOptimizerConfig) &AdamOptimizer<T> {
 }
 
 pub fn (mut o AdamOptimizer<T>) build_params(layers []types.Layer) {
-	for layer in layers {
-		for v in layer.variables() {
-			o.params << v
-			o.first_moments << vtl.zeros_like<T>(v.grad)
-			o.second_moments << vtl.zeros_like<T>(v.grad)
-		}
-	}
+	// @todo: @ulises-jeremias to uncomment this
+	// for layer in layers {
+	// for v in layer.variables() {
+	// 	o.params << v
+	// 	o.first_moments << vtl.zeros_like<T>(v.grad)
+	// 	o.second_moments << vtl.zeros_like<T>(v.grad)
+	// }
+	//}
 }
 
 pub fn (mut o AdamOptimizer<T>) update() ? {
