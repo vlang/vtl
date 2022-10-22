@@ -82,7 +82,12 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-20.04, ubuntu-18.04]
+        os:
+          - ubuntu-20.04
+          - ubuntu-18.04
+        flags: 
+          - ""
+          - "-prod"
 
     steps:
       - name: Checkout VTL
@@ -107,15 +112,15 @@ jobs:
         run: mv ./vtl ~/.vmodules
 
       - name: Execute Tests using Pure V Backend
-        run: ~/.vmodules/vtl/bin/test
+        run: ~/.vmodules/vtl/bin/test ${{ matrix.flags }}
 
       - name: Execute Tests using Pure V Backend with Pure C Blas
-        run: ~/.vmodules/vtl/bin/test --use-cblas
+        run: ~/.vmodules/vtl/bin/test ${{ matrix.flags }} --use-cblas
         if: ${{ matrix.os != 'ubuntu-18.04' }}
 
       - name: Execute Tests using Pure V Backend and Garbage Collection enabled
-        run: ~/.vmodules/vtl/bin/test --use-gc boehm
+        run: ~/.vmodules/vtl/bin/test ${{ matrix.flags }} --use-gc boehm
 
       - name: Execute Tests using Pure V Backend with Pure C Blas and Garbage Collection enabled
-        run: ~/.vmodules/vtl/bin/test --use-cblas --use-gc boehm
+        run: ~/.vmodules/vtl/bin/test ${{ matrix.flags }} --use-cblas --use-gc boehm
         if: ${{ matrix.os != 'ubuntu-18.04' }}
