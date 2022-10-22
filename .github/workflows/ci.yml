@@ -87,7 +87,7 @@ jobs:
           - ubuntu-18.04
         flags: 
           - ""
-          - "-prod"
+          - "--prod"
 
     steps:
       - name: Checkout VTL
