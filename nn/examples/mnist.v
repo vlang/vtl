@@ -32,7 +32,7 @@ for epoch in 0 .. epochs {
 	for {
 		batch := train_ds.next() or { break }
 
-		xt := batch.features.divide_scalar(255.0)?.reshape([-1.0, 1.0, 28.0, 28.0])?
+		xt := batch.features.divide_scalar(u8(255))?.reshape([-1.0, 1.0, 28.0, 28.0])?
 		mut x := ctx.variable(xt)
 		target := batch.labels
 
