@@ -59,7 +59,7 @@ pub fn cast<T>(x TensorDataType) T {
 	} $else $if T is u64 {
 		return x.u64()
 	} $else {
-		panic('$T.name is not a supported type for a Tensor. Check the type TensorDataType to know the valid data types')
+		panic('${T.name} is not a supported type for a Tensor. Check the type TensorDataType to know the valid data types')
 	}
 }
 

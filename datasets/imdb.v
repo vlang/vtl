@@ -70,7 +70,7 @@ pub fn (ds &ImdbDataset) str() string {
 	mut res := []string{}
 	res << 'vtl.datasets.ImdbDataset{'
 	res << '    @type: ${ds.@type}'
-	res << '    batch_size: $ds.batch_size'
+	res << '    batch_size: ${ds.batch_size}'
 	res << '}'
 	return res.join('\n')
 }
