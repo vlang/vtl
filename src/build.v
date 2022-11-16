@@ -14,7 +14,7 @@ pub:
 pub fn from_array<T>(arr []T, shape []int, params TensorData) ?&Tensor<T> {
 	size := size_from_shape(shape)
 	if size != arr.len {
-		return error('Bad shape for array, shape [$arr.len] cannot fit into shape $shape')
+		return error('Bad shape for array, shape [${arr.len}] cannot fit into shape ${shape}')
 	}
 	data_storage := storage.from_array<T>(arr)
 	if shape.len == 0 {

@@ -42,7 +42,7 @@ for epoch in 0 .. epochs {
 		// Compute the loss
 		mut loss := model.loss(y_pred, target)?
 
-		println('Epoch: $epoch, Batch id: $batch_id, Loss: $loss.value')
+		println('Epoch: ${epoch}, Batch id: ${batch_id}, Loss: ${loss.value}')
 
 		losses << loss.value
 

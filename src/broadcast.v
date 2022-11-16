@@ -27,7 +27,7 @@ pub fn (a &Tensor<T>) broadcastable<T>(b &Tensor<T>) ?[]int {
 			}
 		}
 	}
-	return error('Shapes $a.shape and $b.shape are not broadcastable')
+	return error('Shapes ${a.shape} and ${b.shape} are not broadcastable')
 }
 
 // broadcast_equal asserts that two shapes can be broadcast
@@ -64,7 +64,7 @@ fn broadcast_strides(dest_shape []int, src_shape []int, dest_strides []int, src_
 		} else if t == dest_shape[i] {
 			result[i] = src_strides[i - start]
 		} else {
-			return error('Cannot broadcast from $src_shape to $dest_shape')
+			return error('Cannot broadcast from ${src_shape} to ${dest_shape}')
 		}
 	}
 	return result

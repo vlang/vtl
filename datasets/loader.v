@@ -70,26 +70,26 @@ fn download_dataset(data DatasetDownload) !map[string]string {
 				// we assume that the correct extraction process was done
 				// before
 				// @todo: check for extraction...
-				println('$filename already exists')
+				println('${filename} already exists')
 			}
 		} else {
 			$if debug ? {
-				println('Downloading $filename from $data.baseurl$path')
+				println('Downloading ${filename} from ${data.baseurl}${path}')
 			}
-			load_from_url(url: '$data.baseurl$path', target: target)!
+			load_from_url(url: '${data.baseurl}${path}', target: target)!
 			if data.extract {
 				$if debug ? {
-					println('Extracting $target')
+					println('Extracting ${target}')
 				}
 				if data.tar {
-					result := os.execute('tar -xvzf $target -C $dataset_dir')
+					result := os.execute('tar -xvzf ${target} -C ${dataset_dir}')
 					if result.exit_code != 0 {
 						$if debug ? {
-							println('Error extracting $target')
-							println('Exit code: $result.exit_code')
-							println('Output: $result.output')
+							println('Error extracting ${target}')
+							println('Exit code: ${result.exit_code}')
+							println('Output: ${result.output}')
 						}
-						return error_with_code('Error extracting $target', result.exit_code)
+						return error_with_code('Error extracting ${target}', result.exit_code)
 					}
 				} else {
 					szip.extract_zip_to_dir(target, dataset_dir)!

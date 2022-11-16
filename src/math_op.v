@@ -4,7 +4,7 @@ fn handle_add<T>(a T, b T) ?T {
 	$if T is bool {
 		return td<T>(a).bool() || td<T>(b).bool()
 	} $else $if T is string {
-		return '$a.str()$b.str()'
+		return '${a.str()}${b.str()}'
 	} $else {
 		return a + b
 	}
