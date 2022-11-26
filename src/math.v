@@ -120,7 +120,7 @@ fn handle_atan2[T](xs []T, _ []int) T {
 [inline]
 pub fn (a &Tensor[T]) atan2[T](b &Tensor[T]) ?&Tensor[T] {
 	// @todo: Implement using a.nmap
-	// return a.nmap<T>(handle_atan2, b)
+	// return a.nmap[T](handle_atan2, b)
 	mut iters, shape := a.iterators[T]([b])?
 	mut ret := tensor_like_with_shape[T](a, shape)
 	for {
@@ -465,7 +465,7 @@ fn handle_fmod[T](xs []T, _ []int) T {
 [inline]
 pub fn (a &Tensor[T]) fmod[T](b &Tensor[T]) ?&Tensor[T] {
 	// @todo: Implement using a.nmap
-	// return a.nmap<T>(handle_fmod, b)
+	// return a.nmap[T](handle_fmod, b)
 	mut iters, shape := a.iterators[T]([b])?
 	mut ret := tensor_like_with_shape[T](a, shape)
 	for {
@@ -504,7 +504,7 @@ fn handle_gcd[T](xs []T, _ []int) T {
 [inline]
 pub fn (a &Tensor[T]) gcd[T](b &Tensor[T]) ?&Tensor[T] {
 	// @todo: Implement using a.nmap
-	// return a.nmap<T>(handle_gcd, b)
+	// return a.nmap[T](handle_gcd, b)
 	mut iters, shape := a.iterators[T]([b])?
 	mut ret := tensor_like_with_shape[T](a, shape)
 	for {
@@ -525,7 +525,7 @@ fn handle_hypot[T](xs []T, _ []int) T {
 [inline]
 pub fn (a &Tensor[T]) hypot[T](b &Tensor[T]) ?&Tensor[T] {
 	// @todo: Implement using a.nmap
-	// return a.nmap<T>(handle_hypot, b)
+	// return a.nmap[T](handle_hypot, b)
 	mut iters, shape := a.iterators[T]([b])?
 	mut ret := tensor_like_with_shape[T](a, shape)
 	for {
@@ -546,7 +546,7 @@ fn handle_lcm[T](xs []T, _ []int) T {
 [inline]
 pub fn (a &Tensor[T]) lcm[T](b &Tensor[T]) ?&Tensor[T] {
 	// @todo: Implement using a.nmap
-	// return a.nmap<T>(handle_lcm, b)
+	// return a.nmap[T](handle_lcm, b)
 	mut iters, shape := a.iterators[T]([b])?
 	mut ret := tensor_like_with_shape[T](a, shape)
 	for {
@@ -675,7 +675,7 @@ fn handle_log_n[T](xs []T, _ []int) T {
 [inline]
 pub fn (a &Tensor[T]) log_n[T](b &Tensor[T]) ?&Tensor[T] {
 	// @todo: Implement using a.nmap
-	// return a.nmap<T>(handle_log_n, b)
+	// return a.nmap[T](handle_log_n, b)
 	mut iters, shape := a.iterators[T]([b])?
 	mut ret := tensor_like_with_shape[T](a, shape)
 	for {
@@ -696,7 +696,7 @@ fn handle_max[T](xs []T, _ []int) T {
 [inline]
 pub fn (a &Tensor[T]) max[T](b &Tensor[T]) ?&Tensor[T] {
 	// @todo: Implement using a.nmap
-	// return a.nmap<T>(handle_max, b)
+	// return a.nmap[T](handle_max, b)
 	mut iters, shape := a.iterators[T]([b])?
 	mut ret := tensor_like_with_shape[T](a, shape)
 	for {
@@ -717,7 +717,7 @@ fn handle_min[T](xs []T, _ []int) T {
 [inline]
 pub fn (a &Tensor[T]) min[T](b &Tensor[T]) ?&Tensor[T] {
 	// @todo: Implement using a.nmap
-	// return a.nmap<T>(handle_min, b)
+	// return a.nmap[T](handle_min, b)
 	mut iters, shape := a.iterators[T]([b])?
 	mut ret := tensor_like_with_shape[T](a, shape)
 	for {
@@ -738,7 +738,7 @@ fn handle_nextafter[T](xs []T, _ []int) T {
 [inline]
 pub fn (a &Tensor[T]) nextafter[T](b &Tensor[T]) ?&Tensor[T] {
 	// @todo: Implement using a.nmap
-	// return a.nmap<T>(handle_nextafter, b)
+	// return a.nmap[T](handle_nextafter, b)
 	mut iters, shape := a.iterators[T]([b])?
 	mut ret := tensor_like_with_shape[T](a, shape)
 	for {
@@ -759,7 +759,7 @@ fn handle_nextafter32[T](xs []T, _ []int) T {
 [inline]
 pub fn (a &Tensor[T]) nextafter32[T](b &Tensor[T]) ?&Tensor[T] {
 	// @todo: Implement using a.nmap
-	// return a.nmap<T>(handle_nextafter32, b)
+	// return a.nmap[T](handle_nextafter32, b)
 	mut iters, shape := a.iterators[T]([b])?
 	mut ret := tensor_like_with_shape[T](a, shape)
 	for {
@@ -780,7 +780,7 @@ fn handle_pow[T](xs []T, _ []int) T {
 [inline]
 pub fn (a &Tensor[T]) pow[T](b &Tensor[T]) ?&Tensor[T] {
 	// @todo: Implement using a.nmap
-	// return a.nmap<T>(handle_pow, b)
+	// return a.nmap[T](handle_pow, b)
 	mut iters, shape := a.iterators[T]([b])?
 	mut ret := tensor_like_with_shape[T](a, shape)
 	for {

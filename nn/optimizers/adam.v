@@ -40,8 +40,8 @@ pub fn (mut o AdamOptimizer[T]) build_params(layers []types.Layer) {
 	// for layer in layers {
 	// for v in layer.variables() {
 	// 	o.params << v
-	// 	o.first_moments << vtl.zeros_like<T>(v.grad)
-	// 	o.second_moments << vtl.zeros_like<T>(v.grad)
+	// 	o.first_moments << vtl.zeros_like[T](v.grad)
+	// 	o.second_moments << vtl.zeros_like[T](v.grad)
 	// }
 	//}
 }

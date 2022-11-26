@@ -22,7 +22,7 @@ fn test_cpu_with_default() {
 // 			device.release() or { panic(err) }
 // 		}
 
-// 		s := storage<f64>(2, 0, 1.0).vcl(device: device) or { panic(err) }
+// 		s := storage[f64](2, 0, 1.0).vcl(device: device) or { panic(err) }
 // 		array := s.to_array() or { panic(err) }
 // 		assert array.len == 2
 // 		assert array[0] == 1.0
