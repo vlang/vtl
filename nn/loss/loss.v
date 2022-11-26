@@ -4,15 +4,15 @@ import vtl
 import vtl.autograd
 import vtl.nn.types
 
-pub fn loss_loss<T>(loss types.Loss, input &autograd.Variable<T>, target &vtl.Tensor<T>) ?&autograd.Variable<T> {
+pub fn loss_loss[T](loss types.Loss, input &autograd.Variable[T], target &vtl.Tensor[T]) ?&autograd.Variable[T] {
 	match loss {
-		MSELoss<T> {
+		MSELoss[T] {
 			return loss.loss(input, target)
 		}
-		SigmoidCrossEntropyLoss<T> {
+		SigmoidCrossEntropyLoss[T] {
 			return loss.loss(input, target)
 		}
-		SoftmaxCrossEntropyLoss<T> {
+		SoftmaxCrossEntropyLoss[T] {
 			return loss.loss(input, target)
 		}
 		else {

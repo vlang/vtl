@@ -2,12 +2,12 @@ module optimizers
 
 import vtl.nn.types
 
-pub fn optimize<T>(mut optim types.Optimizer) ? {
+pub fn optimize[T](mut optim types.Optimizer) ? {
 	match mut optim {
-		SgdOptimizer<T> {
+		SgdOptimizer[T] {
 			return optim.update()
 		}
-		AdamOptimizer<T> {
+		AdamOptimizer[T] {
 			return optim.update()
 		}
 		else {

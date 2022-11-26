@@ -18,6 +18,6 @@ mut:
 
 // @todo: Use generic type for DatasetBatch
 pub interface DatasetBatch {
-	labels &vtl.Tensor<int>
-	features &vtl.Tensor<string>
+	labels &vtl.Tensor[int]
+	features &vtl.Tensor[string]
 }

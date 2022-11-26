@@ -23,8 +23,8 @@ pub:
 // ImdbBatch is a batch of ImdbDataset.
 pub struct ImdbBatch {
 pub:
-	features &vtl.Tensor<string>
-	labels   &vtl.Tensor<int>
+	features &vtl.Tensor[string]
+	labels   &vtl.Tensor[int]
 }
 
 [params]

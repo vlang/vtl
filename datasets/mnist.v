@@ -27,8 +27,8 @@ mut:
 // MnistBatch is a batch of MNIST handwritten digits.
 pub struct MnistBatch {
 pub:
-	features &vtl.Tensor<u8>
-	labels   &vtl.Tensor<u8>
+	features &vtl.Tensor[u8]
+	labels   &vtl.Tensor[u8]
 }
 
 [params]
@@ -86,7 +86,7 @@ pub fn (mut ds MnistDataset) next() ?MnistBatch {
 	}
 
 	mut lt := vtl.from_1d(labels)?
-	mut lft := vtl.zeros<u8>([10])
+	mut lft := vtl.zeros[u8]([10])
 
 	mut iter := lt.iterator()
 	for {

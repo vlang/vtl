@@ -7,36 +7,36 @@ import rand.seed
 import time
 
 // bernoulli returns a tensor of bernoulli random variables.
-pub fn bernoulli<T>(prob f64, shape []int, params TensorData) &Tensor<T> {
-	mut t := zeros<T>(shape, params)
+pub fn bernoulli[T](prob f64, shape []int, params TensorData) &Tensor[T] {
+	mut t := zeros[T](shape, params)
 	mut iter := t.iterator()
 	for {
 		_, i := iter.next() or { break }
-		rand_value := cast<T>(rand.bernoulli(prob)?)
+		rand_value := cast[T](rand.bernoulli(prob)?)
 		t.set(i, rand_value)
 	}
 	return t
 }
 
 // binomial returns a tensor of binomial random variables.
-pub fn binomial<T>(n int, prob f64, shape []int, params TensorData) ?&Tensor<T> {
-	mut t := zeros<T>(shape, params)
+pub fn binomial[T](n int, prob f64, shape []int, params TensorData) ?&Tensor[T] {
+	mut t := zeros[T](shape, params)
 	mut iter := t.iterator()
 	for {
 		_, i := iter.next() or { break }
-		rand_value := cast<T>(rand.binomial(n, prob) or { return err })
+		rand_value := cast[T](rand.binomial(n, prob) or { return err })
 		t.set(i, rand_value)
 	}
 	return t
 }
 
 // exponential returns a tensor of exponential random variables.
-pub fn exponential<T>(lambda f64, shape []int, params TensorData) &Tensor<T> {
-	mut t := zeros<T>(shape, params)
+pub fn exponential[T](lambda f64, shape []int, params TensorData) &Tensor[T] {
+	mut t := zeros[T](shape, params)
 	mut iter := t.iterator()
 	for {
 		_, i := iter.next() or { break }
-		rand_value := cast<T>(rand.exponential(lambda))
+		rand_value := cast[T](rand.exponential(lambda))
 		t.set(i, rand_value)
 	}
 	return t
@@ -50,12 +50,12 @@ pub struct NormalTensorData {
 }
 
 // normal returns a tensor of normal random variables.
-pub fn normal<T>(shape []int, params NormalTensorData) &Tensor<T> {
-	mut t := zeros<T>(shape, memory: params.memory)
+pub fn normal[T](shape []int, params NormalTensorData) &Tensor[T] {
+	mut t := zeros[T](shape, memory: params.memory)
 	mut iter := t.iterator()
 	for {
 		_, i := iter.next() or { break }
-		rand_value := cast<T>(rand.normal(mu: params.mu, sigma: params.sigma) or { math.nan() })
+		rand_value := cast[T](rand.normal(mu: params.mu, sigma: params.sigma) or { math.nan() })
 		t.set(i, rand_value)
 	}
 	return t
@@ -63,12 +63,12 @@ pub fn normal<T>(shape []int, params NormalTensorData) &Tensor<T> {
 
 // random returns a new Tensor of given shape and type, initialized
 // with random numbers between a given min and max value
-pub fn random<T>(min T, max T, shape []int, params TensorData) &Tensor<T> {
-	mut t := zeros<T>(shape, params)
+pub fn random[T](min T, max T, shape []int, params TensorData) &Tensor[T] {
+	mut t := zeros[T](shape, params)
 	mut iter := t.iterator()
 	for {
 		_, i := iter.next() or { break }
-		rand_value := random_in_range<T>(min, max)
+		rand_value := random_in_range[T](min, max)
 		t.set(i, rand_value)
 	}
 	return t
@@ -83,7 +83,7 @@ fn init() {
 	rand.seed([unix_time, 0])
 }
 
-fn random_in_range<T>(min T, max T) T {
+fn random_in_range[T](min T, max T) T {
 	$if T is u16 {
 		return u16(rand.int_in_range(int(min), int(max)) or { u16(min) })
 	}
