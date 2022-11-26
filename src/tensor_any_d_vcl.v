@@ -1,11 +1,11 @@
 module vtl
 
 // AnyTensor is an interface that allows for any tensor to be used in the vtl library
-pub interface AnyTensor<T> {
+pub interface AnyTensor[T] {
 	shape []int
 	strides []int
-	cpu() &Tensor<T>
-	vcl() ?&VclTensor<T>
+	cpu() &Tensor[T]
+	vcl() ?&VclTensor[T]
 	str() string
 	rank() int
 	size() int

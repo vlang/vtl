@@ -13,19 +13,19 @@ const (
 )
 
 // Autograd context / neuralnet graph
-ctx := autograd.ctx<f64>()
+ctx := autograd.ctx[f64]()
 
 // We create a neural network
-mut model := models.sequential_from_ctx<f64>(ctx)
+mut model := models.sequential_from_ctx[f64](ctx)
 model.input([1, 28, 28])
 model.mse_loss()
 
 mut train_ds := datasets.load_mnist(.train, batch_size: batch_size)!
 
-mut losses := []&vtl.Tensor<f64>{cap: epochs}
+mut losses := []&vtl.Tensor[f64]{cap: epochs}
 
 // Stochastic Gradient Descent
-mut optimizer := optimizers.sgd<f64>(learning_rate: 0.01)
+mut optimizer := optimizers.sgd[f64](learning_rate: 0.01)
 
 for epoch in 0 .. epochs {
 	mut batch_id := 0

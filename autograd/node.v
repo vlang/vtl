@@ -4,23 +4,23 @@ module autograd
 // a reference to a gate, as well as the parents of the operation
 // and the payload that resulted from the operation.
 [heap]
-pub struct Node<T> {
+pub struct Node[T] {
 pub:
 	// A Gate containing a backwards and cache function for
 	// a node
 	gate Gate
 pub mut:
 	// The variables that created this node
-	parents []&Variable<T>
+	parents []&Variable[T]
 	// Wrapper around a Tensor, contains operation data
-	payload &Payload<T>
+	payload &Payload[T]
 	// Debug use only, contains a name for a node
 	name string
 }
 
 // node
-pub fn node<T>(gate Gate, parents []&Variable<T>, payload &Payload<T>, name string) &Node<T> {
-	return &Node<T>{
+pub fn node[T](gate Gate, parents []&Variable[T], payload &Payload[T], name string) &Node[T] {
+	return &Node[T]{
 		gate: gate
 		parents: parents
 		payload: payload

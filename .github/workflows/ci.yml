@@ -1,8 +1,8 @@
 name: VTL Continuous Integration
 
 concurrency:
-  group: ci-${{ github.event.number }}
-  cancel-in-progress: true
+   group: ci-${{ github.event.number }}
+   cancel-in-progress: true
 
 on:
   # Allows you to run this workflow manually from the Actions tab
@@ -20,6 +20,15 @@ on:
       - main
 
 jobs:
+  shellcheck:
+    name: Shellcheck
+    uses: ./.github/workflows/shellcheck.yml
+
+  todo:
+    if: github.event_name == 'push'
+    name: TODO
+    uses: ./.github/workflows/todo.yml
+
   validate-docs:
     runs-on: ubuntu-latest
     steps:
