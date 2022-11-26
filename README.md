@@ -75,8 +75,7 @@ $ v test .
 ## Contributors
 
 > This work was originally based on the work done by
-> Christopher ([christopherzimmerman](https://github.com/christopherzimmerman))
-> and the rest of the VLang-Num group. 
+> Christopher ([christopherzimmerman](https://github.com/christopherzimmerman)).
 
 > The development of this library continues its course after having reimplemented its core
 > and a large part of its interface. In the same way, we do not want to stop recognizing
