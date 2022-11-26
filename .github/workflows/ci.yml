@@ -13,11 +13,11 @@ on:
 
   push:
     branches:
-      - master
+      - main
 
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   shellcheck:
@@ -28,6 +28,7 @@ jobs:
     if: github.event_name == 'push'
     name: TODO
     uses: ./.github/workflows/todo.yml
+
   validate-docs:
     runs-on: ubuntu-latest
     steps:
