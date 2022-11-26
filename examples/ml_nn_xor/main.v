@@ -14,7 +14,7 @@ const (
 // Learning XOR function with a neural network.
 
 // Autograd context / neuralnet graph
-ctx := autograd.ctx<f64>()
+ctx := autograd.ctx[f64]()
 
 // We will create a tensor of size 3200 (100 batches of size 32)
 // We create it as int between [0, 2[ and convert to bool
@@ -31,7 +31,7 @@ y := y_bool.as_f64()
 
 // We create a neural network with 2 inputs, 2 hidden layers of 4 neurons each and 1 output
 // We use the sigmoid activation function
-mut model := models.sequential_from_ctx<f64>(ctx)
+mut model := models.sequential_from_ctx[f64](ctx)
 model.input([2])
 model.linear(3)
 model.relu()
@@ -39,9 +39,9 @@ model.linear(1)
 model.sigmoid_cross_entropy_loss()
 
 // Stochastic Gradient Descent
-mut optimizer := optimizers.sgd<f64>(learning_rate: 0.7)
+mut optimizer := optimizers.sgd[f64](learning_rate: 0.7)
 
-mut losses := []&vtl.Tensor<f64>{cap: epochs * batches}
+mut losses := []&vtl.Tensor[f64]{cap: epochs * batches}
 
 // Learning loop
 for epoch in 0 .. epochs {

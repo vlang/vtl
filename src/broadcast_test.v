@@ -14,8 +14,8 @@ fn test_broadcastable_same_shape() ? {
 }
 
 fn test_broadcastable_different_shape1() ? {
-	a := zeros<f64>([8, 1, 6, 1])
-	b := zeros<f64>([7, 1, 5])
+	a := zeros[f64]([8, 1, 6, 1])
+	b := zeros[f64]([7, 1, 5])
 	shape := a.broadcastable(b)?
 	assert shape == [8, 7, 6, 5]
 }

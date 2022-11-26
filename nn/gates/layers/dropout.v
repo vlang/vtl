@@ -3,33 +3,33 @@ module layers
 import vtl
 import vtl.autograd
 
-pub struct DropoutGate<T> {
+pub struct DropoutGate[T] {
 pub:
 	prob f64
-	mask &vtl.Tensor<T>
+	mask &vtl.Tensor[T]
 }
 
-pub fn dropout_gate<T>(mask &vtl.Tensor<T>, prob f64) &DropoutGate<T> {
-	return &DropoutGate<T>{
+pub fn dropout_gate[T](mask &vtl.Tensor[T], prob f64) &DropoutGate[T] {
+	return &DropoutGate[T]{
 		mask: mask
 		prob: prob
 	}
 }
 
-pub fn (g &DropoutGate<T>) backward<T>(payload &autograd.Payload<T>) ?[]&vtl.Tensor<T> {
+pub fn (g &DropoutGate[T]) backward[T](payload &autograd.Payload[T]) ?[]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
-	return [gradient.multiply(g.mask)?.divide_scalar(vtl.cast<T>(g.prob))?]
+	return [gradient.multiply(g.mask)?.divide_scalar(vtl.cast[T](g.prob))?]
 }
 
-pub fn (g &DropoutGate<T>) cache<T>(mut result autograd.Variable<T>, args ...autograd.CacheParam) ? {
+pub fn (g &DropoutGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ? {
 	a := args[0]
 
 	match a {
-		autograd.Variable<T> {
-			result.grad = vtl.zeros_like<T>(result.value)
+		autograd.Variable[T] {
+			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
 
-			autograd.register<T>('Dropout', g, result, [a])?
+			autograd.register[T]('Dropout', g, result, [a])?
 		}
 		else {
 			return error('DropoutGate: cache: invalid argument')

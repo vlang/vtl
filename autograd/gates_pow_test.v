@@ -3,7 +3,7 @@ module autograd
 import vtl
 
 fn test_pow() ? {
-	f64_ctx := ctx<f64>()
+	f64_ctx := ctx[f64]()
 
 	x := f64_ctx.variable(vtl.from_1d([3.0])?)
 	y := f64_ctx.variable(vtl.from_1d([2.0])?)

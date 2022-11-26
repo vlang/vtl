@@ -76,12 +76,12 @@ booleans := vtl.tensor(false, [2, 3])
 println(booleans)
 // [[false, false, false], [false, false, false]]
 
-z := vtl.zeros<f64>([2, 3])
+z := vtl.zeros[f64]([2, 3])
 
 println(z)
 // [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
 
-o := vtl.ones<f64>([2, 3])
+o := vtl.ones[f64]([2, 3])
 
 println(o)
 // [[1.0, 1.0, 1.0], [1.0, 1.0, 1.0]]

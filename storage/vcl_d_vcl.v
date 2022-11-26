@@ -9,12 +9,12 @@ pub struct VclStorageParams {
 
 // VclStorage
 [heap]
-pub struct VclStorage<T> {
+pub struct VclStorage[T] {
 pub mut:
-	data vcl.Vector<T>
+	data vcl.Vector[T]
 }
 
-pub fn (cpu &CpuStorage<T>) vcl(params VclStorageParams) ?&VclStorage<T> {
+pub fn (cpu &CpuStorage[T]) vcl(params VclStorageParams) ?&VclStorage[T] {
 	mut device := params.device
 
 	if isnil(device) {
@@ -22,29 +22,29 @@ pub fn (cpu &CpuStorage<T>) vcl(params VclStorageParams) ?&VclStorage<T> {
 	}
 
 	arr := cpu.data.clone()
-	mut data := device.vector<T>(arr.len)?
+	mut data := device.vector[T](arr.len)?
 	err := <-data.load(arr)
 	if err !is none {
 		return err
 	}
-	return &VclStorage<T>{
+	return &VclStorage[T]{
 		data: data
 	}
 }
 
-pub fn (storage &VclStorage<T>) cpu() ?&CpuStorage<T> {
+pub fn (storage &VclStorage[T]) cpu() ?&CpuStorage[T] {
 	arr := storage.to_array()?
-	return &CpuStorage<T>{
+	return &CpuStorage[T]{
 		data: arr
 	}
 }
 
 [inline]
-pub fn (storage &VclStorage<T>) to_array<T>() ?[]T {
+pub fn (storage &VclStorage[T]) to_array[T]() ?[]T {
 	return storage.data.data()
 }
 
 [inline]
-pub fn (storage &VclStorage<T>) release() ? {
+pub fn (storage &VclStorage[T]) release() ? {
 	return storage.data.release()
 }

@@ -4,7 +4,7 @@ import math
 
 // broadcastable takes two Tensors and either returns a valid
 // broadcastable shape or an error
-pub fn (a &Tensor<T>) broadcastable<T>(b &Tensor<T>) ?[]int {
+pub fn (a &Tensor[T]) broadcastable[T](b &Tensor[T]) ?[]int {
 	a_size := a.rank()
 	b_size := b.rank()
 
@@ -72,14 +72,14 @@ fn broadcast_strides(dest_shape []int, src_shape []int, dest_strides []int, src_
 
 // broadcast_to broadcasts a Tensor to a compatible shape with no
 // data copy
-pub fn (t &Tensor<T>) broadcast_to<T>(shape []int) ?&Tensor<T> {
+pub fn (t &Tensor[T]) broadcast_to[T](shape []int) ?&Tensor[T] {
 	if t.shape == shape {
 		return t
 	}
 	size := size_from_shape(shape)
 	strides := strides_from_shape(shape, .row_major)
 	result_strides := broadcast_strides(shape, t.shape, strides, t.strides)?
-	return &Tensor<T>{
+	return &Tensor[T]{
 		data: t.data
 		shape: shape
 		size: size
@@ -121,7 +121,7 @@ fn broadcast_shapes(args ...[]int) []int {
 
 // broadcast2 broadcasts two Tensors against each other
 [inline]
-pub fn broadcast2<T>(a &Tensor<T>, b &Tensor<T>) ?(&Tensor<T>, &Tensor<T>) {
+pub fn broadcast2[T](a &Tensor[T], b &Tensor[T]) ?(&Tensor[T], &Tensor[T]) {
 	shape := a.broadcastable(b)?
 	r1 := a.broadcast_to(shape)?
 	r2 := b.broadcast_to(shape)?
@@ -130,7 +130,7 @@ pub fn broadcast2<T>(a &Tensor<T>, b &Tensor<T>) ?(&Tensor<T>, &Tensor<T>) {
 
 // broadcast3 broadcasts three Tensors against each other
 [inline]
-pub fn broadcast3<T>(a &Tensor<T>, b &Tensor<T>, c &Tensor<T>) ?(&Tensor<T>, &Tensor<T>, &Tensor<T>) {
+pub fn broadcast3[T](a &Tensor[T], b &Tensor[T], c &Tensor[T]) ?(&Tensor[T], &Tensor[T], &Tensor[T]) {
 	shape := broadcast_shapes(a.shape, b.shape, c.shape)
 	r1 := a.broadcast_to(shape)?
 	r2 := b.broadcast_to(shape)?
@@ -140,10 +140,10 @@ pub fn broadcast3<T>(a &Tensor<T>, b &Tensor<T>, c &Tensor<T>) ?(&Tensor<T>, &Te
 
 // broadcast_n broadcasts N Tensors against each other
 [inline]
-pub fn broadcast_n<T>(ts []&Tensor<T>) ?[]&Tensor<T> {
+pub fn broadcast_n[T](ts []&Tensor[T]) ?[]&Tensor[T] {
 	shapes := ts.map(it.shape)
 	shape := broadcast_shapes(...shapes)
-	mut result := []&Tensor<T>{cap: ts.len}
+	mut result := []&Tensor[T]{cap: ts.len}
 	for t in ts {
 		result << t.broadcast_to(shape)?
 	}

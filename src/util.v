@@ -4,7 +4,7 @@ import arrays
 
 // assert_square_matrix panics if the given tensor is not a square matrix
 [inline]
-fn (t &Tensor<T>) assert_square_matrix<T>() ? {
+fn (t &Tensor[T]) assert_square_matrix[T]() ? {
 	if t.is_square_matrix() {
 		return error('Matrix is not square')
 	}
@@ -12,7 +12,7 @@ fn (t &Tensor<T>) assert_square_matrix<T>() ? {
 
 // assert_square_matrix panics if the given tensor is not a matrix
 [inline]
-fn (t &Tensor<T>) assert_matrix<T>() ? {
+fn (t &Tensor[T]) assert_matrix[T]() ? {
 	if t.is_matrix() {
 		return error('Tensor is not two-dimensional')
 	}
@@ -29,7 +29,7 @@ fn irange(start int, stop int) []int {
 
 // assert_rank ensures that a Tensor has a given rank
 [inline]
-fn (t &Tensor<T>) assert_rank<T>(n int) ? {
+fn (t &Tensor[T]) assert_rank[T](n int) ? {
 	if n != t.rank() {
 		return error('Bad number of dimensions')
 	}
@@ -37,7 +37,7 @@ fn (t &Tensor<T>) assert_rank<T>(n int) ? {
 
 // assert_min_rank ensures that a Tensor has at least a given rank
 [inline]
-fn (t &Tensor<T>) assert_min_rank<T>(n int) ? {
+fn (t &Tensor[T]) assert_min_rank[T](n int) ? {
 	if n > t.rank() {
 		return error('Bad number of dimensions')
 	}
@@ -45,7 +45,7 @@ fn (t &Tensor<T>) assert_min_rank<T>(n int) ? {
 
 // ensure_memory sets a correct memory layout to a given tensor
 [inline]
-pub fn (mut t Tensor<T>) ensure_memory<T>() {
+pub fn (mut t Tensor[T]) ensure_memory[T]() {
 	if t.is_col_major() {
 		if !t.is_col_major_contiguous() {
 			t.memory = .row_major
@@ -60,7 +60,7 @@ pub fn (mut t Tensor<T>) ensure_memory<T>() {
 
 // assert_shape_off_axis ensures that the shapes of Tensors match
 // for concatenation, except along the axis being joined
-fn assert_shape_off_axis<T>(ts []&Tensor<T>, axis int, shape []int) ?[]int {
+fn assert_shape_off_axis[T](ts []&Tensor[T], axis int, shape []int) ?[]int {
 	mut retshape := shape.clone()
 	for t in ts {
 		if t.shape.len != retshape.len {
@@ -81,7 +81,7 @@ fn assert_shape_off_axis<T>(ts []&Tensor<T>, axis int, shape []int) ?[]int {
 // assert_shape ensures that the shapes of Tensors match
 // for each tensor given list of tensors
 [inline]
-fn assert_shape<T>(shape []int, ts []&Tensor<T>) ? {
+fn assert_shape[T](shape []int, ts []&Tensor[T]) ? {
 	for t in ts {
 		if shape != t.shape {
 			return error('All shapes must be equal')
@@ -247,7 +247,7 @@ fn pad_with_max(pad []int, shape []int, ndims int) []int {
 // the use of arrays.min give us an optimizad version of this function
 [inline]
 fn iarray_min(arr []int) int {
-	return arrays.min<int>(arr) or { 0 }
+	return arrays.min[int](arr) or { 0 }
 }
 
 // iarray_sum returns the sum value of a given array of int values

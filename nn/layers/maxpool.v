@@ -8,15 +8,15 @@ import vtl.nn.gates.layers
 import vtl.nn.types
 
 // MaxPool2DLayer is a layer that implements the maxpooling operation.
-pub struct MaxPool2DLayer<T> {
+pub struct MaxPool2DLayer[T] {
 	input_shape []int
 	kernel      []int
 	padding     []int
 	stride      []int
 }
 
-pub fn maxpool2d_layer<T>(ctx &autograd.Context<T>, input_shape []int, kernel []int, padding []int, stride []int) types.Layer {
-	return types.Layer(&MaxPool2DLayer<T>{
+pub fn maxpool2d_layer[T](ctx &autograd.Context[T], input_shape []int, kernel []int, padding []int, stride []int) types.Layer {
+	return types.Layer(&MaxPool2DLayer[T]{
 		input_shape: input_shape.clone()
 		kernel: kernel.clone()
 		padding: padding.clone()
@@ -24,7 +24,7 @@ pub fn maxpool2d_layer<T>(ctx &autograd.Context<T>, input_shape []int, kernel []
 	})
 }
 
-pub fn (layer &MaxPool2DLayer<T>) output_shape() []int {
+pub fn (layer &MaxPool2DLayer[T]) output_shape() []int {
 	c := layer.input_shape[0]
 	h := layer.input_shape[1]
 	w := layer.input_shape[2]
@@ -38,17 +38,17 @@ pub fn (layer &MaxPool2DLayer<T>) output_shape() []int {
 	return [c, (h - kh + 2 * ph) / sh + 1, (w - kw + 2 * pw) / sw + 1]
 }
 
-pub fn (layer &MaxPool2DLayer<T>) variables() []&autograd.Variable<T> {
-	return []&autograd.Variable<T>{}
+pub fn (layer &MaxPool2DLayer[T]) variables() []&autograd.Variable[T] {
+	return []&autograd.Variable[T]{}
 }
 
-pub fn (layer &MaxPool2DLayer<T>) forward(mut input autograd.Variable<T>) ?&autograd.Variable<T> {
-	max_indices, output := internal.maxpool2d<T>(input.value, layer.kernel, layer.padding,
+pub fn (layer &MaxPool2DLayer[T]) forward(mut input autograd.Variable[T]) ?&autograd.Variable[T] {
+	max_indices, output := internal.maxpool2d[T](input.value, layer.kernel, layer.padding,
 		layer.stride)
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {
-		gate := layers.maxpool2d_gate<T>(max_indices, layer.kernel, input.value.shape,
+		gate := layers.maxpool2d_gate[T](max_indices, layer.kernel, input.value.shape,
 			layer.padding, layer.stride)
 		gate.cache(mut result, input, layer.kernel, layer.padding, layer.stride)?
 	}

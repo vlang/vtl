@@ -12,33 +12,33 @@ pub struct DropoutLayerConfig {
 }
 
 // DropoutLayer is a dropout layer.
-pub struct DropoutLayer<T> {
+pub struct DropoutLayer[T] {
 	output_shape []int
 	prob         f64
 }
 
-pub fn dropout_layer<T>(ctx &autograd.Context<T>, output_shape []int, data DropoutLayerConfig) types.Layer {
-	return types.Layer(&DropoutLayer<T>{
+pub fn dropout_layer[T](ctx &autograd.Context[T], output_shape []int, data DropoutLayerConfig) types.Layer {
+	return types.Layer(&DropoutLayer[T]{
 		output_shape: output_shape.clone()
 		prob: 1.0 - data.prob
 	})
 }
 
-pub fn (layer &DropoutLayer<T>) output_shape() []int {
+pub fn (layer &DropoutLayer[T]) output_shape() []int {
 	return layer.output_shape
 }
 
-pub fn (_ &DropoutLayer<T>) variables() []&autograd.Variable<T> {
-	return []&autograd.Variable<T>{}
+pub fn (_ &DropoutLayer[T]) variables() []&autograd.Variable[T] {
+	return []&autograd.Variable[T]{}
 }
 
-pub fn (layer &DropoutLayer<T>) forward(mut input autograd.Variable<T>) ?&autograd.Variable<T> {
-	mask := vtl.binomial<T>(1, layer.prob, input.value.shape)?
-	output := internal.dropout<T>(input.value, mask, layer.prob)?
+pub fn (layer &DropoutLayer[T]) forward(mut input autograd.Variable[T]) ?&autograd.Variable[T] {
+	mask := vtl.binomial[T](1, layer.prob, input.value.shape)?
+	output := internal.dropout[T](input.value, mask, layer.prob)?
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {
-		gate := layers.dropout_gate<T>(mask, layer.prob)
+		gate := layers.dropout_gate[T](mask, layer.prob)
 		gate.cache(mut result, input)?
 	}
 	return result

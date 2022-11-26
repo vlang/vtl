@@ -37,7 +37,7 @@ fn test_t() ? {
 }
 
 fn test_ones_t() ? {
-	t := ones<f64>([2, 3])
+	t := ones[f64]([2, 3])
 	tt := t.t()?
 	assert t.shape == [2, 3]
 	assert tt.shape == [3, 2]
@@ -45,7 +45,7 @@ fn test_ones_t() ? {
 }
 
 fn test_transpose() ? {
-	t := ones<f64>([2, 3])
+	t := ones[f64]([2, 3])
 	order := irange(0, t.rank())
 	tt := t.transpose(order.reverse())?
 	assert t.shape == [2, 3]

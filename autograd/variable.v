@@ -10,20 +10,20 @@ import vtl
 // differentiation, as well as the neural network aspects
 // of VTL
 [heap]
-pub struct Variable<T> {
+pub struct Variable[T] {
 pub mut:
 	// The value of the Variable.  This should not be edited outside
 	// of Variable operations, as other edits will not be tracked
 	// and will lead to incorrect results
-	value &vtl.Tensor<T>
+	value &vtl.Tensor[T]
 	// The graph the variable is associated with.  This is a reference,
 	// as a variable does not own its context
-	context &Context<T>
+	context &Context[T]
 	// The gradient of the Variable.  This is set as a reference to
 	// the value of a Variable unless `backprop` has been called, in
 	// which case all related Variables will have their gradient
 	// updated correctly
-	grad &vtl.Tensor<T>
+	grad &vtl.Tensor[T]
 	// If set to true, this variable will track its operations,
 	// otherwise it will act similar to a vtl.Tensor, only calculating
 	// forward operations
@@ -36,9 +36,9 @@ pub struct VariableData {
 }
 
 // variable
-pub fn variable<T>(context &Context<T>, value &vtl.Tensor<T>, data VariableData) &Variable<T> {
-	grad := if data.requires_grad { vtl.zeros_like<T>(value) } else { value }
-	return &Variable<T>{
+pub fn variable[T](context &Context[T], value &vtl.Tensor[T], data VariableData) &Variable[T] {
+	grad := if data.requires_grad { vtl.zeros_like[T](value) } else { value }
+	return &Variable[T]{
 		context: context
 		value: value
 		grad: grad
@@ -46,21 +46,21 @@ pub fn variable<T>(context &Context<T>, value &vtl.Tensor<T>, data VariableData)
 	}
 }
 
-pub fn (v &Variable<T>) slice<T>(idx ...[]int) ?&Variable<T> {
+pub fn (v &Variable[T]) slice[T](idx ...[]int) ?&Variable[T] {
 	value := v.value.slice(...idx)?
-	return variable<T>(v.context, value, requires_grad: v.requires_grad)
+	return variable[T](v.context, value, requires_grad: v.requires_grad)
 }
 
-pub fn (v &Variable<T>) slice_hilo<T>(idx1 []int, idx2 []int) ?&Variable<T> {
+pub fn (v &Variable[T]) slice_hilo[T](idx1 []int, idx2 []int) ?&Variable[T] {
 	value := v.value.slice_hilo(idx1, idx2)?
-	return variable<T>(v.context, value, requires_grad: v.requires_grad)
+	return variable[T](v.context, value, requires_grad: v.requires_grad)
 }
 
-pub fn (v &Variable<T>) is_grad_needed() bool {
+pub fn (v &Variable[T]) is_grad_needed() bool {
 	return v.requires_grad && !v.context.no_grad
 }
 
-pub fn (v &Variable<T>) str() string {
+pub fn (v &Variable[T]) str() string {
 	return v.value.str()
 }
 
@@ -71,8 +71,8 @@ pub fn (v &Variable<T>) str() string {
 // Even if this is called on the first node in a graph, it will
 // destroy all descendents of this variable stored by the
 // Context
-pub fn (mut v Variable<T>) backprop<T>() ? {
-	v.grad = vtl.ones_like<T>(v.value)
+pub fn (mut v Variable[T]) backprop[T]() ? {
+	v.grad = vtl.ones_like[T](v.value)
 	for v.context.len() > 0 && v.context.last().payload.variable != v {
 		node := v.context.pop()
 		$if debug {
@@ -84,11 +84,11 @@ pub fn (mut v Variable<T>) backprop<T>() ? {
 		$if debug {
 			print(cur_node.name)
 		}
-		diffs := gate_backward<T>(cur_node.gate, cur_node.payload)?
+		diffs := gate_backward[T](cur_node.gate, cur_node.payload)?
 		for i, diff in diffs {
 			mut parent_i := cur_node.parents[i]
 			if parent_i.requires_grad {
-				parent_i.grad = parent_i.grad.add<T>(diff)?
+				parent_i.grad = parent_i.grad.add[T](diff)?
 			}
 		}
 	}

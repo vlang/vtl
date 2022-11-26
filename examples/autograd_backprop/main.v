@@ -3,7 +3,7 @@ module main
 import vtl
 import vtl.autograd
 
-ctx := autograd.ctx<f64>()
+ctx := autograd.ctx[f64]()
 
 x := ctx.variable(vtl.from_1d([3.0])?)
 y := ctx.variable(vtl.from_1d([2.0])?)

@@ -2,22 +2,22 @@ module vtl
 
 // get returns a scalar value from a Tensor at the provided index
 [inline]
-pub fn (t &Tensor<T>) get<T>(index []int) T {
+pub fn (t &Tensor[T]) get[T](index []int) T {
 	offset := t.offset_index(index)
-	return t.data.get<T>(offset)
+	return t.data.get[T](offset)
 }
 
 // get_nth returns a scalar value from a Tensor at the provided index
 [inline]
-pub fn (t &Tensor<T>) get_nth<T>(n int) T {
+pub fn (t &Tensor[T]) get_nth[T](n int) T {
 	index := t.nth_index(n)
-	return t.get<T>(index)
+	return t.get[T](index)
 }
 
 // offset_index returns the index to a Tensor's data at
 // a given index
 [inline]
-pub fn (t &Tensor<T>) offset_index<T>(index []int) int {
+pub fn (t &Tensor[T]) offset_index[T](index []int) int {
 	mut offset := 0
 	for i in 0 .. t.rank() {
 		mut j := index[i]
@@ -41,7 +41,7 @@ pub fn (t &Tensor<T>) offset_index<T>(index []int) int {
 // for `n == 2` and a `shape` of `[2, 2]` the _nth index_ is `[1, 0]`
 // and for a `shape` of `[2, 3]` and `n == 3` the _nth index_ is `[0, 1, 1]`
 // in sorted order.
-pub fn (t &Tensor<T>) nth_index<T>(n int) []int {
+pub fn (t &Tensor[T]) nth_index[T](n int) []int {
 	rank := t.rank()
 	mut index := []int{len: rank}
 	for i in 0 .. rank {
@@ -67,7 +67,7 @@ pub fn (t &Tensor<T>) nth_index<T>(n int) []int {
 
 // strided_offset_index returns the index of the starting offset
 // for arrays that may be negatively strided
-pub fn (t &Tensor<T>) strided_offset_index<T>() int {
+pub fn (t &Tensor[T]) strided_offset_index[T]() int {
 	mut offset := 0
 	for i in 0 .. t.rank() {
 		if t.strides[i] < 0 {

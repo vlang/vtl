@@ -2,7 +2,7 @@ module la
 
 import vtl
 
-fn correct_axes<T>(a &vtl.Tensor<T>, b &vtl.Tensor<T>, axes_a_ []int, axes_b_ []int) ?([]int, []int) {
+fn correct_axes[T](a &vtl.Tensor[T], b &vtl.Tensor[T], axes_a_ []int, axes_b_ []int) ?([]int, []int) {
 	mut equal := true
 	mut axes_a := axes_a_.clone()
 	mut axes_b := axes_b_.clone()
@@ -32,7 +32,7 @@ fn correct_axes<T>(a &vtl.Tensor<T>, b &vtl.Tensor<T>, axes_a_ []int, axes_b_ []
 	return axes_a_, axes_b_
 }
 
-fn tensordot_output_data<T>(a &vtl.Tensor<T>, b &vtl.Tensor<T>, a_axes_ []int, b_axes_ []int) ([]int, []int, []int, []int, []int) {
+fn tensordot_output_data[T](a &vtl.Tensor[T], b &vtl.Tensor[T], a_axes_ []int, b_axes_ []int) ([]int, []int, []int, []int, []int) {
 	a_shape := a.shape
 	a_rank := a.rank()
 	b_shape := b.shape
@@ -66,7 +66,7 @@ fn tensordot_output_data<T>(a &vtl.Tensor<T>, b &vtl.Tensor<T>, a_axes_ []int, b
 	return outshape, a_newshape, b_newshape, a_newaxes, b_newaxes
 }
 
-pub fn tensordot<T>(a &vtl.Tensor<T>, b &vtl.Tensor<T>, a_axes []int, b_axes []int) &vtl.Tensor<T> {
+pub fn tensordot[T](a &vtl.Tensor[T], b &vtl.Tensor[T], a_axes []int, b_axes []int) &vtl.Tensor[T] {
 	outshape, a_newshape, b_newshape, a_newaxes, b_newaxes := tensordot_output_data(a,
 		b, a_axes, b_axes)
 	at := a.transpose(a_newaxes).reshape(a_newshape)

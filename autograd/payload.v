@@ -4,14 +4,14 @@ module autograd
 // is only abstracted out to be a bit more explicit that
 // it is being passed around through an operation
 [heap]
-pub struct Payload<T> {
+pub struct Payload[T] {
 pub:
 	// Contents of the paylod
-	variable &Variable<T>
+	variable &Variable[T]
 }
 
-pub fn payload<T>(variable &Variable<T>) &Payload<T> {
-	return &Payload<T>{
+pub fn payload[T](variable &Variable[T]) &Payload[T] {
+	return &Payload[T]{
 		variable: variable
 	}
 }
