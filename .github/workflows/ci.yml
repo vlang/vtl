@@ -48,7 +48,17 @@ jobs:
       - name: Install VSL and dependencies
         run: |
           v install vsl
-          sudo apt-get install --quiet -y --no-install-recommends gfortran liblapacke-dev libopenblas-dev libgc-dev
+          sudo apt-get install --quiet -y --no-install-recommends \
+            gfortran \
+            libxi-dev \
+            libxcursor-dev \
+            mesa-common-dev \
+            liblapacke-dev \
+            libopenblas-dev \
+            libgc-dev \
+            libgl1-mesa-dev \
+            libopenmpi-dev \
+            opencl-headers
 
       - name: Copy VTL source code to V Modules
         run: cp -rf ./vtl ~/.vmodules
@@ -78,7 +88,17 @@ jobs:
       - name: Install VSL and dependencies
         run: |
           v install vsl
-          sudo apt-get install --quiet -y --no-install-recommends gfortran liblapacke-dev libopenblas-dev libgc-dev
+          sudo apt-get install --quiet -y --no-install-recommends \
+            gfortran \
+            libxi-dev \
+            libxcursor-dev \
+            mesa-common-dev \
+            liblapacke-dev \
+            libopenblas-dev \
+            libgc-dev \
+            libgl1-mesa-dev \
+            libopenmpi-dev \
+            opencl-headers
 
       - name: Move VTL source code to V Modules
         run: mv ./vtl ~/.vmodules
@@ -115,7 +135,17 @@ jobs:
       - name: Install VSL and dependencies
         run: |
           v install vsl
-          sudo apt-get install --quiet -y --no-install-recommends gfortran liblapacke-dev libopenblas-dev libgc-dev
+          sudo apt-get install --quiet -y --no-install-recommends \
+            gfortran \
+            libxi-dev \
+            libxcursor-dev \
+            mesa-common-dev \
+            liblapacke-dev \
+            libopenblas-dev \
+            libgc-dev \
+            libgl1-mesa-dev \
+            libopenmpi-dev \
+            opencl-headers
 
       - name: Move VTL source code to V Modules
         run: mv ./vtl ~/.vmodules
