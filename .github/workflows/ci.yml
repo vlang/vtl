@@ -58,6 +58,7 @@ jobs:
             libgc-dev \
             libgl1-mesa-dev \
             libopenmpi-dev \
+            libhdf5-dev \
             opencl-headers
 
       - name: Copy VTL source code to V Modules
@@ -98,6 +99,7 @@ jobs:
             libgc-dev \
             libgl1-mesa-dev \
             libopenmpi-dev \
+            libhdf5-dev \
             opencl-headers
 
       - name: Move VTL source code to V Modules
@@ -145,6 +147,7 @@ jobs:
             libgc-dev \
             libgl1-mesa-dev \
             libopenmpi-dev \
+            libhdf5-dev \
             opencl-headers
 
       - name: Move VTL source code to V Modules
