@@ -2,7 +2,7 @@ import vtl
 import vsl.vcl
 
 // get all devices if you want
-devices := vcl.get_devices(vcl.device_cpu)?
+devices := vcl.get_devices(.cpu)?
 println('Devices: ${devices}')
 
 // do not create platforms/devices/contexts/queues/...
