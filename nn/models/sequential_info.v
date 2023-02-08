@@ -14,10 +14,10 @@ pub mut:
 
 // sequential_info creates a new neural network container
 // with an empty list of layers.
-pub fn sequential_info[T](ctx &autograd.Context[T], layers []types.Layer) &SequentialInfo[T] {
+pub fn sequential_info[T](ctx &autograd.Context[T], layers_ []types.Layer) &SequentialInfo[T] {
 	return &SequentialInfo[T]{
 		ctx: ctx
-		layers: layers
+		layers: layers_
 		loss: unsafe { nil }
 	}
 }
