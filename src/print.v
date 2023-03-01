@@ -26,6 +26,7 @@ fn leading_trailing[T](t &Tensor[T], edgeitems int, lo []int, hi []int) ?&Tensor
 		nhi << t.shape[axis]
 		return leading_trailing[T](t, edgeitems, nlo, nhi)
 	}
+	return none
 }
 
 // extends a line to contain new elements
