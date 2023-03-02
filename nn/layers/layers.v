@@ -38,7 +38,7 @@ pub fn layer_output_shape[T](layer types.Layer) []int {
 	}
 }
 
-pub fn layer_forward[T](layer types.Layer, mut input autograd.Variable[T]) ?&autograd.Variable[T] {
+pub fn layer_forward[T](layer types.Layer, mut input autograd.Variable[T]) !&autograd.Variable[T] {
 	match layer {
 		DropoutLayer[T] {
 			return layer.forward[T](mut input)

@@ -32,14 +32,14 @@ pub fn (_ &DropoutLayer[T]) variables() []&autograd.Variable[T] {
 	return []&autograd.Variable[T]{}
 }
 
-pub fn (layer &DropoutLayer[T]) forward(mut input autograd.Variable[T]) ?&autograd.Variable[T] {
-	mask := vtl.binomial[T](1, layer.prob, input.value.shape)?
-	output := internal.dropout[T](input.value, mask, layer.prob)?
+pub fn (layer &DropoutLayer[T]) forward(mut input autograd.Variable[T]) !&autograd.Variable[T] {
+	mask := vtl.binomial[T](1, layer.prob, input.value.shape)!
+	output := internal.dropout[T](input.value, mask, layer.prob)!
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {
 		gate := layers.dropout_gate[T](mask, layer.prob)
-		gate.cache(mut result, input)?
+		gate.cache(mut result, input)!
 	}
 	return result
 }

@@ -34,8 +34,8 @@ pub fn (t &Tensor[T]) reduce[T](init T, f fn (acc T, x T, i []int) T) T {
 }
 
 // napply applies a function to each element of a given Tensor with params
-pub fn (mut t Tensor[T]) napply[T](ts []&Tensor[T], f fn (xs []T, i []int) T) ? {
-	mut iters, _ := t.iterators[T](ts)?
+pub fn (mut t Tensor[T]) napply[T](ts []&Tensor[T], f fn (xs []T, i []int) T) ! {
+	mut iters, _ := t.iterators[T](ts)!
 	for {
 		vals, i := iters.next() or { break }
 		val := f(vals, i)
@@ -44,8 +44,8 @@ pub fn (mut t Tensor[T]) napply[T](ts []&Tensor[T], f fn (xs []T, i []int) T) ? 
 }
 
 // nmap maps a function to a given list of Tensor retuning a new Tensor with same shape
-pub fn (t &Tensor[T]) nmap[T](ts []&Tensor[T], f fn (xs []T, i []int) T) ?&Tensor[T] {
-	mut iters, shape := t.iterators[T](ts)?
+pub fn (t &Tensor[T]) nmap[T](ts []&Tensor[T], f fn (xs []T, i []int) T) !&Tensor[T] {
+	mut iters, shape := t.iterators[T](ts)!
 	mut ret := tensor_like_with_shape[T](t, shape)
 	for {
 		vals, i := iters.next() or { break }
@@ -56,9 +56,9 @@ pub fn (t &Tensor[T]) nmap[T](ts []&Tensor[T], f fn (xs []T, i []int) T) ?&Tenso
 }
 
 // nreduce reduces a function to a given list of Tensor retuning a new agregatted value
-pub fn (t &Tensor[T]) nreduce[T](ts []&Tensor[T], init T, f fn (acc T, xs []T, i []int) T) ?T {
+pub fn (t &Tensor[T]) nreduce[T](ts []&Tensor[T], init T, f fn (acc T, xs []T, i []int) T) !T {
 	mut ret := init
-	mut iters, _ := t.iterators[T](ts)?
+	mut iters, _ := t.iterators[T](ts)!
 	for {
 		vals, i := iters.next() or { break }
 		ret = f(ret, vals, i)
@@ -68,7 +68,7 @@ pub fn (t &Tensor[T]) nreduce[T](ts []&Tensor[T], init T, f fn (acc T, xs []T, i
 
 // with_dims returns a new Tensor adding dimensions so that it has
 // at least `n` dimensions
-pub fn (t &Tensor[T]) with_dims[T](n int) ?&Tensor[T] {
+pub fn (t &Tensor[T]) with_dims[T](n int) !&Tensor[T] {
 	if t.rank() >= n {
 		return t.view()
 	}
@@ -80,7 +80,7 @@ pub fn (t &Tensor[T]) with_dims[T](n int) ?&Tensor[T] {
 
 // with_broadcast expands a `Tensor`s dimensions n times by broadcasting
 // the shape and strides
-pub fn (t &Tensor[T]) with_broadcast[T](n int) ?&Tensor[T] {
+pub fn (t &Tensor[T]) with_broadcast[T](n int) !&Tensor[T] {
 	mut newshape := []int{}
 	newshape << t.shape
 	newshape << []int{len: n, init: 1}
@@ -110,14 +110,14 @@ pub fn (t &Tensor[T]) diagonal[T]() &Tensor[T] {
 // ravel returns a flattened view of an Tensor if possible,
 // otherwise a flattened copy
 [inline]
-pub fn (t &Tensor[T]) ravel[T]() ?&Tensor[T] {
+pub fn (t &Tensor[T]) ravel[T]() !&Tensor[T] {
 	return t.reshape([-1])
 }
 
 // reshape returns an Tensor with a new shape
-pub fn (t &Tensor[T]) reshape[T](shape []int) ?&Tensor[T] {
+pub fn (t &Tensor[T]) reshape[T](shape []int) !&Tensor[T] {
 	size := size_from_shape(t.shape)
-	newshape, _ := shape_with_autosize(shape, size)?
+	newshape, _ := shape_with_autosize(shape, size)!
 	mut ret := tensor_like_with_shape[T](t, newshape)
 	ret.data = t.data
 	ret.ensure_memory()
@@ -125,8 +125,8 @@ pub fn (t &Tensor[T]) reshape[T](shape []int) ?&Tensor[T] {
 }
 
 // as_strided returns a view of the Tensor with new shape and strides
-pub fn (t &Tensor[T]) as_strided[T](shape []int, strides []int) ?&Tensor[T] {
-	newshape, _ := shape_with_autosize(shape, t.size)?
+pub fn (t &Tensor[T]) as_strided[T](shape []int, strides []int) !&Tensor[T] {
+	newshape, _ := shape_with_autosize(shape, t.size)!
 	mut ret := tensor_like_with_shape_and_strides[T](t, newshape, strides)
 	ret.data = t.data
 	ret.ensure_memory()
@@ -135,10 +135,10 @@ pub fn (t &Tensor[T]) as_strided[T](shape []int, strides []int) ?&Tensor[T] {
 
 // transpose permutes the axes of an tensor in a specified
 // order and returns a view of the data
-pub fn (t &Tensor[T]) transpose[T](order []int) ?&Tensor[T] {
+pub fn (t &Tensor[T]) transpose[T](order []int) !&Tensor[T] {
 	mut ret := t.view()
 	n := order.len
-	t.assert_rank(n)?
+	t.assert_rank(n)!
 	mut permutation := []int{len: 32}
 	mut reverse_permutation := []int{len: 32, init: -1}
 	mut i := 0
@@ -169,14 +169,14 @@ pub fn (t &Tensor[T]) transpose[T](order []int) ?&Tensor[T] {
 
 // t returns a ful transpose of an tensor, with the axes
 // reversed
-pub fn (t &Tensor[T]) t[T]() ?&Tensor[T] {
+pub fn (t &Tensor[T]) t[T]() !&Tensor[T] {
 	order := irange(0, t.rank())
 	return t.transpose(order.reverse())
 }
 
 // swapaxes returns a view of an tensor with two axes
 // swapped.
-pub fn (t &Tensor[T]) swapaxes[T](a1 int, a2 int) ?&Tensor[T] {
+pub fn (t &Tensor[T]) swapaxes[T](a1 int, a2 int) !&Tensor[T] {
 	mut order := irange(0, t.rank())
 	tmp := order[a1]
 	order[a1] = order[a2]
@@ -189,7 +189,7 @@ fn fabs(x f64) f64 {
 }
 
 // slice returns a tensor from a variadic list of indexing operations
-pub fn (t &Tensor[T]) slice[T](idx ...[]int) ?&Tensor[T] {
+pub fn (t &Tensor[T]) slice[T](idx ...[]int) !&Tensor[T] {
 	mut newshape := t.shape.clone()
 	mut newstrides := t.strides.clone()
 	mut indexer := []int{}
@@ -250,7 +250,7 @@ pub fn (t &Tensor[T]) slice[T](idx ...[]int) ?&Tensor[T] {
 		}
 	}
 	// remove 0 shaped dimensions
-	newshape_, newstrides_ := filter_shape_not_strides(newshape, newstrides)?
+	newshape_, newstrides_ := filter_shape_not_strides(newshape, newstrides)!
 	mut offset := 0
 	for i in 0 .. indexer.len {
 		offset += t.strides[i] * indexer[i]
@@ -268,7 +268,7 @@ pub fn (t &Tensor[T]) slice[T](idx ...[]int) ?&Tensor[T] {
 
 // slice_hilo returns a view of an array from a list of starting
 // indices and a list of closing indices.
-pub fn (t &Tensor[T]) slice_hilo[T](idx1 []int, idx2 []int) ?&Tensor[T] {
+pub fn (t &Tensor[T]) slice_hilo[T](idx1 []int, idx2 []int) !&Tensor[T] {
 	mut newshape := t.shape.clone()
 	mut newstrides := t.strides.clone()
 	idx_start := pad_with_zeros(idx1, t.rank())
@@ -294,7 +294,7 @@ pub fn (t &Tensor[T]) slice_hilo[T](idx1 []int, idx2 []int) ?&Tensor[T] {
 		}
 	}
 	// remove 0 shaped dimensions
-	newshape_, newstrides_ := filter_shape_not_strides(newshape, newstrides)?
+	newshape_, newstrides_ := filter_shape_not_strides(newshape, newstrides)!
 	mut offset := 0
 	for i in 0 .. t.rank() {
 		offset += t.strides[i] * idx[i]

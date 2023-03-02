@@ -23,8 +23,8 @@ pub fn (mut t Tensor[T]) fill[T](val T) &Tensor[T] {
 
 // assign sets the values of an Tensor equal to the values of another
 // Tensor of the same shape
-pub fn (mut t Tensor[T]) assign[T](other &Tensor[T]) ?&Tensor[T] {
-	mut iters, _ := t.iterators[T]([other])?
+pub fn (mut t Tensor[T]) assign[T](other &Tensor[T]) !&Tensor[T] {
+	mut iters, _ := t.iterators[T]([other])!
 	for {
 		vals, i := iters.next() or { break }
 		t.set(i, vals[1])

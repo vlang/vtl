@@ -2,7 +2,7 @@ module vtl
 
 // diag constructs a diagonal array.
 // input must be one dimensional and will be placed along the resulting diagonal
-pub fn (t &Tensor[T]) diag[T]() ?&Tensor[T] {
+pub fn (t &Tensor[T]) diag[T]() !&Tensor[T] {
 	if t.rank() != 1 {
 		return error('Input array must be 1D. Use diag_flat for higher dimensional arrays')
 	}
@@ -12,9 +12,9 @@ pub fn (t &Tensor[T]) diag[T]() ?&Tensor[T] {
 
 // diag_flat constructs a diagonal array.
 // the flattened input is placed along the diagonal of the resulting matrix
-pub fn (t &Tensor[T]) diag_flat[T]() ?&Tensor[T] {
+pub fn (t &Tensor[T]) diag_flat[T]() !&Tensor[T] {
 	mut ret := zeros[T]([t.size, t.size]).diagonal()
-	return ret.assign(t.ravel()?)
+	return ret.assign(t.ravel()!)
 }
 
 // tril computes the lower triangle of an array.
