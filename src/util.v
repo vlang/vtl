@@ -4,7 +4,7 @@ import arrays
 
 // assert_square_matrix panics if the given tensor is not a square matrix
 [inline]
-fn (t &Tensor[T]) assert_square_matrix[T]() ? {
+fn (t &Tensor[T]) assert_square_matrix[T]() ! {
 	if t.is_square_matrix() {
 		return error('Matrix is not square')
 	}
@@ -12,7 +12,7 @@ fn (t &Tensor[T]) assert_square_matrix[T]() ? {
 
 // assert_square_matrix panics if the given tensor is not a matrix
 [inline]
-fn (t &Tensor[T]) assert_matrix[T]() ? {
+fn (t &Tensor[T]) assert_matrix[T]() ! {
 	if t.is_matrix() {
 		return error('Tensor is not two-dimensional')
 	}
@@ -29,7 +29,7 @@ fn irange(start int, stop int) []int {
 
 // assert_rank ensures that a Tensor has a given rank
 [inline]
-fn (t &Tensor[T]) assert_rank[T](n int) ? {
+fn (t &Tensor[T]) assert_rank[T](n int) ! {
 	if n != t.rank() {
 		return error('Bad number of dimensions')
 	}
@@ -37,7 +37,7 @@ fn (t &Tensor[T]) assert_rank[T](n int) ? {
 
 // assert_min_rank ensures that a Tensor has at least a given rank
 [inline]
-fn (t &Tensor[T]) assert_min_rank[T](n int) ? {
+fn (t &Tensor[T]) assert_min_rank[T](n int) ! {
 	if n > t.rank() {
 		return error('Bad number of dimensions')
 	}
@@ -60,7 +60,7 @@ pub fn (mut t Tensor[T]) ensure_memory[T]() {
 
 // assert_shape_off_axis ensures that the shapes of Tensors match
 // for concatenation, except along the axis being joined
-fn assert_shape_off_axis[T](ts []&Tensor[T], axis int, shape []int) ?[]int {
+fn assert_shape_off_axis[T](ts []&Tensor[T], axis int, shape []int) ![]int {
 	mut retshape := shape.clone()
 	for t in ts {
 		if t.shape.len != retshape.len {
@@ -81,7 +81,7 @@ fn assert_shape_off_axis[T](ts []&Tensor[T], axis int, shape []int) ?[]int {
 // assert_shape ensures that the shapes of Tensors match
 // for each tensor given list of tensors
 [inline]
-fn assert_shape[T](shape []int, ts []&Tensor[T]) ? {
+fn assert_shape[T](shape []int, ts []&Tensor[T]) ! {
 	for t in ts {
 		if shape != t.shape {
 			return error('All shapes must be equal')
@@ -138,7 +138,7 @@ fn is_row_major_contiguous(shape []int, strides []int, ndims int) bool {
 }
 
 // clip_axis is just a check for negative axes, so that negative axes can be inferred
-fn clip_axis(axis int, size int) ?int {
+fn clip_axis(axis int, size int) !int {
 	mut next_axis := axis
 	if next_axis < 0 {
 		next_axis += size
@@ -178,7 +178,7 @@ fn size_from_shape(shape []int) int {
 
 // shape_with_autosize returns a new shape and size with autosize
 // applied if needed
-fn shape_with_autosize(shape []int, size int) ?([]int, int) {
+fn shape_with_autosize(shape []int, size int) !([]int, int) {
 	mut newshape := shape.clone()
 	mut newsize := 1
 	mut autosize := -1
@@ -207,7 +207,7 @@ fn shape_with_autosize(shape []int, size int) ?([]int, int) {
 
 // filter_shape_not_strides removes 0 size dimensions from the shape
 // and strides of an array
-fn filter_shape_not_strides(shape []int, strides []int) ?([]int, []int) {
+fn filter_shape_not_strides(shape []int, strides []int) !([]int, []int) {
 	mut newshape := []int{}
 	mut newstrides := []int{}
 	for i := 0; i < shape.len; i++ {

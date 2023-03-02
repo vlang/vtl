@@ -62,7 +62,7 @@ mut:
 }
 
 // iterators creates an array of iterators through a list of tensors
-pub fn (t &Tensor[T]) iterators[T](ts []&Tensor[T]) ?(&TensorsIterator[T], []int) {
+pub fn (t &Tensor[T]) iterators[T](ts []&Tensor[T]) !(&TensorsIterator[T], []int) {
 	mut next_ts := [t]
 	for t_ in ts {
 		next_ts << t_
@@ -73,7 +73,7 @@ pub fn (t &Tensor[T]) iterators[T](ts []&Tensor[T]) ?(&TensorsIterator[T], []int
 		}
 		return its, t.shape
 	}
-	broadcasted_ts := broadcast_n[T](next_ts)?
+	broadcasted_ts := broadcast_n[T](next_ts)!
 	shape := broadcasted_ts[0].shape
 	mut iters := []&TensorIterator[T]{cap: broadcasted_ts.len}
 	for t_ in broadcasted_ts {
@@ -92,7 +92,7 @@ pub fn (mut its TensorsIterator[T]) next[T]() ?([]T, []int) {
 	mut nums := []T{cap: its.iters.len}
 	mut index := []int{}
 	for i, mut iter in its.iters {
-		val, index_ := iter.next() or { return err }
+		val, index_ := iter.next() or { return none }
 		if i == 0 {
 			index = index_.clone()
 		}

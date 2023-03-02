@@ -15,13 +15,13 @@ pub fn relu_gate[T](cache &vtl.Tensor[T]) &ReLUGate[T] {
 	}
 }
 
-pub fn (g &ReLUGate[T]) backward[T](payload &autograd.Payload[T]) ?[]&vtl.Tensor[T] {
+pub fn (g &ReLUGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
-	r0 := internal.deriv_relu[T](gradient, g.cache)?
+	r0 := internal.deriv_relu[T](gradient, g.cache)!
 	return [r0]
 }
 
-pub fn (g &ReLUGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ? {
+pub fn (g &ReLUGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
 
 	match a {
@@ -29,7 +29,7 @@ pub fn (g &ReLUGate[T]) cache[T](mut result autograd.Variable[T], args ...autogr
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
 
-			autograd.register[T]('Relu', g, result, [a])?
+			autograd.register[T]('Relu', g, result, [a])!
 		}
 		else {
 			return error('Relu: cache: invalid argument')

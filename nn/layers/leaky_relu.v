@@ -25,13 +25,13 @@ pub fn (_ &LeakyReluLayer[T]) variables() []&autograd.Variable[T] {
 	return []&autograd.Variable[T]{}
 }
 
-pub fn (layer &LeakyReluLayer[T]) forward(mut input autograd.Variable[T]) ?&autograd.Variable[T] {
+pub fn (layer &LeakyReluLayer[T]) forward(mut input autograd.Variable[T]) !&autograd.Variable[T] {
 	output := internal.leaky_relu[T](input.value, vtl.cast[T](0))
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {
 		gate := activation.leaky_relu_gate[T](input.value)
-		gate.cache(mut result, input)?
+		gate.cache(mut result, input)!
 	}
 	return result
 }

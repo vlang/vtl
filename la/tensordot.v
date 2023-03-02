@@ -2,7 +2,7 @@ module la
 
 import vtl
 
-fn correct_axes[T](a &vtl.Tensor[T], b &vtl.Tensor[T], axes_a_ []int, axes_b_ []int) ?([]int, []int) {
+fn correct_axes[T](a &vtl.Tensor[T], b &vtl.Tensor[T], axes_a_ []int, axes_b_ []int) !([]int, []int) {
 	mut equal := true
 	mut axes_a := axes_a_.clone()
 	mut axes_b := axes_b_.clone()

@@ -46,13 +46,13 @@ pub fn variable[T](context &Context[T], value &vtl.Tensor[T], data VariableData)
 	}
 }
 
-pub fn (v &Variable[T]) slice[T](idx ...[]int) ?&Variable[T] {
-	value := v.value.slice(...idx)?
+pub fn (v &Variable[T]) slice[T](idx ...[]int) !&Variable[T] {
+	value := v.value.slice(...idx)!
 	return variable[T](v.context, value, requires_grad: v.requires_grad)
 }
 
-pub fn (v &Variable[T]) slice_hilo[T](idx1 []int, idx2 []int) ?&Variable[T] {
-	value := v.value.slice_hilo(idx1, idx2)?
+pub fn (v &Variable[T]) slice_hilo[T](idx1 []int, idx2 []int) !&Variable[T] {
+	value := v.value.slice_hilo(idx1, idx2)!
 	return variable[T](v.context, value, requires_grad: v.requires_grad)
 }
 
@@ -71,7 +71,7 @@ pub fn (v &Variable[T]) str() string {
 // Even if this is called on the first node in a graph, it will
 // destroy all descendents of this variable stored by the
 // Context
-pub fn (mut v Variable[T]) backprop[T]() ? {
+pub fn (mut v Variable[T]) backprop[T]() ! {
 	v.grad = vtl.ones_like[T](v.value)
 	for v.context.len() > 0 && v.context.last().payload.variable != v {
 		node := v.context.pop()
@@ -84,11 +84,11 @@ pub fn (mut v Variable[T]) backprop[T]() ? {
 		$if debug {
 			print(cur_node.name)
 		}
-		diffs := gate_backward[T](cur_node.gate, cur_node.payload)?
+		diffs := gate_backward[T](cur_node.gate, cur_node.payload)!
 		for i, diff in diffs {
 			mut parent_i := cur_node.parents[i]
 			if parent_i.requires_grad {
-				parent_i.grad = parent_i.grad.add[T](diff)?
+				parent_i.grad = parent_i.grad.add[T](diff)!
 			}
 		}
 	}

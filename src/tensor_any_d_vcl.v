@@ -5,7 +5,7 @@ pub interface AnyTensor[T] {
 	shape []int
 	strides []int
 	cpu() &Tensor[T]
-	vcl() ?&VclTensor[T]
+	vcl() !&VclTensor[T]
 	str() string
 	rank() int
 	size() int

@@ -16,14 +16,14 @@ pub fn flatten_gate[T](input &autograd.Variable[T], cached_shape []int) &Flatten
 	}
 }
 
-pub fn (g &FlattenGate[T]) backward[T](payload &autograd.Payload[T]) ?[]&vtl.Tensor[T] {
+pub fn (g &FlattenGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	mut next_shape := [gradient.shape[0]]
 	next_shape << g.cached_shape
-	return [gradient.reshape(next_shape)?]
+	return [gradient.reshape(next_shape)!]
 }
 
-pub fn (g &FlattenGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ? {
+pub fn (g &FlattenGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
 
 	match a {
@@ -31,7 +31,7 @@ pub fn (g &FlattenGate[T]) cache[T](mut result autograd.Variable[T], args ...aut
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
 
-			autograd.register[T]('Flatten', g, result, [a])?
+			autograd.register[T]('Flatten', g, result, [a])!
 		}
 		else {
 			return error('FlattenGate: cache: invalid argument')

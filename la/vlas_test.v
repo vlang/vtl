@@ -2,11 +2,11 @@ module la
 
 import vtl
 
-fn test_matmul1() ? {
-	a := vtl.from_2d([[1.0, 0], [0.0, 1]])?
-	b := vtl.from_2d([[4.0, 1], [2.0, 2]])?
-	expected := vtl.from_2d([[4.0, 1], [2.0, 2]])?
-	result := matmul(a, b)?
+fn test_matmul1() {
+	a := vtl.from_2d([[1.0, 0], [0.0, 1]])!
+	b := vtl.from_2d([[4.0, 1], [2.0, 2]])!
+	expected := vtl.from_2d([[4.0, 1], [2.0, 2]])!
+	result := matmul(a, b)!
 	assert result.shape == [2, 2]
 	assert result.array_equal(expected)
 }

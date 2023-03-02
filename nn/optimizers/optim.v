@@ -2,7 +2,7 @@ module optimizers
 
 import vtl.nn.types
 
-pub fn optimize[T](mut optim types.Optimizer) ? {
+pub fn optimize[T](mut optim types.Optimizer) ! {
 	match mut optim {
 		SgdOptimizer[T] {
 			return optim.update()

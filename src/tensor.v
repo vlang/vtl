@@ -21,7 +21,7 @@ pub mut:
 
 // cpu returns a Tensor from a Tensor
 [inline]
-pub fn (t &Tensor[T]) cpu() ?&Tensor[T] {
+pub fn (t &Tensor[T]) cpu() !&Tensor[T] {
 	return t
 }
 

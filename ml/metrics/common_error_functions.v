@@ -5,19 +5,19 @@ import vtl
 import vtl.stats
 
 [inline]
-pub fn squared_error[T](y &vtl.Tensor[T], y_true &vtl.Tensor[T]) ?&vtl.Tensor[T] {
-	diff := y.subtract(y_true)?
+pub fn squared_error[T](y &vtl.Tensor[T], y_true &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	diff := y.subtract(y_true)!
 	return diff.multiply(diff)
 }
 
 [inline]
-pub fn mean_squared_error[T](y &vtl.Tensor[T], y_true &vtl.Tensor[T]) ?T {
-	return stats.mean[T](squared_error[T](y, y_true)?)
+pub fn mean_squared_error[T](y &vtl.Tensor[T], y_true &vtl.Tensor[T]) !T {
+	return stats.mean[T](squared_error[T](y, y_true)!)
 }
 
 [inline]
-pub fn relative_error[T](y &vtl.Tensor[T], y_true &vtl.Tensor[T]) ?&vtl.Tensor[T] {
-	mut iters, shape := y.iterators[T]([y_true])?
+pub fn relative_error[T](y &vtl.Tensor[T], y_true &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	mut iters, shape := y.iterators[T]([y_true])!
 	mut ret := vtl.tensor_like_with_shape[T](y, shape)
 	for {
 		vals, i := iters.next() or { break }
@@ -33,16 +33,16 @@ pub fn relative_error[T](y &vtl.Tensor[T], y_true &vtl.Tensor[T]) ?&vtl.Tensor[T
 }
 
 [inline]
-pub fn mean_relative_error[T](y &vtl.Tensor[T], y_true &vtl.Tensor[T]) ?T {
-	return stats.mean[T](relative_error[T](y, y_true)?)
+pub fn mean_relative_error[T](y &vtl.Tensor[T], y_true &vtl.Tensor[T]) !T {
+	return stats.mean[T](relative_error[T](y, y_true)!)
 }
 
 [inline]
-pub fn absolute_error[T](y &vtl.Tensor[T], y_true &vtl.Tensor[T]) ?&vtl.Tensor[T] {
-	return y_true.subtract(y)?.abs()
+pub fn absolute_error[T](y &vtl.Tensor[T], y_true &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	return y_true.subtract(y)!.abs()
 }
 
 [inline]
-pub fn mean_absolute_error[T](y &vtl.Tensor[T], y_true &vtl.Tensor[T]) ?T {
-	return stats.mean[T](absolute_error[T](y, y_true)?)
+pub fn mean_absolute_error[T](y &vtl.Tensor[T], y_true &vtl.Tensor[T]) !T {
+	return stats.mean[T](absolute_error[T](y, y_true)!)
 }

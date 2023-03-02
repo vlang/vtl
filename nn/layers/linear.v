@@ -30,13 +30,13 @@ pub fn (layer &LinearLayer[T]) variables() []&autograd.Variable[T] {
 	return [layer.weights, layer.bias]
 }
 
-pub fn (layer &LinearLayer[T]) forward(mut input autograd.Variable[T]) ?&autograd.Variable[T] {
-	mut output := la.matmul[T](input.value, layer.weights.value)?.add[T](layer.bias.value)?
+pub fn (layer &LinearLayer[T]) forward(mut input autograd.Variable[T]) !&autograd.Variable[T] {
+	mut output := la.matmul[T](input.value, layer.weights.value)!.add[T](layer.bias.value)!
 	mut result := input.context.variable(output)
 
 	if input.requires_grad || layer.weights.requires_grad || layer.bias.requires_grad {
 		gate := layers.linear_gate[T](input, layer.weights, layer.bias)
-		gate.cache(mut result, input, layer.weights, layer.bias)?
+		gate.cache(mut result, input, layer.weights, layer.bias)!
 	}
 
 	return result

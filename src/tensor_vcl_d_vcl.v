@@ -14,9 +14,9 @@ pub mut:
 }
 
 // vcl returns a VclTensor from a Tensor
-pub fn (t &Tensor[T]) vcl(params storage.VclStorageParams) ?&VclTensor[T] {
+pub fn (t &Tensor[T]) vcl(params storage.VclStorageParams) !&VclTensor[T] {
 	row_tensor := t.copy(.row_major)
-	cldata := row_tensor.data.vcl(params)?
+	cldata := row_tensor.data.vcl(params)!
 	return &VclTensor[T]{
 		data: cldata
 		memory: row_tensor.memory
@@ -27,8 +27,8 @@ pub fn (t &Tensor[T]) vcl(params storage.VclStorageParams) ?&VclTensor[T] {
 }
 
 // cpu returns a Tensor from a VclTensor
-pub fn (t &VclTensor[T]) cpu() ?&Tensor[T] {
-	data := t.data.cpu()?
+pub fn (t &VclTensor[T]) cpu() !&Tensor[T] {
+	data := t.data.cpu()!
 	return &Tensor[T]{
 		data: data
 		memory: t.memory
@@ -40,12 +40,12 @@ pub fn (t &VclTensor[T]) cpu() ?&Tensor[T] {
 
 // vcl returns a VclTensor from a VclTensor
 [inline]
-pub fn (t &VclTensor[T]) vcl() ?&VclTensor[T] {
+pub fn (t &VclTensor[T]) vcl() !&VclTensor[T] {
 	return t
 }
 
 // release releases the VclTensor's data
-pub fn (t &VclTensor[T]) release() ? {
+pub fn (t &VclTensor[T]) release() ! {
 	return t.data.release()
 }
 

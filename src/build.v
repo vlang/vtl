@@ -11,7 +11,7 @@ pub:
 // from_varray takes a one dimensional array of T values
 // and coerces it into an arbitrary shaped Tensor if possible.
 // Panics if the shape provided does not hold the provided array
-pub fn from_array[T](arr []T, shape []int, params TensorData) ?&Tensor[T] {
+pub fn from_array[T](arr []T, shape []int, params TensorData) !&Tensor[T] {
 	size := size_from_shape(shape)
 	if size != arr.len {
 		return error('Bad shape for array, shape [${arr.len}] cannot fit into shape ${shape}')
