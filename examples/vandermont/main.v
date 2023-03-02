@@ -55,7 +55,7 @@ println(slice3.shape) // [3, 5]
 
 t999 := vtl.tensor(999, [2, 2])
 
-slice1.assign(t999)?
+slice1.assign(t999)!
 
 println('assign: ')
 println(t)
