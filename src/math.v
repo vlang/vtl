@@ -118,10 +118,10 @@ fn handle_atan2[T](xs []T, _ []int) T {
 
 // atan2 returns the atan2 elementwise of two tensors
 [inline]
-pub fn (a &Tensor[T]) atan2[T](b &Tensor[T]) ?&Tensor[T] {
+pub fn (a &Tensor[T]) atan2[T](b &Tensor[T]) !&Tensor[T] {
 	// @todo: Implement using a.nmap
 	// return a.nmap[T](handle_atan2, b)
-	mut iters, shape := a.iterators[T]([b])?
+	mut iters, shape := a.iterators[T]([b])!
 	mut ret := tensor_like_with_shape[T](a, shape)
 	for {
 		vals, i := iters.next() or { break }
@@ -463,10 +463,10 @@ fn handle_fmod[T](xs []T, _ []int) T {
 
 // fmod returns the fmod elementwise of two tensors
 [inline]
-pub fn (a &Tensor[T]) fmod[T](b &Tensor[T]) ?&Tensor[T] {
+pub fn (a &Tensor[T]) fmod[T](b &Tensor[T]) !&Tensor[T] {
 	// @todo: Implement using a.nmap
 	// return a.nmap[T](handle_fmod, b)
-	mut iters, shape := a.iterators[T]([b])?
+	mut iters, shape := a.iterators[T]([b])!
 	mut ret := tensor_like_with_shape[T](a, shape)
 	for {
 		vals, i := iters.next() or { break }
@@ -502,10 +502,10 @@ fn handle_gcd[T](xs []T, _ []int) T {
 
 // gcd returns the gcd elementwise of two tensors
 [inline]
-pub fn (a &Tensor[T]) gcd[T](b &Tensor[T]) ?&Tensor[T] {
+pub fn (a &Tensor[T]) gcd[T](b &Tensor[T]) !&Tensor[T] {
 	// @todo: Implement using a.nmap
 	// return a.nmap[T](handle_gcd, b)
-	mut iters, shape := a.iterators[T]([b])?
+	mut iters, shape := a.iterators[T]([b])!
 	mut ret := tensor_like_with_shape[T](a, shape)
 	for {
 		vals, i := iters.next() or { break }
@@ -523,10 +523,10 @@ fn handle_hypot[T](xs []T, _ []int) T {
 
 // hypot returns the hypot elementwise of two tensors
 [inline]
-pub fn (a &Tensor[T]) hypot[T](b &Tensor[T]) ?&Tensor[T] {
+pub fn (a &Tensor[T]) hypot[T](b &Tensor[T]) !&Tensor[T] {
 	// @todo: Implement using a.nmap
 	// return a.nmap[T](handle_hypot, b)
-	mut iters, shape := a.iterators[T]([b])?
+	mut iters, shape := a.iterators[T]([b])!
 	mut ret := tensor_like_with_shape[T](a, shape)
 	for {
 		vals, i := iters.next() or { break }
