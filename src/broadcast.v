@@ -4,7 +4,7 @@ import math
 
 // broadcastable takes two Tensors and either returns a valid
 // broadcastable shape or an error
-pub fn (a &Tensor[T]) broadcastable[T](b &Tensor[T]) ?[]int {
+pub fn (a &Tensor[T]) broadcastable[T](b &Tensor[T]) ![]int {
 	a_size := a.rank()
 	b_size := b.rank()
 
@@ -53,7 +53,7 @@ fn broadcastable_shape(a []int, b []int) []int {
 
 // broadcast strides broadcasts the strides of an existing array to
 // allow it to be viewed as a compatible shape
-fn broadcast_strides(dest_shape []int, src_shape []int, dest_strides []int, src_strides []int) ?[]int {
+fn broadcast_strides(dest_shape []int, src_shape []int, dest_strides []int, src_strides []int) ![]int {
 	dims := dest_shape.len
 	start := dims - src_shape.len
 	mut result := []int{len: dims, init: 0}
@@ -72,13 +72,13 @@ fn broadcast_strides(dest_shape []int, src_shape []int, dest_strides []int, src_
 
 // broadcast_to broadcasts a Tensor to a compatible shape with no
 // data copy
-pub fn (t &Tensor[T]) broadcast_to[T](shape []int) ?&Tensor[T] {
+pub fn (t &Tensor[T]) broadcast_to[T](shape []int) !&Tensor[T] {
 	if t.shape == shape {
 		return t
 	}
 	size := size_from_shape(shape)
 	strides := strides_from_shape(shape, .row_major)
-	result_strides := broadcast_strides(shape, t.shape, strides, t.strides)?
+	result_strides := broadcast_strides(shape, t.shape, strides, t.strides)!
 	return &Tensor[T]{
 		data: t.data
 		shape: shape
@@ -140,12 +140,12 @@ pub fn broadcast3[T](a &Tensor[T], b &Tensor[T], c &Tensor[T]) ?(&Tensor[T], &Te
 
 // broadcast_n broadcasts N Tensors against each other
 [inline]
-pub fn broadcast_n[T](ts []&Tensor[T]) ?[]&Tensor[T] {
+pub fn broadcast_n[T](ts []&Tensor[T]) ![]&Tensor[T] {
 	shapes := ts.map(it.shape)
 	shape := broadcast_shapes(...shapes)
 	mut result := []&Tensor[T]{cap: ts.len}
 	for t in ts {
-		result << t.broadcast_to(shape)?
+		result << t.broadcast_to(shape)!
 	}
 	return result
 }

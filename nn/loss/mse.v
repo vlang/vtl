@@ -12,14 +12,14 @@ pub fn mse_loss[T]() &MSELoss[T] {
 	return &MSELoss[T]{}
 }
 
-pub fn (_ &MSELoss[T]) loss(input &autograd.Variable[T], target &vtl.Tensor[T]) ?&autograd.Variable[T] {
-	output := internal.mse[T](input.value, target)?
+pub fn (_ &MSELoss[T]) loss(input &autograd.Variable[T], target &vtl.Tensor[T]) !&autograd.Variable[T] {
+	output := internal.mse[T](input.value, target)!
 
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {
 		gate := loss.mse_gate[T](input, target)
-		gate.cache(mut result, input, target)?
+		gate.cache(mut result, input, target)!
 	}
 
 	return result

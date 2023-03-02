@@ -15,7 +15,7 @@ for i, x in xs {
 	}
 }
 
-mut t := vtl.from_2d(vandermont)?
+mut t := vtl.from_2d(vandermont)!
 
 println(t)
 // [[   1,    1,    1,    1,    1],
@@ -27,14 +27,14 @@ println(t)
 println(t.shape) // [5, 5]
 
 println('slice: ')
-mut slice1 := t.slice_hilo([1, 3], [3, 5])?
+mut slice1 := t.slice_hilo([1, 3], [3, 5])!
 
 println(slice1)
 // [[16, 32], [81, 243]]
 
 println(slice1.shape) // [2, 2]
 
-slice2 := t.slice_hilo([3], [])?
+slice2 := t.slice_hilo([3], [])!
 
 println('span slice: ')
 println(slice2)
@@ -43,7 +43,7 @@ println(slice2)
 
 println(slice2.shape) // [2, 5]
 
-slice3 := t.slice_hilo([], [-2])?
+slice3 := t.slice_hilo([], [-2])!
 
 println('slice until: ')
 println(slice3)

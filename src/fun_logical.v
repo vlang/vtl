@@ -108,9 +108,9 @@ fn handle_equal[T](vals []T, _ []int) bool {
 
 // equal compares two tensors elementwise
 [inline]
-pub fn (t &Tensor[T]) equal[T](other &Tensor[T]) ?&Tensor[bool] {
+pub fn (t &Tensor[T]) equal[T](other &Tensor[T]) !&Tensor[bool] {
 	// @todo: Implement using nmap
-	mut iters, shape := t.iterators[T]([other])?
+	mut iters, shape := t.iterators[T]([other])!
 	mut ret := empty[bool](shape)
 	for {
 		vals, i := iters.next() or { break }
@@ -122,9 +122,9 @@ pub fn (t &Tensor[T]) equal[T](other &Tensor[T]) ?&Tensor[bool] {
 
 // not_equal compares two tensors elementwise
 [inline]
-pub fn (t &Tensor[T]) not_equal[T](other &Tensor[T]) ?&Tensor[bool] {
+pub fn (t &Tensor[T]) not_equal[T](other &Tensor[T]) !&Tensor[bool] {
 	// @todo: Implement using nmap
-	mut iters, shape := t.iterators[T]([other])?
+	mut iters, shape := t.iterators[T]([other])!
 	mut ret := empty[bool](shape)
 	for {
 		vals, i := iters.next() or { break }
@@ -136,9 +136,9 @@ pub fn (t &Tensor[T]) not_equal[T](other &Tensor[T]) ?&Tensor[bool] {
 
 // tolerance compares two tensors elementwise with a given tolerance
 [inline]
-pub fn (t &Tensor[T]) tolerance[T](other &Tensor[T], tol T) ?&Tensor[bool] {
+pub fn (t &Tensor[T]) tolerance[T](other &Tensor[T], tol T) !&Tensor[bool] {
 	// @todo: Implement using nmap
-	mut iters, shape := t.iterators[T]([other])?
+	mut iters, shape := t.iterators[T]([other])!
 	mut ret := empty[bool](shape)
 	for {
 		vals, i := iters.next() or { break }
@@ -150,9 +150,9 @@ pub fn (t &Tensor[T]) tolerance[T](other &Tensor[T], tol T) ?&Tensor[bool] {
 
 // close compares two tensors elementwise
 [inline]
-pub fn (t &Tensor[T]) close[T](other &Tensor[T]) ?&Tensor[bool] {
+pub fn (t &Tensor[T]) close[T](other &Tensor[T]) !&Tensor[bool] {
 	// @todo: Implement using nmap
-	mut iters, shape := t.iterators[T]([other])?
+	mut iters, shape := t.iterators[T]([other])!
 	mut ret := empty[bool](shape)
 	for {
 		vals, i := iters.next() or { break }
@@ -164,9 +164,9 @@ pub fn (t &Tensor[T]) close[T](other &Tensor[T]) ?&Tensor[bool] {
 
 // veryclose compares two tensors elementwise
 [inline]
-pub fn (t &Tensor[T]) veryclose[T](other &Tensor[T]) ?&Tensor[bool] {
+pub fn (t &Tensor[T]) veryclose[T](other &Tensor[T]) !&Tensor[bool] {
 	// @todo: Implement using nmap
-	mut iters, shape := t.iterators[T]([other])?
+	mut iters, shape := t.iterators[T]([other])!
 	mut ret := empty[bool](shape)
 	for {
 		vals, i := iters.next() or { break }
@@ -178,9 +178,9 @@ pub fn (t &Tensor[T]) veryclose[T](other &Tensor[T]) ?&Tensor[bool] {
 
 // alike compares two tensors elementwise
 [inline]
-pub fn (t &Tensor[T]) alike[T](other &Tensor[T]) ?&Tensor[bool] {
+pub fn (t &Tensor[T]) alike[T](other &Tensor[T]) !&Tensor[bool] {
 	// @todo: Implement using nmap
-	mut iters, shape := t.iterators[T]([other])?
+	mut iters, shape := t.iterators[T]([other])!
 	mut ret := empty[bool](shape)
 	for {
 		vals, i := iters.next() or { break }

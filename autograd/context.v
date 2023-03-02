@@ -71,7 +71,7 @@ pub fn (ctx &Context[T]) str() string {
 	return str
 }
 
-pub fn register[T](name string, gate Gate, result &Variable[T], parents []&Variable[T]) ? {
+pub fn register[T](name string, gate Gate, result &Variable[T], parents []&Variable[T]) ! {
 	assert parents.len > 0
 	if parents.len == 0 {
 		return error(@FN + ': it is needed to specify at least one parent')

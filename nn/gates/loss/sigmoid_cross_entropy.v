@@ -17,12 +17,12 @@ pub fn sigmoid_cross_entropy_gate[T](cache &autograd.Variable[T], target &vtl.Te
 	}
 }
 
-pub fn (g &SigmoidCrossEntropyGate[T]) backward[T](payload &autograd.Payload[T]) ?[]&vtl.Tensor[T] {
+pub fn (g &SigmoidCrossEntropyGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	return internal.sigmoid_cross_entropy_backward[T](gradient, g.cache.value, g.target)
 }
 
-pub fn (g &SigmoidCrossEntropyGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ? {
+pub fn (g &SigmoidCrossEntropyGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
 	b := args[1]
 
@@ -33,7 +33,7 @@ pub fn (g &SigmoidCrossEntropyGate[T]) cache[T](mut result autograd.Variable[T],
 					result.grad = vtl.zeros_like[T](result.value)
 					result.requires_grad = true
 
-					autograd.register[T]('SigmoidCrossEntropy', g, result, [a, b])?
+					autograd.register[T]('SigmoidCrossEntropy', g, result, [a, b])!
 				}
 				else {
 					return error('SigmoidCrossEntropyGate: cache: invalid argument')

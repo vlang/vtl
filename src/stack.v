@@ -87,7 +87,7 @@ pub fn concatenate[T](ts []&Tensor[T], data AxisData) ?&Tensor[T] {
 
 // expand_dims adds an axis to a Tensor in order to support
 // broadcasting operations
-pub fn (t &Tensor[T]) expand_dims[T](data AxisData) ?&Tensor[T] {
+pub fn (t &Tensor[T]) expand_dims[T](data AxisData) !&Tensor[T] {
 	axis := data.axis
 	mut newshape := []int{}
 	newaxis := match axis < 0 {

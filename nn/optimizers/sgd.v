@@ -31,10 +31,10 @@ pub fn (mut o SgdOptimizer[T]) build_params(layers []types.Layer) {
 	//}
 }
 
-pub fn (mut o SgdOptimizer[T]) update() ? {
+pub fn (mut o SgdOptimizer[T]) update() ! {
 	for mut v in o.params {
 		if v.requires_grad {
-			internal.sgd_optimize[T](mut v.value, v.grad, o.learning_rate)?
+			internal.sgd_optimize[T](mut v.value, v.grad, o.learning_rate)!
 			v.grad = vtl.zeros_like[T](v.value)
 		}
 	}

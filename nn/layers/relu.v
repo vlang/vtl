@@ -25,13 +25,13 @@ pub fn (_ &ReLULayer[T]) variables() []&autograd.Variable[T] {
 	return []&autograd.Variable[T]{}
 }
 
-pub fn (layer &ReLULayer[T]) forward(mut input autograd.Variable[T]) ?&autograd.Variable[T] {
+pub fn (layer &ReLULayer[T]) forward(mut input autograd.Variable[T]) !&autograd.Variable[T] {
 	output := internal.relu[T](input.value)
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {
 		gate := activation.relu_gate[T](input.value)
-		gate.cache(mut result, input)?
+		gate.cache(mut result, input)!
 	}
 	return result
 }

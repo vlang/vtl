@@ -8,12 +8,12 @@ pub fn add_gate[T]() &AddGate[T] {
 	return &AddGate[T]{}
 }
 
-pub fn (g &AddGate[T]) backward[T](payload &Payload[T]) ?[]&vtl.Tensor[T] {
+pub fn (g &AddGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	return [gradient, gradient]
 }
 
-pub fn (g &AddGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ? {
+pub fn (g &AddGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	b := args[1]
 
@@ -24,7 +24,7 @@ pub fn (g &AddGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ? {
 					result.grad = vtl.zeros_like[T](result.value)
 					result.requires_grad = true
 
-					register[T]('Add', g, result, [a, b])?
+					register[T]('Add', g, result, [a, b])!
 				}
 				else {
 					return error('AddGate: b must be a Variable')
@@ -43,13 +43,13 @@ pub fn subtract_gate[T]() &SubstractGate[T] {
 	return &SubstractGate[T]{}
 }
 
-pub fn (g &SubstractGate[T]) backward[T](payload &Payload[T]) ?[]&vtl.Tensor[T] {
+pub fn (g &SubstractGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
-	oposite := gradient.multiply_scalar[T](vtl.cast[T](-1))?
+	oposite := gradient.multiply_scalar[T](vtl.cast[T](-1))!
 	return [gradient, oposite]
 }
 
-pub fn (g &SubstractGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ? {
+pub fn (g &SubstractGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	b := args[1]
 
@@ -60,7 +60,7 @@ pub fn (g &SubstractGate[T]) cache[T](mut result Variable[T], args ...CacheParam
 					result.grad = vtl.zeros_like[T](result.value)
 					result.requires_grad = true
 
-					register[T]('Sub', g, result, [a, b])?
+					register[T]('Sub', g, result, [a, b])!
 				}
 				else {
 					panic('SubGate: b must be a Variable')
@@ -86,14 +86,14 @@ pub fn multiply_gate[T](a &Variable[T], b &Variable[T]) &MultiplyGate[T] {
 	}
 }
 
-pub fn (g &MultiplyGate[T]) backward[T](payload &Payload[T]) ?[]&vtl.Tensor[T] {
+pub fn (g &MultiplyGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
-	r0 := gradient.multiply[T](g.b.value)?
-	r1 := gradient.multiply[T](g.a.value)?
+	r0 := gradient.multiply[T](g.b.value)!
+	r1 := gradient.multiply[T](g.a.value)!
 	return [r0, r1]
 }
 
-pub fn (g &MultiplyGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ? {
+pub fn (g &MultiplyGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	b := args[1]
 
@@ -104,7 +104,7 @@ pub fn (g &MultiplyGate[T]) cache[T](mut result Variable[T], args ...CacheParam)
 					result.grad = vtl.zeros_like[T](result.value)
 					result.requires_grad = true
 
-					register[T]('Multiply', g, result, [a, b])?
+					register[T]('Multiply', g, result, [a, b])!
 				}
 				else {
 					panic('MultiplyGate: b must be a Variable')
@@ -130,17 +130,17 @@ pub fn divide_gate[T](a &Variable[T], b &Variable[T]) &DivideGate[T] {
 	}
 }
 
-pub fn (g &DivideGate[T]) backward[T](payload &Payload[T]) ?[]&vtl.Tensor[T] {
+pub fn (g &DivideGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
-	r0 := gradient.divide[T](g.b.value)?
-	bx2 := g.b.value.multiply_scalar[T](vtl.cast[T](2))?
-	oposite := gradient.multiply_scalar[T](vtl.cast[T](-1))?
-	mut r1 := oposite.multiply[T](g.a.value)?
-	r1 = r1.divide[T](bx2)?
+	r0 := gradient.divide[T](g.b.value)!
+	bx2 := g.b.value.multiply_scalar[T](vtl.cast[T](2))!
+	oposite := gradient.multiply_scalar[T](vtl.cast[T](-1))!
+	mut r1 := oposite.multiply[T](g.a.value)!
+	r1 = r1.divide[T](bx2)!
 	return [r0, r1]
 }
 
-pub fn (g &DivideGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ? {
+pub fn (g &DivideGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	b := args[1]
 
@@ -151,7 +151,7 @@ pub fn (g &DivideGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ?
 					result.grad = vtl.zeros_like[T](result.value)
 					result.requires_grad = true
 
-					register[T]('Divide', g, result, [a, b])?
+					register[T]('Divide', g, result, [a, b])!
 				}
 				else {
 					panic('DivideGate: b must be a Variable')

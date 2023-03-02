@@ -20,26 +20,26 @@ pub fn linear_gate[T](input &autograd.Variable[T], weight &autograd.Variable[T],
 	}
 }
 
-pub fn (g &LinearGate[T]) backward[T](payload &autograd.Payload[T]) ?[]&vtl.Tensor[T] {
+pub fn (g &LinearGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	grad := payload.variable.grad
 	mut result := [grad, grad, grad]
 
 	if g.input.requires_grad {
-		result[0] = la.matmul[T](grad, g.weight.value)?
+		result[0] = la.matmul[T](grad, g.weight.value)!
 	}
 
 	if g.weight.requires_grad {
-		result[1] = la.matmul[T](grad.t()?, g.input.value)?
+		result[1] = la.matmul[T](grad.t()!, g.input.value)!
 	}
 
 	if g.bias.requires_grad {
-		result[2] = vtl.from_1d[T]([stats.sum_axis[T](grad, axis: 0)])?
+		result[2] = vtl.from_1d[T]([stats.sum_axis[T](grad, axis: 0)])!
 	}
 
 	return result
 }
 
-pub fn (g &LinearGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ? {
+pub fn (g &LinearGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	input := args[0]
 	weight := args[1]
 	bias := args[1]
@@ -53,7 +53,7 @@ pub fn (g &LinearGate[T]) cache[T](mut result autograd.Variable[T], args ...auto
 							result.grad = vtl.zeros_like[T](result.value)
 							result.requires_grad = true
 
-							autograd.register[T]('Linear', g, result, [input, weight, bias])?
+							autograd.register[T]('Linear', g, result, [input, weight, bias])!
 						}
 						else {
 							return error('LinearGate: bias must be a Variable')

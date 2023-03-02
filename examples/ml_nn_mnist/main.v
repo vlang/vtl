@@ -32,25 +32,25 @@ for epoch in 0 .. epochs {
 	for {
 		batch := train_ds.next() or { break }
 
-		xt := batch.features.divide_scalar(u8(255))?.reshape([-1, 1, 28, 28])?
+		xt := batch.features.divide_scalar(u8(255))!.reshape([-1, 1, 28, 28])!
 		mut x := ctx.variable(xt)
 		target := batch.labels
 
 		// Running input through the network
-		y_pred := model.forward(mut x)?
+		y_pred := model.forward(mut x)!
 
 		// Compute the loss
-		mut loss := model.loss(y_pred, target)?
+		mut loss := model.loss(y_pred, target)!
 
 		println('Epoch: ${epoch}, Batch id: ${batch_id}, Loss: ${loss.value}')
 
 		losses << loss.value
 
 		// Compute the gradient (i.e. contribution of each parameter to the loss)
-		loss.backprop()?
+		loss.backprop()!
 
 		// Correct the weights now that we have the gradient information
-		optimizer.update()?
+		optimizer.update()!
 
 		batch_id++
 	}
