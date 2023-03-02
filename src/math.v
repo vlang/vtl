@@ -544,10 +544,10 @@ fn handle_lcm[T](xs []T, _ []int) T {
 
 // lcm returns the lcm elementwise of two tensors
 [inline]
-pub fn (a &Tensor[T]) lcm[T](b &Tensor[T]) ?&Tensor[T] {
+pub fn (a &Tensor[T]) lcm[T](b &Tensor[T]) !&Tensor[T] {
 	// @todo: Implement using a.nmap
 	// return a.nmap[T](handle_lcm, b)
-	mut iters, shape := a.iterators[T]([b])?
+	mut iters, shape := a.iterators[T]([b])!
 	mut ret := tensor_like_with_shape[T](a, shape)
 	for {
 		vals, i := iters.next() or { break }
@@ -673,10 +673,10 @@ fn handle_log_n[T](xs []T, _ []int) T {
 
 // log_n returns the log_n elementwise of two tensors
 [inline]
-pub fn (a &Tensor[T]) log_n[T](b &Tensor[T]) ?&Tensor[T] {
+pub fn (a &Tensor[T]) log_n[T](b &Tensor[T]) !&Tensor[T] {
 	// @todo: Implement using a.nmap
 	// return a.nmap[T](handle_log_n, b)
-	mut iters, shape := a.iterators[T]([b])?
+	mut iters, shape := a.iterators[T]([b])!
 	mut ret := tensor_like_with_shape[T](a, shape)
 	for {
 		vals, i := iters.next() or { break }
@@ -694,10 +694,10 @@ fn handle_max[T](xs []T, _ []int) T {
 
 // max returns the max elementwise of two tensors
 [inline]
-pub fn (a &Tensor[T]) max[T](b &Tensor[T]) ?&Tensor[T] {
+pub fn (a &Tensor[T]) max[T](b &Tensor[T]) !&Tensor[T] {
 	// @todo: Implement using a.nmap
 	// return a.nmap[T](handle_max, b)
-	mut iters, shape := a.iterators[T]([b])?
+	mut iters, shape := a.iterators[T]([b])!
 	mut ret := tensor_like_with_shape[T](a, shape)
 	for {
 		vals, i := iters.next() or { break }
@@ -715,10 +715,10 @@ fn handle_min[T](xs []T, _ []int) T {
 
 // min returns the min elementwise of two tensors
 [inline]
-pub fn (a &Tensor[T]) min[T](b &Tensor[T]) ?&Tensor[T] {
+pub fn (a &Tensor[T]) min[T](b &Tensor[T]) !&Tensor[T] {
 	// @todo: Implement using a.nmap
 	// return a.nmap[T](handle_min, b)
-	mut iters, shape := a.iterators[T]([b])?
+	mut iters, shape := a.iterators[T]([b])!
 	mut ret := tensor_like_with_shape[T](a, shape)
 	for {
 		vals, i := iters.next() or { break }
@@ -736,10 +736,10 @@ fn handle_nextafter[T](xs []T, _ []int) T {
 
 // nextafter returns the nextafter elementwise of two tensors
 [inline]
-pub fn (a &Tensor[T]) nextafter[T](b &Tensor[T]) ?&Tensor[T] {
+pub fn (a &Tensor[T]) nextafter[T](b &Tensor[T]) !&Tensor[T] {
 	// @todo: Implement using a.nmap
 	// return a.nmap[T](handle_nextafter, b)
-	mut iters, shape := a.iterators[T]([b])?
+	mut iters, shape := a.iterators[T]([b])!
 	mut ret := tensor_like_with_shape[T](a, shape)
 	for {
 		vals, i := iters.next() or { break }
@@ -757,10 +757,10 @@ fn handle_nextafter32[T](xs []T, _ []int) T {
 
 // nextafter32 returns the nextafter32 elementwise of two tensors
 [inline]
-pub fn (a &Tensor[T]) nextafter32[T](b &Tensor[T]) ?&Tensor[T] {
+pub fn (a &Tensor[T]) nextafter32[T](b &Tensor[T]) !&Tensor[T] {
 	// @todo: Implement using a.nmap
 	// return a.nmap[T](handle_nextafter32, b)
-	mut iters, shape := a.iterators[T]([b])?
+	mut iters, shape := a.iterators[T]([b])!
 	mut ret := tensor_like_with_shape[T](a, shape)
 	for {
 		vals, i := iters.next() or { break }
@@ -778,10 +778,10 @@ fn handle_pow[T](xs []T, _ []int) T {
 
 // pow returns the pow elementwise of two tensors
 [inline]
-pub fn (a &Tensor[T]) pow[T](b &Tensor[T]) ?&Tensor[T] {
+pub fn (a &Tensor[T]) pow[T](b &Tensor[T]) !&Tensor[T] {
 	// @todo: Implement using a.nmap
 	// return a.nmap[T](handle_pow, b)
-	mut iters, shape := a.iterators[T]([b])?
+	mut iters, shape := a.iterators[T]([b])!
 	mut ret := tensor_like_with_shape[T](a, shape)
 	for {
 		vals, i := iters.next() or { break }

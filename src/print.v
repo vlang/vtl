@@ -152,7 +152,7 @@ fn tensor_str[T](t &Tensor[T], separator string, prefix string) !string {
 	mut data := unsafe { t }
 	if t.size > max_printable_size {
 		summary_insert = '...'
-		data = leading_trailing[T](t, 3, [], [])?
+		data = leading_trailing[T](t, 3, [], [])!
 	}
 	max_len := max_str_len[T](data)
 	mut next_line_prefix := ''
