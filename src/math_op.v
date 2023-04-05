@@ -14,7 +14,7 @@ fn handle_add[T](a T, b T) !T {
 // add adds two tensors elementwise
 [inline]
 pub fn (a &Tensor[T]) add[T](b &Tensor[T]) !&Tensor[T] {
-	// @todo: Implement using nmap
+	// TODO: Implement using nmap
 	mut iters, shape := a.iterators[T]([b])!
 	mut ret := tensor_like_with_shape[T](a, shape)
 	for {
@@ -28,7 +28,7 @@ pub fn (a &Tensor[T]) add[T](b &Tensor[T]) !&Tensor[T] {
 // add adds a scalar to a tensor elementwise
 [inline]
 pub fn (a &Tensor[T]) add_scalar[T](scalar T) !&Tensor[T] {
-	// @todo: Implement using map
+	// TODO: Implement using map
 	mut ret := tensor_like[T](a)
 	mut iter := a.iterator()
 	for {
@@ -53,7 +53,7 @@ fn handle_subtract[T](a T, b T) !T {
 // subtract subtracts two tensors elementwise
 [inline]
 pub fn (a &Tensor[T]) subtract[T](b &Tensor[T]) !&Tensor[T] {
-	// @todo: Implement using nmap
+	// TODO: Implement using nmap
 	mut iters, shape := a.iterators[T]([b])!
 	mut ret := tensor_like_with_shape[T](a, shape)
 	for {
@@ -67,7 +67,7 @@ pub fn (a &Tensor[T]) subtract[T](b &Tensor[T]) !&Tensor[T] {
 // subtract subtracts a scalar to a tensor elementwise
 [inline]
 pub fn (a &Tensor[T]) subtract_scalar[T](scalar T) !&Tensor[T] {
-	// @todo: Implement using map
+	// TODO: Implement using map
 	mut ret := tensor_like[T](a)
 	mut iter := a.iterator()
 	for {
@@ -90,7 +90,7 @@ fn handle_divide[T](a T, b T) !T {
 // divide divides two tensors elementwise
 [inline]
 pub fn (a &Tensor[T]) divide[T](b &Tensor[T]) !&Tensor[T] {
-	// @todo: Implement using nmap
+	// TODO: Implement using nmap
 	mut iters, shape := a.iterators[T]([b])!
 	mut ret := tensor_like_with_shape[T](a, shape)
 	for {
@@ -104,7 +104,7 @@ pub fn (a &Tensor[T]) divide[T](b &Tensor[T]) !&Tensor[T] {
 // divide divides a scalar to a tensor elementwise
 [inline]
 pub fn (a &Tensor[T]) divide_scalar[T](scalar T) !&Tensor[T] {
-	// @todo: Implement using map
+	// TODO: Implement using map
 	mut ret := tensor_like[T](a)
 	mut iter := a.iterator()
 	for {
@@ -127,7 +127,7 @@ fn handle_multiply[T](a T, b T) !T {
 // multiply multiplies two tensors elementwise
 [inline]
 pub fn (a &Tensor[T]) multiply[T](b &Tensor[T]) !&Tensor[T] {
-	// @todo: Implement using nmap
+	// TODO: Implement using nmap
 	mut iters, shape := a.iterators[T]([b])!
 	mut ret := tensor_like_with_shape[T](a, shape)
 	for {
@@ -141,7 +141,7 @@ pub fn (a &Tensor[T]) multiply[T](b &Tensor[T]) !&Tensor[T] {
 // multiply multiplies a scalar to a tensor elementwise
 [inline]
 pub fn (a &Tensor[T]) multiply_scalar[T](scalar T) !&Tensor[T] {
-	// @todo: Implement using map
+	// TODO: Implement using map
 	mut ret := tensor_like[T](a)
 	mut iter := a.iterator()
 	for {

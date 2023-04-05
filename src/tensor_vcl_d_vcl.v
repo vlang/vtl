@@ -87,7 +87,7 @@ pub fn (t &VclTensor[T]) is_vector() bool {
 // order
 [inline]
 pub fn (t &VclTensor[T]) is_row_major() bool {
-	// @todo: we need to ensure that t.memory is the source of truth
+	// TODO: we need to ensure that t.memory is the source of truth
 	return t.memory == .row_major
 }
 
@@ -95,7 +95,7 @@ pub fn (t &VclTensor[T]) is_row_major() bool {
 // order
 [inline]
 pub fn (t &VclTensor[T]) is_col_major() bool {
-	// @todo: we need to ensure that t.memory is the source of truth
+	// TODO: we need to ensure that t.memory is the source of truth
 	return t.memory == .col_major
 }
 

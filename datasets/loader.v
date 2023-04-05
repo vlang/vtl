@@ -69,7 +69,7 @@ fn download_dataset(data DatasetDownload) !map[string]string {
 			$if debug ? {
 				// we assume that the correct extraction process was done
 				// before
-				// @todo: check for extraction...
+				// TODO: check for extraction...
 				println('${filename} already exists')
 			}
 		} else {
