@@ -25,6 +25,6 @@ pub fn sigmoid_cross_entropy_backward[T](gradient &vtl.Tensor[T], cache &vtl.Ten
 pub fn softmax_cross_entropy_backward[T](gradient &vtl.Tensor[T], cache &vtl.Tensor[T], target &vtl.Tensor[T]) ![]&vtl.Tensor[T] {
 	// batch_size := cache.shape[0]
 	mut ret := vtl.tensor_like[T](cache)
-	// @todo: implement softmax_cross_entropy_backward
+	// TODO: implement softmax_cross_entropy_backward
 	return [ret]
 }

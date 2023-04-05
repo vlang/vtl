@@ -23,7 +23,7 @@ pub fn sgd[T](config SgdOptimizerConfig) &SgdOptimizer[T] {
 }
 
 pub fn (mut o SgdOptimizer[T]) build_params(layers []types.Layer) {
-	// @todo: @ulises-jeremias to uncomment this
+	// TODO: @ulises-jeremias to uncomment this
 	// for layer in layers {
 	// for v in layer.variables() {
 	// 	o.params << v

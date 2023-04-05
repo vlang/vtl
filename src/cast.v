@@ -3,7 +3,7 @@ module vtl
 // as_bool casts the Tensor to a Tensor of bools.
 [inline]
 pub fn (t &Tensor[T]) as_bool[T]() &Tensor[bool] {
-	// @todo: Implement using map
+	// TODO: Implement using map
 	mut iter := t.iterator[T]()
 	mut ret := empty[bool](t.shape)
 	for {
@@ -17,7 +17,7 @@ pub fn (t &Tensor[T]) as_bool[T]() &Tensor[bool] {
 // as_f64 casts the Tensor to a Tensor of f64s.
 [inline]
 pub fn (t &Tensor[T]) as_f64[T]() &Tensor[f64] {
-	// @todo: Implement using map
+	// TODO: Implement using map
 	mut iter := t.iterator[T]()
 	mut ret := empty[f64](t.shape)
 	for {
@@ -31,7 +31,7 @@ pub fn (t &Tensor[T]) as_f64[T]() &Tensor[f64] {
 // as_int casts the Tensor to a Tensor of ints.
 [inline]
 pub fn (t &Tensor[T]) as_int[T]() &Tensor[int] {
-	// @todo: Implement using map
+	// TODO: Implement using map
 	mut iter := t.iterator[T]()
 	mut ret := empty[int](t.shape)
 	for {

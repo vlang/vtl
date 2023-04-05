@@ -39,7 +39,7 @@ pub fn maxpool2d[T](input &vtl.Tensor[T], kernel []int, padding []int, stride []
 	max_indices := vtl.zeros[int]([nn, cc, outh, outw])
 	output := vtl.zeros[T]([nn, cc, outh, outw])
 
-	// @todo: Implement maxpool here
+	// TODO: Implement maxpool here
 
 	return max_indices, output
 }
@@ -49,7 +49,7 @@ pub fn maxpool2d_backward[T](shape []int, max_indices &vtl.Tensor[int], grad_out
 		panic('maxpool2d_backward: grad_output and max_indices must have the same size')
 	}
 
-	// @todo: @ulises-jeremias to override this on other backends
+	// TODO: @ulises-jeremias to override this on other backends
 	mut ret := vtl.zeros[T](shape)
 	for i in 0 .. grad_output.size {
 		idx := max_indices.data.get[int](i)
