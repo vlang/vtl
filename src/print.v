@@ -51,7 +51,7 @@ fn rprint[T](t &Tensor[T], index []int, hanging_indent string, curr_width int, s
 	next_hanging_indent := hanging_indent + ' '
 	next_width := curr_width - 1
 	t_len := t.shape[axis]
-	show_summary := (summary_insert.len > 0) && (2 * edge_items < t_len)
+	show_summary := summary_insert.len > 0 && 2 * edge_items < t_len
 	mut leading_items := 0
 	mut trailing_items := t_len
 	if show_summary {
