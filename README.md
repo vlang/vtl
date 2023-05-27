@@ -11,7 +11,7 @@
 <div align="center">
 
 [![Mentioned in Awesome V][awesomevbadge]][awesomevurl]
-[![VSL Continuous Integration][workflowbadge]][workflowurl]
+[![Continuous Integration][workflowbadge]][workflowurl]
 [![Deploy Documentation][deploydocsbadge]][deploydocsurl]
 [![License: MIT][licensebadge]][licenseurl]
 
