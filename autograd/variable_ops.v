@@ -9,7 +9,7 @@ pub fn (v &Variable[T]) add[T](other &Variable[T]) !&Variable[T] {
 
 	if v.requires_grad || other.requires_grad {
 		gate := add_gate[T]()
-		gate.cache[T](mut result, v, other)!
+		gate.cache(mut result, v, other)!
 	}
 
 	return result
@@ -21,7 +21,7 @@ pub fn (v &Variable[T]) subtract[T](other &Variable[T]) !&Variable[T] {
 
 	if v.requires_grad || other.requires_grad {
 		gate := subtract_gate[T]()
-		gate.cache[T](mut result, v, other)!
+		gate.cache(mut result, v, other)!
 	}
 
 	return result
@@ -33,7 +33,7 @@ pub fn (v &Variable[T]) multiply[T](other &Variable[T]) !&Variable[T] {
 
 	if v.requires_grad || other.requires_grad {
 		gate := multiply_gate[T](v, other)
-		gate.cache[T](mut result, v, other)!
+		gate.cache(mut result, v, other)!
 	}
 
 	return result
@@ -45,7 +45,7 @@ pub fn (v &Variable[T]) divide[T](other &Variable[T]) !&Variable[T] {
 
 	if v.requires_grad || other.requires_grad {
 		gate := divide_gate[T](v, other)
-		gate.cache[T](mut result, v, other)!
+		gate.cache(mut result, v, other)!
 	}
 
 	return result
@@ -57,7 +57,7 @@ pub fn (v &Variable[T]) pow[T](other &Variable[T]) !&Variable[T] {
 
 	if v.requires_grad || other.requires_grad {
 		gate := pow_gate[T](v, other)
-		gate.cache[T](mut result, v, other)!
+		gate.cache(mut result, v, other)!
 	}
 
 	return result
@@ -69,7 +69,7 @@ pub fn (v &Variable[T]) exp[T]() !&Variable[T] {
 
 	if v.requires_grad {
 		gate := exp_gate[T](v)
-		gate.cache[T](mut result, v)!
+		gate.cache(mut result, v)!
 	}
 
 	return result
@@ -81,7 +81,7 @@ pub fn (v &Variable[T]) matmul[T](other &Variable[T]) !&Variable[T] {
 
 	if v.requires_grad || other.requires_grad {
 		gate := matmul_gate[T](v, other)
-		gate.cache[T](mut result, v, other)!
+		gate.cache(mut result, v, other)!
 	}
 
 	return result
@@ -93,7 +93,7 @@ pub fn (v &Variable[T]) sin[T]() !&Variable[T] {
 
 	if v.requires_grad {
 		gate := sin_gate[T](v)
-		gate.cache[T](mut result, v)!
+		gate.cache(mut result, v)!
 	}
 
 	return result
@@ -105,7 +105,7 @@ pub fn (v &Variable[T]) cos[T]() !&Variable[T] {
 
 	if v.requires_grad {
 		gate := cos_gate[T](v)
-		gate.cache[T](mut result, v)!
+		gate.cache(mut result, v)!
 	}
 
 	return result
@@ -117,7 +117,7 @@ pub fn (v &Variable[T]) tan[T]() !&Variable[T] {
 
 	if v.requires_grad {
 		gate := tan_gate[T](v)
-		gate.cache[T](mut result, v)!
+		gate.cache(mut result, v)!
 	}
 
 	return result
