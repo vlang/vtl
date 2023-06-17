@@ -1,7 +1,6 @@
 module main
 
 import vsl.plot
-import vsl.util
 import vtl
 
 y := [
