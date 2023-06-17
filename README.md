@@ -19,7 +19,7 @@
 
 ```v ignore
 >>> import vtl
->>> t := vtl.from_array([1.0, 2, 3, 4], [2, 2])?
+>>> t := vtl.from_array([1.0, 2, 3, 4], [2, 2])!
 >>> t.get([1, 1])
 4.0
 ```
