@@ -11,8 +11,8 @@ pub struct ReLULayer[T] {
 	output_shape []int
 }
 
-pub fn relu_layer[T](ctx &autograd.Context[T], output_shape []int) types.Layer {
-	return types.Layer(&ReLULayer[T]{
+pub fn relu_layer[T](ctx &autograd.Context[T], output_shape []int) types.Layer[T] {
+	return types.Layer[T](&ReLULayer[T]{
 		output_shape: output_shape.clone()
 	})
 }

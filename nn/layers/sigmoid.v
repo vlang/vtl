@@ -11,8 +11,8 @@ pub struct SigmoidLayer[T] {
 	output_shape []int
 }
 
-pub fn sigmoid_layer[T](ctx &autograd.Context[T], output_shape []int) types.Layer {
-	return types.Layer(&SigmoidLayer[T]{
+pub fn sigmoid_layer[T](ctx &autograd.Context[T], output_shape []int) types.Layer[T] {
+	return types.Layer[T](&SigmoidLayer[T]{
 		output_shape: output_shape.clone()
 	})
 }

@@ -11,8 +11,8 @@ pub struct LeakyReluLayer[T] {
 	output_shape []int
 }
 
-pub fn leaky_relu_layer[T](ctx &autograd.Context[T], output_shape []int) types.Layer {
-	return types.Layer(&LeakyReluLayer[T]{
+pub fn leaky_relu_layer[T](ctx &autograd.Context[T], output_shape []int) types.Layer[T] {
+	return types.Layer[T](&LeakyReluLayer[T]{
 		output_shape: output_shape.clone()
 	})
 }

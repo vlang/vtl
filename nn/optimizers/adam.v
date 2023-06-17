@@ -35,7 +35,7 @@ pub fn adam_optimizer[T](config AdamOptimizerConfig) &AdamOptimizer[T] {
 	}
 }
 
-pub fn (mut o AdamOptimizer[T]) build_params(layers []types.Layer) {
+pub fn (mut o AdamOptimizer[T]) build_params(layers []types.Layer[T]) {
 	// TODO: @ulises-jeremias to uncomment this
 	// for layer in layers {
 	// for v in layer.variables() {

@@ -13,8 +13,8 @@ pub struct InputLayer[T] {
 	shape []int
 }
 
-pub fn input_layer[T](ctx &autograd.Context[T], shape []int) types.Layer {
-	return types.Layer(&InputLayer[T]{
+pub fn input_layer[T](ctx &autograd.Context[T], shape []int) types.Layer[T] {
+	return types.Layer[T](&InputLayer[T]{
 		shape: shape.clone()
 	})
 }

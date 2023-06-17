@@ -15,8 +15,8 @@ pub struct MaxPool2DLayer[T] {
 	stride      []int
 }
 
-pub fn maxpool2d_layer[T](ctx &autograd.Context[T], input_shape []int, kernel []int, padding []int, stride []int) types.Layer {
-	return types.Layer(&MaxPool2DLayer[T]{
+pub fn maxpool2d_layer[T](ctx &autograd.Context[T], input_shape []int, kernel []int, padding []int, stride []int) types.Layer[T] {
+	return types.Layer[T](&MaxPool2DLayer[T]{
 		input_shape: input_shape.clone()
 		kernel: kernel.clone()
 		padding: padding.clone()

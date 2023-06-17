@@ -11,8 +11,8 @@ pub struct FlattenLayer[T] {
 	shape []int
 }
 
-pub fn flatten_layer[T](ctx &autograd.Context[T], shape []int) types.Layer {
-	return types.Layer(&FlattenLayer[T]{
+pub fn flatten_layer[T](ctx &autograd.Context[T], shape []int) types.Layer[T] {
+	return types.Layer[T](&FlattenLayer[T]{
 		shape: shape.clone()
 	})
 }
