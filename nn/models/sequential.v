@@ -15,16 +15,37 @@ pub mut:
 	info &SequentialInfo[T]
 }
 
-pub fn sequential[T](incomming_layers []types.Layer[T]) &Sequential[T] {
+// sequential creates a new sequential network with a new context.
+pub fn sequential[T]() &Sequential[T] {
 	ctx := autograd.ctx[T]()
+	empty_layers := []types.Layer[T]{}
 	return &Sequential[T]{
-		info: sequential_info[T](ctx, incomming_layers)
+		info: sequential_info[T](ctx, empty_layers)
 	}
 }
 
-pub fn sequential_from_ctx[T](ctx &autograd.Context[T], incomming_layers []types.Layer[T]) &Sequential[T] {
+// sequential_with_layers creates a new sequential network with a new context
+// and the given layers.
+pub fn sequential_with_layers[T](given_layers []types.Layer[T]) &Sequential[T] {
+	ctx := autograd.ctx[T]()
 	return &Sequential[T]{
-		info: sequential_info[T](ctx, incomming_layers)
+		info: sequential_info[T](ctx, given_layers)
+	}
+}
+
+// sequential_from_ctx creates a new sequential network with the given context.
+pub fn sequential_from_ctx[T](ctx &autograd.Context[T]) &Sequential[T] {
+	empty_layers := []types.Layer[T]{}
+	return &Sequential[T]{
+		info: sequential_info[T](ctx, empty_layers)
+	}
+}
+
+// sequential_from_ctx_with_layers creates a new sequential network with the given context
+// and the given layers.
+pub fn sequential_from_ctx_with_layers[T](ctx &autograd.Context[T], given_layers []types.Layer[T]) &Sequential[T] {
+	return &Sequential[T]{
+		info: sequential_info[T](ctx, given_layers)
 	}
 }
 
