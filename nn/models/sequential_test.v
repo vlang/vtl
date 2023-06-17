@@ -3,8 +3,6 @@ module models
 import vtl.nn.layers
 import vtl.nn.types
 
-const empty_layers = []types.Layer[f64]{}
-
 fn test_nnc() {
 	mut nn := sequential[f64]()
 	nn.input([1, 2])
