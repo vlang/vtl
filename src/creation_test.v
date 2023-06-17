@@ -2,46 +2,26 @@ module vtl
 
 fn test_eye() {
 	res := eye[f64](3, 3, 0)
-	expected := from_array([1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0], [3, 3]) or {
-		panic(@FN + ' failed')
-	}
-	for i in 0 .. res.size() {
-		println('${res.get([0, i])} ${expected.get([0, i])}')
-		assert res.get([0, i]) == expected.get([0, i])
-	}
+	expected := from_array([1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0], [3, 3])!
+	assert res.array_equal(expected)
 }
 
 fn test_eye_different_shape() {
 	res := eye[f64](2, 4, 0)
-	expected := from_array([1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0], [2, 4]) or {
-		panic(@FN + ' failed')
-	}
-	for i in 0 .. res.size() {
-		println('${res.get([0, i])} ${expected.get([0, i])}')
-		assert res.get([0, i]) == expected.get([0, i])
-	}
+	expected := from_array([1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0], [2, 4])!
+	assert res.array_equal(expected)
 }
 
 fn test_eye_offset() {
 	res := eye[f64](3, 3, 1)
-	expected := from_array([0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0], [3, 3]) or {
-		panic(@FN + ' failed')
-	}
-	for i in 0 .. res.size() {
-		println('${res.get([0, i])} ${expected.get([0, i])}')
-		assert res.get([0, i]) == expected.get([0, i])
-	}
+	expected := from_array([0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0], [3, 3])!
+	assert res.array_equal(expected)
 }
 
 fn test_identity() {
 	res := identity[f64](3)
-	expected := from_array([1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0], [3, 3]) or {
-		panic(@FN + ' failed')
-	}
-	for i in 0 .. res.size() {
-		println('${res.get([0, i])} ${expected.get([0, i])}')
-		assert res.get([0, i]) == expected.get([0, i])
-	}
+	expected := from_array([1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0], [3, 3])!
+	assert res.array_equal(expected)
 }
 
 fn test_zeros() {
