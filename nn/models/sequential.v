@@ -15,21 +15,16 @@ pub mut:
 	info &SequentialInfo[T]
 }
 
-[params]
-pub struct SequentialParams {
-	layers []types.Layer
-}
-
-pub fn sequential[T](params SequentialParams) &Sequential[T] {
+pub fn sequential[T](incomming_layers []types.Layer[T]) &Sequential[T] {
 	ctx := autograd.ctx[T]()
 	return &Sequential[T]{
-		info: sequential_info[T](ctx, params.layers)
+		info: sequential_info[T](ctx, incomming_layers)
 	}
 }
 
-pub fn sequential_from_ctx[T](ctx &autograd.Context[T], params SequentialParams) &Sequential[T] {
+pub fn sequential_from_ctx[T](ctx &autograd.Context[T], incomming_layers []types.Layer[T]) &Sequential[T] {
 	return &Sequential[T]{
-		info: sequential_info[T](ctx, params.layers)
+		info: sequential_info[T](ctx, incomming_layers)
 	}
 }
 
@@ -93,7 +88,7 @@ pub fn (mut nn Sequential[T]) sigmod() {
 
 pub fn (mut nn Sequential[T]) forward(mut train autograd.Variable[T]) !&autograd.Variable[T] {
 	for layer in nn.info.layers {
-		train = layers.layer_forward[T](layer, mut train)!
+		train = *layer.forward(mut train)!
 	}
 	return train
 }

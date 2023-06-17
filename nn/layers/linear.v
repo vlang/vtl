@@ -13,10 +13,10 @@ pub struct LinearLayer[T] {
 	bias    &autograd.Variable[T]
 }
 
-pub fn linear_layer[T](ctx &autograd.Context[T], input_dim int, output_dim int) types.Layer {
+pub fn linear_layer[T](ctx &autograd.Context[T], input_dim int, output_dim int) types.Layer[T] {
 	weights := internal.kaiming_normal[T]([output_dim, input_dim])
 	bias := vtl.zeros[T]([1, output_dim])
-	return types.Layer(&LinearLayer[T]{
+	return types.Layer[T](&LinearLayer[T]{
 		weights: ctx.variable(weights)
 		bias: ctx.variable(bias)
 	})
