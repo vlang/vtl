@@ -1,8 +1,8 @@
 import vtl
 
-a := vtl.from_1d([1, 2, 3, 4]) or { panic(err) }
-b := vtl.from_1d([0, 1, 2, 3]) or { panic(err) }
+a := vtl.from_1d([1, 2, 3, 4])!
+b := vtl.from_1d([0, 1, 2, 3])!
 
-c := a.add(b) or { panic(err) }
+c := a.add(b)!
 
-print(c)
+println(c)

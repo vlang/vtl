@@ -14,7 +14,7 @@ Tensors have the following properties:
 ```v
 import vtl
 
-t := vtl.from_2d([[1, 2, 3], [4, 5, 6]])?
+t := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
 
 println(t)
 // [[1, 2, 3], [4, 5, 6]]
@@ -32,17 +32,17 @@ The canonical way to create a tensor is to use the `vtl.from_*` functions.
 ```v
 import vtl
 
-t1d := vtl.from_1d([1, 2, 3])?
+t1d := vtl.from_1d([1, 2, 3])!
 
 println(t1d)
 // [1, 2, 3]
 
-t2d := vtl.from_2d([[1, 2, 3], [4, 5, 6]])?
+t2d := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
 
 println(t2d)
 // [[1, 2, 3], [4, 5, 6]]
 
-t := vtl.from_array([1, 2, 3, 4, 5, 6, 7, 8], [2, 4])?
+t := vtl.from_array([1, 2, 3, 4, 5, 6, 7, 8], [2, 4])!
 
 println(t)
 // [[1, 2, 3, 4], [5, 6, 7, 8]]
@@ -86,7 +86,7 @@ o := vtl.ones[f64]([2, 3])
 println(o)
 // [[1.0, 1.0, 1.0], [1.0, 1.0, 1.0]]
 
-tmp := vtl.from_array([1, 2, 3, 4], [2, 2])?
+tmp := vtl.from_array([1, 2, 3, 4], [2, 2])!
 
 h := vtl.zeros_like(tmp)
 
@@ -104,7 +104,7 @@ println(i)
 ```v
 import vtl
 
-mut t := vtl.from_array([1, 2, 3, 4, 5, 6, 7, 8], [2, 4])?
+mut t := vtl.from_array([1, 2, 3, 4, 5, 6, 7, 8], [2, 4])!
 
 println(t.get([1, 1]))
 // 5
@@ -123,12 +123,12 @@ Full copy must be explicitly requested via the `copy()` function.
 ```v
 import vtl
 
-a := vtl.from_array([1, 2, 3, 4, 5, 6, 7, 8], [2, 4])?
+a := vtl.from_array([1, 2, 3, 4, 5, 6, 7, 8], [2, 4])!
 
 println(a)
 // [[1, 2, 3, 4], [5, 6, 7, 8]]
 
-b := a.reshape([4, 2])?
+b := a.reshape([4, 2])!
 
 println(b)
 // [[1, 2], [3, 4], [5, 6], [7, 8]]
