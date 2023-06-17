@@ -31,7 +31,7 @@
 - Data Structures that can easily be passed to C libraries
 - Powerful linear algebra routines backed by VSL.
 
-In the [docs](https://vlang.github.io/vtl) you can find more information about this module 
+In the [docs](https://vlang.github.io/vtl) you can find more information about this module
 
 ## Installation
 
@@ -46,16 +46,8 @@ at VSL docs in order to install VSL with all needed dependencies.
 
 ### Install VTL
 
-**Via vpm**
-
 ```sh
-$ v install vtl
-```
-
-**Via [vpkg](https://github.com/v-pkg/vpkg)**
-
-```sh
-$ vpkg get https://github.com/vlang/vtl
+v install vtl
 ```
 
 Done. Installation completed.
@@ -65,7 +57,7 @@ Done. Installation completed.
 To test the module, just type the following command:
 
 ```sh
-$ v test .
+v test .
 ```
 
 ## License
