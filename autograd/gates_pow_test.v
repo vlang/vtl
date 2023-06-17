@@ -12,5 +12,7 @@ fn test_pow() {
 
 	f.backprop()!
 
-	assert x.grad.array_equal(vtl.from_1d([6.0])!)
+	expected_grad := vtl.from_1d([6.0])!
+
+	assert x.grad.array_equal(expected_grad)
 }
