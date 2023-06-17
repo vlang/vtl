@@ -6,7 +6,7 @@ import vtl.nn.types
 const empty_layers = []types.Layer[f64]{}
 
 fn test_nnc() {
-	mut nn := sequential[f64](models.empty_layers)
+	mut nn := sequential[f64]()
 	nn.input([1, 2])
 	nn.sigmod()
 	assert nn.info.layers.len == 2
@@ -15,5 +15,5 @@ fn test_nnc() {
 }
 
 fn test_nn() {
-	mut nn := sequential[f64](models.empty_layers)
+	mut nn := sequential[f64]()
 }
