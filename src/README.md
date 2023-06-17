@@ -23,7 +23,7 @@
 - Data Structures that can easily be passed to C libraries
 - Powerful linear algebra routines backed by VSL that uses LAPACKE and OpenBLAS.
 
-In the [docs](https://vlang.github.io/vtl) you can find more information about this module 
+In the [docs](https://vlang.github.io/vtl) you can find more information about this module
 
 ## Installation
 
@@ -38,16 +38,8 @@ at VSL docs in order to install VSL with all needed dependencies.
 
 ### Install VTL
 
-**Via vpm**
-
 ```sh
-$ v install vtl
-```
-
-**Via [vpkg](https://github.com/v-pkg/vpkg)**
-
-```sh
-$ vpkg get https://github.com/vlang/vtl
+v install vtl
 ```
 
 Done. Installation completed.
@@ -57,7 +49,7 @@ Done. Installation completed.
 To test the module, just type the following command:
 
 ```sh
-$ ./bin/test # execute `./bin/test -h` to know more about the test command
+v test .
 ```
 
 ## License
@@ -67,8 +59,7 @@ $ ./bin/test # execute `./bin/test -h` to know more about the test command
 ## Contributors
 
 > This work was originally based on the work done by
-> Christopher ([christopherzimmerman](https://github.com/christopherzimmerman))
-> and the rest of the VLang-Num group. 
+> Christopher ([christopherzimmerman](https://github.com/christopherzimmerman)).
 
 > The development of this library continues its course after having reimplemented its core
 > and a large part of its interface. In the same way, we do not want to stop recognizing
@@ -80,7 +71,3 @@ $ ./bin/test # execute `./bin/test -h` to know more about the test command
 
 Made with [contributors-img](https://contrib.rocks).
 
-[awesomevbadge]: https://awesome.re/mentioned-badge.svg
-[licensebadge]: https://img.shields.io/badge/License-MIT-blue.svg
-[awesomevurl]: https://github.com/vlang/awesome-v/blob/master/README.md#scientific-computing
-[licenseurl]: https://github.com/vlang/vtl/blob/main/LICENSE
