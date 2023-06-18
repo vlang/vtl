@@ -32,8 +32,14 @@ mut losses := []&vtl.Tensor[f64]{cap: epochs}
 // Stochastic Gradient Descent
 mut optimizer := optimizers.sgd[f64](learning_rate: 0.01)
 
+println('Training...')
+
 for epoch in 0 .. epochs {
+	println('Epoch: ${epoch}')
+
 	for batch_id in 0 .. batches {
+		println('Batch id: ${batch_id}')
+
 		offset := batch_id * batch_size
 
 		mut x := ctx.variable(features.slice([offset, offset + batch_size])!)
