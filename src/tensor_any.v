@@ -161,6 +161,15 @@ pub fn (v TensorDataType) bool() bool {
 	match v {
 		bool { return v }
 		string { return v.bool() }
-		else { return false }
+		f32 { return v != f32(0) }
+		f64 { return v != f64(0) }
+		i8 { return v != i8(0) }
+		i16 { return v != i16(0) }
+		i64 { return v != i64(0) }
+		int { return v != int(0) }
+		u8 { return v != u8(0) }
+		u16 { return v != u16(0) }
+		u32 { return v != u32(0) }
+		u64 { return v != u64(0) }
 	}
 }
