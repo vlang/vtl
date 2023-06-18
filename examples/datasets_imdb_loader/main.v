@@ -2,16 +2,9 @@ module main
 
 import vtl.datasets
 
-mut train_ds := datasets.load_imdb(.train, batch_size: 6)!
+imdb := datasets.load_imdb()!
 
-mut i := 0
-for {
-	batch := train_ds.next() or { break }
-	println('Labels Batch #${i++}')
-	println(*batch.labels)
-	println('')
-
-	if i == 10 {
-		break
-	}
-}
+assert imdb.train_features.shape == [25000]
+assert imdb.test_features.shape == [25000]
+assert imdb.train_labels.shape == [25000]
+assert imdb.test_labels.shape == [25000]

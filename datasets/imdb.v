@@ -1,6 +1,5 @@
 module datasets
 
-import rand
 import vtl
 import os
 
@@ -12,30 +11,15 @@ pub const (
 
 // ImdbDataset is a dataset for sentiment analysis.
 pub struct ImdbDataset {
-	paths []string
-mut:
-	batch_pos int
 pub:
-	@type      DatasetType
-	batch_size int
+	train_features &vtl.Tensor[string]
+	train_labels   &vtl.Tensor[int]
+	test_features  &vtl.Tensor[string]
+	test_labels    &vtl.Tensor[int]
 }
 
-// ImdbBatch is a batch of ImdbDataset.
-pub struct ImdbBatch {
-pub:
-	features &vtl.Tensor[string]
-	labels   &vtl.Tensor[int]
-}
-
-[params]
-pub struct ImdbDatasetConfig {
-	batch_size int = 32
-}
-
-// load_imdb loads the IMDB dataset iterator for a given split type.
-pub fn load_imdb(set_type DatasetType, data ImdbDatasetConfig) !&ImdbDataset {
-	split := if set_type == .train { 'train' } else { 'test' }
-
+// load_imdb_helper loads the IMDB dataset for a given split.
+pub fn load_imdb_helper(split string) !(&vtl.Tensor[string], &vtl.Tensor[int]) {
 	paths := download_dataset(
 		dataset: 'imdb'
 		baseurl: datasets.imdb_base_url
@@ -56,44 +40,15 @@ pub fn load_imdb(set_type DatasetType, data ImdbDatasetConfig) !&ImdbDataset {
 	split_paths << os.walk_ext(pos_dir, '.txt')
 	split_paths << os.walk_ext(neg_dir, '.txt')
 
-	rand.shuffle(mut split_paths) or { return error('shuffle failed') }
+	mut labels := []int{cap: split_paths.len}
+	mut texts := []string{cap: split_paths.len}
 
-	return &ImdbDataset{
-		@type: set_type
-		batch_size: data.batch_size
-		paths: split_paths
-	}
-}
-
-// str is a string representation of the ImdbDataset.
-pub fn (ds &ImdbDataset) str() string {
-	mut res := []string{}
-	res << 'vtl.datasets.ImdbDataset{'
-	res << '    @type: ${ds.@type}'
-	res << '    batch_size: ${ds.batch_size}'
-	res << '}'
-	return res.join('\n')
-}
-
-// next returns the next batch of the ImdbDataset.
-pub fn (mut ds ImdbDataset) next() ?ImdbBatch {
-	batch_size := ds.batch_size
-	batch_pos := ds.batch_pos
-	paths := ds.paths
-
-	if batch_pos + batch_size > paths.len {
-		return none
-	}
-
-	mut labels := []int{cap: batch_size}
-	mut texts := []string{cap: batch_size}
-
-	for path in paths[batch_pos..batch_pos + batch_size] {
+	for path in split_paths {
 		if !os.exists(path) {
-			return none
+			return error('file does not exist')
 		}
 
-		content := os.read_file(path) or { return none }
+		content := os.read_file(path)!
 		file_name := os.file_name(path)
 		label := file_name.split('_')[1]
 
@@ -101,13 +56,21 @@ pub fn (mut ds ImdbDataset) next() ?ImdbBatch {
 		texts << content
 	}
 
-	ds.batch_pos += batch_size
+	mut lt := vtl.from_1d(labels)!
+	mut tt := vtl.from_1d(texts)!
 
-	mut lt := vtl.from_1d(labels) or { return none }
-	mut tt := vtl.from_1d(texts) or { return none }
+	return tt, lt
+}
 
-	return ImdbBatch{
-		labels: lt
-		features: tt
+// load_imdb loads the IMDB dataset.
+pub fn load_imdb() !ImdbDataset {
+	train_features, train_labels := load_imdb_helper('train')!
+	test_features, test_labels := load_imdb_helper('test')!
+
+	return ImdbDataset{
+		train_features: train_features
+		train_labels: train_labels
+		test_features: test_features
+		test_labels: test_labels
 	}
 }

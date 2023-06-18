@@ -2,7 +2,7 @@ module main
 
 import vtl.datasets
 
-mut mnist := datasets.load_mnist()!
+mnist := datasets.load_mnist()!
 
 assert mnist.train_features.shape == [60000, 28, 28]
 assert mnist.test_features.shape == [10000, 28, 28]
