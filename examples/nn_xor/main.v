@@ -21,7 +21,7 @@ ctx := autograd.ctx[f64]()
 x_train_bool := vtl.random(0, 2, [batch_size * 100, 2]).as_bool()
 
 // Let's build our truth labels. We need to apply xor between the 2 columns of the tensors
-x_train_bool_1 := x_train_bool.slice([]int{}, [0])!
+x_train_bool_1 := x_train_bool.slice_hilo([]int{}, [0])!
 x_train_bool_2 := x_train_bool.slice_hilo([]int{}, [1])!
 
 println(x_train_bool_1.shape)
