@@ -14,6 +14,20 @@ pub fn (t &Tensor[T]) as_bool[T]() &Tensor[bool] {
 	return ret
 }
 
+// as_f32 casts the Tensor to a Tensor of f32s.
+[inline]
+pub fn (t &Tensor[T]) as_f32[T]() &Tensor[f32] {
+	// TODO: Implement using map
+	mut iter := t.iterator[T]()
+	mut ret := empty[f32](t.shape)
+	for {
+		val, i := iter.next() or { break }
+		f32_val := td[T](val).f32()
+		ret.set(i, f32_val)
+	}
+	return ret
+}
+
 // as_f64 casts the Tensor to a Tensor of f64s.
 [inline]
 pub fn (t &Tensor[T]) as_f64[T]() &Tensor[f64] {

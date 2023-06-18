@@ -2,16 +2,9 @@ module main
 
 import vtl.datasets
 
-mut train_ds := datasets.load_mnist(.train, batch_size: 6)!
+mut mnist := datasets.load_mnist()!
 
-mut i := 0
-for {
-	batch := train_ds.next() or { break }
-	println('Labels Batch #${i++}')
-	println(*batch.labels)
-	println('')
-
-	if i == 10 {
-		break
-	}
-}
+assert mnist.train_features.shape == [60000, 28, 28]
+assert mnist.test_features.shape == [10000, 28, 28]
+assert mnist.train_labels.shape == [60000, 10]
+assert mnist.test_labels.shape == [10000, 10]
