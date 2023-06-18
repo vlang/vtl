@@ -20,7 +20,12 @@ mut model := models.sequential_from_ctx[f64](ctx)
 model.input([1, 28, 28])
 model.mse_loss()
 
-mut train_ds := datasets.load_mnist(.train, batch_size: batch_size)!
+// Load the MNIST dataset
+mnist := datasets.load_mnist()!
+
+// We reshape the data to fit the network
+features := mnist.train_features.divide_scalar(u8(255))!.reshape([-1, 1, 28, 28])!
+labels := mnist.train_labels
 
 mut losses := []&vtl.Tensor[f64]{cap: epochs}
 
@@ -28,13 +33,11 @@ mut losses := []&vtl.Tensor[f64]{cap: epochs}
 mut optimizer := optimizers.sgd[f64](learning_rate: 0.01)
 
 for epoch in 0 .. epochs {
-	mut batch_id := 0
-	for {
-		batch := train_ds.next() or { break }
+	for batch_id in 0 .. batches {
+		offset := batch_id * batch_size
 
-		xt := batch.features.divide_scalar(u8(255))!.reshape([-1, 1, 28, 28])!
-		mut x := ctx.variable(xt)
-		target := batch.labels
+		mut x := ctx.variable(features.slice([offset, offset + batch_size])!)
+		target := labels.slice([offset, offset + batch_size])!
 
 		// Running input through the network
 		y_pred := model.forward(mut x)!
@@ -51,7 +54,5 @@ for epoch in 0 .. epochs {
 
 		// Correct the weights now that we have the gradient information
 		optimizer.update()!
-
-		batch_id++
 	}
 }
