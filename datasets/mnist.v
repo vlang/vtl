@@ -10,36 +10,17 @@ pub const (
 	mnist_train_file = 'mnist_train.csv'
 )
 
-interface Reader {
-mut:
-	read() ![]string
-}
-
 // MnistDataset is a dataset of MNIST handwritten digits.
 pub struct MnistDataset {
 pub:
-	@type      DatasetType
-	batch_size int
-mut:
-	parser Reader
+	train_features &vtl.Tensor[u8]
+	train_labels   &vtl.Tensor[u8]
+	test_features  &vtl.Tensor[u8]
+	test_labels    &vtl.Tensor[u8]
 }
 
-// MnistBatch is a batch of MNIST handwritten digits.
-pub struct MnistBatch {
-pub:
-	features &vtl.Tensor[u8]
-	labels   &vtl.Tensor[u8]
-}
-
-[params]
-pub struct MnistDatasetConfig {
-	batch_size int = 32
-}
-
-// load_mnist returns a new MNIST iterator.
-pub fn load_mnist(set_type DatasetType, data MnistDatasetConfig) !&MnistDataset {
-	filename := if set_type == .train { datasets.mnist_train_file } else { datasets.mnist_test_file }
-
+// load_mnist_helper loads the MNIST dataset from the given filename.
+pub fn load_mnist_helper(filename string) !(&vtl.Tensor[u8], &vtl.Tensor[u8]) {
 	paths := download_dataset(
 		dataset: 'mnist'
 		baseurl: datasets.mnist_base_url
@@ -50,56 +31,42 @@ pub fn load_mnist(set_type DatasetType, data MnistDatasetConfig) !&MnistDataset 
 
 	path := paths[filename]
 	content := os.read_file(path)!
+	mut parser := csv.new_reader(content)
 
-	return &MnistDataset{
-		@type: set_type
-		batch_size: data.batch_size
-		parser: Reader(csv.new_reader(content))
-	}
-}
+	mut labels := []int{}
+	mut features := []u8{}
 
-// str is a string representation of the MnistDataset.
-pub fn (ds &MnistDataset) str() string {
-	mut res := []string{}
-	res << 'vtl.datasets.MnistDataset{'
-	res << '    @type: ${ds.@type}'
-	res << '    batch_size: ${ds.batch_size}'
-	res << '}'
-	return res.join('\n')
-}
-
-// next returns the next batch of MNIST handwritten digits.
-pub fn (mut ds MnistDataset) next() ?MnistBatch {
-	batch_size := ds.batch_size
-
-	mut labels := []u8{cap: batch_size}
-	mut features := []u8{cap: batch_size}
-
-	for _ in 0 .. batch_size {
-		items := ds.parser.read() or { break }
-		labels << items[0].u8()
+	for {
+		items := parser.read() or { break }
+		labels << items[0].int()
 		features << items[1..].map(it.u8())
 	}
 
-	if labels.len == 0 {
-		return none
-	}
-
-	mut lt := vtl.from_1d(labels) or { return none }
-	mut lft := vtl.zeros[u8]([10])
+	mut lt := vtl.from_1d(labels)!
+	mut lft := vtl.zeros[u8]([lt.shape[0], 10])
 
 	mut iter := lt.iterator()
 	for {
-		_, i := iter.next() or { break }
-		lft.set(i, 1)
+		val, i := iter.next() or { break }
+		mut next_index := i.clone()
+		next_index << val
+		lft.set(next_index, 1)
 	}
 
-	ft := (vtl.from_array(features, [features.len]) or { return none }).reshape([-1, 1, 32, 32]) or {
-		return none
-	}
+	ft := vtl.from_1d(features)!.reshape([-1, 28, 28])!
 
-	return MnistBatch{
-		labels: lft
-		features: ft
+	return ft, lft
+}
+
+// load_mnist loads the MNIST dataset.
+pub fn load_mnist() !MnistDataset {
+	train_features, train_labels := load_mnist_helper(datasets.mnist_train_file)!
+	test_features, test_labels := load_mnist_helper(datasets.mnist_test_file)!
+
+	return MnistDataset{
+		train_features: train_features
+		train_labels: train_labels
+		test_features: test_features
+		test_labels: test_labels
 	}
 }
