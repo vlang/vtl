@@ -41,7 +41,7 @@ pub fn cast[T](x TensorDataType) T {
 	} $else $if T is f64 {
 		return x.f64()
 	} $else $if T is i16 {
-		return x.i16()
+		return x as i16
 	} $else $if T is i64 {
 		return x.i64()
 	} $else $if T is i8 {
@@ -90,6 +90,15 @@ pub fn (v TensorDataType) i64() i64 {
 pub fn (v TensorDataType) i8() i8 {
 	match v {
 		i8 { return v }
+		else { return 0 }
+	}
+}
+
+// i16 uses `TensorDataType` as a 16-bit unsigned integer.
+pub fn (v TensorDataType) i16() i16 {
+	match v {
+		i16 { return v }
+		i8 { return i16(v) }
 		else { return 0 }
 	}
 }

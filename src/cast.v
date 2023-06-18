@@ -42,6 +42,34 @@ pub fn (t &Tensor[T]) as_f64[T]() &Tensor[f64] {
 	return ret
 }
 
+// as_i16 casts the Tensor to a Tensor of i16 values.
+[inline]
+pub fn (t &Tensor[T]) as_i16[T]() &Tensor[i16] {
+	// TODO: Implement using map
+	mut iter := t.iterator[T]()
+	mut ret := empty[i16](t.shape)
+	for {
+		val, i := iter.next() or { break }
+		i16_val := td[T](val).i16()
+		ret.set(i, i16_val)
+	}
+	return ret
+}
+
+// as_i8 casts the Tensor to a Tensor of i8 values.
+[inline]
+pub fn (t &Tensor[T]) as_i8[T]() &Tensor[i8] {
+	// TODO: Implement using map
+	mut iter := t.iterator[T]()
+	mut ret := empty[i8](t.shape)
+	for {
+		val, i := iter.next() or { break }
+		i8_val := td[T](val).i8()
+		ret.set(i, i8_val)
+	}
+	return ret
+}
+
 // as_int casts the Tensor to a Tensor of ints.
 [inline]
 pub fn (t &Tensor[T]) as_int[T]() &Tensor[int] {
@@ -52,6 +80,20 @@ pub fn (t &Tensor[T]) as_int[T]() &Tensor[int] {
 		val, i := iter.next() or { break }
 		int_val := td[T](val).int()
 		ret.set(i, int_val)
+	}
+	return ret
+}
+
+// as_string casts the Tensor to a Tensor of string values.
+[inline]
+pub fn (t &Tensor[T]) as_string[T]() &Tensor[string] {
+	// TODO: Implement using map
+	mut iter := t.iterator[T]()
+	mut ret := empty[string](t.shape)
+	for {
+		val, i := iter.next() or { break }
+		string_val := td[T](val).string()
+		ret.set(i, string_val)
 	}
 	return ret
 }
