@@ -97,3 +97,17 @@ pub fn (t &Tensor[T]) as_string[T]() &Tensor[string] {
 	}
 	return ret
 }
+
+// as_u8 casts the Tensor to a Tensor of u8 values.
+[inline]
+pub fn (t &Tensor[T]) as_u8[T]() &Tensor[u8] {
+	// TODO: Implement using map
+	mut iter := t.iterator[T]()
+	mut ret := empty[u8](t.shape)
+	for {
+		val, i := iter.next() or { break }
+		u8_val := td[T](val).u8()
+		ret.set(i, u8_val)
+	}
+	return ret
+}
