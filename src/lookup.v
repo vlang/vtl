@@ -64,15 +64,3 @@ pub fn (t &Tensor[T]) nth_index[T](n int) []int {
 
 	return index
 }
-
-// strided_offset_index returns the index of the starting offset
-// for arrays that may be negatively strided
-pub fn (t &Tensor[T]) strided_offset_index[T]() int {
-	mut offset := 0
-	for i in 0 .. t.rank() {
-		if t.strides[i] < 0 {
-			offset += (t.shape[i] - 1) * int(fabs(t.strides[i]))
-		}
-	}
-	return offset
-}
