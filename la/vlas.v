@@ -13,14 +13,6 @@ pub fn dot[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 	return vtl.from_1d([res])
 }
 
-pub fn dger[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[f64] {
-	if !a.is_vector() || !b.is_vector() {
-		return error('Tensors must be one dimensional')
-	}
-	m := vsl_la.vector_vector_tr_mul(1.0, arr_to_f64arr(a.to_array()), arr_to_f64arr(a.to_array()))
-	return vtl.from_2d[f64](m.get_deep2())
-}
-
 pub fn det[T](t &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 	t.assert_square_matrix()!
 	m := t.shape[0]
