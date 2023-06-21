@@ -30,7 +30,7 @@ pub fn inv[T](t &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 	return vtl.from_2d[f64](ret_m.get_deep2())
 }
 
-pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
+pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 	a.assert_matrix()!
 	b.assert_matrix()!
 	if a.shape[1] != b.shape[0] {
