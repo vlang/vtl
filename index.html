@@ -1015,21 +1015,21 @@ swapped.</p>
 returns a copy of an array with elements above the diagonal zeroed</p>
 
 </section>
-						<section id="Tensor[T].tril_inpl" class="doc-node">
-							<div class="title"><h2>fn (Tensor[T]) tril_inpl <a href="#Tensor[T].tril_inpl">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/mat_creation.v#L36"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> t Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> tril_inpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
-<p>tril_inpl computes the lower triangle of an array.<br>
-modifies an array inplace with elements above the diagonal zeroed.</p>
-
-</section>
 						<section id="Tensor[T].tril_inpl_offset" class="doc-node">
 							<div class="title"><h2>fn (Tensor[T]) tril_inpl_offset <a href="#Tensor[T].tril_inpl_offset">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/mat_creation.v#L42"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> t Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> tril_inpl_offset<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>offset <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">&</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>tril_inpl_offset computes the lower triangle of an array.<br>
 modifies an array inplace with elements above the k-th diagonal zeroed.</p>
 
 </section>
+						<section id="Tensor[T].tril_inplace" class="doc-node">
+							<div class="title"><h2>fn (Tensor[T]) tril_inplace <a href="#Tensor[T].tril_inplace">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/mat_creation.v#L36"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> t Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> tril_inplace<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<p>tril_inplace computes the lower triangle of an array.<br>
+modifies an array inplace with elements above the diagonal zeroed.</p>
+
+</section>
 						<section id="Tensor[T].tril_offset" class="doc-node">
 							<div class="title"><h2>fn (Tensor[T]) tril_offset <a href="#Tensor[T].tril_offset">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/mat_creation.v#L29"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> tril_offset<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>offset <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">&</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
-<p>tril_inpl computes the lower triangle of an array.<br>
+<p>tril_inplace computes the lower triangle of an array.<br>
 returns a copy of an array with elements above the kth diagonal zeroed</p>
 
 </section>
@@ -1039,9 +1039,9 @@ returns a copy of an array with elements above the kth diagonal zeroed</p>
 returns a copy of an array with elements below the diagonal zeroed</p>
 
 </section>
-						<section id="Tensor[T].triu_inpl" class="doc-node">
-							<div class="title"><h2>fn (Tensor[T]) triu_inpl <a href="#Tensor[T].triu_inpl">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/mat_creation.v#L62"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> t Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> triu_inpl<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
-<p>triu_inpl computes the upper triangle of an array.<br>
+						<section id="Tensor[T].triu_inplace" class="doc-node">
+							<div class="title"><h2>fn (Tensor[T]) triu_inplace <a href="#Tensor[T].triu_inplace">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/mat_creation.v#L62"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> t Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> triu_inplace<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<p>triu_inplace computes the upper triangle of an array.<br>
 modifies an array inplace with elements below the diagonal zeroed.</p>
 
 </section>
@@ -1276,7 +1276,7 @@ Stores a copy of the shape and strides reduced along a given axis</p>
 </section>
 
           <div class="footer">
-            Powered by vdoc. Generated on: 21 Jun 2023 04:48:29
+            Powered by vdoc. Generated on: 21 Jun 2023 04:51:19
           </div>
         </div>
         <div class="doc-toc"><ul><li class="open"><a href="#readme_">README</a></li>
@@ -1525,11 +1525,11 @@ Stores a copy of the shape and strides reduced along a given axis</p>
 <li><a href="#Tensor[T].tolerance">fn tolerance</a></li>
 <li><a href="#Tensor[T].transpose">fn transpose</a></li>
 <li><a href="#Tensor[T].tril">fn tril</a></li>
-<li><a href="#Tensor[T].tril_inpl">fn tril_inpl</a></li>
 <li><a href="#Tensor[T].tril_inpl_offset">fn tril_inpl_offset</a></li>
+<li><a href="#Tensor[T].tril_inplace">fn tril_inplace</a></li>
 <li><a href="#Tensor[T].tril_offset">fn tril_offset</a></li>
 <li><a href="#Tensor[T].triu">fn triu</a></li>
-<li><a href="#Tensor[T].triu_inpl">fn triu_inpl</a></li>
+<li><a href="#Tensor[T].triu_inplace">fn triu_inplace</a></li>
 <li><a href="#Tensor[T].triu_offset">fn triu_offset</a></li>
 <li><a href="#Tensor[T].trunc">fn trunc</a></li>
 <li><a href="#Tensor[T].vcl">fn vcl</a></li>
