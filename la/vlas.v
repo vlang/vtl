@@ -3,16 +3,17 @@ module la
 import vsl.la as vsl_la
 import vtl
 
-pub fn dot[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !f64 {
+pub fn dot[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 	if !a.is_vector() || !b.is_vector() {
 		return error('Tensors must be one dimensional')
 	} else if a.size != b.size {
 		return error('Tensors must have the same shape')
 	}
-	return vsl_la.vector_dot(arr_to_f64arr(a.to_array()), arr_to_f64arr(b.to_array()))
+	res := vsl_la.vector_dot(arr_to_f64arr(a.to_array()), arr_to_f64arr(b.to_array()))
+	return vtl.from_1d([res])
 }
 
-pub fn dger[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
+pub fn dger[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 	if !a.is_vector() || !b.is_vector() {
 		return error('Tensors must be one dimensional')
 	}
@@ -20,17 +21,17 @@ pub fn dger[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	return vtl.from_2d[f64](m.get_deep2())
 }
 
-pub fn det[T](t &vtl.Tensor[T]) !f64 {
+pub fn det[T](t &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 	t.assert_square_matrix()!
 	m := t.shape[0]
 	n := t.shape[1]
 	mat := vsl_la.matrix_raw(m, n, arr_to_f64arr(t.to_array()))
-	return mat.det()
+	return vtl.from_1d([vsl_la.matrix_det(mat)])
 }
 
-pub fn inv[T](t &vtl.Tensor[T]) !&vtl.Tensor[T] {
+pub fn inv[T](t &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 	t.assert_square_matrix()!
-	mut colmajort := t.copy(.colmajor)
+	mut colmajort := t.copy(.col_major)
 	mut ret_m := vsl_la.new_matrix[f64](colmajort.shape[0], colmajort.shape[1])
 	mut colmajorm := vsl_la.matrix_raw(colmajort.shape[0], colmajort.shape[1], arr_to_f64arr(colmajort.to_array()))
 	vsl_la.matrix_inv(mut ret_m, mut colmajorm, true)
