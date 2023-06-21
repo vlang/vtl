@@ -34,7 +34,7 @@ pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 	a.assert_matrix()!
 	b.assert_matrix()!
 	if a.shape[1] != b.shape[0] {
-		return error('Tensors must have the same shape')
+		return error('Invalid shapes for matrix multiplication ${a.shape} and ${b.shape}')
 	}
 	ma, mb := vtl.broadcast2[T](a.copy(.row_major), b.copy(.row_major))!
 	mut dm := vsl_la.new_matrix[f64](a.shape[0], b.shape[1])
