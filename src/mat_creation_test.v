@@ -53,3 +53,81 @@ fn test_diag_flat_from_2d() {
 	assert diag.get([7]) == 8
 	assert diag.get([8]) == 9
 }
+
+fn test_tril() {
+	t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
+	assert t.shape == [3, 3]
+	assert t.strides == [3, 1]
+	tril := t.tril()
+	assert tril.shape == [3, 3]
+	assert tril.strides == [3, 1]
+	assert tril.get([0, 0]) == 1
+	assert tril.get([0, 1]) == 0
+	assert tril.get([0, 2]) == 0
+	assert tril.get([1, 0]) == 4
+	assert tril.get([1, 1]) == 5
+	assert tril.get([1, 2]) == 0
+	assert tril.get([2, 0]) == 7
+	assert tril.get([2, 1]) == 8
+	assert tril.get([2, 2]) == 9
+}
+
+fn test_tril_offset_0() {
+	t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
+	assert t.shape == [3, 3]
+	assert t.strides == [3, 1]
+	tril := t.tril_offset(0)
+	assert tril.array_equal(t.tril())
+}
+
+fn test_tril_offset_1() {
+	t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
+	assert t.shape == [3, 3]
+	assert t.strides == [3, 1]
+	tril := t.tril_offset(1)
+	assert tril.shape == [3, 3]
+	assert tril.strides == [3, 1]
+	assert tril.get([0, 0]) == 1
+	assert tril.get([0, 1]) == 2
+	assert tril.get([0, 2]) == 0
+	assert tril.get([1, 0]) == 4
+	assert tril.get([1, 1]) == 5
+	assert tril.get([1, 2]) == 6
+	assert tril.get([2, 0]) == 7
+	assert tril.get([2, 1]) == 8
+	assert tril.get([2, 2]) == 9
+}
+
+fn test_tril_inpl() {
+	mut t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
+	assert t.shape == [3, 3]
+	assert t.strides == [3, 1]
+	t.tril_inpl()
+	assert t.shape == [3, 3]
+	assert t.strides == [3, 1]
+	assert t.get([0, 0]) == 1
+	assert t.get([0, 1]) == 0
+	assert t.get([0, 2]) == 0
+	assert t.get([1, 0]) == 4
+	assert t.get([1, 1]) == 5
+	assert t.get([1, 2]) == 0
+	assert t.get([2, 0]) == 7
+	assert t.get([2, 1]) == 8
+	assert t.get([2, 2]) == 9
+}
+
+fn test_tril_inpl_offset_0() {
+	mut t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
+	assert t.shape == [3, 3]
+	assert t.strides == [3, 1]
+	t.tril_inpl_offset(0)
+	assert t.array_equal(from_2d([[1, 0, 0], [4, 5, 0], [7, 8, 9]])!)
+}
+
+fn test_tril_inpl_offset_1() {
+	mut t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
+	assert t.shape == [3, 3]
+	assert t.strides == [3, 1]
+	t.tril_inpl_offset(1)
+	assert t.array_equal(from_2d([[1, 2, 0], [4, 5, 6], [7, 8, 9]])!)
+}
