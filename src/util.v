@@ -4,16 +4,16 @@ import arrays
 
 // assert_square_matrix panics if the given tensor is not a square matrix
 [inline]
-fn (t &Tensor[T]) assert_square_matrix[T]() ! {
-	if t.is_square_matrix() {
+pub fn (t &Tensor[T]) assert_square_matrix[T]() ! {
+	if !t.is_square_matrix() {
 		return error('Matrix is not square')
 	}
 }
 
 // assert_square_matrix panics if the given tensor is not a matrix
 [inline]
-fn (t &Tensor[T]) assert_matrix[T]() ! {
-	if t.is_matrix() {
+pub fn (t &Tensor[T]) assert_matrix[T]() ! {
+	if !t.is_matrix() {
 		return error('Tensor is not two-dimensional')
 	}
 }

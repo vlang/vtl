@@ -38,6 +38,11 @@ pub fn inv[T](t &vtl.Tensor[T]) !&vtl.Tensor[T] {
 }
 
 pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	a.assert_matrix()!
+	b.assert_matrix()!
+	if a.shape[1] != b.shape[0] {
+		return error('Tensors must have the same shape')
+	}
 	ma, mb := vtl.broadcast2[T](a.copy(.row_major), b.copy(.row_major))!
 	mut dm := vsl_la.new_matrix[f64](a.shape[0], b.shape[1])
 	mam := vsl_la.matrix_raw(a.shape[0], a.shape[1], arr_to_f64arr(ma.to_array()))
