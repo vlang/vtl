@@ -435,6 +435,16 @@ size l//n + 1 and the rest of size l//n.</p>
 <p>asinh returns the elementwise asinh of an tensor</p>
 
 </section>
+						<section id="Tensor[T].assert_matrix" class="doc-node">
+							<div class="title"><h2>fn (Tensor[T]) assert_matrix <a href="#Tensor[T].assert_matrix">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/util.v#L15"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> assert_matrix<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<p>assert_square_matrix panics if the given tensor is not a matrix</p>
+
+</section>
+						<section id="Tensor[T].assert_square_matrix" class="doc-node">
+							<div class="title"><h2>fn (Tensor[T]) assert_square_matrix <a href="#Tensor[T].assert_square_matrix">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/util.v#L7"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> assert_square_matrix<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<p>assert_square_matrix panics if the given tensor is not a square matrix</p>
+
+</section>
 						<section id="Tensor[T].assign" class="doc-node">
 							<div class="title"><h2>fn (Tensor[T]) assign <a href="#Tensor[T].assign">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/src/assignment.v#L26"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> t Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> assign<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>other <span class="token operator">&</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>assign sets the values of an Tensor equal to the values of another Tensor of the same shape</p>
@@ -1276,7 +1286,7 @@ Stores a copy of the shape and strides reduced along a given axis</p>
 </section>
 
           <div class="footer">
-            Powered by vdoc. Generated on: 21 Jun 2023 05:31:00
+            Powered by vdoc. Generated on: 21 Jun 2023 05:35:44
           </div>
         </div>
         <div class="doc-toc"><ul><li class="open"><a href="#readme_">README</a></li>
@@ -1413,6 +1423,8 @@ Stores a copy of the shape and strides reduced along a given axis</p>
 <li><a href="#Tensor[T].as_u8">fn as_u8</a></li>
 <li><a href="#Tensor[T].asin">fn asin</a></li>
 <li><a href="#Tensor[T].asinh">fn asinh</a></li>
+<li><a href="#Tensor[T].assert_matrix">fn assert_matrix</a></li>
+<li><a href="#Tensor[T].assert_square_matrix">fn assert_square_matrix</a></li>
 <li><a href="#Tensor[T].assign">fn assign</a></li>
 <li><a href="#Tensor[T].atan">fn atan</a></li>
 <li><a href="#Tensor[T].atan2">fn atan2</a></li>
