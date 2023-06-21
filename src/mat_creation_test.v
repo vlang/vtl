@@ -98,11 +98,11 @@ fn test_tril_offset_1() {
 	assert tril.get([2, 2]) == 9
 }
 
-fn test_tril_inpl() {
+fn test_tril_inplace() {
 	mut t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
 	assert t.shape == [3, 3]
 	assert t.strides == [3, 1]
-	t.tril_inpl()
+	t.tril_inplace()
 	assert t.shape == [3, 3]
 	assert t.strides == [3, 1]
 	assert t.get([0, 0]) == 1
@@ -116,18 +116,96 @@ fn test_tril_inpl() {
 	assert t.get([2, 2]) == 9
 }
 
-fn test_tril_inpl_offset_0() {
+fn test_tril_inplace_offset_0() {
 	mut t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
 	assert t.shape == [3, 3]
 	assert t.strides == [3, 1]
-	t.tril_inpl_offset(0)
+	t.tril_inplace_offset(0)
 	assert t.array_equal(from_2d([[1, 0, 0], [4, 5, 0], [7, 8, 9]])!)
 }
 
-fn test_tril_inpl_offset_1() {
+fn test_tril_inplace_offset_1() {
 	mut t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
 	assert t.shape == [3, 3]
 	assert t.strides == [3, 1]
-	t.tril_inpl_offset(1)
+	t.tril_inplace_offset(1)
 	assert t.array_equal(from_2d([[1, 2, 0], [4, 5, 6], [7, 8, 9]])!)
+}
+
+fn test_triu() {
+	t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
+	assert t.shape == [3, 3]
+	assert t.strides == [3, 1]
+	triu := t.triu()
+	assert triu.shape == [3, 3]
+	assert triu.strides == [3, 1]
+	assert triu.get([0, 0]) == 1
+	assert triu.get([0, 1]) == 2
+	assert triu.get([0, 2]) == 3
+	assert triu.get([1, 0]) == 0
+	assert triu.get([1, 1]) == 5
+	assert triu.get([1, 2]) == 6
+	assert triu.get([2, 0]) == 0
+	assert triu.get([2, 1]) == 0
+	assert triu.get([2, 2]) == 9
+}
+
+fn test_triu_offset_0() {
+	t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
+	assert t.shape == [3, 3]
+	assert t.strides == [3, 1]
+	triu := t.triu_offset(0)
+	assert triu.array_equal(t.triu())
+}
+
+fn test_triu_offset_1() {
+	t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
+	assert t.shape == [3, 3]
+	assert t.strides == [3, 1]
+	triu := t.triu_offset(1)
+	assert triu.shape == [3, 3]
+	assert triu.strides == [3, 1]
+	assert triu.get([0, 0]) == 0
+	assert triu.get([0, 1]) == 2
+	assert triu.get([0, 2]) == 3
+	assert triu.get([1, 0]) == 0
+	assert triu.get([1, 1]) == 0
+	assert triu.get([1, 2]) == 6
+	assert triu.get([2, 0]) == 0
+	assert triu.get([2, 1]) == 0
+	assert triu.get([2, 2]) == 0
+}
+
+fn test_triu_inplace() {
+	mut t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
+	assert t.shape == [3, 3]
+	assert t.strides == [3, 1]
+	t.triu_inplace()
+	assert t.shape == [3, 3]
+	assert t.strides == [3, 1]
+	assert t.get([0, 0]) == 1
+	assert t.get([0, 1]) == 2
+	assert t.get([0, 2]) == 3
+	assert t.get([1, 0]) == 0
+	assert t.get([1, 1]) == 5
+	assert t.get([1, 2]) == 6
+	assert t.get([2, 0]) == 0
+	assert t.get([2, 1]) == 0
+	assert t.get([2, 2]) == 9
+}
+
+fn test_triu_inplace_offset_0() {
+	mut t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
+	assert t.shape == [3, 3]
+	assert t.strides == [3, 1]
+	t.triu_inplace_offset(0)
+	assert t.array_equal(from_2d([[1, 2, 3], [0, 5, 6], [0, 0, 9]])!)
+}
+
+fn test_triu_inplace_offset_1() {
+	mut t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
+	assert t.shape == [3, 3]
+	assert t.strides == [3, 1]
+	t.triu_inplace_offset(1)
+	assert t.array_equal(from_2d([[0, 2, 3], [0, 0, 6], [0, 0, 0]])!)
 }
