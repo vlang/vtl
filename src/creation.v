@@ -71,8 +71,10 @@ pub fn full_like[T](t &Tensor[T], val T) &Tensor[T] {
 // range returns a Tensor containing values ranging from [from, to)
 pub fn range[T](from int, to int, params TensorData) &Tensor[T] {
 	mut res := empty[T]([to - from], params)
-	for i := from; i < to; i++ {
-		res.set([i], cast[T](i))
+	mut index := 0
+	for val in from .. to {
+		res.set([index], cast[T](val))
+		index++
 	}
 	return res
 }
