@@ -10,40 +10,20 @@ pub fn (t &Tensor[T]) abs[T]() &Tensor[T] {
 	})
 }
 
-fn handle_acos[T](x T, _ []int) T {
-	return cast[T](math.acos(td(x).f64()))
-}
-
 // acos returns the elementwise acos of an tensor
 [inline]
 pub fn (t &Tensor[T]) acos[T]() &Tensor[T] {
-	// TODO: Implement using map
-	mut ret := tensor_like[T](t)
-	mut iter := t.iterator()
-	for {
-		val, i := iter.next() or { break }
-		next_val := handle_acos[T](val, i)
-		ret.set(i, next_val)
-	}
-	return ret
-}
-
-fn handle_acosh[T](x T, _ []int) T {
-	return cast[T](math.acosh(td(x).f64()))
+	return t.map(fn [T](x T, _ []int) T {
+		return cast[T](math.acos(td(x).f64()))
+	})
 }
 
 // acosh returns the elementwise acosh of an tensor
 [inline]
 pub fn (t &Tensor[T]) acosh[T]() &Tensor[T] {
-	// TODO: Implement using map
-	mut ret := tensor_like[T](t)
-	mut iter := t.iterator()
-	for {
-		val, i := iter.next() or { break }
-		next_val := handle_acosh[T](val, i)
-		ret.set(i, next_val)
-	}
-	return ret
+	return t.map(fn [T](x T, _ []int) T {
+		return cast[T](math.acosh(td(x).f64()))
+	})
 }
 
 fn handle_asin[T](x T, _ []int) T {
