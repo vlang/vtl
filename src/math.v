@@ -2,22 +2,12 @@ module vtl
 
 import math
 
-fn handle_abs[T](x T, _ []int) T {
-	return cast[T](math.abs(td(x).f64()))
-}
-
 // abs returns the elementwise abs of an tensor
 [inline]
 pub fn (t &Tensor[T]) abs[T]() &Tensor[T] {
-	// TODO: Implement using map
-	mut ret := tensor_like[T](t)
-	mut iter := t.iterator()
-	for {
-		val, i := iter.next() or { break }
-		next_val := handle_abs[T](val, i)
-		ret.set(i, next_val)
-	}
-	return ret
+	return t.map(fn [T](x T, _ []int) T {
+		return cast[T](math.abs(td(x).f64()))
+	})
 }
 
 fn handle_acos[T](x T, _ []int) T {

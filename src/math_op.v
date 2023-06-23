@@ -3,7 +3,7 @@ module vtl
 // add adds two tensors elementwise
 [inline]
 pub fn (a &Tensor[T]) add[T](b &Tensor[T]) !&Tensor[T] {
-	return a.nmap([b], fn [T](xs []T, i []int) T {
+	return a.nmap([b], fn [T](xs []T, _ []int) T {
 		a := xs[0]
 		b := xs[1]
 		$if T is bool {
@@ -19,7 +19,7 @@ pub fn (a &Tensor[T]) add[T](b &Tensor[T]) !&Tensor[T] {
 // add adds a scalar to a tensor elementwise
 [inline]
 pub fn (a &Tensor[T]) add_scalar[T](scalar T) !&Tensor[T] {
-	return a.map(fn [scalar] [T](x T, i []int) T {
+	return a.map(fn [scalar] [T](x T, _ []int) T {
 		$if T is bool {
 			return td[T](x).bool() || td[T](scalar).bool()
 		} $else $if T is string {
@@ -33,7 +33,7 @@ pub fn (a &Tensor[T]) add_scalar[T](scalar T) !&Tensor[T] {
 // subtract subtracts two tensors elementwise
 [inline]
 pub fn (a &Tensor[T]) subtract[T](b &Tensor[T]) !&Tensor[T] {
-	return a.nmap([b], fn [T](xs []T, i []int) T {
+	return a.nmap([b], fn [T](xs []T, _ []int) T {
 		a := xs[0]
 		b := xs[1]
 		$if T is bool {
@@ -49,7 +49,7 @@ pub fn (a &Tensor[T]) subtract[T](b &Tensor[T]) !&Tensor[T] {
 // subtract subtracts a scalar to a tensor elementwise
 [inline]
 pub fn (a &Tensor[T]) subtract_scalar[T](scalar T) !&Tensor[T] {
-	return a.map(fn [scalar] [T](x T, i []int) T {
+	return a.map(fn [scalar] [T](x T, _ []int) T {
 		$if T is bool {
 			return td[T](x).bool() && !td[T](scalar).bool()
 		} $else $if T is string {
@@ -63,7 +63,7 @@ pub fn (a &Tensor[T]) subtract_scalar[T](scalar T) !&Tensor[T] {
 // divide divides two tensors elementwise
 [inline]
 pub fn (a &Tensor[T]) divide[T](b &Tensor[T]) !&Tensor[T] {
-	return a.nmap([b], fn [T](xs []T, i []int) T {
+	return a.nmap([b], fn [T](xs []T, _ []int) T {
 		a := xs[0]
 		b := xs[1]
 		$if T is bool || T is string {
@@ -77,7 +77,7 @@ pub fn (a &Tensor[T]) divide[T](b &Tensor[T]) !&Tensor[T] {
 // divide divides a scalar to a tensor elementwise
 [inline]
 pub fn (a &Tensor[T]) divide_scalar[T](scalar T) !&Tensor[T] {
-	return a.map(fn [scalar] [T](x T, i []int) T {
+	return a.map(fn [scalar] [T](x T, _ []int) T {
 		$if T is bool || T is string {
 			panic(@FN + ' is not supported for type ${typeof(x).name}')
 		} $else {
@@ -89,7 +89,7 @@ pub fn (a &Tensor[T]) divide_scalar[T](scalar T) !&Tensor[T] {
 // multiply multiplies two tensors elementwise
 [inline]
 pub fn (a &Tensor[T]) multiply[T](b &Tensor[T]) !&Tensor[T] {
-	return a.nmap([b], fn [T](xs []T, i []int) T {
+	return a.nmap([b], fn [T](xs []T, _ []int) T {
 		a := xs[0]
 		b := xs[1]
 		$if T is bool || T is string {
@@ -103,7 +103,7 @@ pub fn (a &Tensor[T]) multiply[T](b &Tensor[T]) !&Tensor[T] {
 // multiply multiplies a scalar to a tensor elementwise
 [inline]
 pub fn (a &Tensor[T]) multiply_scalar[T](scalar T) !&Tensor[T] {
-	return a.map(fn [scalar] [T](x T, i []int) T {
+	return a.map(fn [scalar] [T](x T, _ []int) T {
 		$if T is bool || T is string {
 			panic(@FN + ' is not supported for type ${typeof(x).name}')
 		} $else {
