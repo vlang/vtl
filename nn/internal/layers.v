@@ -52,8 +52,8 @@ pub fn maxpool2d_backward[T](shape []int, max_indices &vtl.Tensor[int], grad_out
 	// TODO: @ulises-jeremias to override this on other backends
 	mut ret := vtl.zeros[T](shape)
 	for i in 0 .. grad_output.size {
-		idx := max_indices.data.get[int](i)
-		ret.set_nth(idx, grad_output.data.get(i))
+		idx := max_indices.get_nth[int](i)
+		ret.set_nth(idx, grad_output.get_nth(i))
 	}
 	return ret
 }
