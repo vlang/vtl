@@ -1,5 +1,67 @@
 module vtl
 
+fn test_apply() {
+	a := from_1d([1, 2, 3, 4])!
+	b := from_1d([0, 1, 2, 3])!
+	mut c := a.add(b)!
+	c.apply(fn (x int, i []int) int {
+		return x * 2
+	})
+	expected := from_1d([2, 6, 10, 14])!
+	assert c.array_equal(expected)
+}
+
+fn test_map() {
+	a := from_1d([1, 2, 3, 4])!
+	b := from_1d([0, 1, 2, 3])!
+	c := a.add(b)!
+	d := c.map(fn (x int, i []int) int {
+		return x * 2
+	})
+	expected := from_1d([2, 6, 10, 14])!
+	assert d.array_equal(expected)
+}
+
+fn test_reduce() {
+	a := from_1d([1, 2, 3, 4])!
+	b := a.reduce(0, fn (acc int, x int, i []int) int {
+		return acc + x
+	})
+	assert b == 10
+}
+
+fn test_napply() {
+	a := from_1d([1, 2, 3, 4])!
+	b := from_1d([0, 1, 2, 3])!
+	mut c := a.add(b)! // [1, 3, 5, 7]
+	c.napply([a, b], fn (xs []int, i []int) int {
+		return xs[0] * xs[1] - xs[2]
+	})!
+	expected := from_1d([1, 5, 13, 25])!
+	assert c.array_equal(expected)
+}
+
+fn test_nmap() {
+	a := from_1d([1, 2, 3, 4])!
+	b := from_1d([0, 1, 2, 3])!
+	c := a.add(b)! // [1, 3, 5, 7]
+	d := c.nmap([a, b], fn (xs []int, i []int) int {
+		return xs[0] * xs[1] - xs[2]
+	})!
+	expected := from_1d([1, 5, 13, 25])!
+	assert d.array_equal(expected)
+}
+
+fn test_nreduce() {
+	a := from_1d([1, 2, 3, 4])!
+	b := from_1d([0, 1, 2, 3])!
+	c := a.add(b)! // [1, 3, 5, 7]
+	d := c.nreduce([a, b], 0, fn (acc int, xs []int, i []int) int {
+		return acc + xs[0] * xs[1] - xs[2]
+	})!
+	assert d == 44
+}
+
 fn test_reshape_tensor_with_know_dim() {
 	values := []int{len: 27, init: index}
 	a := from_array(values, [3, 3, 3])!
