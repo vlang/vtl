@@ -1,5 +1,6 @@
 module internal
 
+import math
 import vtl
 
 pub fn dropout[T](input &vtl.Tensor[T], mask &vtl.Tensor[T], prob f64) !&vtl.Tensor[T] {
@@ -36,10 +37,41 @@ pub fn maxpool2d[T](input &vtl.Tensor[T], kernel []int, padding []int, stride []
 	outh := (hh + 2 * padding[0] - kk) / stride[0] + 1
 	outw := (ww + 2 * padding[1] - kw) / stride[1] + 1
 
-	max_indices := vtl.zeros[int]([nn, cc, outh, outw])
-	output := vtl.zeros[T]([nn, cc, outh, outw])
+	mut max_indices := vtl.zeros[int]([nn, cc, outh, outw])
+	mut output := vtl.zeros[T]([nn, cc, outh, outw])
 
-	// TODO: Implement maxpool here
+	for n in 0 .. nn {
+		for c in 0 .. cc {
+			for h in 0 .. outh {
+				for w in 0 .. outw {
+					mut hstart := h * stride[0] - padding[0]
+					mut hend := hstart + kk
+					mut wstart := w * stride[1] - padding[1]
+					mut wend := wstart + kw
+
+					hstart = math.max(hstart, 0)
+					wstart = math.max(wstart, 0)
+					hend = math.min(hend, hh)
+					wend = math.min(wend, ww)
+
+					mut max_val := vtl.cast[T](math.max_f64)
+					mut max_idx := -1
+					for i in hstart .. hend {
+						for j in wstart .. wend {
+							idx := i * ww + j
+							val := input.get([n, c, i, j])
+							if val > max_val {
+								max_val = val
+								max_idx = idx
+							}
+						}
+					}
+					output.set([n, c, h, w], max_val)
+					max_indices.set([n, c, h, w], max_idx)
+				}
+			}
+		}
+	}
 
 	return max_indices, output
 }
