@@ -22,14 +22,9 @@ pub fn deriv_tanh[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tenso
 // sigmoid takes a real-valued number and squashes it to the range [0, 1]
 [inline]
 pub fn sigmoid[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
-	mut ret := vtl.tensor_like[T](x)
-	mut iter := x.iterator()
-	for {
-		val, i := iter.next() or { break }
-		next_val := vtl.cast[T](1) / vtl.cast[T](1) + vtl.cast[T](math.exp(f64(val)))
-		ret.set(i, next_val)
-	}
-	return ret
+	return x.map(fn [T](val T, i []int) T {
+		return vtl.cast[T](1) / vtl.cast[T](1) + vtl.cast[T](math.exp(vtl.cast[f64](val)))
+	})
 }
 
 // deriv_sigmoid computes the derivative of sigmoid
@@ -48,17 +43,12 @@ pub fn deriv_sigmoid[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Te
 // relu activation function
 [inline]
 pub fn relu[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
-	mut ret := vtl.tensor_like[T](x)
-	mut iter := x.iterator()
-	for {
-		val, i := iter.next() or { break }
-		mut next_val := val
+	return x.map(fn [T](val T, i []int) T {
 		if val < 0 {
-			next_val = vtl.cast[T](0)
+			return vtl.cast[T](0)
 		}
-		ret.set(i, next_val)
-	}
-	return ret
+		return val
+	})
 }
 
 // deriv_relu computes the derivate of relu
@@ -80,17 +70,12 @@ pub fn deriv_relu[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tenso
 // leaky_relu activation function
 [inline]
 pub fn leaky_relu[T](x &vtl.Tensor[T], alpha T) &vtl.Tensor[T] {
-	mut ret := vtl.tensor_like[T](x)
-	mut iter := x.iterator()
-	for {
-		val, i := iter.next() or { break }
-		mut next_val := val
+	return x.map(fn [alpha] [T](val T, i []int) T {
 		if val < 0 {
-			next_val = alpha * val
+			return alpha * val
 		}
-		ret.set(i, next_val)
-	}
-	return ret
+		return val
+	})
 }
 
 // deriv_leaky_relu computes the derivative of leaky_relu
@@ -112,17 +97,12 @@ pub fn deriv_leaky_relu[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T], alpha
 // elu activation function
 [inline]
 pub fn elu[T](x &vtl.Tensor[T], alpha T) &vtl.Tensor[T] {
-	mut ret := vtl.tensor_like[T](x)
-	mut iter := x.iterator()
-	for {
-		val, i := iter.next() or { break }
-		mut next_val := val
+	return x.map(fn [alpha] [T](val T, i []int) T {
 		if val < 0 {
-			next_val = alpha * (vtl.cast[T](math.exp(f64(val))) - vtl.cast[T](1))
+			return alpha * (vtl.cast[T](math.exp(vtl.cast[f64](val))) - vtl.cast[T](1))
 		}
-		ret.set(i, next_val)
-	}
-	return ret
+		return val
+	})
 }
 
 // deriv_elu computes the derivative of elu
