@@ -17,19 +17,13 @@ pub fn mean_squared_error[T](y &vtl.Tensor[T], y_true &vtl.Tensor[T]) !T {
 
 [inline]
 pub fn relative_error[T](y &vtl.Tensor[T], y_true &vtl.Tensor[T]) !&vtl.Tensor[T] {
-	mut iters, shape := y.iterators[T]([y_true])!
-	mut ret := vtl.tensor_like_with_shape[T](y, shape)
-	for {
-		vals, i := iters.next() or { break }
+	return y.nmap([y_true], fn [T](vals []T, i []int) T {
 		denom := math.max(math.abs(vals[1]), math.abs(vals[0]))
-		val := if denom == vtl.cast[T](0) {
-			vtl.cast[T](0)
-		} else {
-			math.abs(math.abs(vals[1]) - math.abs(vals[0])) / denom
+		if denom == vtl.cast[T](0) {
+			return vtl.cast[T](0)
 		}
-		ret.set(i, val)
-	}
-	return ret
+		return math.abs(math.abs(vals[1]) - math.abs(vals[0])) / denom
+	})
 }
 
 [inline]

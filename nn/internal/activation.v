@@ -30,14 +30,9 @@ pub fn sigmoid[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 // deriv_sigmoid computes the derivative of sigmoid
 [inline]
 pub fn deriv_sigmoid[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tensor[T] {
-	mut iters, shape := gradient.iterators[T]([cached])!
-	mut ret := vtl.tensor_like_with_shape[T](gradient, shape)
-	for {
-		vals, i := iters.next() or { break }
-		val := vals[0] * (vtl.cast[T](1) - vals[0]) * vals[1]
-		ret.set(i, val)
-	}
-	return ret
+	return gradient.nmap([cached], fn [T](vals []T, i []int) T {
+		return vals[0] * (vtl.cast[T](1) - vals[0])
+	})
 }
 
 // relu activation function
@@ -54,17 +49,12 @@ pub fn relu[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 // deriv_relu computes the derivate of relu
 [inline]
 pub fn deriv_relu[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tensor[T] {
-	mut iters, shape := gradient.iterators[T]([cached])!
-	mut ret := vtl.tensor_like_with_shape[T](gradient, shape)
-	for {
-		vals, i := iters.next() or { break }
-		mut val := vals[0]
-		if vals[1] < 0 {
-			val = vtl.cast[T](0)
+	return gradient.nmap([cached], fn [T](vals []T, i []int) T {
+		if vals[0] < 0 {
+			return vtl.cast[T](0)
 		}
-		ret.set(i, val)
-	}
-	return ret
+		return vals[1]
+	})
 }
 
 // leaky_relu activation function
@@ -81,17 +71,12 @@ pub fn leaky_relu[T](x &vtl.Tensor[T], alpha T) &vtl.Tensor[T] {
 // deriv_leaky_relu computes the derivative of leaky_relu
 [inline]
 pub fn deriv_leaky_relu[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T], alpha T) !&vtl.Tensor[T] {
-	mut iters, shape := gradient.iterators[T]([cached])!
-	mut ret := vtl.tensor_like_with_shape[T](gradient, shape)
-	for {
-		vals, i := iters.next() or { break }
-		mut val := vals[1]
+	return gradient.nmap([cached], fn [alpha] [T](vals []T, i []int) T {
 		if vals[0] < 0 {
-			val = alpha * vals[1]
+			return alpha * vals[1]
 		}
-		ret.set(i, val)
-	}
-	return ret
+		return vals[1]
+	})
 }
 
 // elu activation function
@@ -108,44 +93,36 @@ pub fn elu[T](x &vtl.Tensor[T], alpha T) &vtl.Tensor[T] {
 // deriv_elu computes the derivative of elu
 [inline]
 pub fn deriv_elu[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T], alpha T) !&vtl.Tensor[T] {
-	mut iters, shape := gradient.iterators[T]([cached])!
-	mut ret := vtl.tensor_like_with_shape[T](gradient, shape)
-	for {
-		vals, i := iters.next() or { break }
-		mut val := vtl.cast[T](1)
+	return gradient.nmap([cached], fn [alpha] [T](vals []T, i []int) T {
 		if vals[0] < 0 {
-			val = vtl.cast[T](math.exp(f64(vals[1])))
+			return alpha * (vals[0] + vtl.cast[T](1))
 		}
-		ret.set(i, val)
-	}
-	return ret
+		return vals[1]
+	})
 }
 
 // sigmoid_cross_entropy computes the sigmoid cross entropy between
 // the labels and the predictions
 [inline]
 pub fn sigmoid_cross_entropy[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Tensor[T] {
-	batch_size := input.shape[0]
-	mut iters, shape := input.iterators[T]([target])!
-	mut ret := vtl.tensor_like_with_shape[T](input, shape)
-	for {
-		vals, i := iters.next() or { break }
-		val := -(vals[1] * vtl.cast[T](math.max(f64(0), f64(vals[0])))) - vtl.cast[T](math.log(
+	sum := input.nreduce([target], vtl.cast[T](0), fn [T](acc T, vals []T, i []int) T {
+		next := -(vals[1] * vtl.cast[T](math.max(f64(0), f64(vals[0])))) - vtl.cast[T](math.log(
 			vtl.cast[T](1) + vtl.cast[T](math.exp(f64(vals[0])))))
-		ret.set(i, val)
-	}
-	return vtl.from_1d([stats.sum[T](ret) / vtl.cast[T](batch_size)])
+		return acc + next
+	})!
+	batch_size := input.shape[0]
+	result := sum / vtl.cast[T](batch_size)
+	return vtl.from_1d([result])
 }
 
 // mse squared error between the labels and the predictions
 [inline]
 pub fn mse[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Tensor[T] {
-	mut iters, shape := input.iterators[T]([target])!
-	mut ret := vtl.tensor_like_with_shape[T](input, shape)
-	for {
-		vals, i := iters.next() or { break }
-		val := vtl.cast[T](math.pow(f64(vals[0] - vals[1]), 2.0))
-		ret.set(i, val)
-	}
-	return vtl.from_1d([stats.mean[T](ret)])
+	sum := input.nreduce([target], vtl.cast[T](0), fn [T](acc T, vals []T, i []int) T {
+		next := vtl.cast[T](math.pow(f64(vals[0] - vals[1]), 2.0))
+		return acc + next
+	})!
+	size := input.size()
+	result := sum / vtl.cast[T](size)
+	return vtl.from_1d([result])
 }

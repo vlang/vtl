@@ -4,25 +4,15 @@ import math
 import vtl
 
 pub fn dropout[T](input &vtl.Tensor[T], mask &vtl.Tensor[T], prob f64) !&vtl.Tensor[T] {
-	mut iters, shape := input.iterators[T]([mask])!
-	mut ret := vtl.tensor_like_with_shape[T](input, shape)
-	for {
-		vals, i := iters.next() or { break }
-		val := vals[0] * vals[1] / vtl.cast[T](prob)
-		ret.set(i, val)
-	}
-	return ret
+	return input.nmap([mask], fn [T](vals []T, i []int) T {
+		return vals[0] * vals[1] / vtl.cast[T](prob)
+	})
 }
 
 pub fn dropout_backwards[T](gradient &vtl.Tensor[T], mask &vtl.Tensor[T], prob f64) !&vtl.Tensor[T] {
-	mut iters, shape := gradient.iterators[T]([mask])
-	mut ret := vtl.tensor_like_with_shape[T](gradient, shape)
-	for {
-		vals, i := iters.next() or { break }
-		val := vals[0] * vals[1] / vtl.cast[T](prob)
-		ret.set(i, val)
-	}
-	return ret
+	return gradiend.nmap([mask], fn [T](vals []T, i []int) T {
+		return vals[0] * vals[1] / vtl.cast[T](prob)
+	})
 }
 
 pub fn maxpool2d[T](input &vtl.Tensor[T], kernel []int, padding []int, stride []int) (&vtl.Tensor[int], &vtl.Tensor[T]) {
