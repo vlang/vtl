@@ -73,14 +73,14 @@ pub fn (v &Variable[T]) str() string {
 // Context
 pub fn (mut v Variable[T]) backprop[T]() ! {
 	v.grad = vtl.ones_like[T](v.value)
-	for v.context.len() > 0 && v.context.last().payload.variable != v {
-		node := v.context.pop()
+	for v.context.len() > 0 && v.context.last()!.payload.variable != v {
+		node := v.context.pop()!
 		$if debug {
 			print(node.name)
 		}
 	}
 	for v.context.len() > 0 {
-		cur_node := v.context.pop()
+		cur_node := v.context.pop()!
 		$if debug {
 			print(cur_node.name)
 		}

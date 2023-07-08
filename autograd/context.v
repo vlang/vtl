@@ -31,11 +31,17 @@ pub fn (mut ctx Context[T]) push[T](node &Node[T]) {
 	ctx.nodes << node
 }
 
-pub fn (ctx &Context[T]) last[T]() &Node[T] {
+pub fn (ctx &Context[T]) last[T]() !&Node[T] {
+	if ctx.nodes.len == 0 {
+		return error(@FN + ': context is empty')
+	}
 	return ctx.nodes.last()
 }
 
-pub fn (mut ctx Context[T]) pop[T]() &Node[T] {
+pub fn (mut ctx Context[T]) pop[T]() !&Node[T] {
+	if ctx.nodes.len == 0 {
+		return error(@FN + ': context is empty')
+	}
 	return ctx.nodes.pop()
 }
 
