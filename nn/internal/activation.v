@@ -2,7 +2,6 @@ module internal
 
 import math
 import vtl
-import vtl.stats
 
 // tanh squashes a real-valued number to the range [-1, 1]
 [inline]
