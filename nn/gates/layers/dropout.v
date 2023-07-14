@@ -18,7 +18,12 @@ pub fn dropout_gate[T](mask &vtl.Tensor[T], prob f64) &DropoutGate[T] {
 
 pub fn (g &DropoutGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
-	return [gradient.multiply(g.mask)!.divide_scalar(vtl.cast[T](g.prob))!]
+	prob := g.prob
+	result := gradient.nmap([g.mask], fn [prob] [T](xs []T, i []int) {
+		return xs[0] * xs[1] / prob
+	})!
+
+	return [result]
 }
 
 pub fn (g &DropoutGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
