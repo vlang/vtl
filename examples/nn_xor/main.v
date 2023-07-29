@@ -24,9 +24,6 @@ x_train_bool := vtl.random(0, 2, [batch_size * 100, 2]).as_bool()
 x_train_bool_1 := x_train_bool.slice_hilo([]int{}, [0])!
 x_train_bool_2 := x_train_bool.slice_hilo([]int{}, [1])!
 
-println(x_train_bool_1.shape)
-println(x_train_bool_2.shape)
-
 y_bool := x_train_bool_1.equal(x_train_bool_2)!
 
 // We need to convert the bool tensor to a float tensor

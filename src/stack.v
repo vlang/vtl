@@ -63,6 +63,18 @@ pub fn stack[T](ts []&Tensor[T], data AxisData) !&Tensor[T] {
 	return concatenate[T](expanded, data)
 }
 
+// unsqueeze adds a dimension of size one to a Tensor
+pub fn (t &Tensor[T]) unsqueeze[T](data AxisData) !&Tensor[T] {
+	axis := data.axis
+	mut newshape := t.shape.clone()
+	newaxis := match axis < 0 {
+		true { axis + t.rank() + 1 }
+		else { axis }
+	}
+	newshape.insert(newaxis, 1)
+	return t.reshape[T](newshape)
+}
+
 // concatenate concatenates two Tensors together
 pub fn concatenate[T](ts []&Tensor[T], data AxisData) !&Tensor[T] {
 	mut newshape := ts[0].shape.clone()

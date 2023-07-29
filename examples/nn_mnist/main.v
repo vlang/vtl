@@ -7,7 +7,7 @@ import vtl.nn.models
 import vtl.nn.optimizers
 
 const (
-	batch_size = 32
+	batch_size = 28
 	epochs     = 1
 	batches    = 100
 )
@@ -24,8 +24,8 @@ model.mse_loss()
 mnist := datasets.load_mnist()!
 
 // We reshape the data to fit the network
-features := mnist.train_features.divide_scalar(u8(255))!.reshape([-1, 1, 28, 28])!
-labels := mnist.train_labels
+features := mnist.train_features.as_f64().divide_scalar(255.0)!.unsqueeze(axis: 1)!
+labels := mnist.train_labels.as_int()
 
 mut losses := []&vtl.Tensor[f64]{cap: epochs}
 
