@@ -24,7 +24,7 @@ model.mse_loss()
 mnist := datasets.load_mnist()!
 
 // We reshape the data to fit the network
-features := mnist.train_features.as_f32().divide_scalar(f32(255.0))!.unsqueeze(axis: 1)!
+features := mnist.train_features.as_f64().divide_scalar(255.0)!.unsqueeze(axis: 1)!
 labels := mnist.train_labels.as_int()
 
 mut losses := []&vtl.Tensor[f64]{cap: epochs}
