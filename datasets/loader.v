@@ -1,9 +1,9 @@
 module datasets
 
 import os
+import compress.gzip
 import crypto.sha1
 import net.http
-import szip
 
 fn get_cache_dir(subdir ...string) string {
 	mut cache_dir := os.cache_dir()
@@ -92,7 +92,14 @@ fn download_dataset(data DatasetDownload) !map[string]string {
 						return error_with_code('Error extracting ${target}', result.exit_code)
 					}
 				} else {
-					szip.extract_zip_to_dir(target, dataset_dir)!
+					file_content := os.read_file(target)!
+					content := gzip.decompress(file_content.bytes(),
+						verify_header_checksum: true
+						verify_length: false
+						verify_checksum: false
+					)!
+					umcompressed_filename := target#[0..-3]
+					os.write_file(umcompressed_filename, content.bytestr())!
 				}
 			}
 		}
