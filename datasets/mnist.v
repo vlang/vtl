@@ -1,15 +1,14 @@
 module datasets
 
-import encoding.csv
-import os
 import vtl
+import os
 
 pub const (
-	mnist_base_url   = 'http://yann.lecun.com/exdb/mnist/'
-        mnist_train_images_file = 'train-images-idx3-ubyte.gz'
-        mnist_train_labels_file = 'train-labels-idx1-ubyte.gz'
-        mnist_test_images_file  = 't10k-images-idx3-ubyte.gz'
-        mnist_test_labels_file  = 't10k-labels-idx1-ubyte.gz'
+	mnist_base_url          = 'http://yann.lecun.com/exdb/mnist/'
+	mnist_train_images_file = 'train-images-idx3-ubyte.gz'
+	mnist_train_labels_file = 'train-labels-idx1-ubyte.gz'
+	mnist_test_images_file  = 't10k-images-idx3-ubyte.gz'
+	mnist_test_labels_file  = 't10k-labels-idx1-ubyte.gz'
 )
 
 // MnistDataset is a dataset of MNIST handwritten digits.
@@ -22,49 +21,45 @@ pub:
 }
 
 // load_mnist_helper loads the MNIST dataset from the given filename.
-pub fn load_mnist_helper(filename string) !(&vtl.Tensor[u8], &vtl.Tensor[u8]) {
+fn load_mnist_helper(filename string) !string {
 	paths := download_dataset(
 		dataset: 'mnist'
 		baseurl: datasets.mnist_base_url
-                extract: true
+		extract: true
 		urls_names: {
 			filename: filename
 		}
 	)!
 
 	path := paths[filename]
-	content := os.read_file(path)!
-	mut parser := csv.new_reader(content)
+	uncompressed_path := path#[0..-3]
+	return os.read_file(uncompressed_path)!
+}
 
-	mut labels := []int{}
-	mut features := []u8{}
+// load_mnist_features loads the MNIST features.
+fn load_mnist_features(filename string) !&vtl.Tensor[u8] {
+	content := load_mnist_helper(filename)!
 
-	for {
-		items := parser.read() or { break }
-		labels << items[0].int()
-		features << items[1..].map(it.u8())
-	}
+	features := content[16..].bytes()
 
-	mut lt := vtl.from_1d(labels)!
-	mut lft := vtl.zeros[u8]([lt.shape[0], 10])
+	return vtl.from_1d(features)!.reshape([-1, 28, 28])
+}
 
-	mut iter := lt.iterator()
-	for {
-		val, i := iter.next() or { break }
-		mut next_index := i.clone()
-		next_index << val
-		lft.set(next_index, 1)
-	}
+// load_mnist_labels loads the MNIST labels.
+fn load_mnist_labels(filename string) !&vtl.Tensor[u8] {
+	content := load_mnist_helper(filename)!
 
-	ft := vtl.from_1d(features)!.reshape([-1, 28, 28])!
+	labels := content[8..].bytes()
 
-	return ft, lft
+	return vtl.from_1d(labels)!
 }
 
 // load_mnist loads the MNIST dataset.
 pub fn load_mnist() !MnistDataset {
-	train_features, train_labels := load_mnist_helper(datasets.mnist_train_file)!
-	test_features, test_labels := load_mnist_helper(datasets.mnist_test_file)!
+	train_features := load_mnist_features(datasets.mnist_train_images_file)!
+	train_labels := load_mnist_labels(datasets.mnist_train_labels_file)!
+	test_features := load_mnist_features(datasets.mnist_test_images_file)!
+	test_labels := load_mnist_labels(datasets.mnist_test_labels_file)!
 
 	return MnistDataset{
 		train_features: train_features
