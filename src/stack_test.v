@@ -80,6 +80,20 @@ fn test_stack() {
 	assert result.array_equal(expected)
 }
 
+fn test_unsqueeze_1() {
+	a := ones[f64]([2, 2])
+	result := a.unsqueeze[f64](axis: 1)!
+	expected := from_array([1.0, 1, 1, 1], [2, 1, 2])!
+	assert result.array_equal(expected)
+}
+
+fn test_unsqueeze_2() {
+	a := ones[f64]([2, 2])
+	result := a.unsqueeze[f64](axis: 0)!
+	expected := from_array([1.0, 1, 1, 1], [1, 2, 2])!
+	assert result.array_equal(expected)
+}
+
 fn test_expand_dims() {
 	a := ones[f64]([2, 2])
 	result := a.expand_dims[f64](axis: 1)!
