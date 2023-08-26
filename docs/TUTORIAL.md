@@ -5,5 +5,5 @@
 - [Matrix and Vector operations](./TUTORIAL_LINEAR_ALGEBRA.md)
 - Broadcasted operations
 - Transposing, Reshaping, Permuting, Concatenating
-- Map and Reduce
+- [Map and Reduce](./TUTORIAL_MAP_REDUCE.md)
 - Iterators
