@@ -20,7 +20,7 @@ println(t.shape) // [5]
 
 println('map: ')
 map1 := t.map(fn (x int, idx []int) int {
-    return x * 2
+	return x * 2
 })
 
 println(map1)
@@ -47,7 +47,7 @@ b := vtl.from_1d([0, 1, 2, 3, 4])!
 
 println('nmap: ')
 nmap1 := t.nmap([a, b], fn (xs []int, idx []int) int {
-    return xs[0] * xs[1] - xs[2]
+	return xs[0] * xs[1] - xs[2]
 })!
 
 println(nmap1)
@@ -71,7 +71,7 @@ println(t.shape) // [5]
 
 println('apply: ')
 t.apply(fn (x int, idx []int) int {
-    return x * 2
+	return x * 2
 })
 
 println(t)
@@ -98,7 +98,7 @@ b := vtl.from_1d([0, 1, 2, 3, 4])!
 
 println('napply: ')
 t.napply([a, b], fn (xs []int, idx []int) int {
-    return xs[0] * xs[1] - xs[2]
+	return xs[0] * xs[1] - xs[2]
 })!
 
 println(t)
@@ -124,7 +124,7 @@ println(t.shape) // [5]
 
 println('reduce: ')
 prod := t.reduce(1, fn (acc int, x int, idx []int) int {
-    return acc * x
+	return acc * x
 })
 
 println(prod) // 120
@@ -147,7 +147,7 @@ a := vtl.from_1d([2, 4, 6, 8, 10])!
 
 println('nreduce: ')
 result := t.nreduce([a], 1, fn (acc int, xs []int, idx []int) int {
-    return acc * xs[0] - xs[1]
+	return acc * xs[0] - xs[1]
 })!
 
 println(result) // -530
