@@ -76,6 +76,14 @@ pub fn (t &Tensor[T]) array_equal[T](other &Tensor[T]) bool {
 	mut iters, _ := t.iterators[T]([other]) or { return false }
 	for {
 		vals, _ := iters.next() or { break }
+		$if T is f64 {
+			if !math.veryclose(vals[0], vals[1]) {
+				eprintln('> failed array_equal, vals[0]: ${vals[0]} | f64_bits: ${math.f64_bits(vals[0])}')
+				eprintln('> failed array_equal, vals[1]: ${vals[1]} | f64_bits: ${math.f64_bits(vals[1])}')
+				return false
+			}
+			continue
+		}
 		if vals[0] != vals[1] {
 			return false
 		}
