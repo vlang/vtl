@@ -11,7 +11,7 @@ pub:
 	gate Gate
 pub mut:
 	// The variables that created this node
-	parents []&Variable[T]
+	parents []Variable[T]
 	// Wrapper around a Tensor, contains operation data
 	payload &Payload[T]
 	// Debug use only, contains a name for a node
@@ -19,7 +19,7 @@ pub mut:
 }
 
 // node
-pub fn node[T](gate Gate, parents []&Variable[T], payload &Payload[T], name string) &Node[T] {
+pub fn node[T](gate Gate, parents []Variable[T], payload &Payload[T], name string) &Node[T] {
 	return &Node[T]{
 		gate: gate
 		parents: parents

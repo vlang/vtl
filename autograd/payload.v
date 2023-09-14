@@ -7,10 +7,10 @@ module autograd
 pub struct Payload[T] {
 pub:
 	// Contents of the paylod
-	variable &Variable[T]
+	variable Variable[T]
 }
 
-pub fn payload[T](variable &Variable[T]) &Payload[T] {
+pub fn payload[T](variable Variable[T]) &Payload[T] {
 	return &Payload[T]{
 		variable: variable
 	}
