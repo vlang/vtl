@@ -33,7 +33,9 @@ pub fn (g &SoftmaxCrossEntropyGate[T]) cache[T](mut result autograd.Variable[T],
 					result.grad = vtl.zeros_like[T](result.value)
 					result.requires_grad = true
 
-					autograd.register[T]('SoftmaxCrossEntropy', g, result, [a, b])!
+					mut a_ := unsafe { a }
+					mut b_ := unsafe { b }
+					autograd.register[T]('SoftmaxCrossEntropy', g, result, [a_, b_])!
 				}
 				else {
 					return error('SoftmaxCrossEntropyGate: cache: invalid argument')
