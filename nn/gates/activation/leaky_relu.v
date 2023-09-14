@@ -29,7 +29,8 @@ pub fn (g &LeakyReluGate[T]) cache[T](mut result autograd.Variable[T], args ...a
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
 
-			autograd.register[T]('LeakyRelu', g, result, [a])!
+			mut a_ := unsafe { a }
+			autograd.register[T]('LeakyRelu', g, result, [a_])!
 		}
 		else {
 			return error('LeakyRelu: cache: invalid argument')
