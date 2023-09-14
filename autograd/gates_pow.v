@@ -41,9 +41,7 @@ pub fn (g &PowGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
 					result.grad = vtl.zeros_like[T](result.value)
 					result.requires_grad = true
 
-					mut a_ := unsafe { a }
-					mut b_ := unsafe { b }
-					register[T]('Pow', g, result, [a_, b_])!
+					register[T]('Pow', g, result, [a, b])!
 				}
 				else {
 					return error('PowGate: b must be a Variable')
