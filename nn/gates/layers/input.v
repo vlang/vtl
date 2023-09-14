@@ -22,7 +22,8 @@ pub fn (g &InputGate[T]) cache[T](mut result autograd.Variable[T], args ...autog
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
 
-			autograd.register[T]('Input', g, result, [a])!
+			mut a_ := unsafe { a }
+			autograd.register[T]('Input', g, result, [a_])!
 		}
 		else {
 			return error('InputGate: cache: invalid argument')
