@@ -29,7 +29,8 @@ pub fn (g &SigmoidGate[T]) cache[T](mut result autograd.Variable[T], args ...aut
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
 
-			autograd.register[T]('Sigmoid', g, result, [a])!
+			mut a_ := unsafe { a }
+			autograd.register[T]('Sigmoid', g, result, [a_])!
 		}
 		else {
 			return error('Sigmoid: cache: invalid argument')

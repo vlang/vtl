@@ -34,7 +34,8 @@ pub fn (g &DropoutGate[T]) cache[T](mut result autograd.Variable[T], args ...aut
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
 
-			autograd.register[T]('Dropout', g, result, [a])!
+			mut a_ := unsafe { a }
+			autograd.register[T]('Dropout', g, result, [a_])!
 		}
 		else {
 			return error('DropoutGate: cache: invalid argument')

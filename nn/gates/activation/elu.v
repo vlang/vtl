@@ -29,7 +29,8 @@ pub fn (g &EluGate[T]) cache[T](mut result autograd.Variable[T], args ...autogra
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
 
-			autograd.register[T]('Elu', g, result, [a])!
+			mut a_ := unsafe { a }
+			autograd.register[T]('Elu', g, result, [a_])!
 		}
 		else {
 			return error('Elu: cache: invalid argument')
