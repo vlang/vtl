@@ -27,8 +27,7 @@ pub fn (g &ExpGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
 
-			mut a_ := unsafe { a }
-			register[T]('Exp', g, result, [a_])!
+			register[T]('Exp', g, result, [a])!
 		}
 		else {
 			return error('ExpGate: a must be a Variable')

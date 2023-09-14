@@ -33,9 +33,7 @@ pub fn (g &SigmoidCrossEntropyGate[T]) cache[T](mut result autograd.Variable[T],
 					result.grad = vtl.zeros_like[T](result.value)
 					result.requires_grad = true
 
-					mut a_ := unsafe { a }
-					mut b_ := unsafe { b }
-					autograd.register[T]('SigmoidCrossEntropy', g, result, [a_, b_])!
+					autograd.register[T]('SigmoidCrossEntropy', g, result, [a, b])!
 				}
 				else {
 					return error('SigmoidCrossEntropyGate: cache: invalid argument')

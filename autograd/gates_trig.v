@@ -27,8 +27,7 @@ pub fn (g &SinGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
 
-			mut a_ := unsafe { a }
-			register[T]('Sin', g, result, [a_])!
+			register[T]('Sin', g, result, [a])!
 		}
 		else {
 			return error('SinGate: a must be a Variable')
@@ -61,8 +60,7 @@ pub fn (g &CosGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
 
-			mut a_ := unsafe { a }
-			register[T]('Cos', g, result, [a_])!
+			register[T]('Cos', g, result, [a])!
 		}
 		else {
 			return error('CosGate: a must be a Variable')
@@ -96,8 +94,7 @@ pub fn (g &TanGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
 
-			mut a_ := unsafe { a }
-			register[T]('Tan', g, result, [a_])!
+			register[T]('Tan', g, result, [a])!
 		}
 		else {
 			return error('TanGate: a must be a Variable')
