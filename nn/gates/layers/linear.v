@@ -42,7 +42,7 @@ pub fn (g &LinearGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tens
 pub fn (g &LinearGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	input := args[0]
 	weight := args[1]
-	bias := args[2]
+	bias := args[1]
 
 	match input {
 		autograd.Variable[T] {
@@ -53,10 +53,7 @@ pub fn (g &LinearGate[T]) cache[T](mut result autograd.Variable[T], args ...auto
 							result.grad = vtl.zeros_like[T](result.value)
 							result.requires_grad = true
 
-							mut input_ := unsafe { input }
-							mut weight_ := unsafe { weight }
-							mut bias_ := unsafe { bias }
-							autograd.register[T]('Linear', g, result, [input_, weight_, bias_])!
+							autograd.register[T]('Linear', g, result, [input, weight, bias])!
 						}
 						else {
 							return error('LinearGate: bias must be a Variable')

@@ -23,9 +23,8 @@ pub fn (g &AddGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
 				Variable[T] {
 					result.grad = vtl.zeros_like[T](result.value)
 					result.requires_grad = true
-					mut a_ := unsafe { a }
-					mut b_ := unsafe { b }
-					register[T]('Add', g, result, [a_, b_])!
+
+					register[T]('Add', g, result, [a, b])!
 				}
 				else {
 					return error('AddGate: b must be a Variable')
@@ -61,9 +60,7 @@ pub fn (g &SubstractGate[T]) cache[T](mut result Variable[T], args ...CacheParam
 					result.grad = vtl.zeros_like[T](result.value)
 					result.requires_grad = true
 
-					mut a_ := unsafe { a }
-					mut b_ := unsafe { b }
-					register[T]('Sub', g, result, [a_, b_])!
+					register[T]('Sub', g, result, [a, b])!
 				}
 				else {
 					panic('SubGate: b must be a Variable')
@@ -107,9 +104,7 @@ pub fn (g &MultiplyGate[T]) cache[T](mut result Variable[T], args ...CacheParam)
 					result.grad = vtl.zeros_like[T](result.value)
 					result.requires_grad = true
 
-					mut a_ := unsafe { a }
-					mut b_ := unsafe { b }
-					register[T]('Multiply', g, result, [a_, b_])!
+					register[T]('Multiply', g, result, [a, b])!
 				}
 				else {
 					panic('MultiplyGate: b must be a Variable')
@@ -156,9 +151,7 @@ pub fn (g &DivideGate[T]) cache[T](mut result Variable[T], args ...CacheParam) !
 					result.grad = vtl.zeros_like[T](result.value)
 					result.requires_grad = true
 
-					mut a_ := unsafe { a }
-					mut b_ := unsafe { b }
-					register[T]('Divide', g, result, [a_, b_])!
+					register[T]('Divide', g, result, [a, b])!
 				}
 				else {
 					panic('DivideGate: b must be a Variable')
