@@ -31,7 +31,7 @@ pub fn (g &FlattenGate[T]) cache[T](mut result autograd.Variable[T], args ...aut
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
 
-			autograd.register[T]('Flatten', g, result, [a])!
+			autograd.register[T]('Flatten', g, result, [args[0]])!
 		}
 		else {
 			return error('FlattenGate: cache: invalid argument')

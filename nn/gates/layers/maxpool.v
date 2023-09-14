@@ -39,7 +39,7 @@ pub fn (g &MaxPool2DGate[T]) cache[T](mut result autograd.Variable[T], args ...a
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
 
-			autograd.register[T]('MaxPool2D', g, result, [a])!
+			autograd.register[T]('MaxPool2D', g, result, [args[0]])!
 		}
 		else {
 			return error('MaxPool2DGate: cache: invalid argument')

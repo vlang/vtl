@@ -29,7 +29,7 @@ pub fn (g &ReLUGate[T]) cache[T](mut result autograd.Variable[T], args ...autogr
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
 
-			autograd.register[T]('Relu', g, result, [a])!
+			autograd.register[T]('Relu', g, result, [args[0]])!
 		}
 		else {
 			return error('Relu: cache: invalid argument')

@@ -30,7 +30,7 @@ pub fn (g &MseGate[T]) cache[T](mut result autograd.Variable[T], args ...autogra
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
 
-			autograd.register[T]('MSE', g, result, [a])!
+			autograd.register[T]('MSE', g, result, [args[0]])!
 		}
 		else {
 			return error('MSEGate: cache: invalid argument')

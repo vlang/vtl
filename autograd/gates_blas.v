@@ -34,7 +34,7 @@ pub fn (g &MatMulGate[T]) cache[T](mut result Variable[T], args ...CacheParam) !
 					result.grad = vtl.zeros_like[T](result.value)
 					result.requires_grad = true
 
-					register[T]('MatMul', g, result, [a, b])!
+					register[T]('MatMul', g, result, [args[0], args[1]])!
 				}
 				else {
 					return error('MatMulGate: b must be a Variable')
