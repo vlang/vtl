@@ -1,6 +1,8 @@
 module vtl
 
 // as_bool casts the Tensor to a Tensor of bools.
+// If the original Tensor is not a Tensor of bools, then each value is cast to a bool,
+// otherwise the original Tensor is returned.
 [inline]
 pub fn (t &Tensor[T]) as_bool[T]() &Tensor[bool] {
 	$if T is bool {
@@ -19,6 +21,8 @@ pub fn (t &Tensor[T]) as_bool[T]() &Tensor[bool] {
 }
 
 // as_f32 casts the Tensor to a Tensor of f32s.
+// If the original Tensor is not a Tensor of f32s, then each value is cast to a f32,
+// otherwise the original Tensor is returned.
 [inline]
 pub fn (t &Tensor[T]) as_f32[T]() &Tensor[f32] {
 	$if T is f32 {
@@ -37,6 +41,8 @@ pub fn (t &Tensor[T]) as_f32[T]() &Tensor[f32] {
 }
 
 // as_f64 casts the Tensor to a Tensor of f64s.
+// If the original Tensor is not a Tensor of f64s, then each value is cast to a f64,
+// otherwise the original Tensor is returned.
 [inline]
 pub fn (t &Tensor[T]) as_f64[T]() &Tensor[f64] {
 	$if T is f64 {
@@ -55,6 +61,8 @@ pub fn (t &Tensor[T]) as_f64[T]() &Tensor[f64] {
 }
 
 // as_i16 casts the Tensor to a Tensor of i16 values.
+// If the original Tensor is not a Tensor of i16s, then each value is cast to a i16,
+// otherwise the original Tensor is returned.
 [inline]
 pub fn (t &Tensor[T]) as_i16[T]() &Tensor[i16] {
 	$if T is i16 {
@@ -73,6 +81,8 @@ pub fn (t &Tensor[T]) as_i16[T]() &Tensor[i16] {
 }
 
 // as_i8 casts the Tensor to a Tensor of i8 values.
+// If the original Tensor is not a Tensor of i8s, then each value is cast to a i8,
+// otherwise the original Tensor is returned.
 [inline]
 pub fn (t &Tensor[T]) as_i8[T]() &Tensor[i8] {
 	$if T is i8 {
@@ -91,6 +101,8 @@ pub fn (t &Tensor[T]) as_i8[T]() &Tensor[i8] {
 }
 
 // as_int casts the Tensor to a Tensor of ints.
+// If the original Tensor is not a Tensor of ints, then each value is cast to a int,
+// otherwise the original Tensor is returned.
 [inline]
 pub fn (t &Tensor[T]) as_int[T]() &Tensor[int] {
 	$if T is int {
@@ -109,6 +121,8 @@ pub fn (t &Tensor[T]) as_int[T]() &Tensor[int] {
 }
 
 // as_string casts the Tensor to a Tensor of string values.
+// If the original Tensor is not a Tensor of strings, then each value is cast to a string,
+// otherwise the original Tensor is returned.
 [inline]
 pub fn (t &Tensor[T]) as_string[T]() &Tensor[string] {
 	$if T is string {
@@ -127,6 +141,8 @@ pub fn (t &Tensor[T]) as_string[T]() &Tensor[string] {
 }
 
 // as_u8 casts the Tensor to a Tensor of u8 values.
+// If the original Tensor is not a Tensor of u8s, then each value is cast to a u8,
+// otherwise the original Tensor is returned.
 [inline]
 pub fn (t &Tensor[T]) as_u8[T]() &Tensor[u8] {
 	$if T is u8 {
