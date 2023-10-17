@@ -17,15 +17,15 @@ pub fn det[T](t &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 	t.assert_square_matrix()!
 	m := t.shape[0]
 	n := t.shape[1]
-	mat := vsl_la.matrix_raw(m, n, tensor_to_f64_array[T](t))
+	mat := vsl_la.Matrix.raw(m, n, tensor_to_f64_array[T](t))
 	return vtl.from_1d([vsl_la.matrix_det(mat)])
 }
 
 pub fn inv[T](t &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 	t.assert_square_matrix()!
 	mut colmajort := t.copy(.col_major)
-	mut ret_m := vsl_la.new_matrix[f64](colmajort.shape[0], colmajort.shape[1])
-	mut colmajorm := vsl_la.matrix_raw(colmajort.shape[0], colmajort.shape[1], tensor_to_f64_array[T](colmajort))
+	mut ret_m := vsl_la.Matrix.new[f64](colmajort.shape[0], colmajort.shape[1])
+	mut colmajorm := vsl_la.Matrix.raw(colmajort.shape[0], colmajort.shape[1], tensor_to_f64_array[T](colmajort))
 	vsl_la.matrix_inv(mut ret_m, mut colmajorm, true)
 	return vtl.from_2d[f64](ret_m.get_deep2())
 }
@@ -37,9 +37,9 @@ pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 		return error('Invalid shapes for matrix multiplication ${a.shape} and ${b.shape}')
 	}
 	ma, mb := vtl.broadcast2[T](a.copy(.row_major), b.copy(.row_major))!
-	mut dm := vsl_la.new_matrix[f64](a.shape[0], b.shape[1])
-	mam := vsl_la.matrix_raw(a.shape[0], a.shape[1], tensor_to_f64_array[T](ma))
-	mbm := vsl_la.matrix_raw(b.shape[0], b.shape[1], tensor_to_f64_array[T](mb))
+	mut dm := vsl_la.Matrix.new[f64](a.shape[0], b.shape[1])
+	mam := vsl_la.Matrix.raw(a.shape[0], a.shape[1], tensor_to_f64_array[T](ma))
+	mbm := vsl_la.Matrix.raw(b.shape[0], b.shape[1], tensor_to_f64_array[T](mb))
 	vsl_la.matrix_matrix_mul(mut dm, 1.0, mam, mbm)
 	return vtl.from_2d[f64](dm.get_deep2())
 }
