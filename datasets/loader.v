@@ -19,7 +19,7 @@ struct RawDownload {
 	target string
 }
 
-fn load_from_url(data RawDownload) !string {
+fn load_from_url(data RawDownload) ! {
 	datasets_cache_dir := get_cache_dir('datasets')
 
 	if !os.is_dir(datasets_cache_dir) {
@@ -33,15 +33,10 @@ fn load_from_url(data RawDownload) !string {
 	}
 
 	if os.is_file(cache_file_path) {
-		return os.read_file(cache_file_path)
+		return
 	}
 
-	res := http.get(data.url)!
-	content := res.body
-
-	os.write_file(cache_file_path, content)!
-
-	return content
+	http.download_file(data.url, cache_file_path)!
 }
 
 [params]
