@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
@@ -36,7 +36,7 @@
 						<div class="info">
 							<div class="module">vtl</div>
 							<div class="toggle-version-container">
-								<span>0.2.0 48a1d6c</span>
+								<span>0.2.0 fbb43f5</span>
 								<div
 									id="dark-mode-toggle"
 									role="switch"
@@ -166,8 +166,7 @@
 	<span class="token comment">// backward(payload &Payload<T>) []&vtl.Tensor<T></span>
 	<span class="token comment">// cache(mut result Variable<T>, args ...CacheParam)</span>
 <span class="token punctuation">}</span></code></pre>
-<p>Gate is an object that can cache the result of an operation, as well as backpropogate a payload backwards along the computational graph</p>
-<p>Structs that implement from this interface can add instance variables if additional caching is needed, and these need to be populated when writing the cached operation TODO: Make this generic once it works as expected</p>
+<p>Gate is an object that can cache the result of an operation, as well as backpropogate a payload backwards along the computational graph</p><p>Structs that implement from this interface can add instance variables if additional caching is needed, and these need to be populated when writing the cached operation TODO: Make this generic once it works as expected</p>
 
 </section>
 		<section id="AddGate[T].backward" class="doc-node">
@@ -307,10 +306,7 @@
 </section>
 		<section id="Variable[T].backprop" class="doc-node">
 			<div class="title"><h2>fn (Variable[T]) backprop <a href="#Variable[T].backprop">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/variable.v#L74"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> v Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> backprop<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
-<p>backprop Back propogates an operation along a computational graph.<br>
-This operation will destroy the operational graph, populating the gradients for all variables that are predecessors of
-the Variable this is called on.<br>
-Even if this is called on the first node in a graph, it will destroy all descendents of this variable stored by the Context</p>
+<p>backprop Back propogates an operation along a computational graph.<br />This operation will destroy the operational graph, populating the gradients for all variables that are predecessors ofthe Variable this is called on.<br />Even if this is called on the first node in a graph, it will destroy all descendents of this variable stored by the Context</p>
 
 </section>
 		<section id="Variable[T].cos" class="doc-node">
@@ -393,8 +389,7 @@ Even if this is called on the first node in a graph, it will destroy all descend
 	<span class="token comment">// be cached, and backpropogation will not be possible</span>
 	no_grad <span class="token builtin">bool</span>
 <span class="token punctuation">}</span></code></pre>
-<p>Context keeps track of the computational graph for a number of operations. Variables that interact with each other must belong to the same context, or state will be
-lost while tracking operations done.</p>
+<p>Context keeps track of the computational graph for a number of operations. Variables that interact with each other must belong to the same context, or state will belost while tracking operations done.</p>
 
 </section>
 		<section id="ContextVariableData" class="doc-node">
@@ -461,8 +456,7 @@ lost while tracking operations done.</p>
 	<span class="token comment">// Debug use only, contains a name for a node</span>
 	name <span class="token builtin">string</span>
 <span class="token punctuation">}</span></code></pre>
-<p>Node is a member of a computational graph that contains a reference to a gate, as well as the parents of the operation
-and the payload that resulted from the operation.</p>
+<p>Node is a member of a computational graph that contains a reference to a gate, as well as the parents of the operationand the payload that resulted from the operation.</p>
 
 </section>
 		<section id="Payload" class="doc-node">
@@ -523,9 +517,7 @@ and the payload that resulted from the operation.</p>
 	<span class="token comment">// forward operations</span>
 	requires_grad <span class="token builtin">bool</span>
 <span class="token punctuation">}</span></code></pre>
-<p>Variable is an abstraction of a vtl.Tensor that tracks the operations done to the vtl.Tensor. It also keeps track of the gradient of the operation if a Variable
-needs to backpropogate.<br>
-This is the fundamental object used in automatic differentiation, as well as the neural network aspects of VTL</p>
+<p>Variable is an abstraction of a vtl.Tensor that tracks the operations done to the vtl.Tensor. It also keeps track of the gradient of the operation if a Variableneeds to backpropogate.<br />This is the fundamental object used in automatic differentiation, as well as the neural network aspects of VTL</p>
 
 </section>
 		<section id="VariableData" class="doc-node">
@@ -536,7 +528,7 @@ This is the fundamental object used in automatic differentiation, as well as the
 
 </section>
 
-						<div class="footer">Powered by vdoc. Generated on: 21 Oct 2023 16:39:34</div>
+						<div class="footer">Powered by vdoc. Generated on: 12 Nov 2023 21:38:31</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#add_gate">fn add_gate</a>        <ul>
 </ul>

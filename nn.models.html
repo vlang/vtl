@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
@@ -36,7 +36,7 @@
 						<div class="info">
 							<div class="module">vtl</div>
 							<div class="toggle-version-container">
-								<span>0.2.0 48a1d6c</span>
+								<span>0.2.0 fbb43f5</span>
 								<div
 									id="dark-mode-toggle"
 									role="switch"
@@ -83,26 +83,22 @@
 </section>
 		<section id="sequential_from_ctx_with_layers" class="doc-node">
 			<div class="title"><h2>fn sequential_from_ctx_with_layers <a href="#sequential_from_ctx_with_layers">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/models/sequential.v#L45"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> sequential_from_ctx_with_layers<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>ctx <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Context<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> given_layers <span class="token punctuation">[</span><span class="token punctuation">]</span>types<span class="token punctuation">.</span>Layer<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&</span>Sequential<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
-<p>sequential_from_ctx_with_layers creates a new sequential network with the given context
-and the given layers.</p>
+<p>sequential_from_ctx_with_layers creates a new sequential network with the given contextand the given layers.</p>
 
 </section>
 		<section id="sequential_info" class="doc-node">
 			<div class="title"><h2>fn sequential_info <a href="#sequential_info">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/models/sequential_info.v#L17"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> sequential_info<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>ctx <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Context<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> layers_ <span class="token punctuation">[</span><span class="token punctuation">]</span>types<span class="token punctuation">.</span>Layer<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&</span>SequentialInfo<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
-<p>sequential_info creates a new neural network container
-with an empty list of layers.</p>
+<p>sequential_info creates a new neural network containerwith an empty list of layers.</p>
 
 </section>
 		<section id="sequential_with_layers" class="doc-node">
 			<div class="title"><h2>fn sequential_with_layers <a href="#sequential_with_layers">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/models/sequential.v#L28"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> sequential_with_layers<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>given_layers <span class="token punctuation">[</span><span class="token punctuation">]</span>types<span class="token punctuation">.</span>Layer<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&</span>Sequential<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
-<p>sequential_with_layers creates a new sequential network with a new context
-and the given layers.</p>
+<p>sequential_with_layers creates a new sequential network with a new contextand the given layers.</p>
 
 </section>
 		<section id="Sequential[T].input" class="doc-node">
 			<div class="title"><h2>fn (Sequential[T]) input <a href="#Sequential[T].input">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/models/sequential.v#L53"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> nn Sequential<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">input</span><span class="token punctuation">(</span>shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span></code></pre>
-<p>input adds a new input layer to the network
-with the given shape.</p>
+<p>input adds a new input layer to the networkwith the given shape.</p>
 
 </section>
 		<section id="Sequential[T].linear" class="doc-node">
@@ -112,8 +108,7 @@ with the given shape.</p>
 </section>
 		<section id="Sequential[T].maxpool2d" class="doc-node">
 			<div class="title"><h2>fn (Sequential[T]) maxpool2d <a href="#Sequential[T].maxpool2d">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/models/sequential.v#L65"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> nn Sequential<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">maxpool2d</span><span class="token punctuation">(</span>kernel <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> padding <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> stride <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span></code></pre>
-<p>maxpool2d adds a new maxpool2d layer to the network
-with the given kernel size and stride.</p>
+<p>maxpool2d adds a new maxpool2d layer to the networkwith the given kernel size and stride.</p>
 
 </section>
 		<section id="Sequential[T].mse_loss" class="doc-node">
@@ -168,8 +163,7 @@ with the given kernel size and stride.</p>
 </section>
 		<section id="SequentialInfo[T].input" class="doc-node">
 			<div class="title"><h2>fn (SequentialInfo[T]) input <a href="#SequentialInfo[T].input">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/models/sequential_info.v#L27"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> ls SequentialInfo<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">input</span><span class="token punctuation">(</span>shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span></code></pre>
-<p>input adds a new input layer to the network
-with the given shape.</p>
+<p>input adds a new input layer to the networkwith the given shape.</p>
 
 </section>
 		<section id="SequentialInfo[T].linear" class="doc-node">
@@ -179,8 +173,7 @@ with the given shape.</p>
 </section>
 		<section id="SequentialInfo[T].maxpool2d" class="doc-node">
 			<div class="title"><h2>fn (SequentialInfo[T]) maxpool2d <a href="#SequentialInfo[T].maxpool2d">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/models/sequential_info.v#L41"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> ls SequentialInfo<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">maxpool2d</span><span class="token punctuation">(</span>kernel <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> padding <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> stride <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span></code></pre>
-<p>maxpool2d adds a new maxpool2d layer to the network
-with the given kernel size and stride.</p>
+<p>maxpool2d adds a new maxpool2d layer to the networkwith the given kernel size and stride.</p>
 
 </section>
 		<section id="SequentialInfo[T].mse_loss" class="doc-node">
@@ -242,7 +235,7 @@ with the given kernel size and stride.</p>
 
 </section>
 
-						<div class="footer">Powered by vdoc. Generated on: 21 Oct 2023 16:39:34</div>
+						<div class="footer">Powered by vdoc. Generated on: 12 Nov 2023 21:38:31</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#sequential">fn sequential</a>        <ul>
 </ul>
