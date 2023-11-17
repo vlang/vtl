@@ -22,7 +22,7 @@ pub fn (t &Tensor[T]) map[T](f fn (x T, i []int) T) &Tensor[T] {
 	return ret
 }
 
-// reduce reduces a function to a given Tensor retuning a new agregatted value
+// reduce reduces a function to a given Tensor retuning a new aggregated value
 pub fn (t &Tensor[T]) reduce[T](init T, f fn (acc T, x T, i []int) T) T {
 	mut ret := init
 	mut iter := t.iterator()
@@ -55,7 +55,7 @@ pub fn (t &Tensor[T]) nmap[T](ts []&Tensor[T], f fn (xs []T, i []int) T) !&Tenso
 	return ret
 }
 
-// nreduce reduces a function to a given list of Tensor retuning a new agregatted value
+// nreduce reduces a function to a given list of Tensor retuning a new aggregated value
 pub fn (t &Tensor[T]) nreduce[T](ts []&Tensor[T], init T, f fn (acc T, xs []T, i []int) T) !T {
 	mut ret := init
 	mut iters, _ := t.iterators[T](ts)!
