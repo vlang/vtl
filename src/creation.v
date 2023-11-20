@@ -1,19 +1,19 @@
 module vtl
 
 // empty returns a new Tensor of given shape and type, without initializing entries
-[inline]
+@[inline]
 pub fn empty[T](shape []int, params TensorData) &Tensor[T] {
 	return tensor[T](cast[T](0), shape, params)
 }
 
 // empty_like returns a new Tensor of given shape and type as a given Tensor
-[inline]
+@[inline]
 pub fn empty_like[T](t &Tensor[T]) &Tensor[T] {
 	return tensor_like[T](t)
 }
 
 // identity returns an array is a square array with ones on the main diagonal
-[inline]
+@[inline]
 pub fn identity[T](n int, params TensorData) &Tensor[T] {
 	return eye[T](n, n, 0, params)
 }
@@ -32,31 +32,31 @@ pub fn eye[T](m int, n int, k int, params TensorData) &Tensor[T] {
 }
 
 // zeros returns a new tensor of a given shape and type, filled with zeros
-[inline]
+@[inline]
 pub fn zeros[T](shape []int, params TensorData) &Tensor[T] {
 	return tensor[T](cast[T](0), shape, params)
 }
 
 // zeros_like returns a new Tensor of given shape and type as a given Tensor, filled with zeros
-[inline]
+@[inline]
 pub fn zeros_like[T](t &Tensor[T]) &Tensor[T] {
 	return tensor_like[T](t)
 }
 
 // ones returns a new tensor of a given shape and type, filled with ones
-[inline]
+@[inline]
 pub fn ones[T](shape []int, params TensorData) &Tensor[T] {
 	return full[T](shape, cast[T](1), params)
 }
 
 // ones_like returns a new tensor of a given shape and type, filled with ones
-[inline]
+@[inline]
 pub fn ones_like[T](t &Tensor[T]) &Tensor[T] {
 	return full_like[T](t, cast[T](1))
 }
 
 // full returns a new tensor of a given shape and type, filled with the given value
-[inline]
+@[inline]
 pub fn full[T](shape []int, val T, params TensorData) &Tensor[T] {
 	return tensor[T](val, shape, params)
 }
@@ -80,7 +80,7 @@ pub fn range[T](from int, to int, params TensorData) &Tensor[T] {
 }
 
 // seq returns a Tensor containing values ranging from [0, to)
-[inline]
+@[inline]
 pub fn seq[T](n int, params TensorData) &Tensor[T] {
 	return range[T](0, n, params)
 }

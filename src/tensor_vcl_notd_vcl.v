@@ -1,6 +1,6 @@
 module vtl
 
-[params]
+@[params]
 pub struct VclParams {}
 
 // vcl returns a VclTensor from a Tensor

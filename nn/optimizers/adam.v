@@ -18,7 +18,7 @@ pub mut:
 	second_moments []&vtl.Tensor[T]
 }
 
-[params]
+@[params]
 pub struct AdamOptimizerConfig {
 	learning_rate f64 = 0.001
 	beta1         f64 = 0.9

@@ -3,7 +3,7 @@ module autograd
 // Node is a member of a computational graph that contains
 // a reference to a gate, as well as the parents of the operation
 // and the payload that resulted from the operation.
-[heap]
+@[heap]
 pub struct Node[T] {
 pub:
 	// A Gate containing a backwards and cache function for

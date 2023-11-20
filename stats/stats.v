@@ -198,7 +198,7 @@ pub fn rms[T](t &vtl.Tensor[T]) T {
 // Population Variance of the given input array
 // Based on
 // https://www.mathsisfun.com/data/standard-deviation.html
-[inline]
+@[inline]
 pub fn population_variance[T](t &vtl.Tensor[T]) T {
 	if t.size == 0 {
 		return vtl.cast[T](0)
@@ -226,7 +226,7 @@ pub fn population_variance_mean[T](t &vtl.Tensor[T], provided_mean T) T {
 // Sample Variance of the given input array
 // Based on
 // https://www.mathsisfun.com/data/standard-deviation.html
-[inline]
+@[inline]
 pub fn sample_variance[T](t &vtl.Tensor[T]) T {
 	if t.size == 0 {
 		return vtl.cast[T](0)
@@ -254,7 +254,7 @@ pub fn sample_variance_mean[T](t &vtl.Tensor[T], provided_mean T) T {
 // Population Standard Deviation of the given input array
 // Based on
 // https://www.mathsisfun.com/data/standard-deviation.html
-[inline]
+@[inline]
 pub fn population_stddev[T](t &vtl.Tensor[T]) T {
 	if t.size == 0 {
 		return vtl.cast[T](0)
@@ -268,7 +268,7 @@ pub fn population_stddev[T](t &vtl.Tensor[T]) T {
 // Population Standard Deviation of the given input array
 // Based on
 // https://www.mathsisfun.com/data/standard-deviation.html
-[inline]
+@[inline]
 pub fn population_stddev_mean[T](t &vtl.Tensor[T], mean T) T {
 	if t.size == 0 {
 		return vtl.cast[T](0)
@@ -281,7 +281,7 @@ pub fn population_stddev_mean[T](t &vtl.Tensor[T], mean T) T {
 // Sample Standard Deviation of the given input array
 // Based on
 // https://www.mathsisfun.com/data/standard-deviation.html
-[inline]
+@[inline]
 pub fn sample_stddev[T](t &vtl.Tensor[T]) T {
 	if t.size == 0 {
 		return vtl.cast[T](0)
@@ -295,7 +295,7 @@ pub fn sample_stddev[T](t &vtl.Tensor[T]) T {
 // Sample Standard Deviation of the given input array
 // Based on
 // https://www.mathsisfun.com/data/standard-deviation.html
-[inline]
+@[inline]
 pub fn sample_stddev_mean[T](t &vtl.Tensor[T], mean T) T {
 	if t.size == 0 {
 		return vtl.cast[T](0)
@@ -308,7 +308,7 @@ pub fn sample_stddev_mean[T](t &vtl.Tensor[T], mean T) T {
 // Mean Absolute Deviation of the given input array
 // Based on
 // https://en.wikipedia.org/wiki/Average_absolute_deviation
-[inline]
+@[inline]
 pub fn absdev[T](t &vtl.Tensor[T]) T {
 	if t.size == 0 {
 		return vtl.cast[T](0)
@@ -333,7 +333,7 @@ pub fn absdev_mean[T](t &vtl.Tensor[T], provided_mean T) T {
 }
 
 // Sum of squares
-[inline]
+@[inline]
 pub fn tss[T](t &vtl.Tensor[T]) T {
 	if t.size == 0 {
 		return vtl.cast[T](0)
@@ -421,7 +421,7 @@ pub fn range[T](t &vtl.Tensor[T]) T {
 	return max - min
 }
 
-[inline]
+@[inline]
 pub fn covariance[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) T {
 	mean1 := mean[T](a)
 	mean2 := mean[T](b)
@@ -444,7 +444,7 @@ pub fn covariance_mean[T](a &vtl.Tensor[T], b &vtl.Tensor[T], mean1 T, mean2 T) 
 	return cov / vtl.cast[T](n)
 }
 
-[inline]
+@[inline]
 pub fn lag1_autocorrelation[T](t &vtl.Tensor[T]) T {
 	data_mean := mean[T](t)
 	return lag1_autocorrelation_mean(t, data_mean)
@@ -468,7 +468,7 @@ pub fn lag1_autocorrelation_mean[T](t &vtl.Tensor[T], provided_mean T) T {
 	return lag1_autocorrelation / lag1_denominator
 }
 
-[inline]
+@[inline]
 pub fn kurtosis[T](t &vtl.Tensor[T]) T {
 	data_mean := mean[T](t)
 	data_sd := stddev[T](t, data_mean)
@@ -491,7 +491,7 @@ pub fn kurtosis_mean_stddev[T](t &vtl.Tensor[T], mean T, sd T) T {
 	return kurtosis / math.pow(sd, vtl.cast[T](4))
 }
 
-[inline]
+@[inline]
 pub fn skew[T](t &vtl.Tensor[T]) T {
 	data_mean := mean[T](t)
 	data_sd := stddev[T](t, data_mean)

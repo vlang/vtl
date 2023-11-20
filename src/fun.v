@@ -109,7 +109,7 @@ pub fn (t &Tensor[T]) diagonal[T]() &Tensor[T] {
 
 // ravel returns a flattened view of an Tensor if possible,
 // otherwise a flattened copy
-[inline]
+@[inline]
 pub fn (t &Tensor[T]) ravel[T]() !&Tensor[T] {
 	return t.reshape([-1])
 }

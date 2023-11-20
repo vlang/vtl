@@ -11,7 +11,7 @@ pub mut:
 	params []&autograd.Variable[T]
 }
 
-[params]
+@[params]
 pub struct SgdOptimizerConfig {
 	learning_rate f64 = 0.001
 }

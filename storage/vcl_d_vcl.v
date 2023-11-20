@@ -2,13 +2,13 @@ module storage
 
 import vsl.vcl
 
-[params]
+@[params]
 pub struct VclStorageParams {
 	device &vcl.Device = unsafe { nil }
 }
 
 // VclStorage
-[heap]
+@[heap]
 pub struct VclStorage[T] {
 pub mut:
 	data vcl.Vector[T]
@@ -39,12 +39,12 @@ pub fn (storage &VclStorage[T]) cpu() !&CpuStorage[T] {
 	}
 }
 
-[inline]
+@[inline]
 pub fn (storage &VclStorage[T]) to_array[T]() ![]T {
 	return storage.data.data()
 }
 
-[inline]
+@[inline]
 pub fn (storage &VclStorage[T]) release() ! {
 	return storage.data.release()
 }

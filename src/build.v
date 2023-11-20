@@ -2,7 +2,7 @@ module vtl
 
 import vtl.storage
 
-[params]
+@[params]
 pub struct TensorData {
 pub:
 	memory MemoryFormat = .row_major

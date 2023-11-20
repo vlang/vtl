@@ -6,7 +6,7 @@ import vtl.nn.internal
 import vtl.nn.gates.activation
 import vtl.nn.types
 
-[params]
+@[params]
 pub struct EluLayerConfig {
 	alpha f64 = 0.01
 }

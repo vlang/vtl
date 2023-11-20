@@ -9,7 +9,7 @@ import vtl
 // This is the fundamental object used in automatic
 // differentiation, as well as the neural network aspects
 // of VTL
-[heap]
+@[heap]
 pub struct Variable[T] {
 pub mut:
 	// The value of the Variable.  This should not be edited outside
@@ -30,7 +30,7 @@ pub mut:
 	requires_grad bool
 }
 
-[params]
+@[params]
 pub struct VariableData {
 	requires_grad bool = true
 }

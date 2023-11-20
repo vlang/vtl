@@ -9,7 +9,7 @@ pub enum IteratorStrategy {
 
 // TensorIterator is a struct to hold a Tensors
 // iteration state while iterating through a Tensor
-[heap]
+@[heap]
 pub struct TensorIterator[T] {
 pub:
 	tensor       &Tensor[T]
@@ -42,7 +42,7 @@ pub fn (t &Tensor[T]) custom_iterator[T](data IteratorBuildData[T]) &TensorItera
 
 // next calls the iteration type for a given iterator
 // which is either flat or strided and returns a Num containing the current value
-[inline]
+@[inline]
 pub fn (mut s TensorIterator[T]) next[T]() ?(T, []int) {
 	if s.iteration >= s.tensor.size() {
 		return none
@@ -87,7 +87,7 @@ pub fn (t &Tensor[T]) iterators[T](ts []&Tensor[T]) !(&TensorsIterator[T], []int
 
 // next calls the iteration type for a given list of iterators
 // which is either flat or strided and returns a list of Nums containing the current values
-[inline]
+@[inline]
 pub fn (mut its TensorsIterator[T]) next[T]() ?([]T, []int) {
 	mut nums := []T{cap: its.iters.len}
 	mut index := []int{}
