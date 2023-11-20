@@ -2,7 +2,7 @@ module vtl
 
 // TensorAxisIterator is the core iterator for axis-wise operations.
 // Stores a copy of the shape and strides reduced along a given axis
-[heap]
+@[heap]
 pub struct TensorAxisIterator[T] {
 pub:
 	tensor &Tensor[T]
@@ -54,7 +54,7 @@ pub fn (t &Tensor[T]) axis_with_dims_iterator[T](axis int) &TensorAxisIterator[T
 
 // next calls the iteration type for a given iterator
 // which is either flat or strided and returns a Num containing the current value
-[inline]
+@[inline]
 pub fn (mut s TensorAxisIterator[T]) next[T]() ?(T, []int) {
 	if s.iteration >= s.tensor.shape[s.axis] {
 		return none

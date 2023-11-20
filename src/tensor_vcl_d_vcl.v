@@ -3,7 +3,7 @@ module vtl
 import vtl.storage
 
 // VclTensor is the main structure defined by VTL to manage N Dimensional data
-[heap]
+@[heap]
 pub struct VclTensor[T] {
 pub mut:
 	data    &storage.VclStorage[T]
@@ -39,7 +39,7 @@ pub fn (t &VclTensor[T]) cpu() !&Tensor[T] {
 }
 
 // vcl returns a VclTensor from a VclTensor
-[inline]
+@[inline]
 pub fn (t &VclTensor[T]) vcl() !&VclTensor[T] {
 	return t
 }
@@ -66,26 +66,26 @@ pub fn (t &VclTensor[T]) size() int {
 }
 
 // is_matrix returns if a VclTensor is a nxm matrix or not
-[inline]
+@[inline]
 pub fn (t &VclTensor[T]) is_matrix() bool {
 	return t.rank() == 2
 }
 
 // is_matrix returns if a VclTensor is a square matrix or not
-[inline]
+@[inline]
 pub fn (t &VclTensor[T]) is_square_matrix() bool {
 	return t.rank() == 2 && t.shape[0] == t.shape[1]
 }
 
 // is_matrix returns if a VclTensor is a square 1D vector or not
-[inline]
+@[inline]
 pub fn (t &VclTensor[T]) is_vector() bool {
 	return t.rank() == 1
 }
 
 // is_row_major returns if a VclTensor is supposed to store its data in Row-Major
 // order
-[inline]
+@[inline]
 pub fn (t &VclTensor[T]) is_row_major() bool {
 	// TODO: we need to ensure that t.memory is the source of truth
 	return t.memory == .row_major
@@ -93,7 +93,7 @@ pub fn (t &VclTensor[T]) is_row_major() bool {
 
 // is_col_major returns if a VclTensor is supposed to store its data in Col-Major
 // order
-[inline]
+@[inline]
 pub fn (t &VclTensor[T]) is_col_major() bool {
 	// TODO: we need to ensure that t.memory is the source of truth
 	return t.memory == .col_major
@@ -101,21 +101,21 @@ pub fn (t &VclTensor[T]) is_col_major() bool {
 
 // is_row_major verifies if a VclTensor stores its data in Row-Major
 // order
-[inline]
+@[inline]
 pub fn (t &VclTensor[T]) is_row_major_contiguous() bool {
 	return is_row_major_contiguous(t.shape, t.strides, t.rank())
 }
 
 // is_col_major verifies if a VclTensor stores its data in Col-Major
 // order
-[inline]
+@[inline]
 pub fn (t &VclTensor[T]) is_col_major_contiguous() bool {
 	return is_col_major_contiguous(t.shape, t.strides, t.rank())
 }
 
 // is_contiguous verifies that a VclTensor is contiguous independent of
 // memory layout
-[inline]
+@[inline]
 pub fn (t &VclTensor[T]) is_contiguous() bool {
 	return t.is_row_major_contiguous() || t.is_col_major_contiguous()
 }

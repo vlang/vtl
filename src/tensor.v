@@ -9,7 +9,7 @@ pub enum MemoryFormat {
 }
 
 // Tensor is the main structure defined by VTL to manage N Dimensional data
-[heap]
+@[heap]
 pub struct Tensor[T] {
 pub mut:
 	data    &storage.CpuStorage[T]
@@ -20,13 +20,13 @@ pub mut:
 }
 
 // cpu returns a Tensor from a Tensor
-[inline]
+@[inline]
 pub fn (t &Tensor[T]) cpu() !&Tensor[T] {
 	return t
 }
 
 // str returns the string representation of a Tensor
-[inline]
+@[inline]
 pub fn (t &Tensor[T]) str() string {
 	return tensor_str[T](t, ', ', '') or { '' }
 }
@@ -42,26 +42,26 @@ pub fn (t &Tensor[T]) size() int {
 }
 
 // is_matrix returns if a Tensor is a nxm matrix or not
-[inline]
+@[inline]
 pub fn (t &Tensor[T]) is_matrix() bool {
 	return t.rank() == 2
 }
 
 // is_matrix returns if a Tensor is a square matrix or not
-[inline]
+@[inline]
 pub fn (t &Tensor[T]) is_square_matrix() bool {
 	return t.rank() == 2 && t.shape[0] == t.shape[1]
 }
 
 // is_matrix returns if a Tensor is a square 1D vector or not
-[inline]
+@[inline]
 pub fn (t &Tensor[T]) is_vector() bool {
 	return t.rank() == 1
 }
 
 // is_row_major returns if a Tensor is supposed to store its data in Row-Major
 // order
-[inline]
+@[inline]
 pub fn (t &Tensor[T]) is_row_major() bool {
 	// TODO: we need to ensure that t.memory is the source of truth
 	return t.memory == .row_major
@@ -69,7 +69,7 @@ pub fn (t &Tensor[T]) is_row_major() bool {
 
 // is_col_major returns if a Tensor is supposed to store its data in Col-Major
 // order
-[inline]
+@[inline]
 pub fn (t &Tensor[T]) is_col_major() bool {
 	// TODO: we need to ensure that t.memory is the source of truth
 	return t.memory == .col_major
@@ -77,21 +77,21 @@ pub fn (t &Tensor[T]) is_col_major() bool {
 
 // is_row_major verifies if a Tensor stores its data in Row-Major
 // order
-[inline]
+@[inline]
 pub fn (t &Tensor[T]) is_row_major_contiguous() bool {
 	return is_row_major_contiguous(t.shape, t.strides, t.rank())
 }
 
 // is_col_major verifies if a Tensor stores its data in Col-Major
 // order
-[inline]
+@[inline]
 pub fn (t &Tensor[T]) is_col_major_contiguous() bool {
 	return is_col_major_contiguous(t.shape, t.strides, t.rank())
 }
 
 // is_contiguous verifies that a Tensor is contiguous independent of
 // memory layout
-[inline]
+@[inline]
 pub fn (t &Tensor[T]) is_contiguous() bool {
 	return t.is_row_major_contiguous() || t.is_col_major_contiguous()
 }
@@ -110,7 +110,7 @@ pub fn (t &Tensor[T]) to_array() []T {
 
 // copy returns a copy of a Tensor with a particular memory
 // layout, either row_major-contiguous or col_major-contiguous
-[inline]
+@[inline]
 pub fn (t &Tensor[T]) copy(memory MemoryFormat) &Tensor[T] {
 	strides := strides_from_shape(t.shape, memory)
 	size := size_from_shape(t.shape)
@@ -127,7 +127,7 @@ pub fn (t &Tensor[T]) copy(memory MemoryFormat) &Tensor[T] {
 
 // view returns a view of a Tensor, identical to the
 // parent but not owning its own data
-[inline]
+@[inline]
 pub fn (t &Tensor[T]) view() &Tensor[T] {
 	return &Tensor[T]{
 		data: t.data

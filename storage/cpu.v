@@ -7,7 +7,7 @@ pub const (
 )
 
 // CpuStorage
-[heap]
+@[heap]
 pub struct CpuStorage[T] {
 pub mut:
 	data []T
@@ -28,13 +28,13 @@ pub fn from_array[T](arr []T) &CpuStorage[T] {
 }
 
 // Private function. Used to implement Storage operator
-[inline]
+@[inline]
 pub fn (s &CpuStorage[T]) get[T](i int) T {
 	return s.data[i]
 }
 
 // Private function. Used to implement assigment to the Storage element
-[inline]
+@[inline]
 pub fn (mut s CpuStorage[T]) set[T](i int, val T) {
 	s.data[i] = val
 }
@@ -47,7 +47,7 @@ pub fn (mut s CpuStorage[T]) fill[T](val T) {
 }
 
 // clone returns an independent copy of a given Storage
-[inline]
+@[inline]
 pub fn (s &CpuStorage[T]) clone[T]() &CpuStorage[T] {
 	return &CpuStorage[T]{
 		data: s.data.clone()
@@ -55,7 +55,7 @@ pub fn (s &CpuStorage[T]) clone[T]() &CpuStorage[T] {
 }
 
 // like returns an independent copy of a given Storage
-[inline]
+@[inline]
 pub fn (s &CpuStorage[T]) like[T]() &CpuStorage[T] {
 	return &CpuStorage[T]{
 		data: []T{len: s.data.len, cap: s.data.cap}
@@ -63,7 +63,7 @@ pub fn (s &CpuStorage[T]) like[T]() &CpuStorage[T] {
 }
 
 // like_with_len returns an independent copy of a given Storage
-[inline]
+@[inline]
 pub fn (s &CpuStorage[T]) like_with_len[T](len int) &CpuStorage[T] {
 	mut capacity := if s.data.cap < len { len } else { s.data.cap }
 	return &CpuStorage[T]{
@@ -77,12 +77,12 @@ pub fn (s &CpuStorage[T]) offset[T](start int) &CpuStorage[T] {
 	}
 }
 
-[inline]
+@[inline]
 pub fn (s &CpuStorage[T]) to_array[T]() []T {
 	return s.data.clone()
 }
 
-[inline]
+@[inline]
 fn imax(a int, b int) int {
 	return if a > b { a } else { b }
 }

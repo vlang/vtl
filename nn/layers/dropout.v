@@ -6,7 +6,7 @@ import vtl.nn.internal
 import vtl.nn.gates.layers
 import vtl.nn.types
 
-[params]
+@[params]
 pub struct DropoutLayerConfig {
 	prob f64 = 0.5
 }

@@ -6,7 +6,7 @@ import vtl
 // a number of operations. Variables that interact with each
 // other must belong to the same context, or state will be
 // lost while tracking operations done.
-[heap]
+@[heap]
 pub struct Context[T] {
 pub mut:
 	// A list of all variables present in an operation.
@@ -45,7 +45,7 @@ pub fn (mut ctx Context[T]) pop[T]() !&Node[T] {
 	return ctx.nodes.pop()
 }
 
-[params]
+@[params]
 pub struct ContextVariableData {
 	requires_grad bool = true
 }

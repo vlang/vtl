@@ -43,7 +43,7 @@ pub fn exponential[T](lambda f64, shape []int, params TensorData) &Tensor[T] {
 }
 
 // NormalTensorData is the data for a normal distribution.
-[params]
+@[params]
 pub struct NormalTensorData {
 	TensorData
 	config.NormalConfigStruct
