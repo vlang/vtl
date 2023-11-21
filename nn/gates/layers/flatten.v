@@ -5,7 +5,7 @@ import vtl.autograd
 
 pub struct FlattenGate[T] {
 pub:
-	input        &autograd.Variable[T]
+	input        &autograd.Variable[T] = unsafe { nil }
 	cached_shape []int
 }
 

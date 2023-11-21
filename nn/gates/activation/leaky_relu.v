@@ -6,7 +6,7 @@ import vtl.nn.internal
 
 pub struct LeakyReluGate[T] {
 pub:
-	cache &vtl.Tensor[T]
+	cache &vtl.Tensor[T] = unsafe { nil }
 }
 
 pub fn leaky_relu_gate[T](cache &vtl.Tensor[T]) &LeakyReluGate[T] {

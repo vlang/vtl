@@ -75,8 +75,8 @@ pub fn (g &SubstractGate[T]) cache[T](mut result Variable[T], args ...CacheParam
 
 pub struct MultiplyGate[T] {
 pub:
-	a &Variable[T]
-	b &Variable[T]
+	a &Variable[T] = unsafe { nil }
+	b &Variable[T] = unsafe { nil }
 }
 
 pub fn multiply_gate[T](a &Variable[T], b &Variable[T]) &MultiplyGate[T] {
@@ -119,8 +119,8 @@ pub fn (g &MultiplyGate[T]) cache[T](mut result Variable[T], args ...CacheParam)
 
 pub struct DivideGate[T] {
 pub:
-	a &Variable[T]
-	b &Variable[T]
+	a &Variable[T] = unsafe { nil }
+	b &Variable[T] = unsafe { nil }
 }
 
 pub fn divide_gate[T](a &Variable[T], b &Variable[T]) &DivideGate[T] {

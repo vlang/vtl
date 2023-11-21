@@ -4,8 +4,8 @@ import math
 import vtl
 
 pub struct PowGate[T] {
-	a &Variable[T]
-	b &Variable[T]
+	a &Variable[T] = unsafe { nil }
+	b &Variable[T] = unsafe { nil }
 }
 
 pub fn pow_gate[T](a &Variable[T], b &Variable[T]) &PowGate[T] {
