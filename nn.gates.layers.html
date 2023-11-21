@@ -36,7 +36,7 @@
 						<div class="info">
 							<div class="module">vtl</div>
 							<div class="toggle-version-container">
-								<span>0.2.0 6cc51f2</span>
+								<span>0.2.0 f8ed96a</span>
 								<div
 									id="dark-mode-toggle"
 									role="switch"
@@ -150,7 +150,7 @@
 			<div class="title"><h2>struct DropoutGate <a href="#DropoutGate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/gates/layers/dropout.v#L6"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> DropoutGate<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
 	prob <span class="token builtin">f64</span>
-	mask <span class="token operator">&</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span>
+	mask <span class="token operator">&</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
 <span class="token punctuation">}</span></code></pre>
 
 
@@ -158,7 +158,7 @@
 		<section id="FlattenGate" class="doc-node">
 			<div class="title"><h2>struct FlattenGate <a href="#FlattenGate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/gates/layers/flatten.v#L6"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> FlattenGate<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
-	input        <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span>
+	input        <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
 	cached_shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
 <span class="token punctuation">}</span></code></pre>
 
@@ -172,9 +172,9 @@
 		<section id="LinearGate" class="doc-node">
 			<div class="title"><h2>struct LinearGate <a href="#LinearGate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/gates/layers/linear.v#L8"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> LinearGate<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
-	input  <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span>
-	weight <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span>
-	bias   <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span>
+	input  <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	weight <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	bias   <span class="token operator">&</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
 <span class="token punctuation">}</span></code></pre>
 
 
@@ -182,7 +182,7 @@
 		<section id="MaxPool2DGate" class="doc-node">
 			<div class="title"><h2>struct MaxPool2DGate <a href="#MaxPool2DGate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/gates/layers/maxpool.v#L7"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div><pre class="signature"><code><span class="token keyword">struct</span> MaxPool2DGate<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
-	max_indices <span class="token operator">&</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span>
+	max_indices <span class="token operator">&</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
 	kernel      <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
 	shape       <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
 	stride      <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
@@ -192,7 +192,7 @@
 
 </section>
 
-						<div class="footer">Powered by vdoc. Generated on: 20 Nov 2023 00:27:54</div>
+						<div class="footer">Powered by vdoc. Generated on: 21 Nov 2023 04:34:23</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#dropout_gate">fn dropout_gate</a>        <ul>
 </ul>
