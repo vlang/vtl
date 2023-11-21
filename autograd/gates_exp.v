@@ -4,7 +4,7 @@ import vtl
 
 pub struct ExpGate[T] {
 pub:
-	a &Variable[T]
+	a &Variable[T] = unsafe { nil }
 }
 
 pub fn exp_gate[T](a &Variable[T]) &ExpGate[T] {

@@ -6,7 +6,7 @@ import vtl.autograd
 pub struct DropoutGate[T] {
 pub:
 	prob f64
-	mask &vtl.Tensor[T]
+	mask &vtl.Tensor[T] = unsafe { nil }
 }
 
 pub fn dropout_gate[T](mask &vtl.Tensor[T], prob f64) &DropoutGate[T] {

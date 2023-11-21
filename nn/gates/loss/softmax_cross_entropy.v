@@ -6,8 +6,8 @@ import vtl.nn.internal
 
 pub struct SoftmaxCrossEntropyGate[T] {
 pub:
-	cache  &autograd.Variable[T]
-	target &vtl.Tensor[T]
+	cache  &autograd.Variable[T] = unsafe { nil }
+	target &vtl.Tensor[T]        = unsafe { nil }
 }
 
 pub fn softmax_cross_entropy_gate[T](cache &autograd.Variable[T], target &vtl.Tensor[T]) &SoftmaxCrossEntropyGate[T] {

@@ -6,7 +6,7 @@ import vtl.nn.internal
 
 pub struct MaxPool2DGate[T] {
 pub:
-	max_indices &vtl.Tensor[int]
+	max_indices &vtl.Tensor[int] = unsafe { nil }
 	kernel      []int
 	shape       []int
 	stride      []int

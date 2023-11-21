@@ -6,8 +6,8 @@ import vtl.nn.internal
 
 pub struct SigmoidCrossEntropyGate[T] {
 pub:
-	cache  &autograd.Variable[T]
-	target &vtl.Tensor[T]
+	cache  &autograd.Variable[T] = unsafe { nil }
+	target &vtl.Tensor[T]        = unsafe { nil }
 }
 
 pub fn sigmoid_cross_entropy_gate[T](cache &autograd.Variable[T], target &vtl.Tensor[T]) &SigmoidCrossEntropyGate[T] {

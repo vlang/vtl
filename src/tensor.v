@@ -12,7 +12,7 @@ pub enum MemoryFormat {
 @[heap]
 pub struct Tensor[T] {
 pub mut:
-	data    &storage.CpuStorage[T]
+	data    &storage.CpuStorage[T] = unsafe { nil }
 	memory  MemoryFormat
 	size    int
 	shape   []int

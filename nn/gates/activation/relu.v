@@ -6,7 +6,7 @@ import vtl.nn.internal
 
 pub struct ReLUGate[T] {
 pub:
-	cache &vtl.Tensor[T]
+	cache &vtl.Tensor[T] = unsafe { nil }
 }
 
 pub fn relu_gate[T](cache &vtl.Tensor[T]) &ReLUGate[T] {

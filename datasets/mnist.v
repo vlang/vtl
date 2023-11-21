@@ -14,10 +14,10 @@ pub const (
 // MnistDataset is a dataset of MNIST handwritten digits.
 pub struct MnistDataset {
 pub:
-	train_features &vtl.Tensor[u8]
-	train_labels   &vtl.Tensor[u8]
-	test_features  &vtl.Tensor[u8]
-	test_labels    &vtl.Tensor[u8]
+	train_features &vtl.Tensor[u8] = unsafe { nil }
+	train_labels   &vtl.Tensor[u8] = unsafe { nil }
+	test_features  &vtl.Tensor[u8] = unsafe { nil }
+	test_labels    &vtl.Tensor[u8] = unsafe { nil }
 }
 
 // load_mnist_helper loads the MNIST dataset from the given filename.

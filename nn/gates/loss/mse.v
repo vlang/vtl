@@ -6,8 +6,8 @@ import vtl.nn.internal
 
 pub struct MseGate[T] {
 pub:
-	cache  &autograd.Variable[T]
-	target &vtl.Tensor[T]
+	cache  &autograd.Variable[T] = unsafe { nil }
+	target &vtl.Tensor[T]        = unsafe { nil }
 }
 
 pub fn mse_gate[T](cache &autograd.Variable[T], target &vtl.Tensor[T]) &MseGate[T] {

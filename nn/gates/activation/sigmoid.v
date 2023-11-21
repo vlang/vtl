@@ -6,7 +6,7 @@ import vtl.nn.internal
 
 pub struct SigmoidGate[T] {
 pub:
-	cache &vtl.Tensor[T]
+	cache &vtl.Tensor[T] = unsafe { nil }
 }
 
 pub fn sigmoid_gate[T](cache &vtl.Tensor[T]) &SigmoidGate[T] {

@@ -11,7 +11,7 @@ fn init() {
 
 pub struct Sequential[T] {
 pub mut:
-	info &SequentialInfo[T]
+	info &SequentialInfo[T] = unsafe { nil }
 }
 
 // sequential creates a new sequential network with a new context.

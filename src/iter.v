@@ -12,7 +12,7 @@ pub enum IteratorStrategy {
 @[heap]
 pub struct TensorIterator[T] {
 pub:
-	tensor       &Tensor[T]
+	tensor       &Tensor[T] = unsafe { nil }
 	next_handler IteratorStrategy
 pub mut:
 	iteration int

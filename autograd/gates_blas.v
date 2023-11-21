@@ -5,8 +5,8 @@ import vtl.la
 
 pub struct MatMulGate[T] {
 pub:
-	a &Variable[T]
-	b &Variable[T]
+	a &Variable[T] = unsafe { nil }
+	b &Variable[T] = unsafe { nil }
 }
 
 pub fn matmul_gate[T](a &Variable[T], b &Variable[T]) &MatMulGate[T] {

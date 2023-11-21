@@ -15,15 +15,15 @@ pub mut:
 	// The value of the Variable.  This should not be edited outside
 	// of Variable operations, as other edits will not be tracked
 	// and will lead to incorrect results
-	value &vtl.Tensor[T]
+	value &vtl.Tensor[T] = unsafe { nil }
 	// The graph the variable is associated with.  This is a reference,
 	// as a variable does not own its context
-	context &Context[T]
+	context &Context[T] = unsafe { nil }
 	// The gradient of the Variable.  This is set as a reference to
 	// the value of a Variable unless `backprop` has been called, in
 	// which case all related Variables will have their gradient
 	// updated correctly
-	grad &vtl.Tensor[T]
+	grad &vtl.Tensor[T] = unsafe { nil }
 	// If set to true, this variable will track its operations,
 	// otherwise it will act similar to a vtl.Tensor, only calculating
 	// forward operations
