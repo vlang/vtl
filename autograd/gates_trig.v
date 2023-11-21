@@ -4,7 +4,7 @@ import vtl
 
 pub struct SinGate[T] {
 pub:
-	a &Variable[T]
+	a &Variable[T] = unsafe { nil }
 }
 
 pub fn sin_gate[T](a &Variable[T]) &SinGate[T] {
@@ -37,7 +37,7 @@ pub fn (g &SinGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
 
 pub struct CosGate[T] {
 pub:
-	a &Variable[T]
+	a &Variable[T] = unsafe { nil }
 }
 
 pub fn cos_gate[T](a &Variable[T]) &CosGate[T] {
@@ -70,7 +70,7 @@ pub fn (g &CosGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
 
 pub struct TanGate[T] {
 pub:
-	a &Variable[T]
+	a &Variable[T] = unsafe { nil }
 }
 
 pub fn tan_gate[T](a &Variable[T]) &TanGate[T] {

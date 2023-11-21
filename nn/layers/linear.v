@@ -9,8 +9,8 @@ import vtl.nn.types
 
 // LinearLayer is a layer that applies a linear transformation to its input.
 pub struct LinearLayer[T] {
-	weights &autograd.Variable[T]
-	bias    &autograd.Variable[T]
+	weights &autograd.Variable[T] = unsafe { nil }
+	bias    &autograd.Variable[T] = unsafe { nil }
 }
 
 pub fn linear_layer[T](ctx &autograd.Context[T], input_dim int, output_dim int) types.Layer[T] {

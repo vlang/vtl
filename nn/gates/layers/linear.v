@@ -7,9 +7,9 @@ import vtl.stats
 
 pub struct LinearGate[T] {
 pub:
-	input  &autograd.Variable[T]
-	weight &autograd.Variable[T]
-	bias   &autograd.Variable[T]
+	input  &autograd.Variable[T] = unsafe { nil }
+	weight &autograd.Variable[T] = unsafe { nil }
+	bias   &autograd.Variable[T] = unsafe { nil }
 }
 
 pub fn linear_gate[T](input &autograd.Variable[T], weight &autograd.Variable[T], bias &autograd.Variable[T]) &LinearGate[T] {

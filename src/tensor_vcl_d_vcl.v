@@ -6,7 +6,7 @@ import vtl.storage
 @[heap]
 pub struct VclTensor[T] {
 pub mut:
-	data    &storage.VclStorage[T]
+	data    &storage.VclStorage[T] = unsafe { nil }
 	memory  MemoryFormat
 	size    int
 	shape   []int

@@ -12,10 +12,10 @@ pub const (
 // ImdbDataset is a dataset for sentiment analysis.
 pub struct ImdbDataset {
 pub:
-	train_features &vtl.Tensor[string]
-	train_labels   &vtl.Tensor[int]
-	test_features  &vtl.Tensor[string]
-	test_labels    &vtl.Tensor[int]
+	train_features &vtl.Tensor[string] = unsafe { nil }
+	train_labels   &vtl.Tensor[int]    = unsafe { nil }
+	test_features  &vtl.Tensor[string] = unsafe { nil }
+	test_labels    &vtl.Tensor[int]    = unsafe { nil }
 }
 
 // load_imdb_helper loads the IMDB dataset for a given split.

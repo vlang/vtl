@@ -5,7 +5,7 @@ module vtl
 @[heap]
 pub struct TensorAxisIterator[T] {
 pub:
-	tensor &Tensor[T]
+	tensor &Tensor[T] = unsafe { nil }
 pub mut:
 	shape     []int
 	strides   []int

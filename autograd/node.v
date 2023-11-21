@@ -13,7 +13,7 @@ pub mut:
 	// The variables that created this node
 	parents []&Variable[T]
 	// Wrapper around a Tensor, contains operation data
-	payload &Payload[T]
+	payload &Payload[T] = unsafe { nil }
 	// Debug use only, contains a name for a node
 	name string
 }
