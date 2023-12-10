@@ -36,7 +36,7 @@
 						<div class="info">
 							<div class="module">vtl</div>
 							<div class="toggle-version-container">
-								<span>0.2.0 f8ed96a</span>
+								<span>0.2.0 08189d6</span>
 								<div
 									id="dark-mode-toggle"
 									role="switch"
@@ -67,7 +67,7 @@
 				<div class="doc-container">
 					<div class="doc-content">
 								<section id="readme_datasets" class="doc-node">
-			<div class="title"><h1> datasets <a href="#readme_datasets">#</a></h1></div><h1>VTL Datasets</h1><p>This module exposes some functionalities to download and use the VTL datasets.For this we created some batch based iterators to load the datasets.We expose the following datasets:</p><ul><li><strong>Mnist</strong>: A dataset of handwritten digits.</li><li><strong>Imdb</strong>: A dataset of IMDB reviews for sentiment analysis.</li></ul>
+			<div class="title"><h1> datasets <a href="#readme_datasets">#</a></h1></div><h1>VTL Datasets</h1><p>This module exposes some functionalities to download and use the VTL datasets. For this we created some batch based iterators to load the datasets. We expose the following datasets:</p><ul><li><strong>Mnist</strong>: A dataset of handwritten digits.</li><li><strong>Imdb</strong>: A dataset of IMDB reviews for sentiment analysis.</li></ul>
 
 </section>
 
@@ -76,22 +76,18 @@
 
 </section>
 		<section id="" class="doc-node const">
-<pre class="signature"><code><span class="token keyword">const</span> <span class="token punctuation">(</span>
-	imdb_folder_name <span class="token operator">=</span> <span class="token string">'aclImdb'</span>
-	imdb_file_name   <span class="token operator">=</span><span class="token string">''</span>$2{imdb_folder_name<span class="token string">'_v1.tar.gz'</span>
-	imdb_base_url    <span class="token operator">=</span> <span class="token string">'http://ai.stanford.edu/~amaas/data/sentiment/'</span>
-<span class="token punctuation">)</span></code></pre>
+<pre class="signature"><code><span class="token keyword">const</span> imdb_folder_name <span class="token operator">=</span> <span class="token string">'aclImdb'</span>
+<span class="token keyword">pub</span> <span class="token keyword">const</span> imdb_file_name <span class="token operator">=</span><span class="token string">'</span><span class="token string_interp">$</span>{imdb_folder_name}<span class="token string">_v1.tar.gz'</span>
+<span class="token keyword">pub</span> <span class="token keyword">const</span> imdb_base_url <span class="token operator">=</span> <span class="token string">'http://ai.stanford.edu/~amaas/data/sentiment/'</span></code></pre>
 
 
 </section>
 		<section id="" class="doc-node const">
-<pre class="signature"><code><span class="token keyword">const</span> <span class="token punctuation">(</span>
-	mnist_base_url          <span class="token operator">=</span> <span class="token string">'http://yann.lecun.com/exdb/mnist/'</span>
-	mnist_train_images_file <span class="token operator">=</span> <span class="token string">'train-images-idx3-ubyte.gz'</span>
-	mnist_train_labels_file <span class="token operator">=</span> <span class="token string">'train-labels-idx1-ubyte.gz'</span>
-	mnist_test_images_file  <span class="token operator">=</span> <span class="token string">'t10k-images-idx3-ubyte.gz'</span>
-	mnist_test_labels_file  <span class="token operator">=</span> <span class="token string">'t10k-labels-idx1-ubyte.gz'</span>
-<span class="token punctuation">)</span></code></pre>
+<pre class="signature"><code><span class="token keyword">const</span> mnist_base_url <span class="token operator">=</span> <span class="token string">'http://yann.lecun.com/exdb/mnist/'</span>
+<span class="token keyword">pub</span> <span class="token keyword">const</span> mnist_train_images_file <span class="token operator">=</span> <span class="token string">'train-images-idx3-ubyte.gz'</span>
+<span class="token keyword">pub</span> <span class="token keyword">const</span> mnist_train_labels_file <span class="token operator">=</span> <span class="token string">'train-labels-idx1-ubyte.gz'</span>
+<span class="token keyword">pub</span> <span class="token keyword">const</span> mnist_test_images_file <span class="token operator">=</span> <span class="token string">'t10k-images-idx3-ubyte.gz'</span>
+<span class="token keyword">pub</span> <span class="token keyword">const</span> mnist_test_labels_file <span class="token operator">=</span> <span class="token string">'t10k-labels-idx1-ubyte.gz'</span></code></pre>
 
 
 </section>
@@ -128,7 +124,7 @@
 
 </section>
 
-						<div class="footer">Powered by vdoc. Generated on: 21 Nov 2023 04:34:23</div>
+						<div class="footer">Powered by vdoc. Generated on: 10 Dec 2023 01:15:53</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_datasets">README</a></li>
 <li class="open"><a href="#Constants">Constants</a></li>
