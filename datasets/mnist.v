@@ -3,13 +3,11 @@ module datasets
 import vtl
 import os
 
-pub const (
-	mnist_base_url          = 'http://yann.lecun.com/exdb/mnist/'
-	mnist_train_images_file = 'train-images-idx3-ubyte.gz'
-	mnist_train_labels_file = 'train-labels-idx1-ubyte.gz'
-	mnist_test_images_file  = 't10k-images-idx3-ubyte.gz'
-	mnist_test_labels_file  = 't10k-labels-idx1-ubyte.gz'
-)
+pub const mnist_base_url = 'http://yann.lecun.com/exdb/mnist/'
+pub const mnist_train_images_file = 'train-images-idx3-ubyte.gz'
+pub const mnist_train_labels_file = 'train-labels-idx1-ubyte.gz'
+pub const mnist_test_images_file = 't10k-images-idx3-ubyte.gz'
+pub const mnist_test_labels_file = 't10k-labels-idx1-ubyte.gz'
 
 // MnistDataset is a dataset of MNIST handwritten digits.
 pub struct MnistDataset {
