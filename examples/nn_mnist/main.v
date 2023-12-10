@@ -6,11 +6,9 @@ import vtl.datasets
 import vtl.nn.models
 import vtl.nn.optimizers
 
-const (
-	batch_size = 28
-	epochs     = 1
-	batches    = 100
-)
+const batch_size = 28
+const epochs = 1
+const batches = 100
 
 fn main() {
 	// Autograd context / neuralnet graph

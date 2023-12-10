@@ -3,11 +3,9 @@ module datasets
 import vtl
 import os
 
-pub const (
-	imdb_folder_name = 'aclImdb'
-	imdb_file_name   = '${imdb_folder_name}_v1.tar.gz'
-	imdb_base_url    = 'http://ai.stanford.edu/~amaas/data/sentiment/'
-)
+pub const imdb_folder_name = 'aclImdb'
+pub const imdb_file_name = '${imdb_folder_name}_v1.tar.gz'
+pub const imdb_base_url = 'http://ai.stanford.edu/~amaas/data/sentiment/'
 
 // ImdbDataset is a dataset for sentiment analysis.
 pub struct ImdbDataset {

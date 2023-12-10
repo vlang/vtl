@@ -5,11 +5,9 @@ import vtl.autograd
 import vtl.nn.models
 import vtl.nn.optimizers
 
-const (
-	batch_size = 32
-	epochs     = 6
-	batches    = 100
-)
+const batch_size = 32
+const epochs = 6
+const batches = 100
 
 // Learning XOR function with a neural network.
 

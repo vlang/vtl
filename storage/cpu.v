@@ -1,10 +1,8 @@
 module storage
 
-pub const (
-	vector_minimum_capacity = 2
-	vector_growth_factor    = 2
-	vector_shrink_threshold = 1.0 / 4.0
-)
+pub const vector_minimum_capacity = 2
+pub const vector_growth_factor = 2
+pub const vector_shrink_threshold = 1.0 / 4.0
 
 // CpuStorage
 @[heap]
