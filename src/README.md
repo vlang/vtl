@@ -1,5 +1,12 @@
 <div align="center">
-<h1>The V Tensor Library</h1>
+  <p>
+    <img
+      style="width: 200px"
+      width="200"
+      src="https://github.com/vlang/vsl/blob/main/static/vtl-logo.png?sanitize=true&ram=true"
+    >
+  </p>
+  <h1>The V Tensor Library</h1>
 
 [vlang.io](https://vlang.io) |
 [Docs](https://vlang.github.io/vtl) |
