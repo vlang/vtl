@@ -3,7 +3,7 @@
     <img
       style="width: 200px"
       width="200"
-      src="https://github.com/vlang/vtl/blob/main/static/vtl-logo.png?sanitize=true&ram=true"
+      src="https://github.com/vlang/vtl/blob/main/static/vtl-logo.png?sanitize=true&raw=true"
     >
   </p>
   <h1>The V Tensor Library</h1>
