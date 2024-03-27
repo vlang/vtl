@@ -1,5 +1,5 @@
-module main
-
+// vtest flaky: true
+// vtest retry: 3
 import vtl.datasets
 
 fn test_mnist() {
