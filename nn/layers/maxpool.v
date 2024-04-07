@@ -1,7 +1,5 @@
 module layers
 
-import vtl
-// import vtl.la
 import vtl.autograd
 import vtl.nn.internal
 import vtl.nn.gates.layers

@@ -1,6 +1,5 @@
 module autograd
 
-import vtl
 import vtl.la
 
 // add Adds two variables together.
