@@ -5,6 +5,7 @@ import math
 import math.stats as math_stats
 
 pub struct AxisData {
+pub:
 	axis int
 }
 

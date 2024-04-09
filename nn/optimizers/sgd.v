@@ -13,6 +13,7 @@ pub mut:
 
 @[params]
 pub struct SgdOptimizerConfig {
+pub:
 	learning_rate f64 = 0.001
 }
 

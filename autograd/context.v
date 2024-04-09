@@ -47,6 +47,7 @@ pub fn (mut ctx Context[T]) pop[T]() !&Node[T] {
 
 @[params]
 pub struct ContextVariableData {
+pub:
 	requires_grad bool = true
 }
 
