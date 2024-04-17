@@ -79,7 +79,7 @@ pub fn random_seed(i int) {
 }
 
 fn init() {
-	unix_time := u32(time.now().unix)
+	unix_time := u32(time.now().unix())
 	rand.seed([unix_time, 0])
 }
 
