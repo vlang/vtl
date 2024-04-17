@@ -36,7 +36,7 @@
 						<div class="info">
 							<div class="module">vtl</div>
 							<div class="toggle-version-container">
-								<span>0.2.0 3db7b44</span>
+								<span>0.2.0 3f725fe</span>
 								<div
 									id="dark-mode-toggle"
 									role="switch"
@@ -109,7 +109,7 @@
 					<div class="doc-content">
 								<section id="readme_datasets" class="doc-node">
 			<div class="title"><h1> datasets <a href="#readme_datasets">#</a></h1></div>
-<h1>VTL Datasets</h1><p>This module exposes some functionalities to download and use the VTL datasets. For this we created some batch based iterators to load the datasets.We expose the following datasets:</p><ul><li><strong>Mnist</strong>: A dataset of handwritten digits. - <strong>Imdb</strong>: A dataset of IMDB reviews for sentiment analysis.</li></ul>
+<h1>VTL Datasets</h1><p>This module exposes some functionalities to download and use the VTL datasets. For this we created some batch based iterators to load the datasets. We expose the following datasets:</p><ul><li><strong>Mnist</strong>: A dataset of handwritten digits.</li><li><strong>Imdb</strong>: A dataset of IMDB reviews for sentiment analysis.</li></ul>
 
 </section>
 
@@ -121,42 +121,7 @@
 
 		<section id="" class="doc-node const">
 <pre class="signature">
-<code><span class="token keyword">const</span> imdb_folder_name <span class="token operator">=</span> <span class="token string">'aclImdb'</span></code></pre>
-
-
-</section>
-
-		<section id="" class="doc-node const">
-<pre class="signature">
-<code><span class="token keyword">const</span> imdb_file_name <span class="token operator">=</span><span class="token string">'</span><span class="token string_interp">$</span>{imdb_folder_name}<span class="token string">_v1.tar.gz'</span></code></pre>
-
-
-</section>
-
-		<section id="" class="doc-node const">
-<pre class="signature">
-<code><span class="token keyword">const</span> imdb_base_url <span class="token operator">=</span> <span class="token string">'http://ai.stanford.edu/~amaas/data/sentiment/'</span></code></pre>
-
-
-</section>
-
-		<section id="" class="doc-node const">
-<pre class="signature">
-<code><span class="token keyword">const</span> mnist_base_url <span class="token operator">=</span> <span class="token string">'http://yann.lecun.com/exdb/mnist/'</span></code></pre>
-
-
-</section>
-
-		<section id="" class="doc-node const">
-<pre class="signature">
-<code><span class="token keyword">const</span> mnist_train_images_file <span class="token operator">=</span> <span class="token string">'train-images-idx3-ubyte.gz'</span></code></pre>
-
-
-</section>
-
-		<section id="" class="doc-node const">
-<pre class="signature">
-<code><span class="token keyword">const</span> mnist_train_labels_file <span class="token operator">=</span> <span class="token string">'train-labels-idx1-ubyte.gz'</span></code></pre>
+<code><span class="token keyword">const</span> mnist_test_labels_file <span class="token operator">=</span> <span class="token string">'t10k-labels-idx1-ubyte.gz'</span></code></pre>
 
 
 </section>
@@ -170,7 +135,42 @@
 
 		<section id="" class="doc-node const">
 <pre class="signature">
-<code><span class="token keyword">const</span> mnist_test_labels_file <span class="token operator">=</span> <span class="token string">'t10k-labels-idx1-ubyte.gz'</span></code></pre>
+<code><span class="token keyword">const</span> mnist_train_labels_file <span class="token operator">=</span> <span class="token string">'train-labels-idx1-ubyte.gz'</span></code></pre>
+
+
+</section>
+
+		<section id="" class="doc-node const">
+<pre class="signature">
+<code><span class="token keyword">const</span> mnist_train_images_file <span class="token operator">=</span> <span class="token string">'train-images-idx3-ubyte.gz'</span></code></pre>
+
+
+</section>
+
+		<section id="" class="doc-node const">
+<pre class="signature">
+<code><span class="token keyword">const</span> mnist_base_url <span class="token operator">=</span> <span class="token string">'http://yann.lecun.com/exdb/mnist/'</span></code></pre>
+
+
+</section>
+
+		<section id="" class="doc-node const">
+<pre class="signature">
+<code><span class="token keyword">const</span> imdb_base_url <span class="token operator">=</span> <span class="token string">'http://ai.stanford.edu/~amaas/data/sentiment/'</span></code></pre>
+
+
+</section>
+
+		<section id="" class="doc-node const">
+<pre class="signature">
+<code><span class="token keyword">const</span> imdb_file_name <span class="token operator">=</span><span class="token string">'</span><span class="token string_interp">$</span>{imdb_folder_name}<span class="token string">_v1.tar.gz'</span></code></pre>
+
+
+</section>
+
+		<section id="" class="doc-node const">
+<pre class="signature">
+<code><span class="token keyword">const</span> imdb_folder_name <span class="token operator">=</span> <span class="token string">'aclImdb'</span></code></pre>
 
 
 </section>
@@ -220,7 +220,7 @@
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 9 Apr 2024 00:55:09</div>
+						<div class="footer">Powered by vdoc. Generated on: 17 Apr 2024 19:45:02</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_datasets">README</a></li>
 <li class="open"><a href="#Constants">Constants</a></li>

@@ -604,7 +604,7 @@ var searchIndex = [
 var searchModuleData = [
 ["<div align=\"center\"> <p> <img style=\"width: 200px\" width=\"200\" src=\"https","index.html"],
 ["","autograd.html"],
-["# VTL Datasets","datasets.html"],
+["This module exposes some functionalities to download and use the VTL datasets. F","datasets.html"],
 ["","la.html"],
 ["","ml.metrics.html"],
 ["","nn.gates.activation.html"],
