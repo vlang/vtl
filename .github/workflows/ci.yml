@@ -34,23 +34,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout VTL
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: vtl
 
       - name: Setup V
-        uses: vlang/setup-v@v1
+        uses: vlang/setup-v@v1.4
         with:
           check-latest: true
 
       - name: V doctor
         run: v doctor
 
-      - name: Install VSL and dependencies
+      - name: Install dependencies
         run: |
           v install vsl && \
-          sudo apt-get update && \
-          sudo apt-get install --quiet -y --no-install-recommends \
+          sudo apt-get -qq update && \
+          sudo apt-get -qq install \
             gfortran \
             libxi-dev \
             libxcursor-dev \
@@ -77,7 +77,7 @@ jobs:
 
     steps:
       - name: Checkout VTL
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: vtl
 
@@ -89,11 +89,11 @@ jobs:
       - name: V doctor
         run: v doctor
 
-      - name: Install VSL and dependencies
+      - name: Install dependencies
         run: |
           v install vsl && \
-          sudo apt-get update && \
-          sudo apt-get install --quiet -y --no-install-recommends \
+          sudo apt-get -qq update && \
+          sudo apt-get -qq install \
             gfortran \
             libxi-dev \
             libxcursor-dev \
@@ -120,32 +120,29 @@ jobs:
 
     strategy:
       matrix:
-        os:
-          - ubuntu-22.04
-          - ubuntu-20.04
-        flags: 
-          - ""
-          - "--prod"
+        os: [ubuntu-20.04, ubuntu-22.04]
+        flags: ['', '--prod']
+      fail-fast: false
 
     steps:
       - name: Checkout VTL
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: vtl
 
       - name: Setup V
-        uses: vlang/setup-v@v1
+        uses: vlang/setup-v@v1.4
         with:
           check-latest: true
 
       - name: V doctor
         run: v doctor
 
-      - name: Install VSL and dependencies
+      - name: Install dependencies
         run: |
           v install vsl && \
-          sudo apt-get update && \
-          sudo apt-get install --quiet -y --no-install-recommends \
+          sudo apt-get -qq update && \
+          sudo apt-get -qq install \
             gfortran \
             libxi-dev \
             libxcursor-dev \
