@@ -122,6 +122,7 @@ jobs:
       matrix:
         os: [ubuntu-20.04, ubuntu-22.04]
         flags: ['', '--prod']
+        backend: ['pure-v', 'cblas']
       fail-fast: false
 
     steps:
@@ -159,8 +160,9 @@ jobs:
       - name: Move VTL source code to V Modules
         run: mv ./vtl ~/.vmodules
 
-      - name: Execute Tests using Pure V Backend
-        run: ~/.vmodules/vtl/bin/test ${{ matrix.flags }}
-
-      - name: Execute Tests using Pure V Backend with Pure C Blas
-        run: ~/.vmodules/vtl/bin/test ${{ matrix.flags }} --use-cblas
+      - name: Execute Tests
+        run: |
+          if [[ "${{ matrix.backend }}" == "cblas" ]]; then
+            backend_flag=--use-cblas
+          fi
+          ~/.vmodules/vtl/bin/test ${{ matrix.flags }} $backend_flag
