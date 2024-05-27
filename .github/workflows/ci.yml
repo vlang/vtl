@@ -13,12 +13,12 @@ on:
     paths-ignore:
       - '**.md'
       - '**.yml'
-      - '.github/workflows/ci.yml'
+      - '!.github/workflows/ci.yml'
   pull_request:
     paths-ignore:
       - '**.md'
       - '**.yml'
-      - '.github/workflows/ci.yml'
+      - '!.github/workflows/ci.yml'
 
 jobs:
   shellcheck:
