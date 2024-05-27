@@ -120,10 +120,15 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04]
+        os: [ubuntu-20.04, ubuntu-22.04, macos-12, macos-14]
         flags: ['', '--prod']
         backend: ['pure-v', 'cblas']
       fail-fast: false
+
+    env:
+      # Fixes complaints about $TERM not being set when running the vtl test script
+      # (a warning on Linux, but an error on macOS).
+      TERM: xterm
 
     steps:
       - name: Checkout VTL
@@ -141,21 +146,25 @@ jobs:
 
       - name: Install dependencies
         run: |
-          v install vsl && \
-          sudo apt-get -qq update && \
-          sudo apt-get -qq install \
-            gfortran \
-            libxi-dev \
-            libxcursor-dev \
-            mesa-common-dev \
-            liblapacke-dev \
-            libopenblas-dev \
-            libgc-dev \
-            libgl1-mesa-dev \
-            libopenmpi-dev \
-            libhdf5-dev \
-            hdf5-tools \
-            opencl-headers
+          if [ $RUNNER_OS == 'Linux' ]; then
+            sudo apt -qq update
+            sudo apt -qq install \
+              gfortran \
+              libxi-dev \
+              libxcursor-dev \
+              mesa-common-dev \
+              liblapacke-dev \
+              libopenblas-dev \
+              libgc-dev \
+              libgl1-mesa-dev \
+              libopenmpi-dev \
+              libhdf5-dev \
+              hdf5-tools \
+              opencl-headers
+          else
+            brew install coreutils hdf5 open-mpi openblas lapack opencl-headers
+          fi
+          v install vsl
 
       - name: Move VTL source code to V Modules
         run: mv ./vtl ~/.vmodules
