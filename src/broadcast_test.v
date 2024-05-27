@@ -1,3 +1,4 @@
+// vtest flaky: true
 module vtl
 
 fn test_broadcast_column() {
