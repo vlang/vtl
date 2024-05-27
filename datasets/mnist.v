@@ -3,7 +3,7 @@ module datasets
 import vtl
 import os
 
-pub const mnist_base_url = 'http://yann.lecun.com/exdb/mnist/'
+pub const mnist_base_url = 'https://github.com/golbin/TensorFlow-MNIST/raw/master/mnist/data/'
 pub const mnist_train_images_file = 'train-images-idx3-ubyte.gz'
 pub const mnist_train_labels_file = 'train-labels-idx1-ubyte.gz'
 pub const mnist_test_images_file = 't10k-images-idx3-ubyte.gz'
@@ -19,36 +19,29 @@ pub:
 }
 
 // load_mnist_helper loads the MNIST dataset from the given filename.
-fn load_mnist_helper(filename string) !string {
-	paths := download_dataset(
+fn load_mnist_helper(file string) !string {
+	dataset_path := download_dataset(
 		dataset: 'mnist'
 		baseurl: datasets.mnist_base_url
-		extract: true
-		urls_names: {
-			filename: filename
-		}
+		compressed: true
+		uncompressed_dir: file.all_before_last('.')
+		file: file
 	)!
 
-	path := paths[filename]
-	uncompressed_path := path#[0..-3]
-	return os.read_file(uncompressed_path)!
+	return os.read_file(dataset_path)!
 }
 
 // load_mnist_features loads the MNIST features.
 fn load_mnist_features(filename string) !&vtl.Tensor[u8] {
 	content := load_mnist_helper(filename)!
-
 	features := content[16..].bytes()
-
 	return vtl.from_1d(features)!.reshape([-1, 28, 28])
 }
 
 // load_mnist_labels loads the MNIST labels.
 fn load_mnist_labels(filename string) !&vtl.Tensor[u8] {
 	content := load_mnist_helper(filename)!
-
 	labels := content[8..].bytes()
-
 	return vtl.from_1d(labels)!
 }
 

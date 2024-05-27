@@ -3,8 +3,7 @@ module datasets
 import vtl
 import os
 
-pub const imdb_folder_name = 'aclImdb'
-pub const imdb_file_name = '${imdb_folder_name}_v1.tar.gz'
+pub const imdb_file_name = 'aclImdb_v1.tar.gz'
 pub const imdb_base_url = 'http://ai.stanford.edu/~amaas/data/sentiment/'
 
 // ImdbDataset is a dataset for sentiment analysis.
@@ -18,20 +17,17 @@ pub:
 
 // load_imdb_helper loads the IMDB dataset for a given split.
 fn load_imdb_helper(split string) !(&vtl.Tensor[string], &vtl.Tensor[int]) {
-	paths := download_dataset(
+	dataset_path := download_dataset(
 		dataset: 'imdb'
 		baseurl: datasets.imdb_base_url
-		extract: true
-		tar: true
-		urls_names: {
-			datasets.imdb_file_name: datasets.imdb_folder_name
-		}
+		compressed: true
+		uncompressed_dir: 'aclImdb'
+		file: datasets.imdb_file_name
 	)!
 
 	mut split_paths := []string{}
 
-	dataset_dir := paths[datasets.imdb_file_name]
-	split_dir := os.join_path(dataset_dir, split)
+	split_dir := os.join_path(dataset_path, split)
 	pos_dir := os.join_path(split_dir, 'pos')
 	neg_dir := os.join_path(split_dir, 'neg')
 
