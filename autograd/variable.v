@@ -5,7 +5,7 @@ import vtl
 // Variable is an abstraction of a vtl.Tensor that tracks
 // the operations done to the vtl.Tensor. It also keeps
 // track of the gradient of the operation if a Variable
-// needs to backpropogate.
+// needs to backpropagate.
 // This is the fundamental object used in automatic
 // differentiation, as well as the neural network aspects
 // of VTL
@@ -64,7 +64,7 @@ pub fn (v &Variable[T]) str() string {
 	return v.value.str()
 }
 
-// backprop Back propogates an operation along a computational graph.
+// backprop Back propagates an operation along a computational graph.
 // This operation will destroy the operational graph, populating
 // the gradients for all variables that are predecessors of
 // the Variable this is called on.

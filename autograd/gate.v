@@ -5,7 +5,7 @@ import vtl
 pub interface CacheParam {}
 
 // Gate is an object that can cache the result of an operation,
-// as well as backpropogate a payload backwards along the
+// as well as backpropagate a payload backwards along the
 // computational graph
 //
 // Structs that implement from this interface can add instance

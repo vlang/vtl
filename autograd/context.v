@@ -13,7 +13,7 @@ pub mut:
 	// This list can contain duplicates
 	nodes []&Node[T]
 	// If no_grad is set to true, operations will not
-	// be cached, and backpropogation will not be possible
+	// be cached, and backpropagation will not be possible
 	no_grad bool
 }
 

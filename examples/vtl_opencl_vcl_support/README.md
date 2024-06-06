@@ -4,7 +4,7 @@ This example shows how to use the OpenCL backend with VCL support.
 
 ## Prerequisites
 
-Read the [docs](https://vlang.github.io/vsl/vcl.html) of the V Computating Language (VCL) and the OpenCL backend.
+Read the [docs](https://vlang.github.io/vsl/vcl.html) of the V Computing Language (VCL) and the OpenCL backend.
 
 ## Running the example
 
