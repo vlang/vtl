@@ -167,15 +167,13 @@ pub fn (t &Tensor[T]) transpose[T](order []int) !&Tensor[T] {
 	return ret
 }
 
-// t returns a ful transpose of an tensor, with the axes
-// reversed
+// t returns a full transpose of a tensor, with the axes reversed
 pub fn (t &Tensor[T]) t[T]() !&Tensor[T] {
 	order := irange(0, t.rank())
 	return t.transpose(order.reverse())
 }
 
-// swapaxes returns a view of an tensor with two axes
-// swapped.
+// swapaxes returns a view of an tensor with two axes swapped
 pub fn (t &Tensor[T]) swapaxes[T](a1 int, a2 int) !&Tensor[T] {
 	mut order := irange(0, t.rank())
 	tmp := order[a1]

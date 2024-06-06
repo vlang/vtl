@@ -48,7 +48,7 @@ struct DatasetDownload {
 fn download_dataset(data DatasetDownload) !string {
 	dataset_dir := os.real_path(get_cache_dir('datasets', data.dataset))
 
-	// Handline extensions like `*.tar.gz`.
+	// Handle extensions like `*.tar.gz`.
 	exts := os.file_name(data.file).rsplit_nth('.', 3)
 	is_tar := exts[0] == 'tar' || (exts.len > 1 && exts[1] == 'tar')
 

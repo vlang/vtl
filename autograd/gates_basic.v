@@ -45,8 +45,8 @@ pub fn subtract_gate[T]() &SubstractGate[T] {
 
 pub fn (g &SubstractGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
-	oposite := gradient.multiply_scalar[T](vtl.cast[T](-1))!
-	return [gradient, oposite]
+	opposite := gradient.multiply_scalar[T](vtl.cast[T](-1))!
+	return [gradient, opposite]
 }
 
 pub fn (g &SubstractGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
@@ -134,8 +134,8 @@ pub fn (g &DivideGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	r0 := gradient.divide[T](g.b.value)!
 	bx2 := g.b.value.multiply_scalar[T](vtl.cast[T](2))!
-	oposite := gradient.multiply_scalar[T](vtl.cast[T](-1))!
-	mut r1 := oposite.multiply[T](g.a.value)!
+	opposite := gradient.multiply_scalar[T](vtl.cast[T](-1))!
+	mut r1 := opposite.multiply[T](g.a.value)!
 	r1 = r1.divide[T](bx2)!
 	return [r0, r1]
 }

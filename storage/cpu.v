@@ -25,13 +25,13 @@ pub fn from_array[T](arr []T) &CpuStorage[T] {
 	}
 }
 
-// Private function. Used to implement Storage operator
+// Private function. Used to implement the Storage operator
 @[inline]
 pub fn (s &CpuStorage[T]) get[T](i int) T {
 	return s.data[i]
 }
 
-// Private function. Used to implement assigment to the Storage element
+// Private function. Used to implement assignments to the Storage element
 @[inline]
 pub fn (mut s CpuStorage[T]) set[T](i int, val T) {
 	s.data[i] = val

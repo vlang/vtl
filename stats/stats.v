@@ -79,7 +79,7 @@ pub fn prod_axis_with_dims[T](t &vtl.Tensor[T], data AxisData) T {
 	return acc
 }
 
-// Measure of Occurance
+// Measure of Occurrence
 // Frequency of a given number
 // Based on
 // https://www.mathsisfun.com/data/frequency-distribution.html
@@ -99,7 +99,7 @@ pub fn freq[T](t &vtl.Tensor[T], val T) int {
 	return count
 }
 
-// Measure of Central Tendancy
+// Measure of Central Tendency
 // Mean of the given input array
 // Based on
 // https://www.mathsisfun.com/data/central-measures.html
@@ -113,7 +113,7 @@ pub fn mean[T](t &vtl.Tensor[T]) T {
 	}) / vtl.cast[T](t.size)
 }
 
-// Measure of Central Tendancy
+// Measure of Central Tendency
 // Geometric Mean of the given input array
 // Based on
 // https://www.mathsisfun.com/numbers/geometric-mean.html
@@ -128,7 +128,7 @@ pub fn geometric_mean[T](t &vtl.Tensor[T]) T {
 	return math.pow(prod, vtl.cast[T](1) / vtl.cast[T](t.size))
 }
 
-// Measure of Central Tendancy
+// Measure of Central Tendency
 // Harmonic Mean of the given input array
 // Based on
 // https://www.mathsisfun.com/numbers/harmonic-mean.html
@@ -142,7 +142,7 @@ pub fn harmonic_mean[T](t &vtl.Tensor[T]) T {
 	})
 }
 
-// Measure of Central Tendancy
+// Measure of Central Tendency
 // Median of the given input array ( input array is assumed to be sorted )
 // Based on
 // https://www.mathsisfun.com/data/central-measures.html
@@ -158,7 +158,7 @@ pub fn median[T](t &vtl.Tensor[T]) T {
 	}
 }
 
-// Measure of Central Tendancy
+// Measure of Central Tendency
 // Mode of the given input array
 // Based on
 // https://www.mathsisfun.com/data/central-measures.html
