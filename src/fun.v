@@ -97,11 +97,11 @@ pub fn (t &Tensor[T]) diagonal[T]() &Tensor[T] {
 	newshape := [nel]
 	newstrides := [iarray_sum(t.strides)]
 	mut ret := &Tensor[T]{
-		data: t.data
-		shape: newshape
+		data:    t.data
+		shape:   newshape
 		strides: newstrides
-		size: nel
-		memory: t.memory
+		size:    nel
+		memory:  t.memory
 	}
 	ret.ensure_memory()
 	return ret
@@ -254,11 +254,11 @@ pub fn (t &Tensor[T]) slice[T](idx ...[]int) !&Tensor[T] {
 		offset += t.strides[i] * indexer[i]
 	}
 	mut ret := &Tensor[T]{
-		shape: newshape_.clone()
+		shape:   newshape_.clone()
 		strides: newstrides_.clone()
-		size: size_from_shape(newshape_)
-		data: t.data.offset[T](offset)
-		memory: .row_major
+		size:    size_from_shape(newshape_)
+		data:    t.data.offset[T](offset)
+		memory:  .row_major
 	}
 	ret.ensure_memory()
 	return ret
@@ -298,11 +298,11 @@ pub fn (t &Tensor[T]) slice_hilo[T](idx1 []int, idx2 []int) !&Tensor[T] {
 		offset += t.strides[i] * idx[i]
 	}
 	mut ret := &Tensor[T]{
-		shape: newshape_.clone()
+		shape:   newshape_.clone()
 		strides: newstrides_.clone()
-		size: size_from_shape(newshape_)
-		data: t.data.offset[T](offset)
-		memory: .row_major
+		size:    size_from_shape(newshape_)
+		data:    t.data.offset[T](offset)
+		memory:  .row_major
 	}
 	ret.ensure_memory()
 	return ret

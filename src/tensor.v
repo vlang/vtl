@@ -115,11 +115,11 @@ pub fn (t &Tensor[T]) copy(memory MemoryFormat) &Tensor[T] {
 	strides := strides_from_shape(t.shape, memory)
 	size := size_from_shape(t.shape)
 	mut ret := &Tensor[T]{
-		data: t.data.clone()
-		memory: memory
-		shape: t.shape
+		data:    t.data.clone()
+		memory:  memory
+		shape:   t.shape
 		strides: strides
-		size: size
+		size:    size
 	}
 	ret.ensure_memory()
 	return ret
@@ -130,10 +130,10 @@ pub fn (t &Tensor[T]) copy(memory MemoryFormat) &Tensor[T] {
 @[inline]
 pub fn (t &Tensor[T]) view() &Tensor[T] {
 	return &Tensor[T]{
-		data: t.data
-		memory: t.memory
-		shape: t.shape.clone()
+		data:    t.data
+		memory:  t.memory
+		shape:   t.shape.clone()
 		strides: t.strides.clone()
-		size: t.size
+		size:    t.size
 	}
 }

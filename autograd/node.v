@@ -21,9 +21,9 @@ pub mut:
 // node
 pub fn node[T](gate Gate, parents []&Variable[T], payload &Payload[T], name string) &Node[T] {
 	return &Node[T]{
-		gate: gate
+		gate:    gate
 		parents: parents
 		payload: payload
-		name: name
+		name:    name
 	}
 }

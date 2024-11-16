@@ -20,7 +20,7 @@ pub struct EluLayer[T] {
 pub fn elu_layer[T](ctx &autograd.Context[T], output_shape []int, data EluLayerConfig) types.Layer[T] {
 	return types.Layer[T](&EluLayer[T]{
 		output_shape: output_shape.clone()
-		alpha: data.alpha
+		alpha:        data.alpha
 	})
 }
 

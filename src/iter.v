@@ -34,8 +34,8 @@ pub struct IteratorBuildData[T] {
 // iterator creates an iterator through a Tensor with custom data
 pub fn (t &Tensor[T]) custom_iterator[T](data IteratorBuildData[T]) &TensorIterator[T] {
 	return &TensorIterator[T]{
-		tensor: t
-		iteration: data.start
+		tensor:       t
+		iteration:    data.start
 		next_handler: data.next_handler
 	}
 }

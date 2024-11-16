@@ -12,7 +12,7 @@ pub:
 
 pub fn mse_gate[T](cache &autograd.Variable[T], target &vtl.Tensor[T]) &MseGate[T] {
 	return &MseGate[T]{
-		cache: cache
+		cache:  cache
 		target: target
 	}
 }

@@ -20,7 +20,7 @@ pub struct DropoutLayer[T] {
 pub fn dropout_layer[T](ctx &autograd.Context[T], output_shape []int, data DropoutLayerConfig) types.Layer[T] {
 	return types.Layer[T](&DropoutLayer[T]{
 		output_shape: output_shape.clone()
-		prob: 1.0 - data.prob
+		prob:         1.0 - data.prob
 	})
 }
 

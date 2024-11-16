@@ -16,10 +16,10 @@ pub:
 pub fn maxpool2d_gate[T](max_indices &vtl.Tensor[int], kernel []int, shape []int, stride []int, padding []int) &MaxPool2DGate[T] {
 	return &MaxPool2DGate[T]{
 		max_indices: max_indices
-		kernel: kernel
-		shape: shape
-		stride: stride
-		padding: padding
+		kernel:      kernel
+		shape:       shape
+		stride:      stride
+		padding:     padding
 	}
 }
 

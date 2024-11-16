@@ -14,9 +14,9 @@ pub:
 
 pub fn linear_gate[T](input &autograd.Variable[T], weight &autograd.Variable[T], bias &autograd.Variable[T]) &LinearGate[T] {
 	return &LinearGate[T]{
-		input: input
+		input:  input
 		weight: weight
-		bias: bias
+		bias:   bias
 	}
 }
 

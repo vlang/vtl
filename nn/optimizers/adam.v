@@ -29,9 +29,9 @@ pub struct AdamOptimizerConfig {
 pub fn adam_optimizer[T](config AdamOptimizerConfig) &AdamOptimizer[T] {
 	return &AdamOptimizer[T]{
 		learning_rate: config.learning_rate
-		beta1: config.beta1
-		beta2: config.beta2
-		epsilon: config.epsilon
+		beta1:         config.beta1
+		beta2:         config.beta2
+		epsilon:       config.epsilon
 	}
 }
 

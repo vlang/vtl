@@ -10,9 +10,9 @@ pub fn (t &VclTensor[T]) broadcast_to[T](shape []int) !&VclTensor[T] {
 	strides := strides_from_shape(shape, .row_major)
 	result_strides := broadcast_strides(shape, t.shape, strides, t.strides)!
 	return &VclTensor[T]{
-		data: t.data
-		shape: shape
-		size: size
+		data:    t.data
+		shape:   shape
+		size:    size
 		strides: result_strides
 	}
 }

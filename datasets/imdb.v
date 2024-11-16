@@ -18,11 +18,11 @@ pub:
 // load_imdb_helper loads the IMDB dataset for a given split.
 fn load_imdb_helper(split string) !(&vtl.Tensor[string], &vtl.Tensor[int]) {
 	dataset_path := download_dataset(
-		dataset: 'imdb'
-		baseurl: datasets.imdb_base_url
-		compressed: true
+		dataset:          'imdb'
+		baseurl:          imdb_base_url
+		compressed:       true
 		uncompressed_dir: 'aclImdb'
-		file: datasets.imdb_file_name
+		file:             imdb_file_name
 	)!
 
 	mut split_paths := []string{}
@@ -63,8 +63,8 @@ pub fn load_imdb() !ImdbDataset {
 
 	return ImdbDataset{
 		train_features: train_features
-		train_labels: train_labels
-		test_features: test_features
-		test_labels: test_labels
+		train_labels:   train_labels
+		test_features:  test_features
+		test_labels:    test_labels
 	}
 }
