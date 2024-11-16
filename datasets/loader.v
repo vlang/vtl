@@ -85,8 +85,8 @@ fn download_dataset(data DatasetDownload) !string {
 			file_content := os.read_file(target)!
 			content := gzip.decompress(file_content.bytes(),
 				verify_header_checksum: true
-				verify_length: false
-				verify_checksum: false
+				verify_length:          false
+				verify_checksum:        false
 			)!
 			os.write_file(uncompressed_path, content.bytestr())!
 		}

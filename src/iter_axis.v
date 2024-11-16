@@ -25,11 +25,11 @@ pub fn (t &Tensor[T]) axis_iterator[T](axis int) &TensorAxisIterator[T] {
 	strides.delete(axis)
 
 	return &TensorAxisIterator[T]{
-		tensor: t
-		shape: shape
+		tensor:  t
+		shape:   shape
 		strides: strides
-		axis: axis
-		inc: t.strides[axis]
+		axis:    axis
+		inc:     t.strides[axis]
 	}
 }
 
@@ -44,11 +44,11 @@ pub fn (t &Tensor[T]) axis_with_dims_iterator[T](axis int) &TensorAxisIterator[T
 	strides[axis] = 0
 
 	return &TensorAxisIterator[T]{
-		tensor: t
-		shape: shape
+		tensor:  t
+		shape:   shape
 		strides: strides
-		axis: axis
-		inc: t.strides[axis]
+		axis:    axis
+		inc:     t.strides[axis]
 	}
 }
 

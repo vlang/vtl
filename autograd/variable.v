@@ -39,9 +39,9 @@ pub struct VariableData {
 pub fn variable[T](context &Context[T], value &vtl.Tensor[T], data VariableData) &Variable[T] {
 	grad := if data.requires_grad { vtl.zeros_like[T](value) } else { value }
 	return &Variable[T]{
-		context: context
-		value: value
-		grad: grad
+		context:       context
+		value:         value
+		grad:          grad
 		requires_grad: data.requires_grad
 	}
 }

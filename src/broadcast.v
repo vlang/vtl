@@ -80,9 +80,9 @@ pub fn (t &Tensor[T]) broadcast_to[T](shape []int) !&Tensor[T] {
 	strides := strides_from_shape(shape, .row_major)
 	result_strides := broadcast_strides(shape, t.shape, strides, t.strides)!
 	return &Tensor[T]{
-		data: t.data
-		shape: shape
-		size: size
+		data:    t.data
+		shape:   shape
+		size:    size
 		strides: result_strides
 	}
 }

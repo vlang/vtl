@@ -16,9 +16,9 @@ pub mut:
 // with an empty list of layers.
 pub fn sequential_info[T](ctx &autograd.Context[T], layers_ []types.Layer[T]) &SequentialInfo[T] {
 	return &SequentialInfo[T]{
-		ctx: ctx
+		ctx:    ctx
 		layers: layers_
-		loss: unsafe { nil }
+		loss:   unsafe { nil }
 	}
 }
 

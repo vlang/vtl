@@ -18,10 +18,10 @@ pub fn (t &Tensor[T]) vcl(params storage.VclStorageParams) !&VclTensor[T] {
 	row_tensor := t.copy(.row_major)
 	cldata := row_tensor.data.vcl(params)!
 	return &VclTensor[T]{
-		data: cldata
-		memory: row_tensor.memory
-		size: row_tensor.size
-		shape: row_tensor.shape
+		data:    cldata
+		memory:  row_tensor.memory
+		size:    row_tensor.size
+		shape:   row_tensor.shape
 		strides: row_tensor.strides
 	}
 }
@@ -30,10 +30,10 @@ pub fn (t &Tensor[T]) vcl(params storage.VclStorageParams) !&VclTensor[T] {
 pub fn (t &VclTensor[T]) cpu() !&Tensor[T] {
 	data := t.data.cpu()!
 	return &Tensor[T]{
-		data: data
-		memory: t.memory
-		size: t.size
-		shape: t.shape
+		data:    data
+		memory:  t.memory
+		size:    t.size
+		shape:   t.shape
 		strides: t.strides
 	}
 }

@@ -21,11 +21,11 @@ pub:
 // load_mnist_helper loads the MNIST dataset from the given filename.
 fn load_mnist_helper(file string) !string {
 	dataset_path := download_dataset(
-		dataset: 'mnist'
-		baseurl: datasets.mnist_base_url
-		compressed: true
+		dataset:          'mnist'
+		baseurl:          mnist_base_url
+		compressed:       true
 		uncompressed_dir: file.all_before_last('.')
-		file: file
+		file:             file
 	)!
 
 	return os.read_file(dataset_path)!
@@ -47,15 +47,15 @@ fn load_mnist_labels(filename string) !&vtl.Tensor[u8] {
 
 // load_mnist loads the MNIST dataset.
 pub fn load_mnist() !MnistDataset {
-	train_features := load_mnist_features(datasets.mnist_train_images_file)!
-	train_labels := load_mnist_labels(datasets.mnist_train_labels_file)!
-	test_features := load_mnist_features(datasets.mnist_test_images_file)!
-	test_labels := load_mnist_labels(datasets.mnist_test_labels_file)!
+	train_features := load_mnist_features(mnist_train_images_file)!
+	train_labels := load_mnist_labels(mnist_train_labels_file)!
+	test_features := load_mnist_features(mnist_test_images_file)!
+	test_labels := load_mnist_labels(mnist_test_labels_file)!
 
 	return MnistDataset{
 		train_features: train_features
-		train_labels: train_labels
-		test_features: test_features
-		test_labels: test_labels
+		train_labels:   train_labels
+		test_features:  test_features
+		test_labels:    test_labels
 	}
 }

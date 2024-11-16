@@ -11,7 +11,7 @@ pub:
 
 pub fn flatten_gate[T](input &autograd.Variable[T], cached_shape []int) &FlattenGate[T] {
 	return &FlattenGate[T]{
-		input: input
+		input:        input
 		cached_shape: cached_shape
 	}
 }

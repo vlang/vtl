@@ -12,7 +12,7 @@ pub:
 
 pub fn softmax_cross_entropy_gate[T](cache &autograd.Variable[T], target &vtl.Tensor[T]) &SoftmaxCrossEntropyGate[T] {
 	return &SoftmaxCrossEntropyGate[T]{
-		cache: cache
+		cache:  cache
 		target: target
 	}
 }

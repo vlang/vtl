@@ -18,7 +18,7 @@ pub fn linear_layer[T](ctx &autograd.Context[T], input_dim int, output_dim int) 
 	bias := vtl.zeros[T]([1, output_dim])
 	return types.Layer[T](&LinearLayer[T]{
 		weights: ctx.variable(weights)
-		bias: ctx.variable(bias)
+		bias:    ctx.variable(bias)
 	})
 }
 
