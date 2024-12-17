@@ -105,7 +105,7 @@ pub fn (t &Tensor[T]) array_equiv[T](other &Tensor[T]) bool {
 	return true
 }
 
-@[inline]
+@[direct_array_access; inline]
 fn handle_equal[T](vals []T, _ []int) bool {
 	mut equal := true
 	for v in vals {

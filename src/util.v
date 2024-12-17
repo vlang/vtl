@@ -60,6 +60,7 @@ pub fn (mut t Tensor[T]) ensure_memory[T]() {
 
 // assert_shape_off_axis ensures that the shapes of Tensors match
 // for concatenation, except along the axis being joined
+@[direct_array_access]
 fn assert_shape_off_axis[T](ts []&Tensor[T], axis int, shape []int) ![]int {
 	mut retshape := shape.clone()
 	for t in ts {
@@ -91,6 +92,7 @@ fn assert_shape[T](shape []int, ts []&Tensor[T]) ! {
 
 // is_col_major_contiguous checks if an array is contiguous with a col-major
 // memory layout
+@[direct_array_access]
 fn is_col_major_contiguous(shape []int, strides []int, ndims int) bool {
 	if ndims == 0 {
 		return true
@@ -114,6 +116,7 @@ fn is_col_major_contiguous(shape []int, strides []int, ndims int) bool {
 
 // is_row_major_contiguous checks if an array is contiguous with a row-major
 // memory layout
+@[direct_array_access]
 fn is_row_major_contiguous(shape []int, strides []int, ndims int) bool {
 	if ndims == 0 {
 		return true
@@ -150,6 +153,7 @@ fn clip_axis(axis int, size int) !int {
 }
 
 // strides_from_shape returns the strides from a shape and memory format
+@[direct_array_access]
 fn strides_from_shape(shape []int, memory MemoryFormat) []int {
 	mut accum := 1
 	mut result := []int{len: shape.len}
@@ -207,6 +211,7 @@ fn shape_with_autosize(shape []int, size int) !([]int, int) {
 
 // filter_shape_not_strides removes 0 size dimensions from the shape
 // and strides of an array
+@[direct_array_access]
 fn filter_shape_not_strides(shape []int, strides []int) !([]int, []int) {
 	mut newshape := []int{}
 	mut newstrides := []int{}

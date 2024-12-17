@@ -93,6 +93,7 @@ pub fn from_1d[T](arr []T, params TensorData) !&Tensor[T] {
 
 // from_2d takes a two dimensional array of floating point values
 // and returns a two-dimensional Tensor if possible
+@[direct_array_access]
 pub fn from_2d[T](a [][]T, params TensorData) !&Tensor[T] {
 	mut arr := []T{cap: a.len * a[0].len}
 	for i in 0 .. a.len {

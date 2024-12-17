@@ -6,6 +6,7 @@ module vtl
 // integer that does not equally divide the axis. For an array of length
 // l that should be split into n sections, it returns l % n sub-arrays of
 // size l//n + 1 and the rest of size l//n.
+@[direct_array_access]
 pub fn (t &Tensor[T]) array_split[T](ind int, axis int) ![]&Tensor[T] {
 	ntotal := t.shape[axis]
 	neach := ntotal / ind
@@ -125,7 +126,11 @@ pub fn (t &Tensor[T]) dsplit_expl[T](ind []int) ![]&Tensor[T] {
 
 // splitter implements a generic splitting function that contains the underlying functionality
 // for all split operations
+@[direct_array_access]
 fn (t &Tensor[T]) splitter[T](axis int, n int, div_points []int) ![]&Tensor[T] {
+	if n > 0 && div_points.len <= n {
+		return error('splitter error, div_points.len <= n')
+	}
 	mut subary := []&Tensor[T]{}
 	sary := t.swapaxes(axis, 0)!
 	for i in 0 .. n {

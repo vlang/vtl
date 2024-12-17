@@ -129,6 +129,7 @@ fn handle_flatten_iteration[T](mut s TensorIterator[T]) T {
 	return val
 }
 
+@[direct_array_access]
 fn tensor_backstrides[T](t &Tensor[T]) []int {
 	rank := t.rank()
 	shape := t.shape

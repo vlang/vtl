@@ -135,6 +135,7 @@ pub fn (t &Tensor[T]) as_strided[T](shape []int, strides []int) !&Tensor[T] {
 
 // transpose permutes the axes of an tensor in a specified
 // order and returns a view of the data
+@[direct_array_access]
 pub fn (t &Tensor[T]) transpose[T](order []int) !&Tensor[T] {
 	mut ret := t.view()
 	n := order.len
@@ -187,6 +188,7 @@ fn fabs(x f64) f64 {
 }
 
 // slice returns a tensor from a variadic list of indexing operations
+@[direct_array_access]
 pub fn (t &Tensor[T]) slice[T](idx ...[]int) !&Tensor[T] {
 	mut newshape := t.shape.clone()
 	mut newstrides := t.strides.clone()
@@ -266,6 +268,7 @@ pub fn (t &Tensor[T]) slice[T](idx ...[]int) !&Tensor[T] {
 
 // slice_hilo returns a view of an array from a list of starting
 // indices and a list of closing indices.
+@[direct_array_access]
 pub fn (t &Tensor[T]) slice_hilo[T](idx1 []int, idx2 []int) !&Tensor[T] {
 	mut newshape := t.shape.clone()
 	mut newstrides := t.strides.clone()
