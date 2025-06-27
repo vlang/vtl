@@ -1,6 +1,5 @@
 module models
 
-import vtl.nn.layers
 import vtl.nn.types
 
 fn test_nnc() {
