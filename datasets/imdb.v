@@ -6,6 +6,8 @@ import os
 pub const imdb_file_name = 'aclImdb_v1.tar.gz'
 pub const imdb_base_url = 'http://ai.stanford.edu/~amaas/data/sentiment/'
 
+const imdb_label_files_count = 12500
+
 // ImdbDataset is a dataset for sentiment analysis.
 pub struct ImdbDataset {
 pub:
@@ -15,9 +17,26 @@ pub:
 	test_labels    &vtl.Tensor[int]    = unsafe { nil }
 }
 
+fn imdb_split_paths(dataset_path string, split string) ![]string {
+	split_dir := os.join_path(dataset_path, split)
+	pos_dir := os.join_path(split_dir, 'pos')
+	neg_dir := os.join_path(split_dir, 'neg')
+
+	pos_paths := os.walk_ext(pos_dir, '.txt')
+	neg_paths := os.walk_ext(neg_dir, '.txt')
+	if pos_paths.len != imdb_label_files_count || neg_paths.len != imdb_label_files_count {
+		return error('invalid cached IMDB ${split} split: got ${pos_paths.len} positive and ${neg_paths.len} negative files, expected ${imdb_label_files_count} each')
+	}
+
+	mut split_paths := []string{cap: pos_paths.len + neg_paths.len}
+	split_paths << pos_paths
+	split_paths << neg_paths
+	return split_paths
+}
+
 // load_imdb_helper loads the IMDB dataset for a given split.
 fn load_imdb_helper(split string) !(&vtl.Tensor[string], &vtl.Tensor[int]) {
-	dataset_path := download_dataset(
+	mut dataset_path := download_dataset(
 		dataset:          'imdb'
 		baseurl:          imdb_base_url
 		compressed:       true
@@ -25,14 +44,17 @@ fn load_imdb_helper(split string) !(&vtl.Tensor[string], &vtl.Tensor[int]) {
 		file:             imdb_file_name
 	)!
 
-	mut split_paths := []string{}
-
-	split_dir := os.join_path(dataset_path, split)
-	pos_dir := os.join_path(split_dir, 'pos')
-	neg_dir := os.join_path(split_dir, 'neg')
-
-	split_paths << os.walk_ext(pos_dir, '.txt')
-	split_paths << os.walk_ext(neg_dir, '.txt')
+	split_paths := imdb_split_paths(dataset_path, split) or {
+		os.rmdir_all(dataset_path)!
+		dataset_path = download_dataset(
+			dataset:          'imdb'
+			baseurl:          imdb_base_url
+			compressed:       true
+			uncompressed_dir: 'aclImdb'
+			file:             imdb_file_name
+		)!
+		imdb_split_paths(dataset_path, split)!
+	}
 
 	mut labels := []int{cap: split_paths.len}
 	mut texts := []string{cap: split_paths.len}

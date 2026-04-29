@@ -1,6 +1,6 @@
 module vtl
 
-import vtl.storage
+import storage
 
 // MemoryFormat is a sum type that lists the possible memory layouts
 pub enum MemoryFormat {
@@ -103,7 +103,7 @@ pub fn (t &Tensor[T]) to_array() []T {
 	mut iter := t.iterator()
 	for {
 		val, _ := iter.next() or { break }
-		arr << cast[T](val)
+		arr << val
 	}
 	return arr
 }

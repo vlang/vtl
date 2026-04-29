@@ -1,10 +1,10 @@
 // vtest retry: 3
-import vtl.datasets
+module datasets
 
 fn test_mnist() {
 	unbuffer_stdout()
 	println('start')
-	mnist := datasets.load_mnist()!
+	mnist := load_mnist()!
 	println('mnist dataset loaded')
 
 	assert mnist.train_features.shape == [60000, 28, 28]
