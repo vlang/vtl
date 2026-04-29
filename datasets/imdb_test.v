@@ -1,10 +1,8 @@
 // vtest retry: 3
-module main
-
-import vtl.datasets
+module datasets
 
 fn test_imdb() {
-	imdb := datasets.load_imdb()!
+	imdb := load_imdb()!
 
 	assert imdb.train_features.shape == [25000]
 	assert imdb.test_features.shape == [25000]
