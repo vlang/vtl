@@ -53,7 +53,7 @@ fn broadcastable_shape(a []int, b []int) []int {
 
 // broadcast strides broadcasts the strides of an existing array to
 // allow it to be viewed as a compatible shape
-fn broadcast_strides(dest_shape []int, src_shape []int, dest_strides []int, src_strides []int) ![]int {
+fn broadcast_strides(dest_shape []int, src_shape []int, _ []int, src_strides []int) ![]int {
 	dims := dest_shape.len
 	start := dims - src_shape.len
 	mut result := []int{len: dims, init: 0}
