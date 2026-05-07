@@ -22,8 +22,8 @@ pub fn deriv_tanh[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tenso
 @[inline]
 pub fn sigmoid[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 	return x.map(fn [T](val T, i []int) T {
-		// B5 fix: parentheses around denominator to get 1/(1+exp(x))
-		return vtl.cast[T](1) / (vtl.cast[T](1) + vtl.cast[T](math.exp(vtl.cast[f64](val))))
+		// correct sigmoid: 1 / (1 + exp(-x))
+		return vtl.cast[T](1) / (vtl.cast[T](1) + vtl.cast[T](math.exp(-vtl.cast[f64](val))))
 	})
 }
 

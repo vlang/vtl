@@ -1,5 +1,6 @@
 module main
 
+import vtl
 import vtl.autograd
 import vtl.datasets
 import vtl.nn.models
@@ -53,7 +54,13 @@ fn main() {
 			mut x := ctx.variable(features.slice([offset, offset + batch_size])!,
 				requires_grad: true
 			)
-			target := labels.slice([offset, offset + batch_size])!
+			// One-hot encode labels to shape [batch_size, 10] to match model output
+			label_slice := labels.slice([offset, offset + batch_size])!
+			mut target := vtl.zeros[f64]([batch_size, 10], vtl.TensorData{})
+			for i in 0 .. batch_size {
+				class_idx := int(label_slice.get([i]))
+				target.set([i, class_idx], 1.0)
+			}
 
 			// Forward pass
 			y_pred := model.forward(x)!
