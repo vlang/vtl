@@ -143,3 +143,46 @@ pub fn mse[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	result := sum / vtl.cast[T](size)
 	return vtl.from_1d([result])
 }
+
+// softmax_cross_entropy computes the mean cross-entropy loss for a batch of
+// logit vectors using the numerically stable log-sum-exp trick.
+//
+// input:  [batch_size, n_classes] — raw logits (unnormalised scores)
+// target: [batch_size, n_classes] — one-hot or soft label targets
+// returns: scalar loss tensor of shape [1]
+//
+// Formula (Arraymancer-style, numerically stable):
+//   For each sample i:
+//     lse_i = log( sum_j exp(logit_ij - max_i) ) + max_i
+//     loss_i = lse_i - sum_j(target_ij * logit_ij)
+//   mean_loss = mean over batch
+@[inline]
+pub fn softmax_cross_entropy[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	batch_size := input.shape[0]
+	n_classes := input.shape[1]
+	mut total_loss := f64(0)
+	for i in 0 .. batch_size {
+		// Compute per-sample max for numerical stability
+		mut max_logit := f64(input.get([i, 0]))
+		for c in 1 .. n_classes {
+			v := f64(input.get([i, c]))
+			if v > max_logit {
+				max_logit = v
+			}
+		}
+		// log-sum-exp
+		mut sum_exp := f64(0)
+		for c in 0 .. n_classes {
+			sum_exp += math.exp(f64(input.get([i, c])) - max_logit)
+		}
+		lse := math.log(sum_exp) + max_logit
+		// dot(target_i, logit_i)
+		mut dot := f64(0)
+		for c in 0 .. n_classes {
+			dot += f64(target.get([i, c])) * f64(input.get([i, c]))
+		}
+		total_loss += lse - dot
+	}
+	mean_loss := total_loss / f64(batch_size)
+	return vtl.from_1d([vtl.cast[T](mean_loss)])
+}
