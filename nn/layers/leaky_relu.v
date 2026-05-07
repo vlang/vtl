@@ -25,7 +25,7 @@ pub fn (_ &LeakyReluLayer[T]) variables() []&autograd.Variable[T] {
 	return []&autograd.Variable[T]{}
 }
 
-pub fn (layer &LeakyReluLayer[T]) forward(mut input autograd.Variable[T]) !&autograd.Variable[T] {
+pub fn (layer &LeakyReluLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	output := internal.leaky_relu[T](input.value, vtl.cast[T](0))
 	mut result := input.context.variable(output)
 

@@ -26,10 +26,11 @@ pub fn (_ &InputLayer[T]) variables() []&autograd.Variable[T] {
 	return []&autograd.Variable[T]{}
 }
 
-pub fn (layer &InputLayer[T]) forward(mut input autograd.Variable[T]) !&autograd.Variable[T] {
+pub fn (layer &InputLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
+	mut result := input.context.variable(input.value, requires_grad: input.requires_grad)
 	if input.requires_grad {
 		gate := layers.input_gate[T]()
-		gate.cache(mut input, input)!
+		gate.cache(mut result, input)!
 	}
-	return input
+	return result
 }

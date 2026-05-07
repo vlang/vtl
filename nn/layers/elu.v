@@ -32,7 +32,7 @@ pub fn (_ &EluLayer[T]) variables() []&autograd.Variable[T] {
 	return []&autograd.Variable[T]{}
 }
 
-pub fn (layer &EluLayer[T]) forward(mut input autograd.Variable[T]) !&autograd.Variable[T] {
+pub fn (layer &EluLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	output := internal.elu[T](input.value, layer.alpha)
 	mut result := input.context.variable(output)
 

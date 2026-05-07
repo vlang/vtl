@@ -6,5 +6,5 @@ import vtl.autograd
 pub interface Layer[T] {
 	output_shape() []int
 	variables() []&autograd.Variable[T]
-	forward(mut input autograd.Variable[T]) !&autograd.Variable[T]
+	forward(input &autograd.Variable[T]) !&autograd.Variable[T]
 }
