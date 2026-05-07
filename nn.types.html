@@ -122,7 +122,7 @@
 <code><span class="token keyword">interface</span> Layer<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
 	<span class="token function">output_shape</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
 	<span class="token function">variables</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span>
-	<span class="token function">forward</span><span class="token punctuation">(</span><span class="token keyword">mut</span> input autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span>
+	<span class="token function">forward</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span>
 <span class="token punctuation">}</span></code></pre>
 <p>Layer is a generic interface for a neural network layer.</p>
 
@@ -153,7 +153,7 @@
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 2 May 2026 00:33:24</div>
+						<div class="footer">Powered by vdoc. Generated on: 7 May 2026 21:39:27</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#Layer">interface Layer</a>        <ul>
 </ul>
