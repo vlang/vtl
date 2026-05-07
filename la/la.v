@@ -36,7 +36,8 @@ pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 	if a.shape[1] != b.shape[0] {
 		return error('Invalid shapes for matrix multiplication ${a.shape} and ${b.shape}')
 	}
-	ma, mb := vtl.broadcast2[T](a.copy(.row_major), b.copy(.row_major))!
+	ma := a.copy(.row_major)
+	mb := b.copy(.row_major)
 	mut dm := vsl_la.Matrix.new[f64](a.shape[0], b.shape[1])
 	mam := vsl_la.Matrix.raw(a.shape[0], a.shape[1], tensor_to_f64_array[T](ma))
 	mbm := vsl_la.Matrix.raw(b.shape[0], b.shape[1], tensor_to_f64_array[T](mb))
