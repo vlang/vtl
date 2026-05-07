@@ -7,17 +7,19 @@ import vtl.nn.internal
 pub struct LeakyReluGate[T] {
 pub:
 	cache &vtl.Tensor[T] = unsafe { nil }
+	slope T
 }
 
-pub fn leaky_relu_gate[T](cache &vtl.Tensor[T]) &LeakyReluGate[T] {
+pub fn leaky_relu_gate[T](cache &vtl.Tensor[T], slope T) &LeakyReluGate[T] {
 	return &LeakyReluGate[T]{
 		cache: cache
+		slope: slope
 	}
 }
 
 pub fn (g &LeakyReluGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
-	r0 := internal.deriv_leaky_relu[T](gradient, g.cache, vtl.cast[T](0))!
+	r0 := internal.deriv_leaky_relu[T](gradient, g.cache, g.slope)!
 	return [r0]
 }
 

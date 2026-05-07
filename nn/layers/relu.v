@@ -24,7 +24,7 @@ pub fn (_ &ReLULayer[T]) variables() []&autograd.Variable[T] {
 	return []&autograd.Variable[T]{}
 }
 
-pub fn (layer &ReLULayer[T]) forward(mut input autograd.Variable[T]) !&autograd.Variable[T] {
+pub fn (layer &ReLULayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	output := internal.relu[T](input.value)
 	mut result := input.context.variable(output)
 
