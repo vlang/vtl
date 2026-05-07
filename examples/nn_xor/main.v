@@ -17,13 +17,17 @@ fn main() {
 
 	// We will create a tensor of size 3200 (100 batches of size 32)
 	// We create it as int between [0, 2] and convert to bool
-	x_train_bool := vtl.random(0, 2, [batch_size * 100, 2]).as_bool()
+	x_train_bool := vtl.random(0, 2, [batch_size * batches, 2]).as_bool()
 
 	// Let's build our truth labels. We need to apply xor between the 2 columns of the tensors
-	x_train_bool_1 := x_train_bool.slice_hilo([]int{}, [0])!
-	x_train_bool_2 := x_train_bool.slice_hilo([]int{}, [1])!
+	// B1 fix: use slice (per-dimension) to extract each column as [n,1],
+	// then reshape to [n] for element-wise XOR computation.
+	n := batch_size * batches
+	x_train_bool_1 := x_train_bool.slice([0, n], [0, 1])!.reshape([n])!
+	x_train_bool_2 := x_train_bool.slice([0, n], [1, 2])!.reshape([n])!
 
-	y_bool := x_train_bool_1.equal(x_train_bool_2)!
+	// XOR: true when columns differ (not equal)
+	y_bool := x_train_bool_1.not_equal(x_train_bool_2)!
 
 	// We need to convert the bool tensor to a float tensor
 	mut x_train := ctx.variable(x_train_bool.as_f64(),
@@ -31,8 +35,7 @@ fn main() {
 	)
 	y := y_bool.as_f64()
 
-	// We create a neural network with 2 inputs, 2 hidden layers of 4 neurons each and 1 output
-	// We use the sigmoid activation function
+	// We create a neural network with 2 inputs, 1 hidden layer of 3 neurons and 1 output
 	mut model := models.sequential_from_ctx[f64](ctx)
 	model.input([2])
 	model.linear(3)
@@ -42,6 +45,8 @@ fn main() {
 
 	// Stochastic Gradient Descent
 	mut optimizer := optimizers.sgd[f64](learning_rate: 0.01)
+	// Register model parameters with the optimizer so it can update weights
+	optimizer.build_params(model.info.layers)
 
 	mut losses := []&vtl.Tensor[f64]{cap: epochs * batches}
 
@@ -55,7 +60,7 @@ fn main() {
 			target := y.slice([offset, offset + batch_size])!
 
 			// Running input through the network
-			y_pred := model.forward(mut x)!
+			y_pred := model.forward(x)!
 
 			// Compute the loss
 			mut loss := model.loss(y_pred, target)!

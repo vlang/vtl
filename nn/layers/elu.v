@@ -1,5 +1,6 @@
 module layers
 
+import vtl
 import vtl.autograd
 import vtl.nn.internal
 import vtl.nn.gates.activation
@@ -32,12 +33,12 @@ pub fn (_ &EluLayer[T]) variables() []&autograd.Variable[T] {
 	return []&autograd.Variable[T]{}
 }
 
-pub fn (layer &EluLayer[T]) forward(mut input autograd.Variable[T]) !&autograd.Variable[T] {
+pub fn (layer &EluLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	output := internal.elu[T](input.value, layer.alpha)
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {
-		gate := activation.elu_gate[T](input.value)
+		gate := activation.elu_gate[T](input.value, vtl.cast[T](layer.alpha))
 		gate.cache(mut result, input)!
 	}
 	return result

@@ -27,7 +27,7 @@ pub fn (_ &FlattenLayer[T]) variables() []&autograd.Variable[T] {
 	return []&autograd.Variable[T]{}
 }
 
-pub fn (layer &FlattenLayer[T]) forward(mut input autograd.Variable[T]) !&autograd.Variable[T] {
+pub fn (layer &FlattenLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	output := input.value.reshape([input.value.shape[0], -1])!
 	mut result := input.context.variable(output)
 

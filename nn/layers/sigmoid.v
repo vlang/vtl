@@ -24,7 +24,7 @@ pub fn (_ &SigmoidLayer[T]) variables() []&autograd.Variable[T] {
 	return []&autograd.Variable[T]{}
 }
 
-pub fn (layer &SigmoidLayer[T]) forward(mut input autograd.Variable[T]) !&autograd.Variable[T] {
+pub fn (layer &SigmoidLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	output := internal.sigmoid[T](input.value)
 	mut result := input.context.variable(output)
 

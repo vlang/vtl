@@ -11,3 +11,10 @@ fns.txt
 /docs/build
 vtl
 vls.log
+
+# Compiled binaries and shared libraries
+*.so
+*.dylib
+*.dll
+examples/*/main
+examples/*/main.exe

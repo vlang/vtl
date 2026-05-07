@@ -106,11 +106,12 @@ pub fn (mut nn Sequential[T]) sigmod() {
 	nn.info.sigmod()
 }
 
-pub fn (mut nn Sequential[T]) forward(mut train autograd.Variable[T]) !&autograd.Variable[T] {
+pub fn (mut nn Sequential[T]) forward(train &autograd.Variable[T]) !&autograd.Variable[T] {
+	mut cur := train
 	for layer in nn.info.layers {
-		train = *layer.forward(mut train)!
+		cur = layer.forward(cur)!
 	}
-	return train
+	return cur
 }
 
 pub fn (mut nn Sequential[T]) loss(output &autograd.Variable[T], target &vtl.Tensor[T]) !&autograd.Variable[T] {

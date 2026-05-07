@@ -7,17 +7,19 @@ import vtl.nn.internal
 pub struct EluGate[T] {
 pub:
 	cache &vtl.Tensor[T] = unsafe { nil }
+	alpha T
 }
 
-pub fn elu_gate[T](cache &vtl.Tensor[T]) &EluGate[T] {
+pub fn elu_gate[T](cache &vtl.Tensor[T], alpha T) &EluGate[T] {
 	return &EluGate[T]{
 		cache: cache
+		alpha: alpha
 	}
 }
 
 pub fn (g &EluGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
-	r0 := internal.deriv_elu[T](gradient, g.cache, vtl.cast[T](0))!
+	r0 := internal.deriv_elu[T](gradient, g.cache, g.alpha)!
 	return [r0]
 }
 

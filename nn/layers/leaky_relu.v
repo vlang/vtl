@@ -6,14 +6,21 @@ import vtl.nn.internal
 import vtl.nn.gates.activation
 import vtl.nn.types
 
-// LeakyReluLayer is an activation layer that applies the leaky elu function to the input.
-pub struct LeakyReluLayer[T] {
-	output_shape []int
+@[params]
+pub struct LeakyReluLayerConfig {
+	slope f64 = 0.01
 }
 
-pub fn leaky_relu_layer[T](ctx &autograd.Context[T], output_shape []int) types.Layer[T] {
+// LeakyReluLayer is an activation layer that applies the leaky relu function to the input.
+pub struct LeakyReluLayer[T] {
+	output_shape []int
+	slope        f64
+}
+
+pub fn leaky_relu_layer[T](ctx &autograd.Context[T], output_shape []int, data LeakyReluLayerConfig) types.Layer[T] {
 	return types.Layer[T](&LeakyReluLayer[T]{
 		output_shape: output_shape.clone()
+		slope:        data.slope
 	})
 }
 
@@ -25,12 +32,12 @@ pub fn (_ &LeakyReluLayer[T]) variables() []&autograd.Variable[T] {
 	return []&autograd.Variable[T]{}
 }
 
-pub fn (layer &LeakyReluLayer[T]) forward(mut input autograd.Variable[T]) !&autograd.Variable[T] {
-	output := internal.leaky_relu[T](input.value, vtl.cast[T](0))
+pub fn (layer &LeakyReluLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
+	output := internal.leaky_relu[T](input.value, vtl.cast[T](layer.slope))
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {
-		gate := activation.leaky_relu_gate[T](input.value)
+		gate := activation.leaky_relu_gate[T](input.value, vtl.cast[T](layer.slope))
 		gate.cache(mut result, input)!
 	}
 	return result

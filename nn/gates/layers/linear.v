@@ -3,7 +3,6 @@ module layers
 import vtl
 import vtl.autograd
 import vtl.la
-import vtl.stats
 
 pub struct LinearGate[T] {
 pub:
@@ -33,7 +32,11 @@ pub fn (g &LinearGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tens
 	}
 
 	if g.bias.requires_grad {
-		result[2] = vtl.from_1d[T]([stats.sum_axis[T](grad, axis: 0)])!
+		// Sum upstream gradient over the batch dimension: [1, batch_size] @ [batch_size, output_dim] = [1, output_dim]
+		// This gives the correct per-neuron bias gradient instead of a scalar.
+		batch_size := grad.shape[0]
+		ones := vtl.ones[T]([1, batch_size])
+		result[2] = la.matmul[T](ones, grad)!
 	}
 
 	return result
@@ -42,7 +45,7 @@ pub fn (g &LinearGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tens
 pub fn (g &LinearGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	input := args[0]
 	weight := args[1]
-	bias := args[1]
+	bias := args[2]
 
 	match input {
 		autograd.Variable[T] {
