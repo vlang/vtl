@@ -58,7 +58,7 @@ pub fn (ctx &Context[T]) variable[T](value &vtl.Tensor[T], data ContextVariableD
 pub fn (ctx &Context[T]) str() string {
 	mut str := ''
 	for i, node in ctx.nodes {
-		if node.parents.len <= 1 {
+		if node.parents.len == 1 {
 			str = '${str}${node.parents[0].value.shape}'
 		} else {
 			str = '${str}('
@@ -78,7 +78,7 @@ pub fn (ctx &Context[T]) str() string {
 	return str
 }
 
-pub fn register[T](name string, gate Gate, result &Variable[T], parents []&Variable[T]) ! {
+pub fn register[T](name string, gate Gate[T], result &Variable[T], parents []&Variable[T]) ! {
 	assert parents.len > 0
 	if parents.len == 0 {
 		return error(@FN + ': it is needed to specify at least one parent')
