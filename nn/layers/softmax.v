@@ -1,0 +1,45 @@
+module layers
+
+import vtl.autograd
+import vtl.nn.internal
+import vtl.nn.types
+import vtl.nn.gates.activation as activation_gates
+
+// SoftmaxLayer applies softmax activation over the last dimension of the input.
+// input shape: [..., n_classes]  →  output shape: [..., n_classes]
+// Softmax output sums to 1 along the last dimension.
+pub struct SoftmaxLayer[T] {
+	dim int
+}
+
+@[params]
+pub struct SoftmaxLayerConfig {
+	dim int = -1 // dimension to apply softmax over; -1 means last dimension
+}
+
+pub fn softmax_layer[T](ctx &autograd.Context[T], config SoftmaxLayerConfig) types.Layer[T] {
+	return types.Layer[T](&SoftmaxLayer[T]{
+		dim: config.dim
+	})
+}
+
+pub fn (layer &SoftmaxLayer[T]) output_shape() []int {
+	return []int{}
+}
+
+pub fn (layer &SoftmaxLayer[T]) variables() []&autograd.Variable[T] {
+	return []&autograd.Variable[T]{}
+}
+
+pub fn (layer &SoftmaxLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
+	// Compute softmax along dim (-1 means last dim)
+	dim := if layer.dim == -1 { input.value.shape.len - 1 } else { layer.dim }
+	output := internal.softmax_forward[T](input.value, dim)!
+	mut result := input.context.variable(output)
+
+	if input.requires_grad {
+		gate := activation_gates.softmax_gate[T](input.value, dim)
+		gate.cache(mut result, input)!
+	}
+	return result
+}

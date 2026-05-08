@@ -1,96 +1,118 @@
-<div align="center">
-  <p>
-    <img
-      style="width: 200px"
-      width="200"
-      src="https://github.com/vlang/vtl/blob/main/static/vtl-logo.png?sanitize=true&raw=true"
-    >
-  </p>
-  <h1>The V Tensor Library</h1>
+# The V Tensor Library
 
-[vlang.io](https://vlang.io) |
-[Docs](https://vlang.github.io/vtl) |
-[Tutorials](https://github.com/vlang/vtl/blob/main/docs/TUTORIAL.md) |
-[Changelog](#) |
-[Contributing](https://github.com/vlang/vtl/blob/main/CONTRIBUTING.md)
-
-</div>
 <div align="center">
 
 [![Mentioned in Awesome V][awesomevbadge]][awesomevurl]
-[![Continuous Integration][workflowbadge]][workflowurl]
-[![Deploy Documentation][deploydocsbadge]][deploydocsurl]
+[![CI][workflowbadge]][workflowurl]
 [![License: MIT][licensebadge]][licenseurl]
+
+**VTL** is a pure-[V](https://vlang.io) tensor library for numerical computing
+and machine learning. It provides n-dimensional arrays with automatic
+differentiation, linear algebra via [VSL](https://github.com/vlang/vsl),
+and a full neural network module.
+
+[Documentation](docs/README.md) ·
+[Tutorials](docs/TUTORIAL.md) ·
+[VSL Backend](https://github.com/vlang/vsl)
 
 </div>
 
-```v ignore
+## Features
+
+- **Tensor operations** — create, slice, reshape, transpose, broadcast, map/reduce
+- **Autograd** — reverse-mode automatic differentiation; build arbitrary computational graphs
+- **Neural networks** — `Sequential` model API; layers (Linear, Conv2D, LSTM, Attention, …);
+  losses (MSE, BCE, CrossEntropy, Huber, …); optimizers (Adam, AdamW, RMSProp, AdaGrad, SGD)
+- **Linear algebra** — VSL-backed: matmul, solve, lstsq, qr, lu, cholesky, pinv, trace, norm, SVD
+- **Hardware acceleration** — zero-copy sharing with C libraries via `vtl.Tensor.data`
+
+## Quick start
+
+```v
 import vtl
-t := vtl.from_array([1.0, 2, 3, 4], [2, 2])!
-t.get([1, 1])
-// 4.0
+import vtl.autograd as ag
+import vtl.nn.layers
+import vtl.nn.loss
+import vtl.nn.optimizers
+
+// 1. Build a two-layer network
+mut ctx := ag.ctx[f64]()
+lin1 := layers.linear_layer[f64](ctx, 784, 256)
+lin2 := layers.linear_layer[f64](ctx, 256, 10)
+model := [layers.Layer[f64](lin1), layers.Layer[f64](lin2)]
+
+// 2. Forward pass
+input_tensor := vtl.zeros[f64]([64, 784])
+mut x := ctx.variable(input_tensor)
+for layer in model {
+    x = layer.forward(x)!
+}
+
+// 3. Loss
+y_pred := ctx.variable(vtl.zeros[f64]([64, 10]))
+target := vtl.zeros[f64]([64, 10])
+mut l := loss.mse_loss[f64]()
+mut loss_val := l.loss(y_pred, target)!
+
+// 4. Backward + update
+loss_val.backward()!
+mut opt := optimizers.adam_optimizer[f64](learning_rate: 0.001)
+opt.build_params(model)
+opt.update()!
 ```
 
-## VTL Provides
+## Module overview
 
-- An n-dimensional `Tensor` data structure
-- Sophisticated reduction, elementwise, and accumulation operations
-- Data Structures that can easily be passed to C libraries
-- Powerful linear algebra routines backed by VSL.
-
-In the [docs](https://vlang.github.io/vtl) you can find more information about this module
+| Module | Purpose |
+|--------|---------|
+| `vtl` | Core `Tensor[T]` type; creation, slicing, broadcasting |
+| `vtl.autograd` | `Context`, `Variable`, gates, `backprop()` |
+| `vtl.la` | Linear algebra (wraps VSL) |
+| `vtl.nn` | Neural network layers, losses, optimizers |
+| `vtl.nn.models` | `Sequential` model API |
+| `vtl.nn.internal` | Weight initialisation (Kaiming, Xavier) |
+| `vtl.nn.gates` | Autograd gate implementations |
 
 ## Installation
 
-### Install dependencies (optional)
-
-We use [VSL](https://github.com/vlang/vsl) as backend for some functionalities.
-VTL requires VSL's linear algebra module.
-If you wish you to use vtl without these, the `vtl` module will still function as normal.
-
-Follow this [install instructions](https://github.com/vlang/vsl#install-vsl-locally)
-at VSL docs in order to install VSL with all needed dependencies.
-
-### Install VTL
+VTL depends on [VSL](https://github.com/vlang/vsl). Follow the
+[VSL install instructions](https://github.com/vlang/vsl#install-vsl-locally)
+before installing VTL.
 
 ```sh
 v install vtl
 ```
 
-Done. Installation completed.
-
 ## Testing
 
-To test the module, just type the following command:
-
 ```sh
-v test .
+v test ~/.vmodules/vtl
 ```
+
+## Documentation
+
+All tutorials live in [`docs/`](docs/README.md):
+
+| Tutorial | Topic |
+|----------|-------|
+| [TUTORIAL_FIRST_STEPS.md](docs/TUTORIAL_FIRST_STEPS.md) | Tensor creation, indexing, slicing |
+| [TUTORIAL_MAP_REDUCE.md](docs/TUTORIAL_MAP_REDUCE.md) | `map` / `nmap` and reductions |
+| [TUTORIAL_AUTOGRAD.md](docs/TUTORIAL_AUTOGRAD.md) | Autograd: `Variable`, gates, backprop |
+| [TUTORIAL_REDUCTIONS.md](docs/TUTORIAL_REDUCTIONS.md) | argmax / argmin / cumsum / cumprod |
+| [TUTORIAL_NEURAL_NETWORKS.md](docs/TUTORIAL_NEURAL_NETWORKS.md) | Layers, losses, optimizers, `Sequential` |
+| [TUTORIAL_OPTIMIZERS.md](docs/TUTORIAL_OPTIMIZERS.md) | Adam / AdamW / RMSProp / AdaGrad / SGD + schedulers |
+| [TUTORIAL_LINEAR_ALGEBRA.md](docs/TUTORIAL_LINEAR_ALGEBRA.md) | LA basics via VSL |
+| [TUTORIAL_ADVANCED_LA.md](docs/TUTORIAL_ADVANCED_LA.md) | trace / norm / qr / lu / cholesky / pinv |
+| [TUTORIAL_BROADCASTING.md](docs/TUTORIAL_BROADCASTING.md) | Broadcasting rules |
+| [TUTORIAL_SLICING.md](docs/TUTORIAL_SLICING.md) | Slicing and views |
 
 ## License
 
 [MIT](LICENSE)
 
-## Contributors
-
-> This work was originally based on the work done by
-> Christopher ([christopherzimmerman](https://github.com/christopherzimmerman)).
-
-> The development of this library continues its course after having reimplemented its core
-> and a large part of its interface. In the same way, we do not want to stop recognizing
-> the work and inspiration that the library done by Christopher has given.
-
-<a href="https://github.com/vlang/vtl/contributors">
-  <img src="https://contrib.rocks/image?repo=vlang/vtl"/>
-</a>
-
-Made with [contributors-img](https://contrib.rocks).
-
 [awesomevbadge]: https://awesome.re/mentioned-badge.svg
 [workflowbadge]: https://github.com/vlang/vtl/actions/workflows/ci.yml/badge.svg
-[deploydocsbadge]: https://github.com/vlang/vtl/actions/workflows/deploy-docs.yml/badge.svg
 [licensebadge]: https://img.shields.io/badge/License-MIT-blue.svg
 [awesomevurl]: https://github.com/vlang/awesome-v/blob/master/README.md#scientific-computing
 [workflowurl]: https://github.com/vlang/vtl/actions/workflows/ci.yml
-[deploydocsurl]: https://github.com/vlang/vtl/actions/workflows/deploy-docs.yml
 [licenseurl]: https://github.com/vlang/vtl/blob/main/LICENSE

@@ -26,7 +26,7 @@ pub fn maxpool2d_gate[T](max_indices &vtl.Tensor[int], kernel []int, shape []int
 pub fn (g &MaxPool2DGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 
-	r0 := internal.maxpool2d_backward[T](g.shape, g.max_indices, gradient)
+	r0 := internal.maxpool2d_backward[T](g.shape, g.max_indices, gradient)!
 
 	return [r0]
 }

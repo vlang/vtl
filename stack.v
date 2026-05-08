@@ -81,7 +81,35 @@ pub fn (t &Tensor[T]) unsqueeze[T](data AxisData) !&Tensor[T] {
 		true { axis + t.rank() + 1 }
 		else { axis }
 	}
-	newshape.insert(newaxis, 1)
+	actual_axis := if newaxis > t.rank() { t.rank() } else { newaxis }
+	newshape.insert(actual_axis, 1)
+	return t.reshape[T](newshape)
+}
+
+// squeeze removes dimensions of size one from a Tensor.
+// If dim is provided, only that dimension is removed (must be size 1).
+// If no dim is provided, all size-1 dimensions are removed.
+pub fn (t &Tensor[T]) squeeze[T](data AxisData) !&Tensor[T] {
+	mut newshape := []int{}
+	if data.axis < 0 {
+		// Remove all size-1 dimensions
+		for dim in t.shape {
+			if dim != 1 {
+				newshape << dim
+			}
+		}
+	} else {
+		// Remove only the specified dimension
+		axis := if data.axis >= t.rank() { t.rank() - 1 } else { data.axis }
+		for i, dim in t.shape {
+			if i != axis || dim != 1 {
+				newshape << dim
+			}
+		}
+	}
+	if newshape.len == 0 {
+		newshape = [1]
+	}
 	return t.reshape[T](newshape)
 }
 

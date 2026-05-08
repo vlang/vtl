@@ -7,12 +7,19 @@ import vtl.nn.internal
 import vtl.nn.gates.layers
 import vtl.nn.types
 
-// LinearLayer is a layer that applies a linear transformation to its input.
+// LinearLayer applies a linear transformation: y = x·Wᵀ + b
+//
+// Input:  [..., in_features]
+// Output: [..., out_features]
+//
+// Weights shape: `[out_features, in_features]`
+// Bias shape:    `[1, out_features]`
 pub struct LinearLayer[T] {
 	weights &autograd.Variable[T] = unsafe { nil }
 	bias    &autograd.Variable[T] = unsafe { nil }
 }
 
+// linear_layer creates a LinearLayer.
 pub fn linear_layer[T](ctx &autograd.Context[T], input_dim int, output_dim int) types.Layer[T] {
 	weights := internal.kaiming_normal[T]([output_dim, input_dim])
 	bias := vtl.zeros[T]([1, output_dim])
