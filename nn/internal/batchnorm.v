@@ -12,10 +12,10 @@ pub fn batchnorm1d_forward[T](input &vtl.Tensor[T], gamma &vtl.Tensor[T], beta &
 	centered := input.map(fn [running_mean] [T](val T, i []int) T {
 		return val - running_mean.get([0, i[1]])
 	})
-	normalized := centered.nmap([std], fn [T](vals []T, i []int) T { return vals[0] * vals[1] })
+	normalized := centered.nmap([std], fn [T](vals []T, i []int) T { return vals[0] * vals[1] })!
 	output := normalized.nmap([gamma, beta], fn [T](vals []T, i []int) T {
 		return vals[0] * vals[1] + vals[2]
-	})
+	})!
 	return output
 }
 
@@ -33,7 +33,7 @@ pub fn batchnorm1d_training[T](input &vtl.Tensor[T], gamma &vtl.Tensor[T], beta 
 		}
 		batch_mean_data[c] = sum / f64(batch_size)
 	}
-	batch_mean := vtl.from_1d(batch_mean_data.map(vtl.cast[T](it)), [1, num_features])!
+	batch_mean := vtl.from_array(batch_mean_data.map(vtl.cast[T](it)), [1, num_features])!
 
 	// Compute batch variance
 	mut batch_var_data := []f64{len: num_features}
@@ -46,7 +46,7 @@ pub fn batchnorm1d_training[T](input &vtl.Tensor[T], gamma &vtl.Tensor[T], beta 
 		}
 		batch_var_data[c] = sum / f64(batch_size)
 	}
-	batch_var := vtl.from_1d(batch_var_data.map(vtl.cast[T](it)), [1, num_features])!
+	batch_var := vtl.from_array(batch_var_data.map(vtl.cast[T](it)), [1, num_features])!
 
 	// Normalize: (x - mean) / sqrt(var + eps)
 	mut output_data := []f64{len: batch_size * num_features}
@@ -103,7 +103,7 @@ pub fn batchnorm1d_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], ga
 		}
 		dgamma_data[c] = sum
 	}
-	dgamma := vtl.from_1d(dgamma_data.map(vtl.cast[T](it)), [1, num_features])!
+	dgamma := vtl.from_array(dgamma_data.map(vtl.cast[T](it)), [1, num_features])!
 
 	// dL/dbeta = sum over batch of grad_out
 	mut dbeta_data := []f64{len: num_features}
@@ -114,7 +114,7 @@ pub fn batchnorm1d_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], ga
 		}
 		dbeta_data[c] = sum
 	}
-	dbeta := vtl.from_1d(dbeta_data.map(vtl.cast[T](it)), [1, num_features])!
+	dbeta := vtl.from_array(dbeta_data.map(vtl.cast[T](it)), [1, num_features])!
 
 	return [dx, dgamma, dbeta]
 }

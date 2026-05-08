@@ -178,7 +178,7 @@ pub fn (g &ConcatGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
 pub fn (g &ConcatGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
 	result.grad = vtl.zeros_like[T](result.value)
 	result.requires_grad = true
-	mut vars := []&autograd.Variable[T]{}
+	mut vars := []&Variable[T]{}
 	for arg in args {
 		match arg {
 			Variable[T] {

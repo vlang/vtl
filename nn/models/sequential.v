@@ -4,6 +4,7 @@ import vtl
 import vtl.autograd
 import vtl.nn.loss
 import vtl.nn.types
+import vtl.nn.layers
 
 fn init() {
 	println(@MOD + ' module is a WIP and not yet functional')
@@ -202,7 +203,12 @@ pub fn (mut nn Sequential[T]) kl_div_loss() {
 }
 
 pub fn (mut nn Sequential[T]) forward(train &autograd.Variable[T]) !&autograd.Variable[T] {
-	mut cur := train
+	mut cur := &autograd.Variable[T]{
+		context: train.context
+		value: train.value
+		grad: train.grad
+		requires_grad: train.requires_grad
+	}
 	for layer in nn.info.layers {
 		cur = layer.forward(cur)!
 	}
@@ -210,5 +216,5 @@ pub fn (mut nn Sequential[T]) forward(train &autograd.Variable[T]) !&autograd.Va
 }
 
 pub fn (mut nn Sequential[T]) loss(output &autograd.Variable[T], target &vtl.Tensor[T]) !&autograd.Variable[T] {
-	return loss.loss_loss[T](nn.info.loss, output, target)
+	return nn.info.loss.loss(output, target)
 }

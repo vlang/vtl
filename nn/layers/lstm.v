@@ -19,10 +19,13 @@ pub:
 
 pub fn lstm_layer[T](ctx &autograd.Context[T], input_size int, hidden_size int, num_layers int) types.Layer[T] {
 	unsafe {
-		w_ih := ctx.variable(internal.kaiming_normal[T](3 * hidden_size, input_size, .relu), true)
-		w_hh := ctx.variable(internal.kaiming_normal[T](3 * hidden_size, hidden_size, .relu), true)
-		b_ih := ctx.variable(vtl.zeros[T](3 * hidden_size), true)
-		b_hh := ctx.variable(vtl.zeros[T](3 * hidden_size), true)
+		w_ih_shape := [3 * hidden_size, input_size]
+		w_hh_shape := [3 * hidden_size, hidden_size]
+		b_shape := [3 * hidden_size]
+		w_ih := ctx.variable(internal.kaiming_normal[T](w_ih_shape))
+		w_hh := ctx.variable(internal.kaiming_normal[T](w_hh_shape))
+		b_ih := ctx.variable(vtl.zeros[T](b_shape))
+		b_hh := ctx.variable(vtl.zeros[T](b_shape))
 
 		mut layer := &LSTMLayer[T]{
 			w_ih: w_ih
@@ -33,7 +36,7 @@ pub fn lstm_layer[T](ctx &autograd.Context[T], input_size int, hidden_size int, 
 			hidden_size: hidden_size
 			num_layers: num_layers
 		}
-		return types.layer[T](layer)
+		return types.Layer[T](layer)
 	}
 }
 
@@ -47,11 +50,10 @@ fn (l &LSTMLayer[T]) variables() []&autograd.Variable[T] {
 
 fn (l &LSTMLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	unsafe {
-		seq_len := input.value.shape[0]
-		batch := input.value.shape[1]
+		batch := input.value.shape[0]
 
-		hidden0 := l.ctx.variable(vtl.zeros[T](batch, l.hidden_size), true)
-		cell0 := l.ctx.variable(vtl.zeros[T](batch, l.hidden_size), true)
+		hidden0 := l.ctx.variable(vtl.zeros[T]([batch, l.hidden_size]))
+		cell0 := l.ctx.variable(vtl.zeros[T]([batch, l.hidden_size]))
 
 		output, _ := internal.lstm_forward_single[T](
 			input.value,
@@ -59,8 +61,9 @@ fn (l &LSTMLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T]
 			l.w_ih.value,
 			l.w_hh.value,
 			l.b_ih.value,
+			l.b_hh.value,
 		)!
 
-		return l.ctx.variable(output, false)
+		return l.ctx.variable(output)
 	}
 }

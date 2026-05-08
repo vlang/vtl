@@ -1,6 +1,5 @@
 module layers
 
-import math
 import vtl
 import vtl.autograd
 import vtl.nn.internal
@@ -74,11 +73,12 @@ pub fn (g &LayerNormGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.T
 }
 
 pub fn (g &LayerNormGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
-	match args[0] {
+	a := args[0]
+	match a {
 		autograd.Variable[T] {
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
-			autograd.register[T]('LayerNorm', g, result, [args[0]])!
+			autograd.register[T]('LayerNorm', g, result, [a])!
 		}
 		else {}
 	}

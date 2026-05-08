@@ -46,8 +46,18 @@ pub fn abs_gate[T](a &Variable[T]) &AbsGate[T] {
 
 pub fn (g &AbsGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
-	// sign(x) = 1 if x > 0, -1 if x < 0, 0 if x == 0
-	r0 := gradient.multiply[T](g.a.value.abs[T]().divide_scalar[T](vtl.cast[T](g.a.value.get_nth(0)))!
+	// d/dx|x| = sign(x): sign(x) = x / |x|
+	// Use: grad * (x / |x|) = grad * sign(x)
+	// But we need to handle x=0 where sign is undefined (gradient=0 there)
+	abs_a := g.a.value.abs[T]()!
+	denom := abs_a.multiply_scalar[T](vtl.cast[T](1))!  // abs_a * 1 for numerical stability
+	// sign(x) = x / |x|, but for x=0 we define sign(0)=1
+	// So: d/dx|x| = gradient * sign(x)
+	// For simplicity, use: gradient * (a / (abs(a) + eps))
+	eps := vtl.cast[T](1e-8)
+	safe_denom := abs_a.map(fn [eps] [T](val T, i []int) T { return if val < eps { eps } else { val } })!
+	sign_a := g.a.value.divide[T](safe_denom)!
+	r0 := gradient.multiply[T](sign_a)!
 	return [r0]
 }
 
@@ -78,9 +88,10 @@ pub fn sqrt_gate[T](a &Variable[T]) &SqrtGate[T] {
 
 pub fn (g &SqrtGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
-	// d/dx sqrt(x) = 1/(2*sqrt(x)) = 0.5 / sqrt(x)
-	sqrt_a := g.a.value.sqrt[T]()
-	r0 := gradient.multiply[T](sqrt_a.multiply_scalar[T](vtl.cast[T](0.5))!
+	// d/dx sqrt(x) = 1/(2*sqrt(x)) = gradient * (0.5 / sqrt(x))
+	sqrt_a := g.a.value.sqrt[T]()!
+	half_over_sqrt := sqrt_a.multiply_scalar[T](vtl.cast[T](0.5))!
+	r0 := gradient.multiply[T](half_over_sqrt)!
 	return [r0]
 }
 

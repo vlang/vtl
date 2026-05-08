@@ -33,6 +33,3 @@ pub fn cross[T](u &vtl.Tensor[T], v &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 	return vtl.from_1d(res)
 }
 
-fn tensor_to_f64_array[T](t &vtl.Tensor[T]) []f64 {
-	return t.as_f64().to_array()
-}

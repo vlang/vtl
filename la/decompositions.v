@@ -259,6 +259,3 @@ pub fn matrix_rank[T](a &vtl.Tensor[T], tol f64) !int {
 	return vsl_la.rank(a_mat, safe_tol)
 }
 
-fn int_min(a int, b int) int {
-	return if a < b { a } else { b }
-}

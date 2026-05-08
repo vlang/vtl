@@ -1,6 +1,5 @@
 module layers
 
-import math
 import vtl
 import vtl.autograd
 import vtl.nn.internal
@@ -41,7 +40,8 @@ pub fn conv2d_layer[T](ctx &autograd.Context[T], in_ch int, out_ch int, kernel_s
 }
 
 pub fn (layer &Conv2DLayer[T]) output_shape() []int {
-	return []int{layer.out_channels, -1, -1}  // resolved at runtime from forward
+	shapes := [layer.out_channels, -1, -1]
+	return shapes
 }
 
 pub fn (layer &Conv2DLayer[T]) variables() []&autograd.Variable[T] {
@@ -49,12 +49,18 @@ pub fn (layer &Conv2DLayer[T]) variables() []&autograd.Variable[T] {
 }
 
 pub fn (layer &Conv2DLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
+	cfg := internal.Conv2DConfig{
+		padding:  layer.config.padding
+		stride:   layer.config.stride
+		dilation: layer.config.dilation
+		groups:   layer.config.groups
+	}
 	output := internal.conv2d_forward[T](
 		input.value,
 		layer.weight.value,
 		layer.bias.value,
 		layer.kernel_size,
-		layer.config
+		cfg
 	)!
 	mut result := input.context.variable(output)
 
@@ -80,18 +86,25 @@ pub fn conv2d_gate[T](input &vtl.Tensor[T], weight &vtl.Tensor[T], bias &vtl.Ten
 }
 
 pub fn (g &Conv2DGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
+	cfg := internal.Conv2DConfig{
+		padding:  g.config.padding
+		stride:   g.config.stride
+		dilation: g.config.dilation
+		groups:   g.config.groups
+	}
 	return internal.conv2d_backward[T](
 		payload.variable.grad,
-		g.input, g.weight, g.bias, g.kernel_size, g.config
+		g.input, g.weight, g.bias, g.kernel_size, cfg
 	)
 }
 
 pub fn (g &Conv2DGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
-	match args[0] {
+	a := args[0]
+	match a {
 		autograd.Variable[T] {
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
-			autograd.register[T]('Conv2D', g, result, [args[0]])!
+			autograd.register[T]('Conv2D', g, result, [a])!
 		}
 		else {}
 	}

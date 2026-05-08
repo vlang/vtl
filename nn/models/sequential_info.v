@@ -9,7 +9,7 @@ pub struct SequentialInfo[T] {
 	ctx &autograd.Context[T] = unsafe { nil }
 pub mut:
 	layers []types.Layer[T]
-	loss   types.Loss
+	loss   types.Loss[T]
 }
 
 // sequential_info creates a new neural network container
@@ -175,7 +175,7 @@ pub fn (mut ls SequentialInfo[T]) multihead_attention(embed_dim int, num_heads i
 
 // positional_encoding adds a new PositionalEncoding layer to the network.
 pub fn (mut ls SequentialInfo[T]) positional_encoding(embed_dim int, max_len int) {
-	ls.layers << layers.positional_encoding_layer[T](ls.ctx, embed_dim, max_len)
+	ls.layers << layers.positional_encoding_layer[T](ls.ctx, embed_dim, max_len) or { panic(err) }
 }
 
 // cross_entropy_loss sets the loss function to cross entropy loss.
@@ -195,7 +195,7 @@ pub fn (mut ls SequentialInfo[T]) huber_loss() {
 
 // nll_loss sets the loss function to negative log likelihood loss.
 pub fn (mut ls SequentialInfo[T]) nll_loss() {
-	ls.loss = loss.nll_loss[T]()
+	ls.loss = loss.nll_loss[T](unsafe { nil })
 }
 
 // kl_div_loss sets the loss function to KL divergence loss.

@@ -1,11 +1,19 @@
 module internal
 
-import math
 import vtl
+
+// Conv2DConfig mirrors vtl.nn.layers.Conv2DConfig to avoid import cycle.
+pub struct Conv2DConfig {
+pub:
+	padding  []int = [0, 0]
+	stride   []int = [1, 1]
+	dilation []int = [1, 1]
+	groups   int   = 1
+}
 
 // conv2d_forward implements the forward pass of 2D convolution.
 // input: [batch, in_ch, H, W]
-// weight: [out_ch, in_ch/groups, kH, kW]
+// weight: [out_ch, in_ch/groups, k_h, k_w]
 // bias: [1, out_ch]
 // config: padding, stride, dilation, groups
 // returns: [batch, out_ch, out_H, out_W]
@@ -21,8 +29,8 @@ pub fn conv2d_forward[T](
 	in_h := input.shape[2]
 	in_w := input.shape[3]
 	out_ch := weight.shape[0]
-	kH := kernel_size[0]
-	kW := kernel_size[1]
+	k_h := kernel_size[0]
+	k_w := kernel_size[1]
 	pad_h := config.padding[0]
 	pad_w := config.padding[1]
 	stride_h := config.stride[0]
@@ -31,8 +39,8 @@ pub fn conv2d_forward[T](
 	dil_w := config.dilation[1]
 	groups := config.groups
 
-	out_h := (in_h + 2 * pad_h - dil_h * (kH - 1) - 1) / stride_h + 1
-	out_w := (in_w + 2 * pad_w - dil_w * (kW - 1) - 1) / stride_w + 1
+	out_h := (in_h + 2 * pad_h - dil_h * (k_h - 1) - 1) / stride_h + 1
+	out_w := (in_w + 2 * pad_w - dil_w * (k_w - 1) - 1) / stride_w + 1
 
 	mut output := vtl.zeros[T]([batch, out_ch, out_h, out_w])
 
@@ -47,8 +55,8 @@ pub fn conv2d_forward[T](
 						// Compute correlation at this output position
 						mut sum := f64(0)
 						for ic in 0 .. g_in_ch {
-							for kh in 0 .. kH {
-								for kw in 0 .. kW {
+							for kh in 0 .. k_h {
+								for kw in 0 .. k_w {
 									ih := oh * stride_h - pad_h + kh * dil_h
 									iw := ow * stride_w - pad_w + kw * dil_w
 									if ih >= 0 && ih < in_h && iw >= 0 && iw < in_w {
@@ -84,8 +92,8 @@ pub fn conv2d_backward[T](
 	in_h := input.shape[2]
 	in_w := input.shape[3]
 	out_ch := weight.shape[0]
-	kH := kernel_size[0]
-	kW := kernel_size[1]
+	k_h := kernel_size[0]
+	k_w := kernel_size[1]
 	pad_h := config.padding[0]
 	pad_w := config.padding[1]
 	stride_h := config.stride[0]
@@ -109,8 +117,8 @@ pub fn conv2d_backward[T](
 					for ow in 0 .. out_w {
 						goh := f64(grad_out.get([b, global_oc, oh, ow]))
 						for ic in 0 .. g_in_ch {
-							for kh in 0 .. kH {
-								for kw in 0 .. kW {
+							for kh in 0 .. k_h {
+								for kw in 0 .. k_w {
 									ih := oh * stride_h - pad_h + kh * dil_h
 									iw := ow * stride_w - pad_w + kw * dil_w
 									if ih >= 0 && ih < in_h && iw >= 0 && iw < in_w {
@@ -131,8 +139,8 @@ pub fn conv2d_backward[T](
 	mut d_weight := vtl.zeros_like[T](weight)
 	for oc in 0 .. out_ch {
 		for ic in 0 .. in_ch {
-			for kh in 0 .. kH {
-				for kw in 0 .. kW {
+			for kh in 0 .. k_h {
+				for kw in 0 .. k_w {
 					mut sum := f64(0)
 					for b in 0 .. batch {
 						for oh in 0 .. out_h {

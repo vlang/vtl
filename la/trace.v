@@ -23,6 +23,3 @@ pub fn norm[T](t &vtl.Tensor[T], ord string) !&vtl.Tensor[f64] {
 	return vtl.from_1d([vsl_la.norm(mat, ord)])
 }
 
-fn tensor_to_f64_array[T](t &vtl.Tensor[T]) []f64 {
-	return t.as_f64().to_array()
-}

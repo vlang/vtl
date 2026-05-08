@@ -54,15 +54,17 @@ pub fn avgpool2d_gate[T](input &vtl.Tensor[T], kernel []int, padding []int, stri
 }
 
 pub fn (g &AvgPool2DGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
-	return internal.avgpool2d_backward[T](payload.variable.grad, g.kernel, g.padding, g.stride)
+	grad := internal.avgpool2d_backward[T](payload.variable.grad, g.kernel, g.padding, g.stride)!
+	return [grad]
 }
 
 pub fn (g &AvgPool2DGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
-	match args[0] {
+	a := args[0]
+	match a {
 		autograd.Variable[T] {
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
-			autograd.register[T]('AvgPool2D', g, result, [args[0]])!
+			autograd.register[T]('AvgPool2D', g, result, [a])!
 		}
 		else {}
 	}
@@ -74,7 +76,9 @@ pub fn global_avgpool2d_layer[T](ctx &autograd.Context[T]) types.Layer[T] {
 	return types.Layer[T](&GlobalAvgPool2DLayer[T]{})
 }
 
-pub fn (layer &GlobalAvgPool2DLayer[T]) output_shape() []int { return []int{-1, -1} }
+pub fn (layer &GlobalAvgPool2DLayer[T]) output_shape() []int {
+	return [-1, -1]
+}
 pub fn (layer &GlobalAvgPool2DLayer[T]) variables() []&autograd.Variable[T] { return [] }
 pub fn (layer &GlobalAvgPool2DLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	output := internal.global_avgpool2d_forward[T](input.value)!
@@ -95,15 +99,17 @@ pub fn global_avgpool2d_gate[T](input &vtl.Tensor[T]) &GlobalAvgPool2DGate[T] {
 }
 
 pub fn (g &GlobalAvgPool2DGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
-	return [internal.global_avgpool2d_backward[T](payload.variable.grad, g.input)]
+	grad := internal.global_avgpool2d_backward[T](payload.variable.grad, g.input)!
+	return [grad]
 }
 
 pub fn (g &GlobalAvgPool2DGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
-	match args[0] {
+	a := args[0]
+	match a {
 		autograd.Variable[T] {
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
-			autograd.register[T]('GlobalAvgPool2D', g, result, [args[0]])!
+			autograd.register[T]('GlobalAvgPool2D', g, result, [a])!
 		}
 		else {}
 	}

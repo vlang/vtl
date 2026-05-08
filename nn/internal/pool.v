@@ -7,34 +7,34 @@ pub fn avgpool2d_forward[T](input &vtl.Tensor[T], kernel []int, padding []int, s
 	c := input.shape[1]
 	h := input.shape[2]
 	w := input.shape[3]
-	kH := kernel[0]
-	kW := kernel[1]
-	pH := padding[0]
-	pW := padding[1]
-	sH := stride[0]
-	sW := stride[1]
-	out_h := (h + 2 * pH - kH) / sH + 1
-	out_w := (w + 2 * pW - kW) / sW + 1
+	k_h := kernel[0]
+	k_w := kernel[1]
+	p_h := padding[0]
+	p_w := padding[1]
+	s_h := stride[0]
+	s_w := stride[1]
+	out_h := (h + 2 * p_h - k_h) / s_h + 1
+	out_w := (w + 2 * p_w - k_w) / s_w + 1
 	mut output := vtl.zeros[T]([n, c, out_h, out_w])
 	for nn in 0 .. n {
 		for cc in 0 .. c {
 			for oh in 0 .. out_h {
 				for ow in 0 .. out_w {
 					mut sum := f64(0)
-					for kh in 0 .. kH {
-						ih := oh * sH - pH + kh
+					for kh in 0 .. k_h {
+						ih := oh * s_h - p_h + kh
 						if ih < 0 || ih >= h {
 							continue
 						}
-						for kw in 0 .. kW {
-							iw := ow * sW - pW + kw
+						for kw in 0 .. k_w {
+							iw := ow * s_w - p_w + kw
 							if iw < 0 || iw >= w {
 								continue
 							}
 							sum += f64(input.get([nn, cc, ih, iw]))
 						}
 					}
-					output.set([nn, cc, oh, ow], vtl.cast[T](sum / f64(kH * kW)))
+					output.set([nn, cc, oh, ow], vtl.cast[T](sum / f64(k_h * k_w)))
 				}
 			}
 		}

@@ -36,19 +36,20 @@ pub fn (s &ExponentialLR[T]) next_lr(current_lr f64, step int) f64 {
 
 // CosineAnnealingLR decays using a cosine schedule from `lrd` to 0.
 pub struct CosineAnnealingLR[T] {
-	T_max int     // maximum number of iterations
+pub:
+	t_max int     // maximum number of iterations
 	lrd   f64     // lower bound lr (default: 0)
 }
 
-pub fn cosine_annealing_lr[T](T_max int, lrd f64) &CosineAnnealingLR[T] {
-	return &CosineAnnealingLR[T]{T_max: T_max, lrd: lrd}
+pub fn cosine_annealing_lr[T](t_max int, lrd f64) &CosineAnnealingLR[T] {
+	return &CosineAnnealingLR[T]{t_max: t_max, lrd: lrd}
 }
 
 pub fn (s &CosineAnnealingLR[T]) next_lr(current_lr f64, step int) f64 {
-	if step >= s.T_max {
+	if step >= s.t_max {
 		return s.lrd
 	}
-	return s.lrd + (current_lr - s.lrd) * (1.0 + math.cos(math.pi * f64(step) / f64(s.T_max))) / 2.0
+	return s.lrd + (current_lr - s.lrd) * (1.0 + math.cos(math.pi * f64(step) / f64(s.t_max))) / 2.0
 }
 
 // ReduceLROnPlateau reduces LR when a metric has stopped improving.
