@@ -93,3 +93,112 @@ pub fn (mut ls SequentialInfo[T]) sigmoid() {
 	shape := layer.output_shape()
 	ls.layers << layers.sigmoid_layer[T](ls.ctx, shape)
 }
+
+// tanh adds a new tanh layer to the network.
+pub fn (mut ls SequentialInfo[T]) tanh() {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.layers << layers.tanh_layer[T](ls.ctx, shape)
+}
+
+// softmax adds a new softmax layer to the network.
+pub fn (mut ls SequentialInfo[T]) softmax() {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.layers << layers.softmax_layer[T](ls.ctx, layers.SoftmaxLayerConfig{})
+}
+
+// gelu adds a new GELU layer to the network.
+pub fn (mut ls SequentialInfo[T]) gelu() {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.layers << layers.gelu_layer[T](ls.ctx, shape)
+}
+
+// swish adds a new Swish layer to the network.
+pub fn (mut ls SequentialInfo[T]) swish() {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.layers << layers.swish_layer[T](ls.ctx, shape)
+}
+
+// mish adds a new Mish layer to the network.
+pub fn (mut ls SequentialInfo[T]) mish() {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.layers << layers.mish_layer[T](ls.ctx, shape)
+}
+
+// conv2d adds a new Conv2D layer to the network.
+pub fn (mut ls SequentialInfo[T]) conv2d(in_channels int, out_channels int, kernel_size []int, config layers.Conv2DConfig) {
+	prev_layer := ls.layers[ls.layers.len - 1]
+	in_ch := if prev_layer.output_shape()[0] > 0 { prev_layer.output_shape()[0] } else { in_channels }
+	ls.layers << layers.conv2d_layer[T](ls.ctx, in_ch, out_channels, kernel_size, config)
+}
+
+// batchnorm1d adds a new BatchNorm1D layer to the network.
+pub fn (mut ls SequentialInfo[T]) batchnorm1d(num_features int, config layers.BatchNorm1DConfig) {
+	ls.layers << layers.batchnorm1d_layer[T](ls.ctx, num_features, config)
+}
+
+// avgpool2d adds a new AveragePool2D layer to the network.
+pub fn (mut ls SequentialInfo[T]) avgpool2d(kernel []int, padding []int, stride []int) {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.layers << layers.avgpool2d_layer[T](ls.ctx, shape, kernel, padding, stride)
+}
+
+// global_avgpool2d adds a new GlobalAveragePool2D layer to the network.
+pub fn (mut ls SequentialInfo[T]) global_avgpool2d() {
+	ls.layers << layers.global_avgpool2d_layer[T](ls.ctx)
+}
+
+// layer_norm adds a new LayerNorm layer to the network.
+pub fn (mut ls SequentialInfo[T]) layer_norm(normalized_shape []int, config layers.LayerNormConfig) {
+	ls.layers << layers.layer_norm_layer[T](ls.ctx, normalized_shape, config)
+}
+
+// embedding adds a new Embedding layer to the network.
+pub fn (mut ls SequentialInfo[T]) embedding(vocab_size int, embedding_dim int) {
+	ls.layers << layers.embedding_layer[T](ls.ctx, vocab_size, embedding_dim)
+}
+
+// lstm adds a new LSTM layer to the network.
+pub fn (mut ls SequentialInfo[T]) lstm(input_size int, hidden_size int, num_layers int) {
+	ls.layers << layers.lstm_layer[T](ls.ctx, input_size, hidden_size, num_layers)
+}
+
+// multihead_attention adds a new MultiHeadAttention layer to the network.
+pub fn (mut ls SequentialInfo[T]) multihead_attention(embed_dim int, num_heads int) {
+	ls.layers << layers.multihead_attention_layer[T](ls.ctx, embed_dim, num_heads)
+}
+
+// positional_encoding adds a new PositionalEncoding layer to the network.
+pub fn (mut ls SequentialInfo[T]) positional_encoding(embed_dim int, max_len int) {
+	ls.layers << layers.positional_encoding_layer[T](ls.ctx, embed_dim, max_len)
+}
+
+// cross_entropy_loss sets the loss function to cross entropy loss.
+pub fn (mut ls SequentialInfo[T]) cross_entropy_loss() {
+	ls.loss = loss.cross_entropy_loss[T]()
+}
+
+// bce_loss sets the loss function to binary cross entropy loss.
+pub fn (mut ls SequentialInfo[T]) bce_loss() {
+	ls.loss = loss.bce_loss[T](loss.BCELossConfig{})
+}
+
+// huber_loss sets the loss function to Huber loss.
+pub fn (mut ls SequentialInfo[T]) huber_loss() {
+	ls.loss = loss.huber_loss[T](loss.HuberLossConfig{})
+}
+
+// nll_loss sets the loss function to negative log likelihood loss.
+pub fn (mut ls SequentialInfo[T]) nll_loss() {
+	ls.loss = loss.nll_loss[T]()
+}
+
+// kl_div_loss sets the loss function to KL divergence loss.
+pub fn (mut ls SequentialInfo[T]) kl_div_loss() {
+	ls.loss = loss.kl_div_loss[T]()
+}
