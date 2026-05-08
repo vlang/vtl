@@ -110,25 +110,74 @@
 			<div class="doc-scrollview" tabindex="-1" id="main-content">
 				<div class="doc-container">
 					<div class="doc-content">
-								<section id="nn.loss" class="doc-node">
-			<div class="title"><h1> nn.loss</h1></div>
+								<section id="readme_nn.loss" class="doc-node">
+			<div class="title"><h1> nn.loss <a href="#readme_nn.loss">#</a></h1></div>
+<p>Re-export all loss structs and constructors from their respective files:- mse.v: MSELoss, mse_loss</p>
+<ul>
+<li>sigmoid_cross_entropy.v: SigmoidCrossEntropyLoss, sigmoid_cross_entropy_loss</li>
+<li>softmax_cross_entropy.v: SoftmaxCrossEntropyLoss, softmax_cross_entropy_loss</li>
+<li>bce.v: BCELoss, BCELossConfig, bce_loss, BCELossGate, bce_loss_gate</li>
+<li>cross_entropy.v: CrossEntropyLoss, cross_entropy_loss, CrossEntropyLossGate, cross_entropy_loss_gate</li>
+<li>huber.v: HuberLoss, HuberLossConfig, huber_loss, HuberLossGate, huber_loss_gate</li>
+<li>nll.v: NLLLoss, nll_loss, NLLLossGate, nll_loss_gate</li>
+<li>kl.v: KLDivLoss, kl_div_loss, KLDivLossGate, kl_div_loss_gate</li></ul>
+
+</section>
+
+		<section id="bce_loss" class="doc-node">
+			<div class="title"><h2>fn bce_loss <a href="#bce_loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/bce.v#L39"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> bce_loss<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>config BCELossConfig<span class="token punctuation">)</span> <span class="token operator">&amp;</span>BCELoss<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<p>bce_loss creates a new BCELoss instance.</p>
+
+</section>
+
+		<section id="cross_entropy_loss" class="doc-node">
+			<div class="title"><h2>fn cross_entropy_loss <a href="#cross_entropy_loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/cross_entropy.v#L18"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> cross_entropy_loss<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>CrossEntropyLoss<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 
 
 </section>
 
-		<section id="loss_loss" class="doc-node">
-			<div class="title"><h2>fn loss_loss <a href="#loss_loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/loss.v#L7"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+		<section id="cross_entropy_loss_gate" class="doc-node">
+			<div class="title"><h2>fn cross_entropy_loss_gate <a href="#cross_entropy_loss_gate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/cross_entropy.v#L40"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> loss_loss<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>loss types<span class="token punctuation">.</span>Loss<span class="token punctuation">,</span> input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<code><span class="token keyword">fn</span> cross_entropy_loss_gate<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>CrossEntropyLossGate<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 
+
+</section>
+
+		<section id="huber_loss" class="doc-node">
+			<div class="title"><h2>fn huber_loss <a href="#huber_loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/huber.v#L37"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> huber_loss<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>config HuberLossConfig<span class="token punctuation">)</span> <span class="token operator">&amp;</span>HuberLoss<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<p>huber_loss creates a new HuberLoss instance.</p>
+
+</section>
+
+		<section id="kl_div_loss" class="doc-node">
+			<div class="title"><h2>fn kl_div_loss <a href="#kl_div_loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/kl.v#L30"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> kl_div_loss<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>KLDivLoss<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<p>kl_div_loss creates a new KLDivLoss instance with <code>reduction = 'mean'</code>.</p>
 
 </section>
 
 		<section id="mse_loss" class="doc-node">
-			<div class="title"><h2>fn mse_loss <a href="#mse_loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/mse.v#L11"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn mse_loss <a href="#mse_loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/mse.v#L23"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> mse_loss<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>MSELoss<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<p>mse_loss creates a new MSELoss instance.</p>
 
+</section>
+
+		<section id="nll_loss" class="doc-node">
+			<div class="title"><h2>fn nll_loss <a href="#nll_loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/nll.v#L37"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> nll_loss<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>weight <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>NLLLoss<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<p>nll_loss creates a new NLLLoss instance.</p>
+<p><code>weight</code> — optional per-class weight tensor; pass <code>unsafe { nil }</code> for uniform weights.</p>
 
 </section>
 
@@ -148,10 +197,66 @@
 
 </section>
 
+		<section id="BCELoss[T].loss" class="doc-node">
+			<div class="title"><h2>fn (BCELoss[T]) loss <a href="#BCELoss[T].loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/bce.v#L45"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>l <span class="token operator">&amp;</span>BCELoss<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">loss</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="CrossEntropyLossGate[T].backward" class="doc-node">
+			<div class="title"><h2>fn (CrossEntropyLossGate[T]) backward <a href="#CrossEntropyLossGate[T].backward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/cross_entropy.v#L46"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&amp;</span>CrossEntropyLossGate<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> backward<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>payload <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Payload<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="CrossEntropyLossGate[T].cache" class="doc-node">
+			<div class="title"><h2>fn (CrossEntropyLossGate[T]) cache <a href="#CrossEntropyLossGate[T].cache">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/cross_entropy.v#L52"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&amp;</span>CrossEntropyLossGate<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> cache<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> result autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> args <span class="token punctuation">...</span>autograd<span class="token punctuation">.</span>CacheParam<span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+
+
+</section>
+
+		<section id="CrossEntropyLoss[T].loss" class="doc-node">
+			<div class="title"><h2>fn (CrossEntropyLoss[T]) loss <a href="#CrossEntropyLoss[T].loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/cross_entropy.v#L24"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>_ <span class="token operator">&amp;</span>CrossEntropyLoss<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">loss</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="HuberLoss[T].loss" class="doc-node">
+			<div class="title"><h2>fn (HuberLoss[T]) loss <a href="#HuberLoss[T].loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/huber.v#L43"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>l <span class="token operator">&amp;</span>HuberLoss<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">loss</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="KLDivLoss[T].loss" class="doc-node">
+			<div class="title"><h2>fn (KLDivLoss[T]) loss <a href="#KLDivLoss[T].loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/kl.v#L36"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>_ <span class="token operator">&amp;</span>KLDivLoss<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">loss</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
 		<section id="MSELoss[T].loss" class="doc-node">
-			<div class="title"><h2>fn (MSELoss[T]) loss <a href="#MSELoss[T].loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/mse.v#L15"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (MSELoss[T]) loss <a href="#MSELoss[T].loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/mse.v#L27"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>_ <span class="token operator">&amp;</span>MSELoss<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">loss</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="NLLLoss[T].loss" class="doc-node">
+			<div class="title"><h2>fn (NLLLoss[T]) loss <a href="#NLLLoss[T].loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/nll.v#L44"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>_ <span class="token operator">&amp;</span>NLLLoss<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">loss</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 
 
 </section>
@@ -172,12 +277,151 @@
 
 </section>
 
+		<section id="BCELoss" class="doc-node">
+			<div class="title"><h2>struct BCELoss <a href="#BCELoss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/bce.v#L24"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> BCELoss<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	from_logits <span class="token builtin">bool</span>
+<span class="token punctuation">}</span></code></pre>
+<p>BCELoss computes Binary Cross-Entropy loss per element and returns the mean.</p>
+<p>Formula (when <code>from_logits = false</code>): <code>L = -mean(y·log(p) + (1-y)·log(1-p))</code></p>
+<p>When <code>from_logits = true</code> (default), a sigmoid is applied to <code>input</code> first, which is numerically more stable than computing sigmoid outside the loss.</p>
+<p>Shape: <code>input</code> and <code>target</code> are both <code>[batch, ...]</code> with values in (0, 1) for target.</p>
+
+<section class="doc-node examples"><h4>Example</h4>
+<pre>
+<code class="language-v"><span class="token keyword">import</span> vtl<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>loss
+l <span class="token operator">:=</span> loss<span class="token punctuation">.</span>bce_loss<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span>          <span class="token comment">// from_logits: true</span>
+out <span class="token operator">:=</span> l<span class="token punctuation">.</span><span class="token function">loss</span><span class="token punctuation">(</span>logits<span class="token punctuation">,</span> labels<span class="token punctuation">)</span><span class="token operator">!</span></code></pre>
+</section>
+</section>
+
+		<section id="BCELossConfig" class="doc-node">
+			<div class="title"><h2>struct BCELossConfig <a href="#BCELossConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/bce.v#L34"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[params]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token symbol">BCELossConfig</span> <span class="token punctuation">{</span>
+	from_logits <span class="token builtin">bool</span> <span class="token operator">=</span> <span class="token boolean">true</span> <span class="token comment">// apply sigmoid to input (recommended for numerical stability)</span>
+<span class="token punctuation">}</span></code></pre>
+<p>BCELossConfig configures BCELoss.</p>
+<p>Fields:- <code>from_logits</code> — when <code>true</code> (default) a sigmoid is applied to the raw model output before computing the loss. Recommended for numerical stability.</p>
+
+</section>
+
+		<section id="CrossEntropyLoss" class="doc-node">
+			<div class="title"><h2>struct CrossEntropyLoss <a href="#CrossEntropyLoss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/cross_entropy.v#L11"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> CrossEntropyLoss<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	weight       <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	ignore_index <span class="token builtin">int</span>            <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span>
+	reduction    <span class="token builtin">string</span>         <span class="token operator">=</span> <span class="token string">'mean'</span> <span class="token comment">// &#39;mean&#39; | &#39;sum&#39; | &#39;none&#39;</span>
+<span class="token punctuation">}</span></code></pre>
+<p>CrossEntropyLoss combines LogSoftmax + NLLLoss in one forward pass. This is more numerically stable than applying softmax then log separately. input: [batch_size, n_classes] raw logits target: [batch_size, n_classes] one-hot targets OR [batch_size] class indices</p>
+
+</section>
+
+		<section id="CrossEntropyLossGate" class="doc-node">
+			<div class="title"><h2>struct CrossEntropyLossGate <a href="#CrossEntropyLossGate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/cross_entropy.v#L35"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> CrossEntropyLossGate<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	target <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+
+
+</section>
+
+		<section id="HuberLoss" class="doc-node">
+			<div class="title"><h2>struct HuberLoss <a href="#HuberLoss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/huber.v#L23"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> HuberLoss<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	delta <span class="token builtin">T</span>
+<span class="token punctuation">}</span></code></pre>
+<p>HuberLoss (also known as Smooth L1 Loss) combines L1 and L2 loss, controlled by <code>delta</code>.</p>
+<p>Formula: <code>L = mean(0.5·(x-y)²)               if |x-y| ≤ delta</code> <code>L = mean(delta·(|x-y| - 0.5·delta)) if |x-y| &gt; delta</code></p>
+<p>Behaves like MSE for small errors and like MAE for large errors, making it more robust to outliers than pure MSE.</p>
+
+<section class="doc-node examples"><h4>Example</h4>
+<pre>
+<code class="language-v"><span class="token keyword">import</span> vtl<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>loss
+l <span class="token operator">:=</span> loss<span class="token punctuation">.</span>huber_loss<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span>delta<span class="token punctuation">:</span> <span class="token number">1.0</span><span class="token punctuation">)</span>
+out <span class="token operator">:=</span> l<span class="token punctuation">.</span><span class="token function">loss</span><span class="token punctuation">(</span>prediction<span class="token punctuation">,</span> target<span class="token punctuation">)</span><span class="token operator">!</span></code></pre>
+</section>
+</section>
+
+		<section id="HuberLossConfig" class="doc-node">
+			<div class="title"><h2>struct HuberLossConfig <a href="#HuberLossConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/huber.v#L32"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[params]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token symbol">HuberLossConfig</span> <span class="token punctuation">{</span>
+	delta <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">1.0</span>
+<span class="token punctuation">}</span></code></pre>
+<p>HuberLossConfig configures HuberLoss.</p>
+<p>Fields:- <code>delta</code> — transition threshold between L2 (below) and L1 (above) behaviour. Default: 1.0.</p>
+
+</section>
+
+		<section id="KLDivLoss" class="doc-node">
+			<div class="title"><h2>struct KLDivLoss <a href="#KLDivLoss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/kl.v#L24"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> KLDivLoss<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	reduction <span class="token builtin">string</span> <span class="token operator">=</span> <span class="token string">'mean'</span>
+<span class="token punctuation">}</span></code></pre>
+<p>KLDivLoss computes the Kullback-Leibler divergence loss.</p>
+<p>Formula: <code>D_KL(P ‖ Q) = sum(P · log(P / Q))</code></p>
+<p>Input:  <code>[batch, n_classes]</code> — Q log-probabilities (e.g. log-softmax output) Target: <code>[batch, n_classes]</code> — P probabilities (non-negative, sum to 1 per sample)</p>
+<p>Fields:- <code>reduction</code> — <code>'mean'</code> | <code>'sum'</code> | <code>'none'</code> (default: <code>'mean'</code>)</p>
+
+<section class="doc-node examples"><h4>Example</h4>
+<pre>
+<code class="language-v"><span class="token keyword">import</span> vtl<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>loss
+l <span class="token operator">:=</span> loss<span class="token punctuation">.</span>kl_div_loss<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+out <span class="token operator">:=</span> l<span class="token punctuation">.</span><span class="token function">loss</span><span class="token punctuation">(</span>log_q<span class="token punctuation">,</span> p_target<span class="token punctuation">)</span><span class="token operator">!</span></code></pre>
+</section>
+</section>
+
 		<section id="MSELoss" class="doc-node">
-			<div class="title"><h2>struct MSELoss <a href="#MSELoss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/mse.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>struct MSELoss <a href="#MSELoss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/mse.v#L20"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">struct</span> MSELoss<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span><span class="token punctuation">}</span></code></pre>
-<p>MSELoss</p>
+<p>MSELoss computes the Mean Squared Error between the model output and the target.</p>
+<p>Formula: <code>L = mean((input - target)²)</code></p>
+<p>Typically used for regression tasks.</p>
 
+<section class="doc-node examples"><h4>Example</h4>
+<pre>
+<code class="language-v"><span class="token keyword">import</span> vtl<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>loss
+l <span class="token operator">:=</span> loss<span class="token punctuation">.</span>mse_loss<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+out  <span class="token operator">:=</span> l<span class="token punctuation">.</span><span class="token function">loss</span><span class="token punctuation">(</span>prediction<span class="token punctuation">,</span> target<span class="token punctuation">)</span><span class="token operator">!</span></code></pre>
+</section>
+</section>
+
+		<section id="NLLLoss" class="doc-node">
+			<div class="title"><h2>struct NLLLoss <a href="#NLLLoss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/loss/nll.v#L27"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> NLLLoss<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	weight       <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	ignore_index <span class="token builtin">int</span>            <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span>
+	reduction    <span class="token builtin">string</span>         <span class="token operator">=</span> <span class="token string">'mean'</span>
+<span class="token punctuation">}</span></code></pre>
+<p>NLLLoss computes the Negative Log Likelihood loss.</p>
+<p>Intended to be used after a log-softmax layer for multi-class classification.</p>
+<p>Input shape:  <code>[batch, n_classes]</code> — log-probabilities (log-softmax output) Target shape: <code>[batch, n_classes]</code> — one-hot class labels</p>
+<p>Fields:- <code>weight</code>       — optional per-class weight tensor (<code>nil</code> = uniform weights)</p>
+<ul>
+<li><code>ignore_index</code> — class index to ignore in the loss computation (default: -1 = none)</li>
+<li><code>reduction</code>    — <code>'mean'</code> | <code>'sum'</code> | <code>'none'</code> (default: <code>'mean'</code>)</li></ul>
+
+<section class="doc-node examples"><h4>Example</h4>
+<pre>
+<code class="language-v"><span class="token keyword">import</span> vtl<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>loss
+l <span class="token operator">:=</span> loss<span class="token punctuation">.</span>nll_loss<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+log_probs <span class="token operator">:=</span> log_softmax_output  <span class="token comment">// shape [batch, n_classes]</span>
+out <span class="token operator">:=</span> l<span class="token punctuation">.</span><span class="token function">loss</span><span class="token punctuation">(</span>log_probs<span class="token punctuation">,</span> one_hot_target<span class="token punctuation">)</span><span class="token operator">!</span></code></pre>
+</section>
 </section>
 
 		<section id="SigmoidCrossEntropyLoss" class="doc-node">
@@ -197,12 +441,28 @@
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 7 May 2026 21:39:27</div>
+						<div class="footer">Powered by vdoc. Generated on: 8 May 2026 06:30:31</div>
 					</div>
-					<div class="doc-toc"><ul><li class="open"><a href="#loss_loss">fn loss_loss</a>        <ul>
+					<div class="doc-toc"><ul><li class="open"><a href="#readme_nn.loss">README</a></li>
+<li class="open"><a href="#bce_loss">fn bce_loss</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#cross_entropy_loss">fn cross_entropy_loss</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#cross_entropy_loss_gate">fn cross_entropy_loss_gate</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#huber_loss">fn huber_loss</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#kl_div_loss">fn kl_div_loss</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#mse_loss">fn mse_loss</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#nll_loss">fn nll_loss</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#sigmoid_cross_entropy_loss">fn sigmoid_cross_entropy_loss</a>        <ul>
@@ -211,8 +471,33 @@
 <li class="open"><a href="#softmax_cross_entropy_loss">fn softmax_cross_entropy_loss</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#BCELoss[T].loss">type BCELoss[T]</a>        <ul>
+<li><a href="#BCELoss[T].loss">fn loss</a></li>
+</ul>
+</li>
+<li class="open"><a href="#CrossEntropyLossGate[T].backward">type CrossEntropyLossGate[T]</a>        <ul>
+<li><a href="#CrossEntropyLossGate[T].backward">fn backward</a></li>
+<li><a href="#CrossEntropyLossGate[T].cache">fn cache</a></li>
+</ul>
+</li>
+<li class="open"><a href="#CrossEntropyLoss[T].loss">type CrossEntropyLoss[T]</a>        <ul>
+<li><a href="#CrossEntropyLoss[T].loss">fn loss</a></li>
+</ul>
+</li>
+<li class="open"><a href="#HuberLoss[T].loss">type HuberLoss[T]</a>        <ul>
+<li><a href="#HuberLoss[T].loss">fn loss</a></li>
+</ul>
+</li>
+<li class="open"><a href="#KLDivLoss[T].loss">type KLDivLoss[T]</a>        <ul>
+<li><a href="#KLDivLoss[T].loss">fn loss</a></li>
+</ul>
+</li>
 <li class="open"><a href="#MSELoss[T].loss">type MSELoss[T]</a>        <ul>
 <li><a href="#MSELoss[T].loss">fn loss</a></li>
+</ul>
+</li>
+<li class="open"><a href="#NLLLoss[T].loss">type NLLLoss[T]</a>        <ul>
+<li><a href="#NLLLoss[T].loss">fn loss</a></li>
 </ul>
 </li>
 <li class="open"><a href="#SigmoidCrossEntropyLoss[T].loss">type SigmoidCrossEntropyLoss[T]</a>        <ul>
@@ -223,7 +508,31 @@
 <li><a href="#SoftmaxCrossEntropyLoss[T].loss">fn loss</a></li>
 </ul>
 </li>
+<li class="open"><a href="#BCELoss">struct BCELoss</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#BCELossConfig">struct BCELossConfig</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#CrossEntropyLoss">struct CrossEntropyLoss</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#CrossEntropyLossGate">struct CrossEntropyLossGate</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#HuberLoss">struct HuberLoss</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#HuberLossConfig">struct HuberLossConfig</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#KLDivLoss">struct KLDivLoss</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#MSELoss">struct MSELoss</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#NLLLoss">struct NLLLoss</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#SigmoidCrossEntropyLoss">struct SigmoidCrossEntropyLoss</a>        <ul>
