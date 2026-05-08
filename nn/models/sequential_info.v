@@ -87,8 +87,8 @@ pub fn (mut ls SequentialInfo[T]) elu() {
 	ls.layers << layers.elu_layer[T](ls.ctx, shape)
 }
 
-// sigmod adds a new sigmod layer to the network.
-pub fn (mut ls SequentialInfo[T]) sigmod() {
+// sigmoid adds a new sigmoid layer to the network.
+pub fn (mut ls SequentialInfo[T]) sigmoid() {
 	layer := ls.layers[ls.layers.len - 1]
 	shape := layer.output_shape()
 	ls.layers << layers.sigmoid_layer[T](ls.ctx, shape)

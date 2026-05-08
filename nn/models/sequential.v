@@ -101,9 +101,9 @@ pub fn (mut nn Sequential[T]) elu() {
 	nn.info.elu()
 }
 
-// sigmod adds a new sigmod layer to the network.
-pub fn (mut nn Sequential[T]) sigmod() {
-	nn.info.sigmod()
+// sigmoid adds a new sigmoid layer to the network.
+pub fn (mut nn Sequential[T]) sigmoid() {
+	nn.info.sigmoid()
 }
 
 pub fn (mut nn Sequential[T]) forward(train &autograd.Variable[T]) !&autograd.Variable[T] {
