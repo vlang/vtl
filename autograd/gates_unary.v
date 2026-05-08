@@ -46,16 +46,9 @@ pub fn abs_gate[T](a &Variable[T]) &AbsGate[T] {
 
 pub fn (g &AbsGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
-	// d/dx|x| = sign(x): sign(x) = x / |x|
-	// Use: grad * (x / |x|) = grad * sign(x)
-	// But we need to handle x=0 where sign is undefined (gradient=0 there)
-	abs_a := g.a.value.abs[T]()!
-	denom := abs_a.multiply_scalar[T](vtl.cast[T](1))!  // abs_a * 1 for numerical stability
-	// sign(x) = x / |x|, but for x=0 we define sign(0)=1
-	// So: d/dx|x| = gradient * sign(x)
-	// For simplicity, use: gradient * (a / (abs(a) + eps))
 	eps := vtl.cast[T](1e-8)
-	safe_denom := abs_a.map(fn [eps] [T](val T, i []int) T { return if val < eps { eps } else { val } })!
+	abs_a := g.a.value.abs[T]()
+	safe_denom := abs_a.map(fn [eps] [T](val T, _ []int) T { return if val < eps { eps } else { val } })
 	sign_a := g.a.value.divide[T](safe_denom)!
 	r0 := gradient.multiply[T](sign_a)!
 	return [r0]
@@ -89,9 +82,9 @@ pub fn sqrt_gate[T](a &Variable[T]) &SqrtGate[T] {
 pub fn (g &SqrtGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	// d/dx sqrt(x) = 1/(2*sqrt(x)) = gradient * (0.5 / sqrt(x))
-	sqrt_a := g.a.value.sqrt[T]()!
-	half_over_sqrt := sqrt_a.multiply_scalar[T](vtl.cast[T](0.5))!
-	r0 := gradient.multiply[T](half_over_sqrt)!
+	sqrt_a := g.a.value.sqrt[T]()
+	two_sqrt := sqrt_a.multiply_scalar[T](vtl.cast[T](2.0))!
+	r0 := gradient.divide[T](two_sqrt)!
 	return [r0]
 }
 
@@ -148,18 +141,20 @@ pub struct ClampGate[T] {
 pub:
 	min_val T
 	max_val T
+	a       &vtl.Tensor[T] = unsafe { nil }
 }
 
-pub fn clamp_gate[T](min_val T, max_val T) &ClampGate[T] {
-	return &ClampGate[T]{min_val: min_val, max_val: max_val}
+pub fn clamp_gate[T](min_val T, max_val T, a &vtl.Tensor[T]) &ClampGate[T] {
+	return &ClampGate[T]{min_val: min_val, max_val: max_val, a: a}
 }
 
 pub fn (g &ClampGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
-	cached := payload.variable.value
-	r0 := gradient.nmap([cached], fn [T](vals []T, _ []int) T {
-		// Pass gradient where value is within bounds, else 0
-		if vals[1] >= g.min_val && vals[1] <= g.max_val {
+	input := g.a
+	min_val := g.min_val
+	max_val := g.max_val
+	r0 := gradient.nmap([input], fn [min_val, max_val] [T](vals []T, _ []int) T {
+		if vals[1] >= min_val && vals[1] <= max_val {
 			return vals[0]
 		}
 		return vtl.cast[T](0)

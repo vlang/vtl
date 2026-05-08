@@ -117,7 +117,7 @@ pub fn lstm_forward_multi[T](
 	num_layers := h0.shape[0]
 	batch := input_.shape[1]
 	hidden_size := h0.shape[2]
-	seq_len := input_.shape[0]
+	_ := input_.shape[0] // seq_len unused here; accessed via layer_input in lstm_forward_single
 
 	mut layer_input := input_
 	mut h_list := []&vtl.Tensor[T]{len: num_layers}

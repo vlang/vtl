@@ -121,3 +121,79 @@ pub fn (v &Variable[T]) tan[T]() !&Variable[T] {
 
 	return result
 }
+
+pub fn (v &Variable[T]) log[T]() !&Variable[T] {
+	g := log_gate[T](v)
+	t := v.value.log[T]()
+	mut result := v.context.variable(t)
+	if v.requires_grad {
+		g.cache(mut result, v)!
+	}
+	return result
+}
+
+pub fn (v &Variable[T]) abs_op[T]() !&Variable[T] {
+	g := abs_gate[T](v)
+	t := v.value.abs[T]()
+	mut result := v.context.variable(t)
+	if v.requires_grad {
+		g.cache(mut result, v)!
+	}
+	return result
+}
+
+pub fn (v &Variable[T]) sqrt_op[T]() !&Variable[T] {
+	g := sqrt_gate[T](v)
+	t := v.value.sqrt[T]()
+	mut result := v.context.variable(t)
+	if v.requires_grad {
+		g.cache(mut result, v)!
+	}
+	return result
+}
+
+pub fn (v &Variable[T]) tanh_op[T]() !&Variable[T] {
+	t := v.value.tanh[T]()
+	g := tanh_gate[T](t)
+	mut result := v.context.variable(t)
+	if v.requires_grad {
+		g.cache(mut result, v)!
+	}
+	return result
+}
+
+pub fn (v &Variable[T]) clamp[T](min_val T, max_val T) !&Variable[T] {
+	g := clamp_gate[T](min_val, max_val, v.value)
+	t := v.value.map(fn [min_val, max_val] [T](x T, _ []int) T {
+		$if T is f64 || T is f32 || T is i16 || T is i8 || T is int {
+			return if x < min_val { min_val } else if x > max_val { max_val } else { x }
+		} $else {
+			return x
+		}
+	})
+	mut result := v.context.variable(t)
+	if v.requires_grad {
+		g.cache(mut result, v)!
+	}
+	return result
+}
+
+pub fn (v &Variable[T]) reshape[T](new_shape []int) !&Variable[T] {
+	g := reshape_gate[T](v.value.shape)
+	t := v.value.reshape[T](new_shape)!
+	mut result := v.context.variable(t)
+	if v.requires_grad {
+		g.cache(mut result, v)!
+	}
+	return result
+}
+
+pub fn (v &Variable[T]) transpose_op[T](perm []int) !&Variable[T] {
+	g := transpose_gate[T](perm)
+	t := v.value.transpose(perm)!
+	mut result := v.context.variable(t)
+	if v.requires_grad {
+		g.cache(mut result, v)!
+	}
+	return result
+}

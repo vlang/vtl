@@ -5,7 +5,6 @@ import vtl.autograd
 import vtl.nn.types
 import vtl
 
-// AdamWOptimizer is Adam with Weight Decay (decoupled from the gradient update).
 pub struct AdamWOptimizer[T] {
 	learning_rate f64
 	epsilon       f64
@@ -36,6 +35,8 @@ pub fn adamw[T](config AdamWOptimizerConfig) &AdamWOptimizer[T] {
 		beta2:         config.beta2
 		epsilon:       config.epsilon
 		weight_decay:  config.weight_decay
+		beta1_t:       config.beta1
+		beta2_t:       config.beta2
 	}
 }
 
@@ -57,25 +58,22 @@ pub fn (mut o AdamWOptimizer[T]) update() ! {
 
 	for i, mut v in o.params {
 		if v.requires_grad {
-			// Update first moment
 			o.first_moments[i].napply([v.grad], fn [o] [T](vals []T, idx []int) T {
 				return vtl.cast[T](o.beta1 * f64(vals[1]) + (1.0 - o.beta1) * f64(vals[0]))
-			})
+			}) or { return err }
 
-			// Update second moment
 			o.second_moments[i].napply([v.grad], fn [o] [T](vals []T, idx []int) T {
 				grad := f64(vals[0])
 				return vtl.cast[T](o.beta2 * f64(vals[1]) + (1.0 - o.beta2) * grad * grad)
-			})
+			}) or { return err }
 
-			// Update params: theta = theta - lr * (m / (sqrt(v) + eps) + wd * theta)
 			v.value.napply([o.first_moments[i], o.second_moments[i]], fn [o, lr_t] [T](vals []T, idx []int) T {
 				theta := f64(vals[0])
 				m := f64(vals[1])
 				v_ := f64(vals[2])
 				wd := o.weight_decay
 				return vtl.cast[T](theta - lr_t * (m / (math.sqrt(v_) + o.epsilon) + wd * theta))
-			})
+			}) or { return err }
 
 			v.grad = vtl.zeros_like[T](v.value)
 		}

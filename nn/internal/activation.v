@@ -120,7 +120,6 @@ pub fn gelu[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 		one := vtl.cast[T](1)
 		sqrt_2_over_pi := vtl.cast[T](0.7978845608028654)
 		coef := vtl.cast[T](0.044715)
-		x_f := vtl.cast[f64](val)
 		tanh_arg := sqrt_2_over_pi * (val + coef * val * val * val)
 		// tanh via epsilon-approximation: (exp(z)-exp(-z))/(exp(z)+exp(-z))
 		exp_2z := math.exp(vtl.cast[f64](2.0 * tanh_arg))

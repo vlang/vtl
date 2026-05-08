@@ -47,7 +47,7 @@ pub fn (mut o AdaGradOptimizer[T]) update() ! {
 			o.accumulated_sq_grads[i].napply([v.grad], fn [o] [T](vals []T, idx []int) T {
 				grad := f64(vals[0])
 				return vtl.cast[T](f64(vals[1]) + grad * grad)
-			})
+			}) or { return err }
 
 			// theta = theta - lr * (grad / (sqrt(G) + eps) + wd * theta)
 			v.value.napply([o.accumulated_sq_grads[i], v.grad], fn [o] [T](vals []T, idx []int) T {
@@ -55,7 +55,7 @@ pub fn (mut o AdaGradOptimizer[T]) update() ! {
 				g := f64(vals[1])
 				grad := f64(vals[2])
 				return vtl.cast[T](theta - o.learning_rate * (grad / (math.sqrt(g) + o.epsilon) + o.weight_decay * theta))
-			})
+			}) or { return err }
 
 			v.grad = vtl.zeros_like[T](v.value)
 		}

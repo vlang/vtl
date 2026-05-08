@@ -74,7 +74,6 @@ pub fn bce[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Tensor[T] {
 		return val
 	})
 	sum := clamped.nreduce([target], vtl.cast[T](0), fn [one] [T](acc T, vals []T, i []int) T {
-		x := vals[0]
 		y := vals[1]
 		return acc + (-y * vtl.cast[T](math.log(vtl.cast[f64](vals[0]))) -
 			(one - y) * vtl.cast[T](math.log(vtl.cast[f64](one - vals[0]))))
@@ -114,7 +113,6 @@ pub fn bce_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], target &vt
 
 // huber computes the Huber loss (smooth L1)
 pub fn huber[T](input &vtl.Tensor[T], target &vtl.Tensor[T], delta T) !&vtl.Tensor[T] {
-	one := vtl.cast[T](1)
 	half := vtl.cast[T](0.5)
 	mut total := vtl.cast[T](0)
 	for i in 0 .. input.size() {
@@ -152,7 +150,6 @@ pub fn huber_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], target &
 // nll computes Negative Log Likelihood loss (assumes input is log-probs)
 // Target is one-hot or class probabilities; we compute -sum(target * log(input))
 pub fn nll[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Tensor[T] {
-	one := vtl.cast[T](1)
 	mut total := vtl.cast[T](0)
 	for i in 0 .. input.size() {
 		log_prob := f64(input.get_nth(i))

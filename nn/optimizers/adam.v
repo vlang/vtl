@@ -32,6 +32,8 @@ pub fn adam_optimizer[T](config AdamOptimizerConfig) &AdamOptimizer[T] {
 		beta1:         config.beta1
 		beta2:         config.beta2
 		epsilon:       config.epsilon
+		beta1_t:       config.beta1
+		beta2_t:       config.beta2
 	}
 }
 
@@ -53,17 +55,26 @@ pub fn (mut o AdamOptimizer[T]) update() ! {
 
 	for i, mut v in o.params {
 		if v.requires_grad {
+			// m = beta1 * m + (1 - beta1) * grad
 			o.first_moments[i].napply([v.grad], fn [o] [T](vals []T, idx []int) T {
-				return vtl.cast[T](o.beta1 * vals[0] + (1.0 - o.beta1) * vals[1])
-			})
+				return vtl.cast[T](o.beta1 * f64(vals[0]) + (1.0 - o.beta1) * f64(vals[1]))
+			}) or { return err }
 
+			// v = beta2 * v + (1 - beta2) * grad^2
 			o.second_moments[i].napply([v.grad], fn [o] [T](vals []T, idx []int) T {
-				return vtl.cast[T](o.beta2 * vals[0] + (1.0 - o.beta2) * vals[1] * vals[1])
-			})
+				g := f64(vals[1])
+				return vtl.cast[T](o.beta2 * f64(vals[0]) + (1.0 - o.beta2) * g * g)
+			}) or { return err }
 
-			v.value.napply([o.first_moments[i], o.second_moments[i]], fn [o, lr_t] [T](vals []T, idx []int) T {
-				return vals[0] - lr_t * vals[1] / (math.sqrt(vals[3]) + o.epsilon)
-			})
+			// theta = theta - lr_t * m / (sqrt(v) + eps)
+			m_i := o.first_moments[i]
+			v_i := o.second_moments[i]
+			v.value.napply([m_i, v_i], fn [o, lr_t] [T](vals []T, idx []int) T {
+				theta := f64(vals[0])
+				m := f64(vals[1])
+				vv := f64(vals[2])
+				return vtl.cast[T](theta - lr_t * m / (math.sqrt(vv) + o.epsilon))
+			}) or { return err }
 
 			v.grad = vtl.zeros_like[T](v.value)
 		}

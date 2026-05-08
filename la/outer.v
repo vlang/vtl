@@ -12,6 +12,8 @@ pub fn outer[T](u &vtl.Tensor[T], v &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 	}
 	ul := u.shape[0]
 	vl := v.shape[0]
+	_ = ul
+	_ = vl
 	ua := tensor_to_f64_array[T](u)
 	va := tensor_to_f64_array[T](v)
 	mat := vsl_la.outer(ua, va)
