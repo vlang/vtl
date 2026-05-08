@@ -5,15 +5,20 @@ import vtl.autograd
 import vtl.nn.internal
 import vtl.nn.types
 
-// EmbeddingLayer maps integer indices to dense vectors.
-// weight shape: [vocab_size, embedding_dim]
+// EmbeddingLayer maps integer token indices to dense embedding vectors.
+//
+// Input:    `[batch, seq_len]` — integer indices in `[0, vocab_size)`
+// Output:   `[batch, seq_len, embedding_dim]`
+//
+// Weight shape: `[vocab_size, embedding_dim]`
 pub struct EmbeddingLayer[T] {
 	vocab_size    int
 	embedding_dim int
 pub mut:
-	weight        &autograd.Variable[T] = unsafe { nil }
+	weight &autograd.Variable[T] = unsafe { nil }
 }
 
+// embedding_layer creates an EmbeddingLayer.
 pub fn embedding_layer[T](ctx &autograd.Context[T], vocab_size int, embedding_dim int) types.Layer[T] {
 	weight := internal.kaiming_uniform[T]([vocab_size, embedding_dim])
 	return types.Layer[T](&EmbeddingLayer[T]{
@@ -49,7 +54,10 @@ pub struct EmbeddingGate[T] {
 }
 
 pub fn embedding_gate[T](input &vtl.Tensor[T], weight &vtl.Tensor[T]) &EmbeddingGate[T] {
-	return &EmbeddingGate[T]{input: input, weight: weight}
+	return &EmbeddingGate[T]{
+		input:  input
+		weight: weight
+	}
 }
 
 pub fn (g &EmbeddingGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {

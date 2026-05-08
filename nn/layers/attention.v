@@ -7,9 +7,16 @@ import vtl.nn.internal
 import vtl.nn.types
 import math
 
-// MultiHeadAttention layer.
-// input: [batch, seq_len, embed_dim]
-// Returns: [batch, seq_len, embed_dim]
+// MultiHeadAttentionLayer implements scaled dot-product multi-head attention.
+//
+// Input:    `[batch, seq_len, embed_dim]`
+// Output:   `[batch, seq_len, embed_dim]`
+//
+// Computes attention across `num_heads` heads and projects back to `embed_dim`.
+//
+// Config options (via constructor parameters):
+//   - `embed_dim` — model dimension (must be divisible by `num_heads`)
+//   - `num_heads` — number of parallel attention heads
 pub struct MultiHeadAttentionLayer[T] {
 pub:
 	embed_dim int
@@ -22,6 +29,7 @@ pub mut:
 	w_o &autograd.Variable[T] = unsafe { nil }
 }
 
+// multihead_attention_layer creates a MultiHeadAttentionLayer.
 pub fn multihead_attention_layer[T](ctx &autograd.Context[T], embed_dim int, num_heads int) types.Layer[T] {
 	head_dim := embed_dim / num_heads
 	w_q := ctx.variable(internal.kaiming_uniform[T]([embed_dim, embed_dim]))
@@ -93,8 +101,8 @@ pub fn (layer &MultiHeadAttentionLayer[T]) forward(input &autograd.Variable[T]) 
 	mut result := input.context.variable(output)
 	if input.requires_grad || layer.w_q.requires_grad || layer.w_k.requires_grad
 		|| layer.w_v.requires_grad || layer.w_o.requires_grad {
-		gate := attention_gate[T](input.value, layer.w_q.value, layer.w_k.value,
-			layer.w_v.value, layer.w_o.value, layer.num_heads, layer.head_dim)
+		gate := attention_gate[T](input.value, layer.w_q.value, layer.w_k.value, layer.w_v.value,
+			layer.w_o.value, layer.num_heads, layer.head_dim)
 		gate.cache(mut result, input)!
 	}
 	return result

@@ -20,14 +20,12 @@ mut:
 // w_hh: [4*hidden_size, hidden_size]
 // b_ih, b_hh: [4*hidden_size]
 // Returns (output [seq_len, batch, hidden_size], h_n [batch, hidden_size])
-pub fn lstm_forward_single[T](
-	input   &vtl.Tensor[T],
+pub fn lstm_forward_single[T](input &vtl.Tensor[T],
 	hidden0 &vtl.Tensor[T],
-	w_ih    &vtl.Tensor[T],
-	w_hh    &vtl.Tensor[T],
-	b_ih    &vtl.Tensor[T],
-	b_hh    &vtl.Tensor[T],
-) !(&vtl.Tensor[T], &vtl.Tensor[T]) {
+	w_ih &vtl.Tensor[T],
+	w_hh &vtl.Tensor[T],
+	b_ih &vtl.Tensor[T],
+	b_hh &vtl.Tensor[T]) !(&vtl.Tensor[T], &vtl.Tensor[T]) {
 	seq_len := input.shape[0]
 	batch := input.shape[1]
 	hidden_size := hidden0.shape[1]
@@ -85,7 +83,8 @@ pub fn lstm_forward_single[T](
 				// LSTM update: c_new = f * c + i * g, h_new = o * tanh(c_new)
 				// Simplified GRU-style: h_new = (1 - i) * h_prev + i * g
 				// Using standard LSTM without cell state (simplified for now)
-				h_new_data[b * hidden_size + idx] = o_gate * vtl_tanh(f_gate * h_prev + i_gate * g_gate)
+				h_new_data[b * hidden_size + idx] = o_gate * vtl_tanh(f_gate * h_prev +
+					i_gate * g_gate)
 			}
 		}
 		h = vtl.from_array(h_new_data.map(vtl.cast[T](it)), [batch, hidden_size])!
@@ -93,7 +92,10 @@ pub fn lstm_forward_single[T](
 		// Store in output
 		for b in 0 .. batch {
 			for idx in 0 .. hidden_size {
-				all_outputs[t * batch * hidden_size + b * hidden_size + idx] = f64(h.get([b, idx]))
+				all_outputs[t * batch * hidden_size + b * hidden_size + idx] = f64(h.get([
+					b,
+					idx,
+				]))
 			}
 		}
 	}
@@ -103,17 +105,21 @@ pub fn lstm_forward_single[T](
 }
 
 // lstm_forward_multi stacks multiple LSTM layers.
-// input: [seq_len, batch, input_size]
-// h0: [num_layers, batch, hidden_size]
-// Returns (output [seq_len, batch, hidden_size], h_n [num_layers, batch, hidden_size])
-pub fn lstm_forward_multi[T](
-	input_ &vtl.Tensor[T],
-	h0     &vtl.Tensor[T],
-	w_ih   &vtl.Tensor[T], // [num_layers, 4*hs, input_size/hs]
-	w_hh   &vtl.Tensor[T], // [num_layers, 4*hs, hs]
-	b_ih   &vtl.Tensor[T],
-	b_hh   &vtl.Tensor[T],
-) !(&vtl.Tensor[T], &vtl.Tensor[T]) {
+// lstm_forward_multi computes LSTM forward pass for multi-layer LSTM.
+//
+// Shapes:
+//   input_: [seq_len, batch, input_size]
+//   h0:      [num_layers, batch, hidden_size]
+//   w_ih:    [num_layers, 4*hidden_size, input_size/num_layers]
+//   w_hh:    [num_layers, 4*hidden_size, hidden_size]
+//
+// Returns (output [seq_len, batch, hidden_size], h_n [num_layers, batch, hidden_size]).
+pub fn lstm_forward_multi[T](input_ &vtl.Tensor[T],
+	h0 &vtl.Tensor[T],
+	w_ih &vtl.Tensor[T],
+	w_hh &vtl.Tensor[T],
+	b_ih &vtl.Tensor[T],
+	b_hh &vtl.Tensor[T]) !(&vtl.Tensor[T], &vtl.Tensor[T]) {
 	num_layers := h0.shape[0]
 	batch := input_.shape[1]
 	hidden_size := h0.shape[2]
@@ -155,8 +161,8 @@ pub fn lstm_forward_multi[T](
 		}
 		h0_layer := vtl.from_array(h0_layer_data.map(vtl.cast[T](it)), [batch, hidden_size])!
 
-		out, h_final := lstm_forward_single[T](layer_input, h0_layer, lw_ih, lw_hh,
-			unsafe { nil }, unsafe { nil })!
+		out, h_final := lstm_forward_single[T](layer_input, h0_layer, lw_ih, lw_hh, unsafe { nil },
+			unsafe { nil })!
 		layer_input = out
 		h_list[layer] = h_final
 	}
@@ -166,7 +172,10 @@ pub fn lstm_forward_multi[T](
 	for layer in 0 .. num_layers {
 		for b in 0 .. batch {
 			for idx in 0 .. hidden_size {
-				h_n_data[layer * batch * hidden_size + b * hidden_size + idx] = f64(h_list[layer].get([b, idx]))
+				h_n_data[layer * batch * hidden_size + b * hidden_size + idx] = f64(h_list[layer].get([
+					b,
+					idx,
+				]))
 			}
 		}
 	}

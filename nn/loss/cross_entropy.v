@@ -11,12 +11,14 @@ import vtl.nn.internal
 pub struct CrossEntropyLoss[T] {
 pub:
 	weight       &vtl.Tensor[T] = unsafe { nil }
-	ignore_index int = -1
-	reduction    string = 'mean'  // 'mean' | 'sum' | 'none'
+	ignore_index int            = -1
+	reduction    string         = 'mean' // 'mean' | 'sum' | 'none'
 }
 
 pub fn cross_entropy_loss[T]() &CrossEntropyLoss[T] {
-	return &CrossEntropyLoss[T]{reduction: 'mean'}
+	return &CrossEntropyLoss[T]{
+		reduction: 'mean'
+	}
 }
 
 pub fn (_ &CrossEntropyLoss[T]) loss(input &autograd.Variable[T], target &vtl.Tensor[T]) !&autograd.Variable[T] {
@@ -36,7 +38,9 @@ pub:
 }
 
 pub fn cross_entropy_loss_gate[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) &CrossEntropyLossGate[T] {
-	return &CrossEntropyLossGate[T]{target: target}
+	return &CrossEntropyLossGate[T]{
+		target: target
+	}
 }
 
 pub fn (g &CrossEntropyLossGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {

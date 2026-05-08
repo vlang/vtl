@@ -3,6 +3,8 @@ module optimizers
 import math
 
 // Scheduler is the interface for learning rate schedulers.
+// Scheduler is the interface for learning rate schedulers.
+// Implementations update the learning rate based on the current training step.
 pub interface Scheduler[T] {
 	next_lr(current_lr f64, step int) f64
 }
@@ -13,8 +15,13 @@ pub struct StepLR[T] {
 	gamma     f64
 }
 
+// step_lr creates a StepLR scheduler: LR decays by `gamma` every `step_size` steps.
+// e.g. step_size=30, gamma=0.1 → LR is 10× smaller after each 30 steps.
 pub fn step_lr[T](step_size int, gamma f64) &StepLR[T] {
-	return &StepLR[T]{step_size: step_size, gamma: gamma}
+	return &StepLR[T]{
+		step_size: step_size
+		gamma:     gamma
+	}
 }
 
 pub fn (s &StepLR[T]) next_lr(current_lr f64, step int) f64 {
@@ -26,8 +33,12 @@ pub struct ExponentialLR[T] {
 	gamma f64
 }
 
+// exponential_lr creates an ExponentialLR scheduler: LR decays by `gamma` at every step.
+// new_lr = current_lr * gamma^step
 pub fn exponential_lr[T](gamma f64) &ExponentialLR[T] {
-	return &ExponentialLR[T]{gamma: gamma}
+	return &ExponentialLR[T]{
+		gamma: gamma
+	}
 }
 
 pub fn (s &ExponentialLR[T]) next_lr(current_lr f64, step int) f64 {
@@ -37,12 +48,17 @@ pub fn (s &ExponentialLR[T]) next_lr(current_lr f64, step int) f64 {
 // CosineAnnealingLR decays using a cosine schedule from `lrd` to 0.
 pub struct CosineAnnealingLR[T] {
 pub:
-	t_max int     // maximum number of iterations
-	lrd   f64     // lower bound lr (default: 0)
+	t_max int // maximum number of iterations
+	lrd   f64 // lower bound lr (default: 0)
 }
 
+// cosine_annealing_lr creates a CosineAnnealingLR scheduler: LR decays from `current_lr` to `lrd`
+// following a cosine schedule over `t_max` steps.
 pub fn cosine_annealing_lr[T](t_max int, lrd f64) &CosineAnnealingLR[T] {
-	return &CosineAnnealingLR[T]{t_max: t_max, lrd: lrd}
+	return &CosineAnnealingLR[T]{
+		t_max: t_max
+		lrd:   lrd
+	}
 }
 
 pub fn (s &CosineAnnealingLR[T]) next_lr(current_lr f64, step int) f64 {
@@ -54,33 +70,36 @@ pub fn (s &CosineAnnealingLR[T]) next_lr(current_lr f64, step int) f64 {
 
 // ReduceLROnPlateau reduces LR when a metric has stopped improving.
 pub struct ReduceLROnPlateau[T] {
-	factor       f64
-	patience     int
-	threshold    f64
-	epsilon      f64
-	cooldown     int
+	factor    f64
+	patience  int
+	threshold f64
+	epsilon   f64
+	cooldown  int
 pub mut:
-	wait         int
-	current_lr   f64
+	wait       int
+	current_lr f64
 }
 
 @[params]
 pub struct ReduceLROnPlateauConfig {
-	factor       f64 = 0.1
-	patience     int = 10
-	threshold    f64 = 1e-4
-	epsilon      f64 = 1e-8
-	cooldown     int = 0
+	factor    f64 = 0.1
+	patience  int = 10
+	threshold f64 = 1e-4
+	epsilon   f64 = 1e-8
+	cooldown  int = 0
 }
 
+// reduce_lr_on_plateau creates a ReduceLROnPlateau scheduler.
+// Reduces LR by `factor` when the monitored metric stops improving for `patience` steps.
+// Pass `metric_delta` to `next_lr` each step: negative = improvement.
 pub fn reduce_lr_on_plateau[T](config ReduceLROnPlateauConfig) &ReduceLROnPlateau[T] {
 	return &ReduceLROnPlateau[T]{
-		factor:   config.factor
-		patience: config.patience
+		factor:    config.factor
+		patience:  config.patience
 		threshold: config.threshold
-		epsilon:  config.epsilon
-		cooldown: config.cooldown
-		wait:     0
+		epsilon:   config.epsilon
+		cooldown:  config.cooldown
+		wait:      0
 	}
 }
 

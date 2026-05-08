@@ -9,7 +9,7 @@ import vtl.nn.types
 // E.g. for input [..., D] it computes mean and variance over the last D dims.
 @[params]
 pub struct LayerNormConfig {
-	eps    f64 = 1e-5
+	eps    f64  = 1e-5
 	affine bool = true
 }
 
@@ -17,10 +17,12 @@ pub struct LayerNormLayer[T] {
 	normalized_shape []int
 	eps              f64
 pub mut:
-	gamma            &autograd.Variable[T] = unsafe { nil }
-	beta             &autograd.Variable[T] = unsafe { nil }
+	gamma &autograd.Variable[T] = unsafe { nil }
+	beta  &autograd.Variable[T] = unsafe { nil }
 }
 
+// layer_norm_layer creates a LayerNormLayer.
+// layer_norm_layer creates a LayerNormLayer.
 pub fn layer_norm_layer[T](ctx &autograd.Context[T], normalized_shape []int, config LayerNormConfig) types.Layer[T] {
 	mut gamma := unsafe { nil }
 	mut beta := unsafe { nil }
@@ -30,9 +32,9 @@ pub fn layer_norm_layer[T](ctx &autograd.Context[T], normalized_shape []int, con
 	}
 	return types.Layer[T](&LayerNormLayer[T]{
 		normalized_shape: normalized_shape
-		eps: config.eps
-		gamma: gamma
-		beta: beta
+		eps:              config.eps
+		gamma:            gamma
+		beta:             beta
 	})
 }
 
@@ -48,7 +50,8 @@ pub fn (layer &LayerNormLayer[T]) variables() []&autograd.Variable[T] {
 }
 
 pub fn (layer &LayerNormLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
-	output := internal.layer_norm_forward[T](input.value, layer.gamma.value, layer.beta.value, layer.eps)!
+	output := internal.layer_norm_forward[T](input.value, layer.gamma.value, layer.beta.value,
+		layer.eps)!
 	mut result := input.context.variable(output)
 	if input.requires_grad {
 		gate := layernorm_gate[T](input.value, layer.gamma.value, layer.beta.value, layer.eps)
@@ -65,7 +68,12 @@ pub struct LayerNormGate[T] {
 }
 
 pub fn layernorm_gate[T](input &vtl.Tensor[T], gamma &vtl.Tensor[T], beta &vtl.Tensor[T], eps f64) &LayerNormGate[T] {
-	return &LayerNormGate[T]{input: input, gamma: gamma, beta: beta, eps: eps}
+	return &LayerNormGate[T]{
+		input: input
+		gamma: gamma
+		beta:  beta
+		eps:   eps
+	}
 }
 
 pub fn (g &LayerNormGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {

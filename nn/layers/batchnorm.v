@@ -18,10 +18,10 @@ pub struct BatchNorm1DLayer[T] {
 	eps      f64
 	momentum f64
 pub mut:
-	gamma            &autograd.Variable[T] = unsafe { nil }
-	beta             &autograd.Variable[T] = unsafe { nil }
-	running_mean     &vtl.Tensor[T]        = unsafe { nil }
-	running_var      &vtl.Tensor[T]        = unsafe { nil }
+	gamma               &autograd.Variable[T] = unsafe { nil }
+	beta                &autograd.Variable[T] = unsafe { nil }
+	running_mean        &vtl.Tensor[T]        = unsafe { nil }
+	running_var         &vtl.Tensor[T]        = unsafe { nil }
 	num_batches_tracked int
 }
 
@@ -49,8 +49,8 @@ pub fn (layer &BatchNorm1DLayer[T]) variables() []&autograd.Variable[T] {
 pub fn (layer &BatchNorm1DLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	if !input.requires_grad {
 		// Inference path: use running stats
-		output := internal.batchnorm1d_forward[T](input.value, layer.gamma.value,
-			layer.beta.value, layer.running_mean, layer.running_var, layer.eps)!
+		output := internal.batchnorm1d_forward[T](input.value, layer.gamma.value, layer.beta.value,
+			layer.running_mean, layer.running_var, layer.eps)!
 		return input.context.variable(output)
 	}
 	// Training path: compute batch stats
@@ -74,8 +74,8 @@ pub fn (layer &BatchNorm1DLayer[T]) forward(input &autograd.Variable[T]) !&autog
 	}
 
 	mut result := input.context.variable(output)
-	gate := batchnorm1d_gate[T](input.value, layer.gamma.value, layer.beta.value,
-		batch_mean, batch_var, layer.eps)
+	gate := batchnorm1d_gate[T](input.value, layer.gamma.value, layer.beta.value, batch_mean,
+		batch_var, layer.eps)
 	gate.cache(mut result, input)!
 	return result
 }
@@ -101,8 +101,8 @@ pub fn batchnorm1d_gate[T](input &vtl.Tensor[T], gamma &vtl.Tensor[T], beta &vtl
 }
 
 pub fn (g &BatchNorm1DGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
-	return internal.batchnorm1d_backward[T](payload.variable.grad, g.input, g.gamma,
-		g.beta, g.mean, g.var_, g.eps)
+	return internal.batchnorm1d_backward[T](payload.variable.grad, g.input, g.gamma, g.beta,
+		g.mean, g.var_, g.eps)
 }
 
 pub fn (g &BatchNorm1DGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ! {

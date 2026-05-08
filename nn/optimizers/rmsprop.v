@@ -5,6 +5,17 @@ import vtl.autograd
 import vtl.nn.types
 import vtl
 
+// RMSPropOptimizer implements the RMSProp optimiser.
+//
+// Maintains a running average of the squared gradient per parameter and
+// normalises the update by it, allowing different effective learning rates
+// per parameter.
+//
+// Update rule:
+//   sq_avg = α·sq_avg + (1-α)·g²
+//   θ = θ - lr · (g / (√sq_avg + ε) + wd·θ)
+//
+// Reference: Hinton, "Neural Networks for Machine Learning", Lecture 6e.
 pub struct RMSPropOptimizer[T] {
 	learning_rate f64
 	epsilon       f64
@@ -15,6 +26,13 @@ pub mut:
 	sq_avg       []&vtl.Tensor[T]
 }
 
+// RMSPropOptimizerConfig configures RMSPropOptimizer.
+//
+// Fields:
+//   - `learning_rate` — step size (default: 0.001)
+//   - `alpha`         — smoothing constant for squared-gradient moving average (default: 0.99)
+//   - `epsilon`       — numerical stability constant (default: 1e-8)
+//   - `weight_decay`  — L2 regularisation coefficient (default: 0.0)
 @[params]
 pub struct RMSPropOptimizerConfig {
 	learning_rate f64 = 0.001
@@ -23,6 +41,7 @@ pub struct RMSPropOptimizerConfig {
 	weight_decay  f64 = 0.0
 }
 
+// rmsprop creates a new RMSPropOptimizer.
 pub fn rmsprop[T](config RMSPropOptimizerConfig) &RMSPropOptimizer[T] {
 	return &RMSPropOptimizer[T]{
 		learning_rate: config.learning_rate
@@ -32,6 +51,7 @@ pub fn rmsprop[T](config RMSPropOptimizerConfig) &RMSPropOptimizer[T] {
 	}
 }
 
+// build_params registers all trainable variables from `layers`. Call once before training.
 pub fn (mut o RMSPropOptimizer[T]) build_params(layers []types.Layer[T]) {
 	for layer in layers {
 		for v in layer.variables() {
@@ -41,6 +61,7 @@ pub fn (mut o RMSPropOptimizer[T]) build_params(layers []types.Layer[T]) {
 	}
 }
 
+// update performs one RMSProp parameter update and zeros all gradients.
 pub fn (mut o RMSPropOptimizer[T]) update() ! {
 	for i, mut v in o.params {
 		if v.requires_grad {
@@ -56,7 +77,8 @@ pub fn (mut o RMSPropOptimizer[T]) update() ! {
 				theta := f64(vals[0])
 				grad := f64(vals[1])
 				vv := f64(vals[2])
-				return vtl.cast[T](theta - o.learning_rate * (grad / (math.sqrt(vv) + o.epsilon) + o.weight_decay * theta))
+				return vtl.cast[T](theta - o.learning_rate * (grad / (math.sqrt(vv) + o.epsilon) +
+					o.weight_decay * theta))
 			}) or { return err }
 
 			v.grad = vtl.zeros_like[T](v.value)

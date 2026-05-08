@@ -11,8 +11,8 @@ pub struct AdaGradOptimizer[T] {
 	learning_rate f64
 	epsilon       f64
 pub mut:
-	weight_decay  f64
-	params        []&autograd.Variable[T]
+	weight_decay         f64
+	params               []&autograd.Variable[T]
 	accumulated_sq_grads []&vtl.Tensor[T]
 }
 
@@ -23,6 +23,7 @@ pub struct AdaGradOptimizerConfig {
 	weight_decay  f64 = 0.0
 }
 
+// adagrad creates a new AdaGradOptimizer.
 pub fn adagrad[T](config AdaGradOptimizerConfig) &AdaGradOptimizer[T] {
 	return &AdaGradOptimizer[T]{
 		learning_rate: config.learning_rate
@@ -31,6 +32,7 @@ pub fn adagrad[T](config AdaGradOptimizerConfig) &AdaGradOptimizer[T] {
 	}
 }
 
+// build_params registers all trainable variables from `layers`. Call once before training.
 pub fn (mut o AdaGradOptimizer[T]) build_params(layers []types.Layer[T]) {
 	for layer in layers {
 		for v in layer.variables() {
@@ -40,6 +42,7 @@ pub fn (mut o AdaGradOptimizer[T]) build_params(layers []types.Layer[T]) {
 	}
 }
 
+// update performs one AdaGrad parameter update and zeros all gradients.
 pub fn (mut o AdaGradOptimizer[T]) update() ! {
 	for i, mut v in o.params {
 		if v.requires_grad {
@@ -54,7 +57,8 @@ pub fn (mut o AdaGradOptimizer[T]) update() ! {
 				theta := f64(vals[0])
 				g := f64(vals[1])
 				grad := f64(vals[2])
-				return vtl.cast[T](theta - o.learning_rate * (grad / (math.sqrt(g) + o.epsilon) + o.weight_decay * theta))
+				return vtl.cast[T](theta - o.learning_rate * (grad / (math.sqrt(g) + o.epsilon) +
+					o.weight_decay * theta))
 			}) or { return err }
 
 			v.grad = vtl.zeros_like[T](v.value)

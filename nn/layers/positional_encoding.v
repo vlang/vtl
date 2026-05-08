@@ -5,6 +5,13 @@ import vtl
 import vtl.autograd
 import vtl.nn.types
 
+// PositionalEncodingLayer adds fixed sinusoidal positional encodings to an embedding.
+//
+// Does not contain learnable parameters. Encodings follow the original Transformer
+// formulation (Attention is All You Need, §3.5).
+//
+// Input:    `[batch, seq_len, embed_dim]`
+// Output:   `[batch, seq_len, embed_dim]` — input + positional encoding
 pub struct PositionalEncodingLayer[T] {
 	max_len   int
 	embed_dim int
@@ -12,6 +19,7 @@ pub mut:
 	pe &vtl.Tensor[T] = unsafe { nil }
 }
 
+// positional_encoding_layer creates a PositionalEncodingLayer.
 pub fn positional_encoding_layer[T](ctx &autograd.Context[T], embed_dim int, max_len int) !types.Layer[T] {
 	mut pe_data := []f64{len: max_len * embed_dim}
 	for pos in 0 .. max_len {

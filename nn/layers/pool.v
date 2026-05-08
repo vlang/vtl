@@ -5,16 +5,29 @@ import vtl.autograd
 import vtl.nn.internal
 import vtl.nn.types
 
+// AveragePool2DLayer applies 2D average pooling over a 4D input.
+//
+// Input:    `[batch, channels, H, W]`
+// Output:   `[batch, channels, out_H, out_W]`
+//
+// Config options:
+//   - `kernel` — pool window size in (H, W) (default: determined by `input_shape`)
+//   - `padding` — zero-border padding before pooling (default: [0,0])
+//   - `stride`  — pool stride in (H, W) (default: same as kernel)
 pub struct AveragePool2DLayer[T] {
-	kernel []int
-	padding []int
-	stride []int
+	kernel      []int
+	padding     []int
+	stride      []int
 	input_shape []int
 }
 
+// avgpool2d_layer creates an AveragePool2DLayer.
 pub fn avgpool2d_layer[T](ctx &autograd.Context[T], input_shape []int, kernel []int, padding []int, stride []int) types.Layer[T] {
 	return types.Layer[T](&AveragePool2DLayer[T]{
-		kernel: kernel.clone(), padding: padding.clone(), stride: stride.clone(), input_shape: input_shape.clone()
+		kernel:      kernel.clone()
+		padding:     padding.clone()
+		stride:      stride.clone()
+		input_shape: input_shape.clone()
 	})
 }
 
@@ -31,7 +44,10 @@ pub fn (layer &AveragePool2DLayer[T]) output_shape() []int {
 	return [c, (h - kh + 2 * ph) / sh + 1, (w - kw + 2 * pw) / sw + 1]
 }
 
-pub fn (layer &AveragePool2DLayer[T]) variables() []&autograd.Variable[T] { return [] }
+pub fn (layer &AveragePool2DLayer[T]) variables() []&autograd.Variable[T] {
+	return []
+}
+
 pub fn (layer &AveragePool2DLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	output := internal.avgpool2d_forward[T](input.value, layer.kernel, layer.padding, layer.stride)!
 	mut result := input.context.variable(output)
@@ -43,14 +59,19 @@ pub fn (layer &AveragePool2DLayer[T]) forward(input &autograd.Variable[T]) !&aut
 }
 
 pub struct AvgPool2DGate[T] {
-	input &vtl.Tensor[T] = unsafe { nil }
-	kernel []int
+	input   &vtl.Tensor[T] = unsafe { nil }
+	kernel  []int
 	padding []int
-	stride []int
+	stride  []int
 }
 
 pub fn avgpool2d_gate[T](input &vtl.Tensor[T], kernel []int, padding []int, stride []int) &AvgPool2DGate[T] {
-	return &AvgPool2DGate[T]{input: input, kernel: kernel, padding: padding, stride: stride}
+	return &AvgPool2DGate[T]{
+		input:   input
+		kernel:  kernel
+		padding: padding
+		stride:  stride
+	}
 }
 
 pub fn (g &AvgPool2DGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
@@ -70,8 +91,13 @@ pub fn (g &AvgPool2DGate[T]) cache[T](mut result autograd.Variable[T], args ...a
 	}
 }
 
+// GlobalAvgPool2DLayer applies global average pooling over spatial dimensions.
+//
+// Input:    `[batch, channels, H, W]`
+// Output:   `[batch, channels, 1, 1]` — one value per channel per sample
 pub struct GlobalAvgPool2DLayer[T] {}
 
+// global_avgpool2d_layer creates a GlobalAvgPool2DLayer.
 pub fn global_avgpool2d_layer[T](ctx &autograd.Context[T]) types.Layer[T] {
 	return types.Layer[T](&GlobalAvgPool2DLayer[T]{})
 }
@@ -79,7 +105,11 @@ pub fn global_avgpool2d_layer[T](ctx &autograd.Context[T]) types.Layer[T] {
 pub fn (layer &GlobalAvgPool2DLayer[T]) output_shape() []int {
 	return [-1, -1]
 }
-pub fn (layer &GlobalAvgPool2DLayer[T]) variables() []&autograd.Variable[T] { return [] }
+
+pub fn (layer &GlobalAvgPool2DLayer[T]) variables() []&autograd.Variable[T] {
+	return []
+}
+
 pub fn (layer &GlobalAvgPool2DLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	output := internal.global_avgpool2d_forward[T](input.value)!
 	mut result := input.context.variable(output)
@@ -95,7 +125,9 @@ pub struct GlobalAvgPool2DGate[T] {
 }
 
 pub fn global_avgpool2d_gate[T](input &vtl.Tensor[T]) &GlobalAvgPool2DGate[T] {
-	return &GlobalAvgPool2DGate[T]{input: input}
+	return &GlobalAvgPool2DGate[T]{
+		input: input
+	}
 }
 
 pub fn (g &GlobalAvgPool2DGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
