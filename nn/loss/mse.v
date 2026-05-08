@@ -5,9 +5,21 @@ import vtl.autograd
 import vtl.nn.gates.loss
 import vtl.nn.internal
 
-// MSELoss
+// MSELoss computes the Mean Squared Error between the model output and the target.
+//
+// Formula: `L = mean((input - target)²)`
+//
+// Typically used for regression tasks.
+//
+// Example:
+// ```v
+// import vtl.nn.loss
+// l := loss.mse_loss[f64]()
+// out  := l.loss(prediction, target)!
+// ```
 pub struct MSELoss[T] {}
 
+// mse_loss creates a new MSELoss instance.
 pub fn mse_loss[T]() &MSELoss[T] {
 	return &MSELoss[T]{}
 }

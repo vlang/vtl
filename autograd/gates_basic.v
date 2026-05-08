@@ -37,19 +37,19 @@ pub fn (g &AddGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
 	}
 }
 
-pub struct SubstractGate[T] {}
+pub struct SubtractGate[T] {}
 
-pub fn subtract_gate[T]() &SubstractGate[T] {
-	return &SubstractGate[T]{}
+pub fn subtract_gate[T]() &SubtractGate[T] {
+	return &SubtractGate[T]{}
 }
 
-pub fn (g &SubstractGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &SubtractGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	opposite := gradient.multiply_scalar[T](vtl.cast[T](-1))!
 	return [gradient, opposite]
 }
 
-pub fn (g &SubstractGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
+pub fn (g &SubtractGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	b := args[1]
 
@@ -63,12 +63,12 @@ pub fn (g &SubstractGate[T]) cache[T](mut result Variable[T], args ...CacheParam
 					register[T]('Sub', g, result, [a, b])!
 				}
 				else {
-					panic('SubGate: b must be a Variable')
+					return error('SubtractGate: b must be a Variable')
 				}
 			}
 		}
 		else {
-			panic('SubGate: a must be a Variable')
+			return error('SubtractGate: a must be a Variable')
 		}
 	}
 }
@@ -107,12 +107,12 @@ pub fn (g &MultiplyGate[T]) cache[T](mut result Variable[T], args ...CacheParam)
 					register[T]('Multiply', g, result, [a, b])!
 				}
 				else {
-					panic('MultiplyGate: b must be a Variable')
+					return error('MultiplyGate: b must be a Variable')
 				}
 			}
 		}
 		else {
-			panic('MultiplyGate: a must be a Variable')
+			return error('MultiplyGate: a must be a Variable')
 		}
 	}
 }
@@ -154,12 +154,12 @@ pub fn (g &DivideGate[T]) cache[T](mut result Variable[T], args ...CacheParam) !
 					register[T]('Divide', g, result, [a, b])!
 				}
 				else {
-					panic('DivideGate: b must be a Variable')
+					return error('DivideGate: b must be a Variable')
 				}
 			}
 		}
 		else {
-			panic('DivideGate: a must be a Variable')
+			return error('DivideGate: a must be a Variable')
 		}
 	}
 }

@@ -29,35 +29,74 @@ model.linear(1) // output layer: 8 -> 1
 model.mse_loss() // loss function
 ```
 
-Available layers: `linear(n)`, `relu()`, `leaky_relu()`, `elu()`, `sigmod()`,
-`flatten()`, `maxpool2d(...)`.
+### All available layers
 
-Available losses: `mse_loss()`, `sigmoid_cross_entropy_loss()`,
-`softmax_cross_entropy_loss()`.
+| Layer method | Description |
+|-------------|-------------|
+| `linear(n)` | Linear transformation `y = x·Wᵀ + b` |
+| `relu()` | Rectified Linear Unit |
+| `leaky_relu()` | Leaky ReLU |
+| `elu()` | Exponential Linear Unit |
+| `sigmoid()` | Logistic sigmoid |
+| `tanh()` | Hyperbolic tangent |
+| `softmax()` | Softmax over the last dimension |
+| `gelu()` | Gaussian Error Linear Unit |
+| `swish()` | Swish activation |
+| `mish()` | Mish activation |
+| `flatten()` | Flatten all non-batch dimensions |
+| `maxpool2d(kernel, padding, stride)` | 2D max pooling |
+| `avgpool2d(kernel, padding, stride)` | 2D average pooling |
+| `global_avgpool2d()` | Global average pooling (per channel) |
+| `conv2d(in, out, kernel_size, config)` | 2D convolution |
+| `batchnorm1d(num_features, config)` | 1D batch normalisation |
+| `layer_norm(normalized_shape, config)` | Layer normalisation |
+| `embedding(vocab_size, embed_dim)` | Token embedding (integer indices → vectors) |
+| `lstm(input_size, hidden_size, num_layers)` | Long Short-Term Memory layer |
+| `multihead_attention(embed_dim, num_heads)` | Multi-head self-attention |
+| `positional_encoding(embed_dim, max_len)` | Sinusoidal positional encoding |
+| `dropout()` | Dropout (eval mode: no-op) |
 
-## Choosing a loss function
+### All available losses
 
-| Task | Loss | Output |
-|------|------|--------|
-| Regression | `mse_loss()` | Any real value |
-| Binary classification | `sigmoid_cross_entropy_loss()` | Single logit |
-| Multi-class classification | `softmax_cross_entropy_loss()` | One logit per class |
+| Loss method | Class | Description |
+|-------------|-------|-------------|
+| `mse_loss()` | `MSELoss` | Mean Squared Error |
+| `bce_loss()` | `BCELoss` | Binary Cross-Entropy (per-element) |
+| `sigmoid_cross_entropy_loss()` | `SigmoidCrossEntropyLoss` | Sigmoid CE, numerically stable |
+| `softmax_cross_entropy_loss()` | `SoftmaxCrossEntropyLoss` | Softmax CE for multi-class |
+| `cross_entropy_loss()` | `CrossEntropyLoss` | Cross-Entropy |
+| `huber_loss(delta: 1.0)` | `HuberLoss` | Huber (smooth L1) loss |
+| `nll_loss(weight)` | `NLLLoss` | Negative Log Likelihood |
+| `kl_div_loss()` | `KLDivLoss` | KL Divergence D_KL(P‖Q) |
+
+### All available optimizers
+
+| Optimizer | Module | Key feature |
+|----------|--------|-------------|
+| `adam_optimizer(lr, ...)` | `optimizers` | Adaptive moment estimation |
+| `adamw(...)` | `optimizers` | Adam + decoupled weight decay |
+| `rmsprop(...)` | `optimizers` | Per-parameter learning rates |
+| `adagrad(...)` | `optimizers` | Accumulates squared grads |
+| `sgd(...)` | `optimizers` | Vanilla stochastic gradient descent |
+
+See [TUTORIAL_OPTIMIZERS.md](./TUTORIAL_OPTIMIZERS.md) for full optimizer details
+and scheduler usage.
 
 ## Training loop
 
 ```v ignore
 // assumes model, x, y_target defined above
-mut optimizer := optimizers.sgd[f64](learning_rate: 0.001)
+mut optimizer := optimizers.adam_optimizer[f64](learning_rate: 0.001)
 optimizer.build_params(model.info.layers)
 
 for epoch in 0 .. 100 {
-	y_pred := model.forward(x)!
-	mut loss := model.loss(y_pred, y_target)!
+    y_pred := model.forward(x)!
+    mut loss := model.loss(y_pred, y_target)!
 
-	println('Epoch ${epoch}: loss = ${loss.value.get([0]):.4f}')
+    println('Epoch ${epoch}: loss = ${loss.value.get([0]):.4f}')
 
-	loss.backprop()!
-	optimizer.update()!
+    loss.backprop()!
+    optimizer.update()!
 }
 ```
 
@@ -69,15 +108,15 @@ inside each epoch.  Use `.slice()` to extract a batch:
 ```v ignore
 // assumes model, x_all, y_tensor, n_batches, batch_size defined above
 for b in 0 .. n_batches {
-	offset := b * batch_size
-	mut x_batch := x_all.slice([offset, offset + batch_size])!
-	y_batch := y_tensor.slice([offset, offset + batch_size])!
+    offset := b * batch_size
+    mut x_batch := x_all.slice([offset, offset + batch_size])!
+    y_batch := y_tensor.slice([offset, offset + batch_size])!
 
-	y_pred := model.forward(x_batch)!
-	mut loss := model.loss(y_pred, y_batch)!
+    y_pred := model.forward(x_batch)!
+    mut loss := model.loss(y_pred, y_batch)!
 
-	loss.backprop()!
-	optimizer.update()!
+    loss.backprop()!
+    optimizer.update()!
 }
 ```
 
@@ -128,4 +167,5 @@ _ = ctx
 ## See also
 
 - [Autograd Tutorial](./TUTORIAL_AUTOGRAD.md) — how gradients are computed
+- [Optimizers Tutorial](./TUTORIAL_OPTIMIZERS.md) — Adam/AdamW/RMSProp/AdaGrad/SGD + schedulers
 - [First Steps](./TUTORIAL_FIRST_STEPS.md) — tensor creation and properties

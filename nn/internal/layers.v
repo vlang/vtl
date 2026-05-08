@@ -10,7 +10,7 @@ pub fn dropout[T](input &vtl.Tensor[T], mask &vtl.Tensor[T], prob f64) !&vtl.Ten
 }
 
 pub fn dropout_backwards[T](gradient &vtl.Tensor[T], mask &vtl.Tensor[T], prob f64) !&vtl.Tensor[T] {
-	return gradiend.nmap([mask], fn [T](vals []T, i []int) T {
+	return gradient.nmap([mask], fn [T](vals []T, i []int) T {
 		return vals[0] * vals[1] / vtl.cast[T](prob)
 	})
 }
@@ -66,12 +66,11 @@ pub fn maxpool2d[T](input &vtl.Tensor[T], kernel []int, padding []int, stride []
 	return max_indices, output
 }
 
-pub fn maxpool2d_backward[T](shape []int, max_indices &vtl.Tensor[int], grad_output &vtl.Tensor[T]) &vtl.Tensor[T] {
+pub fn maxpool2d_backward[T](shape []int, max_indices &vtl.Tensor[int], grad_output &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	if grad_output.size != max_indices.size {
-		panic('maxpool2d_backward: grad_output and max_indices must have the same size')
+		return error('maxpool2d_backward: grad_output and max_indices must have the same size')
 	}
 
-	// TODO: @ulises-jeremias to override this on other backends
 	mut ret := vtl.zeros[T](shape)
 	for i in 0 .. grad_output.size {
 		idx := max_indices.get_nth[int](i)
