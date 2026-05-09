@@ -64,8 +64,8 @@ for file in $(find "${vtl_dir_path}" -wholename '*/examples/*.v'); do
         continue
     fi
     echo "Compiling ${file}"
-    v ${flags} -o "${file}.o" "${file}"
-    echo "${file}.o created"
-    echo "Removing ${file}.o"
-    rm -f "${file}.o"
+    v ${flags} -o "${file}.bin" "${file}"
+    echo "${file}.bin created"
+    echo "Removing ${file}.bin"
+    rm -f "${file}.bin"
 done
