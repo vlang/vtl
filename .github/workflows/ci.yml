@@ -115,6 +115,60 @@ jobs:
           cd ~
           v fmt -verify ~/.vmodules/vtl
 
+  run-tests-vulkan:
+    name: Tests (Vulkan) — ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+        flags: ['', '--prod']
+      fail-fast: false
+
+    env:
+      TERM: xterm
+
+    steps:
+      - name: Checkout VTL
+        uses: actions/checkout@v4
+        with:
+          path: vtl
+
+      - name: Setup V
+        uses: vlang/setup-v@v1.4
+        with:
+          check-latest: true
+
+      - name: V doctor
+        run: v doctor
+
+      - name: Install dependencies (Linux + Vulkan)
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get -qq install --no-install-recommends \
+            gfortran \
+            libxi-dev \
+            libxcursor-dev \
+            mesa-common-dev \
+            liblapacke-dev \
+            libopenblas-dev \
+            libgc-dev \
+            libgl1-mesa-dev \
+            libopenmpi-dev \
+            libhdf5-dev \
+            hdf5-tools \
+            opencl-headers \
+            vulkan-tools \
+            mesa-vulkan-drivers \
+            libvulkan-dev
+          v install vsl
+
+      - name: Move VTL source code to V Modules
+        run: mv ./vtl ~/.vmodules
+
+      - name: Execute Tests with Vulkan backend
+        run: ~/.vmodules/vtl/bin/test ${{ matrix.flags }} --use-vulkan
+
   run-tests:
     runs-on: ${{ matrix.os }}
 
