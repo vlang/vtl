@@ -25,6 +25,7 @@ and a full neural network module.
   losses (MSE, BCE, CrossEntropy, Huber, …); optimizers (Adam, AdamW, RMSProp, AdaGrad, SGD)
 - **Linear algebra** — VSL-backed: matmul, solve, lstsq, qr, lu, cholesky, pinv, trace, norm, SVD
 - **Hardware acceleration** — zero-copy sharing with C libraries via `vtl.Tensor.data`
+  plus Vulkan (`-d vulkan`) and OpenCL/VCL (`-d vcl`) backend paths
 
 ## Quick start
 
@@ -105,6 +106,18 @@ All tutorials live in [`docs/`](docs/README.md):
 | [TUTORIAL_ADVANCED_LA.md](docs/TUTORIAL_ADVANCED_LA.md) | trace / norm / qr / lu / cholesky / pinv |
 | [TUTORIAL_BROADCASTING.md](docs/TUTORIAL_BROADCASTING.md) | Broadcasting rules |
 | [TUTORIAL_SLICING.md](docs/TUTORIAL_SLICING.md) | Slicing and views |
+| [TUTORIAL_GPU_BACKENDS.md](docs/TUTORIAL_GPU_BACKENDS.md) | Vulkan + OpenCL/VCL backend guide |
+
+## Benchmarking
+
+Backend comparison benchmark is available in [`benchmark/`](benchmark/README.md).
+
+```sh
+v run benchmark/main.v
+v -d vcl run benchmark/main.v
+v -d vulkan run benchmark/main.v
+v -d vulkan -d vcl run benchmark/main.v
+```
 
 ## License
 
