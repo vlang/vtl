@@ -2,7 +2,6 @@ module la
 
 import vtl
 import vsl.vulkan
-import vtl.storage
 
 // matmul_vulkan performs matrix multiplication on Vulkan GPU.
 // A: [m, k], B: [k, n] → C: [m, n]
@@ -18,24 +17,9 @@ pub fn matmul_vulkan[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	k := u32(a.shape[1])
 	n := u32(b.shape[1])
 
-	// Get Vulkan device (try from storage, fallback to new device)
-	mut dev := &vulkan.Device(unsafe { nil })
-	mut dev_owned := false
-	
-	match a.storage {
-		storage.VulkanStorage[T] {
-			a_vk := a.storage as storage.VulkanStorage[T]
-			dev = a_vk.params.device
-		}
-		else {
-			dev = vulkan.new_device() or { return error('matmul_vulkan: no Vulkan device available') }
-			dev_owned = true
-		}
-	}
-	
-	if dev_owned {
-		defer { dev.release() }
-	}
+	// Create Vulkan device
+	mut dev := vulkan.new_device() or { return error('matmul_vulkan: no Vulkan device available') }
+	defer { dev.release() }
 
 	// Allocate GPU buffers
 	mut a_buf := dev.buffer(vulkan.DeviceSize(a.size() * 4))!
@@ -87,6 +71,6 @@ pub fn matmul_vulkan[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	c_data := c_f32.map(vtl.cast[T](it))
 	
 	// Return as tensor with correct shape
-	mut c_tensor := vtl.from_1d[T](c_data, vtl.TensorData{})
+	mut c_tensor := vtl.from_1d[T](c_data, vtl.TensorData{}) or { return err }
 	return c_tensor.reshape([int(m), int(n)])!
 }

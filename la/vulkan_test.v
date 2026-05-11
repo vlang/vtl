@@ -1,23 +1,24 @@
 module la
 
 import vtl
+import math
 
 fn test_matmul_vulkan_basic() {
 	// Create 2x3 matrix A
 	a_data := [f32(1.0), 2.0, 3.0, 4.0, 5.0, 6.0]
-	a := vtl.from_1d[f32](a_data, vtl.TensorData{}).reshape([2, 3]) or {
+	mut a_1d := vtl.from_1d[f32](a_data, vtl.TensorData{}) or {
 		eprintln('Failed to create tensor A: ${err}')
-		assert false
 		return
 	}
+	a := a_1d.reshape([2, 3])!
 
 	// Create 3x2 matrix B
 	b_data := [f32(7.0), 8.0, 9.0, 10.0, 11.0, 12.0]
-	b := vtl.from_1d[f32](b_data, vtl.TensorData{}).reshape([3, 2]) or {
+	mut b_1d := vtl.from_1d[f32](b_data, vtl.TensorData{}) or {
 		eprintln('Failed to create tensor B: ${err}')
-		assert false
 		return
 	}
+	b := b_1d.reshape([3, 2])!
 
 	// Expected result C = A @ B (2x2)
 	// Row 0: [1*7 + 2*9 + 3*11, 1*8 + 2*10 + 3*12] = [58, 64]
@@ -36,10 +37,10 @@ fn test_matmul_vulkan_basic() {
 
 	// Check values (with tolerance)
 	tol := f32(0.01)
-	assert vtl.abs(c.get([0, 0]) - 58.0) < tol
-	assert vtl.abs(c.get([0, 1]) - 64.0) < tol
-	assert vtl.abs(c.get([1, 0]) - 139.0) < tol
-	assert vtl.abs(c.get([1, 1]) - 154.0) < tol
+	assert math.abs(c.get([0, 0]) - 58.0) < tol
+	assert math.abs(c.get([0, 1]) - 64.0) < tol
+	assert math.abs(c.get([1, 0]) - 139.0) < tol
+	assert math.abs(c.get([1, 1]) - 154.0) < tol
 
 	println('✓ test_matmul_vulkan_basic passed')
 }
