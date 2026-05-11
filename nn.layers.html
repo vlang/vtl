@@ -156,6 +156,14 @@
 
 </section>
 
+		<section id="batchnorm1d_forward_vulkan" class="doc-node">
+			<div class="title"><h2>fn batchnorm1d_forward_vulkan <a href="#batchnorm1d_forward_vulkan">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/batchnorm_vulkan_notd_vulkan.v#L10"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> batchnorm1d_forward_vulkan<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> eps <span class="token builtin">f32</span><span class="token punctuation">,</span> dev <span class="token builtin">voidptr</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
 		<section id="batchnorm1d_gate" class="doc-node">
 			<div class="title"><h2>fn batchnorm1d_gate <a href="#batchnorm1d_gate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/batchnorm.v#L92"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -572,6 +580,14 @@
 			<div class="title"><h2>fn (BatchNorm1DGate[T]) cache <a href="#BatchNorm1DGate[T].cache">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/batchnorm.v#L108"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&amp;</span>BatchNorm1DGate<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> cache<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> result autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> args <span class="token punctuation">...</span>autograd<span class="token punctuation">.</span>CacheParam<span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+
+
+</section>
+
+		<section id="BatchNorm1DLayerVulkan[T].forward" class="doc-node">
+			<div class="title"><h2>fn (BatchNorm1DLayerVulkan[T]) forward <a href="#BatchNorm1DLayerVulkan[T].forward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/batchnorm_vulkan_notd_vulkan.v#L14"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span>BatchNorm1DLayerVulkan<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">forward</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 
 
 </section>
@@ -1290,6 +1306,17 @@
 
 </section>
 
+		<section id="BatchNorm1DLayerVulkan" class="doc-node">
+			<div class="title"><h2>struct BatchNorm1DLayerVulkan <a href="#BatchNorm1DLayerVulkan">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/batchnorm_vulkan_notd_vulkan.v#L5"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> BatchNorm1DLayerVulkan<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	eps    <span class="token builtin">f32</span>
+	device <span class="token builtin">voidptr</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+
+
+</section>
+
 		<section id="Conv2DConfig" class="doc-node">
 			<div class="title"><h2>struct Conv2DConfig <a href="#Conv2DConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/conv2d.v#L11"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <div class="attributes"><div class="attribute">@[params]</div></div>
@@ -1729,7 +1756,7 @@
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 11 May 2026 19:48:37</div>
+						<div class="footer">Powered by vdoc. Generated on: 11 May 2026 20:24:17</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_nn.layers">README</a></li>
 <li class="open"><a href="#attention_forward_vulkan">fn attention_forward_vulkan</a>        <ul>
@@ -1745,6 +1772,9 @@
 </ul>
 </li>
 <li class="open"><a href="#avgpool2d_layer">fn avgpool2d_layer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#batchnorm1d_forward_vulkan">fn batchnorm1d_forward_vulkan</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#batchnorm1d_gate">fn batchnorm1d_gate</a>        <ul>
@@ -1896,6 +1926,10 @@
 <li class="open"><a href="#BatchNorm1DGate[T].backward">type BatchNorm1DGate[T]</a>        <ul>
 <li><a href="#BatchNorm1DGate[T].backward">fn backward</a></li>
 <li><a href="#BatchNorm1DGate[T].cache">fn cache</a></li>
+</ul>
+</li>
+<li class="open"><a href="#BatchNorm1DLayerVulkan[T].forward">type BatchNorm1DLayerVulkan[T]</a>        <ul>
+<li><a href="#BatchNorm1DLayerVulkan[T].forward">fn forward</a></li>
 </ul>
 </li>
 <li class="open"><a href="#BatchNorm1DLayer[T].output_shape">type BatchNorm1DLayer[T]</a>        <ul>
@@ -2077,6 +2111,9 @@
 </ul>
 </li>
 <li class="open"><a href="#BatchNorm1DLayer">struct BatchNorm1DLayer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#BatchNorm1DLayerVulkan">struct BatchNorm1DLayerVulkan</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#Conv2DConfig">struct Conv2DConfig</a>        <ul>
