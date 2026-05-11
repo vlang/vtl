@@ -127,7 +127,7 @@
 <li><strong>Autograd</strong> — reverse-mode automatic differentiation; build arbitrary computational graphs</li>
 <li><strong>Neural networks</strong> — <code>Sequential</code> model API; layers (Linear, Conv2D, LSTM, Attention, …); losses (MSE, BCE, CrossEntropy, Huber, …); optimizers (Adam, AdamW, RMSProp, AdaGrad, SGD)</li>
 <li><strong>Linear algebra</strong> — VSL-backed: matmul, solve, lstsq, qr, lu, cholesky, pinv, trace, norm, SVD</li>
-<li><strong>Hardware acceleration</strong> — zero-copy sharing with C libraries via <code>vtl.Tensor.data</code></li></ul>
+<li><strong>Hardware acceleration</strong> — zero-copy sharing with C libraries via <code>vtl.Tensor.data</code> plus Vulkan (<code>-d vulkan</code>) and OpenCL/VCL (<code>-d vcl</code>) backend paths</li></ul>
 <h2 id="quick-start">Quick start</h2>
 <pre><code class="language-v"><span class="token keyword">import</span> vtl
 <span class="token keyword">import</span> vtl<span class="token punctuation">.</span>autograd <span class="token keyword">as</span> ag
@@ -229,7 +229,16 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 <td>Broadcasting rules</td></tr>
 <tr>
 <td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_SLICING.md">TUTORIAL_SLICING.md</a></td>
-<td>Slicing and views</td></tr></tbody></table>
+<td>Slicing and views</td></tr>
+<tr>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_GPU_BACKENDS.md">TUTORIAL_GPU_BACKENDS.md</a></td>
+<td>Vulkan + OpenCL/VCL backend guide</td></tr></tbody></table>
+<h2 id="benchmarking">Benchmarking</h2>
+<p>Backend comparison benchmark is available in <a href="https://github.com/vlang/vtl/blob/master/benchmark/README.md"><code>benchmark/</code></a>.</p>
+<pre><code class="language-sh">v run benchmark<span class="token operator">/</span>main<span class="token punctuation">.</span>v
+v <span class="token operator">-</span>d vcl run benchmark<span class="token operator">/</span>main<span class="token punctuation">.</span>v
+v <span class="token operator">-</span>d vulkan run benchmark<span class="token operator">/</span>main<span class="token punctuation">.</span>v
+v <span class="token operator">-</span>d vulkan <span class="token operator">-</span>d vcl run benchmark<span class="token operator">/</span>main<span class="token punctuation">.</span>v</code></pre>
 <h2 id="license">License</h2>
 <p><a href="https://github.com/vlang/vtl/blob/master/LICENSE">MIT</a></p>
 <p>[awesomevbadge]: <a href="https://awesome.re/mentioned-badge.svg">https://awesome.re/mentioned-badge.svg</a> [workflowbadge]: <a href="https://github.com/vlang/vtl/actions/workflows/ci.yml/badge.svg">https://github.com/vlang/vtl/actions/workflows/ci.yml/badge.svg</a> [licensebadge]: <a href="https://img.shields.io/badge/License-MIT-blue.svg">https://img.shields.io/badge/License-MIT-blue.svg</a> [awesomevurl]: <a href="https://github.com/vlang/awesome-v/blob/master/README.md#scientific-computing">https://github.com/vlang/awesome-v/blob/master/README.md#scientific-computing</a> [workflowurl]: <a href="https://github.com/vlang/vtl/actions/workflows/ci.yml">https://github.com/vlang/vtl/actions/workflows/ci.yml</a> [licenseurl]: <a href="https://github.com/vlang/vtl/blob/main/LICENSE">https://github.com/vlang/vtl/blob/main/LICENSE</a></p>
@@ -2130,7 +2139,7 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 11 May 2026 22:05:37</div>
+						<div class="footer">Powered by vdoc. Generated on: 11 May 2026 23:40:13</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_vtl">README</a></li>
 <li class="open"><a href="#bernoulli">fn bernoulli</a>        <ul>

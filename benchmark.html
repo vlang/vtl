@@ -115,8 +115,36 @@
 					<div class="doc-content">
 								<section id="readme_benchmark" class="doc-node">
 			<div class="title"><h1> benchmark <a href="#readme_benchmark">#</a></h1></div>
-<p>benchmark is a VTL module for measuring and comparing CPU, Vulkan GPU, and OpenCL GPU performance on common tensor operations.</p>
-<p>Usage: v run benchmark/main.v             # CPU only v -d vulkan run benchmark/main.v   # CPU + Vulkan v -d vcl run benchmark/main.v      # CPU + OpenCL v -d vulkan -d vcl run benchmark/main.v  # all backends</p>
+<h1 id="vtl-backend-benchmark">VTL Backend Benchmark</h1>
+<p>This benchmark compares matrix multiplication (<code>matmul</code>) across:</p>
+<ul>
+<li>CPU (<code>vtl.la.matmul</code>)</li>
+<li>Vulkan backend (<code>-d vulkan</code>)</li>
+<li>OpenCL/VCL backend (<code>-d vcl</code>)</li></ul>
+<h2 id="what-it-runs">What it runs</h2>
+<p><code>benchmark/main.v</code> executes <code>matmul</code> over square matrices for sizes:</p>
+<ul>
+<li><code>64 x 64</code></li>
+<li><code>128 x 128</code></li>
+<li><code>256 x 256</code></li></ul>
+<p>Each size is repeated 3 times and averaged.</p>
+<h2 id="run-commands">Run commands</h2>
+<pre><code class="language-sh">##v run benchmark<span class="token operator">/</span>main<span class="token punctuation">.</span>v
+
+##v <span class="token operator">-</span>d vcl run benchmark<span class="token operator">/</span>main<span class="token punctuation">.</span>v
+
+##v <span class="token operator">-</span>d vulkan run benchmark<span class="token operator">/</span>main<span class="token punctuation">.</span>v
+
+##v <span class="token operator">-</span>d vulkan <span class="token operator">-</span>d vcl run benchmark<span class="token operator">/</span>main<span class="token punctuation">.</span>v</code></pre>
+<h2 id="output-format">Output format</h2>
+<p>Each line prints timing and speedup against CPU:</p>
+<pre><code class="language-text">matmul <span class="token punctuation">[</span><span class="token number">128x128</span><span class="token punctuation">]</span><span class="token punctuation">:</span> CPU<span class="token operator">=</span><span class="token number">8.12</span>ms <span class="token operator">|</span> Vulkan<span class="token operator">=</span><span class="token number">1.20</span><span class="token function">ms</span> <span class="token punctuation">(</span><span class="token number">6.77</span>x<span class="token punctuation">)</span> <span class="token operator">|</span> VCL<span class="token operator">=</span><span class="token number">1.55</span><span class="token function">ms</span> <span class="token punctuation">(</span><span class="token number">5.24</span>x<span class="token punctuation">)</span></code></pre>
+<p>If a backend is not enabled, it is omitted.</p>
+<h2 id="notes">Notes</h2>
+<ul>
+<li>Benchmarks are sensitive to GPU model, thermal state, and driver/runtime.</li>
+<li>First run can include setup overhead (shader/kernel setup, memory init).</li>
+<li>Use repeated runs for stable comparisons.</li></ul>
 
 </section>
 
@@ -152,7 +180,7 @@
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 11 May 2026 22:05:37</div>
+						<div class="footer">Powered by vdoc. Generated on: 11 May 2026 23:40:13</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_benchmark">README</a></li>
 <li class="open"><a href="#timeit">fn timeit</a>        <ul>
