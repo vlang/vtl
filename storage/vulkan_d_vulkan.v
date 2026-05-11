@@ -2,7 +2,8 @@ module storage
 
 import vsl.vulkan
 
-// VulkanStorageParams provides optional parameters for creating VulkanStorage.
+// VulkanStorageParams provides parameters for creating VulkanStorage.
+// device must be set to an initialised vulkan.Device.
 @[params]
 pub struct VulkanStorageParams {
 	device &vulkan.Device = unsafe { nil }
@@ -18,14 +19,12 @@ pub mut:
 }
 
 // vulkan converts CPU storage to a Vulkan GPU buffer.
-// Returns a new VulkanStorage with the data uploaded to the GPU.
+// params.device must be a valid, initialised vulkan.Device.
 pub fn (cpu &CpuStorage[T]) vulkan(params VulkanStorageParams) !&VulkanStorage[T] {
-	mut device := params.device
-
-	// Use shared default device if none specified
-	if isnil(device) {
-		device = get_vulkan_device()!
+	if isnil(params.device) {
+		return error('VulkanStorageParams: device must be set (call vulkan.new_device() and pass it)')
 	}
+	device := params.device
 
 	n := cpu.data.len
 	esz := usize(sizeof(T))
@@ -50,7 +49,7 @@ pub fn (s &VulkanStorage[T]) cpu() !&CpuStorage[T] {
 	}
 }
 
-// to_array reads data from GPU and returns as a []T.
+// to_array reads data from GPU and returns it as a []T.
 @[inline]
 pub fn (s &VulkanStorage[T]) to_array[T]() ![]T {
 	mut bytes := []u8{len: int(s.data.size)}
@@ -66,22 +65,4 @@ pub fn (s &VulkanStorage[T]) release() ! {
 	if !isnil(s.data) {
 		s.data.release()
 	}
-}
-
-// --------------------------------------------------------------------------
-// Shared Vulkan device (lazy, module-level)
-// --------------------------------------------------------------------------
-__global g_vk_dev = &vulkan.Device(unsafe { nil })
-
-// get_vulkan_device returns a shared Vulkan device, creating it on first call.
-fn get_vulkan_device() !&vulkan.Device {
-	d := unsafe { g_vk_dev }
-	if isnil(d) {
-		mut new_d := vulkan.new_device()!
-		unsafe {
-			g_vk_dev = new_d
-		}
-		return new_d
-	}
-	return d
 }
