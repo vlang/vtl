@@ -11,5 +11,5 @@ Read the [docs](https://vlang.github.io/vsl/vcl.html) of the V Computing Languag
 To run the example, execute the following command:
 
 ```sh
-v -d vcl run examples/opencl_vcl_support/main_not_ci.v
+v -d vcl run examples/vtl_opencl_vcl_support/main_not_ci.v
 ```
