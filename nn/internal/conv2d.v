@@ -17,13 +17,11 @@ pub:
 // bias: [1, out_ch]
 // config: padding, stride, dilation, groups
 // returns: [batch, out_ch, out_H, out_W]
-pub fn conv2d_forward[T](
-	input       &vtl.Tensor[T],
-	weight      &vtl.Tensor[T],
-	bias        &vtl.Tensor[T],
+pub fn conv2d_forward[T](input &vtl.Tensor[T],
+	weight &vtl.Tensor[T],
+	bias &vtl.Tensor[T],
 	kernel_size []int,
-	config      Conv2DConfig
-) !&vtl.Tensor[T] {
+	config Conv2DConfig) !&vtl.Tensor[T] {
 	batch := input.shape[0]
 	in_ch := input.shape[1]
 	in_h := input.shape[2]
@@ -79,14 +77,12 @@ pub fn conv2d_forward[T](
 
 // conv2d_backward computes gradients for input, weight, bias.
 // Returns [d_input, d_weight, d_bias].
-pub fn conv2d_backward[T](
-	grad_out    &vtl.Tensor[T],
-	input       &vtl.Tensor[T],
-	weight      &vtl.Tensor[T],
-	bias        &vtl.Tensor[T],
+pub fn conv2d_backward[T](grad_out &vtl.Tensor[T],
+	input &vtl.Tensor[T],
+	weight &vtl.Tensor[T],
+	bias &vtl.Tensor[T],
 	kernel_size []int,
-	config      Conv2DConfig
-) ![]&vtl.Tensor[T] {
+	config Conv2DConfig) ![]&vtl.Tensor[T] {
 	batch := input.shape[0]
 	in_ch := input.shape[1]
 	in_h := input.shape[2]
@@ -124,7 +120,8 @@ pub fn conv2d_backward[T](
 									if ih >= 0 && ih < in_h && iw >= 0 && iw < in_w {
 										w_val := f64(weight.get([global_oc, ic, kh, kw]))
 										d_input.set([b, g * g_in_ch + ic, ih, iw],
-											d_input.get([b, g * g_in_ch + ic, ih, iw]) + vtl.cast[T](goh * w_val))
+											d_input.get([b, g * g_in_ch + ic, ih, iw]) +
+											vtl.cast[T](goh * w_val))
 									}
 								}
 							}
@@ -148,7 +145,12 @@ pub fn conv2d_backward[T](
 								ih := oh * stride_h - pad_h + kh * dil_h
 								iw := ow * stride_w - pad_w + kw * dil_w
 								if ih >= 0 && ih < in_h && iw >= 0 && iw < in_w {
-									sum += f64(input.get([b, ic, ih, iw])) * f64(grad_out.get([b, oc, oh, ow]))
+									sum += f64(input.get([b, ic, ih, iw])) * f64(grad_out.get([
+										b,
+										oc,
+										oh,
+										ow,
+									]))
 								}
 							}
 						}

@@ -170,7 +170,9 @@ fn vcl_tensor_from_array[T](data []T, shape []int, mut dev vcl.Device) !&VclTens
 	sz := size_from_shape(shape)
 	strides := strides_from_shape(shape, .row_major)
 	return &VclTensor[T]{
-		data:    &storage.VclStorage[T]{data: vec}
+		data:    &storage.VclStorage[T]{
+			data: vec
+		}
 		memory:  .row_major
 		size:    sz
 		shape:   shape

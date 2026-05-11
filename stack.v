@@ -81,6 +81,7 @@ pub fn (t &Tensor[T]) unsqueeze[T](data AxisData) !&Tensor[T] {
 		true { axis + t.rank() + 1 }
 		else { axis }
 	}
+
 	actual_axis := if newaxis > t.rank() { t.rank() } else { newaxis }
 	newshape.insert(actual_axis, 1)
 	return t.reshape[T](newshape)
@@ -144,6 +145,7 @@ pub fn (t &Tensor[T]) expand_dims[T](data AxisData) !&Tensor[T] {
 		true { axis + t.rank() + 1 }
 		else { axis }
 	}
+
 	newshape << t.shape[..newaxis]
 	newshape << 1
 	newshape << t.shape[newaxis..]

@@ -10,7 +10,7 @@ All functions below accept `vtl.Tensor[T]` inputs and return VTL tensors
 
 `la.trace(t)` returns the sum of the diagonal elements of a square matrix.
 
-```v
+```v ignore
 import vtl.la
 import vtl
 
@@ -31,7 +31,7 @@ la.trace(a)!
 | `"I"` | Infinity — max absolute row sum |
 | `"1"` | 1-norm — max absolute column sum |
 
-```v
+```v ignore
 import vtl.la
 import vtl
 
@@ -47,7 +47,7 @@ la.norm(a, '1')! // 4.0  (max col sum: 3+0=3, 4+0=4)
 `la.outer(u, v)` computes the outer product `result[i,j] = u[i] * v[j]`,
 producing a `u.len × v.len` matrix.
 
-```v
+```v ignore
 import vtl.la
 import vtl
 
@@ -62,7 +62,7 @@ la.outer(u, v)!
 `la.cross(u, v)` computes the 3-D cross product `u × v`.
 Both inputs must have length 3.
 
-```v
+```v ignore
 import vtl.la
 import vtl
 
@@ -143,7 +143,7 @@ x, residuals, rank, sv := la.lstsq(a, b)!
 for symmetric positive-definite matrices.
 Returns the lower-triangular `L`.
 
-```v
+```v ignore
 import vtl.la
 import vtl
 

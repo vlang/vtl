@@ -114,7 +114,10 @@ pub fn (a &VulkanTensor[T]) gemm(b &VulkanTensor[T]) !&VulkanTensor[T] {
 		mut c_buf := dev.buffer(c_size)!
 		vulkan.gemm(dev, c_buf, a.data.data, b.data.data, u32(m), u32(n), u32(k))!
 		return &VulkanTensor[T]{
-			data:    &storage.VulkanStorage[T]{ data: c_buf, nelems: m * n }
+			data:    &storage.VulkanStorage[T]{
+				data:   c_buf
+				nelems: m * n
+			}
 			memory:  .row_major
 			size:    m * n
 			shape:   [m, n]
@@ -132,7 +135,10 @@ pub fn (a &VulkanTensor[T]) gemm(b &VulkanTensor[T]) !&VulkanTensor[T] {
 		unsafe { C.memcpy(c_bytes.data, c_data.data, c_size) }
 		c_buf.load(c_bytes)!
 		return &VulkanTensor[T]{
-			data:    &storage.VulkanStorage[T]{ data: c_buf, nelems: m * n }
+			data:    &storage.VulkanStorage[T]{
+				data:   c_buf
+				nelems: m * n
+			}
 			memory:  .row_major
 			size:    m * n
 			shape:   [m, n]
@@ -151,7 +157,10 @@ pub fn (t &VulkanTensor[T]) relu() !&VulkanTensor[T] {
 		mut dst_buf := dev.buffer(size)!
 		vulkan.relu(dev, dst_buf, t.data.data)!
 		return &VulkanTensor[T]{
-			data:    &storage.VulkanStorage[T]{ data: dst_buf, nelems: n }
+			data:    &storage.VulkanStorage[T]{
+				data:   dst_buf
+				nelems: n
+			}
 			memory:  t.memory
 			size:    n
 			shape:   t.shape.clone()
@@ -168,7 +177,10 @@ pub fn (t &VulkanTensor[T]) relu() !&VulkanTensor[T] {
 		unsafe { C.memcpy(bytes.data, result.data, size) }
 		dst_buf.load(bytes)!
 		return &VulkanTensor[T]{
-			data:    &storage.VulkanStorage[T]{ data: dst_buf, nelems: n }
+			data:    &storage.VulkanStorage[T]{
+				data:   dst_buf
+				nelems: n
+			}
 			memory:  t.memory
 			size:    n
 			shape:   t.shape.clone()
@@ -187,7 +199,10 @@ pub fn (t &VulkanTensor[T]) sigmoid() !&VulkanTensor[T] {
 		mut dst_buf := dev.buffer(size)!
 		vulkan.sigmoid(dev, dst_buf, t.data.data)!
 		return &VulkanTensor[T]{
-			data:    &storage.VulkanStorage[T]{ data: dst_buf, nelems: n }
+			data:    &storage.VulkanStorage[T]{
+				data:   dst_buf
+				nelems: n
+			}
 			memory:  t.memory
 			size:    n
 			shape:   t.shape.clone()
@@ -204,7 +219,10 @@ pub fn (t &VulkanTensor[T]) sigmoid() !&VulkanTensor[T] {
 		unsafe { C.memcpy(bytes.data, result.data, size) }
 		dst_buf.load(bytes)!
 		return &VulkanTensor[T]{
-			data:    &storage.VulkanStorage[T]{ data: dst_buf, nelems: n }
+			data:    &storage.VulkanStorage[T]{
+				data:   dst_buf
+				nelems: n
+			}
 			memory:  t.memory
 			size:    n
 			shape:   t.shape.clone()
@@ -231,7 +249,10 @@ pub fn (a &VulkanTensor[T]) gemv(x &VulkanTensor[T]) !&VulkanTensor[T] {
 		mut y_buf := dev.buffer(y_size)!
 		vulkan.gemv(dev, y_buf, a.data.data, x.data.data, m, n)!
 		return &VulkanTensor[T]{
-			data:    &storage.VulkanStorage[T]{ data: y_buf, nelems: m }
+			data:    &storage.VulkanStorage[T]{
+				data:   y_buf
+				nelems: m
+			}
 			memory:  .row_major
 			size:    m
 			shape:   [m]
@@ -249,7 +270,10 @@ pub fn (a &VulkanTensor[T]) gemv(x &VulkanTensor[T]) !&VulkanTensor[T] {
 		unsafe { C.memcpy(bytes.data, result.data, int(y_size)) }
 		y_buf.load(bytes)!
 		return &VulkanTensor[T]{
-			data:    &storage.VulkanStorage[T]{ data: y_buf, nelems: m }
+			data:    &storage.VulkanStorage[T]{
+				data:   y_buf
+				nelems: m
+			}
 			memory:  .row_major
 			size:    m
 			shape:   [m]
@@ -270,7 +294,10 @@ pub fn vector_add_vulkan[T](dst &VulkanTensor[T], a &VulkanTensor[T], b &VulkanT
 		mut out_buf := dev.buffer(size)!
 		vulkan.vector_add(dev, out_buf, a.data.data, b.data.data)!
 		return &VulkanTensor[T]{
-			data:    &storage.VulkanStorage[T]{ data: out_buf, nelems: dst.size }
+			data:    &storage.VulkanStorage[T]{
+				data:   out_buf
+				nelems: dst.size
+			}
 			memory:  dst.memory
 			size:    dst.size
 			shape:   dst.shape.clone()
@@ -290,7 +317,10 @@ pub fn vector_add_vulkan[T](dst &VulkanTensor[T], a &VulkanTensor[T], b &VulkanT
 		unsafe { C.memcpy(bytes.data, result.data, int(size)) }
 		out_buf.load(bytes)!
 		return &VulkanTensor[T]{
-			data:    &storage.VulkanStorage[T]{ data: out_buf, nelems: dst.size }
+			data:    &storage.VulkanStorage[T]{
+				data:   out_buf
+				nelems: dst.size
+			}
 			memory:  dst.memory
 			size:    dst.size
 			shape:   dst.shape.clone()

@@ -8,11 +8,14 @@ import vtl.nn.internal
 pub struct SoftmaxGate[T] {
 pub:
 	input &vtl.Tensor[T] = unsafe { nil }
-	dim    int
+	dim   int
 }
 
 pub fn softmax_gate[T](input &vtl.Tensor[T], dim int) &SoftmaxGate[T] {
-	return &SoftmaxGate[T]{input: input, dim: dim}
+	return &SoftmaxGate[T]{
+		input: input
+		dim:   dim
+	}
 }
 
 pub fn (g &SoftmaxGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {

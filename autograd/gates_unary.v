@@ -10,7 +10,9 @@ pub:
 }
 
 pub fn log_gate[T](a &Variable[T]) &LogGate[T] {
-	return &LogGate[T]{a: a}
+	return &LogGate[T]{
+		a: a
+	}
 }
 
 pub fn (g &LogGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
@@ -41,14 +43,18 @@ pub:
 }
 
 pub fn abs_gate[T](a &Variable[T]) &AbsGate[T] {
-	return &AbsGate[T]{a: a}
+	return &AbsGate[T]{
+		a: a
+	}
 }
 
 pub fn (g &AbsGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	eps := vtl.cast[T](1e-8)
 	abs_a := g.a.value.abs[T]()
-	safe_denom := abs_a.map(fn [eps] [T](val T, _ []int) T { return if val < eps { eps } else { val } })
+	safe_denom := abs_a.map(fn [eps] [T](val T, _ []int) T {
+		return if val < eps { eps } else { val }
+	})
 	sign_a := g.a.value.divide[T](safe_denom)!
 	r0 := gradient.multiply[T](sign_a)!
 	return [r0]
@@ -76,7 +82,9 @@ pub:
 }
 
 pub fn sqrt_gate[T](a &Variable[T]) &SqrtGate[T] {
-	return &SqrtGate[T]{a: a}
+	return &SqrtGate[T]{
+		a: a
+	}
 }
 
 pub fn (g &SqrtGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
@@ -110,7 +118,9 @@ pub:
 }
 
 pub fn tanh_gate[T](cache &vtl.Tensor[T]) &TanhGate[T] {
-	return &TanhGate[T]{cache: cache}
+	return &TanhGate[T]{
+		cache: cache
+	}
 }
 
 pub fn (g &TanhGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
@@ -145,7 +155,11 @@ pub:
 }
 
 pub fn clamp_gate[T](min_val T, max_val T, a &vtl.Tensor[T]) &ClampGate[T] {
-	return &ClampGate[T]{min_val: min_val, max_val: max_val, a: a}
+	return &ClampGate[T]{
+		min_val: min_val
+		max_val: max_val
+		a:       a
+	}
 }
 
 pub fn (g &ClampGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {

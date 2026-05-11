@@ -103,8 +103,9 @@ fn test_full_like() {
 
 fn test_range() {
 	t := range[f64](-2, 10)
-	expected := from_array([-2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0],
-		[12])!
+	expected := from_array([-2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0], [
+		12,
+	])!
 	assert t.array_equal(expected)
 }
 

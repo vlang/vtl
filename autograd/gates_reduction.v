@@ -11,7 +11,10 @@ pub:
 }
 
 pub fn sum_gate[T](shape []int, axis int) &SumGate[T] {
-	return &SumGate[T]{shape: shape, axis: axis}
+	return &SumGate[T]{
+		shape: shape
+		axis:  axis
+	}
 }
 
 pub fn (g &SumGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
@@ -39,13 +42,17 @@ pub fn (g &SumGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
 // backward: grad broadcast to input shape / num_elements
 pub struct MeanGate[T] {
 pub:
-	shape      []int
-	axis       int
+	shape     []int
+	axis      int
 	num_elems int
 }
 
 pub fn mean_gate[T](shape []int, axis int, num_elems int) &MeanGate[T] {
-	return &MeanGate[T]{shape: shape, axis: axis, num_elems: num_elems}
+	return &MeanGate[T]{
+		shape:     shape
+		axis:      axis
+		num_elems: num_elems
+	}
 }
 
 pub fn (g &MeanGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
@@ -78,7 +85,9 @@ pub:
 }
 
 pub fn reshape_gate[T](orig_shape []int) &ReshapeGate[T] {
-	return &ReshapeGate[T]{orig_shape: orig_shape}
+	return &ReshapeGate[T]{
+		orig_shape: orig_shape
+	}
 }
 
 pub fn (g &ReshapeGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
@@ -115,7 +124,10 @@ pub fn transpose_gate[T](perm []int) &TransposeGate[T] {
 	for i, p in perm {
 		iperm[p] = i
 	}
-	return &TransposeGate[T]{perm: perm, iperm: iperm}
+	return &TransposeGate[T]{
+		perm:  perm
+		iperm: iperm
+	}
 }
 
 pub fn (g &TransposeGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
@@ -143,12 +155,15 @@ pub fn (g &TransposeGate[T]) cache[T](mut result Variable[T], args ...CacheParam
 // backward: split gradient back into original inputs
 pub struct ConcatGate[T] {
 pub:
-	axis    int
-	splits  []int // size of each input along the concat axis
+	axis   int
+	splits []int // size of each input along the concat axis
 }
 
 pub fn concat_gate[T](axis int, splits []int) &ConcatGate[T] {
-	return &ConcatGate[T]{axis: axis, splits: splits}
+	return &ConcatGate[T]{
+		axis:   axis
+		splits: splits
+	}
 }
 
 pub fn (g &ConcatGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {

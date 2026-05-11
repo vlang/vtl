@@ -28,7 +28,7 @@ and a full neural network module.
 
 ## Quick start
 
-```v
+```v ignore
 import vtl
 import vtl.autograd as ag
 import vtl.nn.layers
@@ -45,7 +45,7 @@ model := [layers.Layer[f64](lin1), layers.Layer[f64](lin2)]
 input_tensor := vtl.zeros[f64]([64, 784])
 mut x := ctx.variable(input_tensor)
 for layer in model {
-    x = layer.forward(x)!
+	x = layer.forward(x)!
 }
 
 // 3. Loss

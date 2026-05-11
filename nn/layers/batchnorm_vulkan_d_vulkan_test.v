@@ -25,8 +25,8 @@ fn test_batchnorm1d_forward_vulkan_basic() {
 	// column 0 normalised values
 	assert math.abs(f64(out.get([0, 0])) - (-1.342)) < 0.01
 	assert math.abs(f64(out.get([1, 0])) - (-0.447)) < 0.01
-	assert math.abs(f64(out.get([2, 0])) -   0.447)  < 0.01
-	assert math.abs(f64(out.get([3, 0])) -   1.342)  < 0.01
+	assert math.abs(f64(out.get([2, 0])) - 0.447) < 0.01
+	assert math.abs(f64(out.get([3, 0])) - 1.342) < 0.01
 }
 
 fn test_batchnorm1d_layer_vulkan() {

@@ -5,7 +5,6 @@ module autograd
 // will use GPU kernels when backward-pass operations are performed.
 // The backward traversal itself is handled by Variable.backprop() in variable.v;
 // this file provides the factory and convenience wrappers.
-
 import vtl
 import vtl.la
 import storage
@@ -17,14 +16,16 @@ import math
 @[heap]
 pub struct VulkanAutograd[T] {
 pub mut:
-	context &Context[T]              = unsafe { nil }
+	context &Context[T] = unsafe { nil }
 	params  storage.VulkanStorageParams
 }
 
 // new_vulkan_autograd creates a VulkanAutograd using the best available GPU.
 pub fn new_vulkan_autograd[T]() !&VulkanAutograd[T] {
 	dev := vulkan.new_device()!
-	params := storage.VulkanStorageParams{device: dev}
+	params := storage.VulkanStorageParams{
+		device: dev
+	}
 	return &VulkanAutograd[T]{
 		context: ctx[T]()
 		params:  params
@@ -83,7 +84,8 @@ pub fn (va &VulkanAutograd[T]) tanh[T](a &Variable[T]) !&Variable[T] {
 pub fn (va &VulkanAutograd[T]) matmul[T](a &Variable[T], b &Variable[T]) !&Variable[T] {
 	result_value := la.matmul[T](a.value, b.value)!
 	mut result := variable[T](va.context, result_value,
-		requires_grad: a.is_grad_needed() || b.is_grad_needed())
+		requires_grad: a.is_grad_needed() || b.is_grad_needed()
+	)
 	if a.is_grad_needed() || b.is_grad_needed() {
 		gate := matmul_gate_vulkan[T](a, b, va.params)
 		gate.cache[T](mut result, a, b)!

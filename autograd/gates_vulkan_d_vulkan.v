@@ -4,7 +4,6 @@ module autograd
 // Compile with -d vulkan. Each gate stores the VulkanStorageParams (device)
 // used during the forward pass so that backward uses the same device.
 // Returns CPU Tensor[T] to conform to the Gate[T] interface.
-
 import vtl
 import storage
 import vsl.vulkan
@@ -13,12 +12,15 @@ import math
 // ReLUGateVulkan: d_relu = grad * (x > 0)
 pub struct ReLUGateVulkan[T] {
 pub:
-	a      &Variable[T]              = unsafe { nil }
+	a      &Variable[T] = unsafe { nil }
 	params storage.VulkanStorageParams
 }
 
 pub fn relu_gate_vulkan[T](a &Variable[T], params storage.VulkanStorageParams) &ReLUGateVulkan[T] {
-	return &ReLUGateVulkan[T]{a: a, params: params}
+	return &ReLUGateVulkan[T]{
+		a:      a
+		params: params
+	}
 }
 
 pub fn (g &ReLUGateVulkan[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
@@ -39,7 +41,9 @@ pub fn (g &ReLUGateVulkan[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T]
 		raw = out_buf.store(mut raw)!
 		mut vals := []T{len: n}
 		for i in 0 .. n {
-			unsafe { vals[i] = T(*(&f32(&raw[i * 4]))) }
+			unsafe {
+				vals[i] = T(*(&f32(&raw[i * 4])))
+			}
 		}
 		r0 := vtl.from_array[T](vals, input.shape, vtl.TensorData{ memory: .row_major })!
 		return [r0]
@@ -69,12 +73,15 @@ pub fn (g &ReLUGateVulkan[T]) cache[T](mut result Variable[T], args ...CachePara
 // SigmoidGateVulkan: d_sigmoid = grad * s * (1 - s), s = sigmoid(x)
 pub struct SigmoidGateVulkan[T] {
 pub:
-	sigmoid_out &vtl.Tensor[T]       = unsafe { nil }
+	sigmoid_out &vtl.Tensor[T] = unsafe { nil }
 	params      storage.VulkanStorageParams
 }
 
 pub fn sigmoid_gate_vulkan[T](sigmoid_out &vtl.Tensor[T], params storage.VulkanStorageParams) &SigmoidGateVulkan[T] {
-	return &SigmoidGateVulkan[T]{sigmoid_out: sigmoid_out, params: params}
+	return &SigmoidGateVulkan[T]{
+		sigmoid_out: sigmoid_out
+		params:      params
+	}
 }
 
 pub fn (g &SigmoidGateVulkan[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
@@ -95,7 +102,9 @@ pub fn (g &SigmoidGateVulkan[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor
 		raw = out_buf.store(mut raw)!
 		mut vals := []T{len: n}
 		for i in 0 .. n {
-			unsafe { vals[i] = T(*(&f32(&raw[i * 4]))) }
+			unsafe {
+				vals[i] = T(*(&f32(&raw[i * 4])))
+			}
 		}
 		r0 := vtl.from_array[T](vals, s.shape, vtl.TensorData{ memory: .row_major })!
 		return [r0]
@@ -125,12 +134,15 @@ pub fn (g &SigmoidGateVulkan[T]) cache[T](mut result Variable[T], args ...CacheP
 // TanhGateVulkan: d_tanh = grad * (1 - tanh(x)^2), tanh_out = tanh(x)
 pub struct TanhGateVulkan[T] {
 pub:
-	tanh_out &vtl.Tensor[T]          = unsafe { nil }
+	tanh_out &vtl.Tensor[T] = unsafe { nil }
 	params   storage.VulkanStorageParams
 }
 
 pub fn tanh_gate_vulkan[T](tanh_out &vtl.Tensor[T], params storage.VulkanStorageParams) &TanhGateVulkan[T] {
-	return &TanhGateVulkan[T]{tanh_out: tanh_out, params: params}
+	return &TanhGateVulkan[T]{
+		tanh_out: tanh_out
+		params:   params
+	}
 }
 
 pub fn (g &TanhGateVulkan[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
@@ -151,7 +163,9 @@ pub fn (g &TanhGateVulkan[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T]
 		raw = out_buf.store(mut raw)!
 		mut vals := []T{len: n}
 		for i in 0 .. n {
-			unsafe { vals[i] = T(*(&f32(&raw[i * 4]))) }
+			unsafe {
+				vals[i] = T(*(&f32(&raw[i * 4])))
+			}
 		}
 		r0 := vtl.from_array[T](vals, t_out.shape, vtl.TensorData{ memory: .row_major })!
 		return [r0]
@@ -181,12 +195,15 @@ pub fn (g &TanhGateVulkan[T]) cache[T](mut result Variable[T], args ...CachePara
 // GELUGateVulkan: d_gelu on GPU (tanh approximation), gelu_input = original x
 pub struct GELUGateVulkan[T] {
 pub:
-	gelu_input &vtl.Tensor[T]        = unsafe { nil }
+	gelu_input &vtl.Tensor[T] = unsafe { nil }
 	params     storage.VulkanStorageParams
 }
 
 pub fn gelu_gate_vulkan[T](gelu_input &vtl.Tensor[T], params storage.VulkanStorageParams) &GELUGateVulkan[T] {
-	return &GELUGateVulkan[T]{gelu_input: gelu_input, params: params}
+	return &GELUGateVulkan[T]{
+		gelu_input: gelu_input
+		params:     params
+	}
 }
 
 pub fn (g &GELUGateVulkan[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
@@ -207,7 +224,9 @@ pub fn (g &GELUGateVulkan[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T]
 		raw = out_buf.store(mut raw)!
 		mut vals := []T{len: n}
 		for i in 0 .. n {
-			unsafe { vals[i] = T(*(&f32(&raw[i * 4]))) }
+			unsafe {
+				vals[i] = T(*(&f32(&raw[i * 4])))
+			}
 		}
 		r0 := vtl.from_array[T](vals, x.shape, vtl.TensorData{ memory: .row_major })!
 		return [r0]
@@ -221,8 +240,7 @@ pub fn (g &GELUGateVulkan[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T]
 			th := T(math.tanh(f64(inner)))
 			sech2 := vtl.cast[T](1) - th * th
 			dgelu := vtl.cast[T](0.5) * (vtl.cast[T](1) + th) +
-				vtl.cast[T](0.5) * xv * sech2 * sqrt_2_over_pi *
-				(vtl.cast[T](1) + vtl.cast[T](3) * c * xv * xv)
+				vtl.cast[T](0.5) * xv * sech2 * sqrt_2_over_pi * (vtl.cast[T](1) + vtl.cast[T](3) * c * xv * xv)
 			return vals[0] * dgelu
 		})!
 		return [r0]

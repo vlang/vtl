@@ -7,5 +7,7 @@ pub:
 }
 
 pub fn new_vulkan_params(dev voidptr) VulkanStorageParams {
-	return VulkanStorageParams{ device: dev }
+	return VulkanStorageParams{
+		device: dev
+	}
 }
