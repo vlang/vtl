@@ -4,7 +4,7 @@
 		<meta charset="UTF-8" />
 		<meta http-equiv="x-ua-compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>main | vdoc</title>
+		<title>benchmark | vdoc</title>
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
@@ -68,13 +68,13 @@
 <li class="open">
 <div class="menu-row"><a href="./autograd.html">autograd</a></div>
 </li>
-<li class="open">
+<li class="open active">
 <div class="menu-row"><a href="./benchmark.html">benchmark</a></div>
 </li>
 <li class="open">
 <div class="menu-row"><a href="./datasets.html">datasets</a></div>
 </li>
-<li class="open active">
+<li class="open">
 <div class="menu-row"><a href="./main.html">main</a></div>
 </li>
 <li class="open">
@@ -113,75 +113,55 @@
 			<div class="doc-scrollview" tabindex="-1" id="main-content">
 				<div class="doc-container">
 					<div class="doc-content">
-								<section id="readme_main" class="doc-node">
-			<div class="title"><h1> main <a href="#readme_main">#</a></h1></div>
-<h1 id="vtlvandermont">vtl_vandermont</h1>
-<p>Builds a 5×5 Vandermonde matrix, then demonstrates tensor slicing and in-place assignment.</p>
-<h2 id="what-it-demonstrates">What it demonstrates</h2>
-<ul>
-<li>Creating a 2-D tensor from a nested V array with <code>vtl.from_2d</code></li>
-<li>Slicing a sub-tensor by row/column range with <code>.slice_hilo()</code></li>
-<li>Inspecting tensor shape with <code>.shape</code></li>
-<li>Assigning into a slice with <code>.assign()</code> (modifies the underlying tensor)</li></ul>
-<h2 id="how-to-run">How to run</h2>
-<pre><code class="language-sh">v run main<span class="token punctuation">.</span>v</code></pre>
-<h2 id="expected-output">Expected output</h2>
-<pre><code>[[   1,    1,    1,    1,    1],
- [   2,    4,    8,   16,   32],
- [   3,    9,   27,   81,  243],
- [   4,   16,   64,  256, 1024],
- [   5,   25,  125,  625, 3125]]
-[5, 5]
-slice:
-[[ 27,   81],
- [ 64,  256]]
-[2, 2]
-span slice:
-[[ 4,   16,   64,  256, 1024],
- [ 5,   25,  125,  625, 3125]]
-[2, 5]
-slice until:
-[[1, 1, 1, 1, 1],
- [2, 4, 8, 16, 32],
- [3, 9, 27, 81, 243]]
-[3, 5]
-assign:
-[[   1,    1,    1,    1,    1],
- [   2,    4,    8,   16,   32],
- [   3,    9,  999,  999,  243],
- [   4,   16,  999,  999, 1024],
- [   5,   25,  125,  625, 3125]]
-</code></pre>
-<h2 id="key-api">Key API</h2>
-<table>
-<thead>
-<tr>
-<th>Function / method</th>
-<th>Description</th></tr></thead>
-<tbody>
-<tr>
-<td><code>vtl.from_2d(arr)</code></td>
-<td>Create a 2-D tensor from a nested V array</td></tr>
-<tr>
-<td><code>t.slice_hilo(rows, cols)</code></td>
-<td>Slice by [start, end) row and column ranges</td></tr>
-<tr>
-<td><code>t.shape</code></td>
-<td><code>[]int</code> with the size of each dimension</td></tr>
-<tr>
-<td><code>slice.assign(t)</code></td>
-<td>Write values from <code>t</code> into the slice's memory</td></tr></tbody></table>
-<h2 id="related-examples">Related examples</h2>
-<ul>
-<li><a href="https://github.com/vlang/vtl/blob/master/examples/vtl_basic_usage"><code>vtl_basic_usage</code></a> — 1-D tensors and basic operations</li>
-<li><a href="https://github.com/vlang/vtl/blob/master/examples/autograd_backprop"><code>autograd_backprop</code></a> — automatic differentiation</li></ul>
+								<section id="readme_benchmark" class="doc-node">
+			<div class="title"><h1> benchmark <a href="#readme_benchmark">#</a></h1></div>
+<p>benchmark is a VTL module for measuring and comparing CPU, Vulkan GPU, and OpenCL GPU performance on common tensor operations.</p>
+<p>Usage: v run benchmark/main.v             # CPU only v -d vulkan run benchmark/main.v   # CPU + Vulkan v -d vcl run benchmark/main.v      # CPU + OpenCL v -d vulkan -d vcl run benchmark/main.v  # all backends</p>
+
+</section>
+
+		<section id="timeit" class="doc-node">
+			<div class="title"><h2>fn timeit <a href="#timeit">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/benchmark/benchmark.v#L42"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">timeit</span><span class="token punctuation">(</span>f <span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">)</span> <span class="token builtin">i64</span></code></pre>
+<p>timeit runs fn and returns elapsed nanoseconds.</p>
+
+</section>
+
+		<section id="BenchResult" class="doc-node">
+			<div class="title"><h2>struct BenchResult <a href="#BenchResult">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/benchmark/benchmark.v#L14"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token symbol">BenchResult</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	name      <span class="token builtin">string</span>
+	size      <span class="token builtin">string</span>
+	cpu_ns    <span class="token builtin">i64</span>
+	vulkan_ns <span class="token builtin">i64</span> <span class="token comment">// -1 if not available</span>
+	vcl_ns    <span class="token builtin">i64</span> <span class="token comment">// -1 if not available</span>
+<span class="token punctuation">}</span></code></pre>
+<p>BenchResult holds timing results for a single operation across backends.</p>
+
+</section>
+
+		<section id="BenchResult.str" class="doc-node">
+			<div class="title"><h2>fn (BenchResult) str <a href="#BenchResult.str">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/benchmark/benchmark.v#L24"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>r <span class="token operator">&amp;</span>BenchResult<span class="token punctuation">)</span> <span class="token function">str</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">string</span></code></pre>
+<p>str returns a human-readable summary line for a BenchResult.</p>
 
 </section>
 
 
 						<div class="footer">Powered by vdoc. Generated on: 11 May 2026 21:43:15</div>
 					</div>
-					<div class="doc-toc"><ul><li class="open"><a href="#readme_main">README</a></li>
+					<div class="doc-toc"><ul><li class="open"><a href="#readme_benchmark">README</a></li>
+<li class="open"><a href="#timeit">fn timeit</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#BenchResult">struct BenchResult</a>        <ul>
+<li><a href="#BenchResult.str">fn str</a></li>
+</ul>
+</li>
 </ul></div>
 				</div>
 			</div>
