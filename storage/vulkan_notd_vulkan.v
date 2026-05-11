@@ -1,6 +1,11 @@
 module storage
 
-// VulkanStorageParams placeholder when compiling without `-d vulkan`.
-// Keeps `Tensor[T].vulkan(storage.VulkanStorageParams)` signatures consistent.
 @[params]
-pub struct VulkanStorageParams {}
+pub struct VulkanStorageParams {
+pub:
+	device voidptr = unsafe { nil }
+}
+
+pub fn new_vulkan_params(dev voidptr) VulkanStorageParams {
+	return VulkanStorageParams{ device: dev }
+}

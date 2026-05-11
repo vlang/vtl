@@ -6,7 +6,13 @@ import vsl.vulkan
 // device must be set to an initialised vulkan.Device.
 @[params]
 pub struct VulkanStorageParams {
+pub:
 	device &vulkan.Device = unsafe { nil }
+}
+
+// new_vulkan_params creates a VulkanStorageParams with the given device.
+pub fn new_vulkan_params(dev &vulkan.Device) VulkanStorageParams {
+	return VulkanStorageParams{ device: dev }
 }
 
 // VulkanStorage wraps a Vulkan GPU buffer as a VTL storage backend.
