@@ -25,6 +25,7 @@ neural network module.
 | [TUTORIAL_REDUCTIONS.md](./TUTORIAL_REDUCTIONS.md) | argmax/argmin/cumsum/cumprod |
 | [TUTORIAL_ADVANCED_LA.md](./TUTORIAL_ADVANCED_LA.md) | trace/norm/outer/qr/lu/cholesky/pinv |
 | [TUTORIAL_OPTIMIZERS.md](./TUTORIAL_OPTIMIZERS.md) | Adam/AdamW/RMSProp/AdaGrad/SGD + schedulers |
+| [TUTORIAL_GPU_BACKENDS.md](./TUTORIAL_GPU_BACKENDS.md) | Vulkan/OpenCL (VCL) backend usage and benchmarking |
 
 ## VSL — V Standard Library
 
