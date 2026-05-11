@@ -14,22 +14,17 @@ import vtl.storage
 // For now these return errors when compiled with -d vcl.
 
 pub fn linear_forward_vcl[T](_ &vtl.Tensor[T], _ &vtl.Tensor[T], _ &vtl.Tensor[T], _ storage.VclStorageParams) !&vtl.Tensor[T] {
-	return error(@METHOD + ':' +
-		' VCL compute (GEMM on GPU via OpenCL) is not yet implemented. ' +
-		' Use CPU backend or Vulkan compute backend (-d vulkan). ' +
-		' See vtl#62 (Phase 5: OpenCL Backend)')
+	return error(@METHOD + ':' + ' VCL compute (GEMM on GPU via OpenCL) is not yet implemented. ' +
+		' Use CPU backend or Vulkan compute backend (-d vulkan). ' + ' See vtl#62 (Phase 5: OpenCL Backend)')
 }
 
 pub fn relu_forward_vcl[T](_ &vtl.Tensor[T], _ storage.VclStorageParams) !&vtl.Tensor[T] {
-	return error(@METHOD + ':' +
-		' VCL compute (ReLU on GPU via OpenCL) is not yet implemented. ' +
-		' Use CPU backend or Vulkan compute backend (-d vulkan). ' +
-		' See vtl#62 (Phase 5: OpenCL Backend)')
+	return error(@METHOD + ':' + ' VCL compute (ReLU on GPU via OpenCL) is not yet implemented. ' +
+		' Use CPU backend or Vulkan compute backend (-d vulkan). ' + ' See vtl#62 (Phase 5: OpenCL Backend)')
 }
 
 pub fn sigmoid_forward_vcl[T](_ &vtl.Tensor[T], _ storage.VclStorageParams) !&vtl.Tensor[T] {
 	return error(@METHOD + ':' +
 		' VCL compute (Sigmoid on GPU via OpenCL) is not yet implemented. ' +
-		' Use CPU backend or Vulkan compute backend (-d vulkan). ' +
-		' See vtl#62 (Phase 5: OpenCL Backend)')
+		' Use CPU backend or Vulkan compute backend (-d vulkan). ' + ' See vtl#62 (Phase 5: OpenCL Backend)')
 }

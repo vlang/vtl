@@ -48,7 +48,8 @@ fn main() {
 		amplitude := 0.5 + rand.f64() * 0.5
 		for d in 0 .. input_dim {
 			phase := f64(phase_idx) * math.pi / f64(n_phases)
-			x_data[i * input_dim + d] = amplitude * math.sin(phase + f64(d) * math.pi / f64(input_dim))
+			x_data[i * input_dim + d] = amplitude * math.sin(phase +
+				f64(d) * math.pi / f64(input_dim))
 		}
 	}
 

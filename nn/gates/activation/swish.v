@@ -10,7 +10,9 @@ pub:
 }
 
 pub fn swish_gate[T](cache &vtl.Tensor[T]) &SwishGate[T] {
-	return &SwishGate[T]{cache: cache}
+	return &SwishGate[T]{
+		cache: cache
+	}
 }
 
 pub fn (g &SwishGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {

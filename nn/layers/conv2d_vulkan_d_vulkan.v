@@ -9,13 +9,11 @@ import vtl.storage
 // weight: [out_ch, in_ch, k_h, k_w]
 // bias: [out_ch] or [1, out_ch]
 // Returns: [batch, out_ch, out_H, out_W]
-pub fn conv2d_forward_vulkan[T](
-	input       &vtl.Tensor[T],
-	weight      &vtl.Tensor[T],
-	bias        &vtl.Tensor[T],
+pub fn conv2d_forward_vulkan[T](input &vtl.Tensor[T],
+	weight &vtl.Tensor[T],
+	bias &vtl.Tensor[T],
 	kernel_size []int,
-	config      Conv2DConfig
-) !&vtl.Tensor[T] {
+	config Conv2DConfig) !&vtl.Tensor[T] {
 	// Only f32 supported for now (Vulkan GEMM is f32 native)
 	$if T !is f32 {
 		return error('conv2d_forward_vulkan: only f32 supported')
@@ -41,7 +39,9 @@ pub fn conv2d_forward_vulkan[T](
 	out_w := (in_w + 2 * pad_w - dil_w * (k_w - 1) - 1) / stride_w + 1
 
 	// Create Vulkan device
-	mut dev := vulkan.new_device() or { return error('conv2d_forward_vulkan: no Vulkan device available') }
+	mut dev := vulkan.new_device() or {
+		return error('conv2d_forward_vulkan: no Vulkan device available')
+	}
 	defer { dev.release() }
 
 	// Allocate GPU buffers
@@ -54,7 +54,9 @@ pub fn conv2d_forward_vulkan[T](
 	mut input_bytes := []u8{len: int(input_size * 4)}
 	for i in 0 .. int(input_size) {
 		val := f32(input.get_nth(i))
-		unsafe { *(&f32(&input_bytes[i * 4])) = val }
+		unsafe {
+			*(&f32(&input_bytes[i * 4])) = val
+		}
 	}
 	mut input_buf := dev.buffer(vulkan.DeviceSize(input_size * 4))!
 	defer { input_buf.release() }
@@ -62,8 +64,8 @@ pub fn conv2d_forward_vulkan[T](
 
 	// Im2col transform on GPU: input → im2col_buf
 	// Result shape: [batch * out_h * out_w, in_ch * k_h * k_w]
-	vulkan.im2col(dev, im2col_buf, input_buf, batch, in_ch, in_h, in_w, k_h, k_w,
-		out_h, out_w, pad_h, pad_w, stride_h, stride_w, dil_h, dil_w)!
+	vulkan.im2col(dev, im2col_buf, input_buf, batch, in_ch, in_h, in_w, k_h, k_w, out_h, out_w,
+		pad_h, pad_w, stride_h, stride_w, dil_h, dil_w)!
 
 	// Prepare weight matrix: [out_ch, in_ch, k_h, k_w] → [out_ch, in_ch*k_h*k_w]
 	// Then transpose to [in_ch*k_h*k_w, out_ch] for GEMM B^T layout
@@ -78,7 +80,9 @@ pub fn conv2d_forward_vulkan[T](
 	}
 	mut weight_bytes := []u8{len: weight_t_data.len * 4}
 	for i, val in weight_t_data {
-		unsafe { *(&f32(&weight_bytes[i * 4])) = val }
+		unsafe {
+			*(&f32(&weight_bytes[i * 4])) = val
+		}
 	}
 	mut weight_buf := dev.buffer(vulkan.DeviceSize(weight_bytes.len))!
 	defer { weight_buf.release() }
@@ -102,7 +106,9 @@ pub fn conv2d_forward_vulkan[T](
 	gemm_out_buf.store(mut result_bytes)!
 	mut result_data := []T{len: int(m * n)}
 	for i in 0 .. int(m * n) {
-		unsafe { result_data[i] = T(*(&f32(&result_bytes[i * 4]))) }
+		unsafe {
+			result_data[i] = T(*(&f32(&result_bytes[i * 4])))
+		}
 	}
 
 	// Add bias: [batch*out_h*out_w, out_ch] + [1, out_ch]

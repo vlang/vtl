@@ -3,7 +3,6 @@ module autograd
 // GPU-accelerated MatMul backward gate.
 // dA = grad_out @ B^T via d_gemm_da kernel
 // dB = A^T @ grad_out via d_gemm_db kernel
-
 import vtl
 import vtl.la
 import storage
@@ -11,13 +10,17 @@ import vsl.vulkan
 
 pub struct MatMulGateVulkan[T] {
 pub:
-	a      &Variable[T]              = unsafe { nil }
-	b      &Variable[T]              = unsafe { nil }
+	a      &Variable[T] = unsafe { nil }
+	b      &Variable[T] = unsafe { nil }
 	params storage.VulkanStorageParams
 }
 
 pub fn matmul_gate_vulkan[T](a &Variable[T], b &Variable[T], params storage.VulkanStorageParams) &MatMulGateVulkan[T] {
-	return &MatMulGateVulkan[T]{a: a, b: b, params: params}
+	return &MatMulGateVulkan[T]{
+		a:      a
+		b:      b
+		params: params
+	}
 }
 
 pub fn (g &MatMulGateVulkan[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
@@ -54,7 +57,9 @@ pub fn (g &MatMulGateVulkan[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[
 		raw_da = da_buf.store(mut raw_da)!
 		mut vals_da := []T{len: int(u64(m) * u64(k))}
 		for i in 0 .. vals_da.len {
-			unsafe { vals_da[i] = T(*(&f32(&raw_da[i * 4]))) }
+			unsafe {
+				vals_da[i] = T(*(&f32(&raw_da[i * 4])))
+			}
 		}
 		r0 := vtl.from_array[T](vals_da, [int(m), int(k)], vtl.TensorData{ memory: .row_major })!
 		// Read back dB
@@ -62,7 +67,9 @@ pub fn (g &MatMulGateVulkan[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[
 		raw_db = db_buf.store(mut raw_db)!
 		mut vals_db := []T{len: int(u64(k) * u64(n))}
 		for i in 0 .. vals_db.len {
-			unsafe { vals_db[i] = T(*(&f32(&raw_db[i * 4]))) }
+			unsafe {
+				vals_db[i] = T(*(&f32(&raw_db[i * 4])))
+			}
 		}
 		r1 := vtl.from_array[T](vals_db, [int(k), int(n)], vtl.TensorData{ memory: .row_major })!
 		return [r0, r1]

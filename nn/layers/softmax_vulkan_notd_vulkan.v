@@ -2,7 +2,6 @@ module layers
 
 // Stub implementations for non-Vulkan builds.
 // The real implementations live in softmax_vulkan_d_vulkan.v
-
 import vtl
 import storage
 

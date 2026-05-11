@@ -22,4 +22,3 @@ pub fn norm[T](t &vtl.Tensor[T], ord string) !&vtl.Tensor[f64] {
 	mat := vsl_la.Matrix.raw(m, n, tensor_to_f64_array[T](t))
 	return vtl.from_1d([vsl_la.norm(mat, ord)])
 }
-

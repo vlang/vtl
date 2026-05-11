@@ -3,7 +3,6 @@ module autograd
 // GPU-accelerated backward gates for reduction operations (Sum, Mean).
 // Uses broadcast_grad VSL kernel to expand gradient from reduced shape
 // back to the original input shape.
-
 import vtl
 import storage
 import vsl.vulkan
@@ -18,7 +17,11 @@ pub:
 }
 
 pub fn sum_gate_vulkan[T](shape []int, axis int, params storage.VulkanStorageParams) &SumGateVulkan[T] {
-	return &SumGateVulkan[T]{shape: shape, axis: axis, params: params}
+	return &SumGateVulkan[T]{
+		shape:  shape
+		axis:   axis
+		params: params
+	}
 }
 
 pub fn (g &SumGateVulkan[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
@@ -26,7 +29,9 @@ pub fn (g &SumGateVulkan[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] 
 	$if T is f32 {
 		dev := g.params.device
 		// Total elements in the original input
-		total := g.shape.reduce(fn (a int, b int) int { return a * b }, 1)
+		total := g.shape.reduce(fn (a int, b int) int {
+			return a * b
+		}, 1)
 		// Number of elements in the gradient (reduced dimension)
 		n_grad := gradient.size
 		size_in := vulkan.DeviceSize(u64(total) * 4)
@@ -40,7 +45,9 @@ pub fn (g &SumGateVulkan[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] 
 		raw = in_buf.store(mut raw)!
 		mut vals := []T{len: total}
 		for i in 0 .. total {
-			unsafe { vals[i] = T(*(&f32(&raw[i * 4]))) }
+			unsafe {
+				vals[i] = T(*(&f32(&raw[i * 4])))
+			}
 		}
 		r0 := vtl.from_array[T](vals, g.shape, vtl.TensorData{ memory: .row_major })!
 		return [r0]
@@ -67,21 +74,28 @@ pub fn (g &SumGateVulkan[T]) cache[T](mut result Variable[T], args ...CacheParam
 // MeanGateVulkan: backward expands and scales by 1/num_elems.
 pub struct MeanGateVulkan[T] {
 pub:
-	shape      []int
-	axis       int
+	shape     []int
+	axis      int
 	num_elems int
-	params     storage.VulkanStorageParams
+	params    storage.VulkanStorageParams
 }
 
 pub fn mean_gate_vulkan[T](shape []int, axis int, num_elems int, params storage.VulkanStorageParams) &MeanGateVulkan[T] {
-	return &MeanGateVulkan[T]{shape: shape, axis: axis, num_elems: num_elems, params: params}
+	return &MeanGateVulkan[T]{
+		shape:     shape
+		axis:      axis
+		num_elems: num_elems
+		params:    params
+	}
 }
 
 pub fn (g &MeanGateVulkan[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	$if T is f32 {
 		dev := g.params.device
-		total := g.shape.reduce(fn (a int, b int) int { return a * b }, 1)
+		total := g.shape.reduce(fn (a int, b int) int {
+			return a * b
+		}, 1)
 		n_grad := gradient.size
 		size_in := vulkan.DeviceSize(u64(total) * 4)
 		vk_grad := gradient.vulkan(g.params)!
@@ -94,7 +108,9 @@ pub fn (g &MeanGateVulkan[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T]
 		raw = in_buf.store(mut raw)!
 		mut vals := []T{len: total}
 		for i in 0 .. total {
-			unsafe { vals[i] = T(*(&f32(&raw[i * 4]))) }
+			unsafe {
+				vals[i] = T(*(&f32(&raw[i * 4])))
+			}
 		}
 		r0 := vtl.from_array[T](vals, g.shape, vtl.TensorData{ memory: .row_major })!
 		return [r0]

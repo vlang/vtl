@@ -10,7 +10,7 @@ All optimizers also support learning rate schedulers — see the last section be
 
 ## Adam
 
-```v
+```v ignore
 import vtl
 import vtl.autograd as ag
 import vtl.nn.layers
@@ -34,7 +34,7 @@ target_vals := vtl.zeros[f64]([64, 10])
 
 mut x := ctx.variable(input_vals)
 for layer in model_layers {
-    x = layer.forward(x)!
+	x = layer.forward(x)!
 }
 mut y_target := ctx.variable(target_vals)
 
@@ -58,7 +58,7 @@ Config options:
 AdamW is Adam with decoupled weight decay — typically gives better
 regularisation than Adam with L2 penalty.
 
-```v
+```v ignore
 import vtl.nn.optimizers
 
 mut opt := optimizers.adamw[f64](learning_rate: 0.001, weight_decay: 0.01)
@@ -69,7 +69,7 @@ Config options (same as Adam, plus `weight_decay` with default `0.01`).
 
 ## RMSProp
 
-```v
+```v ignore
 import vtl.nn.optimizers
 
 mut opt := optimizers.rmsprop[f64](learning_rate: 0.001, alpha: 0.99)
@@ -85,7 +85,7 @@ opt.build_params(model_layers)
 
 ## AdaGrad
 
-```v
+```v ignore
 import vtl.nn.optimizers
 
 mut opt := optimizers.adagrad[f64](learning_rate: 0.01)
@@ -105,7 +105,7 @@ frequently updated parameters. Good for sparse gradients.
 
 Vanilla Stochastic Gradient Descent:
 
-```v
+```v ignore
 import vtl.nn.optimizers
 
 mut opt := optimizers.sgd[f64](learning_rate: 0.01)
@@ -117,7 +117,7 @@ opt.build_params(model_layers)
 Schedulers adjust the learning rate during training. Create a scheduler,
 then pass the current step and (optionally) a metric delta to `next_lr()`:
 
-```v
+```v ignore
 import vtl.nn.optimizers
 
 // StepLR: reduce LR by gamma every step_size steps
@@ -134,16 +134,16 @@ mut scheduler4 := optimizers.reduce_lr_on_plateau[f64](patience: 10, factor: 0.1
 
 // Inside the training loop:
 for step in 0 .. 100 {
-    opt.update()!
-    current_lr := scheduler.next_lr(0.001, step)
-    // or for ReduceLROnPlateau:
-    // current_lr := scheduler4.next_lr(0.001, step, metric_delta: val_loss - prev_loss)
+	opt.update()!
+	current_lr := scheduler.next_lr(0.001, step)
+	// or for ReduceLROnPlateau:
+	// current_lr := scheduler4.next_lr(0.001, step, metric_delta: val_loss - prev_loss)
 }
 ```
 
 ## Complete Training Loop Example
 
-```v
+```v ignore
 import vtl
 import vtl.autograd as ag
 import vtl.nn.layers
@@ -153,9 +153,9 @@ import vtl.nn.optimizers
 mut ctx := ag.ctx[f64]()
 
 model_layers := [
-    layers.Layer[f64](layers.linear_layer[f64](ctx, 784, 256)),
-    layers.Layer[f64](layers.relu_layer[f64](ctx)),
-    layers.Layer[f64](layers.linear_layer[f64](ctx, 256, 10)),
+	layers.Layer[f64](layers.linear_layer[f64](ctx, 784, 256)),
+	layers.Layer[f64](layers.relu_layer[f64](ctx)),
+	layers.Layer[f64](layers.linear_layer[f64](ctx, 256, 10)),
 ]
 
 mut opt := optimizers.adam_optimizer[f64](learning_rate: 0.001)
@@ -164,22 +164,22 @@ opt.build_params(model_layers)
 mut scheduler := optimizers.step_lr[f64](step_size: 30, gamma: 0.1)
 
 for epoch in 0 .. 10 {
-    // Replace with real data batches
-    input_batch := vtl.zeros[f64]([64, 784])
-    target_batch := vtl.zeros[f64]([64, 10])
+	// Replace with real data batches
+	input_batch := vtl.zeros[f64]([64, 784])
+	target_batch := vtl.zeros[f64]([64, 10])
 
-    mut x := ctx.variable(input_batch)
-    for layer in model_layers {
-        x = layer.forward(x)!
-    }
-    mut target := ctx.variable(target_batch)
+	mut x := ctx.variable(input_batch)
+	for layer in model_layers {
+		x = layer.forward(x)!
+	}
+	mut target := ctx.variable(target_batch)
 
-    l := loss.mse_loss[f64]()
-    mut loss_val := l.loss(x, target_batch)!
-    loss_val.backward()!
-    opt.update()!
+	l := loss.mse_loss[f64]()
+	mut loss_val := l.loss(x, target_batch)!
+	loss_val.backward()!
+	opt.update()!
 
-    current_lr := scheduler.next_lr(0.001, epoch)
-    println('Epoch ${epoch}: lr = ${current_lr}')
+	current_lr := scheduler.next_lr(0.001, epoch)
+	println('Epoch ${epoch}: lr = ${current_lr}')
 }
 ```

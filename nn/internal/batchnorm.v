@@ -12,7 +12,9 @@ pub fn batchnorm1d_forward[T](input &vtl.Tensor[T], gamma &vtl.Tensor[T], beta &
 	centered := input.map(fn [running_mean] [T](val T, i []int) T {
 		return val - running_mean.get([0, i[1]])
 	})
-	normalized := centered.nmap([std], fn [T](vals []T, i []int) T { return vals[0] * vals[1] })!
+	normalized := centered.nmap([std], fn [T](vals []T, i []int) T {
+		return vals[0] * vals[1]
+	})!
 	output := normalized.nmap([gamma, beta], fn [T](vals []T, i []int) T {
 		return vals[0] * vals[1] + vals[2]
 	})!
@@ -52,8 +54,10 @@ pub fn batchnorm1d_training[T](input &vtl.Tensor[T], gamma &vtl.Tensor[T], beta 
 	mut output_data := []f64{len: batch_size * num_features}
 	for n in 0 .. batch_size {
 		for c in 0 .. num_features {
-			normalized := (f64(input.get([n, c])) - batch_mean_data[c]) / math.sqrt(batch_var_data[c] + eps)
-			output_data[n * num_features + c] = f64(gamma.get([0, c])) * normalized + f64(beta.get([0, c]))
+			normalized := (f64(input.get([n, c])) - batch_mean_data[c]) / math.sqrt(
+				batch_var_data[c] + eps)
+			output_data[n * num_features + c] = f64(gamma.get([0, c])) * normalized +
+				f64(beta.get([0, c]))
 		}
 	}
 	output := vtl.from_array(output_data.map(vtl.cast[T](it)), [batch_size, num_features])!
@@ -86,7 +90,10 @@ pub fn batchnorm1d_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], ga
 	mut dx_data := []f64{len: batch_size * num_features}
 	for n in 0 .. batch_size {
 		for c in 0 .. num_features {
-			dx_data[n * num_features + c] = f64(gamma.get([0, c])) * (f64(gradient.get([n, c])) - grad_mean_data[c]) / std_data[c]
+			dx_data[n * num_features + c] = f64(gamma.get([0, c])) * (f64(gradient.get([
+				n,
+				c,
+			])) - grad_mean_data[c]) / std_data[c]
 		}
 	}
 	dx := vtl.from_array(dx_data.map(vtl.cast[T](it)), [batch_size, num_features])!

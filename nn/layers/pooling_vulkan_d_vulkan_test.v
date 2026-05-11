@@ -18,10 +18,22 @@ fn test_avgpool2d_forward_vulkan() {
 	// Output should be 1×1×2×2
 	input_data := [
 		// Channel 0:
-		f32(1), 2, 3, 4,
-		f32(5), 6, 7, 8,
-		f32(9), 10, 11, 12,
-		f32(13), 14, 15, 16,
+		f32(1),
+		2,
+		3,
+		4,
+		f32(5),
+		6,
+		7,
+		8,
+		f32(9),
+		10,
+		11,
+		12,
+		f32(13),
+		14,
+		15,
+		16,
 	]
 
 	input := vtl.from_1d[f32](input_data, vtl.TensorData{})!
@@ -63,13 +75,25 @@ fn test_global_avgpool2d_forward_vulkan() {
 	// Test: 2×2×2×2 input (batch=2, channels=2, height=2, width=2)
 	input_data := [
 		// batch 0, channel 0: [1,2,3,4] → avg = 2.5
-		f32(1), 2, 3, 4,
+		f32(1),
+		2,
+		3,
+		4,
 		// batch 0, channel 1: [5,6,7,8] → avg = 6.5
-		f32(5), 6, 7, 8,
+		f32(5),
+		6,
+		7,
+		8,
 		// batch 1, channel 0: [9,10,11,12] → avg = 10.5
-		f32(9), 10, 11, 12,
+		f32(9),
+		10,
+		11,
+		12,
 		// batch 1, channel 1: [13,14,15,16] → avg = 14.5
-		f32(13), 14, 15, 16,
+		f32(13),
+		14,
+		15,
+		16,
 	]
 
 	input := vtl.from_1d[f32](input_data, vtl.TensorData{})!

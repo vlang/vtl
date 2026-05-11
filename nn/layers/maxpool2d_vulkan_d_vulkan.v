@@ -37,17 +37,16 @@ pub fn maxpool2d_forward_vulkan[T](input &vtl.Tensor[T], kernel_size [2]int, str
 
 	mut input_bytes := []u8{len: int(input_size)}
 	for i := 0; i < int(batch * channels * in_h * in_w); i++ {
-		val := f32(input.get([i / int(channels * in_h * in_w),
-			(i / int(in_h * in_w)) % int(channels),
-			(i / int(in_w)) % int(in_h),
-			i % int(in_w)]))
+		val := f32(input.get([i / int(channels * in_h * in_w), (i / int(in_h * in_w)) % int(channels),
+			(i / int(in_w)) % int(in_h), i % int(in_w)]))
 		unsafe {
 			*(&f32(&input_bytes[i * 4])) = val
 		}
 	}
 	input_buf.load(input_bytes)!
 
-	vulkan.maxpool2d(dev, output_buf, input_buf, batch, channels, in_h, in_w, k_h, k_w, out_h, out_w, pad_h, pad_w, stride_h, stride_w)!
+	vulkan.maxpool2d(dev, output_buf, input_buf, batch, channels, in_h, in_w, k_h, k_w, out_h,
+		out_w, pad_h, pad_w, stride_h, stride_w)!
 
 	mut output_bytes := []u8{len: int(output_size)}
 	output_bytes = output_buf.store(mut output_bytes)!
@@ -68,5 +67,6 @@ pub fn (layer &MaxPool2DLayerVulkan[T]) forward(input &vtl.Tensor[T]) !&vtl.Tens
 	if layer.device == unsafe { nil } {
 		return error('MaxPool2DLayerVulkan: device is nil')
 	}
-	return maxpool2d_forward_vulkan[T](input, layer.kernel_size, layer.stride, layer.padding, layer.device)!
+	return maxpool2d_forward_vulkan[T](input, layer.kernel_size, layer.stride, layer.padding,
+		layer.device)!
 }

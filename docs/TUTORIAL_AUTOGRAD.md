@@ -15,7 +15,7 @@ with respect to any input tensor without writing derivative formulas by hand.
 
 ## Creating variables
 
-```v
+```v ignore
 import vtl
 import vtl.autograd
 
@@ -67,7 +67,7 @@ VTL provides differentiable unary element-wise operations via `Variable` methods
 | `.tanh_op[T]()!` | `tanh(x)` | `grad * (1 - tanh²(x))` |
 | `.clamp[T](min, max)!` | `clamp(x, min, max)` | `grad` where min < x < max, else 0 |
 
-```v
+```v ignore
 import vtl
 import vtl.autograd as ag
 
@@ -91,7 +91,7 @@ y3.backprop()!
 
 Reduction operations on `Variable`:
 
-```v
+```v ignore
 import vtl
 import vtl.autograd as ag
 

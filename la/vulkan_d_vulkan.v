@@ -32,10 +32,10 @@ pub fn matmul_vulkan[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	// Convert A and B to f32 and upload
 	a_f32 := a.to_f32()
 	b_f32 := b.to_f32()
-	
+
 	mut a_bytes := []u8{len: int(a.size() * 4)}
 	mut b_bytes := []u8{len: int(b.size() * 4)}
-	
+
 	for i in 0 .. a_f32.len {
 		val := a_f32[i]
 		unsafe {
@@ -48,7 +48,7 @@ pub fn matmul_vulkan[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
 			*(&f32(&b_bytes[i * 4])) = val
 		}
 	}
-	
+
 	a_buf.load(a_bytes)!
 	b_buf.load(b_bytes)!
 
@@ -58,7 +58,7 @@ pub fn matmul_vulkan[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	// Download result
 	mut c_bytes := []u8{len: int(m * n * 4)}
 	c_buf.store(mut c_bytes)!
-	
+
 	// Convert bytes back to f32 then to T
 	mut c_f32 := []f32{len: int(m * n)}
 	for i in 0 .. int(m * n) {
@@ -66,10 +66,10 @@ pub fn matmul_vulkan[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
 			c_f32[i] = *(&f32(&c_bytes[i * 4]))
 		}
 	}
-	
+
 	// Convert f32 to T
 	c_data := c_f32.map(vtl.cast[T](it))
-	
+
 	// Return as tensor with correct shape
 	mut c_tensor := vtl.from_1d[T](c_data, vtl.TensorData{}) or { return err }
 	return c_tensor.reshape([int(m), int(n)])!

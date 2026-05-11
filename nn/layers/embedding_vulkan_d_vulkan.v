@@ -18,9 +18,7 @@ pub fn embedding_forward_vulkan[T](input &vtl.Tensor[T], weight &vtl.Tensor[T]) 
 	embed_dim := u32(weight.shape[1])
 	num_indices := u32(batch * seq_len)
 
-	mut dev := vulkan.new_device() or {
-		return embedding_forward_cpu[T](input, weight)
-	}
+	mut dev := vulkan.new_device() or { return embedding_forward_cpu[T](input, weight) }
 	defer { dev.release() or {} }
 
 	// Upload flat indices as u32
@@ -29,7 +27,9 @@ pub fn embedding_forward_vulkan[T](input &vtl.Tensor[T], weight &vtl.Tensor[T]) 
 		b := i / seq_len
 		s := i % seq_len
 		val := u32(input.get([b, s]))
-		unsafe { *(&u32(&idx_bytes[i * 4])) = val }
+		unsafe {
+			*(&u32(&idx_bytes[i * 4])) = val
+		}
 	}
 	mut idx_buf := dev.buffer(vulkan.DeviceSize(u64(num_indices) * 4))!
 	defer { idx_buf.release() }
@@ -42,7 +42,9 @@ pub fn embedding_forward_vulkan[T](input &vtl.Tensor[T], weight &vtl.Tensor[T]) 
 		r := i / int(embed_dim)
 		c := i % int(embed_dim)
 		val := f32(weight.get([r, c]))
-		unsafe { *(&f32(&table_bytes[i * 4])) = val }
+		unsafe {
+			*(&f32(&table_bytes[i * 4])) = val
+		}
 	}
 	mut table_buf := dev.buffer(vulkan.DeviceSize(u64(table_size) * 4))!
 	defer { table_buf.release() }
@@ -59,7 +61,9 @@ pub fn embedding_forward_vulkan[T](input &vtl.Tensor[T], weight &vtl.Tensor[T]) 
 
 	mut result_data := []T{len: int(num_indices * embed_dim)}
 	for i in 0 .. result_data.len {
-		unsafe { result_data[i] = T(*(&f32(&raw[i * 4]))) }
+		unsafe {
+			result_data[i] = T(*(&f32(&raw[i * 4])))
+		}
 	}
 
 	mut t := vtl.from_1d[T](result_data, vtl.TensorData{})!
