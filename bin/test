@@ -12,6 +12,7 @@
 ##         --use-cblas                       Execute tests using cblas
 ##         --use-autofree                    Execute tests using atofree
 ##         --use-gc=STRATEGY                 Execute tests using garbage collector
+##         --use-vulkan                      Execute tests using Vulkan compute
 ##
 
 set -e
@@ -30,6 +31,11 @@ flags=""
 if [[ -n "${use_cblas}" ]]; then
     echo "Running tests using Open BLAS"
     flags="${flags} -d cblas"
+fi
+
+if [[ -n "${use_vulkan}" ]]; then
+    echo "Running tests using Vulkan compute"
+    flags="${flags} -d vulkan"
 fi
 
 if [[ -n "${use_autofree}" ]]; then
