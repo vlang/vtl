@@ -12,7 +12,9 @@ pub:
 
 // new_vulkan_params creates a VulkanStorageParams with the given device.
 pub fn new_vulkan_params(dev &vulkan.Device) VulkanStorageParams {
-	return VulkanStorageParams{ device: dev }
+	return VulkanStorageParams{
+		device: dev
+	}
 }
 
 // VulkanStorage wraps a Vulkan GPU buffer as a VTL storage backend.
@@ -59,7 +61,9 @@ pub fn (s &VulkanStorage[T]) cpu() !&CpuStorage[T] {
 @[inline]
 pub fn (s &VulkanStorage[T]) to_array[T]() ![]T {
 	mut bytes := []u8{len: int(s.data.size)}
-	bytes = s.data.store(mut bytes) or { return error('VulkanStorage.to_array: store failed: ${err}') }
+	bytes = s.data.store(mut bytes) or {
+		return error('VulkanStorage.to_array: store failed: ${err}')
+	}
 	mut result := []T{len: s.nelems}
 	unsafe { C.memcpy(result.data, bytes.data, bytes.len) }
 	return result

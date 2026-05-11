@@ -10,7 +10,9 @@ pub:
 }
 
 pub fn tanh_gate[T](cache &vtl.Tensor[T]) &TanhGate[T] {
-	return &TanhGate[T]{cache: cache}
+	return &TanhGate[T]{
+		cache: cache
+	}
 }
 
 pub fn (g &TanhGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {

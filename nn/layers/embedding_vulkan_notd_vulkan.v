@@ -1,7 +1,6 @@
 module layers
 
 // Stub for non-Vulkan builds — embedding_forward_vulkan falls through to CPU.
-
 import vtl
 
 pub fn embedding_forward_vulkan[T](input &vtl.Tensor[T], weight &vtl.Tensor[T]) !&vtl.Tensor[T] {

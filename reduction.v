@@ -298,6 +298,7 @@ pub fn (t &Tensor[T]) argmax[T](axis int) !&Tensor[int] {
 pub fn (t &Tensor[T]) argmin[T](axis int) !&Tensor[int] {
 	return t.argmin_axis(axis)
 }
+
 // cumsum returns the cumulative sum along the given axis.
 // Only meaningful for numeric types; bool and string follow their respective + semantics.
 @[inline]

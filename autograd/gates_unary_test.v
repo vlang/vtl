@@ -13,8 +13,8 @@ fn test_log_forward_backward() {
 	assert diff * diff < 1e-10
 	// backward: d/dx log(x) = 1/x
 	f.backprop()!
-	assert x.grad.get_nth(0) == f64(1)  // 1/1
-	half_diff := x.grad.get_nth(1) - 0.5  // 1/2
+	assert x.grad.get_nth(0) == f64(1) // 1/1
+	half_diff := x.grad.get_nth(1) - 0.5 // 1/2
 	assert half_diff * half_diff < 1e-10
 }
 
@@ -27,8 +27,8 @@ fn test_abs_forward_backward() {
 	assert f.value.get_nth(1) == f64(4)
 	// backward: sign(x)
 	f.backprop()!
-	assert x.grad.get_nth(0) < 0  // sign(-3) = -1
-	assert x.grad.get_nth(1) > 0  // sign(4) = 1
+	assert x.grad.get_nth(0) < 0 // sign(-3) = -1
+	assert x.grad.get_nth(1) > 0 // sign(4) = 1
 }
 
 fn test_sqrt_forward_backward() {
@@ -66,7 +66,7 @@ fn test_clamp_forward_backward() {
 	assert f.value.get_nth(2) == f64(1)
 	// backward: gradient passes through where within bounds, else 0
 	f.backprop()!
-	assert x.grad.get_nth(0) == f64(0)   // clamped, no grad
-	assert x.grad.get_nth(1) == f64(1)   // within bounds
-	assert x.grad.get_nth(2) == f64(0)   // clamped, no grad
+	assert x.grad.get_nth(0) == f64(0) // clamped, no grad
+	assert x.grad.get_nth(1) == f64(1) // within bounds
+	assert x.grad.get_nth(2) == f64(0) // clamped, no grad
 }

@@ -28,7 +28,9 @@ pub fn batchnorm1d_forward_vulkan[T](input &vtl.Tensor[T], eps f32, dev &vulkan.
 		row := idx / int(c)
 		col := idx % int(c)
 		val := f32(input.get([row, col]))
-		unsafe { *(&f32(&src_bytes[idx * 4])) = val }
+		unsafe {
+			*(&f32(&src_bytes[idx * 4])) = val
+		}
 	}
 
 	mut src_buf := dev.buffer(vulkan.DeviceSize(u64(total) * 4))!
@@ -45,7 +47,9 @@ pub fn batchnorm1d_forward_vulkan[T](input &vtl.Tensor[T], eps f32, dev &vulkan.
 
 	mut vals := []T{len: total}
 	for idx in 0 .. total {
-		unsafe { vals[idx] = T(*(&f32(&raw[idx * 4]))) }
+		unsafe {
+			vals[idx] = T(*(&f32(&raw[idx * 4])))
+		}
 	}
 
 	out := vtl.from_1d[T](vals, vtl.TensorData{})!

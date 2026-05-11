@@ -132,7 +132,11 @@ pub fn (mut ls SequentialInfo[T]) mish() {
 // conv2d adds a new Conv2D layer to the network.
 pub fn (mut ls SequentialInfo[T]) conv2d(in_channels int, out_channels int, kernel_size []int, config layers.Conv2DConfig) {
 	prev_layer := ls.layers[ls.layers.len - 1]
-	in_ch := if prev_layer.output_shape()[0] > 0 { prev_layer.output_shape()[0] } else { in_channels }
+	in_ch := if prev_layer.output_shape()[0] > 0 {
+		prev_layer.output_shape()[0]
+	} else {
+		in_channels
+	}
 	ls.layers << layers.conv2d_layer[T](ls.ctx, in_ch, out_channels, kernel_size, config)
 }
 

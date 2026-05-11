@@ -6,7 +6,6 @@ module main
 // Network: input(1) → linear(16) → relu → linear(1) → mse_loss
 // The model learns to map a scalar x to sin(x) without any explicit
 // knowledge of the sine function — only from (x, y) training pairs.
-
 import math
 import vtl
 import vtl.autograd

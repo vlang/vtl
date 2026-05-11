@@ -2,7 +2,6 @@ module optimizers
 
 // GPU-accelerated SGD optimizer step using VSL vector_add and scale kernels.
 // Compiles only with -d vulkan.
-
 import vtl
 import vtl.autograd
 import storage

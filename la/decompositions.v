@@ -258,4 +258,3 @@ pub fn matrix_rank[T](a &vtl.Tensor[T], tol f64) !int {
 	safe_tol := if tol > 0 { tol } else { 1e-8 }
 	return vsl_la.rank(a_mat, safe_tol)
 }
-

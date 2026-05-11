@@ -14,10 +14,22 @@ fn test_maxpool2d_forward_vulkan_basic() {
 
 	// 1×1×4×4 input
 	input_data := [
-		f32(1), 2, 3, 4,
-		f32(5), 6, 7, 8,
-		f32(9), 10, 11, 12,
-		f32(13), 14, 15, 16,
+		f32(1),
+		2,
+		3,
+		4,
+		f32(5),
+		6,
+		7,
+		8,
+		f32(9),
+		10,
+		11,
+		12,
+		f32(13),
+		14,
+		15,
+		16,
 	]
 	input := vtl.from_1d[f32](input_data, vtl.TensorData{})!.reshape([1, 1, 4, 4])!
 

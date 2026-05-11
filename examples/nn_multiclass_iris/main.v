@@ -18,7 +18,6 @@ module main
 //   - batch_size:     6    (each batch sees all 3 classes twice)
 //   - epochs:       500    (small dataset benefits from many passes)
 //   - rand seed:    42     (fixed for reproducibility, as in Arraymancer)
-
 import math
 import rand
 import vtl

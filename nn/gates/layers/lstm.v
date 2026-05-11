@@ -6,27 +6,30 @@ import vtl.autograd
 // LSTMGate implements the forward pass of LSTM with full gradients.
 // This is a basic implementation; for production use an optimized version.
 pub struct LSTMGate[T] {
-	input_ &vtl.Tensor[T] = unsafe { nil }
+	input_  &vtl.Tensor[T] = unsafe { nil }
 	hidden_ &vtl.Tensor[T] = unsafe { nil }
 	cell_   &vtl.Tensor[T] = unsafe { nil }
-	w_ih   &vtl.Tensor[T] = unsafe { nil }
-	w_hh   &vtl.Tensor[T] = unsafe { nil }
-	b_ih   &vtl.Tensor[T] = unsafe { nil }
-	b_hh   &vtl.Tensor[T] = unsafe { nil }
+	w_ih    &vtl.Tensor[T] = unsafe { nil }
+	w_hh    &vtl.Tensor[T] = unsafe { nil }
+	b_ih    &vtl.Tensor[T] = unsafe { nil }
+	b_hh    &vtl.Tensor[T] = unsafe { nil }
 }
 
-pub fn lstm_gate[T](
-	input_ &vtl.Tensor[T],
+pub fn lstm_gate[T](input_ &vtl.Tensor[T],
 	hidden_ &vtl.Tensor[T],
 	cell_ &vtl.Tensor[T],
 	w_ih &vtl.Tensor[T],
 	w_hh &vtl.Tensor[T],
 	b_ih &vtl.Tensor[T],
-	b_hh &vtl.Tensor[T],
-) &LSTMGate[T] {
+	b_hh &vtl.Tensor[T]) &LSTMGate[T] {
 	return &LSTMGate[T]{
-		input_: input_, hidden_: hidden_, cell_: cell_
-		w_ih: w_ih, w_hh: w_hh, b_ih: b_ih, b_hh: b_hh
+		input_:  input_
+		hidden_: hidden_
+		cell_:   cell_
+		w_ih:    w_ih
+		w_hh:    w_hh
+		b_ih:    b_ih
+		b_hh:    b_hh
 	}
 }
 

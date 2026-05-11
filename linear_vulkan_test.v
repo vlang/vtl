@@ -28,7 +28,7 @@ fn test_linear_forward_vulkan_f32() {
 	// + b = [[1,2]]  broadcasted row-wise
 	// = [[20,24],[44,52]]
 	expected := [f32(20.0), 24.0, 44.0, 52.0]
-	for i in 0..4 {
+	for i in 0 .. 4 {
 		assert approx_eq_f32(out.data.data[i], expected[i], f32(0.1))
 	}
 	println('  PASS: linear_forward_vulkan f32 result=${out.data.data}')
@@ -45,7 +45,7 @@ fn test_linear_forward_vulkan_f64() {
 	// f64 uses compute bridge (f64->f32 GPU->f64), results may have
 	// small rounding differences from pure CPU. Use wider tolerance.
 	expected := [f64(20.0), 24.0, 44.0, 52.0]
-	for i in 0..4 {
+	for i in 0 .. 4 {
 		assert approx_eq_f64(out.data.data[i], expected[i], 1.0)
 	}
 	println('  PASS: linear_forward_vulkan f64 result=${out.data.data}')
@@ -57,7 +57,7 @@ fn test_relu_forward_vulkan_f32() {
 	out := layers.relu_forward_vulkan[f32](x, params) or { panic(err) }
 
 	expected := [f32(0.0), 0.0, 0.0, 1.0, 2.0]
-	for i in 0..5 {
+	for i in 0 .. 5 {
 		assert approx_eq_f32(out.data.data[i], expected[i], f32(0.001))
 	}
 	println('  PASS: relu_forward_vulkan f32')
@@ -69,7 +69,7 @@ fn test_relu_forward_vulkan_f64() {
 	out := layers.relu_forward_vulkan[f64](x, params) or { panic(err) }
 
 	expected := [f64(0.0), 0.0, 0.0, 1.0, 2.0]
-	for i in 0..5 {
+	for i in 0 .. 5 {
 		assert approx_eq_f64(out.data.data[i], expected[i], 0.001)
 	}
 	println('  PASS: relu_forward_vulkan f64')
@@ -81,7 +81,7 @@ fn test_sigmoid_forward_vulkan_f32() {
 	out := layers.sigmoid_forward_vulkan[f32](x, params) or { panic(err) }
 
 	expected := [f32(0.5), f32(0.7310586), f32(0.2689414)]
-	for i in 0..3 {
+	for i in 0 .. 3 {
 		assert approx_eq_f32(out.data.data[i], expected[i], f32(0.01))
 	}
 	println('  PASS: sigmoid_forward_vulkan f32')
@@ -93,7 +93,7 @@ fn test_sigmoid_forward_vulkan_f64() {
 	out := layers.sigmoid_forward_vulkan[f64](x, params) or { panic(err) }
 
 	expected := [f64(0.5), f64(0.7310586), f64(0.2689414)]
-	for i in 0..3 {
+	for i in 0 .. 3 {
 		assert approx_eq_f64(out.data.data[i], expected[i], 0.01)
 	}
 	println('  PASS: sigmoid_forward_vulkan f64')

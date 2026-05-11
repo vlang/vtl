@@ -54,7 +54,8 @@ pub fn (layer &LayerNormLayerVulkan[T]) forward(input &autograd.Variable[T]) !&a
 	// GPU normalisation (f32 only; falls back to CPU for other types)
 	normed := layernorm_forward_vulkan[T](input.value, layer.eps, layer.params) or {
 		// CPU fallback
-		internal.layer_norm_forward[T](input.value, layer.gamma.value, layer.beta.value, f64(layer.eps))!
+		internal.layer_norm_forward[T](input.value, layer.gamma.value, layer.beta.value,
+			f64(layer.eps))!
 	}
 	// Apply affine transform on CPU if requested
 	mut out := normed
