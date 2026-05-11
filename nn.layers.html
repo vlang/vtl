@@ -110,9 +110,17 @@
 			<div class="doc-scrollview" tabindex="-1" id="main-content">
 				<div class="doc-container">
 					<div class="doc-content">
-								<section id="nn.layers" class="doc-node">
-			<div class="title"><h1> nn.layers</h1></div>
+								<section id="readme_nn.layers" class="doc-node">
+			<div class="title"><h1> nn.layers <a href="#readme_nn.layers">#</a></h1></div>
+<p>Stub for non-Vulkan builds — LayerNormLayerVulkan falls through to CPU. Stub implementations for non-Vulkan builds. The real implementations live in softmax_vulkan_d_vulkan.v</p>
 
+</section>
+
+		<section id="attention_forward_vulkan" class="doc-node">
+			<div class="title"><h2>fn attention_forward_vulkan <a href="#attention_forward_vulkan">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/attention_vulkan_notd_vulkan.v#L6"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> attention_forward_vulkan<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>q <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> k <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> v <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> head_dim <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<p>attention_forward_vulkan stub: not available without Vulkan.</p>
 
 </section>
 
@@ -252,6 +260,22 @@
 
 </section>
 
+		<section id="layer_norm_vulkan_layer" class="doc-node">
+			<div class="title"><h2>fn layer_norm_vulkan_layer <a href="#layer_norm_vulkan_layer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/layer_norm_vulkan_notd_vulkan.v#L25"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> layer_norm_vulkan_layer<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>ctx <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Context<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> normalized_shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> params storage<span class="token punctuation">.</span>VulkanStorageParams<span class="token punctuation">,</span> config LayerNormVulkanConfig<span class="token punctuation">)</span> types<span class="token punctuation">.</span>Layer<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="layernorm_forward_vulkan" class="doc-node">
+			<div class="title"><h2>fn layernorm_forward_vulkan <a href="#layernorm_forward_vulkan">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/softmax_vulkan_notd_vulkan.v#L13"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> layernorm_forward_vulkan<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>x <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> eps <span class="token builtin">f32</span><span class="token punctuation">,</span> params storage<span class="token punctuation">.</span>VulkanStorageParams<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
 		<section id="layernorm_gate" class="doc-node">
 			<div class="title"><h2>fn layernorm_gate <a href="#layernorm_gate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/layer_norm.v#L70"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -332,6 +356,14 @@
 
 </section>
 
+		<section id="reduce_sum_vulkan" class="doc-node">
+			<div class="title"><h2>fn reduce_sum_vulkan <a href="#reduce_sum_vulkan">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/softmax_vulkan_notd_vulkan.v#L17"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> reduce_sum_vulkan<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>x <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> params storage<span class="token punctuation">.</span>VulkanStorageParams<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">T</span></code></pre>
+
+
+</section>
+
 		<section id="relu_forward_vcl" class="doc-node">
 			<div class="title"><h2>fn relu_forward_vcl <a href="#relu_forward_vcl">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/linear_vcl_notd_vcl.v#L13"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -376,6 +408,14 @@
 			<div class="title"><h2>fn sigmoid_layer <a href="#sigmoid_layer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/sigmoid.v#L13"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> sigmoid_layer<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>ctx <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Context<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> output_shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> types<span class="token punctuation">.</span>Layer<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="softmax_forward_vulkan" class="doc-node">
+			<div class="title"><h2>fn softmax_forward_vulkan <a href="#softmax_forward_vulkan">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/softmax_vulkan_notd_vulkan.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> softmax_forward_vulkan<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>x <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> params storage<span class="token punctuation">.</span>VulkanStorageParams<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 
 
 </section>
@@ -752,6 +792,30 @@
 			<div class="title"><h2>fn (LayerNormGate[T]) cache <a href="#LayerNormGate[T].cache">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/layer_norm.v#L83"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&amp;</span>LayerNormGate<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> cache<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> result autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> args <span class="token punctuation">...</span>autograd<span class="token punctuation">.</span>CacheParam<span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+
+
+</section>
+
+		<section id="LayerNormLayerVulkan[T].output_shape" class="doc-node">
+			<div class="title"><h2>fn (LayerNormLayerVulkan[T]) output_shape <a href="#LayerNormLayerVulkan[T].output_shape">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/layer_norm_vulkan_notd_vulkan.v#L33"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span>LayerNormLayerVulkan<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">output_shape</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span></code></pre>
+
+
+</section>
+
+		<section id="LayerNormLayerVulkan[T].variables" class="doc-node">
+			<div class="title"><h2>fn (LayerNormLayerVulkan[T]) variables <a href="#LayerNormLayerVulkan[T].variables">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/layer_norm_vulkan_notd_vulkan.v#L37"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span>LayerNormLayerVulkan<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">variables</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="LayerNormLayerVulkan[T].forward" class="doc-node">
+			<div class="title"><h2>fn (LayerNormLayerVulkan[T]) forward <a href="#LayerNormLayerVulkan[T].forward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/layer_norm_vulkan_notd_vulkan.v#L44"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span>LayerNormLayerVulkan<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">forward</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 
 
 </section>
@@ -1365,6 +1429,33 @@
 
 </section>
 
+		<section id="LayerNormLayerVulkan" class="doc-node">
+			<div class="title"><h2>struct LayerNormLayerVulkan <a href="#LayerNormLayerVulkan">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/layer_norm_vulkan_notd_vulkan.v#L10"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> LayerNormLayerVulkan<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	normalized_shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
+	eps              <span class="token builtin">f32</span>
+	params           storage<span class="token punctuation">.</span>VulkanStorageParams
+<span class="token keyword">pub</span> <span class="token keyword">mut</span><span class="token punctuation">:</span>
+	gamma <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	beta  <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+
+
+</section>
+
+		<section id="LayerNormVulkanConfig" class="doc-node">
+			<div class="title"><h2>struct LayerNormVulkanConfig <a href="#LayerNormVulkanConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/layer_norm_vulkan_notd_vulkan.v#L20"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[params]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token symbol">LayerNormVulkanConfig</span> <span class="token punctuation">{</span>
+	eps    <span class="token builtin">f32</span>  <span class="token operator">=</span> <span class="token number">1e-5</span>
+	affine <span class="token builtin">bool</span> <span class="token operator">=</span> <span class="token boolean">true</span>
+<span class="token punctuation">}</span></code></pre>
+
+
+</section>
+
 		<section id="LeakyReluLayer" class="doc-node">
 			<div class="title"><h2>struct LeakyReluLayer <a href="#LeakyReluLayer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/leaky_relu.v#L15"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -1523,9 +1614,13 @@
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 11 May 2026 06:28:00</div>
+						<div class="footer">Powered by vdoc. Generated on: 11 May 2026 09:48:30</div>
 					</div>
-					<div class="doc-toc"><ul><li class="open"><a href="#attention_gate">fn attention_gate</a>        <ul>
+					<div class="doc-toc"><ul><li class="open"><a href="#readme_nn.layers">README</a></li>
+<li class="open"><a href="#attention_forward_vulkan">fn attention_forward_vulkan</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#attention_gate">fn attention_gate</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#avgpool2d_gate">fn avgpool2d_gate</a>        <ul>
@@ -1576,6 +1671,12 @@
 <li class="open"><a href="#layer_norm_layer">fn layer_norm_layer</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#layer_norm_vulkan_layer">fn layer_norm_vulkan_layer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#layernorm_forward_vulkan">fn layernorm_forward_vulkan</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#layernorm_gate">fn layernorm_gate</a>        <ul>
 </ul>
 </li>
@@ -1606,6 +1707,9 @@
 <li class="open"><a href="#positional_encoding_layer">fn positional_encoding_layer</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#reduce_sum_vulkan">fn reduce_sum_vulkan</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#relu_forward_vcl">fn relu_forward_vcl</a>        <ul>
 </ul>
 </li>
@@ -1622,6 +1726,9 @@
 </ul>
 </li>
 <li class="open"><a href="#sigmoid_layer">fn sigmoid_layer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#softmax_forward_vulkan">fn softmax_forward_vulkan</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#softmax_layer">fn softmax_layer</a>        <ul>
@@ -1726,6 +1833,12 @@
 <li class="open"><a href="#LayerNormGate[T].backward">type LayerNormGate[T]</a>        <ul>
 <li><a href="#LayerNormGate[T].backward">fn backward</a></li>
 <li><a href="#LayerNormGate[T].cache">fn cache</a></li>
+</ul>
+</li>
+<li class="open"><a href="#LayerNormLayerVulkan[T].output_shape">type LayerNormLayerVulkan[T]</a>        <ul>
+<li><a href="#LayerNormLayerVulkan[T].output_shape">fn output_shape</a></li>
+<li><a href="#LayerNormLayerVulkan[T].variables">fn variables</a></li>
+<li><a href="#LayerNormLayerVulkan[T].forward">fn forward</a></li>
 </ul>
 </li>
 <li class="open"><a href="#LayerNormLayer[T].output_shape">type LayerNormLayer[T]</a>        <ul>
@@ -1870,6 +1983,12 @@
 </ul>
 </li>
 <li class="open"><a href="#LayerNormLayer">struct LayerNormLayer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#LayerNormLayerVulkan">struct LayerNormLayerVulkan</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#LayerNormVulkanConfig">struct LayerNormVulkanConfig</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#LeakyReluLayer">struct LeakyReluLayer</a>        <ul>
