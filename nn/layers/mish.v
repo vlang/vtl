@@ -26,6 +26,10 @@ pub fn (_ &MishLayer[T]) variables() []&autograd.Variable[T] {
 }
 
 pub fn (layer &MishLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
+	if input.context.compute_strict && input.context.compute_backend != .cpu
+		&& input.context.compute_backend != .auto {
+		return error('mish: backend `${input.context.compute_backend}` is not implemented for GPU path yet')
+	}
 	output := internal.mish[T](input.value)
 	mut result := input.context.variable(output)
 

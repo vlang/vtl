@@ -34,6 +34,10 @@ pub fn (_ &EluLayer[T]) variables() []&autograd.Variable[T] {
 }
 
 pub fn (layer &EluLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
+	if input.context.compute_strict && input.context.compute_backend != .cpu
+		&& input.context.compute_backend != .auto {
+		return error('elu: backend `${input.context.compute_backend}` is not implemented for GPU path yet')
+	}
 	output := internal.elu[T](input.value, layer.alpha)
 	mut result := input.context.variable(output)
 

@@ -33,6 +33,10 @@ pub fn (_ &LeakyReluLayer[T]) variables() []&autograd.Variable[T] {
 }
 
 pub fn (layer &LeakyReluLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
+	if input.context.compute_strict && input.context.compute_backend != .cpu
+		&& input.context.compute_backend != .auto {
+		return error('leaky_relu: backend `${input.context.compute_backend}` is not implemented for GPU path yet')
+	}
 	output := internal.leaky_relu[T](input.value, vtl.cast[T](layer.slope))
 	mut result := input.context.variable(output)
 
