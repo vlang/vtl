@@ -6,6 +6,7 @@ import vtl.autograd
 import vtl.nn.internal
 import vtl.nn.types
 import math
+import vsl.compute as vsl_compute
 
 // MultiHeadAttentionLayer implements scaled dot-product multi-head attention.
 //
@@ -56,6 +57,12 @@ pub fn (layer &MultiHeadAttentionLayer[T]) variables() []&autograd.Variable[T] {
 }
 
 pub fn (layer &MultiHeadAttentionLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
+	if input.context.compute_strict && input.context.compute_backend != .cpu
+		&& input.context.compute_backend != .auto {
+		available := vsl_compute.available_backends().map(it.str()).join(', ')
+		return error('attention: backend `${input.context.compute_backend}` is not implemented for runtime GPU dispatch yet. available=[${available}]')
+	}
+
 	q := la.matmul[T](input.value, layer.w_q.value)!
 	k := la.matmul[T](input.value, layer.w_k.value)!
 	v := la.matmul[T](input.value, layer.w_v.value)!

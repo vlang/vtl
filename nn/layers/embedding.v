@@ -4,6 +4,7 @@ import vtl
 import vtl.autograd
 import vtl.nn.internal
 import vtl.nn.types
+import vsl.compute as vsl_compute
 
 // EmbeddingLayer maps integer token indices to dense embedding vectors.
 //
@@ -39,7 +40,17 @@ pub fn (layer &EmbeddingLayer[T]) variables() []&autograd.Variable[T] {
 pub fn (layer &EmbeddingLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	// input: [batch, seq_len] of integer indices
 	// output: [batch, seq_len, embedding_dim]
-	output := internal.embedding_forward[T](input.value, layer.weight.value)!
+	backend := input.context.compute_backend
+	strict := input.context.compute_strict
+	mut output := internal.embedding_forward[T](input.value, layer.weight.value)!
+	if backend == .vulkan {
+		output = embedding_forward_vulkan[T](input.value, layer.weight.value)!
+	} else if backend == .auto {
+		output = embedding_forward_vulkan[T](input.value, layer.weight.value) or { output }
+	} else if strict && backend != .cpu {
+		available := vsl_compute.available_backends().map(it.str()).join(', ')
+		return error('embedding: backend `${backend}` unavailable for this build. available=[${available}]')
+	}
 	mut result := input.context.variable(output)
 	if input.requires_grad || layer.weight.requires_grad {
 		gate := embedding_gate[T](input.value, layer.weight.value)

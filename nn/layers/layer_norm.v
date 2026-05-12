@@ -4,6 +4,9 @@ import vtl
 import vtl.autograd
 import vtl.nn.internal
 import vtl.nn.types
+import vsl.compute as vsl_compute
+import vsl.vulkan
+import vtl.storage
 
 // LayerNorm normalizes over the last D dimensions of the input.
 // E.g. for input [..., D] it computes mean and variance over the last D dims.
@@ -50,8 +53,36 @@ pub fn (layer &LayerNormLayer[T]) variables() []&autograd.Variable[T] {
 }
 
 pub fn (layer &LayerNormLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
-	output := internal.layer_norm_forward[T](input.value, layer.gamma.value, layer.beta.value,
+	backend := input.context.compute_backend
+	strict := input.context.compute_strict
+	mut output := internal.layer_norm_forward[T](input.value, layer.gamma.value, layer.beta.value,
 		layer.eps)!
+	if backend == .vulkan {
+		mut dev := vulkan.new_device()!
+		defer {
+			dev.release() or {}
+		}
+		params := storage.new_vulkan_params(dev)
+		norm := layernorm_forward_vulkan[T](input.value, f32(layer.eps), params)!
+		output = norm.multiply[T](layer.gamma.value)!.add[T](layer.beta.value)!
+	} else if backend == .auto {
+		mut dev := vulkan.new_device() or { unsafe { nil } }
+		if !isnil(dev) {
+			defer {
+				dev.release() or {}
+			}
+			params := storage.new_vulkan_params(dev)
+			norm := layernorm_forward_vulkan[T](input.value, f32(layer.eps), params) or {
+				unsafe { nil }
+			}
+			if !isnil(norm) {
+				output = norm.multiply[T](layer.gamma.value)!.add[T](layer.beta.value)!
+			}
+		}
+	} else if strict && backend != .cpu {
+		available := vsl_compute.available_backends().map(it.str()).join(', ')
+		return error('layernorm: backend `${backend}` unavailable for this build. available=[${available}]')
+	}
 	mut result := input.context.variable(output)
 	if input.requires_grad {
 		gate := layernorm_gate[T](input.value, layer.gamma.value, layer.beta.value, layer.eps)
