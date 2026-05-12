@@ -65,7 +65,7 @@ pub fn (layer &BatchNorm1DLayer[T]) forward(input &autograd.Variable[T]) !&autog
 					layer.running_mean, layer.running_var, layer.eps)!
 			} else {
 				defer {
-					dev.release()
+					dev.release() or {}
 				}
 				norm := batchnorm1d_forward_vulkan[T](input.value, f32(layer.eps), dev) or {
 					if strict && backend != .auto {

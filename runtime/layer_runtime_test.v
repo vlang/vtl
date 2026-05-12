@@ -1,6 +1,5 @@
 module runtime
 
-import vsl.compute
 import vtl
 import vtl.autograd
 import vtl.nn.layers
@@ -31,7 +30,7 @@ fn test_softmax_strict_shape_guard() {
 
 fn test_relu_cpu_runtime_dispatch() {
 	mut ctx := autograd.ctx[f64]()
-	ctx.set_compute_backend(compute.Backend.cpu)
+	ctx.set_compute_backend(vtl.Backend.cpu)
 	x := vtl.from_1d[f64]([-1.0, 0.0, 2.0], vtl.TensorData{}) or { panic(err) }
 	input := ctx.variable(x)
 	l := layers.relu_layer[f64](ctx, [3])

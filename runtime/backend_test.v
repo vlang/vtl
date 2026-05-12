@@ -1,14 +1,14 @@
 module runtime
 
 import os
-import vsl.compute
+import vtl
 import vtl.autograd
 
 fn test_backend_from_string() {
-	assert backend_from_string('auto') or { compute.Backend.cpu } == .auto
-	assert backend_from_string('cpu') or { compute.Backend.auto } == .cpu
-	assert backend_from_string('vulkan') or { compute.Backend.auto } == .vulkan
-	assert backend_from_string('vcl') or { compute.Backend.auto } == .vcl
+	assert backend_from_string('auto') or { vtl.Backend.cpu } == .auto
+	assert backend_from_string('cpu') or { vtl.Backend.auto } == .cpu
+	assert backend_from_string('vulkan') or { vtl.Backend.auto } == .vulkan
+	assert backend_from_string('vcl') or { vtl.Backend.auto } == .vcl
 	if _ := backend_from_string('invalid') {
 		assert false
 	}

@@ -37,7 +37,7 @@ pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 }
 
 // matmul_with_backend computes matrix multiplication using runtime backend selection.
-pub fn matmul_with_backend[T](a &vtl.Tensor[T], b &vtl.Tensor[T], backend vsl_compute.Backend, strict bool) !&vtl.Tensor[f64] {
+pub fn matmul_with_backend[T](a &vtl.Tensor[T], b &vtl.Tensor[T], backend vtl.Backend, strict bool) !&vtl.Tensor[f64] {
 	a.assert_matrix()!
 	b.assert_matrix()!
 	if a.shape[1] != b.shape[0] {
@@ -47,7 +47,14 @@ pub fn matmul_with_backend[T](a &vtl.Tensor[T], b &vtl.Tensor[T], backend vsl_co
 		m := a.shape[0]
 		k := a.shape[1]
 		n := b.shape[1]
-		mut cctx := vsl_compute.new_context(backend)
+		compute_backend := match backend {
+			.auto { vsl_compute.Backend.auto }
+			.vulkan { vsl_compute.Backend.vulkan }
+			.vcl { vsl_compute.Backend.vcl }
+			.cpu { vsl_compute.Backend.cpu }
+		}
+
+		mut cctx := vsl_compute.new_context(compute_backend)
 		cctx.strict = strict
 		a_f64 := a.copy(.row_major).as_f64().to_array()
 		b_f64 := b.copy(.row_major).as_f64().to_array()
