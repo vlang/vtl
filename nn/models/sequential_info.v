@@ -6,8 +6,8 @@ import vtl.nn.loss
 import vtl.nn.types
 
 pub struct SequentialInfo[T] {
-	ctx &autograd.Context[T] = unsafe { nil }
 pub mut:
+	ctx    &autograd.Context[T] = unsafe { nil }
 	layers []types.Layer[T]
 	loss   types.Loss[T]
 }

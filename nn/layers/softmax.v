@@ -39,32 +39,31 @@ pub fn (layer &SoftmaxLayer[T]) forward(input &autograd.Variable[T]) !&autograd.
 	dim := if layer.dim == -1 { input.value.shape.len - 1 } else { layer.dim }
 	backend := input.context.compute_backend
 	strict := input.context.compute_strict
-	output := if (backend == .vulkan || backend == .auto) && input.value.shape.len == 1 && dim == 0 {
-		mut dev := vulkan.new_device() or {
-			if strict && backend != .auto {
-				return err
-			}
-			unsafe { nil }
-		}
-		if isnil(dev) {
-			internal.softmax_forward[T](input.value, dim)!
-		} else {
+	mut output := internal.softmax_forward[T](input.value, dim)!
+	if input.value.shape.len == 1 && dim == 0 {
+		if backend == .vulkan {
+			mut dev := vulkan.new_device()!
 			defer {
 				dev.release() or {}
 			}
-			softmax_forward_vulkan[T](input.value, storage.new_vulkan_params(dev)) or {
-				if strict && backend != .auto {
-					return err
+			output = softmax_forward_vulkan[T](input.value, storage.new_vulkan_params(dev))!
+		} else if backend == .auto {
+			mut dev := vulkan.new_device() or { unsafe { nil } }
+			if !isnil(dev) {
+				defer {
+					dev.release() or {}
 				}
-				internal.softmax_forward[T](input.value, dim)!
+				output = softmax_forward_vulkan[T](input.value, storage.new_vulkan_params(dev)) or {
+					output
+				}
 			}
-		}
-	} else {
-		if strict && backend != .cpu && backend != .auto {
+		} else if strict && backend != .cpu {
 			available := vsl_compute.available_backends().map(it.str()).join(', ')
-			return error('softmax: backend `${backend}` unsupported for this shape/dim. available=[${available}]')
+			return error('softmax: backend `${backend}` unavailable for this build. available=[${available}]')
 		}
-		internal.softmax_forward[T](input.value, dim)!
+	} else if strict && backend != .cpu && backend != .auto {
+		available := vsl_compute.available_backends().map(it.str()).join(', ')
+		return error('softmax: backend `${backend}` unsupported for this shape/dim. available=[${available}]')
 	}
 	mut result := input.context.variable(output)
 
