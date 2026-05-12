@@ -1,7 +1,6 @@
 module autograd
 
 import vtl
-import vsl.compute
 
 // Context keeps track of the computational graph for
 // a number of operations. Variables that interact with each
@@ -17,7 +16,7 @@ pub mut:
 	// be cached, and backpropagation will not be possible
 	no_grad bool
 	// Backend preference used by NN/LA runtime dispatch.
-	compute_backend compute.Backend = .auto
+	compute_backend vtl.Backend = .auto
 	// If true, fail when preferred backend is unavailable.
 	compute_strict bool
 }
@@ -29,7 +28,7 @@ pub fn ctx[T]() &Context[T] {
 }
 
 // set_compute_backend configures backend preference for runtime dispatch.
-pub fn (mut ctx Context[T]) set_compute_backend(backend compute.Backend) {
+pub fn (mut ctx Context[T]) set_compute_backend(backend vtl.Backend) {
 	ctx.compute_backend = backend
 }
 

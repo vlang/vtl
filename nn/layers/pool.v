@@ -53,36 +53,34 @@ pub fn (layer &AveragePool2DLayer[T]) variables() []&autograd.Variable[T] {
 pub fn (layer &AveragePool2DLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	backend := input.context.compute_backend
 	strict := input.context.compute_strict
-	output := if backend == .vulkan || backend == .auto {
+	mut output := internal.avgpool2d_forward[T](input.value, layer.kernel, layer.padding,
+		layer.stride)!
+	if backend == .vulkan || backend == .auto {
+		mut has_device := true
 		mut dev := vulkan.new_device() or {
-			if strict && backend != .auto {
-				return err
-			}
-			unsafe { nil }
+			has_device = false
+			&vulkan.Device(unsafe { nil })
 		}
-		if isnil(dev) {
-			internal.avgpool2d_forward[T](input.value, layer.kernel, layer.padding, layer.stride)!
-		} else {
+		if has_device {
 			defer {
-				dev.release()
+				dev.release() or {}
 			}
-			avgpool2d_forward_vulkan[T](input.value, [layer.kernel[0], layer.kernel[1]], [
-				layer.stride[0],
-				layer.stride[1],
-			], [layer.padding[0], layer.padding[1]], dev) or {
-				if strict && backend != .auto {
+			k := [layer.kernel[0], layer.kernel[1]]!
+			s := [layer.stride[0], layer.stride[1]]!
+			p := [layer.padding[0], layer.padding[1]]!
+			output = avgpool2d_forward_vulkan[T](input.value, k, s, p, dev) or {
+				if strict && backend == .vulkan {
 					return err
 				}
-				internal.avgpool2d_forward[T](input.value, layer.kernel, layer.padding,
-					layer.stride)!
+				output
 			}
-		}
-	} else {
-		if strict && backend != .cpu {
+		} else if strict && backend == .vulkan {
 			available := vsl_compute.available_backends().map(it.str()).join(', ')
 			return error('avgpool2d: backend `${backend}` unavailable for this build. available=[${available}]')
 		}
-		internal.avgpool2d_forward[T](input.value, layer.kernel, layer.padding, layer.stride)!
+	} else if strict && backend != .cpu {
+		available := vsl_compute.available_backends().map(it.str()).join(', ')
+		return error('avgpool2d: backend `${backend}` unavailable for this build. available=[${available}]')
 	}
 	mut result := input.context.variable(output)
 	if input.requires_grad {
@@ -147,32 +145,30 @@ pub fn (layer &GlobalAvgPool2DLayer[T]) variables() []&autograd.Variable[T] {
 pub fn (layer &GlobalAvgPool2DLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	backend := input.context.compute_backend
 	strict := input.context.compute_strict
-	output := if backend == .vulkan || backend == .auto {
+	mut output := internal.global_avgpool2d_forward[T](input.value)!
+	if backend == .vulkan || backend == .auto {
+		mut has_device := true
 		mut dev := vulkan.new_device() or {
-			if strict && backend != .auto {
-				return err
-			}
-			unsafe { nil }
+			has_device = false
+			&vulkan.Device(unsafe { nil })
 		}
-		if isnil(dev) {
-			internal.global_avgpool2d_forward[T](input.value)!
-		} else {
+		if has_device {
 			defer {
-				dev.release()
+				dev.release() or {}
 			}
-			global_avgpool2d_forward_vulkan[T](input.value, dev) or {
-				if strict && backend != .auto {
+			output = global_avgpool2d_forward_vulkan[T](input.value, dev) or {
+				if strict && backend == .vulkan {
 					return err
 				}
-				internal.global_avgpool2d_forward[T](input.value)!
+				output
 			}
-		}
-	} else {
-		if strict && backend != .cpu {
+		} else if strict && backend == .vulkan {
 			available := vsl_compute.available_backends().map(it.str()).join(', ')
 			return error('global_avgpool2d: backend `${backend}` unavailable for this build. available=[${available}]')
 		}
-		internal.global_avgpool2d_forward[T](input.value)!
+	} else if strict && backend != .cpu {
+		available := vsl_compute.available_backends().map(it.str()).join(', ')
+		return error('global_avgpool2d: backend `${backend}` unavailable for this build. available=[${available}]')
 	}
 	mut result := input.context.variable(output)
 	if input.requires_grad {

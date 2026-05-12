@@ -50,7 +50,7 @@ pub fn (layer &SoftmaxLayer[T]) forward(input &autograd.Variable[T]) !&autograd.
 			internal.softmax_forward[T](input.value, dim)!
 		} else {
 			defer {
-				dev.release()
+				dev.release() or {}
 			}
 			softmax_forward_vulkan[T](input.value, storage.new_vulkan_params(dev)) or {
 				if strict && backend != .auto {

@@ -4,11 +4,18 @@ import math
 import vtl
 import vsl.compute as vsl_compute
 
-fn apply_unary_backend[T](x &vtl.Tensor[T], backend vsl_compute.Backend, strict bool, op string) !&vtl.Tensor[T] {
+fn apply_unary_backend[T](x &vtl.Tensor[T], backend vtl.Backend, strict bool, op string) !&vtl.Tensor[T] {
 	if backend == .cpu {
 		return error('cpu backend should use native path')
 	}
-	mut cctx := vsl_compute.new_context(backend)
+	compute_backend := match backend {
+		.auto { vsl_compute.Backend.auto }
+		.vulkan { vsl_compute.Backend.vulkan }
+		.vcl { vsl_compute.Backend.vcl }
+		.cpu { vsl_compute.Backend.cpu }
+	}
+
+	mut cctx := vsl_compute.new_context(compute_backend)
 	cctx.strict = strict
 	x_f64 := x.copy(.row_major).as_f64().to_array()
 	y_f64 := match op {
@@ -29,7 +36,7 @@ pub fn tanh[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 	return x.tanh()
 }
 
-pub fn tanh_with_backend[T](x &vtl.Tensor[T], backend vsl_compute.Backend, strict bool) !&vtl.Tensor[T] {
+pub fn tanh_with_backend[T](x &vtl.Tensor[T], backend vtl.Backend, strict bool) !&vtl.Tensor[T] {
 	if backend == .cpu {
 		return tanh[T](x)
 	}
@@ -54,7 +61,7 @@ pub fn sigmoid[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 	})
 }
 
-pub fn sigmoid_with_backend[T](x &vtl.Tensor[T], backend vsl_compute.Backend, strict bool) !&vtl.Tensor[T] {
+pub fn sigmoid_with_backend[T](x &vtl.Tensor[T], backend vtl.Backend, strict bool) !&vtl.Tensor[T] {
 	if backend == .cpu {
 		return sigmoid[T](x)
 	}
@@ -83,7 +90,7 @@ pub fn relu[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 	})
 }
 
-pub fn relu_with_backend[T](x &vtl.Tensor[T], backend vsl_compute.Backend, strict bool) !&vtl.Tensor[T] {
+pub fn relu_with_backend[T](x &vtl.Tensor[T], backend vtl.Backend, strict bool) !&vtl.Tensor[T] {
 	if backend == .cpu {
 		return relu[T](x)
 	}

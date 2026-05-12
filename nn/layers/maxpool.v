@@ -46,37 +46,32 @@ pub fn (layer &MaxPool2DLayer[T]) variables() []&autograd.Variable[T] {
 pub fn (layer &MaxPool2DLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	backend := input.context.compute_backend
 	strict := input.context.compute_strict
-	mut output := &vtl.Tensor[T](unsafe { nil })
-	if backend == .vulkan || backend == .auto {
-		mut dev := vulkan.new_device() or {
-			if strict && backend != .auto {
-				return err
-			}
-			unsafe { nil }
-		}
-		if !isnil(dev) {
-			defer {
-				dev.release()
-			}
-			output = maxpool2d_forward_vulkan[T](input.value, [layer.kernel[0], layer.kernel[1]], [
-				layer.stride[0],
-				layer.stride[1],
-			], [layer.padding[0], layer.padding[1]], dev) or {
-				if strict && backend != .auto {
-					return err
-				}
-				unsafe { nil }
-			}
-		}
-	}
 	max_indices, cpu_output := internal.maxpool2d[T](input.value, layer.kernel, layer.padding,
 		layer.stride)
-	if isnil(output) {
-		if strict && backend != .cpu && backend != .auto {
+	mut output := cpu_output
+	if backend == .vulkan || backend == .auto {
+		mut has_device := true
+		mut dev := vulkan.new_device() or {
+			has_device = false
+			&vulkan.Device(unsafe { nil })
+		}
+		if has_device {
+			defer {
+				dev.release() or {}
+			}
+			k := [layer.kernel[0], layer.kernel[1]]!
+			s := [layer.stride[0], layer.stride[1]]!
+			p := [layer.padding[0], layer.padding[1]]!
+			output = maxpool2d_forward_vulkan[T](input.value, k, s, p, dev) or {
+				if strict && backend == .vulkan {
+					return err
+				}
+				cpu_output
+			}
+		} else if strict && backend == .vulkan {
 			available := vsl_compute.available_backends().map(it.str()).join(', ')
 			return error('maxpool2d: backend `${backend}` unavailable for this build. available=[${available}]')
 		}
-		output = cpu_output
 	}
 	mut result := input.context.variable(output)
 

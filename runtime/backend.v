@@ -2,18 +2,28 @@ module runtime
 
 import os
 import vsl.compute
+import vtl
 import vtl.autograd
 
 // ExecutionPolicy configures runtime backend selection.
 pub struct ExecutionPolicy {
 pub:
-	backend compute.Backend = .auto
+	backend vtl.Backend = .auto
 	strict  bool
 }
 
 // available_backends returns backends compiled in the current binary.
-pub fn available_backends() []compute.Backend {
-	return compute.available_backends()
+pub fn available_backends() []vtl.Backend {
+	mut out := []vtl.Backend{}
+	for b in compute.available_backends() {
+		out << match b {
+			.auto { .auto }
+			.vulkan { .vulkan }
+			.vcl { .vcl }
+			.cpu { .cpu }
+		}
+	}
+	return out
 }
 
 // apply_policy applies runtime backend settings to an autograd context.
@@ -23,7 +33,7 @@ pub fn apply_policy[T](mut ctx autograd.Context[T], policy ExecutionPolicy) {
 }
 
 // backend_from_string parses backend names used by env/config files.
-pub fn backend_from_string(value string) !compute.Backend {
+pub fn backend_from_string(value string) !vtl.Backend {
 	match value.to_lower() {
 		'', 'auto' { return .auto }
 		'cpu' { return .cpu }
