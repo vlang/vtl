@@ -53,36 +53,31 @@ pub fn (layer &BatchNorm1DLayer[T]) forward(input &autograd.Variable[T]) !&autog
 	strict := input.context.compute_strict
 	if !input.requires_grad {
 		// Inference path: use running stats
-		output := if backend == .vulkan || backend == .auto {
-			mut dev := vulkan.new_device() or {
-				if strict && backend != .auto {
-					return err
-				}
-				unsafe { nil }
+		mut output := internal.batchnorm1d_forward[T](input.value, layer.gamma.value,
+			layer.beta.value, layer.running_mean, layer.running_var, layer.eps)!
+		if backend == .vulkan {
+			mut dev := vulkan.new_device()!
+			defer {
+				dev.release() or {}
 			}
-			if isnil(dev) {
-				internal.batchnorm1d_forward[T](input.value, layer.gamma.value, layer.beta.value,
-					layer.running_mean, layer.running_var, layer.eps)!
-			} else {
+			norm := batchnorm1d_forward_vulkan[T](input.value, f32(layer.eps), dev)!
+			output = norm.multiply[T](layer.gamma.value)!.add[T](layer.beta.value)!
+		} else if backend == .auto {
+			mut dev := vulkan.new_device() or { unsafe { nil } }
+			if !isnil(dev) {
 				defer {
 					dev.release() or {}
 				}
 				norm := batchnorm1d_forward_vulkan[T](input.value, f32(layer.eps), dev) or {
-					if strict && backend != .auto {
-						return err
-					}
-					internal.batchnorm1d_forward[T](input.value, layer.gamma.value,
-						layer.beta.value, layer.running_mean, layer.running_var, layer.eps)!
+					unsafe { nil }
 				}
-				norm.multiply[T](layer.gamma.value)!.add[T](layer.beta.value)!
+				if !isnil(norm) {
+					output = norm.multiply[T](layer.gamma.value)!.add[T](layer.beta.value)!
+				}
 			}
-		} else {
-			if strict && backend != .cpu {
-				available := vsl_compute.available_backends().map(it.str()).join(', ')
-				return error('batchnorm1d(inference): backend `${backend}` unavailable for this build. available=[${available}]')
-			}
-			internal.batchnorm1d_forward[T](input.value, layer.gamma.value, layer.beta.value,
-				layer.running_mean, layer.running_var, layer.eps)!
+		} else if strict && backend != .cpu {
+			available := vsl_compute.available_backends().map(it.str()).join(', ')
+			return error('batchnorm1d(inference): backend `${backend}` unavailable for this build. available=[${available}]')
 		}
 		return input.context.variable(output)
 	}

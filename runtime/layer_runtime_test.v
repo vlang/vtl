@@ -15,12 +15,12 @@ fn test_sequential_backend_setters() {
 }
 
 fn test_softmax_strict_shape_guard() {
-	mut ctx := autograd.ctx[f32]()
+	mut ctx := autograd.ctx[f64]()
 	ctx.set_compute_backend(.vulkan)
 	ctx.set_compute_strict(true)
-	x := vtl.from_2d[f32]([[1.0, 2.0], [3.0, 4.0]]) or { panic(err) }
+	x := vtl.from_2d[f64]([[1.0, 2.0], [3.0, 4.0]]) or { panic(err) }
 	input := ctx.variable(x)
-	l := layers.softmax_layer[f32](ctx, layers.SoftmaxLayerConfig{})
+	l := layers.softmax_layer[f64](ctx, layers.SoftmaxLayerConfig{})
 	if _ := l.forward(input) {
 		assert false
 	} else {
