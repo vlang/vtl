@@ -34,6 +34,54 @@ v -d vulkan run your_program.v
 v -d vulkan -d vcl run your_program.v
 ```
 
+Compile-time flags define which backends are available in the binary.
+Runtime policy selects which backend to use at execution time.
+
+## Runtime backend selection
+
+You can choose backend at runtime without changing model code:
+
+```sh
+# Auto selection (default)
+v -d vulkan -d vcl run your_program.v
+
+# Force Vulkan
+VTL_BACKEND=vulkan v -d vulkan -d vcl run your_program.v
+
+# Force OpenCL/VCL
+VTL_BACKEND=vcl v -d vulkan -d vcl run your_program.v
+
+# Force CPU
+VTL_BACKEND=cpu v -d vulkan -d vcl run your_program.v
+
+# Strict mode: fail if preferred backend is unavailable
+VTL_BACKEND=vulkan VTL_BACKEND_STRICT=1 v -d vulkan -d vcl run your_program.v
+```
+
+Supported values for `VTL_BACKEND`: `auto`, `cpu`, `vulkan`, `vcl`.
+
+Current runtime-dispatched NN/LA coverage:
+
+- `la.matmul` through `Linear` layer
+- `ReLU`, `Sigmoid`, `Tanh` layers
+- `Conv2D` layer (tries Vulkan path first when selected, then CPU fallback when not strict)
+- `MaxPool2D`, `AveragePool2D`, `GlobalAveragePool2D` layers (Vulkan try + CPU fallback)
+- `Softmax` layer for 1-D tensors (Vulkan try + CPU fallback)
+- `BatchNorm1D` inference path (Vulkan normalize + CPU affine/fallback)
+
+You can also configure backend policy directly on a model context:
+
+```v ignore
+import vsl.compute
+import vtl.autograd
+import vtl.nn.models
+
+mut ctx := autograd.ctx[f64]()
+mut model := models.sequential_from_ctx[f64](ctx)
+model.set_backend(compute.Backend.vulkan)
+model.set_backend_strict(false)
+```
+
 ## OpenCL/VCL workflow
 
 ```v ignore

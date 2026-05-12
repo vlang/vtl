@@ -25,7 +25,8 @@ pub fn (_ &TanhLayer[T]) variables() []&autograd.Variable[T] {
 }
 
 pub fn (layer &TanhLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
-	output := internal.tanh[T](input.value)
+	output := internal.tanh_with_backend[T](input.value, input.context.compute_backend,
+		input.context.compute_strict)!
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {
