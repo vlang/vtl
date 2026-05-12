@@ -57,15 +57,11 @@ pub fn (layer &MultiHeadAttentionLayer[T]) variables() []&autograd.Variable[T] {
 }
 
 pub fn (layer &MultiHeadAttentionLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
-	if input.context.compute_strict && input.context.compute_backend != .cpu
-		&& input.context.compute_backend != .auto {
-		available := vsl_compute.available_backends().map(it.str()).join(', ')
-		return error('attention: backend `${input.context.compute_backend}` is not implemented for runtime GPU dispatch yet. available=[${available}]')
-	}
-
-	q := la.matmul[T](input.value, layer.w_q.value)!
-	k := la.matmul[T](input.value, layer.w_k.value)!
-	v := la.matmul[T](input.value, layer.w_v.value)!
+	backend := input.context.compute_backend
+	strict := input.context.compute_strict
+	q := la.matmul_with_backend[T](input.value, layer.w_q.value, backend, strict)!
+	k := la.matmul_with_backend[T](input.value, layer.w_k.value, backend, strict)!
+	v := la.matmul_with_backend[T](input.value, layer.w_v.value, backend, strict)!
 
 	batch := q.shape[0]
 	seq_len := q.shape[1]
@@ -79,9 +75,32 @@ pub fn (layer &MultiHeadAttentionLayer[T]) forward(input &autograd.Variable[T]) 
 	k_transposed := k_reshaped.transpose([0, 2, 1, 3])!
 	v_transposed := v_reshaped.transpose([0, 2, 1, 3])!
 
-	// k_t: [batch, heads, head_dim, seq_len]
-	k_t := k_transposed.transpose([0, 1, 3, 2])!
-	scores := la.matmul[T](q_transposed, k_t)!
+	mut has_vulkan := false
+	for b in vsl_compute.available_backends() {
+		if b.str() == 'vulkan' {
+			has_vulkan = true
+			break
+		}
+	}
+
+	mut scores := &vtl.Tensor[T](unsafe { nil })
+	if backend == .vulkan || (backend == .auto && has_vulkan) {
+		scores = attention_scores_vulkan[T](q_transposed, k_transposed, layer.head_dim) or {
+			if strict {
+				available := vsl_compute.available_backends().map(it.str()).join(', ')
+				return error('attention: Vulkan score path failed in strict mode: ${err}. available=[${available}]')
+			}
+			k_t := k_transposed.transpose([0, 1, 3, 2])!
+			la.matmul[T](q_transposed, k_t)!
+		}
+	} else {
+		if strict && backend != .cpu && backend != .auto {
+			available := vsl_compute.available_backends().map(it.str()).join(', ')
+			return error('attention: backend `${backend}` is not implemented for runtime GPU dispatch yet. available=[${available}]')
+		}
+		k_t := k_transposed.transpose([0, 1, 3, 2])!
+		scores = la.matmul[T](q_transposed, k_t)!
+	}
 
 	// Scale scores
 	scale := vtl.cast[T](1.0 / math.sqrt(f64(layer.head_dim)))
@@ -94,7 +113,18 @@ pub fn (layer &MultiHeadAttentionLayer[T]) forward(input &autograd.Variable[T]) 
 	attn_weights := internal.softmax_forward[T](scores_scaled, -1)!
 
 	// attn_output: [batch, heads, seq_len, head_dim]
-	attn_output := la.matmul[T](attn_weights, v_transposed)!
+	mut attn_output := &vtl.Tensor[T](unsafe { nil })
+	if backend == .vulkan || (backend == .auto && has_vulkan) {
+		attn_output = attention_apply_values_vulkan[T](attn_weights, v_transposed, layer.head_dim) or {
+			if strict {
+				available := vsl_compute.available_backends().map(it.str()).join(', ')
+				return error('attention: Vulkan value path failed in strict mode: ${err}. available=[${available}]')
+			}
+			la.matmul[T](attn_weights, v_transposed)!
+		}
+	} else {
+		attn_output = la.matmul[T](attn_weights, v_transposed)!
+	}
 
 	// Transpose back: [batch, seq_len, heads, head_dim]
 	attn_output_t := attn_output.transpose([0, 2, 1, 3])!
@@ -103,7 +133,7 @@ pub fn (layer &MultiHeadAttentionLayer[T]) forward(input &autograd.Variable[T]) 
 	merged := attn_output_t.reshape([batch, seq_len, layer.embed_dim])!
 
 	// Output projection
-	output := la.matmul[T](merged, layer.w_o.value)!
+	output := la.matmul_with_backend[T](merged, layer.w_o.value, backend, strict)!
 
 	mut result := input.context.variable(output)
 	if input.requires_grad || layer.w_q.requires_grad || layer.w_k.requires_grad
