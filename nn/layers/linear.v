@@ -38,7 +38,9 @@ pub fn (layer &LinearLayer[T]) variables() []&autograd.Variable[T] {
 }
 
 pub fn (layer &LinearLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
-	mut output := la.matmul[T](input.value, layer.weights.value.t()!)!.add[T](layer.bias.value)!
+	mat := la.matmul_with_backend[T](input.value, layer.weights.value.t()!,
+		input.context.compute_backend, input.context.compute_strict)!
+	mut output := mat.add[T](layer.bias.value)!
 	mut result := input.context.variable(output)
 
 	if input.requires_grad || layer.weights.requires_grad || layer.bias.requires_grad {

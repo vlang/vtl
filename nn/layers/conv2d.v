@@ -4,6 +4,7 @@ import vtl
 import vtl.autograd
 import vtl.nn.internal
 import vtl.nn.types
+import vsl.compute as vsl_compute
 
 // Conv2D layer: 2D convolution over a 4D input tensor [batch, in_channels, H, W].
 // Produces [batch, out_channels, out_H, out_W] output.
@@ -66,8 +67,25 @@ pub fn (layer &Conv2DLayer[T]) forward(input &autograd.Variable[T]) !&autograd.V
 		dilation: layer.config.dilation
 		groups:   layer.config.groups
 	}
-	output := internal.conv2d_forward[T](input.value, layer.weight.value, layer.bias.value,
-		layer.kernel_size, cfg)!
+	backend := input.context.compute_backend
+	strict := input.context.compute_strict
+	output := if backend == .vulkan || backend == .auto {
+		conv2d_forward_vulkan[T](input.value, layer.weight.value, layer.bias.value,
+			layer.kernel_size, layer.config) or {
+			if strict && backend != .auto {
+				return err
+			}
+			internal.conv2d_forward[T](input.value, layer.weight.value, layer.bias.value,
+				layer.kernel_size, cfg)!
+		}
+	} else {
+		if strict && backend != .cpu {
+			available := vsl_compute.available_backends().map(it.str()).join(', ')
+			return error('conv2d: backend `${backend}` unavailable for this build. available=[${available}]')
+		}
+		internal.conv2d_forward[T](input.value, layer.weight.value, layer.bias.value,
+			layer.kernel_size, cfg)!
+	}
 	mut result := input.context.variable(output)
 
 	if input.requires_grad || layer.weight.requires_grad || layer.bias.requires_grad {

@@ -5,6 +5,7 @@ import vtl.autograd
 import vtl.nn.loss
 import vtl.nn.types
 import vtl.nn.layers
+import vsl.compute
 
 fn init() {
 	println(@MOD + ' module is a WIP and not yet functional')
@@ -200,6 +201,16 @@ pub fn (mut nn Sequential[T]) nll_loss() {
 // kl_div_loss sets the loss function to KL divergence loss.
 pub fn (mut nn Sequential[T]) kl_div_loss() {
 	nn.info.kl_div_loss()
+}
+
+// set_backend configures runtime backend preference for all forward passes in this model context.
+pub fn (mut nn Sequential[T]) set_backend(backend compute.Backend) {
+	nn.info.ctx.set_compute_backend(backend)
+}
+
+// set_backend_strict enables/disables strict runtime backend enforcement.
+pub fn (mut nn Sequential[T]) set_backend_strict(strict bool) {
+	nn.info.ctx.set_compute_strict(strict)
 }
 
 pub fn (mut nn Sequential[T]) forward(train &autograd.Variable[T]) !&autograd.Variable[T] {

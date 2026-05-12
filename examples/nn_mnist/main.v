@@ -5,6 +5,7 @@ import vtl.autograd
 import vtl.datasets
 import vtl.nn.models
 import vtl.nn.optimizers
+import vtl.runtime
 
 const batch_size = 32
 const epochs = 3
@@ -16,7 +17,10 @@ const batches = 100
 
 fn main() {
 	// Autograd context / neuralnet graph
-	ctx := autograd.ctx[f64]()
+	mut ctx := autograd.ctx[f64]()
+	policy := runtime.policy_from_env() or { runtime.ExecutionPolicy{} }
+	runtime.apply_policy[f64](mut ctx, policy)
+	println('Runtime backend policy: backend=${policy.backend}, strict=${policy.strict}')
 
 	// Load the MNIST dataset (downloads automatically on first run)
 	println('Loading MNIST dataset...')

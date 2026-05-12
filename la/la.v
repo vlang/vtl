@@ -1,6 +1,7 @@
 module la
 
 import vsl.la as vsl_la
+import vsl.compute as vsl_compute
 import vtl
 
 pub fn dot[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[f64] {
@@ -32,10 +33,27 @@ pub fn inv[T](t &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 }
 
 pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[f64] {
+	return matmul_with_backend[T](a, b, .cpu, false)
+}
+
+// matmul_with_backend computes matrix multiplication using runtime backend selection.
+pub fn matmul_with_backend[T](a &vtl.Tensor[T], b &vtl.Tensor[T], backend vsl_compute.Backend, strict bool) !&vtl.Tensor[f64] {
 	a.assert_matrix()!
 	b.assert_matrix()!
 	if a.shape[1] != b.shape[0] {
 		return error('Invalid shapes for matrix multiplication ${a.shape} and ${b.shape}')
+	}
+	if backend != .cpu {
+		m := a.shape[0]
+		k := a.shape[1]
+		n := b.shape[1]
+		mut cctx := vsl_compute.new_context(backend)
+		cctx.strict = strict
+		a_f64 := a.copy(.row_major).as_f64().to_array()
+		b_f64 := b.copy(.row_major).as_f64().to_array()
+		c_row := vsl_compute.gemm(cctx, a_f64, b_f64, m, n, k)!
+		mut c := vtl.from_1d[f64](c_row, vtl.TensorData{})!
+		return c.reshape([m, n])!
 	}
 	ma := a.copy(.row_major)
 	mb := b.copy(.row_major)

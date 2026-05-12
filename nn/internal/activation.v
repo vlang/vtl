@@ -2,11 +2,38 @@ module internal
 
 import math
 import vtl
+import vsl.compute as vsl_compute
+
+fn apply_unary_backend[T](x &vtl.Tensor[T], backend vsl_compute.Backend, strict bool, op string) !&vtl.Tensor[T] {
+	if backend == .cpu {
+		return error('cpu backend should use native path')
+	}
+	mut cctx := vsl_compute.new_context(backend)
+	cctx.strict = strict
+	x_f64 := x.copy(.row_major).as_f64().to_array()
+	y_f64 := match op {
+		'relu' { vsl_compute.relu(cctx, x_f64)! }
+		'sigmoid' { vsl_compute.sigmoid(cctx, x_f64)! }
+		'tanh' { vsl_compute.tanh(cctx, x_f64)! }
+		else { return error('unsupported unary op `${op}`') }
+	}
+
+	y_data := y_f64.map(vtl.cast[T](it))
+	mut out := vtl.from_1d[T](y_data, vtl.TensorData{})!
+	return out.reshape(x.shape)!
+}
 
 // tanh squashes a real-valued number to the range [-1, 1]
 @[inline]
 pub fn tanh[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 	return x.tanh()
+}
+
+pub fn tanh_with_backend[T](x &vtl.Tensor[T], backend vsl_compute.Backend, strict bool) !&vtl.Tensor[T] {
+	if backend == .cpu {
+		return tanh[T](x)
+	}
+	return apply_unary_backend[T](x, backend, strict, 'tanh')
 }
 
 // deriv_tanh computes the derivative of tanh
@@ -25,6 +52,13 @@ pub fn sigmoid[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 		// correct sigmoid: 1 / (1 + exp(-x))
 		return vtl.cast[T](1) / (vtl.cast[T](1) + vtl.cast[T](math.exp(-vtl.cast[f64](val))))
 	})
+}
+
+pub fn sigmoid_with_backend[T](x &vtl.Tensor[T], backend vsl_compute.Backend, strict bool) !&vtl.Tensor[T] {
+	if backend == .cpu {
+		return sigmoid[T](x)
+	}
+	return apply_unary_backend[T](x, backend, strict, 'sigmoid')
 }
 
 // deriv_sigmoid computes the derivative of sigmoid
@@ -47,6 +81,13 @@ pub fn relu[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 		}
 		return val
 	})
+}
+
+pub fn relu_with_backend[T](x &vtl.Tensor[T], backend vsl_compute.Backend, strict bool) !&vtl.Tensor[T] {
+	if backend == .cpu {
+		return relu[T](x)
+	}
+	return apply_unary_backend[T](x, backend, strict, 'relu')
 }
 
 // deriv_relu computes the derivate of relu

@@ -25,7 +25,8 @@ pub fn (_ &ReLULayer[T]) variables() []&autograd.Variable[T] {
 }
 
 pub fn (layer &ReLULayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
-	output := internal.relu[T](input.value)
+	output := internal.relu_with_backend[T](input.value, input.context.compute_backend,
+		input.context.compute_strict)!
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {

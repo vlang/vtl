@@ -4,6 +4,8 @@ import vtl
 import vtl.autograd
 import vtl.nn.internal
 import vtl.nn.types
+import vsl.compute as vsl_compute
+import vsl.vulkan
 
 // BatchNorm1D normalizes a 2D input [batch, features].
 // Tracks running mean and variance for inference.
@@ -47,10 +49,41 @@ pub fn (layer &BatchNorm1DLayer[T]) variables() []&autograd.Variable[T] {
 }
 
 pub fn (layer &BatchNorm1DLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
+	backend := input.context.compute_backend
+	strict := input.context.compute_strict
 	if !input.requires_grad {
 		// Inference path: use running stats
-		output := internal.batchnorm1d_forward[T](input.value, layer.gamma.value, layer.beta.value,
-			layer.running_mean, layer.running_var, layer.eps)!
+		output := if backend == .vulkan || backend == .auto {
+			mut dev := vulkan.new_device() or {
+				if strict && backend != .auto {
+					return err
+				}
+				unsafe { nil }
+			}
+			if isnil(dev) {
+				internal.batchnorm1d_forward[T](input.value, layer.gamma.value, layer.beta.value,
+					layer.running_mean, layer.running_var, layer.eps)!
+			} else {
+				defer {
+					dev.release()
+				}
+				norm := batchnorm1d_forward_vulkan[T](input.value, f32(layer.eps), dev) or {
+					if strict && backend != .auto {
+						return err
+					}
+					internal.batchnorm1d_forward[T](input.value, layer.gamma.value,
+						layer.beta.value, layer.running_mean, layer.running_var, layer.eps)!
+				}
+				norm.multiply[T](layer.gamma.value)!.add[T](layer.beta.value)!
+			}
+		} else {
+			if strict && backend != .cpu {
+				available := vsl_compute.available_backends().map(it.str()).join(', ')
+				return error('batchnorm1d(inference): backend `${backend}` unavailable for this build. available=[${available}]')
+			}
+			internal.batchnorm1d_forward[T](input.value, layer.gamma.value, layer.beta.value,
+				layer.running_mean, layer.running_var, layer.eps)!
+		}
 		return input.context.variable(output)
 	}
 	// Training path: compute batch stats
