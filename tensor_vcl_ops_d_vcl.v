@@ -2,7 +2,7 @@ module vtl
 
 import storage
 import vsl.vcl
-import vsl.vcl.compute
+import vsl.compute as vsl_compute
 
 // matmul returns the matrix product of two VclTensors via OpenCL GEMM.
 // Both tensors must be 2-D. Returns a new VclTensor on the same device.
@@ -24,17 +24,14 @@ pub fn (a &VclTensor[T]) matmul[T](b &VclTensor[T]) !&VclTensor[T] {
 	// compute.gemm_vcl uses column-major layout; convert from row-major
 	a_f64 := a_arr.map(f64(cast[f64](it)))
 	b_f64 := b_arr.map(f64(cast[f64](it)))
-	a_col := vcl_row_to_col_f64(a_f64, m, k)
-	b_col := vcl_row_to_col_f64(b_f64, k, n)
 
+	mut cctx := vsl_compute.new_context(.vcl)
+	c_row := vsl_compute.gemm(cctx, a_f64, b_f64, m, n, k)!
+	c := c_row.map(cast[T](it))
 	mut dev := vcl.get_default_device()!
 	defer {
 		dev.release() or {}
 	}
-
-	c_col := compute.gemm_vcl(mut dev, a_col, b_col, m, n, k)!
-	c_row := vcl_col_to_row_f64(c_col, m, n)
-	c := c_row.map(cast[T](it))
 	return vcl_tensor_from_array[T](c, [m, n], mut dev)!
 }
 
@@ -51,7 +48,8 @@ pub fn (a &VclTensor[T]) add[T](b &VclTensor[T]) !&VclTensor[T] {
 	defer {
 		dev.release() or {}
 	}
-	c_f64 := compute.add_vec_vcl(mut dev, a_f64, b_f64)!
+	mut cctx := vsl_compute.new_context(.vcl)
+	c_f64 := vsl_compute.add_vec(cctx, a_f64, b_f64)!
 	c := c_f64.map(cast[T](it))
 	return vcl_tensor_from_array[T](c, a.shape, mut dev)!
 }
@@ -69,7 +67,8 @@ pub fn (a &VclTensor[T]) multiply[T](b &VclTensor[T]) !&VclTensor[T] {
 	defer {
 		dev.release() or {}
 	}
-	c_f64 := compute.mul_vec_vcl(mut dev, a_f64, b_f64)!
+	mut cctx := vsl_compute.new_context(.vcl)
+	c_f64 := vsl_compute.mul_vec(cctx, a_f64, b_f64)!
 	c := c_f64.map(cast[T](it))
 	return vcl_tensor_from_array[T](c, a.shape, mut dev)!
 }
@@ -82,7 +81,8 @@ pub fn (t &VclTensor[T]) relu[T]() !&VclTensor[T] {
 	defer {
 		dev.release() or {}
 	}
-	y_f64 := compute.relu_vcl(mut dev, x_f64)!
+	mut cctx := vsl_compute.new_context(.vcl)
+	y_f64 := vsl_compute.relu(cctx, x_f64)!
 	y := y_f64.map(cast[T](it))
 	return vcl_tensor_from_array[T](y, t.shape, mut dev)!
 }
@@ -95,7 +95,8 @@ pub fn (t &VclTensor[T]) sigmoid[T]() !&VclTensor[T] {
 	defer {
 		dev.release() or {}
 	}
-	y_f64 := compute.sigmoid_vcl(mut dev, x_f64)!
+	mut cctx := vsl_compute.new_context(.vcl)
+	y_f64 := vsl_compute.sigmoid(cctx, x_f64)!
 	y := y_f64.map(cast[T](it))
 	return vcl_tensor_from_array[T](y, t.shape, mut dev)!
 }
@@ -108,7 +109,8 @@ pub fn (t &VclTensor[T]) tanh_act[T]() !&VclTensor[T] {
 	defer {
 		dev.release() or {}
 	}
-	y_f64 := compute.tanh_vcl(mut dev, x_f64)!
+	mut cctx := vsl_compute.new_context(.vcl)
+	y_f64 := vsl_compute.tanh(cctx, x_f64)!
 	y := y_f64.map(cast[T](it))
 	return vcl_tensor_from_array[T](y, t.shape, mut dev)!
 }
@@ -121,7 +123,8 @@ pub fn (t &VclTensor[T]) add_scalar[T](s T) !&VclTensor[T] {
 	defer {
 		dev.release() or {}
 	}
-	y_f64 := compute.add_scalar_vcl(mut dev, x_f64, f64(cast[f64](s)))!
+	mut cctx := vsl_compute.new_context(.vcl)
+	y_f64 := vsl_compute.add_scalar(cctx, x_f64, f64(cast[f64](s)))!
 	y := y_f64.map(cast[T](it))
 	return vcl_tensor_from_array[T](y, t.shape, mut dev)!
 }
@@ -134,32 +137,13 @@ pub fn (t &VclTensor[T]) mul_scalar[T](s T) !&VclTensor[T] {
 	defer {
 		dev.release() or {}
 	}
-	y_f64 := compute.mul_scalar_vcl(mut dev, x_f64, f64(cast[f64](s)))!
+	mut cctx := vsl_compute.new_context(.vcl)
+	y_f64 := vsl_compute.mul_scalar(cctx, x_f64, f64(cast[f64](s)))!
 	y := y_f64.map(cast[T](it))
 	return vcl_tensor_from_array[T](y, t.shape, mut dev)!
 }
 
 // --- internal helpers ---
-
-fn vcl_row_to_col_f64(data []f64, rows int, cols int) []f64 {
-	mut out := []f64{len: data.len}
-	for r in 0 .. rows {
-		for c in 0 .. cols {
-			out[r + c * rows] = data[r * cols + c]
-		}
-	}
-	return out
-}
-
-fn vcl_col_to_row_f64(data []f64, rows int, cols int) []f64 {
-	mut out := []f64{len: data.len}
-	for r in 0 .. rows {
-		for c in 0 .. cols {
-			out[r * cols + c] = data[r + c * rows]
-		}
-	}
-	return out
-}
 
 fn vcl_tensor_from_array[T](data []T, shape []int, mut dev vcl.Device) !&VclTensor[T] {
 	mut vec := dev.vector[T](data.len)!
