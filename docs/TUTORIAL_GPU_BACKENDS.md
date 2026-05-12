@@ -4,6 +4,11 @@ This tutorial explains how to run VTL workloads on GPU backends and benchmark th
 
 ## Current backend status
 
+VTL uses the unified backend-agnostic entrypoint from VSL:
+
+- `vsl.compute` for operation dispatch
+- backend implementations under `vsl/vcl/compute` and `vsl/vulkan/compute`
+
 - **Vulkan backend (`-d vulkan`)**
   - Autograd gates and training-related paths are available for selected operations.
   - Tensor and NN integrations are available for Vulkan-enabled builds.
@@ -65,7 +70,7 @@ out := vy.cpu()!
 println(out)
 ```
 
-## Linear algebra on OpenCL
+## Linear algebra on OpenCL (via unified compute dispatch)
 
 ```v ignore
 import vtl
