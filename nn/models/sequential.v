@@ -2,7 +2,6 @@ module models
 
 import vtl
 import vtl.autograd
-import vtl.nn.loss
 import vtl.nn.types
 import vtl.nn.layers
 

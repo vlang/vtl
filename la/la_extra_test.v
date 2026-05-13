@@ -1,7 +1,6 @@
 module la
 
 import vtl
-import math
 
 fn test_trace_identity() {
 	a := vtl.from_2d([[1.0, 0.0], [0.0, 1.0]])!

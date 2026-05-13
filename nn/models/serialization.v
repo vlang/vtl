@@ -3,7 +3,6 @@ module models
 import json
 import os
 import vtl
-import vtl.autograd
 
 // ModelState stores all variable tensor data for serialization.
 struct ModelState {
