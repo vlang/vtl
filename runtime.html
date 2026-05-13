@@ -146,6 +146,14 @@
 
 </section>
 
+		<section id="new_vulkan_device" class="doc-node">
+			<div class="title"><h2>fn new_vulkan_device <a href="#new_vulkan_device">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/runtime/vulkan_device_notd_vulkan.v#L10"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">new_vulkan_device</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span>VulkanDevice</code></pre>
+<p>new_vulkan_device returns an error because Vulkan is not enabled. Compile with -d vulkan to get a real device.</p>
+
+</section>
+
 		<section id="policy_from_env" class="doc-node">
 			<div class="title"><h2>fn policy_from_env <a href="#policy_from_env">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/runtime/backend.v#L50"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -168,8 +176,24 @@
 
 </section>
 
+		<section id="VulkanDevice" class="doc-node">
+			<div class="title"><h2>struct VulkanDevice <a href="#VulkanDevice">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/runtime/vulkan_device_notd_vulkan.v#L6"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token symbol">VulkanDevice</span> <span class="token punctuation">{</span><span class="token punctuation">}</span></code></pre>
+<p>VulkanDevice is a stub type used when Vulkan is not enabled (-d vulkan not set). Calling new_vulkan_device() always returns an error in this path. Layer functions that accept VulkanDevice return errors without doing any work.</p>
 
-						<div class="footer">Powered by vdoc. Generated on: 12 May 2026 14:45:42</div>
+</section>
+
+		<section id="VulkanDevice.release" class="doc-node">
+			<div class="title"><h2>fn (VulkanDevice) release <a href="#VulkanDevice.release">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/runtime/vulkan_device_notd_vulkan.v#L15"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> d VulkanDevice<span class="token punctuation">)</span> <span class="token function">release</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<p>release is a no-op in the non-Vulkan build.</p>
+
+</section>
+
+
+						<div class="footer">Powered by vdoc. Generated on: 13 May 2026 05:13:18</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#apply_policy">fn apply_policy</a>        <ul>
 </ul>
@@ -180,10 +204,17 @@
 <li class="open"><a href="#backend_from_string">fn backend_from_string</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#new_vulkan_device">fn new_vulkan_device</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#policy_from_env">fn policy_from_env</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#ExecutionPolicy">struct ExecutionPolicy</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#VulkanDevice">struct VulkanDevice</a>        <ul>
+<li><a href="#VulkanDevice.release">fn release</a></li>
 </ul>
 </li>
 </ul></div>
