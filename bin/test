@@ -61,11 +61,11 @@ if [[ -n "${prod}" ]]; then
     flags="${flags} -cflags -fno-lto"
 fi
 
-# On macOS, force VCL to use dlopen so tcc does not choke on
-# '-framework OpenCL'. OpenCL loads at runtime (graceful failure).
-if [[ "$(uname -s)" == "Darwin" ]]; then
-    flags="${flags} -d vsl_vcl_dlopencl"
-fi
+# Force VCL to use dlopen for OpenCL so the linker does not need
+# libOpenCL at compile time. OpenCL loads at runtime (graceful failure
+# when no device is present). This avoids tcc/ld failing on CI where
+# ocl-icd is not installed or on macOS where tcc can't handle frameworks.
+flags="${flags} -d vsl_vcl_dlopencl"
 
 echo "Executing tests with command: \"v ${flags} test .\""
 
