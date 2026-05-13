@@ -4,9 +4,9 @@ import vtl
 import vtl.autograd
 import vtl.nn.internal
 import vtl.nn.types
-import vsl.compute as vsl_compute
-import vsl.vulkan
+import vtl.runtime
 import vtl.storage
+import vsl.compute as vsl_compute
 
 // LayerNorm normalizes over the last D dimensions of the input.
 // E.g. for input [..., D] it computes mean and variance over the last D dims.
@@ -58,20 +58,20 @@ pub fn (layer &LayerNormLayer[T]) forward(input &autograd.Variable[T]) !&autogra
 	mut output := internal.layer_norm_forward[T](input.value, layer.gamma.value, layer.beta.value,
 		layer.eps)!
 	if backend == .vulkan {
-		mut dev := vulkan.new_device()!
+		mut dev := runtime.new_vulkan_device()!
 		defer {
 			dev.release() or {}
 		}
-		params := storage.new_vulkan_params(dev)
+		params := storage.new_vulkan_params(dev.device())
 		norm := layernorm_forward_vulkan[T](input.value, f32(layer.eps), params)!
 		output = norm.multiply[T](layer.gamma.value)!.add[T](layer.beta.value)!
 	} else if backend == .auto {
-		mut dev := vulkan.new_device() or { unsafe { nil } }
-		if !isnil(dev) {
+		mut dev := runtime.new_vulkan_device() or { runtime.VulkanDevice{} }
+		if !isnil(dev.device()) {
 			defer {
 				dev.release() or {}
 			}
-			params := storage.new_vulkan_params(dev)
+			params := storage.new_vulkan_params(dev.device())
 			norm := layernorm_forward_vulkan[T](input.value, f32(layer.eps), params) or {
 				unsafe { nil }
 			}

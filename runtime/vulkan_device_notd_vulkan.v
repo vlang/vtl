@@ -13,3 +13,8 @@ pub fn new_vulkan_device() !VulkanDevice {
 
 // release is a no-op in the non-Vulkan build.
 pub fn (mut d VulkanDevice) release() ! {}
+
+// device returns a nil placeholder in non-Vulkan builds.
+pub fn (d &VulkanDevice) device() voidptr {
+	return unsafe { nil }
+}

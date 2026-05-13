@@ -4,8 +4,8 @@ import vtl.autograd
 import vtl.nn.internal
 import vtl.nn.gates.layers
 import vtl.nn.types
+import vtl.runtime
 import vsl.compute as vsl_compute
-import vsl.vulkan
 
 // MaxPool2DLayer is a layer that implements the maxpooling operation.
 pub struct MaxPool2DLayer[T] {
@@ -50,9 +50,9 @@ pub fn (layer &MaxPool2DLayer[T]) forward(input &autograd.Variable[T]) !&autogra
 	mut output := cpu_output
 	if backend == .vulkan || backend == .auto {
 		mut has_device := true
-		mut dev := vulkan.new_device() or {
+		mut dev := runtime.new_vulkan_device() or {
 			has_device = false
-			&vulkan.Device(unsafe { nil })
+			runtime.VulkanDevice{}
 		}
 		if has_device {
 			defer {
@@ -61,7 +61,7 @@ pub fn (layer &MaxPool2DLayer[T]) forward(input &autograd.Variable[T]) !&autogra
 			k := [layer.kernel[0], layer.kernel[1]]!
 			s := [layer.stride[0], layer.stride[1]]!
 			p := [layer.padding[0], layer.padding[1]]!
-			output = maxpool2d_forward_vulkan[T](input.value, k, s, p, dev) or {
+			output = maxpool2d_forward_vulkan[T](input.value, k, s, p, dev.device()) or {
 				if strict && backend == .vulkan {
 					return err
 				}
