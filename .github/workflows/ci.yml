@@ -71,7 +71,7 @@ jobs:
       - name: Validate Docs
         run: |
           cd ./vtl
-          v check-md .
+          v -d vsl_vcl_dlopencl check-md .
 
   fmt-check:
     runs-on: ubuntu-latest
