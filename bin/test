@@ -61,11 +61,10 @@ if [[ -n "${prod}" ]]; then
     flags="${flags} -cflags -fno-lto"
 fi
 
-# Force VCL to use dlopen for OpenCL so the linker does not need
-# libOpenCL at compile time. OpenCL loads at runtime (graceful failure
-# when no device is present). This avoids tcc/ld failing on CI where
-# ocl-icd is not installed or on macOS where tcc can't handle frameworks.
-flags="${flags} -d vsl_vcl_dlopencl"
+# Use dlopen for VCL and Vulkan so linker does not need libOpenCL or
+# libvulkan. Also use cc (gcc/clang) instead of tcc to work around tcc
+# struct-ordering bugs in V-generated C code.
+flags="${flags} -d vsl_vcl_dlopencl -d vsl_vulkan_dlopen -cc gcc"
 
 echo "Executing tests with command: \"v ${flags} test .\""
 
