@@ -1,7 +1,6 @@
 module layers
 
 // Stub for non-Vulkan builds — LayerNormLayerVulkan falls through to CPU.
-import vtl
 import vtl.autograd
 import vtl.nn.types
 import storage

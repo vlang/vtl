@@ -35,7 +35,6 @@ pub fn (g &SumGateVulkan[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] 
 		// Number of elements in the gradient (reduced dimension)
 		n_grad := gradient.size
 		size_in := vulkan.DeviceSize(u64(total) * 4)
-		size_out := vulkan.DeviceSize(u64(n_grad) * 4)
 		vk_grad := gradient.vulkan(g.params)!
 		defer { vk_grad.release() or {} }
 		mut in_buf := dev.buffer(size_in)!
