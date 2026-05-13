@@ -55,7 +55,6 @@ pub fn (va &VulkanAutograd[T]) relu[T](a &Variable[T]) !&Variable[T] {
 pub fn (va &VulkanAutograd[T]) sigmoid[T](a &Variable[T]) !&Variable[T] {
 	result_value := a.value.map(fn [T](val T, _ []int) T {
 		one := vtl.cast[T](1)
-		neg_val := -val
 		// sigmoid(x) = 1 / (1 + exp(-x))
 		return one / (one + T(math.exp(f64(-val))))
 	})
