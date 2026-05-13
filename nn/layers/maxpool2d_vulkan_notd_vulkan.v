@@ -1,7 +1,6 @@
 module layers
 
 import vtl
-import vsl.vulkan
 
 pub struct MaxPool2DLayerVulkan[T] {
 pub mut:

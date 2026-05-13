@@ -4,8 +4,8 @@ import vtl
 import vtl.autograd
 import vtl.nn.internal
 import vtl.nn.types
+import vtl.runtime
 import vsl.compute as vsl_compute
-import vsl.vulkan
 
 // BatchNorm1D normalizes a 2D input [batch, features].
 // Tracks running mean and variance for inference.
@@ -56,19 +56,19 @@ pub fn (layer &BatchNorm1DLayer[T]) forward(input &autograd.Variable[T]) !&autog
 		mut output := internal.batchnorm1d_forward[T](input.value, layer.gamma.value,
 			layer.beta.value, layer.running_mean, layer.running_var, layer.eps)!
 		if backend == .vulkan {
-			mut dev := vulkan.new_device()!
+			mut dev := runtime.new_vulkan_device()!
 			defer {
 				dev.release() or {}
 			}
-			norm := batchnorm1d_forward_vulkan[T](input.value, f32(layer.eps), dev)!
+			norm := batchnorm1d_forward_vulkan[T](input.value, f32(layer.eps), dev.device())!
 			output = norm.multiply[T](layer.gamma.value)!.add[T](layer.beta.value)!
 		} else if backend == .auto {
-			mut dev := vulkan.new_device() or { unsafe { nil } }
-			if !isnil(dev) {
+			mut dev := runtime.new_vulkan_device() or { runtime.VulkanDevice{} }
+			if !isnil(dev.device()) {
 				defer {
 					dev.release() or {}
 				}
-				norm := batchnorm1d_forward_vulkan[T](input.value, f32(layer.eps), dev) or {
+				norm := batchnorm1d_forward_vulkan[T](input.value, f32(layer.eps), dev.device()) or {
 					unsafe { nil }
 				}
 				if !isnil(norm) {

@@ -4,8 +4,8 @@ import vtl
 import vtl.autograd
 import vtl.nn.internal
 import vtl.nn.types
+import vtl.runtime
 import vsl.compute as vsl_compute
-import vsl.vulkan
 
 // AveragePool2DLayer applies 2D average pooling over a 4D input.
 //
@@ -57,9 +57,9 @@ pub fn (layer &AveragePool2DLayer[T]) forward(input &autograd.Variable[T]) !&aut
 		layer.stride)!
 	if backend == .vulkan || backend == .auto {
 		mut has_device := true
-		mut dev := vulkan.new_device() or {
+		mut dev := runtime.new_vulkan_device() or {
 			has_device = false
-			&vulkan.Device(unsafe { nil })
+			runtime.VulkanDevice{}
 		}
 		if has_device {
 			defer {
@@ -68,7 +68,7 @@ pub fn (layer &AveragePool2DLayer[T]) forward(input &autograd.Variable[T]) !&aut
 			k := [layer.kernel[0], layer.kernel[1]]!
 			s := [layer.stride[0], layer.stride[1]]!
 			p := [layer.padding[0], layer.padding[1]]!
-			output = avgpool2d_forward_vulkan[T](input.value, k, s, p, dev) or {
+			output = avgpool2d_forward_vulkan[T](input.value, k, s, p, dev.device()) or {
 				if strict && backend == .vulkan {
 					return err
 				}
@@ -148,15 +148,15 @@ pub fn (layer &GlobalAvgPool2DLayer[T]) forward(input &autograd.Variable[T]) !&a
 	mut output := internal.global_avgpool2d_forward[T](input.value)!
 	if backend == .vulkan || backend == .auto {
 		mut has_device := true
-		mut dev := vulkan.new_device() or {
+		mut dev := runtime.new_vulkan_device() or {
 			has_device = false
-			&vulkan.Device(unsafe { nil })
+			runtime.VulkanDevice{}
 		}
 		if has_device {
 			defer {
 				dev.release() or {}
 			}
-			output = global_avgpool2d_forward_vulkan[T](input.value, dev) or {
+			output = global_avgpool2d_forward_vulkan[T](input.value, dev.device()) or {
 				if strict && backend == .vulkan {
 					return err
 				}

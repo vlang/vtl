@@ -26,6 +26,20 @@ pub fn available_backends() []vtl.Backend {
 	return out
 }
 
+// nr_cpus returns a conservative CPU count for stdlib runtime compatibility.
+pub fn nr_cpus() int {
+	return 1
+}
+
+// nr_jobs returns a worker count compatible with the stdlib runtime module.
+pub fn nr_jobs() int {
+	vjobs := os.getenv('VJOBS').int()
+	if vjobs > 0 {
+		return vjobs
+	}
+	return nr_cpus()
+}
+
 // apply_policy applies runtime backend settings to an autograd context.
 pub fn apply_policy[T](mut ctx autograd.Context[T], policy ExecutionPolicy) {
 	ctx.set_compute_backend(policy.backend)

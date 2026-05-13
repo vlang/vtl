@@ -4,9 +4,9 @@ import vtl.autograd
 import vtl.nn.internal
 import vtl.nn.types
 import vtl.nn.gates.activation as activation_gates
-import vsl.compute as vsl_compute
-import vsl.vulkan
+import vtl.runtime
 import vtl.storage
+import vsl.compute as vsl_compute
 
 // SoftmaxLayer applies softmax activation over the last dimension of the input.
 // input shape: [..., n_classes]  →  output shape: [..., n_classes]
@@ -42,20 +42,20 @@ pub fn (layer &SoftmaxLayer[T]) forward(input &autograd.Variable[T]) !&autograd.
 	mut output := internal.softmax_forward[T](input.value, dim)!
 	if input.value.shape.len == 1 && dim == 0 {
 		if backend == .vulkan {
-			mut dev := vulkan.new_device()!
+			mut dev := runtime.new_vulkan_device()!
 			defer {
 				dev.release() or {}
 			}
-			output = softmax_forward_vulkan[T](input.value, storage.new_vulkan_params(dev))!
+			output =
+				softmax_forward_vulkan[T](input.value, storage.new_vulkan_params(dev.device()))!
 		} else if backend == .auto {
-			mut dev := vulkan.new_device() or { unsafe { nil } }
-			if !isnil(dev) {
+			mut dev := runtime.new_vulkan_device() or { runtime.VulkanDevice{} }
+			if !isnil(dev.device()) {
 				defer {
 					dev.release() or {}
 				}
-				output = softmax_forward_vulkan[T](input.value, storage.new_vulkan_params(dev)) or {
-					output
-				}
+				output = softmax_forward_vulkan[T](input.value,
+					storage.new_vulkan_params(dev.device())) or { output }
 			}
 		} else if strict && backend != .cpu {
 			available := vsl_compute.available_backends().map(it.str()).join(', ')
