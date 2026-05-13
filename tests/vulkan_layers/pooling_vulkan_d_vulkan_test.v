@@ -1,6 +1,7 @@
-module layers
+module vulkan_layers
 
 import vtl
+import vtl.nn.layers
 import vtl.runtime
 
 fn test_avgpool2d_forward_vulkan() {
@@ -42,8 +43,8 @@ fn test_avgpool2d_forward_vulkan() {
 		stride := [2, 2]!
 		padding := [0, 0]!
 
-		output := avgpool2d_forward_vulkan[f32](input_reshaped, kernel_size, stride, padding,
-			dev.device())!
+		output := layers.avgpool2d_forward_vulkan[f32](input_reshaped, kernel_size, stride,
+			padding, dev.device())!
 
 		assert output.shape == [1, 1, 2, 2]
 
@@ -62,7 +63,7 @@ fn test_avgpool2d_forward_vulkan() {
 			assert diff < 0.01, 'output[${i}] = ${val}, expected ${expected[i]}'
 		}
 
-		println('✓ test_avgpool2d_forward_vulkan passed')
+		println('✓ test_layers.avgpool2d_forward_vulkan passed')
 	}
 }
 
@@ -103,7 +104,7 @@ fn test_global_avgpool2d_forward_vulkan() {
 		input := vtl.from_1d[f32](input_data, vtl.TensorData{})!
 		input_reshaped := input.reshape([2, 2, 2, 2])!
 
-		output := global_avgpool2d_forward_vulkan[f32](input_reshaped, dev.device())!
+		output := global_layers.avgpool2d_forward_vulkan[f32](input_reshaped, dev.device())!
 
 		assert output.shape == [2, 2, 1, 1]
 
@@ -116,6 +117,6 @@ fn test_global_avgpool2d_forward_vulkan() {
 			assert diff < 0.01, 'output[${i}] = ${val}, expected ${expected[i]}'
 		}
 
-		println('✓ test_global_avgpool2d_forward_vulkan passed')
+		println('✓ test_global_layers.avgpool2d_forward_vulkan passed')
 	}
 }

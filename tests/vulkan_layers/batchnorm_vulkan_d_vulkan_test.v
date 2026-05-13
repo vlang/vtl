@@ -1,6 +1,7 @@
-module layers
+module vulkan_layers
 
 import vtl
+import vtl.nn.layers
 import vtl.runtime
 import math
 
@@ -19,7 +20,7 @@ fn test_batchnorm1d_forward_vulkan_basic() {
 		input_data := [f32(1), 2, 2, 4, 3, 6, 4, 8]
 		input := vtl.from_1d[f32](input_data, vtl.TensorData{})!.reshape([4, 2])!
 
-		out := batchnorm1d_forward_vulkan[f32](input, f32(1e-5), dev.device())!
+		out := layers.batchnorm1d_forward_vulkan[f32](input, f32(1e-5), dev.device())!
 
 		assert out.shape == [4, 2]
 
@@ -41,7 +42,7 @@ fn test_batchnorm1d_layer_vulkan() {
 			dev.release() or {}
 		}
 
-		layer := BatchNorm1DLayerVulkan[f32]{
+		layer := layers.BatchNorm1DLayerVulkan[f32]{
 			eps:    f32(1e-5)
 			device: dev.device()
 		}

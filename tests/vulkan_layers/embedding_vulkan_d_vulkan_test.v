@@ -1,6 +1,7 @@
-module layers
+module vulkan_layers
 
 import vtl
+import vtl.nn.layers
 
 fn test_embedding_forward_vulkan_basic() {
 	// vocab_size=4, embed_dim=3
@@ -12,7 +13,7 @@ fn test_embedding_forward_vulkan_basic() {
 	indices_data := [f32(0), 2, 1, 3]
 	indices := vtl.from_1d[f32](indices_data, vtl.TensorData{})!.reshape([1, 4])!
 
-	out := embedding_forward_vulkan[f32](indices, weight)!
+	out := layers.embedding_forward_vulkan[f32](indices, weight)!
 
 	assert out.shape == [1, 4, 3]
 
@@ -46,7 +47,7 @@ fn test_embedding_forward_vulkan_batch() {
 	indices_data := [f32(0), 1, 2, 0]
 	indices := vtl.from_1d[f32](indices_data, vtl.TensorData{})!.reshape([2, 2])!
 
-	out := embedding_forward_vulkan[f32](indices, weight)!
+	out := layers.embedding_forward_vulkan[f32](indices, weight)!
 
 	assert out.shape == [2, 2, 2]
 

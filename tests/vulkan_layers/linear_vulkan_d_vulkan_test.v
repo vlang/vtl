@@ -1,7 +1,8 @@
-module layers
+module vulkan_layers
 
 import math
 import vtl
+import vtl.nn.layers
 import vtl.storage
 
 fn test_linear_vulkan_configuration() {

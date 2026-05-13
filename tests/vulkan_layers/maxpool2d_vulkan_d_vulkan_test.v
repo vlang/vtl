@@ -1,6 +1,7 @@
-module layers
+module vulkan_layers
 
 import vtl
+import vtl.nn.layers
 import vtl.runtime
 
 fn test_maxpool2d_forward_vulkan_basic() {
@@ -38,7 +39,8 @@ fn test_maxpool2d_forward_vulkan_basic() {
 		stride := [2, 2]!
 		padding := [0, 0]!
 
-		out := maxpool2d_forward_vulkan[f32](input, kernel_size, stride, padding, dev.device())!
+		out := layers.maxpool2d_forward_vulkan[f32](input, kernel_size, stride, padding,
+			dev.device())!
 
 		assert out.shape == [1, 1, 2, 2]
 
@@ -60,7 +62,7 @@ fn test_maxpool2d_layer_vulkan() {
 			dev.release() or {}
 		}
 
-		layer := MaxPool2DLayerVulkan[f32]{
+		layer := layers.MaxPool2DLayerVulkan[f32]{
 			kernel_size: [2, 2]!
 			stride:      [2, 2]!
 			padding:     [0, 0]!
