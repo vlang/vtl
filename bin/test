@@ -36,6 +36,13 @@ fi
 if [[ -n "${use_vulkan}" ]]; then
     echo "Running tests using Vulkan compute"
     flags="${flags} -d vulkan"
+    # When Vulkan is enabled, the nn/layers module has ~54 source files with
+    # 500+ generic type references. Combined with vsl.vulkan's 65+ C types,
+    # the V checker exceeds its expression recursion limit (40). The
+    # -skip-unused flag tells the checker to skip resolving generic functions
+    # that aren't directly called from the compilation unit, reducing the
+    # type resolution depth below the limit.
+    flags="${flags} -skip-unused"
 fi
 
 if [[ -n "${use_autofree}" ]]; then
