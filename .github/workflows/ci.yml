@@ -62,7 +62,8 @@ jobs:
             libopenmpi-dev \
             libhdf5-dev \
             hdf5-tools \
-            opencl-headers
+            opencl-headers \
+            libvulkan-dev
 
       - name: Copy VTL source code to V Modules
         run: cp -rf ./vtl ~/.vmodules
@@ -70,7 +71,7 @@ jobs:
       - name: Validate Docs
         run: |
           cd ./vtl
-          v -d vsl_vulkan_dlopen check-md .
+          v check-md .
 
   fmt-check:
     runs-on: ubuntu-latest
@@ -105,7 +106,8 @@ jobs:
             libopenmpi-dev \
             libhdf5-dev \
             hdf5-tools \
-            opencl-headers
+            opencl-headers \
+            libvulkan-dev
 
       - name: Move VTL source code to V Modules
         run: mv ./vtl ~/.vmodules
@@ -214,9 +216,10 @@ jobs:
               libopenmpi-dev \
               libhdf5-dev \
               hdf5-tools \
-              opencl-headers
+              opencl-headers \
+              libvulkan-dev
           else
-            brew install coreutils hdf5 open-mpi openblas lapack opencl-headers
+            brew install coreutils hdf5 open-mpi openblas lapack opencl-headers vulkan-headers
           fi
           v install vsl
 
