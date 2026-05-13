@@ -436,31 +436,20 @@
 
 </section>
 
-		<section id="lstm_forward_multi" class="doc-node">
-			<div class="title"><h2>fn lstm_forward_multi <a href="#lstm_forward_multi">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/lstm.v#L117"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
-<pre class="signature">
-<code><span class="token keyword">fn</span> lstm_forward_multi<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>input_ <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
-	h0 <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
-	w_ih <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
-	w_hh <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
-	b_ih <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
-	b_hh <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
-<p>lstm_forward_multi stacks multiple LSTM layers. lstm_forward_multi computes LSTM forward pass for multi-layer LSTM.</p>
-<p>Shapes: input_: [seq_len, batch, input_size] h0:      [num_layers, batch, hidden_size] w_ih:    [num_layers, 4<em>hidden_size, input_size/num_layers] w_hh:    [num_layers, 4</em>hidden_size, hidden_size]</p>
-<p>Returns (output [seq_len, batch, hidden_size], h_n [num_layers, batch, hidden_size]).</p>
-
-</section>
-
 		<section id="lstm_forward_single" class="doc-node">
-			<div class="title"><h2>fn lstm_forward_single <a href="#lstm_forward_single">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/lstm.v#L23"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn lstm_forward_single <a href="#lstm_forward_single">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/lstm.v#L34"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> lstm_forward_single<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
 	hidden0 <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+	cell0 <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
 	w_ih <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
 	w_hh <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
 	b_ih <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
-	b_hh <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
-<p>lstm_forward_single runs a single-layer LSTM. input: [seq_len, batch, input_size] hidden0: [batch, hidden_size] w_ih: [4<em>hidden_size, input_size]  (i, f, g, o gates) w_hh: [4</em>hidden_size, hidden_size] b_ih, b_hh: [4*hidden_size] Returns (output [seq_len, batch, hidden_size], h_n [batch, hidden_size])</p>
+	b_hh <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+<p>lstm_forward_single runs a single-layer LSTM over a sequence.</p>
+<p>Implements the standard LSTM equations: i_t = sigmoid(x_t @ W_ii^T + h_{t-1} @ W_hi^T + b_ii + b_hi) f_t = sigmoid(x_t @ W_if^T + h_{t-1} @ W_hf^T + b_if + b_hf) g_t = tanh(x_t @ W_ig^T + h_{t-1} @ W_hg^T + b_ig + b_hg) o_t = sigmoid(x_t @ W_io^T + h_{t-1} @ W_ho^T + b_io + b_ho) c_t = f_t * c_{t-1} + i_t * g_t h_t = o_t * tanh(c_t)</p>
+<p>Shapes: input:   [seq_len, batch, input_size] hidden0: [batch, hidden_size] cell0:   [batch, hidden_size] w_ih:    [4<em>hidden_size, input_size] w_hh:    [4</em>hidden_size, hidden_size] b_ih:    [4<em>hidden_size] b_hh:    [4</em>hidden_size]</p>
+<p>Returns (output [seq_len, batch, hidden_size], h_n [batch, hidden_size], c_n [batch, hidden_size])</p>
 
 </section>
 
@@ -693,18 +682,16 @@
 <pre class="signature">
 <code><span class="token keyword">struct</span> LSTMIntermediate<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
 <span class="token keyword">mut</span><span class="token punctuation">:</span>
-	zs      <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token comment">// update gate per timestep</span>
-	rs      <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token comment">// reset gate per timestep</span>
-	hs      <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token comment">// candidate hidden per timestep</span>
-	gates_x <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token comment">// gates from input per timestep</span>
-	gates_h <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token comment">// gates from hidden per timestep</span>
+	gates   <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token comment">// full gate tensor per timestep</span>
+	cells   <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token comment">// cell state per timestep</span>
+	hiddens <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token comment">// hidden state per timestep</span>
 <span class="token punctuation">}</span></code></pre>
 <p>LSTMIntermediate stores per-timestep gate values for backprop.</p>
 
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 13 May 2026 20:52:39</div>
+						<div class="footer">Powered by vdoc. Generated on: 13 May 2026 22:20:57</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#avgpool2d_backward">fn avgpool2d_backward</a>        <ul>
 </ul>
@@ -818,9 +805,6 @@
 </ul>
 </li>
 <li class="open"><a href="#leaky_relu">fn leaky_relu</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#lstm_forward_multi">fn lstm_forward_multi</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#lstm_forward_single">fn lstm_forward_single</a>        <ul>
