@@ -10,5 +10,5 @@ pub fn matmul_vulkan[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	for i in 0 .. result_f64.size() {
 		result_array[i] = vtl.cast[T](result_f64.get_nth(i))
 	}
-	return vtl.from_1d[T](result_array, vtl.TensorData{}).reshape(result_f64.shape)!
+  return vtl.from_1d[T](result_array, vtl.TensorData{})!.reshape(result_f64.shape)!
 }
