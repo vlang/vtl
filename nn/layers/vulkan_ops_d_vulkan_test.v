@@ -120,9 +120,7 @@ fn test_attention_forward_vulkan() {
 		mut v_1d := vtl.from_1d[f32](v_data, vtl.TensorData{}) or { panic('from_1d V: ${err}') }
 		v := v_1d.reshape([batch, num_heads, seq_len, head_dim]) or { panic('reshape V: ${err}') }
 
-		result := attention_forward_vulkan[f32](q, k, v, head_dim) or {
-			panic('attention: ${err}')
-		}
+		result := attention_forward_vulkan[f32](q, k, v, head_dim) or { panic('attention: ${err}') }
 
 		assert result.shape == [batch, num_heads, seq_len, head_dim], 'attention output shape mismatch'
 
