@@ -1,7 +1,8 @@
-module layers
+module vulkan_layers
 
 import storage
 import vtl
+import vtl.nn.layers
 import vtl.runtime
 import math
 
@@ -19,7 +20,7 @@ fn test_gelu_forward_vulkan_basic() {
 		input_data := [f32(0), 1, -1, 2]
 		input := vtl.from_1d[f32](input_data, vtl.TensorData{})!
 
-		out := gelu_forward_vulkan[f32](input, params)!
+		out := layers.gelu_forward_vulkan[f32](input, params)!
 
 		assert out.shape == [4]
 
@@ -48,7 +49,7 @@ fn test_gelu_forward_vulkan_shape_preserved() {
 		input_data := [f32(1), 2, 3, 4, 5, 6]
 		input := vtl.from_1d[f32](input_data, vtl.TensorData{})!.reshape([2, 3])!
 
-		out := gelu_forward_vulkan[f32](input, params)!
+		out := layers.gelu_forward_vulkan[f32](input, params)!
 
 		assert out.shape == [2, 3]
 	}

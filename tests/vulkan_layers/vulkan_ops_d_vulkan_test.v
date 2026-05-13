@@ -1,10 +1,11 @@
-module layers
+module vulkan_layers
 
 import storage
 import vtl
+import vtl.nn.layers
 import vtl.runtime
 
-// test_softmax_forward_vulkan verifies numerically-stable GPU softmax.
+// test_layers.softmax_forward_vulkan verifies numerically-stable GPU softmax.
 fn test_softmax_forward_vulkan() {
 	$if vulkan ? {
 		mut dev := runtime.new_vulkan_device() or {
@@ -20,7 +21,7 @@ fn test_softmax_forward_vulkan() {
 		data := []f32{len: n, init: f32(index) * 0.1}
 		x := vtl.from_1d[f32](data, vtl.TensorData{}) or { panic('from_1d: ${err}') }
 
-		result := softmax_forward_vulkan[f32](x, params) or { panic('softmax: ${err}') }
+		result := layers.softmax_forward_vulkan[f32](x, params) or { panic('softmax: ${err}') }
 
 		assert result.size() == n
 		mut s := f32(0)
@@ -33,7 +34,7 @@ fn test_softmax_forward_vulkan() {
 	}
 }
 
-// test_layernorm_forward_vulkan verifies GPU layer normalisation (mean ≈ 0).
+// test_layers.layernorm_forward_vulkan verifies GPU layer normalisation (mean ≈ 0).
 fn test_layernorm_forward_vulkan() {
 	$if vulkan ? {
 		mut dev := runtime.new_vulkan_device() or {
@@ -49,7 +50,7 @@ fn test_layernorm_forward_vulkan() {
 		data := []f32{len: n, init: f32(index) - f32(n) / 2.0}
 		x := vtl.from_1d[f32](data, vtl.TensorData{}) or { panic('from_1d: ${err}') }
 
-		result := layernorm_forward_vulkan[f32](x, f32(1e-5), params) or {
+		result := layers.layernorm_forward_vulkan[f32](x, f32(1e-5), params) or {
 			panic('layernorm: ${err}')
 		}
 
@@ -63,7 +64,7 @@ fn test_layernorm_forward_vulkan() {
 	}
 }
 
-// test_reduce_sum_vulkan verifies GPU per-workgroup reduction sum.
+// test_layers.reduce_sum_vulkan verifies GPU per-workgroup reduction sum.
 fn test_reduce_sum_vulkan() {
 	$if vulkan ? {
 		mut dev := runtime.new_vulkan_device() or {
@@ -79,7 +80,7 @@ fn test_reduce_sum_vulkan() {
 		data := []f32{len: n, init: f32(1)} // all ones → sum = n
 		x := vtl.from_1d[f32](data, vtl.TensorData{}) or { panic('from_1d: ${err}') }
 
-		partial := reduce_sum_vulkan[f32](x, params) or { panic('reduce: ${err}') }
+		partial := layers.reduce_sum_vulkan[f32](x, params) or { panic('reduce: ${err}') }
 
 		mut total := f32(0)
 		for v in partial {
@@ -89,7 +90,7 @@ fn test_reduce_sum_vulkan() {
 	}
 }
 
-// test_attention_forward_vulkan verifies GPU-accelerated scaled dot-product attention.
+// test_layers.attention_forward_vulkan verifies GPU-accelerated scaled dot-product attention.
 fn test_attention_forward_vulkan() {
 	$if vulkan ? {
 		// Probe: skip gracefully if no Vulkan device is available.
@@ -120,7 +121,9 @@ fn test_attention_forward_vulkan() {
 		mut v_1d := vtl.from_1d[f32](v_data, vtl.TensorData{}) or { panic('from_1d V: ${err}') }
 		v := v_1d.reshape([batch, num_heads, seq_len, head_dim]) or { panic('reshape V: ${err}') }
 
-		result := attention_forward_vulkan[f32](q, k, v, head_dim) or { panic('attention: ${err}') }
+		result := layers.attention_forward_vulkan[f32](q, k, v, head_dim) or {
+			panic('attention: ${err}')
+		}
 
 		assert result.shape == [batch, num_heads, seq_len, head_dim], 'attention output shape mismatch'
 
@@ -134,6 +137,6 @@ fn test_attention_forward_vulkan() {
 		assert out_10 >= 2.0 && out_10 <= 4.0, 'attention[0,0,1,0]=${out_10} out of range'
 		assert out_11 >= 3.0 && out_11 <= 5.0, 'attention[0,0,1,1]=${out_11} out of range'
 
-		println('✓ test_attention_forward_vulkan passed')
+		println('✓ test_layers.attention_forward_vulkan passed')
 	}
 }
