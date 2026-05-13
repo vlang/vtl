@@ -36,11 +36,6 @@ fi
 if [[ -n "${use_vulkan}" ]]; then
     echo "Running tests using Vulkan compute"
     flags="${flags} -d vulkan"
-else
-    # Without --use-vulkan, the system Vulkan SDK (vulkan/vulkan.h) is not
-    # guaranteed to be installed. Use dlopen path so the vsl.vulkan module
-    # (transitively imported via autograd/compute) uses a bundled header.
-    flags="${flags} -d vsl_vulkan_dlopen"
 fi
 
 if [[ -n "${use_autofree}" ]]; then
