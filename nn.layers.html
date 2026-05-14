@@ -318,6 +318,14 @@
 
 </section>
 
+		<section id="gru_layer" class="doc-node">
+			<div class="title"><h2>fn gru_layer <a href="#gru_layer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/gru.v#L42"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> gru_layer<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>ctx <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Context<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> input_size <span class="token builtin">int</span><span class="token punctuation">,</span> hidden_size <span class="token builtin">int</span><span class="token punctuation">)</span> types<span class="token punctuation">.</span>Layer<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<p>gru_layer creates a GRULayer with Kaiming-initialized weights.</p>
+
+</section>
+
 		<section id="input_layer" class="doc-node">
 			<div class="title"><h2>fn input_layer <a href="#input_layer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/input.v#L15"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -1479,6 +1487,31 @@
 
 </section>
 
+		<section id="GRULayer" class="doc-node">
+			<div class="title"><h2>struct GRULayer <a href="#GRULayer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/gru.v#L29"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> GRULayer<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<span class="token keyword">mut</span><span class="token punctuation">:</span>
+	w_ih <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span>
+	w_hh <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span>
+	b_ih <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span>
+	b_hh <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	ctx         <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Context<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span>
+	input_size  <span class="token builtin">int</span>
+	hidden_size <span class="token builtin">int</span>
+<span class="token punctuation">}</span></code></pre>
+<p>GRULayer implements a Gated Recurrent Unit layer.</p>
+<p>Implements the standard GRU equations (PyTorch/CuDNN compatible): r_t = sigmoid(x_t @ W_ir^T + h_{t-1} @ W_hr^T + b_ir + b_hr) z_t = sigmoid(x_t @ W_iz^T + h_{t-1} @ W_hz^T + b_iz + b_hz) n_t = tanh(x_t @ W_in^T + b_in + r_t * (h_{t-1} @ W_hn^T + b_hn)) h_t = (1 - z_t) * n_t + z_t * h_{t-1}</p>
+<p>Input:  <code>[batch, seq_len, input_size]</code> Output: <code>[batch, hidden_size]</code>  (final hidden state)</p>
+<p>Compared to LSTM, GRU:- Has 3 gates instead of 4 (no separate cell state)</p>
+<ul>
+<li>Uses fewer parameters (3<em>hidden_size vs 4</em>hidden_size weights)</li>
+<li>Often trains faster while achieving comparable performance</li></ul>
+<p>Contains learnable weights: w_ih: [3<em>hidden_size, input_size]  — input-to-hidden for r, z, n gates w_hh: [3</em>hidden_size, hidden_size] — hidden-to-hidden for r, z, n gates b_ih: [3<em>hidden_size]              — input bias b_hh: [3</em>hidden_size]              — hidden bias</p>
+
+</section>
+
 		<section id="GlobalAvgPool2DGate" class="doc-node">
 			<div class="title"><h2>struct GlobalAvgPool2DGate <a href="#GlobalAvgPool2DGate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/pool.v#L181"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -1780,7 +1813,7 @@
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 13 May 2026 23:43:23</div>
+						<div class="footer">Powered by vdoc. Generated on: 14 May 2026 04:20:02</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_nn.layers">README</a></li>
 <li class="open"><a href="#attention_apply_values_vulkan">fn attention_apply_values_vulkan</a>        <ul>
@@ -1853,6 +1886,9 @@
 </ul>
 </li>
 <li class="open"><a href="#global_avgpool2d_layer">fn global_avgpool2d_layer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#gru_layer">fn gru_layer</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#input_layer">fn input_layer</a>        <ul>
@@ -2177,6 +2213,9 @@
 </ul>
 </li>
 <li class="open"><a href="#GELULayer">struct GELULayer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#GRULayer">struct GRULayer</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#GlobalAvgPool2DGate">struct GlobalAvgPool2DGate</a>        <ul>
