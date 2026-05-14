@@ -2,7 +2,7 @@ module vulkan_layers
 
 import math
 import vtl
-import vtl.nn.layers
+import vtl.nn.layers { linear_forward_vulkan, relu_forward_vulkan, sigmoid_forward_vulkan }
 import vtl.storage
 
 fn test_linear_vulkan_configuration() {
