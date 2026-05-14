@@ -79,26 +79,24 @@ fn main() {
 	epoch_x := []f64{len: epochs, init: f64(index)}
 
 	plt.scatter(
-		x:     epoch_x
-		y:     losses
-		mode:  'lines'
-		line:  plot.Line{
+		x:    epoch_x
+		y:    losses
+		mode: 'lines'
+		line: plot.Line{
 			color: '#F44336'
 			width: 2.0
 		}
-		name:  'Loss (MSE)'
-		yaxis: 'y'
+		name: 'Loss (MSE)'
 	)
 	plt.scatter(
-		x:     epoch_x
-		y:     accuracies
-		mode:  'lines'
-		line:  plot.Line{
+		x:    epoch_x
+		y:    accuracies
+		mode: 'lines'
+		line: plot.Line{
 			color: '#2196F3'
 			width: 2.0
 		}
-		name:  'Accuracy'
-		yaxis: 'y2'
+		name: 'Accuracy'
 	)
 	plt.layout(
 		title: 'VTL Training Metrics: XOR Classification'
