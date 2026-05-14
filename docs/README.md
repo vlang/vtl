@@ -27,13 +27,15 @@ neural network module.
 | [TUTORIAL_OPTIMIZERS.md](./TUTORIAL_OPTIMIZERS.md) | Adam/AdamW/RMSProp/AdaGrad/SGD + schedulers |
 | [TUTORIAL_GPU_BACKENDS.md](./TUTORIAL_GPU_BACKENDS.md) | Vulkan/OpenCL (VCL) backend usage and benchmarking |
 
-## VSL — V Standard Library
+## VSL — V Scientific Library
 
-VSL is the pure-V linear algebra companion of VTL. It wraps LAPACK via `go-vlang/vsl`
-and provides matrix operations, decompositions, and random number generation.
+VSL is a comprehensive scientific computing library for V.  It provides linear
+algebra (BLAS/LAPACK), statistics, polynomials, derivatives, noise generators,
+plotting (`vsl.plot`), and more.
 
-> **VTL automatically uses VSL as its LA backend.** There is usually no need to
-> install or import VSL directly when working with VTL.
+> **VTL uses VSL as its LA and plotting backend.** You generally don't need to
+> import VSL directly when using VTL's tensor or neural network modules, but
+> you will import `vsl.plot` for visualization.
 
 | Document | Description |
 |----------|-------------|
