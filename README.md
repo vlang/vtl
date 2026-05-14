@@ -4,7 +4,10 @@
 
 [![Mentioned in Awesome V][awesomevbadge]][awesomevurl]
 [![CI][workflowbadge]][workflowurl]
+[![Deploy Documentation][deploydocsbadge]][deploydocsurl]
+[![Shellcheck][shellcheckbadge]][shellcheckurl]
 [![License: MIT][licensebadge]][licenseurl]
+[![Documentation][docsbadge]][docsurl]
 
 **VTL** is a pure-[V](https://vlang.io) tensor library for numerical computing
 and machine learning. It provides n-dimensional arrays with automatic
@@ -125,7 +128,13 @@ v -d vulkan -d vcl run benchmark/main.v
 
 [awesomevbadge]: https://awesome.re/mentioned-badge.svg
 [workflowbadge]: https://github.com/vlang/vtl/actions/workflows/ci.yml/badge.svg
+[deploydocsbadge]: https://github.com/vlang/vtl/actions/workflows/deploy-docs.yml/badge.svg
+[shellcheckbadge]: https://github.com/vlang/vtl/actions/workflows/shellcheck.yml/badge.svg
 [licensebadge]: https://img.shields.io/badge/License-MIT-blue.svg
+[docsbadge]: https://img.shields.io/badge/docs-reference-027d9c?logo=v&logoColor=white&logoWidth=10
 [awesomevurl]: https://github.com/vlang/awesome-v/blob/master/README.md#scientific-computing
 [workflowurl]: https://github.com/vlang/vtl/actions/workflows/ci.yml
+[deploydocsurl]: https://github.com/vlang/vtl/actions/workflows/deploy-docs.yml
+[shellcheckurl]: https://github.com/vlang/vtl/actions/workflows/shellcheck.yml
 [licenseurl]: https://github.com/vlang/vtl/blob/main/LICENSE
+[docsurl]: https://vlang.github.io/vtl
