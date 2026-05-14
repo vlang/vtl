@@ -154,12 +154,116 @@ _ = ctx
 - Large batch sizes (32+) help — see the XOR example.
 - `learning_rate = 0.01` is a reliable starting point.
 
+## Visualizing Training with vsl.plot
+
+VTL integrates with [vsl.plot](https://github.com/vlang/vsl) to produce
+interactive training visualizations directly from V code. This is the
+recommended workflow for understanding model convergence and debugging.
+
+### Collecting metrics during training
+
+```v ignore
+import vsl.plot
+
+mut losses := []f64{cap: epochs}
+mut accuracies := []f64{cap: epochs}
+
+for epoch in 0 .. epochs {
+	y_pred := model.forward(x)!
+	mut loss := model.loss(y_pred, y_tensor)!
+	losses << loss.value.get([0])
+
+	// Compute accuracy (for classification tasks)
+	mut correct := 0
+	for i in 0 .. n_samples {
+		pred_class := if y_pred.value.get([i, 0]) >= 0.5 { 1.0 } else { 0.0 }
+		if pred_class == targets[i] { correct++ }
+	}
+	accuracies << f64(correct) / f64(n_samples)
+
+	loss.backprop()!
+	optimizer.update()!
+}
+```
+
+### Plotting the results
+
+```v ignore
+mut plt := plot.Plot.new()
+epoch_x := []f64{len: epochs, init: f64(index)}
+
+plt.scatter(
+    x:    epoch_x
+    y:    losses
+    mode: 'lines'
+    line: plot.Line{ color: '#F44336', width: 2.0 }
+    name: 'Loss'
+)
+plt.layout(
+    title: 'Training Loss'
+    xaxis: plot.Axis{ title: plot.AxisTitle{ text: 'Epoch' } }
+    yaxis: plot.Axis{ title: plot.AxisTitle{ text: 'Loss' } }
+)
+plt.show()!
+```
+
+### Comparing predictions vs ground truth
+
+For regression tasks, overlay the true function with model predictions:
+
+```v ignore
+// After training, evaluate at each point
+mut y_predicted := []f64{len: n_samples}
+for i in 0 .. n_samples {
+	x_check := vtl.from_array([x_data[i]], [1, 1])!
+	mut xv := ctx.variable(x_check, requires_grad: false)
+	pred := model.forward(xv)!
+	y_predicted[i] = pred.value.get([0, 0])
+}
+
+mut plt := plot.Plot.new()
+plt.scatter(x: x_data, y: y_true, mode: 'lines', name: 'True')
+plt.scatter(x: x_data, y: y_predicted, mode: 'lines', name: 'Predicted')
+plt.layout(title: 'Regression: True vs Predicted')
+plt.show()!
+```
+
+See the full examples: [`nn_regression_sine_plot`](../examples/nn_regression_sine_plot/)
+and [`nn_training_metrics_plot`](../examples/nn_training_metrics_plot/).
+
+## Recurrent layers: LSTM and GRU
+
+VTL provides two recurrent layer types for sequence modeling:
+
+| Layer | Gates | Parameters | Cell state |
+|-------|-------|------------|------------|
+| LSTM  | 4 (i, f, g, o) | `4 * hidden_size * (input_size + hidden_size)` | Yes |
+| GRU   | 3 (r, z, n) | `3 * hidden_size * (input_size + hidden_size)` | No |
+
+GRU is simpler and often trains faster, while LSTM can model longer
+dependencies thanks to its explicit cell state.
+
+```v ignore
+import vtl.nn.layers
+
+// LSTM layer: input_size=10, hidden_size=32
+lstm := layers.lstm_layer[f64](ctx, 10, 32)
+
+// GRU layer: input_size=10, hidden_size=32
+gru := layers.gru_layer[f64](ctx, 10, 32)
+```
+
+Both expect input shape `[batch, seq_len, input_size]` and produce output
+shape `[batch, hidden_size]` (the final hidden state).
+
 ## Examples
 
 | Example | Task | Loss |
 |---------|------|------|
 | [`nn_xor`](../examples/nn_xor/) | XOR binary classification | Sigmoid CE |
 | [`nn_regression_sine`](../examples/nn_regression_sine/) | sin(x) regression | MSE |
+| [`nn_regression_sine_plot`](../examples/nn_regression_sine_plot/) | sin(x) regression + plot | MSE |
+| [`nn_training_metrics_plot`](../examples/nn_training_metrics_plot/) | XOR + metrics visualization | MSE |
 | [`nn_simple_two_layer`](../examples/nn_simple_two_layer/) | Random target fitting | MSE |
 | [`nn_multiclass_iris`](../examples/nn_multiclass_iris/) | 3-class classification | Softmax CE |
 | [`nn_autoencoder_simple`](../examples/nn_autoencoder_simple/) | Reconstruction | MSE |
