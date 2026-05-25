@@ -204,9 +204,9 @@ pub fn (mut nn Sequential[T]) kl_div_loss() {
 
 pub fn (mut nn Sequential[T]) forward(train &autograd.Variable[T]) !&autograd.Variable[T] {
 	mut cur := &autograd.Variable[T]{
-		context: train.context
-		value: train.value
-		grad: train.grad
+		context:       train.context
+		value:         train.value
+		grad:          train.grad
 		requires_grad: train.requires_grad
 	}
 	for layer in nn.info.layers {

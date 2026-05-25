@@ -94,7 +94,8 @@ pub fn (nn &Sequential[T]) save_checkpoint(path string, epoch int, loss f64) ! {
 					weights['bias'] = encode_tensor[T](ll.bias.value)!
 				}
 			}
-			'ReLULayer', 'SigmoidLayer', 'TanhLayer', 'LeakyReLULayer', 'ELULayer', 'SwishLayer', 'MishLayer', 'GeluLayer' {
+			'ReLULayer', 'SigmoidLayer', 'TanhLayer', 'LeakyReLULayer', 'ELULayer', 'SwishLayer',
+			'MishLayer', 'GeluLayer' {
 				// Activation layers have no weights - they just copy shapes
 			}
 			'BatchNorm1DLayer' {
@@ -194,7 +195,9 @@ pub fn (nn &Sequential[T]) save_checkpoint(path string, epoch int, loss f64) ! {
 			in_shape:   in_shape
 			config:     config
 		}
-		layer_data << SerializedLayer{weights: weights}
+		layer_data << SerializedLayer{
+			weights: weights
+		}
 	}
 
 	// Create metadata with current timestamp
@@ -270,18 +273,42 @@ pub fn (nn &Sequential[T]) load_weights(path string) ! {
 					if j == 0 { 'weight' } else { 'bias' }
 				}
 				'BatchNorm1DLayer' {
-					if j == 0 { 'gamma' } else if j == 1 { 'beta' } else { key }
+					if j == 0 {
+						'gamma'
+					} else if j == 1 {
+						'beta'
+					} else {
+						key
+					}
 				}
 				'LSTMLayer' {
-					if j == 0 { 'w_ih' } else if j == 1 { 'w_hh' } else if j == 2 { 'b_ih' } else { 'b_hh' }
+					if j == 0 {
+						'w_ih'
+					} else if j == 1 {
+						'w_hh'
+					} else if j == 2 {
+						'b_ih'
+					} else {
+						'b_hh'
+					}
 				}
 				'MultiHeadAttentionLayer' {
-					if j == 0 { 'w_q' } else if j == 1 { 'w_k' } else if j == 2 { 'w_v' } else { 'w_o' }
+					if j == 0 {
+						'w_q'
+					} else if j == 1 {
+						'w_k'
+					} else if j == 2 {
+						'w_v'
+					} else {
+						'w_o'
+					}
 				}
 				'LayerNormLayer' {
 					if j == 0 { 'gamma' } else { 'beta' }
 				}
-				else { key }
+				else {
+					key
+				}
 			}
 
 			if weight_key !in serialized.weights {
@@ -310,11 +337,11 @@ pub fn (nn &Sequential[T]) load_weights(path string) ! {
 // pub fn (mut opt optimizers.AdamOptimizer[T]) load_state(path string) ! {
 // 	data := os.read_file(path)!
 // 	model := json.decode(ModelFile, data)!
-// 
+//
 // 	if model.optimizer.optimizer_type != 'AdamOptimizer' {
 // 		return error('Optimizer type mismatch: expected AdamOptimizer, got ${model.optimizer.optimizer_type}')
 // 	}
-// 
+//
 // 	// Load beta states if present
 // 	if model.optimizer.config.len > 0 {
 // 		if 'beta1_t' in model.optimizer.config {
@@ -324,7 +351,7 @@ pub fn (nn &Sequential[T]) load_weights(path string) ! {
 // 			opt.beta2_t = model.optimizer.config['beta2_t']
 // 		}
 // 	}
-// 
+//
 // 	// Load moments for each parameter
 // 	for i, _ in opt.params {
 // 		key_m := 'moment_${i}'

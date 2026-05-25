@@ -108,7 +108,6 @@ fn test_load_weights() {
 			ll.bias.value.set_nth(i, vtl.cast[f64](0.5))
 		}
 	}
-
 	path := '${test_dir}/weights_test.json'
 	nn1.save(path)!
 
@@ -247,7 +246,6 @@ fn test_linear_layer_weights_serialization() {
 			ll.weights.value.set_nth(i, vtl.cast[f64](weights_data[i]))
 		}
 	}
-
 	path := '${test_dir}/linear_weights_test.json'
 	nn.save(path)!
 
@@ -275,7 +273,7 @@ fn test_batchnorm_serialization() {
 	mut nn := sequential_with_layers[f64]([]types.Layer[f64]{})
 	nn.input([1, 8])
 	nn.batchnorm1d(8, layers.BatchNorm1DConfig{
-		eps: 1e-5
+		eps:      1e-5
 		momentum: 0.1
 	})
 
@@ -287,7 +285,6 @@ fn test_batchnorm_serialization() {
 			bn.beta.value.set_nth(i, vtl.cast[f64](f64(i) * 0.1))
 		}
 	}
-
 	path := '${test_dir}/batchnorm_test.json'
 	nn.save(path)!
 
@@ -415,7 +412,7 @@ fn test_convolutional_network_serialization() {
 	nn.input([1, 1, 28, 28])
 	nn.conv2d(1, 8, [3, 3], layers.Conv2DConfig{
 		padding: [1, 1]
-		stride: [1, 1]
+		stride:  [1, 1]
 	})
 	nn.relu()
 	nn.avgpool2d([2, 2], [0, 0], [2, 2])
