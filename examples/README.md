@@ -19,6 +19,7 @@ Some examples use alternate file names (for example, `main_not_ci.v`) when exclu
 
 - `autograd_backprop`
 - `datasets_imdb`
+- `datasets_iris`
 - `datasets_mnist`
 - `nn_autoencoder_simple`
 - `nn_mnist`
