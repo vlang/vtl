@@ -30,3 +30,7 @@ Some examples use alternate file names (for example, `main_not_ci.v`) when exclu
 - `vtl_opencl_vcl_support`
 - `vtl_plot_scatter_colorscale`
 - `vtl_vandermont`
+
+## Module-scoped examples
+
+- `ml/metrics/examples` — focused examples for `vtl.ml.metrics`
