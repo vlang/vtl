@@ -15,9 +15,9 @@ import vtl
 
 // From a V array
 t := vtl.from_2d([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])!
-println(t.shape)   // [2, 3]
-println(t.size)    // 6
-println(t.rank())  // 2
+println(t.shape) // [2, 3]
+println(t.size) // 6
+println(t.rank()) // 2
 ```
 
 Tensors are the fundamental data structure — n-dimensional arrays that support
@@ -33,8 +33,8 @@ import vtl
 a := vtl.from_1d([1.0, 2.0, 3.0])!
 b := vtl.from_1d([4.0, 5.0, 6.0])!
 
-c := a.add(b)!        // [5, 7, 9]
-d := a.multiply(b)!   // [4, 10, 18]
+c := a.add(b)! // [5, 7, 9]
+d := a.multiply(b)! // [4, 10, 18]
 println(c)
 println(d)
 ```
@@ -58,10 +58,10 @@ ctx := autograd.ctx[f64]()
 x := ctx.variable(vtl.from_1d([3.0])!)
 y := ctx.variable(vtl.from_1d([2.0])!)
 
-mut z := x.pow(y)!   // z = 3^2 = 9
+mut z := x.pow(y)! // z = 3^2 = 9
 z.backprop()!
 
-println(x.grad)       // [6.0] — dz/dx = 2*x = 6
+println(x.grad) // [6.0] — dz/dx = 2*x = 6
 ```
 
 This is how neural networks learn — the loss is backpropagated through
