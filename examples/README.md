@@ -26,6 +26,7 @@ Some examples use alternate file names (for example, `main_not_ci.v`) when exclu
 - `nn_regression_sine`
 - `nn_simple_two_layer`
 - `nn_xor`
+- `vtl_broadcast_basics`
 - `vtl_basic_usage`
 - `vtl_opencl_vcl_support`
 - `vtl_plot_scatter_colorscale`
