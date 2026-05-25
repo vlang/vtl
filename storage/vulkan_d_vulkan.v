@@ -1,0 +1,63 @@
+module storage
+
+import vsl.vulkan
+
+@[params]
+pub struct VulkanParams {
+	device &vulkan.Device = unsafe { nil }
+}
+
+@[heap]
+pub struct VulkanStorage[T] {
+pub mut:
+	data   &vulkan.GpuBuffer = unsafe { nil }
+	length int
+}
+
+pub fn (cpu &CpuStorage[T]) vulkan(params VulkanParams) !&VulkanStorage[T] {
+	mut device := params.device
+
+	if isnil(device) {
+		device = vulkan.new_device()!
+	}
+
+	arr := cpu.data
+	size := u64(arr.len) * u64(sizeof(T))
+	mut buf := device.buffer(vulkan.DeviceSize(size))!
+	mut raw := []u8{len: int(size)}
+	unsafe { C.memcpy(raw.data, arr.data, size) }
+	buf.load(raw)!
+	return &VulkanStorage[T]{
+		data:   buf
+		length: arr.len
+	}
+}
+
+@[inline]
+pub fn (storage &VulkanStorage[T]) vulkan(params VulkanParams) !&VulkanStorage[T] {
+	return storage
+}
+
+pub fn (storage &VulkanStorage[T]) cpu() !&CpuStorage[T] {
+	size := u64(storage.length) * u64(sizeof(T))
+	mut raw := []u8{len: int(size)}
+	storage.data.store(mut raw)!
+	mut arr := []T{len: storage.length}
+	unsafe { C.memcpy(arr.data, raw.data, size) }
+	return &CpuStorage[T]{
+		data: arr
+	}
+}
+
+pub fn (storage &VulkanStorage[T]) to_array() ![]T {
+	size := u64(storage.length) * u64(sizeof(T))
+	mut raw := []u8{len: int(size)}
+	storage.data.store(mut raw)!
+	mut arr := []T{len: storage.length}
+	unsafe { C.memcpy(arr.data, raw.data, size) }
+	return arr
+}
+
+pub fn (storage &VulkanStorage[T]) release() {
+	storage.data.release()
+}
