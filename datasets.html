@@ -122,7 +122,13 @@
 <p>This module exposes some functionalities to download and use the VTL datasets. For this we created some batch based iterators to load the datasets. We expose the following datasets:</p>
 <ul>
 <li><strong>Mnist</strong>: A dataset of handwritten digits.</li>
-<li><strong>Imdb</strong>: A dataset of IMDB reviews for sentiment analysis.</li></ul>
+<li><strong>Imdb</strong>: A dataset of IMDB reviews for sentiment analysis.</li>
+<li><strong>Iris</strong>: A tabular dataset for 3-class flower classification.</li></ul>
+<h2 id="api">API</h2>
+<ul>
+<li><code>load_mnist()</code></li>
+<li><code>load_imdb()</code></li>
+<li><code>load_iris()</code></li></ul>
 
 </section>
 
@@ -142,6 +148,27 @@
 		<section id="" class="doc-node const">
 <pre class="signature">
 <code><span class="token keyword">const</span> imdb_base_url <span class="token operator">=</span> <span class="token string">'http://ai.stanford.edu/~amaas/data/sentiment/'</span></code></pre>
+
+
+</section>
+
+		<section id="" class="doc-node const">
+<pre class="signature">
+<code><span class="token keyword">const</span> iris_file_name <span class="token operator">=</span> <span class="token string">'iris.data'</span></code></pre>
+
+
+</section>
+
+		<section id="" class="doc-node const">
+<pre class="signature">
+<code><span class="token keyword">const</span> iris_base_url <span class="token operator">=</span> <span class="token string">'https://archive.ics.uci.edu/ml/machine-learning-databases/iris/'</span></code></pre>
+
+
+</section>
+
+		<section id="" class="doc-node const">
+<pre class="signature">
+<code><span class="token keyword">const</span> iris_features_count <span class="token operator">=</span> <span class="token number">4</span></code></pre>
 
 
 </section>
@@ -189,6 +216,14 @@
 
 </section>
 
+		<section id="load_iris" class="doc-node">
+			<div class="title"><h2>fn load_iris <a href="#load_iris">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/iris.v#L39"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">load_iris</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span>IrisDataset</code></pre>
+<p>load_iris downloads (if needed) and parses the UCI Iris dataset.</p>
+
+</section>
+
 		<section id="load_mnist" class="doc-node">
 			<div class="title"><h2>fn load_mnist <a href="#load_mnist">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/mnist.v#L49"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -211,6 +246,27 @@
 
 </section>
 
+		<section id="IrisDataset" class="doc-node">
+			<div class="title"><h2>struct IrisDataset <a href="#IrisDataset">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/iris.v#L23"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token symbol">IrisDataset</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	features <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	labels   <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<p>IrisDataset is the classic Iris classification dataset.</p>
+<p>Features are shape [150, 4] with columns:- sepal length</p>
+<ul>
+<li>sepal width</li>
+<li>petal length</li>
+<li>petal width</li></ul>
+<p>Labels are encoded as:- 0 =&gt; Iris-setosa</p>
+<ul>
+<li>1 =&gt; Iris-versicolor</li>
+<li>2 =&gt; Iris-virginica</li></ul>
+
+</section>
+
 		<section id="MnistDataset" class="doc-node">
 			<div class="title"><h2>struct MnistDataset <a href="#MnistDataset">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/mnist.v#L13"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -226,17 +282,23 @@
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 25 May 2026 06:21:40</div>
+						<div class="footer">Powered by vdoc. Generated on: 25 May 2026 07:00:47</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_datasets">README</a></li>
 <li class="open"><a href="#Constants">Constants</a></li>
 <li class="open"><a href="#load_imdb">fn load_imdb</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#load_iris">fn load_iris</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#load_mnist">fn load_mnist</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#ImdbDataset">struct ImdbDataset</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#IrisDataset">struct IrisDataset</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#MnistDataset">struct MnistDataset</a>        <ul>
