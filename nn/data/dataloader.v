@@ -37,8 +37,7 @@ pub fn (s &Subset[T]) len() int {
 // get returns the input and label at subset index i
 pub fn (s &Subset[T]) get(i int) !(&la.Matrix[T], []T) {
 	if i < 0 || i >= s.len() {
-		return errors.error('index ${i} out of bounds for subset of size ${s.len()}',
-			.einval)
+		return errors.error('index ${i} out of bounds for subset of size ${s.len()}', .einval)
 	}
 	return s.dataset.get(s.indices[i])!
 }
@@ -49,8 +48,7 @@ pub fn (s &Subset[T]) split(train_ratio f64) !(&Subset[T], &Subset[T]) {
 	n := s.len()
 	n_train := int(f64(n) * train_ratio)
 	if n_train == 0 || n_train == n {
-		return errors.error('split ratio ${train_ratio} results in empty train or val set',
-			.einval)
+		return errors.error('split ratio ${train_ratio} results in empty train or val set', .einval)
 	}
 	train_indices := s.indices[..n_train].clone()
 	val_indices := s.indices[n_train..].clone()
@@ -66,8 +64,8 @@ pub:
 	batch_size int
 	shuffle    bool
 pub mut:
-	indices    []int // current indices for shuffling
-	position   int   // current position in epoch
+	indices  []int // current indices for shuffling
+	position int   // current position in epoch
 }
 
 // DataLoader.new creates a new DataLoader
@@ -134,12 +132,12 @@ pub fn (mut dl DataLoader[T]) next() !(&la.Matrix[T], []T) {
 }
 
 // reset resets the DataLoader to start a new epoch
-pub fn (mut dl &DataLoader[T]) reset() {
+pub fn (mut dl DataLoader[T]) reset() {
 	dl.position = 0
 }
 
 // shuffle_indices shuffles the indices array using Fisher-Yates
-fn (mut dl &DataLoader[T]) shuffle_indices() {
+fn (mut dl DataLoader[T]) shuffle_indices() {
 	for i := dl.indices.len - 1; i > 0; i-- {
 		j := rand.intn(i + 1) or { 0 }
 		dl.indices[i], dl.indices[j] = dl.indices[j], dl.indices[i]

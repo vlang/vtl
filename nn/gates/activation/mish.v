@@ -10,7 +10,9 @@ pub:
 }
 
 pub fn mish_gate[T](cache &vtl.Tensor[T]) &MishGate[T] {
-	return &MishGate[T]{cache: cache}
+	return &MishGate[T]{
+		cache: cache
+	}
 }
 
 pub fn (g &MishGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {

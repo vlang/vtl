@@ -5,11 +5,9 @@ import vsl.la
 
 fn test_dataloader_basic() {
 	// Create simple test data: 10 samples, 3 features
-	mut x_data := [][]f64{
-		len: 10
-		init: []f64{len: 3, init: f64(index)}
-	}
+	mut x_data := [][]f64{len: 10}
 	for i := 0; i < 10; i++ {
+		x_data[i] = []f64{len: 3}
 		for j := 0; j < 3; j++ {
 			x_data[i][j] = f64(i * 3 + j)
 		}
@@ -51,11 +49,9 @@ fn test_dataloader_basic() {
 
 fn test_dataloader_shuffle() {
 	// Create test data: 10 samples, 2 features
-	mut x_data := [][]f64{
-		len: 10
-		init: []f64{len: 2, init: 0.0}
-	}
+	mut x_data := [][]f64{len: 10}
 	for i := 0; i < 10; i++ {
+		x_data[i] = []f64{len: 2}
 		x_data[i][0] = f64(i)
 		x_data[i][1] = f64(i) * 2.0
 	}
@@ -82,11 +78,9 @@ fn test_dataloader_shuffle() {
 
 fn test_dataloader_reset() {
 	// Create test data: 6 samples, 2 features
-	mut x_data := [][]f64{
-		len: 6
-		init: []f64{len: 2, init: 0.0}
-	}
+	mut x_data := [][]f64{len: 6}
 	for i := 0; i < 6; i++ {
+		x_data[i] = []f64{len: 2}
 		x_data[i][0] = f64(i)
 		x_data[i][1] = f64(i) * 2.0
 	}
@@ -110,11 +104,9 @@ fn test_dataloader_reset() {
 
 fn test_dataloader_padding() {
 	// Create test data: 7 samples, 2 features
-	mut x_data := [][]f64{
-		len: 7
-		init: []f64{len: 2, init: 0.0}
-	}
+	mut x_data := [][]f64{len: 7}
 	for i := 0; i < 7; i++ {
+		x_data[i] = []f64{len: 2}
 		x_data[i][0] = f64(i)
 		x_data[i][1] = f64(i) * 2.0
 	}

@@ -14,11 +14,11 @@ pub mut:
 	// device is the CUDA device this storage is allocated on
 	device &cuda.CudaDevice = unsafe { nil }
 	// ptr is the raw GPU memory pointer
-	ptr    voidptr
+	ptr voidptr
 	// size is the total byte size
-	size   int
+	size int
 	// count is the number of elements of type T
-	count  int
+	count int
 }
 
 // from_cpu creates a CudaStorage from CPU memory with GPU allocation and copy
@@ -27,7 +27,7 @@ pub fn (cpu &CpuStorage[T]) cuda(params CudaParams) !&CudaStorage[T] {
 
 	arr := cpu.data
 	count := arr.len
-	mut ptr := voidptr(0)
+	mut ptr := unsafe { nil }
 	sz := int(sizeof(T)) * count
 	status := C.cudaMalloc(&ptr, sz)
 	if status != 0 {

@@ -10,7 +10,9 @@ pub:
 }
 
 pub fn gelu_gate[T](cache &vtl.Tensor[T]) &GELUGate[T] {
-	return &GELUGate[T]{cache: cache}
+	return &GELUGate[T]{
+		cache: cache
+	}
 }
 
 pub fn (g &GELUGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {

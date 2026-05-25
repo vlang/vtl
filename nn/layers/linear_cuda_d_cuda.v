@@ -57,7 +57,7 @@ pub fn linear_forward_cuda[T](x &Tensor[T], weights &Tensor[T], bias &Tensor[T])
 	mut result_storage := &storage.CudaStorage[f64]{
 		device: dev
 	}
-	mut ptr := voidptr(0)
+	mut ptr := unsafe { nil }
 	sz := int(sizeof(f64)) * final_result.len
 	status := C.cudaMalloc(&ptr, sz)
 	if status != 0 {
@@ -93,7 +93,7 @@ pub fn relu_forward_cuda[T](x &Tensor[T]) !&Tensor[T] {
 	mut output_storage := &storage.CudaStorage[f64]{
 		device: dev
 	}
-	mut ptr := voidptr(0)
+	mut ptr := unsafe { nil }
 	sz := int(sizeof(f64)) * result.len
 	status := C.cudaMalloc(&ptr, sz)
 	if status != 0 {
@@ -128,7 +128,7 @@ pub fn sigmoid_forward_cuda[T](x &Tensor[T]) !&Tensor[T] {
 	mut output_storage := &storage.CudaStorage[f64]{
 		device: dev
 	}
-	mut ptr := voidptr(0)
+	mut ptr := unsafe { nil }
 	sz := int(sizeof(f64)) * result.len
 	status := C.cudaMalloc(&ptr, sz)
 	if status != 0 {

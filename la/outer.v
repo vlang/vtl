@@ -34,4 +34,3 @@ pub fn cross[T](u &vtl.Tensor[T], v &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 	res := vsl_la.cross(ua, va)
 	return vtl.from_1d(res)
 }
-

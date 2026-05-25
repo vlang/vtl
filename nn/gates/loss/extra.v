@@ -6,8 +6,8 @@ import vtl.nn.internal
 
 pub struct BCEGate[T] {
 pub:
-	target       &vtl.Tensor[T] = unsafe { nil }
-	from_logits  bool
+	target      &vtl.Tensor[T] = unsafe { nil }
+	from_logits bool
 }
 
 pub fn bce_gate[T](input &vtl.Tensor[T], target &vtl.Tensor[T], from_logits bool) &BCEGate[T] {
@@ -44,7 +44,10 @@ pub:
 }
 
 pub fn huber_loss_gate[T](input &vtl.Tensor[T], target &vtl.Tensor[T], delta T) &HuberLossGate[T] {
-	return &HuberLossGate[T]{target: target, delta: delta}
+	return &HuberLossGate[T]{
+		target: target
+		delta:  delta
+	}
 }
 
 pub fn (g &HuberLossGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
@@ -73,7 +76,9 @@ pub:
 }
 
 pub fn nll_loss_gate[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) &NLLLossGate[T] {
-	return &NLLLossGate[T]{target: target}
+	return &NLLLossGate[T]{
+		target: target
+	}
 }
 
 pub fn (g &NLLLossGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
@@ -102,7 +107,9 @@ pub:
 }
 
 pub fn kl_div_loss_gate[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) &KLDivLossGate[T] {
-	return &KLDivLossGate[T]{target: target}
+	return &KLDivLossGate[T]{
+		target: target
+	}
 }
 
 pub fn (g &KLDivLossGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {

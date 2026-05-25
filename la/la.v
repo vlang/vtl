@@ -25,7 +25,8 @@ pub fn inv[T](t &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 	t.assert_square_matrix()!
 	mut colmajort := t.copy(.col_major)
 	mut ret_m := vsl_la.Matrix.new[f64](colmajort.shape[0], colmajort.shape[1])
-	mut colmajorm := vsl_la.Matrix.raw(colmajort.shape[0], colmajort.shape[1], tensor_to_f64_array[T](colmajort))
+	mut colmajorm := vsl_la.Matrix.raw(colmajort.shape[0], colmajort.shape[1],
+		tensor_to_f64_array[T](colmajort))
 	vsl_la.matrix_inv(mut ret_m, mut colmajorm, true)
 	return vtl.from_2d[f64](ret_m.get_deep2())
 }

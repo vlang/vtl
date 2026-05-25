@@ -155,8 +155,7 @@ pub fn gemv_cuda(y &CudaTensor[f64], a &CudaTensor[f64], x &CudaTensor[f64]) ! {
 
 	// Copy result to destination
 	unsafe {
-		C.cudaMemcpy(y.data.ptr, result.data, int(sizeof(f64)) * m,
-			C.cuda_memcpy_host_to_device)
+		C.cudaMemcpy(y.data.ptr, result.data, int(sizeof(f64)) * m, C.cuda_memcpy_host_to_device)
 	}
 }
 
@@ -172,7 +171,7 @@ pub fn (t &CudaTensor[f64]) relu_cuda() !&CudaTensor[f64] {
 	mut output_storage := &storage.CudaStorage[f64]{
 		device: dev
 	}
-	mut ptr := voidptr(0)
+	mut ptr := unsafe { nil }
 	sz := int(sizeof(f64)) * result.len
 	status := C.cudaMalloc(&ptr, sz)
 	if status != 0 {
@@ -207,7 +206,7 @@ pub fn (t &CudaTensor[f64]) sigmoid_cuda() !&CudaTensor[f64] {
 	mut output_storage := &storage.CudaStorage[f64]{
 		device: dev
 	}
-	mut ptr := voidptr(0)
+	mut ptr := unsafe { nil }
 	sz := int(sizeof(f64)) * result.len
 	status := C.cudaMalloc(&ptr, sz)
 	if status != 0 {
