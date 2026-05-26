@@ -9,38 +9,29 @@ import vtl.nn.optimizers
 
 // Training configuration
 const batch_size = 64
-const epochs = 10
+const epochs = 1
 const learning_rate = 0.001
 
-// create_cnn_cifar10 creates a CNN for CIFAR-10 classification
 fn create_cnn_cifar10[T](ctx &autograd.Context[T]) &models.Sequential[T] {
 	mut model := models.sequential_from_ctx[T](ctx)
-	// Input shape: [batch, 3, 32, 32]
 	model.input([3, 32, 32])
-	// Block 1: Conv2d (3, 64, 3x3) + ReLU + MaxPool
 	model.conv2d(3, 64, [3, 3], layers.Conv2DConfig{ padding: [1, 1] })
 	model.relu()
 	model.maxpool2d([2, 2], [0, 0], [2, 2])
-	// Block 2: Conv2d (64, 128, 3x3) + ReLU + MaxPool
 	model.conv2d(64, 128, [3, 3], layers.Conv2DConfig{ padding: [1, 1] })
 	model.relu()
 	model.maxpool2d([2, 2], [0, 0], [2, 2])
-	// Block 3: Conv2d (128, 256, 3x3) + ReLU + MaxPool
 	model.conv2d(128, 256, [3, 3], layers.Conv2DConfig{ padding: [1, 1] })
 	model.relu()
 	model.maxpool2d([2, 2], [0, 0], [2, 2])
-	// Flatten: [batch, 256*4*4] = [batch, 4096]
 	model.flatten()
-	// FC1: Linear (4096, 256) + ReLU
 	model.linear(256)
 	model.relu()
-	// FC2: Linear (256, 10) + Softmax
 	model.linear(10)
 	model.softmax()
 	return model
 }
 
-// calculate_accuracy calculates classification accuracy
 fn calculate_accuracy[T](predictions &vtl.Tensor[T], targets &vtl.Tensor[T]) f64 {
 	pred_shape := predictions.shape
 	sample_count := pred_shape[0]
@@ -70,101 +61,85 @@ fn calculate_accuracy[T](predictions &vtl.Tensor[T], targets &vtl.Tensor[T]) f64
 	return f64(correct) / f64(sample_count) * 100.0
 }
 
-// evaluate_validation runs validation and returns loss and accuracy
-fn evaluate_validation[T](mut model &models.Sequential[T], ctx &autograd.Context[T], dataset &datasets.Cifar10Dataset) !(f64, f64) {
-	val_batch_size := 100
-	val_num_batches := dataset.test_features.shape[0] / val_batch_size
-	mut total_loss := 0.0
-	mut total_correct := 0
-	mut total_samples := 0
-	for batch_id := 0; batch_id < int(val_num_batches); batch_id++ {
-		offset := batch_id * val_batch_size
-		x := ctx.variable(dataset.test_features.slice([offset, offset + val_batch_size])!,
-			requires_grad: false
-		)
-		y := dataset.test_labels.slice([offset, offset + val_batch_size])!
-		y_pred := model.forward(x)!
-		loss := model.loss(y_pred, y)!
-		acc := calculate_accuracy(y_pred.value, y)
-		total_loss += loss.value.get([0])
-		total_correct += int(f64(val_batch_size) * acc / 100.0)
-		total_samples += val_batch_size
-	}
-	avg_loss := total_loss / f64(val_num_batches)
-	accuracy := f64(total_correct) / f64(total_samples) * 100.0
-	return avg_loss, accuracy
-}
-
 fn main() {
 	ctx := autograd.ctx[f64]()
 
-	// Load CIFAR-10 dataset using the datasets module
 	println('Loading CIFAR-10 dataset...')
-	dataset := datasets.load_cifar10_with_config(datasets.Cifar10Config{
+	ds := datasets.load_cifar10_with_config(datasets.Cifar10Config{
 		train_count: 10000
 		test_count:  2000
 	})!
 	println('Dataset loaded successfully!')
-	println('Training samples: ${dataset.train_features.shape[0]}')
-	println('Test samples: ${dataset.test_features.shape[0]}')
-	println('Image shape: ${dataset.train_features.shape[1..]}')
+	println('Training samples: ${ds.train_features.shape[0]}')
+	println('Test samples: ${ds.test_features.shape[0]}')
+	println('Image shape: ${ds.train_features.shape[1..]}')
 	println('Class names: ${datasets.class_names()}')
 
-	// Create model
 	println('\nBuilding CNN model...')
 	mut model := create_cnn_cifar10[f64](ctx)
-	// Set loss function
 	model.cross_entropy_loss()
 
-	// Create optimizer
 	mut optimizer := optimizers.adam_optimizer[f64](optimizers.AdamOptimizerConfig{
 		learning_rate: learning_rate
 	})
 	optimizer.build_params(model.info.layers)
 	println('Model built successfully!')
 
-	num_batches := dataset.train_features.shape[0] / batch_size
-	println('Training for ${epochs} epochs with batch size ${batch_size}')
+	// Training DataLoader with lockstep features + labels
+	mut train_dl := datasets.new_data_loader_with_labels[f64](ds.train_features, ds.train_labels, datasets.DataLoaderConfig{
+		batch_size: batch_size
+		shuffle:    false
+		drop_last:  true
+		seed:       42
+	})
 
-	// Training history
+	// Validation DataLoader (drop_last=false to use all samples)
+	val_dl := datasets.new_data_loader_with_labels[f64](ds.test_features, ds.test_labels, datasets.DataLoaderConfig{
+		batch_size: 100
+		shuffle:    false
+		drop_last:  false
+		seed:       0
+	})
+
+	println('Training for ${epochs} epoch(s) with batch size ${batch_size}')
+	println('Train batches: ${train_dl.len()} | Val batches: ${val_dl.len()}')
+
 	mut train_losses := []f64{}
 	mut train_accuracies := []f64{}
 	mut val_losses := []f64{}
 	mut val_accuracies := []f64{}
 
-	// Training loop
 	for epoch := 0; epoch < epochs; epoch++ {
 		println('\n========================================')
 		println('Epoch ${epoch + 1}/${epochs}')
 		println('========================================')
+
 		mut epoch_loss := 0.0
 		mut epoch_correct := 0
 		mut total_samples := 0
 
-		// Mini-batch training
-		for batch_id := 0; batch_id < int(num_batches); batch_id++ {
-			offset := batch_id * batch_size
-			x := ctx.variable(dataset.train_features.slice([offset, offset + batch_size])!,
-				requires_grad: true
-			)
-			y := dataset.train_labels.slice([offset, offset + batch_size])!
+		for batch_id := 0; batch_id < train_dl.len(); batch_id++ {
+			feat, lab := train_dl.batch_with_labels(batch_id) or { break }
+
+			x := ctx.variable(feat, requires_grad: true)
 			y_pred := model.forward(x)!
-			mut loss := model.loss(y_pred, y)!
+			mut loss := model.loss(y_pred, lab)!
 			loss_scalar := loss.value.get([0])
 			epoch_loss += loss_scalar
-			acc := calculate_accuracy(y_pred.value, y)
+
+			acc := calculate_accuracy(y_pred.value, lab)
 			epoch_correct += int(f64(batch_size) * acc / 100.0)
 			total_samples += batch_size
 
-			if batch_id % 100 == 0 {
-				println('  Batch ${batch_id}/${num_batches}: Loss=${loss_scalar:.4f}, Acc=${acc:.2f}%')
+			if batch_id % 50 == 0 {
+				println('  Batch ${batch_id}/${train_dl.len()}: Loss=${loss_scalar:.4f}, Acc=${acc:.2f}%')
 			}
 
 			loss.backprop()!
 			optimizer.update()!
 		}
 
-		avg_loss := epoch_loss / f64(num_batches)
+		avg_loss := epoch_loss / f64(train_dl.len())
 		accuracy := f64(epoch_correct) / f64(total_samples) * 100.0
 		println('\n  Epoch ${epoch + 1} Summary:')
 		println('    Train Loss: ${avg_loss:.4f}')
@@ -172,25 +147,43 @@ fn main() {
 		train_losses << avg_loss
 		train_accuracies << accuracy
 
-		// Validation
+		// Validation using DataLoader
 		println('\n  Running validation...')
-		val_loss, val_acc := evaluate_validation(mut model, ctx, dataset)!
-		val_losses << val_loss
-		val_accuracies << val_acc
-		println('    Val Loss: ${val_loss:.4f}')
-		println('    Val Accuracy: ${val_acc:.2f}%')
+		mut val_loss_sum := 0.0
+		mut val_correct := 0
+		mut val_total := 0
+		for val_batch_id := 0; val_batch_id < val_dl.len(); val_batch_id++ {
+			vfeat, vlab := val_dl.batch_with_labels(val_batch_id) or { break }
+			vx := ctx.variable(vfeat, requires_grad: false)
+			vpred := model.forward(vx)!
+			vloss := model.loss(vpred, vlab)!
+			vacc := calculate_accuracy(vpred.value, vlab)
+			batch_sz := vfeat.shape[0]
+			val_loss_sum += vloss.value.get([0])
+			val_correct += int(f64(batch_sz) * vacc / 100.0)
+			val_total += batch_sz
+		}
+		val_avg_loss := val_loss_sum / f64(val_dl.len())
+		val_accuracy := f64(val_correct) / f64(val_total) * 100.0
+		println('    Val Loss: ${val_avg_loss:.4f}')
+		println('    Val Accuracy: ${val_accuracy:.2f}%')
+		val_losses << val_avg_loss
+		val_accuracies << val_accuracy
+
+		train_dl.reset()
 	}
 
-	// Print final summary
 	println('\n========================================')
 	println('Training Complete!')
 	println('========================================')
-	println('\nTraining History:')
-	println('----------------------------------------')
-	println('Epoch | Train Loss | Train Acc | Val Loss | Val Acc')
-	println('----------------------------------------')
-	for i := 0; i < epochs; i++ {
-		println('  ${i + 1:3d} |    ${train_losses[i]:.4f}   |  ${train_accuracies[i]:.2f}%  |  ${val_losses[i]:.4f}  |  ${val_accuracies[i]:.2f}%')
+	if train_losses.len > 0 {
+		println('\nTraining History:')
+		println('----------------------------------------')
+		println('Epoch | Train Loss | Train Acc | Val Loss | Val Acc')
+		println('----------------------------------------')
+		for i := 0; i < train_losses.len; i++ {
+			println('  ${i + 1:3d} |    ${train_losses[i]:.4f}   |  ${train_accuracies[i]:.2f}%  |  ${val_losses[i]:.4f}  |  ${val_accuracies[i]:.2f}%')
+		}
+		println('----------------------------------------')
 	}
-	println('----------------------------------------')
 }

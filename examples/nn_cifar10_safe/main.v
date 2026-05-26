@@ -65,12 +65,12 @@ fn main() {
 	ctx := autograd.ctx[f64]()
 
 	println('Loading CIFAR-10 SAFE subset...')
-	dataset := datasets.load_cifar10_with_config(datasets.Cifar10Config{
+	ds := datasets.load_cifar10_with_config(datasets.Cifar10Config{
 		train_count: train_count
 		test_count:  test_count
 	})!
 
-	println('Train samples: ${dataset.train_features.shape[0]} | Test samples: ${dataset.test_features.shape[0]}')
+	println('Train samples: ${ds.train_features.shape[0]} | Test samples: ${ds.test_features.shape[0]}')
 
 	mut model := create_cnn_cifar10[f64](ctx)
 	model.cross_entropy_loss()
@@ -80,8 +80,16 @@ fn main() {
 	})
 	optimizer.build_params(model.info.layers)
 
-	num_batches := dataset.train_features.shape[0] / batch_size
-	train_batches := if int(num_batches) < max_train_batches { int(num_batches) } else { max_train_batches }
+	// DataLoader for training with lockstep (features, labels)
+	mut dl := datasets.new_data_loader_with_labels[f64](ds.train_features, ds.train_labels, datasets.DataLoaderConfig{
+		batch_size: batch_size
+		shuffle:    false
+		drop_last:  true
+		seed:       42
+	})
+
+	num_batches := dl.len()
+	train_batches := if num_batches < max_train_batches { num_batches } else { max_train_batches }
 
 	for epoch := 0; epoch < epochs; epoch++ {
 		mut epoch_loss := 0.0
@@ -89,18 +97,15 @@ fn main() {
 		mut total_samples := 0
 
 		for batch_id := 0; batch_id < train_batches; batch_id++ {
-			offset := batch_id * batch_size
-			x := ctx.variable(dataset.train_features.slice([offset, offset + batch_size])!,
-				requires_grad: true
-			)
-			y := dataset.train_labels.slice([offset, offset + batch_size])!
+			feat, lab := dl.batch_with_labels(batch_id) or { break }
 
+			x := ctx.variable(feat, requires_grad: true)
 			y_pred := model.forward(x)!
-			mut loss := model.loss(y_pred, y)!
+			mut loss := model.loss(y_pred, lab)!
 			loss_scalar := loss.value.get([0])
 			epoch_loss += loss_scalar
 
-			acc := calculate_accuracy(y_pred.value, y)
+			acc := calculate_accuracy(y_pred.value, lab)
 			epoch_correct += int(f64(batch_size) * acc / 100.0)
 			total_samples += batch_size
 
@@ -115,6 +120,8 @@ fn main() {
 		avg_loss := epoch_loss / f64(train_batches)
 		accuracy := f64(epoch_correct) / f64(total_samples) * 100.0
 		println('Epoch ${epoch + 1} done | Avg Loss=${avg_loss:.4f} | Avg Acc=${accuracy:.2f}%')
+
+		dl.reset()
 	}
 
 	println('SAFE run finished.')

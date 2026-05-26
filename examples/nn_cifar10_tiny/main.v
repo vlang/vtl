@@ -61,26 +61,32 @@ fn main() {
 	})
 	opt.build_params(model.info.layers)
 
-	num_batches := ds.train_features.shape[0] / batch_size
-	batches := if int(num_batches) < max_train_batches { int(num_batches) } else { max_train_batches }
+	// Use DataLoader for features and labels in lockstep
+	mut dl := datasets.new_data_loader_with_labels[f64](ds.train_features, ds.train_labels, datasets.DataLoaderConfig{
+		batch_size: batch_size
+		shuffle:    false // deterministic for tiny run
+		drop_last:  true
+		seed:       42
+	})
+
+	num_batches := dl.len()
+	batches := if num_batches < max_train_batches { num_batches } else { max_train_batches }
 
 	for epoch := 0; epoch < epochs; epoch++ {
 		mut loss_sum := 0.0
 		for b := 0; b < batches; b++ {
-			off := b * batch_size
-			x := ctx.variable(ds.train_features.slice([off, off + batch_size])!,
-				requires_grad: true
-			)
-			y := ds.train_labels.slice([off, off + batch_size])!
+			feat, lab := dl.batch_with_labels(b) or { break }
+			x := ctx.variable(feat, requires_grad: true)
 			pred := model.forward(x)!
-			mut loss := model.loss(pred, y)!
+			mut loss := model.loss(pred, lab)!
 			lv := loss.value.get([0])
 			loss_sum += lv
-			acc := accuracy(pred.value, y)
+			acc := accuracy(pred.value, lab)
 			loss.backprop()!
 			opt.update()!
 			println('batch ${b + 1}/${batches} | loss=${lv:.4f} | acc=${acc:.2f}%')
 		}
+		dl.reset()
 		println('epoch ${epoch + 1}/${epochs} | avg_loss=${loss_sum / f64(batches):.4f}')
 	}
 
