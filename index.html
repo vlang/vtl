@@ -128,34 +128,33 @@
 <li><strong>Hardware acceleration</strong> — zero-copy sharing with C libraries via <code>vtl.Tensor.data</code></li></ul>
 <h2 id="quick-start">Quick start</h2>
 <pre><code class="language-v"><span class="token keyword">import</span> vtl
-<span class="token keyword">import</span> vtl<span class="token punctuation">.</span>autograd <span class="token keyword">as</span> ag
+<span class="token keyword">import</span> vtl<span class="token punctuation">.</span>autograd
 <span class="token keyword">import</span> vtl<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>layers
-<span class="token keyword">import</span> vtl<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>loss
+<span class="token keyword">import</span> vtl<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>models
 <span class="token keyword">import</span> vtl<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>optimizers
 
-<span class="token comment">// 1. Build a two-layer network</span>
-<span class="token keyword">mut</span> ctx <span class="token operator">:=</span> ag<span class="token punctuation">.</span>ctx<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-lin1 <span class="token operator">:=</span> layers<span class="token punctuation">.</span>linear_layer<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> <span class="token number">784</span><span class="token punctuation">,</span> <span class="token number">256</span><span class="token punctuation">)</span>
-lin2 <span class="token operator">:=</span> layers<span class="token punctuation">.</span>linear_layer<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> <span class="token number">256</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span>
-model <span class="token operator">:=</span> <span class="token punctuation">[</span>layers<span class="token punctuation">.</span>Layer<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span>lin1<span class="token punctuation">)</span><span class="token punctuation">,</span> layers<span class="token punctuation">.</span>Layer<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span>lin2<span class="token punctuation">)</span><span class="token punctuation">]</span>
+<span class="token comment">// 1. Build a two-layer network using Sequential API</span>
+<span class="token keyword">mut</span> ctx <span class="token operator">:=</span> autograd<span class="token punctuation">.</span>ctx<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">mut</span> model <span class="token operator">:=</span> models<span class="token punctuation">.</span>sequential_from_ctx<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span>ctx<span class="token punctuation">)</span>
+model<span class="token punctuation">.</span><span class="token function">input</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">784</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+model<span class="token punctuation">.</span><span class="token function">linear</span><span class="token punctuation">(</span><span class="token number">256</span><span class="token punctuation">)</span> <span class="token comment">// 784 -&gt; 256</span>
+model<span class="token punctuation">.</span><span class="token function">linear</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span> <span class="token comment">// 256 -&gt; 10</span>
 
 <span class="token comment">// 2. Forward pass</span>
 input_tensor <span class="token operator">:=</span> vtl<span class="token punctuation">.</span>zeros<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">64</span><span class="token punctuation">,</span> <span class="token number">784</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
 <span class="token keyword">mut</span> x <span class="token operator">:=</span> ctx<span class="token punctuation">.</span><span class="token function">variable</span><span class="token punctuation">(</span>input_tensor<span class="token punctuation">)</span>
-<span class="token keyword">for</span> layer <span class="token keyword">in</span> <span class="token symbol">model</span> <span class="token punctuation">{</span>
-    x <span class="token operator">=</span> layer<span class="token punctuation">.</span><span class="token function">forward</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token operator">!</span>
-<span class="token punctuation">}</span>
+y_pred <span class="token operator">:=</span> model<span class="token punctuation">.</span><span class="token function">forward</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token operator">!</span>
 
 <span class="token comment">// 3. Loss</span>
-y_pred <span class="token operator">:=</span> ctx<span class="token punctuation">.</span><span class="token function">variable</span><span class="token punctuation">(</span>vtl<span class="token punctuation">.</span>zeros<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">64</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 target <span class="token operator">:=</span> vtl<span class="token punctuation">.</span>zeros<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">64</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-<span class="token keyword">mut</span> l <span class="token operator">:=</span> loss<span class="token punctuation">.</span>mse_loss<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token keyword">mut</span> loss_val <span class="token operator">:=</span> l<span class="token punctuation">.</span><span class="token function">loss</span><span class="token punctuation">(</span>y_pred<span class="token punctuation">,</span> target<span class="token punctuation">)</span><span class="token operator">!</span>
+<span class="token keyword">mut</span> loss_val <span class="token operator">:=</span> model<span class="token punctuation">.</span><span class="token function">loss</span><span class="token punctuation">(</span>y_pred<span class="token punctuation">,</span> target<span class="token punctuation">)</span><span class="token operator">!</span>
 
 <span class="token comment">// 4. Backward + update</span>
-loss_val<span class="token punctuation">.</span><span class="token function">backward</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">!</span>
-<span class="token keyword">mut</span> opt <span class="token operator">:=</span> optimizers<span class="token punctuation">.</span>adam_optimizer<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span>learning_rate<span class="token punctuation">:</span> <span class="token number">0.001</span><span class="token punctuation">)</span>
-opt<span class="token punctuation">.</span><span class="token function">build_params</span><span class="token punctuation">(</span>model<span class="token punctuation">)</span>
+loss_val<span class="token punctuation">.</span><span class="token function">backprop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">!</span>
+<span class="token keyword">mut</span> opt <span class="token operator">:=</span> optimizers<span class="token punctuation">.</span>adam_optimizer<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span>optimizers<span class="token punctuation">.</span><span class="token symbol">AdamOptimizerConfig</span><span class="token punctuation">{</span>
+    learning_rate<span class="token punctuation">:</span> <span class="token number">0.001</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+opt<span class="token punctuation">.</span><span class="token function">build_params</span><span class="token punctuation">(</span>model<span class="token punctuation">.</span>info<span class="token punctuation">.</span>layers<span class="token punctuation">)</span>
 opt<span class="token punctuation">.</span><span class="token function">update</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">!</span></code></pre>
 <h2 id="module-overview">Module overview</h2>
 <table>
@@ -235,7 +234,7 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 26 May 2026 07:45:36</div>
+						<div class="footer">Powered by vdoc. Generated on: 26 May 2026 07:46:30</div>
 					</div>
 					
 				</div>
