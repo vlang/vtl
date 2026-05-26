@@ -69,9 +69,6 @@
 <div class="menu-row"><a href="./autograd.html">autograd</a></div>
 </li>
 <li class="open">
-<div class="menu-row"><a href="./benchmark.html">benchmark</a></div>
-</li>
-<li class="open">
 <div class="menu-row"><a href="./datasets.html">datasets</a></div>
 </li>
 <li class="open">
@@ -99,9 +96,6 @@
 <li><a href="./nn.optimizers.html">optimizers</a></li>
 <li><a href="./nn.types.html">types</a></li>
 </ul>
-</li>
-<li class="open">
-<div class="menu-row"><a href="./runtime.html">runtime</a></div>
 </li>
 <li class="open">
 <div class="menu-row"><a href="./stats.html">stats</a></div>
@@ -139,7 +133,7 @@
 </section>
 
 		<section id="batchnorm1d_backward" class="doc-node">
-			<div class="title"><h2>fn batchnorm1d_backward <a href="#batchnorm1d_backward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/batchnorm.v#L68"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn batchnorm1d_backward <a href="#batchnorm1d_backward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/batchnorm.v#L64"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> batchnorm1d_backward<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>gradient <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> gamma <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> beta <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> mean <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> var_ <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> eps <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>batchnorm1d_backward computes gradients w.r.t. input, gamma, beta.</p>
@@ -155,7 +149,7 @@
 </section>
 
 		<section id="batchnorm1d_training" class="doc-node">
-			<div class="title"><h2>fn batchnorm1d_training <a href="#batchnorm1d_training">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/batchnorm.v#L25"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn batchnorm1d_training <a href="#batchnorm1d_training">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/batchnorm.v#L23"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> batchnorm1d_training<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> gamma <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> beta <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> eps <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
 <p>batchnorm1d_training computes batch norm using batch stats (training path).</p>
@@ -187,7 +181,7 @@
 </section>
 
 		<section id="conv2d_backward" class="doc-node">
-			<div class="title"><h2>fn conv2d_backward <a href="#conv2d_backward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/conv2d.v#L80"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn conv2d_backward <a href="#conv2d_backward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/conv2d.v#L82"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> conv2d_backward<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>grad_out <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
 	input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
@@ -228,7 +222,7 @@
 </section>
 
 		<section id="deriv_elu" class="doc-node">
-			<div class="title"><h2>fn deriv_elu <a href="#deriv_elu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L152"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn deriv_elu <a href="#deriv_elu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L104"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> deriv_elu<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>gradient <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> cached <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> alpha <span class="token builtin">T</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>deriv_elu computes the derivative of elu For x &gt;= 0: d/dx = 1  → upstream * 1 For x &lt;  0: d/dx = alpha * exp(x) = elu(x) + alpha = cached + alpha</p>
@@ -236,7 +230,7 @@
 </section>
 
 		<section id="deriv_gelu" class="doc-node">
-			<div class="title"><h2>fn deriv_gelu <a href="#deriv_gelu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L184"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn deriv_gelu <a href="#deriv_gelu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L136"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> deriv_gelu<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>gradient <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> cached <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>deriv_gelu computes the derivative of GELU. d/dx GELU(x) = 0.5 * (1 + tanh(z)) + 0.5 * x * sech^2(z) * dz/dx where z = sqrt(2/pi) * (x + 0.044715 * x^3) and dz/dx = sqrt(2/pi) * (1 + 3 * 0.044715 * x^2)</p>
@@ -244,7 +238,7 @@
 </section>
 
 		<section id="deriv_leaky_relu" class="doc-node">
-			<div class="title"><h2>fn deriv_leaky_relu <a href="#deriv_leaky_relu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L126"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn deriv_leaky_relu <a href="#deriv_leaky_relu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L78"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> deriv_leaky_relu<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>gradient <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> cached <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> alpha <span class="token builtin">T</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>deriv_leaky_relu computes the derivative of leaky_relu</p>
@@ -252,7 +246,7 @@
 </section>
 
 		<section id="deriv_mish" class="doc-node">
-			<div class="title"><h2>fn deriv_mish <a href="#deriv_mish">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L243"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn deriv_mish <a href="#deriv_mish">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L195"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> deriv_mish<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>gradient <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> cached <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>deriv_mish computes the derivative of Mish(x) = x * tanh(softplus(x)). d/dx Mish = tanh(softplus(x)) + x * (1 - tanh^2(softplus(x))) * sigmoid(x)</p>
@@ -260,7 +254,7 @@
 </section>
 
 		<section id="deriv_relu" class="doc-node">
-			<div class="title"><h2>fn deriv_relu <a href="#deriv_relu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L102"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn deriv_relu <a href="#deriv_relu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L54"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> deriv_relu<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>gradient <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> cached <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>deriv_relu computes the derivate of relu</p>
@@ -268,7 +262,7 @@
 </section>
 
 		<section id="deriv_sigmoid" class="doc-node">
-			<div class="title"><h2>fn deriv_sigmoid <a href="#deriv_sigmoid">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L75"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn deriv_sigmoid <a href="#deriv_sigmoid">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L34"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> deriv_sigmoid<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>gradient <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> cached <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>deriv_sigmoid computes the derivative of sigmoid sigmoid'(x) = sigmoid(x) * (1 - sigmoid(x)) The gate caches the sigmoid output, so vals[1] = sigmoid(x).</p>
@@ -276,7 +270,7 @@
 </section>
 
 		<section id="deriv_softmax" class="doc-node">
-			<div class="title"><h2>fn deriv_softmax <a href="#deriv_softmax">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L266"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn deriv_softmax <a href="#deriv_softmax">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L218"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> deriv_softmax<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>gradient <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> dim <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>deriv_softmax computes the Jacobian-vector product for softmax. For a softmax slice s_i = exp(x_i) / sum_j exp(x_j), the Jacobian is: dL/dx_k = sum_i L_i * ds_i/dx_k ds_i/dx_k = s_i * (delta_ik - s_k)   (i = k: s_i*(1-s_i), i ≠ k: -s_i*s_k)</p>
@@ -285,7 +279,7 @@
 </section>
 
 		<section id="deriv_swish" class="doc-node">
-			<div class="title"><h2>fn deriv_swish <a href="#deriv_swish">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L215"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn deriv_swish <a href="#deriv_swish">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L167"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> deriv_swish<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>gradient <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> cached <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>deriv_swish computes the derivative of Swish(x) = x * sigmoid(x). d/dx Swish = sigmoid(x) + x * sigmoid(x) * (1 - sigmoid(x)) = sigmoid(x) * (1 + x * (1 - sigmoid(x)))</p>
@@ -293,7 +287,7 @@
 </section>
 
 		<section id="deriv_tanh" class="doc-node">
-			<div class="title"><h2>fn deriv_tanh <a href="#deriv_tanh">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L48"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn deriv_tanh <a href="#deriv_tanh">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L14"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> deriv_tanh<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>gradient <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> cached <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>deriv_tanh computes the derivative of tanh</p>
@@ -317,7 +311,7 @@
 </section>
 
 		<section id="elu" class="doc-node">
-			<div class="title"><h2>fn elu <a href="#elu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L139"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn elu <a href="#elu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L91"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> elu<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>x <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> alpha <span class="token builtin">T</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>elu activation function</p>
@@ -341,7 +335,7 @@
 </section>
 
 		<section id="gelu" class="doc-node">
-			<div class="title"><h2>fn gelu <a href="#gelu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L166"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn gelu <a href="#gelu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L118"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> gelu<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>x <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>gelu applies the Gaussian Error Linear Unit activation. GELU(x) = 0.5 * x * (1 + tanh(sqrt(2/pi) * (x + 0.044715 * x^3)))</p>
@@ -361,22 +355,6 @@
 <pre class="signature">
 <code><span class="token keyword">fn</span> global_avgpool2d_forward<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 
-
-</section>
-
-		<section id="gru_forward_single" class="doc-node">
-			<div class="title"><h2>fn gru_forward_single <a href="#gru_forward_single">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/gru.v#L23"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
-<pre class="signature">
-<code><span class="token keyword">fn</span> gru_forward_single<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
-	hidden0 <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
-	w_ih <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
-	w_hh <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
-	b_ih <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
-	b_hh <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
-<p>gru_forward_single runs a single-layer GRU over a sequence.</p>
-<p>Implements the standard GRU equations (PyTorch/CuDNN compatible): r_t = sigmoid(x_t @ W_ir^T + h_{t-1} @ W_hr^T + b_ir + b_hr) z_t = sigmoid(x_t @ W_iz^T + h_{t-1} @ W_hz^T + b_iz + b_hz) n_t = tanh(x_t @ W_in^T + b_in + r_t * (h_{t-1} @ W_hn^T + b_hn)) h_t = (1 - z_t) * n_t + z_t * h_{t-1}</p>
-<p>Shapes: input:   [seq_len, batch, input_size] hidden0: [batch, hidden_size] w_ih:    [3<em>hidden_size, input_size]  (r, z, n gates stacked) w_hh:    [3</em>hidden_size, hidden_size] b_ih:    [3<em>hidden_size] b_hh:    [3</em>hidden_size]</p>
-<p>Returns (output [seq_len, batch, hidden_size], h_n [batch, hidden_size])</p>
 
 </section>
 
@@ -445,27 +423,38 @@
 </section>
 
 		<section id="leaky_relu" class="doc-node">
-			<div class="title"><h2>fn leaky_relu <a href="#leaky_relu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L115"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn leaky_relu <a href="#leaky_relu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L67"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> leaky_relu<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>x <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> alpha <span class="token builtin">T</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>leaky_relu activation function</p>
 
 </section>
 
-		<section id="lstm_forward_single" class="doc-node">
-			<div class="title"><h2>fn lstm_forward_single <a href="#lstm_forward_single">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/lstm.v#L34"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+		<section id="lstm_forward_multi" class="doc-node">
+			<div class="title"><h2>fn lstm_forward_multi <a href="#lstm_forward_multi">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/lstm.v#L117"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> lstm_forward_single<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
-	hidden0 <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
-	cell0 <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+<code><span class="token keyword">fn</span> lstm_forward_multi<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>input_ <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+	h0 <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
 	w_ih <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
 	w_hh <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
 	b_ih <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
-	b_hh <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
-<p>lstm_forward_single runs a single-layer LSTM over a sequence.</p>
-<p>Implements the standard LSTM equations: i_t = sigmoid(x_t @ W_ii^T + h_{t-1} @ W_hi^T + b_ii + b_hi) f_t = sigmoid(x_t @ W_if^T + h_{t-1} @ W_hf^T + b_if + b_hf) g_t = tanh(x_t @ W_ig^T + h_{t-1} @ W_hg^T + b_ig + b_hg) o_t = sigmoid(x_t @ W_io^T + h_{t-1} @ W_ho^T + b_io + b_ho) c_t = f_t * c_{t-1} + i_t * g_t h_t = o_t * tanh(c_t)</p>
-<p>Shapes: input:   [seq_len, batch, input_size] hidden0: [batch, hidden_size] cell0:   [batch, hidden_size] w_ih:    [4<em>hidden_size, input_size] w_hh:    [4</em>hidden_size, hidden_size] b_ih:    [4<em>hidden_size] b_hh:    [4</em>hidden_size]</p>
-<p>Returns (output [seq_len, batch, hidden_size], h_n [batch, hidden_size], c_n [batch, hidden_size])</p>
+	b_hh <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+<p>lstm_forward_multi stacks multiple LSTM layers. lstm_forward_multi computes LSTM forward pass for multi-layer LSTM.</p>
+<p>Shapes: input_: [seq_len, batch, input_size] h0:      [num_layers, batch, hidden_size] w_ih:    [num_layers, 4<em>hidden_size, input_size/num_layers] w_hh:    [num_layers, 4</em>hidden_size, hidden_size]</p>
+<p>Returns (output [seq_len, batch, hidden_size], h_n [num_layers, batch, hidden_size]).</p>
+
+</section>
+
+		<section id="lstm_forward_single" class="doc-node">
+			<div class="title"><h2>fn lstm_forward_single <a href="#lstm_forward_single">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/lstm.v#L23"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> lstm_forward_single<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+	hidden0 <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+	w_ih <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+	w_hh <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+	b_ih <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+	b_hh <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+<p>lstm_forward_single runs a single-layer LSTM. input: [seq_len, batch, input_size] hidden0: [batch, hidden_size] w_ih: [4<em>hidden_size, input_size]  (i, f, g, o gates) w_hh: [4</em>hidden_size, hidden_size] b_ih, b_hh: [4*hidden_size] Returns (output [seq_len, batch, hidden_size], h_n [batch, hidden_size])</p>
 
 </section>
 
@@ -486,7 +475,7 @@
 </section>
 
 		<section id="mish" class="doc-node">
-			<div class="title"><h2>fn mish <a href="#mish">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L229"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn mish <a href="#mish">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L181"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> mish<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>x <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>mish applies the Mish activation: x * tanh(softplus(x)). softplus(x) = log(1 + exp(x))</p>
@@ -494,7 +483,7 @@
 </section>
 
 		<section id="mse" class="doc-node">
-			<div class="title"><h2>fn mse <a href="#mse">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L338"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn mse <a href="#mse">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L290"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> mse<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>mse squared error between the labels and the predictions</p>
@@ -526,18 +515,10 @@
 </section>
 
 		<section id="relu" class="doc-node">
-			<div class="title"><h2>fn relu <a href="#relu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L84"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn relu <a href="#relu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L43"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> relu<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>x <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>relu activation function</p>
-
-</section>
-
-		<section id="relu_with_backend" class="doc-node">
-			<div class="title"><h2>fn relu_with_backend <a href="#relu_with_backend">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L93"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
-<pre class="signature">
-<code><span class="token keyword">fn</span> relu_with_backend<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>x <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> backend vtl<span class="token punctuation">.</span>Backend<span class="token punctuation">,</span> strict <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
-
 
 </section>
 
@@ -550,7 +531,7 @@
 </section>
 
 		<section id="sigmoid" class="doc-node">
-			<div class="title"><h2>fn sigmoid <a href="#sigmoid">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L57"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn sigmoid <a href="#sigmoid">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L23"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> sigmoid<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>x <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>sigmoid takes a real-valued number and squashes it to the range [0, 1]</p>
@@ -558,7 +539,7 @@
 </section>
 
 		<section id="sigmoid_cross_entropy" class="doc-node">
-			<div class="title"><h2>fn sigmoid_cross_entropy <a href="#sigmoid_cross_entropy">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L321"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn sigmoid_cross_entropy <a href="#sigmoid_cross_entropy">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L273"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> sigmoid_cross_entropy<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>sigmoid_cross_entropy computes the sigmoid cross entropy between the labels and the predictions. Uses the numerically stable logsumexp formulation (Arraymancer source of truth): loss = mean( -y*x + max(x,0) + log1p(exp(-|x|)) )</p>
@@ -573,16 +554,8 @@
 
 </section>
 
-		<section id="sigmoid_with_backend" class="doc-node">
-			<div class="title"><h2>fn sigmoid_with_backend <a href="#sigmoid_with_backend">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L64"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
-<pre class="signature">
-<code><span class="token keyword">fn</span> sigmoid_with_backend<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>x <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> backend vtl<span class="token punctuation">.</span>Backend<span class="token punctuation">,</span> strict <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
-
-
-</section>
-
 		<section id="softmax_cross_entropy" class="doc-node">
-			<div class="title"><h2>fn softmax_cross_entropy <a href="#softmax_cross_entropy">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L361"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn softmax_cross_entropy <a href="#softmax_cross_entropy">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L313"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> softmax_cross_entropy<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>softmax_cross_entropy computes the mean cross-entropy loss for a batch of logit vectors using the numerically stable log-sum-exp trick.</p>
@@ -601,7 +574,7 @@
 </section>
 
 		<section id="softmax_forward" class="doc-node">
-			<div class="title"><h2>fn softmax_forward <a href="#softmax_forward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L392"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn softmax_forward <a href="#softmax_forward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L344"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> softmax_forward<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> dim <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>softmax_forward computes softmax along a specified dimension.</p>
@@ -609,7 +582,7 @@
 </section>
 
 		<section id="swish" class="doc-node">
-			<div class="title"><h2>fn swish <a href="#swish">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L202"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn swish <a href="#swish">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L154"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> swish<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>x <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>swish applies the Swish activation: x * sigmoid(beta * x), beta=1.</p>
@@ -617,18 +590,10 @@
 </section>
 
 		<section id="tanh" class="doc-node">
-			<div class="title"><h2>fn tanh <a href="#tanh">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L35"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn tanh <a href="#tanh">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L8"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> tanh<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>x <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>tanh squashes a real-valued number to the range [-1, 1]</p>
-
-</section>
-
-		<section id="tanh_with_backend" class="doc-node">
-			<div class="title"><h2>fn tanh_with_backend <a href="#tanh_with_backend">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/activation.v#L39"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
-<pre class="signature">
-<code><span class="token keyword">fn</span> tanh_with_backend<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>x <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> backend vtl<span class="token punctuation">.</span>Backend<span class="token punctuation">,</span> strict <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
-
 
 </section>
 
@@ -698,16 +663,18 @@
 <pre class="signature">
 <code><span class="token keyword">struct</span> LSTMIntermediate<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
 <span class="token keyword">mut</span><span class="token punctuation">:</span>
-	gates   <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token comment">// full gate tensor per timestep</span>
-	cells   <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token comment">// cell state per timestep</span>
-	hiddens <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token comment">// hidden state per timestep</span>
+	zs      <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token comment">// update gate per timestep</span>
+	rs      <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token comment">// reset gate per timestep</span>
+	hs      <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token comment">// candidate hidden per timestep</span>
+	gates_x <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token comment">// gates from input per timestep</span>
+	gates_h <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span> <span class="token comment">// gates from hidden per timestep</span>
 <span class="token punctuation">}</span></code></pre>
 <p>LSTMIntermediate stores per-timestep gate values for backprop.</p>
 
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 25 May 2026 07:00:47</div>
+						<div class="footer">Powered by vdoc. Generated on: 26 May 2026 07:07:28</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#avgpool2d_backward">fn avgpool2d_backward</a>        <ul>
 </ul>
@@ -796,9 +763,6 @@
 <li class="open"><a href="#global_avgpool2d_forward">fn global_avgpool2d_forward</a>        <ul>
 </ul>
 </li>
-<li class="open"><a href="#gru_forward_single">fn gru_forward_single</a>        <ul>
-</ul>
-</li>
 <li class="open"><a href="#huber">fn huber</a>        <ul>
 </ul>
 </li>
@@ -824,6 +788,9 @@
 </ul>
 </li>
 <li class="open"><a href="#leaky_relu">fn leaky_relu</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#lstm_forward_multi">fn lstm_forward_multi</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#lstm_forward_single">fn lstm_forward_single</a>        <ul>
@@ -853,9 +820,6 @@
 <li class="open"><a href="#relu">fn relu</a>        <ul>
 </ul>
 </li>
-<li class="open"><a href="#relu_with_backend">fn relu_with_backend</a>        <ul>
-</ul>
-</li>
 <li class="open"><a href="#sgd_optimize">fn sgd_optimize</a>        <ul>
 </ul>
 </li>
@@ -866,9 +830,6 @@
 </ul>
 </li>
 <li class="open"><a href="#sigmoid_cross_entropy_backward">fn sigmoid_cross_entropy_backward</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#sigmoid_with_backend">fn sigmoid_with_backend</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#softmax_cross_entropy">fn softmax_cross_entropy</a>        <ul>
@@ -884,9 +845,6 @@
 </ul>
 </li>
 <li class="open"><a href="#tanh">fn tanh</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#tanh_with_backend">fn tanh_with_backend</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#variance_scaled">fn variance_scaled</a>        <ul>

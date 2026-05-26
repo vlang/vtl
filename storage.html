@@ -69,9 +69,6 @@
 <div class="menu-row"><a href="./autograd.html">autograd</a></div>
 </li>
 <li class="open">
-<div class="menu-row"><a href="./benchmark.html">benchmark</a></div>
-</li>
-<li class="open">
 <div class="menu-row"><a href="./datasets.html">datasets</a></div>
 </li>
 <li class="open">
@@ -99,9 +96,6 @@
 <li><a href="./nn.optimizers.html">optimizers</a></li>
 <li><a href="./nn.types.html">types</a></li>
 </ul>
-</li>
-<li class="open">
-<div class="menu-row"><a href="./runtime.html">runtime</a></div>
 </li>
 <li class="open">
 <div class="menu-row"><a href="./stats.html">stats</a></div>
@@ -153,14 +147,6 @@
 			<div class="title"><h2>fn from_array <a href="#from_array">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/cpu.v#L22"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> from_array<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>arr <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">T</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>CpuStorage<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
-
-
-</section>
-
-		<section id="new_vulkan_params" class="doc-node">
-			<div class="title"><h2>fn new_vulkan_params <a href="#new_vulkan_params">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/vulkan_notd_vulkan.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
-<pre class="signature">
-<code><span class="token keyword">fn</span> <span class="token function">new_vulkan_params</span><span class="token punctuation">(</span>dev <span class="token builtin">voidptr</span><span class="token punctuation">)</span> VulkanStorageParams</code></pre>
 
 
 </section>
@@ -237,10 +223,10 @@
 
 </section>
 
-		<section id="CpuStorage[T].vcl" class="doc-node">
-			<div class="title"><h2>fn (CpuStorage[T]) vcl <a href="#CpuStorage[T].vcl">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/vcl_notd_vcl.v#L6"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+		<section id="CpuStorage[T].vulkan" class="doc-node">
+			<div class="title"><h2>fn (CpuStorage[T]) vulkan <a href="#CpuStorage[T].vulkan">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/vulkan_notd_vulkan.v#L6"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>cpu <span class="token operator">&amp;</span>CpuStorage<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">vcl</span><span class="token punctuation">(</span>params VclStorageParams<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>CpuStorage<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>cpu <span class="token operator">&amp;</span>CpuStorage<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">vulkan</span><span class="token punctuation">(</span>params VulkanParams<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>CpuStorage<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 
 
 </section>
@@ -257,35 +243,20 @@
 
 </section>
 
-		<section id="VclStorageParams" class="doc-node">
-			<div class="title"><h2>struct VclStorageParams <a href="#VclStorageParams">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/vcl_notd_vcl.v#L4"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+		<section id="VulkanParams" class="doc-node">
+			<div class="title"><h2>struct VulkanParams <a href="#VulkanParams">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/vulkan_notd_vulkan.v#L4"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <div class="attributes"><div class="attribute">@[params]</div></div>
 <pre class="signature">
-<code><span class="token keyword">struct</span> <span class="token symbol">VclStorageParams</span> <span class="token punctuation">{</span><span class="token punctuation">}</span></code></pre>
-
-
-</section>
-
-		<section id="VulkanStorageParams" class="doc-node">
-			<div class="title"><h2>struct VulkanStorageParams <a href="#VulkanStorageParams">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/storage/vulkan_notd_vulkan.v#L4"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
-<div class="attributes"><div class="attribute">@[params]</div></div>
-<pre class="signature">
-<code><span class="token keyword">struct</span> <span class="token symbol">VulkanStorageParams</span> <span class="token punctuation">{</span>
-<span class="token keyword">pub</span><span class="token punctuation">:</span>
-	device <span class="token builtin">voidptr</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
-<span class="token punctuation">}</span></code></pre>
+<code><span class="token keyword">struct</span> <span class="token symbol">VulkanParams</span> <span class="token punctuation">{</span><span class="token punctuation">}</span></code></pre>
 
 
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 25 May 2026 07:00:47</div>
+						<div class="footer">Powered by vdoc. Generated on: 26 May 2026 07:07:28</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#Constants">Constants</a></li>
 <li class="open"><a href="#from_array">fn from_array</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#new_vulkan_params">fn new_vulkan_params</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#storage">fn storage</a>        <ul>
@@ -300,16 +271,13 @@
 <li><a href="#CpuStorage[T].offset">fn offset</a></li>
 <li><a href="#CpuStorage[T].set">fn set</a></li>
 <li><a href="#CpuStorage[T].to_array">fn to_array</a></li>
-<li><a href="#CpuStorage[T].vcl">fn vcl</a></li>
+<li><a href="#CpuStorage[T].vulkan">fn vulkan</a></li>
 </ul>
 </li>
 <li class="open"><a href="#CpuStorage">struct CpuStorage</a>        <ul>
 </ul>
 </li>
-<li class="open"><a href="#VclStorageParams">struct VclStorageParams</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#VulkanStorageParams">struct VulkanStorageParams</a>        <ul>
+<li class="open"><a href="#VulkanParams">struct VulkanParams</a>        <ul>
 </ul>
 </li>
 </ul></div>

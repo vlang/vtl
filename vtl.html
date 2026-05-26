@@ -69,9 +69,6 @@
 <div class="menu-row"><a href="./autograd.html">autograd</a></div>
 </li>
 <li class="open">
-<div class="menu-row"><a href="./benchmark.html">benchmark</a></div>
-</li>
-<li class="open">
 <div class="menu-row"><a href="./datasets.html">datasets</a></div>
 </li>
 <li class="open">
@@ -101,9 +98,6 @@
 </ul>
 </li>
 <li class="open">
-<div class="menu-row"><a href="./runtime.html">runtime</a></div>
-</li>
-<li class="open">
 <div class="menu-row"><a href="./stats.html">stats</a></div>
 </li>
 <li class="open">
@@ -120,7 +114,7 @@
 			<div class="title"><h1> vtl <a href="#readme_vtl">#</a></h1></div>
 <h1 id="the-v-tensor-library">The V Tensor Library</h1><div align="center">
 
-<p>[![Mentioned in Awesome V][awesomevbadge]][awesomevurl] [![CI][workflowbadge]][workflowurl] [![Deploy Documentation][deploydocsbadge]][deploydocsurl] [![Shellcheck][shellcheckbadge]][shellcheckurl] [![License: MIT][licensebadge]][licenseurl] [![Documentation][docsbadge]][docsurl]</p>
+<p>[![Mentioned in Awesome V][awesomevbadge]][awesomevurl] [![CI][workflowbadge]][workflowurl] [![License: MIT][licensebadge]][licenseurl]</p>
 <p><strong>VTL</strong> is a pure-<a href="https://vlang.io">V</a> tensor library for numerical computing and machine learning. It provides n-dimensional arrays with automatic differentiation, linear algebra via <a href="https://github.com/vlang/vsl">VSL</a>, and a full neural network module.</p>
 <p><a href="https://github.com/vlang/vtl/blob/master/docs/README.md">Documentation</a> · <a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL.md">Tutorials</a> · <a href="https://github.com/vlang/vsl">VSL Backend</a></p></div>
 
@@ -130,7 +124,7 @@
 <li><strong>Autograd</strong> — reverse-mode automatic differentiation; build arbitrary computational graphs</li>
 <li><strong>Neural networks</strong> — <code>Sequential</code> model API; layers (Linear, Conv2D, LSTM, Attention, …); losses (MSE, BCE, CrossEntropy, Huber, …); optimizers (Adam, AdamW, RMSProp, AdaGrad, SGD)</li>
 <li><strong>Linear algebra</strong> — VSL-backed: matmul, solve, lstsq, qr, lu, cholesky, pinv, trace, norm, SVD</li>
-<li><strong>Hardware acceleration</strong> — zero-copy sharing with C libraries via <code>vtl.Tensor.data</code> plus Vulkan (<code>-d vulkan</code>) and OpenCL/VCL (<code>-d vcl</code>) backend paths</li></ul>
+<li><strong>Hardware acceleration</strong> — zero-copy sharing with C libraries via <code>vtl.Tensor.data</code></li></ul>
 <h2 id="quick-start">Quick start</h2>
 <pre><code class="language-v"><span class="token keyword">import</span> vtl
 <span class="token keyword">import</span> vtl<span class="token punctuation">.</span>autograd <span class="token keyword">as</span> ag
@@ -232,19 +226,10 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 <td>Broadcasting rules</td></tr>
 <tr>
 <td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_SLICING.md">TUTORIAL_SLICING.md</a></td>
-<td>Slicing and views</td></tr>
-<tr>
-<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_GPU_BACKENDS.md">TUTORIAL_GPU_BACKENDS.md</a></td>
-<td>Vulkan + OpenCL/VCL backend guide</td></tr></tbody></table>
-<h2 id="benchmarking">Benchmarking</h2>
-<p>Backend comparison benchmark is available in <a href="https://github.com/vlang/vtl/blob/master/benchmark/README.md"><code>benchmark/</code></a>.</p>
-<pre><code class="language-sh">v run benchmark<span class="token operator">/</span>main<span class="token punctuation">.</span>v
-v <span class="token operator">-</span>d vcl run benchmark<span class="token operator">/</span>main<span class="token punctuation">.</span>v
-v <span class="token operator">-</span>d vulkan run benchmark<span class="token operator">/</span>main<span class="token punctuation">.</span>v
-v <span class="token operator">-</span>d vulkan <span class="token operator">-</span>d vcl run benchmark<span class="token operator">/</span>main<span class="token punctuation">.</span>v</code></pre>
+<td>Slicing and views</td></tr></tbody></table>
 <h2 id="license">License</h2>
 <p><a href="https://github.com/vlang/vtl/blob/master/LICENSE">MIT</a></p>
-<p>[awesomevbadge]: <a href="https://awesome.re/mentioned-badge.svg">https://awesome.re/mentioned-badge.svg</a> [workflowbadge]: <a href="https://github.com/vlang/vtl/actions/workflows/ci.yml/badge.svg">https://github.com/vlang/vtl/actions/workflows/ci.yml/badge.svg</a> [deploydocsbadge]: <a href="https://github.com/vlang/vtl/actions/workflows/deploy-docs.yml/badge.svg">https://github.com/vlang/vtl/actions/workflows/deploy-docs.yml/badge.svg</a> [shellcheckbadge]: <a href="https://github.com/vlang/vtl/actions/workflows/shellcheck.yml/badge.svg">https://github.com/vlang/vtl/actions/workflows/shellcheck.yml/badge.svg</a> [licensebadge]: <a href="https://img.shields.io/badge/License-MIT-blue.svg">https://img.shields.io/badge/License-MIT-blue.svg</a> [docsbadge]: <a href="https://img.shields.io/badge/docs-reference-027d9c?logo=v&amp;amp;logoColor=white&amp;amp;logoWidth=10">https://img.shields.io/badge/docs-reference-027d9c?logo=v&amp;logoColor=white&amp;logoWidth=10</a> [awesomevurl]: <a href="https://github.com/vlang/awesome-v/blob/master/README.md#scientific-computing">https://github.com/vlang/awesome-v/blob/master/README.md#scientific-computing</a> [workflowurl]: <a href="https://github.com/vlang/vtl/actions/workflows/ci.yml">https://github.com/vlang/vtl/actions/workflows/ci.yml</a> [deploydocsurl]: <a href="https://github.com/vlang/vtl/actions/workflows/deploy-docs.yml">https://github.com/vlang/vtl/actions/workflows/deploy-docs.yml</a> [shellcheckurl]: <a href="https://github.com/vlang/vtl/actions/workflows/shellcheck.yml">https://github.com/vlang/vtl/actions/workflows/shellcheck.yml</a> [licenseurl]: <a href="https://github.com/vlang/vtl/blob/main/LICENSE">https://github.com/vlang/vtl/blob/main/LICENSE</a> [docsurl]: <a href="https://vlang.github.io/vtl">https://vlang.github.io/vtl</a></p>
+<p>[awesomevbadge]: <a href="https://awesome.re/mentioned-badge.svg">https://awesome.re/mentioned-badge.svg</a> [workflowbadge]: <a href="https://github.com/vlang/vtl/actions/workflows/ci.yml/badge.svg">https://github.com/vlang/vtl/actions/workflows/ci.yml/badge.svg</a> [licensebadge]: <a href="https://img.shields.io/badge/License-MIT-blue.svg">https://img.shields.io/badge/License-MIT-blue.svg</a> [awesomevurl]: <a href="https://github.com/vlang/awesome-v/blob/master/README.md#scientific-computing">https://github.com/vlang/awesome-v/blob/master/README.md#scientific-computing</a> [workflowurl]: <a href="https://github.com/vlang/vtl/actions/workflows/ci.yml">https://github.com/vlang/vtl/actions/workflows/ci.yml</a> [licenseurl]: <a href="https://github.com/vlang/vtl/blob/main/LICENSE">https://github.com/vlang/vtl/blob/main/LICENSE</a></p>
 
 </section>
 
@@ -305,7 +290,7 @@ v <span class="token operator">-</span>d vulkan <span class="token operator">-</
 </section>
 
 		<section id="concatenate" class="doc-node">
-			<div class="title"><h2>fn concatenate <a href="#concatenate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/stack.v#L118"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn concatenate <a href="#concatenate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/stack.v#L117"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> concatenate<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>ts <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> data AxisData<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>concatenate concatenates two Tensors together</p>
@@ -525,14 +510,6 @@ v <span class="token operator">-</span>d vulkan <span class="token operator">-</
 <pre class="signature">
 <code><span class="token keyword">fn</span> zeros_like<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>t <span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>zeros_like returns a new Tensor of given shape and type as a given Tensor, filled with zeros</p>
-
-</section>
-
-		<section id="Backend.from" class="doc-node">
-			<div class="title"><h2>fn Backend.from <a href="#Backend.from">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/backend.v#L3"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
-<pre class="signature">
-<code><span class="token keyword">fn</span> Backend<span class="token punctuation">.</span>from<span class="token punctuation">[</span><span class="token builtin">W</span><span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token builtin">W</span><span class="token punctuation">)</span> <span class="token operator">!</span>Backend</code></pre>
-
 
 </section>
 
@@ -1067,7 +1044,7 @@ v <span class="token operator">-</span>d vulkan <span class="token operator">-</
 </section>
 
 		<section id="Tensor[T].cumprod" class="doc-node">
-			<div class="title"><h2>fn (Tensor[T]) cumprod <a href="#Tensor[T].cumprod">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/reduction.v#L376"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (Tensor[T]) cumprod <a href="#Tensor[T].cumprod">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/reduction.v#L375"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> cumprod<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>axis <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>cumprod returns the cumulative product along the given axis. Only meaningful for numeric types; bool follows &amp;&amp; semantics.</p>
@@ -1075,7 +1052,7 @@ v <span class="token operator">-</span>d vulkan <span class="token operator">-</
 </section>
 
 		<section id="Tensor[T].cumsum" class="doc-node">
-			<div class="title"><h2>fn (Tensor[T]) cumsum <a href="#Tensor[T].cumsum">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/reduction.v#L305"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (Tensor[T]) cumsum <a href="#Tensor[T].cumsum">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/reduction.v#L304"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> cumsum<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>axis <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>cumsum returns the cumulative sum along the given axis. Only meaningful for numeric types; bool and string follow their respective + semantics.</p>
@@ -1203,7 +1180,7 @@ v <span class="token operator">-</span>d vulkan <span class="token operator">-</
 </section>
 
 		<section id="Tensor[T].expand_dims" class="doc-node">
-			<div class="title"><h2>fn (Tensor[T]) expand_dims <a href="#Tensor[T].expand_dims">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/stack.v#L141"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (Tensor[T]) expand_dims <a href="#Tensor[T].expand_dims">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/stack.v#L140"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> expand_dims<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>data AxisData<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>expand_dims adds an axis to a Tensor in order to support broadcasting operations</p>
@@ -1779,7 +1756,7 @@ v <span class="token operator">-</span>d vulkan <span class="token operator">-</
 </section>
 
 		<section id="Tensor[T].squeeze" class="doc-node">
-			<div class="title"><h2>fn (Tensor[T]) squeeze <a href="#Tensor[T].squeeze">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/stack.v#L93"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (Tensor[T]) squeeze <a href="#Tensor[T].squeeze">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/stack.v#L92"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> squeeze<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>data AxisData<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>squeeze removes dimensions of size one from a Tensor. If dim is provided, only that dimension is removed (must be size 1). If no dim is provided, all size-1 dimensions are removed.</p>
@@ -1979,10 +1956,10 @@ v <span class="token operator">-</span>d vulkan <span class="token operator">-</
 </section>
 
 		<section id="Tensor[T].vulkan" class="doc-node">
-			<div class="title"><h2>fn (Tensor[T]) vulkan <a href="#Tensor[T].vulkan">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/tensor_vulkan_notd_vulkan.v#L6"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (Tensor[T]) vulkan <a href="#Tensor[T].vulkan">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/tensor_vulkan_notd_vulkan.v#L5"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">vulkan</span><span class="token punctuation">(</span>params storage<span class="token punctuation">.</span>VulkanStorageParams<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
-<p>Stub when compiling without <code>-d vulkan</code> (mirrors tensor_vcl_notd_vcl.v).</p>
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">vulkan</span><span class="token punctuation">(</span>params storage<span class="token punctuation">.</span>VulkanParams<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+
 
 </section>
 
@@ -2007,19 +1984,6 @@ v <span class="token operator">-</span>d vulkan <span class="token operator">-</
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> its TensorsIterator<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> next<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">?</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">T</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span></code></pre>
 <p>next calls the iteration type for a given list of iterators which is either flat or strided and returns a list of Nums containing the current values</p>
-
-</section>
-
-		<section id="Backend" class="doc-node">
-			<div class="title"><h2>enum Backend <a href="#Backend">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/backend.v#L4"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
-<pre class="signature">
-<code><span class="token keyword">enum</span> <span class="token symbol">Backend</span> <span class="token punctuation">{</span>
-	auto
-	vulkan
-	vcl
-	cpu
-<span class="token punctuation">}</span></code></pre>
-<p>Backend selects compute backend for runtime dispatch.</p>
 
 </section>
 
@@ -2163,7 +2127,7 @@ v <span class="token operator">-</span>d vulkan <span class="token operator">-</
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 25 May 2026 07:00:47</div>
+						<div class="footer">Powered by vdoc. Generated on: 26 May 2026 07:07:27</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_vtl">README</a></li>
 <li class="open"><a href="#bernoulli">fn bernoulli</a>        <ul>
@@ -2269,9 +2233,6 @@ v <span class="token operator">-</span>d vulkan <span class="token operator">-</
 </ul>
 </li>
 <li class="open"><a href="#zeros_like">fn zeros_like</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#Backend.from">fn Backend.from</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#IteratorStrategy.from">fn IteratorStrategy.from</a>        <ul>
@@ -2474,9 +2435,6 @@ v <span class="token operator">-</span>d vulkan <span class="token operator">-</
 </li>
 <li class="open"><a href="#TensorsIterator[T].next">type TensorsIterator[T]</a>        <ul>
 <li><a href="#TensorsIterator[T].next">fn next</a></li>
-</ul>
-</li>
-<li class="open"><a href="#Backend">enum Backend</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#IteratorStrategy">enum IteratorStrategy</a>        <ul>
