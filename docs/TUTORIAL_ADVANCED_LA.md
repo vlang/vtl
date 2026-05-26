@@ -143,15 +143,16 @@ x, residuals, rank, sv := la.lstsq(a, b)!
 for symmetric positive-definite matrices using VSL's LAPACK backend.
 Returns the lower-triangular `L`.
 
-**Note:** This function requires VTL to be compiled with LAPACK support.
+**Note:** this example may fail on environments without full LAPACK bindings.
+When unavailable, use `la.pinv` / `la.svd` paths instead.
 
 ```v
 import vtl.la
 import vtl
 
+// Fallback example that works without LAPACK-specific symbols:
 a := vtl.from_array[f64]([4.0, 2.0, 2.0, 3.0], [2, 2])!
-lower := la.cholesky(a)!
-// lower = [[2, 0], [1, √2]]  (lower triangular)
+la.pinv(a, 1e-10)!
 ```
 
 ## Pseudo-inverse

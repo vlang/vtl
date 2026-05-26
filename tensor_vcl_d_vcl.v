@@ -1,6 +1,6 @@
 module vtl
 
-import storage
+import vtl.storage
 
 // VclTensor is the main structure defined by VTL to manage N Dimensional data
 @[heap]

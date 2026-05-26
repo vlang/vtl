@@ -48,7 +48,7 @@ pub fn (mut o AdaGradOptimizer[T]) update() ! {
 	for i, mut v in o.params {
 		if v.requires_grad {
 			// Accumulate squared gradients: G += grad^2
-			o.accumulated_sq_grads[i].napply([v.grad], fn [o] [T](vals []T, idx []int) T {
+			o.accumulated_sq_grads[i].napply([v.grad], fn [T](vals []T, idx []int) T {
 				grad := f64(vals[0])
 				return vtl.cast[T](f64(vals[1]) + grad * grad)
 			}) or { return err }

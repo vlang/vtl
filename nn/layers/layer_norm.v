@@ -14,6 +14,7 @@ pub struct LayerNormConfig {
 }
 
 pub struct LayerNormLayer[T] {
+pub:
 	normalized_shape []int
 	eps              f64
 pub mut:

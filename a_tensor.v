@@ -1,6 +1,6 @@
 module vtl
 
-import storage
+import vtl.storage
 
 // MemoryFormat is a sum type that lists the possible memory layouts
 pub enum MemoryFormat {

@@ -1,6 +1,6 @@
 module vtl
 
-import storage
+import vtl.storage
 import vsl.cuda
 import vsl.cuda.compute
 

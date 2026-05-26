@@ -13,7 +13,7 @@ import vtl
 // Contains learnable weights `w_ih`, `w_hh`, `b_ih`, `b_hh` for the input-to-hidden
 // and hidden-to-hidden transformations of the three gates (forget, input, cell).
 pub struct LSTMLayer[T] {
-mut:
+pub mut:
 	w_ih &autograd.Variable[T]
 	w_hh &autograd.Variable[T]
 	b_ih &autograd.Variable[T]
@@ -61,7 +61,7 @@ fn (l &LSTMLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T]
 		batch := input.value.shape[0]
 
 		hidden0 := l.ctx.variable(vtl.zeros[T]([batch, l.hidden_size]))
-		cell0 := l.ctx.variable(vtl.zeros[T]([batch, l.hidden_size]))
+		_ := l.ctx.variable(vtl.zeros[T]([batch, l.hidden_size]))
 
 		output, _ := internal.lstm_forward_single[T](input.value, hidden0.value, l.w_ih.value,
 			l.w_hh.value, l.b_ih.value, l.b_hh.value)!

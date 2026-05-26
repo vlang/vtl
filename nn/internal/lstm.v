@@ -30,90 +30,73 @@ pub fn lstm_forward_single[T](input &vtl.Tensor[T],
 	batch := input.shape[1]
 	hidden_size := hidden0.shape[1]
 
-	// w_ih.t(): [input_size, 4*hidden_size]
 	w_ih_t := w_ih.transpose([1, 0])!
 	w_hh_t := w_hh.transpose([1, 0])!
 
-	mut h := hidden0
-	mut all_outputs := []f64{len: seq_len * batch * hidden_size}
+	unsafe {
+		mut h := hidden0
+		mut all_outputs := []f64{len: seq_len * batch * hidden_size}
 
-	for t in 0 .. seq_len {
-		// Extract x_t: row t from input -> [batch, input_size]
-		x_t_size := input.shape[2]
-		mut x_t_data := []f64{len: batch * x_t_size}
-		for b in 0 .. batch {
-			for f in 0 .. x_t_size {
-				x_t_data[b * x_t_size + f] = f64(input.get([t, b, f]))
-			}
-		}
-		x_t := vtl.from_array(x_t_data.map(vtl.cast[T](it)), [batch, x_t_size])!
-
-		// gate = x_t @ w_ih.t() + h @ w_hh.t()
-		gate_ih := la.matmul[T](x_t, w_ih_t)!
-		gate_hh := la.matmul[T](h, w_hh_t)!
-		gate := gate_ih.add(gate_hh)!
-
-		// Add biases if provided
-		gate_sz := 4 * hidden_size
-		mut gate_data := []f64{len: batch * gate_sz}
-		for b in 0 .. batch {
-			for g in 0 .. gate_sz {
-				mut v := f64(gate.get([b, g]))
-				if b_ih != unsafe { nil } {
-					v += f64(b_ih.get_nth(g))
+		for t in 0 .. seq_len {
+			x_t_size := input.shape[2]
+			mut x_t_data := []f64{len: batch * x_t_size}
+			for b in 0 .. batch {
+				for f in 0 .. x_t_size {
+					x_t_data[b * x_t_size + f] = f64(input.get([t, b, f]))
 				}
-				if b_hh != unsafe { nil } {
-					v += f64(b_hh.get_nth(g))
+			}
+			x_t := vtl.from_array(x_t_data.map(vtl.cast[T](it)), [batch, x_t_size])!
+
+			gate_ih := la.matmul[T](x_t, w_ih_t)!
+			gate_hh := la.matmul[T](h, w_hh_t)!
+			gate := gate_ih.add(gate_hh)!
+
+			gate_sz := 4 * hidden_size
+			mut gate_data := []f64{len: batch * gate_sz}
+			for b in 0 .. batch {
+				for g in 0 .. gate_sz {
+					mut v := f64(gate.get([b, g]))
+					if !isnil(b_ih) {
+						v += f64(b_ih.get_nth(g))
+					}
+					if !isnil(b_hh) {
+						v += f64(b_hh.get_nth(g))
+					}
+					gate_data[b * gate_sz + g] = v
 				}
-				gate_data[b * gate_sz + g] = v
 			}
-		}
-		gate_full := vtl.from_array(gate_data.map(vtl.cast[T](it)), [batch, gate_sz])!
+			gate_full := vtl.from_array(gate_data.map(vtl.cast[T](it)), [batch, gate_sz])!
 
-		// Split: i=0..hs, f=hs..2hs, g=2hs..3hs, o=3hs..4hs
-		mut h_new_data := []f64{len: batch * hidden_size}
-		for b in 0 .. batch {
-			for idx in 0 .. hidden_size {
-				// sigmoid(i), sigmoid(f), tanh(g), sigmoid(o)
-				i_gate := 1.0 / (1.0 + vtl_exp(-f64(gate_full.get([b, idx]))))
-				f_gate := 1.0 / (1.0 + vtl_exp(-f64(gate_full.get([b, hidden_size + idx]))))
-				g_gate := vtl_tanh(f64(gate_full.get([b, 2 * hidden_size + idx])))
-				o_gate := 1.0 / (1.0 + vtl_exp(-f64(gate_full.get([b, 3 * hidden_size + idx]))))
-				h_prev := f64(h.get([b, idx]))
-				// LSTM update: c_new = f * c + i * g, h_new = o * tanh(c_new)
-				// Simplified GRU-style: h_new = (1 - i) * h_prev + i * g
-				// Using standard LSTM without cell state (simplified for now)
-				h_new_data[b * hidden_size + idx] = o_gate * vtl_tanh(f_gate * h_prev +
-					i_gate * g_gate)
+			mut h_new_data := []f64{len: batch * hidden_size}
+			for b in 0 .. batch {
+				for idx in 0 .. hidden_size {
+					i_gate := 1.0 / (1.0 + vtl_exp(-f64(gate_full.get([b, idx]))))
+					f_gate := 1.0 / (1.0 + vtl_exp(-f64(gate_full.get([b, hidden_size + idx]))))
+					g_gate := vtl_tanh(f64(gate_full.get([b, 2 * hidden_size + idx])))
+					o_gate := 1.0 / (1.0 + vtl_exp(-f64(gate_full.get([b, 3 * hidden_size + idx]))))
+					h_prev := f64(h.get([b, idx]))
+					h_new_data[b * hidden_size + idx] = o_gate * vtl_tanh(f_gate * h_prev +
+						i_gate * g_gate)
+				}
 			}
-		}
-		h = vtl.from_array(h_new_data.map(vtl.cast[T](it)), [batch, hidden_size])!
+			h = vtl.from_array(h_new_data.map(vtl.cast[T](it)), [batch, hidden_size])!
 
-		// Store in output
-		for b in 0 .. batch {
-			for idx in 0 .. hidden_size {
-				all_outputs[t * batch * hidden_size + b * hidden_size + idx] = f64(h.get([
-					b,
-					idx,
-				]))
+			for b in 0 .. batch {
+				for idx in 0 .. hidden_size {
+					all_outputs[t * batch * hidden_size + b * hidden_size + idx] = f64(h.get([
+						b,
+						idx,
+					]))
+				}
 			}
 		}
+
+		output := vtl.from_array(all_outputs.map(vtl.cast[T](it)), [seq_len, batch, hidden_size])!
+		return output, h
 	}
-
-	output := vtl.from_array(all_outputs.map(vtl.cast[T](it)), [seq_len, batch, hidden_size])!
-	return output, h
 }
 
 // lstm_forward_multi stacks multiple LSTM layers.
-// lstm_forward_multi computes LSTM forward pass for multi-layer LSTM.
-//
-// Shapes:
-//   input_: [seq_len, batch, input_size]
-//   h0:      [num_layers, batch, hidden_size]
-//   w_ih:    [num_layers, 4*hidden_size, input_size/num_layers]
-//   w_hh:    [num_layers, 4*hidden_size, hidden_size]
-//
-// Returns (output [seq_len, batch, hidden_size], h_n [num_layers, batch, hidden_size]).
 pub fn lstm_forward_multi[T](input_ &vtl.Tensor[T],
 	h0 &vtl.Tensor[T],
 	w_ih &vtl.Tensor[T],
@@ -123,13 +106,11 @@ pub fn lstm_forward_multi[T](input_ &vtl.Tensor[T],
 	num_layers := h0.shape[0]
 	batch := input_.shape[1]
 	hidden_size := h0.shape[2]
-	_ := input_.shape[0] // seq_len unused here; accessed via layer_input in lstm_forward_single
 
 	mut layer_input := input_
 	mut h_list := []&vtl.Tensor[T]{len: num_layers}
 
 	for layer in 0 .. num_layers {
-		// Extract per-layer weights: w_ih[layer] = [4*hs, input_size]
 		layer_w_ih_sz := w_ih.size() / num_layers
 		layer_w_hh_sz := w_hh.size() / num_layers
 		rows_ih := w_ih.shape[1]
@@ -152,35 +133,32 @@ pub fn lstm_forward_multi[T](input_ &vtl.Tensor[T],
 		lw_ih := vtl.from_array(lw_ih_data.map(vtl.cast[T](it)), [rows_ih, cols_ih])!
 		lw_hh := vtl.from_array(lw_hh_data.map(vtl.cast[T](it)), [rows_hh, cols_hh])!
 
-		// Extract h0[layer]: [batch, hidden_size]
-		mut h0_layer_data := []f64{len: batch * hidden_size}
-		for b in 0 .. batch {
-			for idx in 0 .. hidden_size {
-				h0_layer_data[b * hidden_size + idx] = f64(h0.get([layer, b, idx]))
-			}
+		mut lb_ih_data := []f64{len: 4 * hidden_size}
+		mut lb_hh_data := []f64{len: 4 * hidden_size}
+		for g in 0 .. 4 * hidden_size {
+			lb_ih_data[g] = f64(b_ih.get([layer, g]))
+			lb_hh_data[g] = f64(b_hh.get([layer, g]))
 		}
-		h0_layer := vtl.from_array(h0_layer_data.map(vtl.cast[T](it)), [batch, hidden_size])!
+		lb_ih := vtl.from_array(lb_ih_data.map(vtl.cast[T](it)), [4 * hidden_size])!
+		lb_hh := vtl.from_array(lb_hh_data.map(vtl.cast[T](it)), [4 * hidden_size])!
 
-		out, h_final := lstm_forward_single[T](layer_input, h0_layer, lw_ih, lw_hh, unsafe { nil },
-			unsafe { nil })!
-		layer_input = out
-		h_list[layer] = h_final
+		layer_h0 := vtl.from_array([]f64{len: batch * hidden_size}.map(fn (_ f64) f64 { 0 }), [batch, hidden_size])!
+		layer_output, layer_h_n := lstm_forward_single[T](layer_input, layer_h0, lw_ih, lw_hh, lb_ih, lb_hh)!
+		layer_input = layer_output
+		h_list[layer] = layer_h_n
 	}
 
-	// Build h_n [num_layers, batch, hidden_size]
+	output := layer_input
 	mut h_n_data := []f64{len: num_layers * batch * hidden_size}
 	for layer in 0 .. num_layers {
 		for b in 0 .. batch {
 			for idx in 0 .. hidden_size {
-				h_n_data[layer * batch * hidden_size + b * hidden_size + idx] = f64(h_list[layer].get([
-					b,
-					idx,
-				]))
+				h_n_data[layer * batch * hidden_size + b * hidden_size + idx] = f64(h_list[layer].get([b, idx]))
 			}
 		}
 	}
 	h_n := vtl.from_array(h_n_data.map(vtl.cast[T](it)), [num_layers, batch, hidden_size])!
-	return layer_input, h_n
+	return output, h_n
 }
 
 // vtl_exp is a helper for f64 exp (avoids importing math in closures).
@@ -198,8 +176,6 @@ fn vtl_exp(x f64) f64 {
 // vtl_tanh is a helper for f64 tanh.
 @[inline]
 fn vtl_tanh(x f64) f64 {
-	if x > 20.0 { return 1.0 }
-	if x < -20.0 { return -1.0 }
 	e2x := vtl_exp(2.0 * x)
-	return (e2x - 1.0) / (e2x + 1.0)
+	return (e2x - f64(1.0)) / (e2x + f64(1.0))
 }

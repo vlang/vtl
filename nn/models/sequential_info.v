@@ -103,8 +103,6 @@ pub fn (mut ls SequentialInfo[T]) tanh() {
 
 // softmax adds a new softmax layer to the network.
 pub fn (mut ls SequentialInfo[T]) softmax() {
-	layer := ls.layers[ls.layers.len - 1]
-	shape := layer.output_shape()
 	ls.layers << layers.softmax_layer[T](ls.ctx, layers.SoftmaxLayerConfig{})
 }
 

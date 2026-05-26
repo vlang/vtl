@@ -2,8 +2,6 @@ module datasets
 
 import vtl
 import os
-import crypto.sha1
-import net.http
 
 pub const cifar10_base_url = 'https://www.cs.toronto.edu/~kriz/'
 pub const cifar10_file = 'cifar-10-binary.tar.gz'
@@ -42,48 +40,14 @@ pub fn class_names() []string {
 	]
 }
 
-fn get_cache_dir(subdir ...string) string {
-	mut cache_dir := os.cache_dir()
-	$if datasets_dir ? {
-		cache_dir = datasets_dir
-	}
-	return os.join_path(cache_dir, ...subdir)
-}
-
-fn load_from_url(url string, target string) ! {
-	datasets_cache_dir := get_cache_dir('datasets')
-	if !os.is_dir(datasets_cache_dir) {
-		os.mkdir_all(datasets_cache_dir)!
-	}
-	cache_file_name := sha1.hexhash(url)
-	cache_file_path := if target == '' {
-		os.join_path(datasets_cache_dir, cache_file_name)
-	} else {
-		target
-	}
-	if os.is_file(cache_file_path) {
-		return
-	}
-	http.download_file(url, cache_file_path)!
-}
-
 fn download_cifar10(dataset string, baseurl string, file string, uncompressed_dir string) !string {
-	dataset_dir := os.real_path(get_cache_dir('datasets', dataset))
-	target := os.join_path(dataset_dir, file)
-	if !os.exists(target) {
-		if !os.is_dir(dataset_dir) {
-			os.mkdir_all(dataset_dir)!
-		}
-		load_from_url(url: '${baseurl}${file}', target: target)!
-	}
-	uncompressed_path := os.join_path(dataset_dir, uncompressed_dir)
-	if !os.is_dir(uncompressed_path) {
-		result := os.execute('tar -xvzf ${target} -C ${dataset_dir}')
-		if result.exit_code != 0 {
-			return error_with_code('Error extracting ${target}', result.exit_code)
-		}
-	}
-	return uncompressed_path
+	return download_dataset(
+		dataset:          dataset
+		baseurl:          baseurl
+		file:             file
+		compressed:       true
+		uncompressed_dir: uncompressed_dir
+	)!
 }
 
 // load_cifar10_batch loads a single batch file from CIFAR-10 binary format.
@@ -109,7 +73,7 @@ fn load_cifar10_train_batches(data_dir string) !([]f64, []int) {
 	mut all_images := []f64{len: 0}
 	mut all_labels := []int{len: 0}
 	for batch_num := 1; batch_num <= 5; batch_num++ {
-		batch_path := os.join_path(data_dir, 'cifar-10-batches-bin', 'data_batch_${batch_num}.bin')
+		batch_path := os.join_path(data_dir, 'data_batch_${batch_num}.bin')
 		images, labels := load_cifar10_batch(batch_path, 10000)!
 		all_images << images
 		all_labels << labels
@@ -144,10 +108,10 @@ pub fn load_cifar10_with_config(cfg Cifar10Config) !Cifar10Dataset {
 		}
 	}
 	train_labels_tensor :=
-		vtl.from_1d(train_labels_onehot.to_array()!)!.reshape([-1, cfg.num_classes])!
+		vtl.from_1d(train_labels_onehot.to_array())!.reshape([-1, cfg.num_classes])!
 
 	// Load test data
-	test_path := os.join_path(dataset_path, 'cifar-10-batches-bin', 'test_batch.bin')
+	test_path := os.join_path(dataset_path, 'test_batch.bin')
 	test_images, test_labels := load_cifar10_batch(test_path, 10000)!
 
 	// Reshape test images to [N, C, H, W]
@@ -162,7 +126,7 @@ pub fn load_cifar10_with_config(cfg Cifar10Config) !Cifar10Dataset {
 		}
 	}
 	test_labels_tensor :=
-		vtl.from_1d(test_labels_onehot.to_array()!)!.reshape([-1, cfg.num_classes])!
+		vtl.from_1d(test_labels_onehot.to_array())!.reshape([-1, cfg.num_classes])!
 
 	return Cifar10Dataset{
 		train_features: train_features

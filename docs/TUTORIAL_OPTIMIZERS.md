@@ -15,12 +15,13 @@ import vtl
 import vtl.autograd
 import vtl.nn.layers
 import vtl.nn.optimizers
+import vtl.nn.types
 
 mut ctx := autograd.ctx[f64]()
 
 lin1 := layers.linear_layer[f64](ctx, 784, 256)
 lin2 := layers.linear_layer[f64](ctx, 256, 10)
-model := [layers.Layer[f64](lin1), layers.Layer[f64](lin2)]
+model := [types.Layer[f64](lin1), types.Layer[f64](lin2)]
 
 mut opt := optimizers.adam_optimizer[f64](optimizers.AdamOptimizerConfig{
 	learning_rate: 0.001
@@ -35,7 +36,8 @@ mut x := ctx.variable(input_vals)
 for layer in model {
 	x = layer.forward(x)!
 }
-mut target := ctx.variable(target_vals)
+target := ctx.variable(target_vals)
+_ = target
 
 mut loss_val := model[1].forward(x)!
 loss_val.backprop()!
@@ -57,7 +59,16 @@ AdamW is Adam with decoupled weight decay — typically gives better
 regularisation than Adam with L2 penalty.
 
 ```v
+import vtl
+import vtl.autograd
+import vtl.nn.layers
 import vtl.nn.optimizers
+import vtl.nn.types
+
+mut ctx := autograd.ctx[f64]()
+lin1 := layers.linear_layer[f64](ctx, 784, 256)
+lin2 := layers.linear_layer[f64](ctx, 256, 10)
+model := [types.Layer[f64](lin1), types.Layer[f64](lin2)]
 
 mut opt := optimizers.adamw[f64](optimizers.AdamWOptimizerConfig{
 	learning_rate: 0.001
@@ -71,7 +82,16 @@ Config options (same as Adam, plus `weight_decay` with default `0.01`).
 ## RMSProp
 
 ```v
+import vtl
+import vtl.autograd
+import vtl.nn.layers
 import vtl.nn.optimizers
+import vtl.nn.types
+
+mut ctx := autograd.ctx[f64]()
+lin1 := layers.linear_layer[f64](ctx, 784, 256)
+lin2 := layers.linear_layer[f64](ctx, 256, 10)
+model := [types.Layer[f64](lin1), types.Layer[f64](lin2)]
 
 mut opt := optimizers.rmsprop[f64](optimizers.RMSPropOptimizerConfig{
 	learning_rate: 0.001
@@ -90,7 +110,16 @@ opt.build_params(model)
 ## AdaGrad
 
 ```v
+import vtl
+import vtl.autograd
+import vtl.nn.layers
 import vtl.nn.optimizers
+import vtl.nn.types
+
+mut ctx := autograd.ctx[f64]()
+lin1 := layers.linear_layer[f64](ctx, 784, 256)
+lin2 := layers.linear_layer[f64](ctx, 256, 10)
+model := [types.Layer[f64](lin1), types.Layer[f64](lin2)]
 
 mut opt := optimizers.adagrad[f64](optimizers.AdaGradOptimizerConfig{
 	learning_rate: 0.01
@@ -112,7 +141,16 @@ frequently updated parameters. Good for sparse gradients.
 Vanilla Stochastic Gradient Descent:
 
 ```v
+import vtl
+import vtl.autograd
+import vtl.nn.layers
 import vtl.nn.optimizers
+import vtl.nn.types
+
+mut ctx := autograd.ctx[f64]()
+lin1 := layers.linear_layer[f64](ctx, 784, 256)
+lin2 := layers.linear_layer[f64](ctx, 256, 10)
+model := [types.Layer[f64](lin1), types.Layer[f64](lin2)]
 
 mut opt := optimizers.sgd[f64](optimizers.SgdOptimizerConfig{
 	learning_rate: 0.01
@@ -126,7 +164,18 @@ Schedulers adjust the learning rate during training. Create a scheduler,
 then pass the current step and (optionally) a metric delta to `next_lr()`:
 
 ```v
+import vtl
+import vtl.autograd
+import vtl.nn.layers
 import vtl.nn.optimizers
+import vtl.nn.types
+
+mut ctx := autograd.ctx[f64]()
+lin1 := layers.linear_layer[f64](ctx, 784, 256)
+lin2 := layers.linear_layer[f64](ctx, 256, 10)
+model := [types.Layer[f64](lin1), types.Layer[f64](lin2)]
+mut opt := optimizers.sgd[f64](optimizers.SgdOptimizerConfig{ learning_rate: 0.01 })
+opt.build_params(model)
 
 // StepLR: reduce LR by gamma every step_size steps
 mut scheduler := optimizers.step_lr[f64](30, 0.1)
@@ -147,6 +196,7 @@ mut scheduler4 := optimizers.reduce_lr_on_plateau[f64](optimizers.ReduceLROnPlat
 for step := 0; step < 100; step++ {
 	opt.update()!
 	current_lr := scheduler.next_lr(0.001, step)
+	_ = current_lr
 }
 ```
 
@@ -157,12 +207,13 @@ import vtl
 import vtl.autograd
 import vtl.nn.layers
 import vtl.nn.optimizers
+import vtl.nn.types
 
 mut ctx := autograd.ctx[f64]()
 
 lin1 := layers.linear_layer[f64](ctx, 784, 256)
 lin2 := layers.linear_layer[f64](ctx, 256, 10)
-model := [layers.Layer[f64](lin1), layers.Layer[f64](lin2)]
+model := [types.Layer[f64](lin1), types.Layer[f64](lin2)]
 
 mut opt := optimizers.adam_optimizer[f64](optimizers.AdamOptimizerConfig{
 	learning_rate: 0.001
@@ -180,7 +231,8 @@ for epoch := 0; epoch < 10; epoch++ {
 	for layer in model {
 		x = layer.forward(x)!
 	}
-	mut target := ctx.variable(target_batch)
+	target := ctx.variable(target_batch)
+	_ = target
 
 	x.backprop()!
 	opt.update()!

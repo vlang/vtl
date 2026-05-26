@@ -1,6 +1,6 @@
 module vtl
 
-import storage
+import vtl.storage as _
 
 @[params]
 pub struct CudaParams {}

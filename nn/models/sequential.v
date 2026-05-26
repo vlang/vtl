@@ -5,9 +5,7 @@ import vtl.autograd
 import vtl.nn.types
 import vtl.nn.layers
 
-fn init() {
-	println(@MOD + ' module is a WIP and not yet functional')
-}
+fn init() {}
 
 pub struct Sequential[T] {
 pub mut:

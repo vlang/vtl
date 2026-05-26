@@ -43,10 +43,10 @@ fn create_cnn_cifar10[T](ctx &autograd.Context[T]) &models.Sequential[T] {
 // calculate_accuracy calculates classification accuracy
 fn calculate_accuracy[T](predictions &vtl.Tensor[T], targets &vtl.Tensor[T]) f64 {
 	pred_shape := predictions.shape
-	batch_size := pred_shape[0]
+	sample_count := pred_shape[0]
 	num_classes := pred_shape[1]
 	mut correct := 0
-	for i := 0; i < batch_size; i++ {
+	for i := 0; i < sample_count; i++ {
 		mut max_val := predictions.get([i, 0])
 		mut max_idx := 0
 		for j := 1; j < num_classes; j++ {
@@ -67,11 +67,11 @@ fn calculate_accuracy[T](predictions &vtl.Tensor[T], targets &vtl.Tensor[T]) f64
 			correct++
 		}
 	}
-	return f64(correct) / f64(batch_size) * 100.0
+	return f64(correct) / f64(sample_count) * 100.0
 }
 
 // evaluate_validation runs validation and returns loss and accuracy
-fn evaluate_validation[T](model &models.Sequential[T], ctx &autograd.Context[T], dataset &datasets.Cifar10Dataset) (f64, f64) {
+fn evaluate_validation[T](mut model &models.Sequential[T], ctx &autograd.Context[T], dataset &datasets.Cifar10Dataset) !(f64, f64) {
 	val_batch_size := 100
 	val_num_batches := 10000 / val_batch_size
 	mut total_loss := 0.0
@@ -86,7 +86,7 @@ fn evaluate_validation[T](model &models.Sequential[T], ctx &autograd.Context[T],
 		y_pred := model.forward(x)!
 		loss := model.loss(y_pred, y)!
 		acc := calculate_accuracy(y_pred.value, y)
-		total_loss += loss.value
+		total_loss += loss.value.get([0])
 		total_correct += int(f64(val_batch_size) * acc / 100.0)
 		total_samples += val_batch_size
 	}
@@ -147,13 +147,14 @@ fn main() {
 			y := dataset.train_labels.slice([offset, offset + batch_size])!
 			y_pred := model.forward(x)!
 			mut loss := model.loss(y_pred, y)!
-			epoch_loss += loss.value
+			loss_scalar := loss.value.get([0])
+			epoch_loss += loss_scalar
 			acc := calculate_accuracy(y_pred.value, y)
 			epoch_correct += int(f64(batch_size) * acc / 100.0)
 			total_samples += batch_size
 
 			if batch_id % 100 == 0 {
-				println('  Batch ${batch_id}/${num_batches}: Loss=${loss.value:.4f}, Acc=${acc:.2f}%')
+				println('  Batch ${batch_id}/${num_batches}: Loss=${loss_scalar:.4f}, Acc=${acc:.2f}%')
 			}
 
 			loss.backprop()!
@@ -170,7 +171,7 @@ fn main() {
 
 		// Validation
 		println('\n  Running validation...')
-		val_loss, val_acc := evaluate_validation(model, ctx, dataset)
+		val_loss, val_acc := evaluate_validation(mut model, ctx, dataset)!
 		val_losses << val_loss
 		val_accuracies << val_acc
 		println('    Val Loss: ${val_loss:.4f}')

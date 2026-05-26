@@ -6,6 +6,7 @@ import vtl
 import vtl.nn.types
 import vtl.nn.layers
 import encoding.base64
+import math
 
 const model_version = '1.0'
 
@@ -165,7 +166,7 @@ pub fn (nn &Sequential[T]) save_checkpoint(path string, epoch int, loss f64) ! {
 			}
 			else {
 				// For unknown layers, just extract variables if any exist
-				for j, v in layer.variables() {
+for j, mut v in layer.variables() {
 					key := 'var_${j}'
 					weights[key] = encode_tensor[T](v.value)!
 				}
@@ -246,8 +247,9 @@ pub fn (nn &Sequential[T]) load_weights(path string) ! {
 		}
 
 		serialized := model.layer_data[i]
-		for j, v in layer.variables() {
-			key := 'var_${j}'
+		vars := layer.variables()
+		for j := 0; j < vars.len; j++ {
+			mut v := vars[j]
 
 			// Determine the correct key based on layer type
 			weight_key := match saved_type {
@@ -260,7 +262,7 @@ pub fn (nn &Sequential[T]) load_weights(path string) ! {
 					} else if j == 1 {
 						'beta'
 					} else {
-						key
+						'var_${j}'
 					}
 				}
 				'LSTMLayer' {
@@ -289,7 +291,7 @@ pub fn (nn &Sequential[T]) load_weights(path string) ! {
 					if j == 0 { 'gamma' } else { 'beta' }
 				}
 				else {
-					key
+					'var_${j}'
 				}
 			}
 
@@ -353,22 +355,30 @@ pub fn (nn &Sequential[T]) load_weights(path string) ! {
 // 	}
 // }
 
-// encode_tensor converts a tensor to a base64 encoded string with shape.
+// encode_tensor converts a tensor to a string encoding with shape.
 fn encode_tensor[T](t &vtl.Tensor[T]) !string {
 	shape := t.shape
 	mut data := []f64{}
 	for i in 0 .. t.size() {
 		data << f64(t.get_nth(i))
 	}
-	encoded := base64.encode(data)
-	// Store shape alongside data
-	shape_str := shape.join(',')
+	// Encode shape as comma-separated
+	shape_str := shape.map(it.str()).join(',')
+	// Encode data as base64
+	mut byte_data := []u8{len: data.len * 8}
+	for i, val in data {
+		bits := math.f64_bits(val)
+		for j in 0 .. 8 {
+			byte_data[i * 8 + j] = u8((bits >> (56 - j * 8)) & 0xff)
+		}
+	}
+	encoded := base64.encode(byte_data)
 	return '${shape_str}|${encoded}'
 }
 
-// decode_tensor decodes a base64 string back to a tensor with the given shape.
+// decode_tensor decodes a string back to a tensor with the given shape.
 fn decode_tensor[T](encoded string, shape []int) !&vtl.Tensor[T] {
-	parts := encoded.splitn('|', 2)
+	parts := encoded.split('|')
 	if parts.len != 2 {
 		return error('Invalid tensor encoding: missing shape delimiter')
 	}
@@ -384,10 +394,14 @@ fn decode_tensor[T](encoded string, shape []int) !&vtl.Tensor[T] {
 	}
 
 	// Decode data
-	decoded := base64.decode(data_str)!
+	decoded := base64.decode(data_str)
 	mut arr := []T{}
-	for i in 0 .. decoded.len {
-		arr << vtl.cast[T](f64(decoded[i]))
+	for i := 0; i < decoded.len / 8; i++ {
+		mut bits := u64(0)
+		for j in 0 .. 8 {
+			bits = (bits << 8) | u64(decoded[i * 8 + j])
+		}
+		arr << vtl.cast[T](math.f64_from_bits(bits))
 	}
 	return vtl.from_array[T](arr, shape)!
 }
