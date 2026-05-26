@@ -1,6 +1,6 @@
 # CIFAR-10 Image Classification with VTL
 
-A Convolutional Neural Network (CNN) example for CIFAR-10 image classification using the V Tensor Library (VTL).
+A CNN example for CIFAR-10 image classification using the V Tensor Library (VTL).
 
 ## Overview
 
@@ -35,7 +35,7 @@ The CIFAR-10 dataset consists of:
 - 10 classes: airplane, automobile, bird, cat, deer, dog, frog, horse, ship, truck
 - Image size: 32×32×3 RGB
 
-The dataset is automatically downloaded from the official University of Toronto repository on first run.
+The dataset is automatically downloaded from the University of Toronto repository on first run.
 
 ## Running the Example
 
@@ -55,9 +55,9 @@ v run examples/nn_cifar10
 You can modify the training parameters in `main.v`:
 
 ```v
-const batch_size = 64        // Mini-batch size
-const epochs = 10           // Number of training epochs
-const learning_rate = 0.001  // Adam learning rate
+const batch_size = 64 // Mini-batch size
+const epochs = 10 // Number of training epochs
+const learning_rate = 0.001 // Adam learning rate
 ```
 
 ## Expected Output
@@ -103,6 +103,7 @@ Epoch 1/10
 
 ## Notes
 
-- Training takes significant time on CPU. For GPU acceleration (CUDA/Vulkan), ensure VTL is compiled with GPU support.
+- Training takes significant time on CPU. For GPU acceleration (CUDA/Vulkan),
+  ensure VTL is compiled with GPU support.
 - The first run will download ~170MB of CIFAR-10 data.
 - Memory usage is approximately 2-4GB depending on batch size.

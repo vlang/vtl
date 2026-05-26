@@ -3,7 +3,6 @@ module models
 import json
 import os
 import vtl
-import vtl.autograd
 import vtl.nn.types
 import vtl.nn.layers
 import encoding.base64
@@ -86,87 +85,70 @@ pub fn (nn &Sequential[T]) save_checkpoint(path string, epoch int, loss f64) ! {
 		// Extract layer-specific configuration and weights
 		match layer_type {
 			'LinearLayer' {
-				unsafe {
-					ll := &layers.LinearLayer[T](layer)
-					config['in_features'] = ll.weights.value.shape[1]
-					config['out_features'] = ll.weights.value.shape[0]
-					weights['weight'] = encode_tensor[T](ll.weights.value)!
-					weights['bias'] = encode_tensor[T](ll.bias.value)!
-				}
+				ll := layer as &layers.LinearLayer[T]
+				config['in_features'] = ll.weights.value.shape[1]
+				config['out_features'] = ll.weights.value.shape[0]
+				weights['weight'] = encode_tensor[T](ll.weights.value)!
+				weights['bias'] = encode_tensor[T](ll.bias.value)!
 			}
 			'ReLULayer', 'SigmoidLayer', 'TanhLayer', 'LeakyReLULayer', 'ELULayer', 'SwishLayer',
 			'MishLayer', 'GeluLayer' {
 				// Activation layers have no weights - they just copy shapes
 			}
 			'BatchNorm1DLayer' {
-				unsafe {
-					bn := &layers.BatchNorm1DLayer[T](layer)
-					config['num_features'] = bn.gamma.value.shape[1]
-					weights['gamma'] = encode_tensor[T](bn.gamma.value)!
-					weights['beta'] = encode_tensor[T](bn.beta.value)!
-					weights['running_mean'] = encode_tensor[T](bn.running_mean)!
-					weights['running_var'] = encode_tensor[T](bn.running_var)!
-				}
+				bn := layer as &layers.BatchNorm1DLayer[T]
+				config['num_features'] = bn.gamma.value.shape[1]
+				weights['gamma'] = encode_tensor[T](bn.gamma.value)!
+				weights['beta'] = encode_tensor[T](bn.beta.value)!
+				weights['running_mean'] = encode_tensor[T](bn.running_mean)!
+				weights['running_var'] = encode_tensor[T](bn.running_var)!
 			}
 			'EmbeddingLayer' {
-				unsafe {
-					em := &layers.EmbeddingLayer[T](layer)
-					config['vocab_size'] = em.weight.value.shape[0]
-					config['embedding_dim'] = em.weight.value.shape[1]
-					weights['weight'] = encode_tensor[T](em.weight.value)!
-				}
+				em := layer as &layers.EmbeddingLayer[T]
+				config['vocab_size'] = em.weight.value.shape[0]
+				config['embedding_dim'] = em.weight.value.shape[1]
+				weights['weight'] = encode_tensor[T](em.weight.value)!
 			}
 			'Conv2DLayer' {
-				unsafe {
-					cv := &layers.Conv2DLayer[T](layer)
-					config['in_channels'] = cv.weight.value.shape[1]
-					config['out_channels'] = cv.weight.value.shape[0]
-					config['kernel_h'] = cv.weight.value.shape[2]
-					config['kernel_w'] = cv.weight.value.shape[3]
-					config['stride_h'] = cv.config.stride[0]
-					config['stride_w'] = cv.config.stride[1]
-					weights['weight'] = encode_tensor[T](cv.weight.value)!
-					weights['bias'] = encode_tensor[T](cv.bias.value)!
-				}
+				cv := layer as &layers.Conv2DLayer[T]
+				config['in_channels'] = cv.weight.value.shape[1]
+				config['out_channels'] = cv.weight.value.shape[0]
+				config['kernel_h'] = cv.weight.value.shape[2]
+				config['kernel_w'] = cv.weight.value.shape[3]
+				config['stride_h'] = cv.config.stride[0]
+				config['stride_w'] = cv.config.stride[1]
+				weights['weight'] = encode_tensor[T](cv.weight.value)!
+				weights['bias'] = encode_tensor[T](cv.bias.value)!
 			}
 			'LSTMLayer' {
-				unsafe {
-					lstm := &layers.LSTMLayer[T](layer)
-					config['input_size'] = lstm.w_ih.value.shape[1]
-					config['hidden_size'] = lstm.hidden_size
-					config['num_layers'] = lstm.num_layers
-					weights['w_ih'] = encode_tensor[T](lstm.w_ih.value)!
-					weights['w_hh'] = encode_tensor[T](lstm.w_hh.value)!
-					weights['b_ih'] = encode_tensor[T](lstm.b_ih.value)!
-					weights['b_hh'] = encode_tensor[T](lstm.b_hh.value)!
-				}
+				lstm := layer as &layers.LSTMLayer[T]
+				config['input_size'] = lstm.w_ih.value.shape[1]
+				config['hidden_size'] = lstm.hidden_size
+				config['num_layers'] = lstm.num_layers
+				weights['w_ih'] = encode_tensor[T](lstm.w_ih.value)!
+				weights['w_hh'] = encode_tensor[T](lstm.w_hh.value)!
+				weights['b_ih'] = encode_tensor[T](lstm.b_ih.value)!
+				weights['b_hh'] = encode_tensor[T](lstm.b_hh.value)!
 			}
 			'MultiHeadAttentionLayer' {
-				unsafe {
-					mha := &layers.MultiHeadAttentionLayer[T](layer)
-					config['embed_dim'] = mha.embed_dim
-					config['num_heads'] = mha.num_heads
-					weights['w_q'] = encode_tensor[T](mha.w_q.value)!
-					weights['w_k'] = encode_tensor[T](mha.w_k.value)!
-					weights['w_v'] = encode_tensor[T](mha.w_v.value)!
-					weights['w_o'] = encode_tensor[T](mha.w_o.value)!
-				}
+				mha := layer as &layers.MultiHeadAttentionLayer[T]
+				config['embed_dim'] = mha.embed_dim
+				config['num_heads'] = mha.num_heads
+				weights['w_q'] = encode_tensor[T](mha.w_q.value)!
+				weights['w_k'] = encode_tensor[T](mha.w_k.value)!
+				weights['w_v'] = encode_tensor[T](mha.w_v.value)!
+				weights['w_o'] = encode_tensor[T](mha.w_o.value)!
 			}
 			'LayerNormLayer' {
-				unsafe {
-					ln := &layers.LayerNormLayer[T](layer)
-					config['normalized_shape_0'] = ln.normalized_shape[0]
-					if ln.normalized_shape.len > 1 {
-						config['normalized_shape_1'] = ln.normalized_shape[1]
-					}
+				ln := layer as &layers.LayerNormLayer[T]
+				config['normalized_shape_0'] = ln.normalized_shape[0]
+				if ln.normalized_shape.len > 1 {
+					config['normalized_shape_1'] = ln.normalized_shape[1]
 				}
-				// gamma/beta check is outside unsafe because ln.gamma is a pointer
 				if layer.variables().len > 0 {
-					unsafe {
-						ln2 := &layers.LayerNormLayer[T](layer)
-						weights['gamma'] = encode_tensor[T](ln2.gamma.value)!
-						weights['beta'] = encode_tensor[T](ln2.beta.value)!
-					}
+					ln2 := layer as &layers.LayerNormLayer[T]
+					weights['gamma'] = encode_tensor[T](ln2.gamma.value)!
+					weights['beta'] = encode_tensor[T](ln2.beta.value)!
 				}
 			}
 			'FlattenLayer' {

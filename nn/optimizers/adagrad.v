@@ -18,6 +18,7 @@ pub mut:
 
 @[params]
 pub struct AdaGradOptimizerConfig {
+pub:
 	learning_rate f64 = 0.01
 	epsilon       f64 = 1e-8
 	weight_decay  f64 = 0.0

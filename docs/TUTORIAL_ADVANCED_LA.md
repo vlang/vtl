@@ -140,16 +140,18 @@ x, residuals, rank, sv := la.lstsq(a, b)!
 ## Cholesky Decomposition
 
 `la.cholesky(a)` computes the Cholesky factorisation `A = L · Lᵀ`
-for symmetric positive-definite matrices.
+for symmetric positive-definite matrices using VSL's LAPACK backend.
 Returns the lower-triangular `L`.
+
+**Note:** This function requires VTL to be compiled with LAPACK support.
 
 ```v
 import vtl.la
 import vtl
 
 a := vtl.from_array[f64]([4.0, 2.0, 2.0, 3.0], [2, 2])!
-la.cholesky(a)!
-// = [[2, 0], [1, √2]]
+lower := la.cholesky(a)!
+// lower = [[2, 0], [1, √2]]  (lower triangular)
 ```
 
 ## Pseudo-inverse

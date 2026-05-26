@@ -69,9 +69,9 @@ VTL provides differentiable unary element-wise operations via `Variable` methods
 
 ```v
 import vtl
-import vtl.autograd as ag
+import vtl.autograd
 
-mut ctx := ag.ctx[f64]()
+mut ctx := autograd.ctx[f64]()
 x := ctx.variable(vtl.from_1d[f64]([0.5, 1.0, 2.0])!)
 
 mut y := x.log[f64]()!
@@ -87,33 +87,15 @@ y3.backprop()!
 // x.grad = [1.0, 1.0, 0.0]  (gradient flows only for values in [0, 1.5])
 ```
 
-## Reduction gates
-
-Reduction operations on `Variable`:
-
-```v
-import vtl
-import vtl.autograd as ag
-
-mut ctx := ag.ctx[f64]()
-flat := vtl.from_1d[f64]([1.0, 2.0, 3.0, 4.0])!
-x := ctx.variable(flat.reshape([2, 2])!)
-
-// Sum: reduce axis 1 (columns) → [3.0, 7.0]
-s := vtl.sum[f64](x.value, 1)!
-mut var_s := ctx.variable(s)
-var_s.backprop()!
-```
-
 ## Shape gates
 
 Changing the shape of a tensor through a `Variable`:
 
 ```v
 import vtl
-import vtl.autograd as ag
+import vtl.autograd
 
-mut ctx := ag.ctx[f64]()
+mut ctx := autograd.ctx[f64]()
 x := ctx.variable(vtl.from_1d[f64]([1.0, 2.0, 3.0, 4.0])!)
 y := x.reshape[f64]([2, 2])!
 // y.value = [[1,2],[3,4]]

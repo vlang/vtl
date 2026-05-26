@@ -35,6 +35,7 @@ pub mut:
 //   - `weight_decay`  — L2 regularisation coefficient (default: 0.0)
 @[params]
 pub struct RMSPropOptimizerConfig {
+pub:
 	learning_rate f64 = 0.001
 	alpha         f64 = 0.99
 	epsilon       f64 = 1e-8

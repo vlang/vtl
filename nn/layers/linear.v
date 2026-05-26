@@ -15,6 +15,7 @@ import vtl.nn.types
 // Weights shape: `[out_features, in_features]`
 // Bias shape:    `[1, out_features]`
 pub struct LinearLayer[T] {
+pub:
 	weights &autograd.Variable[T] = unsafe { nil }
 	bias    &autograd.Variable[T] = unsafe { nil }
 }

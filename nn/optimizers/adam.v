@@ -38,6 +38,7 @@ pub mut:
 //   - `epsilon`       — small constant for numerical stability (default: 1e-8)
 @[params]
 pub struct AdamOptimizerConfig {
+pub:
 	learning_rate f64 = 0.001
 	beta1         f64 = 0.9
 	beta2         f64 = 0.999

@@ -30,34 +30,33 @@ and a full neural network module.
 
 ```v
 import vtl
-import vtl.autograd as ag
+import vtl.autograd
 import vtl.nn.layers
-import vtl.nn.loss
+import vtl.nn.models
 import vtl.nn.optimizers
 
-// 1. Build a two-layer network
-mut ctx := ag.ctx[f64]()
-lin1 := layers.linear_layer[f64](ctx, 784, 256)
-lin2 := layers.linear_layer[f64](ctx, 256, 10)
-model := [layers.Layer[f64](lin1), layers.Layer[f64](lin2)]
+// 1. Build a two-layer network using Sequential API
+mut ctx := autograd.ctx[f64]()
+mut model := models.sequential_from_ctx[f64](ctx)
+model.input([784])
+model.linear(256) // 784 -> 256
+model.linear(10) // 256 -> 10
 
 // 2. Forward pass
 input_tensor := vtl.zeros[f64]([64, 784])
 mut x := ctx.variable(input_tensor)
-for layer in model {
-    x = layer.forward(x)!
-}
+y_pred := model.forward(x)!
 
 // 3. Loss
-y_pred := ctx.variable(vtl.zeros[f64]([64, 10]))
 target := vtl.zeros[f64]([64, 10])
-mut l := loss.mse_loss[f64]()
-mut loss_val := l.loss(y_pred, target)!
+mut loss_val := model.loss(y_pred, target)!
 
 // 4. Backward + update
-loss_val.backward()!
-mut opt := optimizers.adam_optimizer[f64](learning_rate: 0.001)
-opt.build_params(model)
+loss_val.backprop()!
+mut opt := optimizers.adam_optimizer[f64](optimizers.AdamOptimizerConfig{
+	learning_rate: 0.001
+})
+opt.build_params(model.info.layers)
 opt.update()!
 ```
 

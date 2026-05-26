@@ -82,6 +82,7 @@ pub mut:
 
 @[params]
 pub struct ReduceLROnPlateauConfig {
+pub:
 	factor    f64 = 0.1
 	patience  int = 10
 	threshold f64 = 1e-4

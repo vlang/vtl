@@ -38,6 +38,7 @@ pub mut:
 //   - `weight_decay`  — decoupled weight-decay coefficient λ (default: 0.01)
 @[params]
 pub struct AdamWOptimizerConfig {
+pub:
 	learning_rate f64 = 0.001
 	beta1         f64 = 0.9
 	beta2         f64 = 0.999

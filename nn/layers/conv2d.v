@@ -9,6 +9,7 @@ import vtl.nn.types
 // Produces [batch, out_channels, out_H, out_W] output.
 @[params]
 pub struct Conv2DConfig {
+pub:
 	padding  []int = [0, 0]
 	stride   []int = [1, 1]
 	dilation []int = [1, 1]
@@ -26,6 +27,7 @@ pub struct Conv2DConfig {
 //   - `dilation` — spacing between kernel elements (default: [1,1])
 //   - `groups`   — split input channels into `groups` groups (default: 1)
 pub struct Conv2DLayer[T] {
+pub:
 	in_channels  int
 	out_channels int
 	kernel_size  []int

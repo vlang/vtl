@@ -3,8 +3,8 @@
 VTL provides several gradient-based optimizers for training neural networks.
 All optimizers share the same interface:
 
-1. Call `build_params(layers)` once after constructing the model
-2. After each loss `backward()`, call `update()!`
+1. Call `build_params(model)` where model is `[]types.Layer[T]`
+2. After each loss `backprop()`, call `update()!`
 
 All optimizers also support learning rate schedulers — see the last section below.
 
@@ -12,35 +12,33 @@ All optimizers also support learning rate schedulers — see the last section be
 
 ```v
 import vtl
-import vtl.autograd as ag
+import vtl.autograd
 import vtl.nn.layers
-import vtl.nn.loss
 import vtl.nn.optimizers
 
-mut ctx := ag.ctx[f64]()
+mut ctx := autograd.ctx[f64]()
 
-// Build a two-layer network
 lin1 := layers.linear_layer[f64](ctx, 784, 256)
 lin2 := layers.linear_layer[f64](ctx, 256, 10)
-model_layers := [layers.Layer[f64](lin1), layers.Layer[f64](lin2)]
+model := [layers.Layer[f64](lin1), layers.Layer[f64](lin2)]
 
-// Create Adam optimizer
-mut opt := optimizers.adam_optimizer[f64](learning_rate: 0.001)
-opt.build_params(model_layers)
+mut opt := optimizers.adam_optimizer[f64](optimizers.AdamOptimizerConfig{
+	learning_rate: 0.001
+})
+opt.build_params(model)
 
 // Dummy data — replace with real training data
 input_vals := vtl.zeros[f64]([64, 784])
 target_vals := vtl.zeros[f64]([64, 10])
 
 mut x := ctx.variable(input_vals)
-for layer in model_layers {
-    x = layer.forward(x)!
+for layer in model {
+	x = layer.forward(x)!
 }
-mut y_target := ctx.variable(target_vals)
+mut target := ctx.variable(target_vals)
 
-l := loss.mse_loss[f64]()
-mut loss_val := l.loss(x, target_vals)!
-loss_val.backward()!
+mut loss_val := model[1].forward(x)!
+loss_val.backprop()!
 opt.update()!
 ```
 
@@ -61,8 +59,11 @@ regularisation than Adam with L2 penalty.
 ```v
 import vtl.nn.optimizers
 
-mut opt := optimizers.adamw[f64](learning_rate: 0.001, weight_decay: 0.01)
-opt.build_params(model_layers)
+mut opt := optimizers.adamw[f64](optimizers.AdamWOptimizerConfig{
+	learning_rate: 0.001
+	weight_decay:  0.01
+})
+opt.build_params(model)
 ```
 
 Config options (same as Adam, plus `weight_decay` with default `0.01`).
@@ -72,8 +73,11 @@ Config options (same as Adam, plus `weight_decay` with default `0.01`).
 ```v
 import vtl.nn.optimizers
 
-mut opt := optimizers.rmsprop[f64](learning_rate: 0.001, alpha: 0.99)
-opt.build_params(model_layers)
+mut opt := optimizers.rmsprop[f64](optimizers.RMSPropOptimizerConfig{
+	learning_rate: 0.001
+	alpha:         0.99
+})
+opt.build_params(model)
 ```
 
 | Field | Default | Description |
@@ -88,8 +92,10 @@ opt.build_params(model_layers)
 ```v
 import vtl.nn.optimizers
 
-mut opt := optimizers.adagrad[f64](learning_rate: 0.01)
-opt.build_params(model_layers)
+mut opt := optimizers.adagrad[f64](optimizers.AdaGradOptimizerConfig{
+	learning_rate: 0.01
+})
+opt.build_params(model)
 ```
 
 Accumulates squared gradients; effective learning rate decreases for
@@ -108,8 +114,10 @@ Vanilla Stochastic Gradient Descent:
 ```v
 import vtl.nn.optimizers
 
-mut opt := optimizers.sgd[f64](learning_rate: 0.01)
-opt.build_params(model_layers)
+mut opt := optimizers.sgd[f64](optimizers.SgdOptimizerConfig{
+	learning_rate: 0.01
+})
+opt.build_params(model)
 ```
 
 ## Learning Rate Schedulers
@@ -121,23 +129,24 @@ then pass the current step and (optionally) a metric delta to `next_lr()`:
 import vtl.nn.optimizers
 
 // StepLR: reduce LR by gamma every step_size steps
-mut scheduler := optimizers.step_lr[f64](step_size: 30, gamma: 0.1)
+mut scheduler := optimizers.step_lr[f64](30, 0.1)
 
 // ExponentialLR: multiply LR by gamma every step
-mut scheduler2 := optimizers.exponential_lr[f64](gamma: 0.95)
+mut scheduler2 := optimizers.exponential_lr[f64](0.95)
 
 // CosineAnnealingLR: cosine decay from initial_lr to lrd
-mut scheduler3 := optimizers.cosine_annealing_lr[f64](t_max: 100, lrd: 1e-5)
+mut scheduler3 := optimizers.cosine_annealing_lr[f64](100, 1e-5)
 
 // ReduceLROnPlateau: reduce when metric stops improving
-mut scheduler4 := optimizers.reduce_lr_on_plateau[f64](patience: 10, factor: 0.1)
+mut scheduler4 := optimizers.reduce_lr_on_plateau[f64](optimizers.ReduceLROnPlateauConfig{
+	patience: 10
+	factor:   0.1
+})
 
 // Inside the training loop:
-for step in 0 .. 100 {
-    opt.update()!
-    current_lr := scheduler.next_lr(0.001, step)
-    // or for ReduceLROnPlateau:
-    // current_lr := scheduler4.next_lr(0.001, step, metric_delta: val_loss - prev_loss)
+for step := 0; step < 100; step++ {
+	opt.update()!
+	current_lr := scheduler.next_lr(0.001, step)
 }
 ```
 
@@ -145,41 +154,38 @@ for step in 0 .. 100 {
 
 ```v
 import vtl
-import vtl.autograd as ag
+import vtl.autograd
 import vtl.nn.layers
-import vtl.nn.loss
 import vtl.nn.optimizers
 
-mut ctx := ag.ctx[f64]()
+mut ctx := autograd.ctx[f64]()
 
-model_layers := [
-    layers.Layer[f64](layers.linear_layer[f64](ctx, 784, 256)),
-    layers.Layer[f64](layers.relu_layer[f64](ctx)),
-    layers.Layer[f64](layers.linear_layer[f64](ctx, 256, 10)),
-]
+lin1 := layers.linear_layer[f64](ctx, 784, 256)
+lin2 := layers.linear_layer[f64](ctx, 256, 10)
+model := [layers.Layer[f64](lin1), layers.Layer[f64](lin2)]
 
-mut opt := optimizers.adam_optimizer[f64](learning_rate: 0.001)
-opt.build_params(model_layers)
+mut opt := optimizers.adam_optimizer[f64](optimizers.AdamOptimizerConfig{
+	learning_rate: 0.001
+})
+opt.build_params(model)
 
-mut scheduler := optimizers.step_lr[f64](step_size: 30, gamma: 0.1)
+mut scheduler := optimizers.step_lr[f64](30, 0.1)
 
-for epoch in 0 .. 10 {
-    // Replace with real data batches
-    input_batch := vtl.zeros[f64]([64, 784])
-    target_batch := vtl.zeros[f64]([64, 10])
+for epoch := 0; epoch < 10; epoch++ {
+	// Replace with real data batches
+	input_batch := vtl.zeros[f64]([64, 784])
+	target_batch := vtl.zeros[f64]([64, 10])
 
-    mut x := ctx.variable(input_batch)
-    for layer in model_layers {
-        x = layer.forward(x)!
-    }
-    mut target := ctx.variable(target_batch)
+	mut x := ctx.variable(input_batch)
+	for layer in model {
+		x = layer.forward(x)!
+	}
+	mut target := ctx.variable(target_batch)
 
-    l := loss.mse_loss[f64]()
-    mut loss_val := l.loss(x, target_batch)!
-    loss_val.backward()!
-    opt.update()!
+	x.backprop()!
+	opt.update()!
 
-    current_lr := scheduler.next_lr(0.001, epoch)
-    println('Epoch ${epoch}: lr = ${current_lr}')
+	current_lr := scheduler.next_lr(0.001, epoch)
+	println('Epoch ${epoch}: lr = ${current_lr}')
 }
 ```
