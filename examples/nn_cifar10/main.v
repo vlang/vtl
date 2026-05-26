@@ -73,7 +73,7 @@ fn calculate_accuracy[T](predictions &vtl.Tensor[T], targets &vtl.Tensor[T]) f64
 // evaluate_validation runs validation and returns loss and accuracy
 fn evaluate_validation[T](mut model &models.Sequential[T], ctx &autograd.Context[T], dataset &datasets.Cifar10Dataset) !(f64, f64) {
 	val_batch_size := 100
-	val_num_batches := 10000 / val_batch_size
+	val_num_batches := dataset.test_features.shape[0] / val_batch_size
 	mut total_loss := 0.0
 	mut total_correct := 0
 	mut total_samples := 0
@@ -100,7 +100,10 @@ fn main() {
 
 	// Load CIFAR-10 dataset using the datasets module
 	println('Loading CIFAR-10 dataset...')
-	dataset := datasets.load_cifar10()!
+	dataset := datasets.load_cifar10_with_config(datasets.Cifar10Config{
+		train_count: 10000
+		test_count:  2000
+	})!
 	println('Dataset loaded successfully!')
 	println('Training samples: ${dataset.train_features.shape[0]}')
 	println('Test samples: ${dataset.test_features.shape[0]}')

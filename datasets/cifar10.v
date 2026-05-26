@@ -22,6 +22,8 @@ pub:
 	height      int = 32
 	width       int = 32
 	num_classes int = 10
+	train_count int = 50000
+	test_count  int = 10000
 }
 
 // class_names returns the CIFAR-10 class names.
@@ -69,14 +71,20 @@ fn load_cifar10_batch(path string, expected_count int) !([]f64, []int) {
 }
 
 // load_cifar10_train_batches loads all 5 training batches.
-fn load_cifar10_train_batches(data_dir string) !([]f64, []int) {
+fn load_cifar10_train_batches(data_dir string, total_count int) !([]f64, []int) {
 	mut all_images := []f64{len: 0}
 	mut all_labels := []int{len: 0}
+	mut remaining := total_count
 	for batch_num := 1; batch_num <= 5; batch_num++ {
+		if remaining <= 0 {
+			break
+		}
 		batch_path := os.join_path(data_dir, 'data_batch_${batch_num}.bin')
 		images, labels := load_cifar10_batch(batch_path, 10000)!
-		all_images << images
-		all_labels << labels
+		take := if remaining < 10000 { remaining } else { 10000 }
+		all_images << images[..take * 3072]
+		all_labels << labels[..take]
+		remaining -= take
 	}
 	return all_images, all_labels
 }
@@ -94,7 +102,7 @@ pub fn load_cifar10_with_config(cfg Cifar10Config) !Cifar10Dataset {
 		'cifar-10-batches-bin')!
 
 	// Load training data
-	train_images, train_labels := load_cifar10_train_batches(dataset_path)!
+	train_images, train_labels := load_cifar10_train_batches(dataset_path, cfg.train_count)!
 
 	// Reshape training images to [N, C, H, W]
 	train_features := vtl.from_1d(train_images)!.reshape([-1, cfg.channels, cfg.height, cfg.width])!
@@ -112,7 +120,10 @@ pub fn load_cifar10_with_config(cfg Cifar10Config) !Cifar10Dataset {
 
 	// Load test data
 	test_path := os.join_path(dataset_path, 'test_batch.bin')
-	test_images, test_labels := load_cifar10_batch(test_path, 10000)!
+	all_test_images, all_test_labels := load_cifar10_batch(test_path, 10000)!
+	test_take := if cfg.test_count < 10000 { cfg.test_count } else { 10000 }
+	test_images := all_test_images[..test_take * 3072]
+	test_labels := all_test_labels[..test_take]
 
 	// Reshape test images to [N, C, H, W]
 	test_features := vtl.from_1d(test_images)!.reshape([-1, cfg.channels, cfg.height, cfg.width])!
