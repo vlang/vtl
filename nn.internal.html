@@ -432,7 +432,7 @@
 </section>
 
 		<section id="lstm_forward_multi" class="doc-node">
-			<div class="title"><h2>fn lstm_forward_multi <a href="#lstm_forward_multi">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/lstm.v#L117"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn lstm_forward_multi <a href="#lstm_forward_multi">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/internal/lstm.v#L100"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> lstm_forward_multi<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>input_ <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
 	h0 <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
@@ -440,9 +440,7 @@
 	w_hh <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
 	b_ih <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
 	b_hh <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
-<p>lstm_forward_multi stacks multiple LSTM layers. lstm_forward_multi computes LSTM forward pass for multi-layer LSTM.</p>
-<p>Shapes: input_: [seq_len, batch, input_size] h0:      [num_layers, batch, hidden_size] w_ih:    [num_layers, 4<em>hidden_size, input_size/num_layers] w_hh:    [num_layers, 4</em>hidden_size, hidden_size]</p>
-<p>Returns (output [seq_len, batch, hidden_size], h_n [num_layers, batch, hidden_size]).</p>
+<p>lstm_forward_multi stacks multiple LSTM layers.</p>
 
 </section>
 
@@ -675,7 +673,7 @@
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 26 May 2026 07:46:31</div>
+						<div class="footer">Powered by vdoc. Generated on: 26 May 2026 07:49:11</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#avgpool2d_backward">fn avgpool2d_backward</a>        <ul>
 </ul>

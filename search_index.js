@@ -1677,7 +1677,7 @@ var searchData = [
 ["nn.internal","cross_entropy_backward computes gradient of CrossEntropyLoss w.r.t. input logits","nn.internal.html#cross_entropy_backward","fn "],
 ["nn.internal","LSTMIntermediate stores per-timestep gate values for backprop.","nn.internal.html#LSTMIntermediate","struct "],
 ["nn.internal","lstm_forward_single runs a single-layer LSTM. input: [seq_len, batch, input_size","nn.internal.html#lstm_forward_single","fn "],
-["nn.internal","lstm_forward_multi stacks multiple LSTM layers. lstm_forward_multi computes LSTM","nn.internal.html#lstm_forward_multi","fn "],
+["nn.internal","lstm_forward_multi stacks multiple LSTM layers.","nn.internal.html#lstm_forward_multi","fn "],
 ["nn.internal","","nn.internal.html#sgd_optimize","fn "],
 ["nn.internal","","nn.internal.html#avgpool2d_forward","fn "],
 ["nn.internal","","nn.internal.html#avgpool2d_backward","fn "],
