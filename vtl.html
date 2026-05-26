@@ -86,6 +86,7 @@
 <li class="open">
 <div class="menu-row"><svg xmlns="http://www.w3.org/2000/svg" class="dropdown-arrow" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M7 10l5 5 5-5z"/></svg><a>nn</a></div>
 <ul>
+<li><a href="./nn.data.html">data</a></li>
 <li><a href="./nn.gates.activation.html">gates.activation</a></li>
 <li><a href="./nn.gates.layers.html">gates.layers</a></li>
 <li><a href="./nn.gates.loss.html">gates.loss</a></li>
@@ -1040,6 +1041,14 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">cpu</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>cpu returns a Tensor from a Tensor</p>
+
+</section>
+
+		<section id="Tensor[T].cuda" class="doc-node">
+			<div class="title"><h2>fn (Tensor[T]) cuda <a href="#Tensor[T].cuda">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/tensor_cuda_notd_cuda.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">cuda</span><span class="token punctuation">(</span>params CudaParams<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<p>cuda returns an error when CUDA is not enabled at compile time</p>
 
 </section>
 
@@ -2021,6 +2030,15 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 
 </section>
 
+		<section id="CudaParams" class="doc-node">
+			<div class="title"><h2>struct CudaParams <a href="#CudaParams">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/tensor_cuda_notd_cuda.v#L6"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[params]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token symbol">CudaParams</span> <span class="token punctuation">{</span><span class="token punctuation">}</span></code></pre>
+
+
+</section>
+
 		<section id="IteratorBuildData" class="doc-node">
 			<div class="title"><h2>struct IteratorBuildData <a href="#IteratorBuildData">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/iter.v#L29"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -2127,7 +2145,7 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 26 May 2026 07:07:27</div>
+						<div class="footer">Powered by vdoc. Generated on: 26 May 2026 07:36:37</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_vtl">README</a></li>
 <li class="open"><a href="#bernoulli">fn bernoulli</a>        <ul>
@@ -2314,6 +2332,7 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 <li><a href="#Tensor[T].cosh">fn cosh</a></li>
 <li><a href="#Tensor[T].cot">fn cot</a></li>
 <li><a href="#Tensor[T].cpu">fn cpu</a></li>
+<li><a href="#Tensor[T].cuda">fn cuda</a></li>
 <li><a href="#Tensor[T].cumprod">fn cumprod</a></li>
 <li><a href="#Tensor[T].cumsum">fn cumsum</a></li>
 <li><a href="#Tensor[T].custom_iterator">fn custom_iterator</a></li>
@@ -2444,6 +2463,9 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 </ul>
 </li>
 <li class="open"><a href="#AxisData">struct AxisData</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#CudaParams">struct CudaParams</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#IteratorBuildData">struct IteratorBuildData</a>        <ul>

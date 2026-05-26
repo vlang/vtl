@@ -86,6 +86,7 @@
 <li class="open">
 <div class="menu-row"><svg xmlns="http://www.w3.org/2000/svg" class="dropdown-arrow" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M7 10l5 5 5-5z"/></svg><a>nn</a></div>
 <ul>
+<li><a href="./nn.data.html">data</a></li>
 <li><a href="./nn.gates.activation.html">gates.activation</a></li>
 <li><a href="./nn.gates.layers.html">gates.layers</a></li>
 <li><a href="./nn.gates.loss.html">gates.loss</a></li>
@@ -153,6 +154,23 @@
 <pre class="signature">
 <code><span class="token keyword">fn</span> sequential_with_layers<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>given_layers <span class="token punctuation">[</span><span class="token punctuation">]</span>types<span class="token punctuation">.</span>Layer<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>Sequential<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>sequential_with_layers creates a new sequential network with a new context and the given layers.</p>
+
+</section>
+
+		<section id="validate_model_compatibility" class="doc-node">
+			<div class="title"><h2>fn validate_model_compatibility <a href="#validate_model_compatibility">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/models/serialization.v#L388"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> validate_model_compatibility<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>saved_path <span class="token builtin">string</span><span class="token punctuation">,</span> layers <span class="token punctuation">[</span><span class="token punctuation">]</span>types<span class="token punctuation">.</span>Layer<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token builtin">bool</span></code></pre>
+<p>validate_model_compatibility checks if a saved model is compatible with the given layers. Returns an error with details if incompatible.</p>
+
+</section>
+
+		<section id="Sequential.load_checkpoint" class="doc-node">
+			<div class="title"><h2>fn Sequential.load_checkpoint <a href="#Sequential.load_checkpoint">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/models/serialization.v#L224"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> Sequential<span class="token punctuation">.</span>load_checkpoint<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>path <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token builtin">int</span><span class="token punctuation">,</span> <span class="token builtin">f64</span><span class="token punctuation">)</span></code></pre>
+<p>load_checkpoint restores a Sequential model's weights and training metadata from a JSON file. Returns the epoch and loss from the checkpoint.</p>
+<p>Note: The model must already be constructed with the same architecture. This method loads weights into an existing model.</p>
 
 </section>
 
@@ -532,11 +550,11 @@
 
 </section>
 
-		<section id="Sequential[T].load" class="doc-node">
-			<div class="title"><h2>fn (Sequential[T]) load <a href="#Sequential[T].load">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/models/serialization.v#L47"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+		<section id="Sequential[T].load_weights" class="doc-node">
+			<div class="title"><h2>fn (Sequential[T]) load_weights <a href="#Sequential[T].load_weights">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/models/serialization.v#L238"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>nn <span class="token operator">&amp;</span>Sequential<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">load</span><span class="token punctuation">(</span>path <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
-<p>load restores weights into an existing Sequential model from a JSON file. The model's layers must already be constructed in the same order as when saved.</p>
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>nn <span class="token operator">&amp;</span>Sequential<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">load_weights</span><span class="token punctuation">(</span>path <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<p>load_weights restores weights into an existing model. The model's layers must already be constructed in the same order as when saved.</p>
 
 </section>
 
@@ -613,10 +631,18 @@
 </section>
 
 		<section id="Sequential[T].save" class="doc-node">
-			<div class="title"><h2>fn (Sequential[T]) save <a href="#Sequential[T].save">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/models/serialization.v#L17"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (Sequential[T]) save <a href="#Sequential[T].save">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/models/serialization.v#L65"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>nn <span class="token operator">&amp;</span>Sequential<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">save</span><span class="token punctuation">(</span>path <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
-<p>save saves a Sequential model's weights to a JSON file.</p>
+<p>save saves a Sequential model's weights to a JSON file. Does NOT save optimizer state - use save_checkpoint for full state.</p>
+
+</section>
+
+		<section id="Sequential[T].save_checkpoint" class="doc-node">
+			<div class="title"><h2>fn (Sequential[T]) save_checkpoint <a href="#Sequential[T].save_checkpoint">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/models/serialization.v#L70"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>nn <span class="token operator">&amp;</span>Sequential<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">save_checkpoint</span><span class="token punctuation">(</span>path <span class="token builtin">string</span><span class="token punctuation">,</span> epoch <span class="token builtin">int</span><span class="token punctuation">,</span> loss <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<p>save_checkpoint saves a Sequential model's weights and training metadata to a JSON file.</p>
 
 </section>
 
@@ -668,6 +694,20 @@
 
 </section>
 
+		<section id="ModelMetadata" class="doc-node">
+			<div class="title"><h2>struct ModelMetadata <a href="#ModelMetadata">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/models/serialization.v#L23"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token symbol">ModelMetadata</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	epoch    <span class="token builtin">int</span>
+	loss     <span class="token builtin">f64</span>
+	saved_at <span class="token builtin">string</span>
+	version  <span class="token builtin">string</span> <span class="token operator">=</span> model_version
+<span class="token punctuation">}</span></code></pre>
+<p>ModelMetadata stores training metadata for checkpoints.</p>
+
+</section>
+
 		<section id="Sequential" class="doc-node">
 			<div class="title"><h2>struct Sequential <a href="#Sequential">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/models/sequential.v#L13"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -692,8 +732,26 @@
 
 </section>
 
+		<section id="SerializationError" class="doc-node">
+			<div class="title"><h2>struct SerializationError <a href="#SerializationError">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/models/serialization.v#L14"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token symbol">SerializationError</span> <span class="token punctuation">{</span>
+	msg <span class="token builtin">string</span>
+<span class="token punctuation">}</span></code></pre>
+<p>SerializationError represents errors during model save/load operations.</p>
 
-						<div class="footer">Powered by vdoc. Generated on: 26 May 2026 07:07:28</div>
+</section>
+
+		<section id="SerializationError.msg" class="doc-node">
+			<div class="title"><h2>fn (SerializationError) msg <a href="#SerializationError.msg">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/models/serialization.v#L18"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>e <span class="token operator">&amp;</span>SerializationError<span class="token punctuation">)</span> <span class="token function">msg</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">string</span></code></pre>
+
+
+</section>
+
+
+						<div class="footer">Powered by vdoc. Generated on: 26 May 2026 07:36:38</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#sequential">fn sequential</a>        <ul>
 </ul>
@@ -708,6 +766,12 @@
 </ul>
 </li>
 <li class="open"><a href="#sequential_with_layers">fn sequential_with_layers</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#validate_model_compatibility">fn validate_model_compatibility</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#Sequential.load_checkpoint">fn Sequential.load_checkpoint</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#SequentialInfo[T].input">type SequentialInfo[T]</a>        <ul>
@@ -761,7 +825,7 @@
 <li><a href="#Sequential[T].layer_norm">fn layer_norm</a></li>
 <li><a href="#Sequential[T].leaky_relu">fn leaky_relu</a></li>
 <li><a href="#Sequential[T].linear">fn linear</a></li>
-<li><a href="#Sequential[T].load">fn load</a></li>
+<li><a href="#Sequential[T].load_weights">fn load_weights</a></li>
 <li><a href="#Sequential[T].loss">fn loss</a></li>
 <li><a href="#Sequential[T].lstm">fn lstm</a></li>
 <li><a href="#Sequential[T].maxpool2d">fn maxpool2d</a></li>
@@ -772,6 +836,7 @@
 <li><a href="#Sequential[T].positional_encoding">fn positional_encoding</a></li>
 <li><a href="#Sequential[T].relu">fn relu</a></li>
 <li><a href="#Sequential[T].save">fn save</a></li>
+<li><a href="#Sequential[T].save_checkpoint">fn save_checkpoint</a></li>
 <li><a href="#Sequential[T].sigmoid">fn sigmoid</a></li>
 <li><a href="#Sequential[T].sigmoid_cross_entropy_loss">fn sigmoid_cross_entropy_loss</a></li>
 <li><a href="#Sequential[T].softmax">fn softmax</a></li>
@@ -780,10 +845,17 @@
 <li><a href="#Sequential[T].tanh">fn tanh</a></li>
 </ul>
 </li>
+<li class="open"><a href="#ModelMetadata">struct ModelMetadata</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#Sequential">struct Sequential</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#SequentialInfo">struct SequentialInfo</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#SerializationError">struct SerializationError</a>        <ul>
+<li><a href="#SerializationError.msg">fn msg</a></li>
 </ul>
 </li>
 </ul></div>
