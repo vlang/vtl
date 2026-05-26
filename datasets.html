@@ -129,6 +129,20 @@
 
 		<section id="" class="doc-node const">
 <pre class="signature">
+<code><span class="token keyword">const</span> cifar10_base_url <span class="token operator">=</span> <span class="token string">'https://www.cs.toronto.edu/~kriz/'</span></code></pre>
+
+
+</section>
+
+		<section id="" class="doc-node const">
+<pre class="signature">
+<code><span class="token keyword">const</span> cifar10_file <span class="token operator">=</span> <span class="token string">'cifar-10-binary.tar.gz'</span></code></pre>
+
+
+</section>
+
+		<section id="" class="doc-node const">
+<pre class="signature">
 <code><span class="token keyword">const</span> imdb_file_name <span class="token operator">=</span> <span class="token string">'aclImdb_v1.tar.gz'</span></code></pre>
 
 
@@ -176,6 +190,30 @@
 
 </section>
 
+		<section id="class_names" class="doc-node">
+			<div class="title"><h2>fn class_names <a href="#class_names">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/cifar10.v#L30"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">class_names</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">string</span></code></pre>
+<p>class_names returns the CIFAR-10 class names.</p>
+
+</section>
+
+		<section id="load_cifar10" class="doc-node">
+			<div class="title"><h2>fn load_cifar10 <a href="#load_cifar10">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/cifar10.v#L122"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">load_cifar10</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span>Cifar10Dataset</code></pre>
+<p>load_cifar10 loads the CIFAR-10 dataset. Returns train/test features (normalized [0,1]) and one-hot encoded labels.</p>
+
+</section>
+
+		<section id="load_cifar10_with_config" class="doc-node">
+			<div class="title"><h2>fn load_cifar10_with_config <a href="#load_cifar10_with_config">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/cifar10.v#L128"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">load_cifar10_with_config</span><span class="token punctuation">(</span>cfg Cifar10Config<span class="token punctuation">)</span> <span class="token operator">!</span>Cifar10Dataset</code></pre>
+<p>load_cifar10_with_config loads CIFAR-10 with custom configuration.</p>
+
+</section>
+
 		<section id="load_imdb" class="doc-node">
 			<div class="title"><h2>fn load_imdb <a href="#load_imdb">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/imdb.v#L82"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -189,6 +227,34 @@
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token function">load_mnist</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span>MnistDataset</code></pre>
 <p>load_mnist loads the MNIST dataset.</p>
+
+</section>
+
+		<section id="Cifar10Config" class="doc-node">
+			<div class="title"><h2>struct Cifar10Config <a href="#Cifar10Config">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/cifar10.v#L21"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token symbol">Cifar10Config</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	channels    <span class="token builtin">int</span> <span class="token operator">=</span> <span class="token number">3</span>
+	height      <span class="token builtin">int</span> <span class="token operator">=</span> <span class="token number">32</span>
+	width       <span class="token builtin">int</span> <span class="token operator">=</span> <span class="token number">32</span>
+	num_classes <span class="token builtin">int</span> <span class="token operator">=</span> <span class="token number">10</span>
+<span class="token punctuation">}</span></code></pre>
+<p>Cifar10Config holds configuration for CIFAR-10 dataset loading.</p>
+
+</section>
+
+		<section id="Cifar10Dataset" class="doc-node">
+			<div class="title"><h2>struct Cifar10Dataset <a href="#Cifar10Dataset">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/datasets/cifar10.v#L12"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token symbol">Cifar10Dataset</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	train_features <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	train_labels   <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	test_features  <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	test_labels    <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<p>Cifar10Dataset holds the CIFAR-10 dataset.</p>
 
 </section>
 
@@ -221,14 +287,29 @@
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 26 May 2026 07:45:08</div>
+						<div class="footer">Powered by vdoc. Generated on: 26 May 2026 07:45:36</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_datasets">README</a></li>
 <li class="open"><a href="#Constants">Constants</a></li>
+<li class="open"><a href="#class_names">fn class_names</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#load_cifar10">fn load_cifar10</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#load_cifar10_with_config">fn load_cifar10_with_config</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#load_imdb">fn load_imdb</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#load_mnist">fn load_mnist</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#Cifar10Config">struct Cifar10Config</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#Cifar10Dataset">struct Cifar10Dataset</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#ImdbDataset">struct ImdbDataset</a>        <ul>
