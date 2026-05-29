@@ -1,7 +1,9 @@
-module vtl
+module main
+
+import vtl
 
 fn test_get() {
-	t := from_array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [5, 2])!
+	t := vtl.from_array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [5, 2])!
 	assert t.size() == 10
 	assert t.get([0, 0]) == 1
 	assert t.get([0, 1]) == 2
@@ -16,7 +18,7 @@ fn test_get() {
 }
 
 fn test_get_nth() {
-	t := from_array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [5, 2])!
+	t := vtl.from_array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [5, 2])!
 	assert t.size() == 10
 	assert t.get_nth(0) == 1
 	assert t.get_nth(1) == 2
@@ -31,7 +33,7 @@ fn test_get_nth() {
 }
 
 fn test_offset_index() {
-	t := from_array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [5, 2])!
+	t := vtl.from_array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [5, 2])!
 	assert t.size() == 10
 	assert t.offset_index([0, 0]) == 0
 	assert t.offset_index([0, 1]) == 1
@@ -46,7 +48,7 @@ fn test_offset_index() {
 }
 
 fn test_nth_index() {
-	t := from_array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [5, 2])!
+	t := vtl.from_array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [5, 2])!
 	assert t.size() == 10
 	assert t.nth_index(0) == [0, 0]
 	assert t.nth_index(1) == [0, 1]

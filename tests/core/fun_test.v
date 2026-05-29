@@ -1,29 +1,31 @@
-module vtl
+module main
+
+import vtl
 
 fn test_apply() {
-	a := from_1d([1, 2, 3, 4])!
-	b := from_1d([0, 1, 2, 3])!
+	a := vtl.from_1d([1, 2, 3, 4])!
+	b := vtl.from_1d([0, 1, 2, 3])!
 	mut c := a.add(b)!
 	c.apply(fn (x int, i []int) int {
 		return x * 2
 	})
-	expected := from_1d([2, 6, 10, 14])!
+	expected := vtl.from_1d([2, 6, 10, 14])!
 	assert c.array_equal(expected)
 }
 
 fn test_map() {
-	a := from_1d([1, 2, 3, 4])!
-	b := from_1d([0, 1, 2, 3])!
+	a := vtl.from_1d([1, 2, 3, 4])!
+	b := vtl.from_1d([0, 1, 2, 3])!
 	c := a.add(b)!
 	d := c.map(fn (x int, i []int) int {
 		return x * 2
 	})
-	expected := from_1d([2, 6, 10, 14])!
+	expected := vtl.from_1d([2, 6, 10, 14])!
 	assert d.array_equal(expected)
 }
 
 fn test_reduce() {
-	a := from_1d([1, 2, 3, 4])!
+	a := vtl.from_1d([1, 2, 3, 4])!
 	b := a.reduce(0, fn (acc int, x int, i []int) int {
 		return acc + x
 	})
@@ -31,30 +33,30 @@ fn test_reduce() {
 }
 
 fn test_napply() {
-	a := from_1d([1, 2, 3, 4])!
-	b := from_1d([0, 1, 2, 3])!
+	a := vtl.from_1d([1, 2, 3, 4])!
+	b := vtl.from_1d([0, 1, 2, 3])!
 	mut c := a.add(b)! // [1, 3, 5, 7]
 	c.napply([a, b], fn (xs []int, i []int) int {
 		return xs[0] * xs[1] - xs[2]
 	})!
-	expected := from_1d([1, 5, 13, 25])!
+	expected := vtl.from_1d([1, 5, 13, 25])!
 	assert c.array_equal(expected)
 }
 
 fn test_nmap() {
-	a := from_1d([1, 2, 3, 4])!
-	b := from_1d([0, 1, 2, 3])!
+	a := vtl.from_1d([1, 2, 3, 4])!
+	b := vtl.from_1d([0, 1, 2, 3])!
 	c := a.add(b)! // [1, 3, 5, 7]
 	d := c.nmap([a, b], fn (xs []int, i []int) int {
 		return xs[0] * xs[1] - xs[2]
 	})!
-	expected := from_1d([1, 5, 13, 25])!
+	expected := vtl.from_1d([1, 5, 13, 25])!
 	assert d.array_equal(expected)
 }
 
 fn test_nreduce() {
-	a := from_1d([1, 2, 3, 4])!
-	b := from_1d([0, 1, 2, 3])!
+	a := vtl.from_1d([1, 2, 3, 4])!
+	b := vtl.from_1d([0, 1, 2, 3])!
 	c := a.add(b)! // [1, 3, 5, 7]
 	d := c.nreduce([a, b], 0, fn (acc int, xs []int, i []int) int {
 		return acc + xs[0] * xs[1] - xs[2]
@@ -64,22 +66,22 @@ fn test_nreduce() {
 
 fn test_reshape_tensor_with_know_dim() {
 	values := []int{len: 27, init: index}
-	a := from_array(values, [3, 3, 3])!
-	b := from_array(values, [9, 3])!
+	a := vtl.from_array(values, [3, 3, 3])!
+	b := vtl.from_array(values, [9, 3])!
 	assert a.reshape(b.shape)!.array_equal(b)
 }
 
 fn test_reshape_tensor_with_unknow_dim() {
 	values := []int{len: 27, init: index}
-	a := from_array(values, [3, 3, 3])!
-	b := from_array(values, [9, 3])!
+	a := vtl.from_array(values, [3, 3, 3])!
+	b := vtl.from_array(values, [9, 3])!
 	c := a.reshape([-1, 3])!
 	assert c.array_equal(b)
 }
 
 fn test_cant_reshape_tensor_with_know_dim() {
 	values := []int{len: 27, init: index}
-	a := from_array(values, [3, 3, 3])!
+	a := vtl.from_array(values, [3, 3, 3])!
 	assert a.shape == [3, 3, 3]
 	if b := a.reshape([10, 10]) {
 		assert false
@@ -89,7 +91,7 @@ fn test_cant_reshape_tensor_with_know_dim() {
 }
 
 fn test_t() {
-	t := from_2d([[6.0, 4, 24], [1.0, -9, 8]])!
+	t := vtl.from_2d([[6.0, 4, 24], [1.0, -9, 8]])!
 	tt := t.t()!
 	assert t.shape == [2, 3]
 	assert tt.shape == [3, 2]
@@ -99,7 +101,7 @@ fn test_t() {
 }
 
 fn test_ones_t() {
-	t := ones[f64]([2, 3])
+	t := vtl.ones[f64]([2, 3])
 	tt := t.t()!
 	assert t.shape == [2, 3]
 	assert tt.shape == [3, 2]
@@ -107,36 +109,35 @@ fn test_ones_t() {
 }
 
 fn test_transpose() {
-	t := ones[f64]([2, 3])
-	order := irange(0, t.rank())
-	tt := t.transpose(order.reverse())!
+	t := vtl.ones[f64]([2, 3])
+	tt := t.transpose([1, 0])!
 	assert t.shape == [2, 3]
 	assert tt.shape == [3, 2]
 }
 
 fn test_slice() {
-	a := from_array([0.0, 1, 2, 3, 4, 5, 6, 7, 8], [3, 3])!
+	a := vtl.from_array([0.0, 1, 2, 3, 4, 5, 6, 7, 8], [3, 3])!
 	slice := a.slice([0])!
-	expected := from_array([0.0, 1, 2], [3])!
+	expected := vtl.from_array([0.0, 1, 2], [3])!
 	assert slice.array_equal(expected)
 }
 
 fn test_slice_implicit() {
-	a := from_array([0.0, 1, 2, 3], [2, 2])!
+	a := vtl.from_array([0.0, 1, 2, 3], [2, 2])!
 	slice := a.slice([]int{}, [1])!
-	expected := from_array([1.0, 3], [2])!
+	expected := vtl.from_array([1.0, 3], [2])!
 	assert slice.array_equal(expected)
 }
 
 fn test_negative_slice() {
-	a := from_array([1.0, 2, 3], [3])!
+	a := vtl.from_array([1.0, 2, 3], [3])!
 	slice := a.slice([0, 3, -1])!
-	expected := from_array([3.0, 2, 1], [3])!
+	expected := vtl.from_array([3.0, 2, 1], [3])!
 	assert slice.array_equal(expected)
 }
 
 fn test_slice_hilo() {
-	t := from_array([1.0, 2, 3, 4], [2, 2])!
+	t := vtl.from_array([1.0, 2, 3, 4], [2, 2])!
 	slice := t.slice_hilo([0], [2])!
 	assert t.array_equal(slice)
 }

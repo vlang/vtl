@@ -9,6 +9,7 @@ import vtl.nn.types
 // E.g. for input [..., D] it computes mean and variance over the last D dims.
 @[params]
 pub struct LayerNormConfig {
+pub:
 	eps    f64  = 1e-5
 	affine bool = true
 }

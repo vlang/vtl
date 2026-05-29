@@ -170,5 +170,9 @@ pub fn (ds &TensorDataset[T]) get(i int) !(&la.Matrix[T], []T) {
 	if i < 0 || i >= ds.len() {
 		return errors.error('index ${i} out of bounds', .einval)
 	}
-	return ds.x, ds.y
+	mut x := la.Matrix.new[T](1, ds.x.n)
+	for j in 0 .. ds.x.n {
+		x.set(0, j, ds.x.get(i, j))
+	}
+	return x, [ds.y[i]]
 }

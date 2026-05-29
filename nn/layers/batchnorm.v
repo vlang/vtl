@@ -9,6 +9,7 @@ import vtl.nn.types
 // Tracks running mean and variance for inference.
 @[params]
 pub struct BatchNorm1DConfig {
+pub:
 	eps      f64  = 1e-5
 	momentum f64  = 0.1
 	affine   bool = true

@@ -3,7 +3,6 @@ module models
 import os
 import json
 import vtl
-import vtl.autograd
 import vtl.nn.types
 import vtl.nn.layers
 
@@ -99,14 +98,14 @@ fn test_load_weights() {
 	nn1.linear(2)
 
 	// Set specific weights
-	unsafe {
-		ll := &layers.LinearLayer[f64](nn1.info.layers[1])
-		for i in 0 .. ll.weights.value.size() {
-			ll.weights.value.set_nth(i, vtl.cast[f64](1.5))
-		}
-		for i in 0 .. ll.bias.value.size() {
-			ll.bias.value.set_nth(i, vtl.cast[f64](0.5))
-		}
+	vars := nn1.info.layers[1].variables()
+	mut ll_weights := vars[0].value
+	mut ll_bias := vars[1].value
+	for i in 0 .. ll_weights.size() {
+		ll_weights.set_nth(i, vtl.cast[f64](1.5))
+	}
+	for i in 0 .. ll_bias.size() {
+		ll_bias.set_nth(i, vtl.cast[f64](0.5))
 	}
 	path := '${test_dir}/weights_test.json'
 	nn1.save(path)!
@@ -122,21 +121,19 @@ fn test_load_weights() {
 	nn2.load_weights(path)!
 
 	// Verify weights were loaded correctly
-	unsafe {
-		ll1 := &layers.LinearLayer[f64](nn1.info.layers[1])
-		ll2 := &layers.LinearLayer[f64](nn2.info.layers[1])
+	vars1 := nn1.info.layers[1].variables()
+	vars2 := nn2.info.layers[1].variables()
 
-		for i in 0 .. ll1.weights.value.size() {
-			orig := f64(ll1.weights.value.get_nth(i))
-			loaded := f64(ll2.weights.value.get_nth(i))
-			assert loaded == orig, 'Weight mismatch at ${i}: expected ${orig}, got ${loaded}'
-		}
+	for i in 0 .. vars1[0].value.size() {
+		orig := f64(vars1[0].value.get_nth(i))
+		loaded := f64(vars2[0].value.get_nth(i))
+		assert loaded == orig, 'Weight mismatch at ${i}: expected ${orig}, got ${loaded}'
+	}
 
-		for i in 0 .. ll1.bias.value.size() {
-			orig := f64(ll1.bias.value.get_nth(i))
-			loaded := f64(ll2.bias.value.get_nth(i))
-			assert loaded == orig, 'Bias mismatch at ${i}: expected ${orig}, got ${loaded}'
-		}
+	for i in 0 .. vars1[1].value.size() {
+		orig := f64(vars1[1].value.get_nth(i))
+		loaded := f64(vars2[1].value.get_nth(i))
+		assert loaded == orig, 'Bias mismatch at ${i}: expected ${orig}, got ${loaded}'
 	}
 }
 
@@ -165,9 +162,11 @@ fn test_version_mismatch() {
 	nn2.input([1, 2])
 	nn2.linear(3)
 
-	result := nn2.load_weights(path)
-	assert result.is_error()
-	assert result.error().msg().contains('version mismatch')
+	nn2.load_weights(path) or {
+		assert err.msg().contains('version mismatch')
+		return
+	}
+	assert false
 }
 
 fn test_layer_count_mismatch() {
@@ -191,9 +190,11 @@ fn test_layer_count_mismatch() {
 	nn2.relu()
 	nn2.linear(2)
 
-	result := nn2.load_weights(path)
-	assert result.is_error()
-	assert result.error().msg().contains('Layer count mismatch')
+	nn2.load_weights(path) or {
+		assert err.msg().contains('Layer count mismatch')
+		return
+	}
+	assert false
 }
 
 fn test_layer_type_mismatch() {
@@ -222,9 +223,11 @@ fn test_layer_type_mismatch() {
 	nn2.linear(3)
 	nn2.relu()
 
-	result := nn2.load_weights(path)
-	assert result.is_error()
-	assert result.error().msg().contains('type mismatch')
+	nn2.load_weights(path) or {
+		assert err.msg().contains('type mismatch')
+		return
+	}
+	assert false
 }
 
 fn test_linear_layer_weights_serialization() {
@@ -235,32 +238,29 @@ fn test_linear_layer_weights_serialization() {
 
 	// Create model with specific weight values
 	mut nn := sequential_with_layers[f64]([]types.Layer[f64]{})
-	nn.input([2, 3])
+	nn.input([3])
 	nn.linear(4)
 
 	// Set known weights: shape [4, 3]
 	weights_data := [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2]
-	unsafe {
-		ll := &layers.LinearLayer[f64](nn.info.layers[1])
-		for i in 0 .. weights_data.len {
-			ll.weights.value.set_nth(i, vtl.cast[f64](weights_data[i]))
-		}
+	vars := nn.info.layers[1].variables()
+	mut ll_weights := vars[0].value
+	for i in 0 .. weights_data.len {
+		ll_weights.set_nth(i, vtl.cast[f64](weights_data[i]))
 	}
 	path := '${test_dir}/linear_weights_test.json'
 	nn.save(path)!
 
 	// Load and verify
 	mut nn2 := sequential_with_layers[f64]([]types.Layer[f64]{})
-	nn2.input([2, 3])
+	nn2.input([3])
 	nn2.linear(4)
 	nn2.load_weights(path)!
 
-	unsafe {
-		ll2 := &layers.LinearLayer[f64](nn2.info.layers[1])
-		for i in 0 .. weights_data.len {
-			loaded := f64(ll2.weights.value.get_nth(i))
-			assert loaded == weights_data[i], 'Weight ${i} mismatch: expected ${weights_data[i]}, got ${loaded}'
-		}
+	vars2 := nn2.info.layers[1].variables()
+	for i in 0 .. weights_data.len {
+		loaded := f64(vars2[0].value.get_nth(i))
+		assert loaded == weights_data[i], 'Weight ${i} mismatch: expected ${weights_data[i]}, got ${loaded}'
 	}
 }
 
@@ -278,12 +278,12 @@ fn test_batchnorm_serialization() {
 	})
 
 	// Set known values
-	unsafe {
-		bn := &layers.BatchNorm1DLayer[f64](nn.info.layers[1])
-		for i in 0 .. bn.gamma.value.size() {
-			bn.gamma.value.set_nth(i, vtl.cast[f64](f64(i) * 0.5))
-			bn.beta.value.set_nth(i, vtl.cast[f64](f64(i) * 0.1))
-		}
+	vars := nn.info.layers[1].variables()
+	mut gamma := vars[0].value
+	mut beta := vars[1].value
+	for i in 0 .. gamma.size() {
+		gamma.set_nth(i, vtl.cast[f64](f64(i) * 0.5))
+		beta.set_nth(i, vtl.cast[f64](f64(i) * 0.1))
 	}
 	path := '${test_dir}/batchnorm_test.json'
 	nn.save(path)!
@@ -379,9 +379,11 @@ fn test_validate_model_compatibility() {
 	nn2.relu()
 	nn2.linear(2)
 
-	result2 := validate_model_compatibility[f64](path, nn2.info.layers)
-	assert result2.is_error()
-	assert result2.error().msg().contains('Layer count mismatch')
+	validate_model_compatibility[f64](path, nn2.info.layers) or {
+		assert err.msg().contains('Layer count mismatch')
+		return
+	}
+	assert false
 }
 
 fn test_load_checkpoint_returns_metadata() {
@@ -449,7 +451,7 @@ fn test_embedding_layer_serialization() {
 
 	mut nn := sequential_with_layers[f64]([]types.Layer[f64]{})
 	nn.input([1, 10])
-	nn.embedding(1000, 64)
+	nn.embedding(16, 8)
 
 	path := '${test_dir}/embedding_test.json'
 	nn.save(path)!
@@ -458,8 +460,8 @@ fn test_embedding_layer_serialization() {
 	model := json.decode(ModelFile, content)!
 
 	assert model.layers[1].layer_type == 'EmbeddingLayer'
-	assert model.layers[1].config['vocab_size'] == 1000
-	assert model.layers[1].config['embedding_dim'] == 64
+	assert model.layers[1].config['vocab_size'] == 16
+	assert model.layers[1].config['embedding_dim'] == 8
 	assert 'weight' in model.layer_data[1].weights
 }
 
@@ -470,8 +472,8 @@ fn test_multihead_attention_serialization() {
 	}
 
 	mut nn := sequential_with_layers[f64]([]types.Layer[f64]{})
-	nn.input([1, 10, 128])
-	nn.multihead_attention(128, 8)
+	nn.input([1, 10, 16])
+	nn.multihead_attention(16, 4)
 
 	path := '${test_dir}/attention_test.json'
 	nn.save(path)!
@@ -481,8 +483,8 @@ fn test_multihead_attention_serialization() {
 
 	layer := model.layers[1]
 	assert layer.layer_type == 'MultiHeadAttentionLayer'
-	assert layer.config['embed_dim'] == 128
-	assert layer.config['num_heads'] == 8
+	assert layer.config['embed_dim'] == 16
+	assert layer.config['num_heads'] == 4
 
 	// 4 weight matrices
 	assert 'w_q' in model.layer_data[1].weights

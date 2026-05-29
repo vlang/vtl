@@ -3,8 +3,8 @@ module models
 import json
 import os
 import vtl
+import vtl.autograd
 import vtl.nn.types
-import vtl.nn.layers
 import encoding.base64
 import math
 
@@ -30,6 +30,7 @@ pub:
 
 // LayerDef defines a single layer's type and configuration for reconstruction.
 struct LayerDef {
+mut:
 	layer_type string
 	in_shape   []int
 	config     map[string]int
@@ -52,12 +53,49 @@ mut:
 
 // ModelFile is the complete serialized model format.
 struct ModelFile {
-pub:
+pub mut:
 	version    string
 	layers     []LayerDef
 	layer_data []SerializedLayer
 	optimizer  OptimizerData
 	metadata   ModelMetadata
+}
+
+fn (nn &Sequential[T]) layer_type_at(index int, layer types.Layer[T]) string {
+	if index < nn.info.layer_types.len && nn.info.layer_types[index] != '' {
+		return nn.info.layer_types[index]
+	}
+	return typeof(layer).name
+}
+
+fn (nn &Sequential[T]) layer_config_at(index int) map[string]int {
+	if index < nn.info.layer_configs.len {
+		return nn.info.layer_configs[index].clone()
+	}
+	return map[string]int{}
+}
+
+fn is_erased_layer_type(name string) bool {
+	return name == '' || name == 'Layer' || name.starts_with('types.Layer[')
+}
+
+fn set_config_default(mut config map[string]int, key string, value int) {
+	if key !in config {
+		config[key] = value
+	}
+}
+
+fn shape_value(shape []int, index int, fallback int) int {
+	if index < shape.len {
+		return shape[index]
+	}
+	return fallback
+}
+
+fn encode_layer_var[T](mut weights map[string]string, vars []&autograd.Variable[T], index int, key string) ! {
+	if index < vars.len {
+		weights[key] = encode_tensor[T](vars[index].value)!
+	}
 }
 
 // save saves a Sequential model's weights to a JSON file.
@@ -72,9 +110,10 @@ pub fn (nn &Sequential[T]) save_checkpoint(path string, epoch int, loss f64) ! {
 	mut layer_data := []SerializedLayer{}
 
 	for i, layer in nn.info.layers {
-		layer_type := typeof(layer).name
-		mut config := map[string]int{}
+		layer_type := nn.layer_type_at(i, layer)
+		mut config := nn.layer_config_at(i)
 		mut weights := map[string]string{}
+		vars := layer.variables()
 
 		// Capture input shape from previous layer or default
 		in_shape := if i > 0 {
@@ -86,70 +125,83 @@ pub fn (nn &Sequential[T]) save_checkpoint(path string, epoch int, loss f64) ! {
 		// Extract layer-specific configuration and weights
 		match layer_type {
 			'LinearLayer' {
-				ll := layer as &layers.LinearLayer[T]
-				config['in_features'] = ll.weights.value.shape[1]
-				config['out_features'] = ll.weights.value.shape[0]
-				weights['weight'] = encode_tensor[T](ll.weights.value)!
-				weights['bias'] = encode_tensor[T](ll.bias.value)!
+				if vars.len > 0 {
+					set_config_default(mut config, 'out_features', shape_value(vars[0].value.shape,
+						0, 0))
+					set_config_default(mut config, 'in_features', shape_value(vars[0].value.shape,
+						1, 0))
+				}
+				encode_layer_var[T](mut weights, vars, 0, 'weight')!
+				encode_layer_var[T](mut weights, vars, 1, 'bias')!
 			}
 			'ReLULayer', 'SigmoidLayer', 'TanhLayer', 'LeakyReLULayer', 'ELULayer', 'SwishLayer',
-			'MishLayer', 'GeluLayer' {
+			'MishLayer', 'GELULayer', 'GeluLayer' {
 				// Activation layers have no weights - they just copy shapes
 			}
 			'BatchNorm1DLayer' {
-				bn := layer as &layers.BatchNorm1DLayer[T]
-				config['num_features'] = bn.gamma.value.shape[1]
-				weights['gamma'] = encode_tensor[T](bn.gamma.value)!
-				weights['beta'] = encode_tensor[T](bn.beta.value)!
-				weights['running_mean'] = encode_tensor[T](bn.running_mean)!
-				weights['running_var'] = encode_tensor[T](bn.running_var)!
+				if vars.len > 0 {
+					set_config_default(mut config, 'num_features', shape_value(vars[0].value.shape,
+						1, 0))
+				}
+				encode_layer_var[T](mut weights, vars, 0, 'gamma')!
+				encode_layer_var[T](mut weights, vars, 1, 'beta')!
 			}
 			'EmbeddingLayer' {
-				em := layer as &layers.EmbeddingLayer[T]
-				config['vocab_size'] = em.weight.value.shape[0]
-				config['embedding_dim'] = em.weight.value.shape[1]
-				weights['weight'] = encode_tensor[T](em.weight.value)!
+				if vars.len > 0 {
+					set_config_default(mut config, 'vocab_size', shape_value(vars[0].value.shape,
+						0, 0))
+					set_config_default(mut config, 'embedding_dim', shape_value(vars[0].value.shape,
+						1, 0))
+				}
+				encode_layer_var[T](mut weights, vars, 0, 'weight')!
 			}
 			'Conv2DLayer' {
-				cv := layer as &layers.Conv2DLayer[T]
-				config['in_channels'] = cv.weight.value.shape[1]
-				config['out_channels'] = cv.weight.value.shape[0]
-				config['kernel_h'] = cv.weight.value.shape[2]
-				config['kernel_w'] = cv.weight.value.shape[3]
-				config['stride_h'] = cv.config.stride[0]
-				config['stride_w'] = cv.config.stride[1]
-				weights['weight'] = encode_tensor[T](cv.weight.value)!
-				weights['bias'] = encode_tensor[T](cv.bias.value)!
+				if vars.len > 0 {
+					set_config_default(mut config, 'out_channels', shape_value(vars[0].value.shape,
+						0, 0))
+					set_config_default(mut config, 'in_channels', shape_value(vars[0].value.shape,
+						1, 0))
+					set_config_default(mut config, 'kernel_h', shape_value(vars[0].value.shape, 2,
+						0))
+					set_config_default(mut config, 'kernel_w', shape_value(vars[0].value.shape, 3,
+						0))
+				}
+				set_config_default(mut config, 'stride_h', 1)
+				set_config_default(mut config, 'stride_w', 1)
+				encode_layer_var[T](mut weights, vars, 0, 'weight')!
+				encode_layer_var[T](mut weights, vars, 1, 'bias')!
 			}
 			'LSTMLayer' {
-				lstm := layer as &layers.LSTMLayer[T]
-				config['input_size'] = lstm.w_ih.value.shape[1]
-				config['hidden_size'] = lstm.hidden_size
-				config['num_layers'] = lstm.num_layers
-				weights['w_ih'] = encode_tensor[T](lstm.w_ih.value)!
-				weights['w_hh'] = encode_tensor[T](lstm.w_hh.value)!
-				weights['b_ih'] = encode_tensor[T](lstm.b_ih.value)!
-				weights['b_hh'] = encode_tensor[T](lstm.b_hh.value)!
+				if vars.len > 1 {
+					set_config_default(mut config, 'input_size', shape_value(vars[0].value.shape,
+						1, 0))
+					set_config_default(mut config, 'hidden_size', shape_value(vars[1].value.shape,
+						1, 0))
+				}
+				set_config_default(mut config, 'num_layers', 1)
+				encode_layer_var[T](mut weights, vars, 0, 'w_ih')!
+				encode_layer_var[T](mut weights, vars, 1, 'w_hh')!
+				encode_layer_var[T](mut weights, vars, 2, 'b_ih')!
+				encode_layer_var[T](mut weights, vars, 3, 'b_hh')!
 			}
 			'MultiHeadAttentionLayer' {
-				mha := layer as &layers.MultiHeadAttentionLayer[T]
-				config['embed_dim'] = mha.embed_dim
-				config['num_heads'] = mha.num_heads
-				weights['w_q'] = encode_tensor[T](mha.w_q.value)!
-				weights['w_k'] = encode_tensor[T](mha.w_k.value)!
-				weights['w_v'] = encode_tensor[T](mha.w_v.value)!
-				weights['w_o'] = encode_tensor[T](mha.w_o.value)!
+				if vars.len > 0 {
+					set_config_default(mut config, 'embed_dim', shape_value(vars[0].value.shape, 0,
+						0))
+				}
+				set_config_default(mut config, 'num_heads', 1)
+				encode_layer_var[T](mut weights, vars, 0, 'w_q')!
+				encode_layer_var[T](mut weights, vars, 1, 'w_k')!
+				encode_layer_var[T](mut weights, vars, 2, 'w_v')!
+				encode_layer_var[T](mut weights, vars, 3, 'w_o')!
 			}
 			'LayerNormLayer' {
-				ln := layer as &layers.LayerNormLayer[T]
-				config['normalized_shape_0'] = ln.normalized_shape[0]
-				if ln.normalized_shape.len > 1 {
-					config['normalized_shape_1'] = ln.normalized_shape[1]
-				}
-				if layer.variables().len > 0 {
-					ln2 := layer as &layers.LayerNormLayer[T]
-					weights['gamma'] = encode_tensor[T](ln2.gamma.value)!
-					weights['beta'] = encode_tensor[T](ln2.beta.value)!
+				if vars.len > 0 {
+					for j, dim in vars[0].value.shape {
+						set_config_default(mut config, 'normalized_shape_${j}', dim)
+					}
+					encode_layer_var[T](mut weights, vars, 0, 'gamma')!
+					encode_layer_var[T](mut weights, vars, 1, 'beta')!
 				}
 			}
 			'FlattenLayer' {
@@ -166,7 +218,7 @@ pub fn (nn &Sequential[T]) save_checkpoint(path string, epoch int, loss f64) ! {
 			}
 			else {
 				// For unknown layers, just extract variables if any exist
-for j, mut v in layer.variables() {
+				for j, v in vars {
 					key := 'var_${j}'
 					weights[key] = encode_tensor[T](v.value)!
 				}
@@ -235,14 +287,13 @@ pub fn (nn &Sequential[T]) load_weights(path string) ! {
 		return error('Layer count mismatch: model has ${nn.info.layers.len}, checkpoint has ${model.layers.len}')
 	}
 
-	mut var_idx := 0
 	for i, layer in nn.info.layers {
 		layer_def := model.layers[i]
 
 		// Validate layer type
 		saved_type := layer_def.layer_type
-		current_type := typeof(layer).name
-		if saved_type != current_type {
+		current_type := nn.layer_type_at(i, layer)
+		if !is_erased_layer_type(current_type) && saved_type != current_type {
 			return error('Layer ${i} type mismatch: expected ${saved_type}, got ${current_type}')
 		}
 
@@ -308,10 +359,15 @@ pub fn (nn &Sequential[T]) load_weights(path string) ! {
 			}
 
 			// Copy data into variable's value tensor
-			for k in 0 .. tensor_data.size() {
-				v.value.set_nth(k, tensor_data.get_nth(k))
+			if tensor_data.memory == v.value.memory {
+				for k in 0 .. tensor_data.size() {
+					v.value.data.data[k] = tensor_data.data.data[k]
+				}
+			} else {
+				for k in 0 .. tensor_data.size() {
+					v.value.set_nth(k, tensor_data.get_nth(k))
+				}
 			}
-			var_idx++
 		}
 	}
 }
@@ -359,11 +415,12 @@ pub fn (nn &Sequential[T]) load_weights(path string) ! {
 fn encode_tensor[T](t &vtl.Tensor[T]) !string {
 	shape := t.shape
 	mut data := []f64{}
-	for i in 0 .. t.size() {
-		data << f64(t.get_nth(i))
+	for val in t.data.data {
+		data << f64(val)
 	}
 	// Encode shape as comma-separated
 	shape_str := shape.map(it.str()).join(',')
+	memory_str := if t.memory == .col_major { 'col_major' } else { 'row_major' }
 	// Encode data as base64
 	mut byte_data := []u8{len: data.len * 8}
 	for i, val in data {
@@ -373,7 +430,7 @@ fn encode_tensor[T](t &vtl.Tensor[T]) !string {
 		}
 	}
 	encoded := base64.encode(byte_data)
-	return '${shape_str}|${encoded}'
+	return '${shape_str};${memory_str}|${encoded}'
 }
 
 // decode_tensor decodes a string back to a tensor with the given shape.
@@ -382,7 +439,13 @@ fn decode_tensor[T](encoded string, shape []int) !&vtl.Tensor[T] {
 	if parts.len != 2 {
 		return error('Invalid tensor encoding: missing shape delimiter')
 	}
-	shape_str := parts[0]
+	shape_parts := parts[0].split(';')
+	shape_str := shape_parts[0]
+	memory := if shape_parts.len > 1 && shape_parts[1] == 'col_major' {
+		vtl.MemoryFormat.col_major
+	} else {
+		vtl.MemoryFormat.row_major
+	}
 	data_str := parts[1]
 
 	// Parse shape
@@ -403,12 +466,12 @@ fn decode_tensor[T](encoded string, shape []int) !&vtl.Tensor[T] {
 		}
 		arr << vtl.cast[T](math.f64_from_bits(bits))
 	}
-	return vtl.from_array[T](arr, shape)!
+	return vtl.from_array[T](arr, shape, memory: memory)!
 }
 
 // validate_model_compatibility checks if a saved model is compatible with the given layers.
 // Returns an error with details if incompatible.
-pub fn validate_model_compatibility[T](saved_path string, layers []types.Layer[T]) !bool {
+pub fn validate_model_compatibility[T](saved_path string, model_layers []types.Layer[T]) !bool {
 	data := os.read_file(saved_path)!
 	model := json.decode(ModelFile, data)!
 
@@ -416,14 +479,14 @@ pub fn validate_model_compatibility[T](saved_path string, layers []types.Layer[T
 		return error('Model version mismatch: expected ${model_version}, got ${model.version}')
 	}
 
-	if model.layers.len != layers.len {
-		return error('Layer count mismatch: model has ${layers.len}, checkpoint has ${model.layers.len}')
+	if model.layers.len != model_layers.len {
+		return error('Layer count mismatch: model has ${model_layers.len}, checkpoint has ${model.layers.len}')
 	}
 
-	for i, layer in layers {
+	for i, layer in model_layers {
 		saved_type := model.layers[i].layer_type
 		current_type := typeof(layer).name
-		if saved_type != current_type {
+		if !is_erased_layer_type(current_type) && saved_type != current_type {
 			return error('Layer ${i} type mismatch: expected ${saved_type}, got ${current_type}')
 		}
 

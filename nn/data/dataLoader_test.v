@@ -32,19 +32,23 @@ fn test_dataloader_basic() {
 	assert batch_y == [0.0, 1.0, 2.0]
 
 	// Get second batch
-	batch_x, batch_y = dl.next()!
-	assert batch_y == [3.0, 4.0, 5.0]
+	_, batch_y2 := dl.next()!
+	assert batch_y2 == [3.0, 4.0, 5.0]
 
 	// Get remaining batches
-	batch_x, batch_y = dl.next()!
-	assert batch_y == [6.0, 7.0, 8.0]
+	_, batch_y3 := dl.next()!
+	assert batch_y3 == [6.0, 7.0, 8.0]
 
-	batch_x, batch_y = dl.next()!
-	assert batch_y == [9.0]
-	assert batch_x.m == 1 // Last batch has only 1 sample
+	batch_x4, batch_y4 := dl.next()!
+	assert batch_y4 == [9.0]
+	assert batch_x4.m == 1 // Last batch has only 1 sample
 
 	// No more batches
-	_, _ = dl.next() or { true }
+	dl.next() or {
+		assert err.msg().contains('no more batches')
+		return
+	}
+	assert false
 }
 
 fn test_dataloader_shuffle() {
@@ -91,15 +95,15 @@ fn test_dataloader_reset() {
 	mut dl := DataLoader.new[f64](x, y_labels, 2, false)
 
 	// First epoch: get first batch
-	batch_x, batch_y := dl.next()!
+	_, batch_y := dl.next()!
 	assert batch_y == [10.0, 20.0]
 
 	// Reset
 	dl.reset()
 
 	// Second epoch: first batch should start from beginning again
-	batch_x, batch_y = dl.next()!
-	assert batch_y == [10.0, 20.0]
+	_, batch_y_after_reset := dl.next()!
+	assert batch_y_after_reset == [10.0, 20.0]
 }
 
 fn test_dataloader_padding() {
@@ -151,12 +155,20 @@ fn test_dataset_subset() {
 	assert subset.len() == 3
 
 	// Get sample at subset index 0 (should be original index 0)
-	ds_x, ds_y := subset.get(0)!
-	assert ds_y == 1.0
+	ds_x0, ds_y0 := subset.get(0)!
+	assert ds_x0.m == 1
+	assert ds_x0.n == 2
+	assert ds_x0.get(0, 0) == 1.0
+	assert ds_x0.get(0, 1) == 2.0
+	assert ds_y0 == [1.0]
 
 	// Get sample at subset index 1 (should be original index 2)
-	ds_x, ds_y = subset.get(1)!
-	assert ds_y == 3.0
+	ds_x1, ds_y1 := subset.get(1)!
+	assert ds_x1.m == 1
+	assert ds_x1.n == 2
+	assert ds_x1.get(0, 0) == 5.0
+	assert ds_x1.get(0, 1) == 6.0
+	assert ds_y1 == [3.0]
 
 	// Split subset
 	train_subset, val_subset := subset.split(0.67)! // ~2 train, ~1 val
@@ -179,8 +191,11 @@ fn test_tensor_dataset() {
 
 	assert ds.len() == 3
 
-	// TensorDataset returns full matrix and labels
+	// TensorDataset returns the requested sample and label
 	ds_x, ds_y := ds.get(0)!
-	// Note: get() returns the full matrix since all data is stored together
-	assert ds_y[0] == 10.0
+	assert ds_x.m == 1
+	assert ds_x.n == 2
+	assert ds_x.get(0, 0) == 1.0
+	assert ds_x.get(0, 1) == 2.0
+	assert ds_y == [10.0]
 }

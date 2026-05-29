@@ -1,3 +1,4 @@
+// vtest build: false // requires a Vulkan SDK and device
 module main
 
 import vtl

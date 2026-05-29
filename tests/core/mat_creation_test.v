@@ -1,7 +1,9 @@
-module vtl
+module main
+
+import vtl
 
 fn test_diag() {
-	t := from_1d([1, 2, 3, 4, 5, 6, 7, 8, 9])!
+	t := vtl.from_1d([1, 2, 3, 4, 5, 6, 7, 8, 9])!
 	assert t.shape == [9]
 	assert t.strides == [1]
 	diag := t.diag()!
@@ -19,7 +21,7 @@ fn test_diag() {
 }
 
 fn test_diag_flat_from_1d() {
-	t := from_1d([1, 2, 3, 4, 5, 6, 7, 8, 9])!
+	t := vtl.from_1d([1, 2, 3, 4, 5, 6, 7, 8, 9])!
 	assert t.shape == [9]
 	assert t.strides == [1]
 	diag := t.diag_flat()!
@@ -37,7 +39,7 @@ fn test_diag_flat_from_1d() {
 }
 
 fn test_diag_flat_from_2d() {
-	t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
+	t := vtl.from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
 	assert t.shape == [3, 3]
 	assert t.strides == [3, 1]
 	diag := t.diag_flat()!
@@ -55,7 +57,7 @@ fn test_diag_flat_from_2d() {
 }
 
 fn test_tril() {
-	t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
+	t := vtl.from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
 	assert t.shape == [3, 3]
 	assert t.strides == [3, 1]
 	tril := t.tril()
@@ -73,7 +75,7 @@ fn test_tril() {
 }
 
 fn test_tril_offset_0() {
-	t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
+	t := vtl.from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
 	assert t.shape == [3, 3]
 	assert t.strides == [3, 1]
 	tril := t.tril_offset(0)
@@ -81,7 +83,7 @@ fn test_tril_offset_0() {
 }
 
 fn test_tril_offset_1() {
-	t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
+	t := vtl.from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
 	assert t.shape == [3, 3]
 	assert t.strides == [3, 1]
 	tril := t.tril_offset(1)
@@ -99,7 +101,7 @@ fn test_tril_offset_1() {
 }
 
 fn test_tril_inplace() {
-	mut t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
+	mut t := vtl.from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
 	assert t.shape == [3, 3]
 	assert t.strides == [3, 1]
 	t.tril_inplace()
@@ -117,23 +119,23 @@ fn test_tril_inplace() {
 }
 
 fn test_tril_inplace_offset_0() {
-	mut t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
+	mut t := vtl.from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
 	assert t.shape == [3, 3]
 	assert t.strides == [3, 1]
-	t.tril_inplace_offset(0)
-	assert t.array_equal(from_2d([[1, 0, 0], [4, 5, 0], [7, 8, 9]])!)
+	t.tril_inpl_offset(0)
+	assert t.array_equal(vtl.from_2d([[1, 0, 0], [4, 5, 0], [7, 8, 9]])!)
 }
 
 fn test_tril_inplace_offset_1() {
-	mut t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
+	mut t := vtl.from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
 	assert t.shape == [3, 3]
 	assert t.strides == [3, 1]
-	t.tril_inplace_offset(1)
-	assert t.array_equal(from_2d([[1, 2, 0], [4, 5, 6], [7, 8, 9]])!)
+	t.tril_inpl_offset(1)
+	assert t.array_equal(vtl.from_2d([[1, 2, 0], [4, 5, 6], [7, 8, 9]])!)
 }
 
 fn test_triu() {
-	t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
+	t := vtl.from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
 	assert t.shape == [3, 3]
 	assert t.strides == [3, 1]
 	triu := t.triu()
@@ -151,7 +153,7 @@ fn test_triu() {
 }
 
 fn test_triu_offset_0() {
-	t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
+	t := vtl.from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
 	assert t.shape == [3, 3]
 	assert t.strides == [3, 1]
 	triu := t.triu_offset(0)
@@ -159,7 +161,7 @@ fn test_triu_offset_0() {
 }
 
 fn test_triu_offset_1() {
-	t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
+	t := vtl.from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
 	assert t.shape == [3, 3]
 	assert t.strides == [3, 1]
 	triu := t.triu_offset(1)
@@ -177,7 +179,7 @@ fn test_triu_offset_1() {
 }
 
 fn test_triu_inplace() {
-	mut t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
+	mut t := vtl.from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
 	assert t.shape == [3, 3]
 	assert t.strides == [3, 1]
 	t.triu_inplace()
@@ -194,18 +196,20 @@ fn test_triu_inplace() {
 	assert t.get([2, 2]) == 9
 }
 
-fn test_triu_inplace_offset_0() {
-	mut t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
+fn test_triu_offset_0_matches_inplace() {
+	t := vtl.from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
 	assert t.shape == [3, 3]
 	assert t.strides == [3, 1]
-	t.triu_inplace_offset(0)
-	assert t.array_equal(from_2d([[1, 2, 3], [0, 5, 6], [0, 0, 9]])!)
+	triu := t.triu_offset(0)
+	assert triu.array_equal(vtl.from_2d([[1, 2, 3], [0, 5, 6],
+		[0, 0, 9]])!)
 }
 
-fn test_triu_inplace_offset_1() {
-	mut t := from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
+fn test_triu_offset_1_matches_inplace() {
+	t := vtl.from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
 	assert t.shape == [3, 3]
 	assert t.strides == [3, 1]
-	t.triu_inplace_offset(1)
-	assert t.array_equal(from_2d([[0, 2, 3], [0, 0, 6], [0, 0, 0]])!)
+	triu := t.triu_offset(1)
+	assert triu.array_equal(vtl.from_2d([[0, 2, 3], [0, 0, 6],
+		[0, 0, 0]])!)
 }

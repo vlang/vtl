@@ -1,7 +1,6 @@
 module vtl
 
 import vtl.storage
-import vsl.vulkan as _
 
 pub fn (t &Tensor[T]) vulkan(params storage.VulkanParams) !&Tensor[T] {
 	return error(@METHOD + ':' +
