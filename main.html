@@ -113,18 +113,49 @@
 					<div class="doc-content">
 								<section id="readme_main" class="doc-node">
 			<div class="title"><h1> main <a href="#readme_main">#</a></h1></div>
-<h1 id="tensor--opencl--vcl-support">Tensor + OpenCL + VCL support</h1>
-<p>This example shows how to use the OpenCL backend with VCL support.</p>
-<h2 id="prerequisites">Prerequisites</h2>
-<p>Read the <a href="https://vlang.github.io/vsl/vcl.html">docs</a> of the V Computing Language (VCL) and the OpenCL backend.</p>
-<h2 id="running-the-example">Running the example</h2>
-<p>To run the example, execute the following command:</p>
-<pre><code class="language-sh">v <span class="token operator">-</span>d vcl run examples<span class="token operator">/</span>opencl_vcl_support<span class="token operator">/</span>main_not_ci<span class="token punctuation">.</span>v</code></pre>
+<h1 id="vtlbasicusage">vtl_basic_usage</h1>
+<p>Shows the core VTL tensor operations: creation, element-wise arithmetic, in-place mutation with <code>apply</code>, and out-of-place transformation with <code>map</code>.</p>
+<h2 id="what-it-demonstrates">What it demonstrates</h2>
+<ul>
+<li>Creating 1-D tensors from arrays with <code>vtl.from_1d</code></li>
+<li>Element-wise addition with <code>.add()</code></li>
+<li>In-place mutation with <code>.apply()</code> (modifies the tensor in place)</li>
+<li>Out-of-place transformation with <code>.map()</code> (returns a new tensor)</li></ul>
+<h2 id="how-to-run">How to run</h2>
+<pre><code class="language-sh">v run main<span class="token punctuation">.</span>v</code></pre>
+<h2 id="expected-output">Expected output</h2>
+<pre><code>[1, 3, 5, 7]       &lt;- a + b
+[2, 6, 10, 14]     &lt;- apply(*2) in place
+[4, 12, 20, 28]    &lt;- map(*2), new tensor
+</code></pre>
+<h2 id="key-api">Key API</h2>
+<table>
+<thead>
+<tr>
+<th>Function / method</th>
+<th>Description</th></tr></thead>
+<tbody>
+<tr>
+<td><code>vtl.from_1d(arr)</code></td>
+<td>Create a 1-D tensor from a V array</td></tr>
+<tr>
+<td><code>a.add(b)</code></td>
+<td>Element-wise addition (returns new tensor)</td></tr>
+<tr>
+<td><code>t.apply(fn)</code></td>
+<td>Mutate each element in place</td></tr>
+<tr>
+<td><code>t.map(fn)</code></td>
+<td>Transform each element, return new tensor</td></tr></tbody></table>
+<h2 id="related-examples">Related examples</h2>
+<ul>
+<li><a href="https://github.com/vlang/vtl/blob/master/examples/vtl_vandermont"><code>vtl_vandermont</code></a> — 2-D tensor creation and slicing</li>
+<li><a href="https://github.com/vlang/vtl/blob/master/examples/autograd_backprop"><code>autograd_backprop</code></a> — automatic differentiation</li></ul>
 
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 26 May 2026 08:34:54</div>
+						<div class="footer">Powered by vdoc. Generated on: 29 May 2026 02:03:26</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_main">README</a></li>
 </ul></div>
