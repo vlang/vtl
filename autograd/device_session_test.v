@@ -45,6 +45,38 @@ fn test_device_session_reuses_buffers_on_second_forward() ! {
 	_ = out1
 }
 
+fn test_linear_backward_f64_cpu() ! {
+	grad := vtl.from_array([1.0, 0.5], [1, 2])!
+	input := vtl.from_array([1.0, 2.0, 3.0], [1, 3])!
+	weight := vtl.from_array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6], [2, 3])!
+	tensors := linear_backward_f64_cpu(grad, input, weight, true)!
+	assert tensors[0].shape == [1, 3]
+	assert tensors[1].shape == [2, 3]
+	assert tensors[2].shape == [1, 2]
+}
+
+fn test_linear_backward_cuda_matches_cpu_when_enabled() ! {
+	if os.getenv('VTL_TEST_CUDA') != '1' || os.getenv('VTL_CUDA_BACKWARD') != '1' {
+		return
+	}
+	mut s := new_device_session()
+	s.init_device()
+	if !s.enabled || !cuda_backward_enabled() {
+		return
+	}
+	grad := vtl.from_array([1.0, 0.5], [1, 2])!
+	input := vtl.from_array([1.0, 2.0, 3.0], [1, 3])!
+	weight := vtl.from_array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6], [2, 3])!
+	cpu := linear_backward_f64_cpu(grad, input, weight, true)!
+	gpu := linear_backward_f64(grad, input, weight, true, mut s)!
+	for ti in 0 .. 3 {
+		for i in 0 .. cpu[ti].size {
+			diff := math.abs(f64(cpu[ti].get_nth(i)) - f64(gpu[ti].get_nth(i)))
+			assert diff < 1e-6, 'backward mismatch tensor ${ti} idx ${i}'
+		}
+	}
+}
+
 fn test_gpu_activation_chain_skips_without_env() ! {
 	if os.getenv('VTL_TEST_CUDA') != '1' {
 		return

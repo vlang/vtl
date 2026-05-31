@@ -1,7 +1,7 @@
 # Device memory model (VTL autograd + CUDA)
 
-Status: **Phase 1** complete · **Phase 2** opt-in (`VTL_GPU_ACTIVATIONS=1`) — chained
-Linear forwards keep activations on GPU between layers; CPU tensor still produced for autograd.
+Status: **Phase 1** complete · **Phase 2** done (`VTL_GPU_ACTIVATIONS=1`, #101/#104) ·
+**Phase 3** opt-in (`VTL_CUDA_BACKWARD=1`) — Linear backward GEMMs on GPU when enabled.
 
 ## Policy
 
@@ -10,7 +10,7 @@ Linear forwards keep activations on GPU between layers; CPU tensor still produce
 | Parameters (weights, bias) | CPU (`CpuStorage`) | Optimizers and gates use CPU matmul today |
 | Forward (Linear/Conv2D) | Compute on GPU when `VTL_USE_CUDA=1` | cuBLAS/cuDNN |
 | Forward output | **CPU tensor** | `Variable` and gates expect `CpuStorage` |
-| Backward | CPU | `LinearGate` / `conv2d_backward` use `vtl.la` on host |
+| Backward | CPU by default; GPU GEMM for Linear when `VTL_CUDA_BACKWARD=1` | Conv2D backward still on host |
 | Optimizer step | CPU | unchanged |
 
 Sync points (host ↔ device) per Linear forward today:
@@ -27,6 +27,7 @@ Phase 1 removes redundant **allocations** via `DeviceSession` buffer reuse on th
 |----------|--------|
 | `VTL_USE_CUDA=1` | Enable GPU forward for eligible ops |
 | `VTL_GPU_ACTIVATIONS=1` | Phase 2: chain GPU activations across Linear layers |
+| `VTL_CUDA_BACKWARD=1` | Phase 3: cuBLAS GEMM for Linear gate backward |
 | `VTL_TEST_CUDA=1` | Run GPU tests |
 
 Build: `-d cuda` required for GPU code paths.
@@ -46,8 +47,8 @@ mut model := models.sequential_from_ctx[f64](ctx)
 
 ## Roadmap (issue #91 follow-ups)
 
-- **Phase 2**: GPU-resident `Variable` (`gpu_activation` on `Variable`, #101) — in progress
-- **Phase 3**: CUDA backward for Linear / Conv2D
+- **Phase 2**: GPU-resident `Variable` (`gpu_activation`, #101) — done (#104)
+- **Phase 3**: CUDA backward for Linear (opt-in) — done; Conv2D backward still CPU
 - **Phase 4**: Optimizer state on device (fused Adam step)
 
 See [DEV_LIGHTWEIGHT.md](DEV_LIGHTWEIGHT.md) for safe test commands.

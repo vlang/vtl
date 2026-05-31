@@ -81,8 +81,8 @@
 
 ### Phase F — GPU training loop (follow-up to #91)
 - [x] Phase 1: `DeviceSession` buffer reuse; CUDA forward for Linear/Conv2D
-- [ ] Phase 2: GPU-resident `Variable` (forward tensors)
-- [ ] Phase 3: CUDA backward for Linear / Conv2D
+- [x] Phase 2: GPU-resident `Variable` (forward tensors, #101/#104)
+- [x] Phase 3: CUDA backward for Linear (opt-in `VTL_CUDA_BACKWARD`; Conv2D backward TBD)
 - [ ] Phase 4: Optimizer state on device
 
 See [docs/DEVICE_MEMORY.md](docs/DEVICE_MEMORY.md).
