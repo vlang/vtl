@@ -15,6 +15,8 @@ GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 | [#89](https://github.com/vlang/vtl/issues/89)–[#91](https://github.com/vlang/vtl/issues/91) | CUDA Linear/Conv2D + `DeviceSession` (Phase 1) |
 | [#101](https://github.com/vlang/vtl/issues/101)/[#104](https://github.com/vlang/vtl/pull/104) | GPU activation chain (Phase 2) |
 | [#105](https://github.com/vlang/vtl/pull/105) | Linear CUDA backward (`VTL_CUDA_BACKWARD=1`, Phase 3) |
+| [#107](https://github.com/vlang/vtl/issues/107) | Conv2D CUDA backward (cuDNN, same eligibility as forward) |
+| [#111](https://github.com/vlang/vtl/pull/111) | Adam GPU moments (`VTL_CUDA_OPTIMIZER=1`, Phase 4 v1) |
 | [#86](https://github.com/vlang/vtl/issues/86) | `DataLoader` |
 
 **VSL (downstream):** [#280](https://github.com/vlang/vsl/issues/280)–[#285](https://github.com/vlang/vsl/issues/285).
@@ -26,10 +28,9 @@ GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 | P1 | [#41](https://github.com/vlang/vtl/issues/41) | Windows example crash |
 | P1 | — | Full `nn_cifar10` in CI (compile OOM on default runners) |
 | P2 | [#106](https://github.com/vlang/vtl/issues/106) | Phase 4 follow-up: device-resident m/v + GPU sqrt |
-| P2 | [#107](https://github.com/vlang/vtl/issues/107) | Conv2D CUDA backward |
-| P2 | — | Conv2D CUDA backward; Vulkan in `Sequential` training |
+| P2 | [#110](https://github.com/vlang/vtl/issues/110) | Vulkan in `Sequential` training |
+| P2 | [#109](https://github.com/vlang/vtl/issues/109) | `nn_cifar10` CI without OOM |
 | P2 | [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support |
-| P2 | — | Vulkan in `Sequential` training (today: smoke in `nn_cifar10_vulkan`) |
 | P2 | — | `v check-md -hide-warnings` on all example READMEs |
 
 ## Local development
