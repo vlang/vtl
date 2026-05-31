@@ -12,7 +12,7 @@ IN_PROGRESS_ID="47fc9ee4"
 TODO_ID="f75ad846"
 
 # Optional: keep these open issues visible as In Progress on the board
-IN_PROGRESS_ISSUES="vlang/vtl#41 vlang/vsl#225 vlang/vtl#63"
+IN_PROGRESS_ISSUES="vlang/vtl#41 vlang/vsl#225 vlang/vtl#63 vlang/vtl#106"
 
 echo "Fetching project $PROJECT_NUMBER items..."
 items=$(gh project item-list "$PROJECT_NUMBER" --owner "$OWNER" --format json --limit 200)

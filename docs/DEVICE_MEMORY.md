@@ -49,6 +49,6 @@ mut model := models.sequential_from_ctx[f64](ctx)
 
 - **Phase 2**: GPU-resident `Variable` (`gpu_activation`, #101) — done (#104)
 - **Phase 3**: CUDA backward for Linear (opt-in) — done; Conv2D backward still CPU
-- **Phase 4**: Optimizer state on device (fused Adam step)
+- **Phase 4**: Optimizer state on device (#106, `VTL_CUDA_OPTIMIZER=1` reserved, not implemented)
 
 See [DEV_LIGHTWEIGHT.md](DEV_LIGHTWEIGHT.md) for safe test commands.
