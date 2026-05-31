@@ -1,6 +1,7 @@
 # VTL Neural Network Roadmap
 
-> **Goal**: Production-grade Neural Network support in VTL with CUDA/GPU acceleration, DataLoader, CIFAR-10 example, and model serialization.
+> **Goal**: Production-grade Neural Network support in VTL with CUDA/GPU
+> acceleration, DataLoader, CIFAR-10 example, and model serialization.
 
 **Reposity**: [vlang/vtl](https://github.com/vlang/vtl) · **VSL Backend**: [vlang/vsl](https://github.com/vlang/vsl)
 
@@ -53,7 +54,8 @@
 - [x] `nn_cifar10_safe` variant — safe defaults for dev/CI
 - [x] `nn_cifar10_tiny` variant — real data subset (64 train, 16 test)
 - [x] `nn_cifar10_tiny_synth` variant — synthetic data, no I/O (pipeline validation)
-- [ ] **Open Issue**: Full `nn_cifar10` example crashes on this runner (OOM at compile time, ~9 GB V compiler memory); runs correctly on user's local machine
+- [ ] **Open Issue**: Full `nn_cifar10` crashes on CI runner (OOM at compile,
+  ~9 GB V compiler memory); runs on a local machine with enough RAM
 
 ### Phase B — DataLoader Infrastructure
 - [x] `datasets/dataloader.v` — `DataLoader[T]` with batching, shuffle, labels ([issue #86](https://github.com/vlang/vtl/issues/86) closed)
@@ -135,14 +137,12 @@ b = np.random.rand(1024, 1024)
 
 ### VTL Implementation
 ```v
-// VTL benchmark
 import vtl
+import vtl.la
 
-a := vtl.rand[f64]([1024, 1024])
-b := vtl.rand[f64]([1024, 1024])
-sw := stats.new_stopwatch()
-c := vtl.la.matmul(a, b)!
-println('VTL matmul: ${sw.elapsed()}')
+a := vtl.random[f64](0.0, 1.0, [1024, 1024], vtl.TensorData{})
+b := vtl.random[f64](0.0, 1.0, [1024, 1024], vtl.TensorData{})
+_ = la.matmul(a, b)!
 ```
 
 ### CI Integration

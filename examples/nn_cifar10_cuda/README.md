@@ -9,7 +9,8 @@ export VTL_USE_CUDA=1
 v -d cuda run vtl/examples/nn_cifar10_cuda/main.v
 ```
 
-Without `VTL_USE_CUDA`, the example still runs on CPU (same weights path as `nn_cifar10_tiny_synth`).
+Without `VTL_USE_CUDA`, the example still runs on CPU (same weights as
+`nn_cifar10_tiny_synth`).
 
 ## Notes
 
