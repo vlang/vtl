@@ -26,10 +26,9 @@ GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 | Priority | Issue | Topic |
 |----------|-------|--------|
 | P1 | [#41](https://github.com/vlang/vtl/issues/41) | Windows example crash |
-| P1 | — | Full `nn_cifar10` in CI (compile OOM on default runners) |
+| [#109](https://github.com/vlang/vtl/issues/109) | CI scoped tests + `full-ml` optional workflow |
 | P2 | [#106](https://github.com/vlang/vtl/issues/106) | Phase 4 follow-up: device-resident m/v + GPU sqrt |
 | P2 | [#110](https://github.com/vlang/vtl/issues/110) | Vulkan in `Sequential` training |
-| P2 | [#109](https://github.com/vlang/vtl/issues/109) | `nn_cifar10` CI without OOM |
 | P2 | [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support |
 | P2 | — | `v check-md -hide-warnings` on all example READMEs |
 
@@ -48,10 +47,11 @@ v run vtl/examples/nn_cifar10_tiny_synth/main.v
 # v -d vulkan run vtl/examples/nn_cifar10_vulkan/main.v
 ```
 
-## CI recommendation
+## CI
 
-- **Default PR:** `nn_cifar10_tiny_synth` + scoped `v test vtl/nn`
-- **Full / CUDA / Vulkan:** labeled runners or local only
+- **Default PR:** `bin/test` (scoped modules + `nn_cifar10_tiny_synth`)
+- **`full-ml` label:** `ci-full-ml.yml` runs `bin/test --full`
+- **CUDA / Vulkan:** local or future labeled workflows
 
 ## Project board sync
 

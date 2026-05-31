@@ -46,8 +46,8 @@ VJOBS=2 v test vtl/autograd/device_session_test.v
 VJOBS=1 v -d cuda test vsl/cuda/examples/cuda_ops_test.v
 ```
 
-## CI split (suggested)
+## CI split (implemented, #109)
 
-- **PR default:** CPU scoped tests + `nn_cifar10_tiny_synth`
-- **Label `cuda`:** optional workflow with `VTL_USE_CUDA=1 -d cuda` on GPU runner
-- **Nightly:** full matrix with low parallelism
+- **PR default (`ci.yml`):** `bin/test` — scoped `v test` (nn, autograd, datasets, …) + compile examples except `nn_cifar10/main.v` + run `nn_cifar10_tiny_synth`
+- **Label `full-ml`:** workflow `ci-full-ml.yml` — `bin/test --full` (weekly schedule + manual dispatch)
+- **Local full suite:** `VJOBS=1 ~/.vmodules/vtl/bin/test --full`

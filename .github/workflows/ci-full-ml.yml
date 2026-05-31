@@ -1,0 +1,49 @@
+name: CI Full ML (optional)
+
+# Heavy compile: full `v test vtl` + `examples/nn_cifar10/main.v`.
+# Default PRs use scoped `bin/test` in ci.yml to avoid OOM.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 3 * * 0'
+  pull_request:
+    types: [labeled]
+
+concurrency:
+  group: full-ml-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  full-ml:
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'schedule' ||
+      (github.event_name == 'pull_request' && github.event.label.name == 'full-ml')
+    runs-on: ubuntu-22.04
+    env:
+      TERM: xterm
+      VJOBS: '1'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: vtl
+
+      - uses: vlang/setup-v@v1.4
+        with:
+          check-latest: true
+
+      - name: Install dependencies
+        run: |
+          v install vsl
+          sudo apt-get -qq update
+          sudo apt-get -qq install \
+            gfortran liblapacke-dev libopenblas-dev libgc-dev \
+            libgl1-mesa-dev opencl-headers
+
+      - name: Install VTL module
+        run: mv ./vtl ~/.vmodules
+
+      - name: Full test tree and examples
+        run: ~/.vmodules/vtl/bin/test --full

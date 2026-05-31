@@ -14,11 +14,13 @@ on:
       - '**.md'
       - '**.yml'
       - '!.github/workflows/ci.yml'
+      - '!.github/workflows/ci-full-ml.yml'
   pull_request:
     paths-ignore:
       - '**.md'
       - '**.yml'
       - '!.github/workflows/ci.yml'
+      - '!.github/workflows/ci-full-ml.yml'
 
 jobs:
   shellcheck:
@@ -170,8 +172,11 @@ jobs:
         run: mv ./vtl ~/.vmodules
 
       - name: Execute Tests
+        env:
+          VJOBS: '2'
         run: |
           if [[ "${{ matrix.backend }}" == "cblas" ]]; then
             backend_flag=--use-cblas
           fi
+          # Default: scoped tests + tiny_synth smoke (see bin/test, issue #109)
           ~/.vmodules/vtl/bin/test ${{ matrix.flags }} $backend_flag

@@ -1,5 +1,6 @@
 module optimizers
 
+import math
 import os
 import vtl
 import vtl.autograd
@@ -72,9 +73,9 @@ fn test_adam_step_cuda_matches_cpu_when_enabled() {
 	adam_step_f64_cpu(grad, mut theta_cpu, mut m_cpu, mut v_cpu, p)
 	adam_step_f64(grad, mut theta_gpu, mut m_gpu, mut v_gpu, p)
 	for i in 0 .. grad.len {
-		assert (theta_cpu[i] - theta_gpu[i]).abs() < 1e-6
-		assert (m_cpu[i] - m_gpu[i]).abs() < 1e-6
-		assert (v_cpu[i] - v_gpu[i]).abs() < 1e-6
+		assert math.abs(theta_cpu[i] - theta_gpu[i]) < 1e-6
+		assert math.abs(m_cpu[i] - m_gpu[i]) < 1e-6
+		assert math.abs(v_cpu[i] - v_gpu[i]) < 1e-6
 	}
 }
 
