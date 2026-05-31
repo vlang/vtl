@@ -56,7 +56,7 @@ fn bench_mlp_backprop(batch int, config bu.BenchConfig) ! {
 	bu.print_row('mlp_backprop', '${batch}x${input_dim}', avg, '-')
 }
 
-fn run_step[T](mut model &models.Sequential[T], x &autograd.Variable[T], y &vtl.Tensor[T]) ! {
+fn run_step[T](mut model models.Sequential[T], x &autograd.Variable[T], y &vtl.Tensor[T]) ! {
 	pred := model.forward(x)!
 	mut loss := model.loss(pred, y)!
 	loss.backprop()!
