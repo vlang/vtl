@@ -32,6 +32,9 @@ Build: `-d cuda` required for GPU code paths.
 ## API
 
 ```v
+import vtl.autograd
+import vtl.nn.models
+
 mut ctx := autograd.ctx[f64]()
 // ctx.device_session is initialized; reuses buffers across forwards on this ctx
 
