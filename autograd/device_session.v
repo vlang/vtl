@@ -10,8 +10,8 @@ pub struct DeviceSession {
 pub mut:
 	enabled bool
 	// Staging buffers for cuBLAS GEMM (column-major staging, row-major output)
-	gemm_x_col  []f64
-	gemm_w_col  []f64
+	gemm_x_col   []f64
+	gemm_w_col   []f64
 	gemm_out_row []f64
 }
 

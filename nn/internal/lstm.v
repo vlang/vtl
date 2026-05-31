@@ -142,8 +142,11 @@ pub fn lstm_forward_multi[T](input_ &vtl.Tensor[T],
 		lb_ih := vtl.from_array(lb_ih_data.map(vtl.cast[T](it)), [4 * hidden_size])!
 		lb_hh := vtl.from_array(lb_hh_data.map(vtl.cast[T](it)), [4 * hidden_size])!
 
-		layer_h0 := vtl.from_array([]f64{len: batch * hidden_size}.map(fn (_ f64) f64 { 0 }), [batch, hidden_size])!
-		layer_output, layer_h_n := lstm_forward_single[T](layer_input, layer_h0, lw_ih, lw_hh, lb_ih, lb_hh)!
+		layer_h0 := vtl.from_array([]f64{len: batch * hidden_size}.map(fn (_ f64) f64 {
+			0
+		}), [batch, hidden_size])!
+		layer_output, layer_h_n := lstm_forward_single[T](layer_input, layer_h0, lw_ih, lw_hh,
+			lb_ih, lb_hh)!
 		layer_input = layer_output
 		h_list[layer] = layer_h_n
 	}
@@ -153,7 +156,10 @@ pub fn lstm_forward_multi[T](input_ &vtl.Tensor[T],
 	for layer in 0 .. num_layers {
 		for b in 0 .. batch {
 			for idx in 0 .. hidden_size {
-				h_n_data[layer * batch * hidden_size + b * hidden_size + idx] = f64(h_list[layer].get([b, idx]))
+				h_n_data[layer * batch * hidden_size + b * hidden_size + idx] = f64(h_list[layer].get([
+					b,
+					idx,
+				]))
 			}
 		}
 	}

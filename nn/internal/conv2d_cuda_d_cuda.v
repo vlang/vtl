@@ -48,8 +48,8 @@ pub fn conv2d_forward_cuda_f64(input &vtl.Tensor[f64],
 	in_flat := input.to_array()
 	w_flat := weight.to_array()
 
-	out_flat := compute.conv2d_cuda(dev, in_flat, w_flat, batch, in_h, in_w, in_ch, out_ch,
-		k_h, k_w, stride_h, stride_w)!
+	out_flat := compute.conv2d_cuda(dev, in_flat, w_flat, batch, in_h, in_w, in_ch, out_ch, k_h,
+		k_w, stride_h, stride_w)!
 
 	out_h := (in_h + 2 * config.padding[0] - k_h) / stride_h + 1
 	out_w := (in_w + 2 * config.padding[1] - k_w) / stride_w + 1

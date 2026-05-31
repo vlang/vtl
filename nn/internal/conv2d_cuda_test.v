@@ -33,7 +33,12 @@ fn test_conv2d_forward_f64_matches_cpu_reference() ! {
 	if os.getenv('VTL_TEST_CUDA') != '1' || os.getenv('VTL_USE_CUDA') != '1' {
 		return
 	}
-	input := vtl.from_array([f64(1), 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], [1, 1, 4, 4])!
+	input := vtl.from_array([f64(1), 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], [
+		1,
+		1,
+		4,
+		4,
+	])!
 	weight := vtl.from_array([f64(1), 0, 0, 0, 0, 1, 0, 0, 0], [1, 1, 3, 3])!
 	bias := vtl.zeros[f64]([1, 1])
 	cfg := Conv2DConfig{
@@ -57,7 +62,12 @@ fn test_conv2d_cuda_direct_optional() ! {
 	if os.getenv('VTL_TEST_CUDA') != '1' || os.getenv('VTL_USE_CUDA') != '1' {
 		return
 	}
-	input := vtl.from_array([f64(1), 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], [1, 1, 4, 4])!
+	input := vtl.from_array([f64(1), 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], [
+		1,
+		1,
+		4,
+		4,
+	])!
 	weight := vtl.from_array([f64(1), 0, 0, 0, 0, 1, 0, 0, 0], [1, 1, 3, 3])!
 	bias := vtl.zeros[f64]([1, 1])
 	cfg := Conv2DConfig{
