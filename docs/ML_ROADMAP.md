@@ -25,7 +25,7 @@ GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 |----------|-------|--------|
 | P1 | [#41](https://github.com/vlang/vtl/issues/41) | Windows example crash |
 | P1 | — | Full `nn_cifar10` in CI (compile OOM on default runners) |
-| P1 | [#106](https://github.com/vlang/vtl/issues/106) | GPU Phase 4 optimizer on device |
+| P2 | [#106](https://github.com/vlang/vtl/issues/106) | Phase 4 follow-up: device-resident m/v + GPU sqrt |
 | P2 | [#107](https://github.com/vlang/vtl/issues/107) | Conv2D CUDA backward |
 | P2 | — | Conv2D CUDA backward; Vulkan in `Sequential` training |
 | P2 | [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support |
