@@ -76,37 +76,44 @@
 ### Phase E — Example Consolidation
 - [x] `nn_cifar10_cuda` — opt-in CUDA smoke (`VTL_USE_CUDA=1`, `-d cuda`)
 - [x] `nn_cifar10_vulkan` — f32 smoke + `linear_forward_vulkan` check
-- [ ] All variants should pass `v check-md -fix -hide-warnings` from `~/.vmodules`
+- [x] Root `README.md` passes `v check-md -hide-warnings`
+- [ ] All example READMEs pass `v check-md -hide-warnings`
+
+### Phase F — GPU training loop (follow-up to #91)
+- [x] Phase 1: `DeviceSession` buffer reuse; CUDA forward for Linear/Conv2D
+- [ ] Phase 2: GPU-resident `Variable` (forward tensors)
+- [ ] Phase 3: CUDA backward for Linear / Conv2D
+- [ ] Phase 4: Optimizer state on device
+
+See [docs/DEVICE_MEMORY.md](docs/DEVICE_MEMORY.md).
 
 ---
 
-## 🧩 Existing Open Issues (VTL)
+## 🔜 Next priorities
+
+| Priority | Work item |
+|----------|-----------|
+| P1 | [#41](https://github.com/vlang/vtl/issues/41) Windows crash |
+| P1 | CI strategy for full `nn_cifar10` (compile memory) |
+| P1 | Phases 2–4 in `DEVICE_MEMORY.md` |
+| P2 | Vulkan wired into training (not only smoke example) |
+| P2 | [#63](https://github.com/vlang/vtl/issues/63) ARM GPU |
+
+**Project board:** [vlang org project #8](https://github.com/orgs/vlang/projects/8)
+
+---
+
+## 🧩 Open issues (VTL)
 
 | # | Title | Priority | Notes |
 |---|-------|----------|-------|
-| [#64](https://github.com/vlang/vtl/issues/64) | Phase 7+: Performance Engineering | 🔴 High | Kernel fusion, mixed precision |
-| [#63](https://github.com/vlang/vtl/issues/63) | Phase 6: ARM GPU Support | 🟢 Done | |
-| [#62](https://github.com/vlang/vtl/issues/62) | Phase 5: OpenCL Backend | 🟢 Done | |
-| [#61](https://github.com/vlang/vtl/issues/61) | Phase 4: GPU Autograd | 🟢 Done | |
-| [#60](https://github.com/vlang/vtl/issues/60) | Phase 3: VSL Integration + CUDA | 🟢 Done | |
-| [#59](https://github.com/vlang/vtl/issues/59) | Phase 2: Forward Pass on GPU | 🟢 Done | |
-| [#58](https://github.com/vlang/vtl/issues/58) | Phase 1: Vulkan Compute Foundation | 🟢 Done | |
-| [#89](https://github.com/vlang/vtl/issues/89) | Wire LinearLayer to CUDA | 🟢 Done | #93 |
-| [#90](https://github.com/vlang/vtl/issues/90) | Wire Conv2D to vsl.cuda | 🟢 Done | #93 |
-| [#91](https://github.com/vlang/vtl/issues/91) | Device-resident autograd | 🟢 Done | #93 |
-| [#88](https://github.com/vlang/vtl/issues/88) | vs NumPy benchmarks | 🟢 Done | #94 |
-| [#87](https://github.com/vlang/vtl/issues/87) | Checkpointing in CIFAR | 🟢 Done | #95 |
-| [#52](https://github.com/vlang/vtl/issues/52) | Tracel-AI/Burn reference | 🟢 Research | |
-| [#43](https://github.com/vlang/vtl/issues/43) | `stats.to_array` performance fix | 🔴 High | Prevent allocation overhead |
-| [#40](https://github.com/vlang/vtl/issues/40) | YOLO for autograd gates | 🟡 Medium | Loop-once pattern for gates |
-| [#39](https://github.com/vlang/vtl/issues/39) | Remove continue-on-error in v fmt | 🔴 High | |
-| [#30](https://github.com/vlang/vtl/issues/30) | Add `vsl.plot` examples | 🟡 Medium | |
-| [#29](https://github.com/vlang/vtl/issues/29) | Improve VTL tutorial | 🟡 Medium | |
-| [#28](https://github.com/vlang/vtl/issues/28) | Add ML metrics examples | 🟡 Medium | |
-| [#27](https://github.com/vlang/vtl/issues/27) | Add more datasets | 🟡 Medium | CIFAR-10 done; MNIST, ImageNet pending |
-| [#26](https://github.com/vlang/vtl/issues/26) | Add more examples | 🟡 Medium | |
-| [#25](https://github.com/vlang/vtl/issues/25) | autograd:register inconsistency | 🟡 Medium | |
-| [#23](https://github.com/vlang/vtl/issues/23) | datasets example compile error | 🔴 High | Fixed |
+| [#41](https://github.com/vlang/vtl/issues/41) | Windows example crash | 🔴 P1 | |
+| [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support | 🟡 P2 | Open |
+| [#43](https://github.com/vlang/vtl/issues/43) | `stats.to_array` performance | 🟡 Medium | |
+| [#40](https://github.com/vlang/vtl/issues/40) | YOLO for autograd gates | 🟡 Medium | |
+| [#52](https://github.com/vlang/vtl/issues/52) | Tracel-AI/Burn reference | Research | |
+
+**Closed ML epics:** #58–#64, #86–#91 — see [ML_ROADMAP.md](docs/ML_ROADMAP.md).
 
 ---
 
@@ -115,10 +122,10 @@
 | Dependency | Repo | Status |
 |------------|------|--------|
 | VSL LA ops (matmul, conv2d, solve, etc.) | [vlang/vsl](https://github.com/vlang/vsl) | ✅ Done |
-| VSL CUDA backend (`vsl/cuda`) | [vlang/vsl](https://github.com/vlang/vsl) | ✅ Phase B done |
-| VSL Vulkan backend (`vsl/vulkan`) | [vlang/vsl](https://github.com/vlang/vsl) | 🔴 Phase A in progress |
-| VSL OpenCL backend (VCL) | [vlang/vsl](https://github.com/vlang/vsl) | 🟡 VCL integrated |
-| Benchmark harness | [vlang/vtl](https://github.com/vlang/vtl) | 🔴 Not started |
+| VSL CUDA (`vsl/cuda`, cuBLAS/cuDNN) | [vlang/vsl](https://github.com/vlang/vsl) | ✅ #280 |
+| VSL Vulkan compute | [vlang/vsl](https://github.com/vlang/vsl) | ✅ #283–#284 |
+| VSL OpenCL (VCL) | [vlang/vsl](https://github.com/vlang/vsl) | ✅ Integrated |
+| vs NumPy / PR benchmarks | [vlang/vtl](https://github.com/vlang/vtl) | ✅ #88, workflow |
 
 ---
 
@@ -167,6 +174,9 @@ vtl/examples/
 ├── nn_cifar10_safe/      # Safe defaults, CI-friendly
 ├── nn_cifar10_tiny/      # Real data subset (64 train, 16 test)
 ├── nn_cifar10_tiny_synth/# Synthetic data, no I/O
+├── nn_cifar10_cuda/      # CUDA smoke (opt-in)
+├── nn_cifar10_vulkan/    # Vulkan GEMM smoke (opt-in)
+├── nn_mnist/             # MNIST example
 ├── nn_xor/               # XOR training example
 ├── nn_regression_sine/   # Sine regression
 ├── nn_multiclass_iris/   # Iris multi-class
@@ -190,10 +200,10 @@ vtl/
 │   └── cifar10.v         # CIFAR-10 loader with subset support
 ├── autograd/
 │   └── gates/            # Autograd gate implementations
-├── benchmarks/           # (TODO) VTL vs NumPy benchmarks
-└── docs/                # Tutorials
+├── benchmarks/vs_numpy/  # matmul, conv2d, autograd_bench
+└── docs/                 # Tutorials + ML_ROADMAP
 ```
 
 ---
 
-*Last updated: 2026-05-26*
+*Last updated: 2026-05-31* · Board: [project #8](https://github.com/orgs/vlang/projects/8)
