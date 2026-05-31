@@ -19,6 +19,7 @@ or `v test vtl` can spike **RAM into the 10–20+ GB** range during compilation 
 | `VTL_USE_CUDA` | off | Set to `1` to use CUDA in Linear forward (`-d cuda` build only). |
 | `VTL_GPU_ACTIVATIONS` | off | Phase 2: chain Linear activations on GPU between layers. |
 | `VTL_CUDA_BACKWARD` | off | Phase 3: cuBLAS GEMM for Linear gate backward. |
+| `VTL_CUDA_OPTIMIZER` | off | Phase 4: cuBLAS moment updates for Adam. |
 | `VTL_TEST_CUDA` | off | Set to `1` to run GPU tests (`linear_cuda_test.v`, `device_session_test.v`). |
 | `VJOBS` | (V auto) | Cap parallel compile jobs, e.g. `VJOBS=2`. |
 

@@ -1,5 +1,6 @@
 module optimizers
 
+import os
 import vtl
 import vtl.autograd
 
@@ -34,6 +35,61 @@ fn test_sgd_zeros_grad_after_update() ! {
 	opt.update()!
 	g := p.grad.get_nth(0)
 	assert g == 0.0, 'grad should be zeroed after update, got ${g}'
+}
+
+fn test_adam_step_f64_cpu() {
+	grad := [1.0, 2.0]
+	mut theta := [5.0, 5.0]
+	mut m := [0.0, 0.0]
+	mut v := [0.0, 0.0]
+	adam_step_f64_cpu(grad, mut theta, mut m, mut v, AdamStepParams{
+		beta1:   0.9
+		beta2:   0.999
+		lr_t:    0.001
+		epsilon: 1e-8
+	})
+	assert theta[0] < 5.0
+	assert m[0] > 0.0
+}
+
+fn test_adam_step_cuda_matches_cpu_when_enabled() {
+	if os.getenv('VTL_TEST_CUDA') != '1' || os.getenv('VTL_CUDA_OPTIMIZER') != '1' {
+		return
+	}
+	grad := [1.0, 2.0, 0.5]
+	mut theta_cpu := [3.0, 4.0, 5.0]
+	mut m_cpu := [0.1, 0.2, 0.3]
+	mut v_cpu := [0.01, 0.02, 0.03]
+	mut theta_gpu := theta_cpu.clone()
+	mut m_gpu := m_cpu.clone()
+	mut v_gpu := v_cpu.clone()
+	p := AdamStepParams{
+		beta1:   0.9
+		beta2:   0.999
+		lr_t:    0.01
+		epsilon: 1e-8
+	}
+	adam_step_f64_cpu(grad, mut theta_cpu, mut m_cpu, mut v_cpu, p)
+	adam_step_f64(grad, mut theta_gpu, mut m_gpu, mut v_gpu, p)
+	for i in 0 .. grad.len {
+		assert (theta_cpu[i] - theta_gpu[i]).abs() < 1e-6
+		assert (m_cpu[i] - m_gpu[i]).abs() < 1e-6
+		assert (v_cpu[i] - v_gpu[i]).abs() < 1e-6
+	}
+}
+
+fn test_adam_update_moves_param() ! {
+	c := ctx[f64]()
+	mut p := make_var[f64](c, 1.0)
+	mut opt := adam_optimizer[f64](learning_rate: 0.01)
+	opt.params << p
+	opt.first_moments << vtl.zeros_like[f64](p.grad)
+	opt.second_moments << vtl.zeros_like[f64](p.grad)
+	p.grad.set_nth(0, 1.0)
+	before := p.value.get_nth(0)
+	opt.update()!
+	after := p.value.get_nth(0)
+	assert after < before, 'Adam should decrease param when grad > 0'
 }
 
 fn test_adamw_update_moves_param() ! {

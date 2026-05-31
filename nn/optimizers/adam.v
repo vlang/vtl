@@ -86,29 +86,40 @@ pub fn (mut o AdamOptimizer[T]) update() ! {
 	o.beta1_t *= o.beta1
 	o.beta2_t *= o.beta2
 
+	step := AdamStepParams{
+		beta1:   o.beta1
+		beta2:   o.beta2
+		lr_t:    lr_t
+		epsilon: o.epsilon
+	}
 	for i, mut v in o.params {
 		if v.requires_grad {
-			// m = beta1 * m + (1 - beta1) * grad
-			o.first_moments[i].napply([v.grad], fn [o] [T](vals []T, idx []int) T {
-				return vtl.cast[T](o.beta1 * f64(vals[0]) + (1.0 - o.beta1) * f64(vals[1]))
-			}) or { return err }
-
-			// v = beta2 * v + (1 - beta2) * grad^2
-			o.second_moments[i].napply([v.grad], fn [o] [T](vals []T, idx []int) T {
-				g := f64(vals[1])
-				return vtl.cast[T](o.beta2 * f64(vals[0]) + (1.0 - o.beta2) * g * g)
-			}) or { return err }
-
-			// theta = theta - lr_t * m / (sqrt(v) + eps)
-			m_i := o.first_moments[i]
-			v_i := o.second_moments[i]
-			v.value.napply([m_i, v_i], fn [o, lr_t] [T](vals []T, idx []int) T {
-				theta := f64(vals[0])
-				m := f64(vals[1])
-				vv := f64(vals[2])
-				return vtl.cast[T](theta - lr_t * m / (math.sqrt(vv) + o.epsilon))
-			}) or { return err }
-
+			if sizeof(T) == 8 {
+				grad := v.grad.to_array()
+				mut theta := v.value.to_array()
+				mut m := o.first_moments[i].to_array()
+				mut v_mom := o.second_moments[i].to_array()
+				adam_step_f64(grad, mut theta, mut m, mut v_mom, step)
+				v.value = vtl.from_array(theta, v.value.shape) or { return err }
+				o.first_moments[i] = vtl.from_array(m, v.value.shape) or { return err }
+				o.second_moments[i] = vtl.from_array(v_mom, v.value.shape) or { return err }
+			} else {
+				o.first_moments[i].napply([v.grad], fn [o] [T](vals []T, idx []int) T {
+					return vtl.cast[T](o.beta1 * f64(vals[0]) + (1.0 - o.beta1) * f64(vals[1]))
+				}) or { return err }
+				o.second_moments[i].napply([v.grad], fn [o] [T](vals []T, idx []int) T {
+					g := f64(vals[1])
+					return vtl.cast[T](o.beta2 * f64(vals[0]) + (1.0 - o.beta2) * g * g)
+				}) or { return err }
+				m_i := o.first_moments[i]
+				v_i := o.second_moments[i]
+				v.value.napply([m_i, v_i], fn [o, lr_t] [T](vals []T, idx []int) T {
+					theta := f64(vals[0])
+					m := f64(vals[1])
+					vv := f64(vals[2])
+					return vtl.cast[T](theta - lr_t * m / (math.sqrt(vv) + o.epsilon))
+				}) or { return err }
+			}
 			v.grad = vtl.zeros_like[T](v.value)
 		}
 	}
