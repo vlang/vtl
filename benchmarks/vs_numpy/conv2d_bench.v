@@ -41,5 +41,5 @@ fn bench_conv2d(config bu.BenchConfig) {
 		samples[i] = f64(time.ticks() - t0)
 	}
 	avg := bu.mean_time_ms(mut samples)
-	bu.print_row('conv2d', '1x1x32x32', avg, '—')
+	bu.print_row('conv2d', '1x1x32x32', avg, '-')
 }
