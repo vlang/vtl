@@ -1,5 +1,6 @@
 module main
 
+import os
 import vtl
 import vtl.autograd
 import vtl.datasets
@@ -11,6 +12,8 @@ import vtl.nn.optimizers
 const batch_size = 64
 const epochs = 1
 const learning_rate = 0.001
+const checkpoint_dir = 'checkpoints'
+const checkpoint_every_epochs = 1
 
 fn create_cnn_cifar10[T](ctx &autograd.Context[T]) &models.Sequential[T] {
 	mut model := models.sequential_from_ctx[T](ctx)
@@ -61,8 +64,48 @@ fn calculate_accuracy[T](predictions &vtl.Tensor[T], targets &vtl.Tensor[T]) f64
 	return f64(correct) / f64(sample_count) * 100.0
 }
 
+fn wants_resume() bool {
+	for arg in os.args {
+		if arg == '--resume' {
+			return true
+		}
+	}
+	return false
+}
+
+fn checkpoint_path(epoch int) string {
+	return '${checkpoint_dir}/cifar10_epoch_${epoch}.json'
+}
+
+fn latest_checkpoint() !string {
+	if !os.exists(checkpoint_dir) {
+		return error('no checkpoint directory')
+	}
+	mut best_epoch := -1
+	mut best_path := ''
+	entries := os.ls(checkpoint_dir)!
+	for entry in entries {
+		if !entry.ends_with('.json') {
+			continue
+		}
+		if entry.starts_with('cifar10_epoch_') {
+			suffix := entry.all_after('cifar10_epoch_').all_before('.json')
+			epoch := suffix.int()
+			if epoch > best_epoch {
+				best_epoch = epoch
+				best_path = os.join_path(checkpoint_dir, entry)
+			}
+		}
+	}
+	if best_path == '' {
+		return error('no checkpoint files found')
+	}
+	return best_path
+}
+
 fn main() {
 	ctx := autograd.ctx[f64]()
+	os.mkdir_all(checkpoint_dir) or {}
 
 	println('Loading CIFAR-10 dataset...')
 	ds := datasets.load_cifar10_with_config(datasets.Cifar10Config{
@@ -84,6 +127,15 @@ fn main() {
 	})
 	optimizer.build_params(model.info.layers)
 	println('Model built successfully!')
+
+	mut start_epoch := 0
+	if wants_resume() {
+		path := latest_checkpoint()!
+		model.load_weights(path)!
+		epoch_meta, loss_meta := models.Sequential.load_checkpoint[f64](path)!
+		start_epoch = epoch_meta
+		println('Resumed from ${path} (epoch ${epoch_meta}, loss ${loss_meta:.6f})')
+	}
 
 	// Training DataLoader with lockstep features + labels
 	mut train_dl := datasets.new_data_loader_with_labels[f64](ds.train_features, ds.train_labels, datasets.DataLoaderConfig{
@@ -109,7 +161,7 @@ fn main() {
 	mut val_losses := []f64{}
 	mut val_accuracies := []f64{}
 
-	for epoch := 0; epoch < epochs; epoch++ {
+	for epoch := start_epoch; epoch < epochs; epoch++ {
 		println('\n========================================')
 		println('Epoch ${epoch + 1}/${epochs}')
 		println('========================================')
@@ -171,6 +223,12 @@ fn main() {
 		val_accuracies << val_accuracy
 
 		train_dl.reset()
+
+		if (epoch + 1) % checkpoint_every_epochs == 0 {
+			ckpt := checkpoint_path(epoch + 1)
+			model.save_checkpoint(ckpt, epoch + 1, avg_loss)!
+			println('    Checkpoint saved: ${ckpt}')
+		}
 	}
 
 	println('\n========================================')

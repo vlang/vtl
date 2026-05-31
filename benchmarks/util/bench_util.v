@@ -24,7 +24,7 @@ pub fn gflops_gemm(m int, n int, k int, time_ms f64) f64 {
 	if time_ms <= 0.0 {
 		return 0.0
 	}
-	ops := f64(2 * m * n * k)
+	ops := 2.0 * f64(m) * f64(n) * f64(k)
 	sec := time_ms / 1000.0
 	return ops / sec / 1_000_000_000.0
 }
