@@ -95,11 +95,12 @@ pub fn (mut o AdamOptimizer[T]) update() ! {
 	for i, mut v in o.params {
 		if v.requires_grad {
 			if sizeof(T) == 8 {
+				mut session := v.context.device_session
 				grad := v.grad.to_array()
 				mut theta := v.value.to_array()
 				mut m := o.first_moments[i].to_array()
 				mut v_mom := o.second_moments[i].to_array()
-				adam_step_f64(grad, mut theta, mut m, mut v_mom, step)
+				adam_step_f64(grad, mut theta, mut m, mut v_mom, step, mut session, i)
 				v.value = vtl.from_array(theta, v.value.shape) or { return err }
 				o.first_moments[i] = vtl.from_array(m, v.value.shape) or { return err }
 				o.second_moments[i] = vtl.from_array(v_mom, v.value.shape) or { return err }
