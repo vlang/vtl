@@ -54,8 +54,8 @@
 - [x] `nn_cifar10_safe` variant — safe defaults for dev/CI
 - [x] `nn_cifar10_tiny` variant — real data subset (64 train, 16 test)
 - [x] `nn_cifar10_tiny_synth` variant — synthetic data, no I/O (pipeline validation)
-- [ ] **Open Issue**: Full `nn_cifar10` crashes on CI runner (OOM at compile,
-  ~9 GB V compiler memory); runs on a local machine with enough RAM
+- [x] CI: scoped `bin/test` on PRs; full tree + `nn_cifar10/main.v` via label `full-ml` (#109)
+- [ ] Full `nn_cifar10` training remains local/high-RAM (~9 GB compile peak on small hosts)
 
 ### Phase B — DataLoader Infrastructure
 - [x] `datasets/dataloader.v` — `DataLoader[T]` with batching, shuffle, labels ([issue #86](https://github.com/vlang/vtl/issues/86) closed)
@@ -94,7 +94,7 @@ See [docs/DEVICE_MEMORY.md](docs/DEVICE_MEMORY.md).
 | Priority | Work item |
 |----------|-----------|
 | P1 | [#41](https://github.com/vlang/vtl/issues/41) Windows crash |
-| P1 | CI strategy for full `nn_cifar10` (compile memory) |
+| P2 | Label `full-ml` for optional heavy CI workflow |
 | P1 | Phases 2–4 in `DEVICE_MEMORY.md` |
 | P2 | Vulkan wired into training (not only smoke example) |
 | P2 | [#63](https://github.com/vlang/vtl/issues/63) ARM GPU |

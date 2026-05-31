@@ -12,6 +12,7 @@
 ##         --use-cblas                       Execute tests using cblas
 ##         --use-autofree                    Execute tests using atofree
 ##         --use-gc=STRATEGY                 Execute tests using garbage collector
+##         --full                            Full v test tree and all examples (high RAM)
 ##
 
 set -e
@@ -52,20 +53,50 @@ if [[ -n "${prod}" ]]; then
     flags="${flags} -prod"
 fi
 
-echo "Executing tests with command: \"v ${flags} test .\""
-v ${flags} test ${vtl_dir_path}
+# Examples that OOM default GitHub runners at compile time (see docs/DEV_LIGHTWEIGHT.md).
+should_skip_example() {
+    case "$1" in
+        */examples/nn_cifar10/main.v) return 0 ;;
+    esac
+    return 1
+}
 
-find ${vtl_dir_path} -name '*_test' -exec rm -f {} +
+export VJOBS="${VJOBS:-2}"
+
+if [[ -n "${full}" ]]; then
+    echo "Full CI mode (high RAM): v test entire tree"
+    v ${flags} test ${vtl_dir_path}
+else
+    echo "Scoped CI mode (VJOBS=${VJOBS}): nn, autograd, datasets, core, la, storage, stats, ml"
+    v ${flags} test \
+        ${vtl_dir_path}/nn \
+        ${vtl_dir_path}/autograd \
+        ${vtl_dir_path}/datasets \
+        ${vtl_dir_path}/tests/core \
+        ${vtl_dir_path}/la \
+        ${vtl_dir_path}/storage \
+        ${vtl_dir_path}/stats \
+        ${vtl_dir_path}/ml
+fi
+
+find ${vtl_dir_path} -name '*_test' -exec rm -f {} + 2>/dev/null || true
 
 echo "Compiling Examples with flags ${flags}"
-for file in $(find "${vtl_dir_path}" -wholename '*/examples/*.v'); do
+for file in $(find "${vtl_dir_path}" -wholename '*/examples/*/main.v' | sort); do
     if [[ "${file}" == *"not_ci"* ]]; then
-        echo "Skipping ${file}"
+        echo "Skipping ${file} (not_ci)"
+        continue
+    fi
+    if should_skip_example "${file}"; then
+        echo "Skipping ${file} (heavy; use bin/test --full or label full-ml)"
         continue
     fi
     echo "Compiling ${file}"
     v ${flags} -o "${file}.bin" "${file}"
-    echo "${file}.bin created"
-    echo "Removing ${file}.bin"
     rm -f "${file}.bin"
 done
+
+if [[ -z "${full}" ]]; then
+    echo "Running nn_cifar10_tiny_synth smoke"
+    v ${flags} run ${vtl_dir_path}/examples/nn_cifar10_tiny_synth/main.v
+fi

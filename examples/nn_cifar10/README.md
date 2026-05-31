@@ -2,6 +2,12 @@
 
 A CNN example for CIFAR-10 image classification using the V Tensor Library (VTL).
 
+## CI note
+
+Default GitHub Actions **does not compile** this example (OOM on runners). PR CI uses
+`nn_cifar10_tiny_synth` instead. For full-tree validation, add the PR label **`full-ml`**
+or run locally: `VJOBS=1 ~/.vmodules/vtl/bin/test --full`.
+
 ## Overview
 
 This example demonstrates:
