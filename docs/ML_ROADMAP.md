@@ -10,15 +10,12 @@ Detailed file-level roadmap: [ROADMAP.md](../ROADMAP.md) in this repo.
 
 | Priority | Issue | Topic |
 |----------|-------|--------|
-| P0 | [#89](https://github.com/vlang/vtl/issues/89) | Wire `LinearLayer` to CUDA — **PR #93** |
-| P0 | [#90](https://github.com/vlang/vtl/issues/90) | Wire `Conv2D` to `vsl.cuda` — **PR #93** |
-| P0 | [#91](https://github.com/vlang/vtl/issues/91) | DeviceSession staging — **PR #93** |
-| P1 | [#88](https://github.com/vlang/vtl/issues/88) | vs NumPy/PyTorch benchmarks |
-| P1 | [#87](https://github.com/vlang/vtl/issues/87) | CIFAR checkpoint example |
 | P1 | [#41](https://github.com/vlang/vtl/issues/41) | Windows example crash |
+| — | — | `nn_cifar10_cuda` example added (opt-in GPU smoke) |
+| P2 | follow-up | Benchmark PR comments + PyTorch baselines (#88 scripts done) |
 
-VSL-side blockers: [vlang/vsl#280](https://github.com/vlang/vsl/issues/280),
-[#281](https://github.com/vlang/vsl/issues/281), [#282](https://github.com/vlang/vsl/issues/282).
+**Done (2026-05-31):** #89–#91 (PR #93), #88 (PR #94), #87 (PR #95).  
+**VSL done:** #280, #281, #282.
 
 ## Local development
 
@@ -32,8 +29,9 @@ cd ~/.vmodules
 # Smoke (avoid full v test vtl on low-RAM machines)
 v test vtl/nn vtl/datasets
 v run vtl/examples/nn_cifar10_tiny_synth/main.v
-# CUDA training (when wired — issue #89+)
-# v -d cuda run vtl/examples/nn_cifar10_tiny/main.v
+# CUDA Linear/Conv2D (opt-in, PR #93)
+# VTL_USE_CUDA=1 v -d cuda run vtl/examples/nn_cifar10_tiny_synth/main.v
+# VTL_USE_CUDA=1 v -d cuda test vtl/nn/layers/linear_cuda_test.v
 ```
 
 ## CI recommendation

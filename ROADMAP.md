@@ -59,26 +59,20 @@
 - [x] `datasets/dataloader.v` — `DataLoader[T]` with batching, shuffle, labels ([issue #86](https://github.com/vlang/vtl/issues/86) closed)
 - [x] Used in `nn_cifar10_*` examples
 
-### Phase C — Model Serialization Polish
-- [x] `nn/models/serialization.v` + `serialization_test.v` (round-trip, checkpoints)
-- [ ] Integrate checkpoint save/load into CIFAR example — [issue #87](https://github.com/vlang/vtl/issues/87)
+### Phase C — Model Serialization Polish — closed [#87](https://github.com/vlang/vtl/issues/87)
+- [x] `serialization_test.v` round-trip at 1e-9
+- [x] `nn_cifar10/main.v` checkpoints + `--resume` (PR #95)
 
-### Phase C2 — VTL ↔ VSL GPU Integration (ML launch critical path)
-- [ ] Wire `LinearLayer` to CUDA — [issue #89](https://github.com/vlang/vtl/issues/89)
-- [ ] Wire `Conv2D` to `vsl.cuda` cuDNN — [issue #90](https://github.com/vlang/vtl/issues/90)
-- [ ] Device-resident autograd / training loop — [issue #91](https://github.com/vlang/vtl/issues/91)
+### Phase C2 — VTL ↔ VSL GPU Integration — closed [#89](https://github.com/vlang/vtl/issues/89)–[#91](https://github.com/vlang/vtl/issues/91) (PR #93)
+- [x] CUDA Linear, Conv2D, DeviceSession (opt-in `VTL_USE_CUDA=1`, `-d cuda`)
 
-### Phase D — Numpy Benchmark Suite — [issue #88](https://github.com/vlang/vtl/issues/88)
-- [ ] `vtl/benchmarks/` directory with:
-  - `matmul_benchmark.v` — VTL vs NumPy: matrix multiplication (CPU + CUDA)
-  - `conv2d_benchmark.v` — VTL vs NumPy: 2D convolution
-  - `autograd_benchmark.v` — VTL vs PyTorch: backprop overhead
-  - `nn_training_benchmark.v` — end-to-end training step (VTL vs PyTorch)
-- [ ] CI benchmark runner (GH Actions) with comparison vs NumPy baseline
-- [ ] Report speedup/slowdown metrics in PRs
+### Phase D — Numpy Benchmark Suite — closed [#88](https://github.com/vlang/vtl/issues/88) (PR #94)
+- [x] `benchmarks/vs_numpy/` matmul + conv2d + `bench_util`
+- [ ] `autograd_bench.v` MLP backprop; PyTorch baseline
+- [x] PR comment workflow (`benchmark-pr-comment.yml`, PR #96)
 
 ### Phase E — Example Consolidation
-- [ ] `nn_cifar10_cuda` variant with explicit CUDA device selection
+- [x] `nn_cifar10_cuda` — opt-in CUDA smoke (`VTL_USE_CUDA=1`, `-d cuda`)
 - [ ] `nn_cifar10_vulkan` variant using Vulkan backend
 - [ ] All variants should pass `v check-md -fix -hide-warnings` from `~/.vmodules`
 
@@ -95,11 +89,11 @@
 | [#60](https://github.com/vlang/vtl/issues/60) | Phase 3: VSL Integration + CUDA | 🟢 Done | |
 | [#59](https://github.com/vlang/vtl/issues/59) | Phase 2: Forward Pass on GPU | 🟢 Done | |
 | [#58](https://github.com/vlang/vtl/issues/58) | Phase 1: Vulkan Compute Foundation | 🟢 Done | |
-| [#89](https://github.com/vlang/vtl/issues/89) | Wire LinearLayer to CUDA | 🔴 P0 | ML launch |
-| [#90](https://github.com/vlang/vtl/issues/90) | Wire Conv2D to vsl.cuda | 🔴 P0 | ML launch |
-| [#91](https://github.com/vlang/vtl/issues/91) | Device-resident autograd | 🔴 P0 | ML launch |
-| [#88](https://github.com/vlang/vtl/issues/88) | vs NumPy/PyTorch benchmarks | 🔴 High | |
-| [#87](https://github.com/vlang/vtl/issues/87) | Checkpointing in CIFAR example | 🟡 Medium | |
+| [#89](https://github.com/vlang/vtl/issues/89) | Wire LinearLayer to CUDA | 🟢 Done | #93 |
+| [#90](https://github.com/vlang/vtl/issues/90) | Wire Conv2D to vsl.cuda | 🟢 Done | #93 |
+| [#91](https://github.com/vlang/vtl/issues/91) | Device-resident autograd | 🟢 Done | #93 |
+| [#88](https://github.com/vlang/vtl/issues/88) | vs NumPy benchmarks | 🟢 Done | #94 |
+| [#87](https://github.com/vlang/vtl/issues/87) | Checkpointing in CIFAR | 🟢 Done | #95 |
 | [#52](https://github.com/vlang/vtl/issues/52) | Tracel-AI/Burn reference | 🟢 Research | |
 | [#43](https://github.com/vlang/vtl/issues/43) | `stats.to_array` performance fix | 🔴 High | Prevent allocation overhead |
 | [#40](https://github.com/vlang/vtl/issues/40) | YOLO for autograd gates | 🟡 Medium | Loop-once pattern for gates |
