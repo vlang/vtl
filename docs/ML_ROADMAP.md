@@ -2,7 +2,9 @@
 
 Central planning: **https://github.com/orgs/vlang/projects/8** (Vlang ML Roadmap — VSL + VTL)
 
-Detailed roadmap: [ROADMAP.md](../ROADMAP.md) · GPU memory model: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
+Detailed roadmap: [ROADMAP.md](../ROADMAP.md)
+
+GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 
 ## Done (2026-05-31)
 
