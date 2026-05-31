@@ -21,9 +21,10 @@ GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 
 | Priority | Issue | Topic |
 |----------|-------|--------|
+| P1 | [#101](https://github.com/vlang/vtl/issues/101) | GPU-resident `Variable` (Phase 2) |
 | P1 | [#41](https://github.com/vlang/vtl/issues/41) | Windows example crash |
 | P1 | — | Full `nn_cifar10` in CI (compile OOM on default runners) |
-| P1 | follow-up | GPU training loop Phase 2–4 ([DEVICE_MEMORY.md](DEVICE_MEMORY.md)) |
+| P1 | follow-up | GPU Phases 3–4 ([DEVICE_MEMORY.md](DEVICE_MEMORY.md)) |
 | P2 | [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support |
 | P2 | — | Vulkan in `Sequential` training (today: smoke in `nn_cifar10_vulkan`) |
 | P2 | — | `v check-md -hide-warnings` on all example READMEs |
