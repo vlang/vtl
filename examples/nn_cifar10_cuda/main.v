@@ -6,8 +6,7 @@ import vtl.nn.layers
 import vtl.nn.models
 import vtl.nn.optimizers
 
-// GPU smoke test: same tiny synthetic pipeline as nn_cifar10_tiny_synth, but documents
-// opt-in CUDA for Linear forward (Conv2D when model includes conv layers).
+// GPU smoke: tiny synthetic CIFAR + Conv2D + Linear on CUDA when opted in.
 //
 //   VTL_USE_CUDA=1 v -d cuda run vtl/examples/nn_cifar10_cuda/main.v
 //
@@ -19,11 +18,15 @@ const batches = 2
 
 fn main() {
 	use_cuda := layers.cuda_linear_enabled()
-	println('nn_cifar10_cuda: VTL_USE_CUDA=${use_cuda} (build with -d cuda for GPU forward)')
+	println('nn_cifar10_cuda: VTL_USE_CUDA=${use_cuda} (-d cuda build for GPU forward)')
 
 	ctx := autograd.ctx[f64]()
 	mut model := models.sequential_from_ctx[f64](ctx)
 	model.input([3, 32, 32])
+	model.conv2d(3, 8, [3, 3], layers.Conv2DConfig{
+		padding: [1, 1]
+	})
+	model.relu()
 	model.flatten()
 	model.linear(10)
 	model.softmax()
