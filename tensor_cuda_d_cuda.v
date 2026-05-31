@@ -132,7 +132,7 @@ pub fn gemm_cuda(dst &CudaTensor[f64], a &CudaTensor[f64], b &CudaTensor[f64]) !
 	result_row := cuda.col_to_row_major(result_col, m, n)
 	unsafe {
 		C.cudaMemcpy(dst.data.ptr, result_row.data, int(sizeof(f64)) * m * n,
-			C.cuda_memcpy_host_to_device)
+			cuda.cuda_memcpy_host_to_device)
 	}
 }
 
@@ -155,7 +155,7 @@ pub fn gemv_cuda(y &CudaTensor[f64], a &CudaTensor[f64], x &CudaTensor[f64]) ! {
 
 	// Copy result to destination
 	unsafe {
-		C.cudaMemcpy(y.data.ptr, result.data, int(sizeof(f64)) * m, C.cuda_memcpy_host_to_device)
+		C.cudaMemcpy(y.data.ptr, result.data, int(sizeof(f64)) * m, cuda.cuda_memcpy_host_to_device)
 	}
 }
 
@@ -182,7 +182,7 @@ pub fn (t &CudaTensor[f64]) relu_cuda() !&CudaTensor[f64] {
 	output_storage.count = result.len
 
 	unsafe {
-		C.cudaMemcpy(ptr, result.data, sz, C.cuda_memcpy_host_to_device)
+		C.cudaMemcpy(ptr, result.data, sz, cuda.cuda_memcpy_host_to_device)
 	}
 
 	return &CudaTensor[f64]{
@@ -217,7 +217,7 @@ pub fn (t &CudaTensor[f64]) sigmoid_cuda() !&CudaTensor[f64] {
 	output_storage.count = result.len
 
 	unsafe {
-		C.cudaMemcpy(ptr, result.data, sz, C.cuda_memcpy_host_to_device)
+		C.cudaMemcpy(ptr, result.data, sz, cuda.cuda_memcpy_host_to_device)
 	}
 
 	return &CudaTensor[f64]{

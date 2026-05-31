@@ -1,153 +1,65 @@
 module layers
 
 import vtl
-import vtl.storage
-import vtl.la
-import vtl.autograd
-import vtl.nn.internal
-import vtl.nn.gates.layers
-import vtl.nn.types
 import vsl.cuda
 import vsl.cuda.compute
 
-// linear_forward_cuda computes y = x * W^T + b using cuBLAS GEMM
-// x: [M, K] (input matrix)
-// W: [N, K] (weights matrix)
-// b: [N] or [1, N] (bias vector)
-// Returns: [M, N] (output matrix)
-pub fn linear_forward_cuda[T](x &Tensor[T], weights &Tensor[T], bias &Tensor[T]) !&Tensor[T] {
-	assert x.is_matrix()
-	assert weights.is_matrix()
-	assert bias.is_vector() || (bias.is_matrix() && bias.shape[0] == 1)
+// linear_forward_cuda_f64 computes y = x·Wᵀ + b using cuBLAS GEMM.
+// Returns a CPU-resident tensor so autograd gates (CPU matmul) stay valid.
+// Opt-in via VTL_USE_CUDA=1 and build flag `-d cuda`.
+pub fn linear_forward_cuda_f64(x &vtl.Tensor[f64], weights &vtl.Tensor[f64], bias &vtl.Tensor[f64]) !&vtl.Tensor[f64] {
+	if !cuda_linear_enabled() {
+		return error('linear_forward_cuda_f64: set VTL_USE_CUDA=1 to enable')
+	}
+	if !x.is_matrix() || !weights.is_matrix() {
+		return error('linear_forward_cuda_f64: input and weights must be matrices')
+	}
+	if !(bias.is_vector() || (bias.is_matrix() && bias.shape[0] == 1)) {
+		return error('linear_forward_cuda_f64: bias must be vector or [1, N]')
+	}
 
-	// Convert to CUDA tensors for GPU computation
-	mut x_cuda := x.cuda()!
-	mut w_cuda := weights.cuda()!
-
-	// GEMM: x * W^T using cuBLAS - the gemm_cuda function expects f64 tensors
-	// We need to get the underlying arrays and use compute directly
-	dev := x_cuda.data.device
-	x_arr := x_cuda.data.to_array()!
-	w_arr := w_cuda.data.to_array()!
+	dev := cuda.get_default_device()!
 
 	m := x.shape[0]
 	k := x.shape[1]
 	n := weights.shape[0]
 
-	// Convert row-major to column-major for cuBLAS
+	x_arr := x.to_array()
+	w_arr := weights.to_array()
+
 	x_col := cuda.row_to_col_major(x_arr, m, k)
-	w_col := cuda.row_to_col_major(w_arr, n, k) // W is [N, K]
+	w_col := cuda.row_to_col_major(w_arr, n, k)
 
-	// Run GEMM on GPU
 	result_col := compute.gemm_cuda(dev, x_col, w_col, m, n, k)!
+	mut out_row := cuda.col_to_row_major(result_col, m, n)
 
-	// Convert result back to row-major
-	gemm_result_row := cuda.col_to_row_major(result_col, m, n)
-
-	// Add bias
-	b_arr := bias.to_array()!
-	mut final_result := gemm_result_row
-	for i in 0 .. final_result.len {
-		row_idx := i / n
+	b_arr := bias.to_array()
+	for i in 0 .. out_row.len {
 		col_idx := i % n
-		final_result[i] += b_arr[col_idx]
+		out_row[i] += b_arr[col_idx]
 	}
 
-	// Create result tensor as CudaStorage then convert to Tensor
-	mut result_storage := &storage.CudaStorage[f64]{
-		device: dev
-	}
-	mut ptr := unsafe { nil }
-	sz := int(sizeof(f64)) * final_result.len
-	status := C.cudaMalloc(&ptr, sz)
-	if status != 0 {
-		return error('linear_forward_cuda: cudaMalloc failed with status ${status}')
-	}
-	result_storage.ptr = ptr
-	result_storage.size = sz
-	result_storage.count = final_result.len
-	unsafe {
-		C.cudaMemcpy(ptr, final_result.data, sz, C.cuda_memcpy_host_to_device)
-	}
-
-	x_cuda.release()
-	w_cuda.release()
-
-	return &Tensor[T]{
-		data:    result_storage
-		memory:  .row_major
-		size:    final_result.len
-		shape:   [m, n]
-		strides: [n, 1]
-	}
+	return vtl.from_array(out_row, [m, n])!
 }
 
-// relu_forward_cuda applies ReLU activation: max(0, x) on GPU
-pub fn relu_forward_cuda[T](x &Tensor[T]) !&Tensor[T] {
-	mut x_cuda := x.cuda()!
-	dev := x_cuda.data.device
-	input_data := x_cuda.data.to_array()!
+// relu_forward_cuda applies ReLU on GPU and returns a CPU tensor (f64 only).
+pub fn relu_forward_cuda(x &vtl.Tensor[f64]) !&vtl.Tensor[f64] {
+	if !cuda_linear_enabled() {
+		return error('relu_forward_cuda: set VTL_USE_CUDA=1')
+	}
+	dev := cuda.get_default_device()!
+	input_data := x.to_array()
 	result := compute.relu_cuda(dev, input_data)!
-
-	// Create output tensor on GPU
-	mut output_storage := &storage.CudaStorage[f64]{
-		device: dev
-	}
-	mut ptr := unsafe { nil }
-	sz := int(sizeof(f64)) * result.len
-	status := C.cudaMalloc(&ptr, sz)
-	if status != 0 {
-		return error('relu_forward_cuda: cudaMalloc failed with status ${status}')
-	}
-	output_storage.ptr = ptr
-	output_storage.size = sz
-	output_storage.count = result.len
-	unsafe {
-		C.cudaMemcpy(ptr, result.data, sz, C.cuda_memcpy_host_to_device)
-	}
-
-	x_cuda.release()
-
-	return &Tensor[T]{
-		data:    output_storage
-		memory:  x_cuda.memory
-		size:    x_cuda.size
-		shape:   x_cuda.shape
-		strides: x_cuda.strides
-	}
+	return vtl.from_array(result, x.shape.clone())!
 }
 
-// sigmoid_forward_cuda applies Sigmoid activation: 1 / (1 + exp(-x)) on GPU
-pub fn sigmoid_forward_cuda[T](x &Tensor[T]) !&Tensor[T] {
-	mut x_cuda := x.cuda()!
-	dev := x_cuda.data.device
-	input_data := x_cuda.data.to_array()!
+// sigmoid_forward_cuda applies Sigmoid on GPU and returns a CPU tensor (f64 only).
+pub fn sigmoid_forward_cuda(x &vtl.Tensor[f64]) !&vtl.Tensor[f64] {
+	if !cuda_linear_enabled() {
+		return error('sigmoid_forward_cuda: set VTL_USE_CUDA=1')
+	}
+	dev := cuda.get_default_device()!
+	input_data := x.to_array()
 	result := compute.sigmoid_cuda(dev, input_data)!
-
-	// Create output tensor on GPU
-	mut output_storage := &storage.CudaStorage[f64]{
-		device: dev
-	}
-	mut ptr := unsafe { nil }
-	sz := int(sizeof(f64)) * result.len
-	status := C.cudaMalloc(&ptr, sz)
-	if status != 0 {
-		return error('sigmoid_forward_cuda: cudaMalloc failed with status ${status}')
-	}
-	output_storage.ptr = ptr
-	output_storage.size = sz
-	output_storage.count = result.len
-	unsafe {
-		C.cudaMemcpy(ptr, result.data, sz, C.cuda_memcpy_host_to_device)
-	}
-
-	x_cuda.release()
-
-	return &Tensor[T]{
-		data:    output_storage
-		memory:  x_cuda.memory
-		size:    x_cuda.size
-		shape:   x_cuda.shape
-		strides: x_cuda.strides
-	}
+	return vtl.from_array(result, x.shape.clone())!
 }
