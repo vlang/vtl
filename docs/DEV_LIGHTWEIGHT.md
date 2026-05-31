@@ -17,7 +17,9 @@ or `v test vtl` can spike **RAM into the 10–20+ GB** range during compilation 
 | Variable | Default | Meaning |
 |----------|---------|---------|
 | `VTL_USE_CUDA` | off | Set to `1` to use CUDA in Linear forward (`-d cuda` build only). |
-| `VTL_TEST_CUDA` | off | Set to `1` to run GPU tests in `linear_cuda_test.v`. |
+| `VTL_GPU_ACTIVATIONS` | off | Phase 2: chain Linear activations on GPU between layers. |
+| `VTL_CUDA_BACKWARD` | off | Phase 3: cuBLAS GEMM for Linear gate backward. |
+| `VTL_TEST_CUDA` | off | Set to `1` to run GPU tests (`linear_cuda_test.v`, `device_session_test.v`). |
 | `VJOBS` | (V auto) | Cap parallel compile jobs, e.g. `VJOBS=2`. |
 
 CUDA is **opt-in** so normal CPU work never touches the GPU driver.
@@ -35,6 +37,9 @@ v run vtl/examples/nn_cifar10_tiny_synth/main.v
 
 # Single-file CUDA test (only when you want GPU)
 VTL_USE_CUDA=1 VTL_TEST_CUDA=1 VJOBS=1 v -d cuda test vtl/nn/layers/linear_cuda_test.v
+VJOBS=2 v test vtl/autograd/device_session_test.v
+# GPU backward parity (optional)
+# VTL_USE_CUDA=1 VTL_TEST_CUDA=1 VTL_CUDA_BACKWARD=1 VJOBS=1 v -d cuda test vtl/autograd/device_session_test.v
 
 # VSL CUDA ops (one file)
 VJOBS=1 v -d cuda test vsl/cuda/examples/cuda_ops_test.v

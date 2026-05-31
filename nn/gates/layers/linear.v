@@ -21,24 +21,37 @@ pub fn linear_gate[T](input &autograd.Variable[T], weight &autograd.Variable[T],
 
 pub fn (g &LinearGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	grad := payload.variable.grad
-	mut result := [grad, grad, grad]
 
+	if sizeof(T) == 8 {
+		mut session := g.input.context.device_session
+		tensors := autograd.linear_backward_f64(unsafe { &vtl.Tensor[f64](grad) },
+			unsafe { &vtl.Tensor[f64](g.input.value) },
+			unsafe { &vtl.Tensor[f64](g.weight.value) }, g.bias.requires_grad, mut session)!
+		mut result := [grad, grad, grad]
+		if g.input.requires_grad {
+			result[0] = unsafe { &vtl.Tensor[T](tensors[0]) }
+		}
+		if g.weight.requires_grad {
+			result[1] = unsafe { &vtl.Tensor[T](tensors[1]) }
+		}
+		if g.bias.requires_grad {
+			result[2] = unsafe { &vtl.Tensor[T](tensors[2]) }
+		}
+		return result
+	}
+
+	mut result := [grad, grad, grad]
 	if g.input.requires_grad {
 		result[0] = la.matmul[T](grad, g.weight.value)!
 	}
-
 	if g.weight.requires_grad {
 		result[1] = la.matmul[T](grad.t()!, g.input.value)!
 	}
-
 	if g.bias.requires_grad {
-		// Sum upstream gradient over the batch dimension: [1, batch_size] @ [batch_size, output_dim] = [1, output_dim]
-		// This gives the correct per-neuron bias gradient instead of a scalar.
 		batch_size := grad.shape[0]
 		ones := vtl.ones[T]([1, batch_size])
 		result[2] = la.matmul[T](ones, grad)!
 	}
-
 	return result
 }
 
