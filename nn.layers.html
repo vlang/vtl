@@ -111,9 +111,9 @@
 			<div class="doc-scrollview" tabindex="-1" id="main-content">
 				<div class="doc-container">
 					<div class="doc-content">
-								<section id="nn.layers" class="doc-node">
-			<div class="title"><h1> nn.layers</h1></div>
-
+								<section id="readme_nn.layers" class="doc-node">
+			<div class="title"><h1> nn.layers <a href="#readme_nn.layers">#</a></h1></div>
+<p>linear_forward_f64_use_cuda is false without <code>-d cuda</code> build.</p>
 
 </section>
 
@@ -170,6 +170,22 @@
 <pre class="signature">
 <code><span class="token keyword">fn</span> conv2d_layer<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>ctx <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Context<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> in_ch <span class="token builtin">int</span><span class="token punctuation">,</span> out_ch <span class="token builtin">int</span><span class="token punctuation">,</span> kernel_size <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> config Conv2DConfig<span class="token punctuation">)</span> types<span class="token punctuation">.</span>Layer<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>conv2d_layer creates a Conv2DLayer.</p>
+
+</section>
+
+		<section id="cuda_linear_enabled" class="doc-node">
+			<div class="title"><h2>fn cuda_linear_enabled <a href="#cuda_linear_enabled">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/cuda_config.v#L7"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">cuda_linear_enabled</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">bool</span></code></pre>
+<p>cuda_linear_enabled is true when the user opts in to CUDA for NN layers.</p>
+
+</section>
+
+		<section id="cuda_tests_enabled" class="doc-node">
+			<div class="title"><h2>fn cuda_tests_enabled <a href="#cuda_tests_enabled">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/cuda_config.v#L13"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">cuda_tests_enabled</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">bool</span></code></pre>
+<p>cuda_tests_enabled gates optional GPU tests.</p>
 
 </section>
 
@@ -269,11 +285,27 @@
 
 </section>
 
-		<section id="linear_forward_cuda" class="doc-node">
-			<div class="title"><h2>fn linear_forward_cuda <a href="#linear_forward_cuda">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/linear_cuda_notd_cuda.v#L7"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+		<section id="linear_forward_cuda_f64" class="doc-node">
+			<div class="title"><h2>fn linear_forward_cuda_f64 <a href="#linear_forward_cuda_f64">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/linear_cuda_notd_cuda.v#L6"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> linear_forward_cuda<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>x <span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> weights <span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> bias <span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
-<p>linear_forward_cuda returns error if CUDA is not enabled</p>
+<code><span class="token keyword">fn</span> <span class="token function">linear_forward_cuda_f64</span><span class="token punctuation">(</span>x <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> weights <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> bias <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
+<p>linear_forward_cuda_f64 stub when not built with <code>-d cuda</code>.</p>
+
+</section>
+
+		<section id="linear_forward_f64" class="doc-node">
+			<div class="title"><h2>fn linear_forward_f64 <a href="#linear_forward_f64">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/linear_forward_f64.v#L8"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">linear_forward_f64</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> weights <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> bias <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> session autograd<span class="token punctuation">.</span>DeviceSession<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
+<p>linear_forward_f64 may use CUDA when enabled at runtime (<code>VTL_USE_CUDA=1</code>, <code>-d cuda</code>). When session is non-nil and initialized, GEMM staging buffers are reused (issue #91).</p>
+
+</section>
+
+		<section id="linear_forward_f64_use_cuda" class="doc-node">
+			<div class="title"><h2>fn linear_forward_f64_use_cuda <a href="#linear_forward_f64_use_cuda">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/linear_cuda_hooks_notd_cuda.v#L5"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">linear_forward_f64_use_cuda</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">bool</span></code></pre>
+
 
 </section>
 
@@ -334,9 +366,9 @@
 </section>
 
 		<section id="relu_forward_cuda" class="doc-node">
-			<div class="title"><h2>fn relu_forward_cuda <a href="#relu_forward_cuda">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/linear_cuda_notd_cuda.v#L13"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn relu_forward_cuda <a href="#relu_forward_cuda">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/linear_cuda_notd_cuda.v#L11"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> relu_forward_cuda<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>x <span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<code><span class="token keyword">fn</span> <span class="token function">relu_forward_cuda</span><span class="token punctuation">(</span>x <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
 <p>relu_forward_cuda returns error if CUDA is not enabled</p>
 
 </section>
@@ -358,9 +390,9 @@
 </section>
 
 		<section id="sigmoid_forward_cuda" class="doc-node">
-			<div class="title"><h2>fn sigmoid_forward_cuda <a href="#sigmoid_forward_cuda">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/linear_cuda_notd_cuda.v#L19"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn sigmoid_forward_cuda <a href="#sigmoid_forward_cuda">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/linear_cuda_notd_cuda.v#L16"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> sigmoid_forward_cuda<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>x <span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
+<code><span class="token keyword">fn</span> <span class="token function">sigmoid_forward_cuda</span><span class="token punctuation">(</span>x <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
 <p>sigmoid_forward_cuda returns error if CUDA is not enabled</p>
 
 </section>
@@ -1190,15 +1222,6 @@
 
 </section>
 
-		<section id="CudaParams" class="doc-node">
-			<div class="title"><h2>struct CudaParams <a href="#CudaParams">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/linear_cuda_notd_cuda.v#L4"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
-<div class="attributes"><div class="attribute">@[params]</div></div>
-<pre class="signature">
-<code><span class="token keyword">struct</span> <span class="token symbol">CudaParams</span> <span class="token punctuation">{</span><span class="token punctuation">}</span></code></pre>
-
-
-</section>
-
 		<section id="DropoutLayer" class="doc-node">
 			<div class="title"><h2>struct DropoutLayer <a href="#DropoutLayer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/layers/dropout.v#L15"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -1548,9 +1571,10 @@
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 31 May 2026 03:58:39</div>
+						<div class="footer">Powered by vdoc. Generated on: 31 May 2026 04:22:50</div>
 					</div>
-					<div class="doc-toc"><ul><li class="open"><a href="#attention_gate">fn attention_gate</a>        <ul>
+					<div class="doc-toc"><ul><li class="open"><a href="#readme_nn.layers">README</a></li>
+<li class="open"><a href="#attention_gate">fn attention_gate</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#avgpool2d_gate">fn avgpool2d_gate</a>        <ul>
@@ -1569,6 +1593,12 @@
 </ul>
 </li>
 <li class="open"><a href="#conv2d_layer">fn conv2d_layer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#cuda_linear_enabled">fn cuda_linear_enabled</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#cuda_tests_enabled">fn cuda_tests_enabled</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#dropout_layer">fn dropout_layer</a>        <ul>
@@ -1607,7 +1637,13 @@
 <li class="open"><a href="#leaky_relu_layer">fn leaky_relu_layer</a>        <ul>
 </ul>
 </li>
-<li class="open"><a href="#linear_forward_cuda">fn linear_forward_cuda</a>        <ul>
+<li class="open"><a href="#linear_forward_cuda_f64">fn linear_forward_cuda_f64</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#linear_forward_f64">fn linear_forward_f64</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#linear_forward_f64_use_cuda">fn linear_forward_f64_use_cuda</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#linear_forward_vulkan">fn linear_forward_vulkan</a>        <ul>
@@ -1850,9 +1886,6 @@
 </ul>
 </li>
 <li class="open"><a href="#Conv2DLayer">struct Conv2DLayer</a>        <ul>
-</ul>
-</li>
-<li class="open"><a href="#CudaParams">struct CudaParams</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#DropoutLayer">struct DropoutLayer</a>        <ul>
