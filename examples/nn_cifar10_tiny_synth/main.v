@@ -2,6 +2,7 @@ module main
 
 import vtl
 import vtl.autograd
+import vtl.nn.layers
 import vtl.nn.models
 import vtl.nn.optimizers
 
@@ -10,6 +11,9 @@ const epochs = 1
 const batches = 2
 
 fn main() {
+	if layers.cuda_linear_enabled() {
+		println('tiny_synth: CUDA forward enabled (VTL_USE_CUDA=1, -d cuda)')
+	}
 	ctx := autograd.ctx[f64]()
 	mut model := models.sequential_from_ctx[f64](ctx)
 	model.input([3, 32, 32])

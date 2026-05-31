@@ -77,7 +77,7 @@
 - [x] `nn_cifar10_cuda` — opt-in CUDA smoke (`VTL_USE_CUDA=1`, `-d cuda`)
 - [x] `nn_cifar10_vulkan` — f32 smoke + `linear_forward_vulkan` check
 - [x] Root `README.md` passes `v check-md -hide-warnings`
-- [ ] All example READMEs pass `v check-md -hide-warnings`
+- [x] All example READMEs pass `v check-md -hide-warnings`
 
 ### Phase F — GPU training loop (follow-up to #91)
 - [x] Phase 1: `DeviceSession` buffer reuse; CUDA forward for Linear/Conv2D

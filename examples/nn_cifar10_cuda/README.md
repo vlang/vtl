@@ -1,6 +1,6 @@
 # nn_cifar10_cuda
 
-Tiny synthetic CIFAR-shaped pipeline for **opt-in** GPU linear forward.
+Tiny synthetic CIFAR-shaped pipeline for **opt-in** GPU Conv2D + Linear forward.
 
 ## Run (local, CUDA build)
 
