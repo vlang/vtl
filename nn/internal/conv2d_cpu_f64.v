@@ -43,8 +43,12 @@ pub fn conv2d_forward_cpu_f64(input &vtl.Tensor[f64],
 									ih := oh * stride_h - pad_h + kh * dil_h
 									iw := ow * stride_w - pad_w + kw * dil_w
 									if ih >= 0 && ih < in_h && iw >= 0 && iw < in_w {
-										sum += input.get([b, g * g_in_ch + ic, ih, iw]) *
-											weight.get([global_oc, ic, kh, kw])
+										sum += input.get([b, g * g_in_ch + ic, ih, iw]) * weight.get([
+											global_oc,
+											ic,
+											kh,
+											kw,
+										])
 									}
 								}
 							}

@@ -87,7 +87,7 @@ pub:
 	patience  int = 10
 	threshold f64 = 1e-4
 	epsilon   f64 = 1e-8
-	cooldown int
+	cooldown  int
 }
 
 // reduce_lr_on_plateau creates a ReduceLROnPlateau scheduler.
