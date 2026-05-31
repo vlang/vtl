@@ -5,9 +5,10 @@ import vtl.autograd
 
 // linear_forward_f64 may use CUDA when enabled at runtime (`VTL_USE_CUDA=1`, `-d cuda`).
 // When session is non-nil and initialized, GEMM staging buffers are reused (issue #91).
-pub fn linear_forward_f64(input &vtl.Tensor[f64], weights &vtl.Tensor[f64], bias &vtl.Tensor[f64], mut session autograd.DeviceSession) !&vtl.Tensor[f64] {
+pub fn linear_forward_f64(input &vtl.Tensor[f64], weights &vtl.Tensor[f64], bias &vtl.Tensor[f64],
+	input_gpu voidptr, mut session autograd.DeviceSession) !&vtl.Tensor[f64] {
 	if session != unsafe { nil } {
-		if out := session.linear_forward_f64(input, weights, bias) {
+		if out := session.linear_forward_f64(input, weights, bias, input_gpu) {
 			return out
 		}
 	}

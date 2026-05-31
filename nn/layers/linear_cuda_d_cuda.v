@@ -14,7 +14,7 @@ pub fn linear_forward_cuda_f64(x &vtl.Tensor[f64], weights &vtl.Tensor[f64], bia
 	}
 	mut session := autograd.new_device_session()
 	session.init_device()
-	return session.linear_forward_f64(x, weights, bias)
+	return session.linear_forward_f64(x, weights, bias, unsafe { nil })
 }
 
 // relu_forward_cuda applies ReLU on GPU and returns a CPU tensor (f64 only).

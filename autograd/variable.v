@@ -28,6 +28,8 @@ pub mut:
 	// otherwise it will act similar to a vtl.Tensor, only calculating
 	// forward operations
 	requires_grad bool
+	// Phase 2: optional forward-only GPU activation (`&vtl.CudaTensor[f64]` when `-d cuda`).
+	gpu_activation voidptr = unsafe { nil }
 }
 
 @[params]
