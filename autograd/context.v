@@ -15,12 +15,20 @@ pub mut:
 	// If no_grad is set to true, operations will not
 	// be cached, and backpropagation will not be possible
 	no_grad bool
+	// Reusable CUDA staging for f64 forwards (nil for other T).
+	device_session &DeviceSession = unsafe { nil }
 }
 
 // Contexts can only be initialized as empty, and
 // a generic type must be provided
 pub fn ctx[T]() &Context[T] {
-	return &Context[T]{}
+	mut c := &Context[T]{}
+	if sizeof(T) == 8 {
+		mut session := new_device_session()
+		session.init_device()
+		c.device_session = session
+	}
+	return c
 }
 
 pub fn (ctx &Context[T]) len() int {

@@ -10,9 +10,9 @@ Detailed file-level roadmap: [ROADMAP.md](../ROADMAP.md) in this repo.
 
 | Priority | Issue | Topic |
 |----------|-------|--------|
-| P0 | [#89](https://github.com/vlang/vtl/issues/89) | Wire `LinearLayer` to CUDA |
-| P0 | [#90](https://github.com/vlang/vtl/issues/90) | Wire `Conv2D` to `vsl.cuda` |
-| P0 | [#91](https://github.com/vlang/vtl/issues/91) | Device-resident autograd |
+| P0 | [#89](https://github.com/vlang/vtl/issues/89) | Wire `LinearLayer` to CUDA — **PR #93** |
+| P0 | [#90](https://github.com/vlang/vtl/issues/90) | Wire `Conv2D` to `vsl.cuda` — **PR #93** |
+| P0 | [#91](https://github.com/vlang/vtl/issues/91) | DeviceSession staging — **PR #93** |
 | P1 | [#88](https://github.com/vlang/vtl/issues/88) | vs NumPy/PyTorch benchmarks |
 | P1 | [#87](https://github.com/vlang/vtl/issues/87) | CIFAR checkpoint example |
 | P1 | [#41](https://github.com/vlang/vtl/issues/41) | Windows example crash |
@@ -21,6 +21,8 @@ VSL-side blockers: [vlang/vsl#280](https://github.com/vlang/vsl/issues/280),
 [#281](https://github.com/vlang/vsl/issues/281), [#282](https://github.com/vlang/vsl/issues/282).
 
 ## Local development
+
+**Lightweight workflow (avoid OOM):** [DEV_LIGHTWEIGHT.md](DEV_LIGHTWEIGHT.md)
 
 Work from `~/.vmodules` (see [vlang pack](https://github.com/vlang/vtl)):
 

@@ -36,7 +36,7 @@ pub fn (cpu &CpuStorage[T]) cuda(params CudaParams) !&CudaStorage[T] {
 
 	// Copy data from CPU to GPU
 	unsafe {
-		C.cudaMemcpy(ptr, arr.data, sz, C.cuda_memcpy_host_to_device)
+		C.cudaMemcpy(ptr, arr.data, sz, cuda.cuda_memcpy_host_to_device)
 	}
 
 	return &CudaStorage[T]{
@@ -60,7 +60,7 @@ pub fn (storage &CudaStorage[T]) cpu() !&CpuStorage[T] {
 	}
 	mut arr := []T{len: storage.count}
 	sz := int(sizeof(T)) * storage.count
-	status := C.cudaMemcpy(arr.data, storage.ptr, sz, C.cuda_memcpy_device_to_host)
+	status := C.cudaMemcpy(arr.data, storage.ptr, sz, cuda.cuda_memcpy_device_to_host)
 	if status != 0 {
 		return error('CudaStorage.cpu: cudaMemcpy failed with status ${status}')
 	}
@@ -76,7 +76,7 @@ pub fn (storage &CudaStorage[T]) to_array() ![]T {
 	}
 	mut arr := []T{len: storage.count}
 	sz := int(sizeof(T)) * storage.count
-	status := C.cudaMemcpy(arr.data, storage.ptr, sz, C.cuda_memcpy_device_to_host)
+	status := C.cudaMemcpy(arr.data, storage.ptr, sz, cuda.cuda_memcpy_device_to_host)
 	if status != 0 {
 		return error('CudaStorage.to_array: cudaMemcpy failed with status ${status}')
 	}
