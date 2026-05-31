@@ -23,6 +23,13 @@ print(timeit.timeit(lambda: a @ b, number=10))
 v run vtl/benchmarks/vs_numpy/conv2d_bench.v
 ```
 
+## Autograd (3-layer MLP backprop)
+
+```bash
+v run vtl/benchmarks/vs_numpy/autograd_bench.v
+python3 vtl/benchmarks/vs_numpy/pytorch_baseline.py autograd
+```
+
 ## Notes
 
 - Use the same matrix sizes when comparing manually.

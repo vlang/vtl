@@ -68,12 +68,12 @@
 
 ### Phase D — Numpy Benchmark Suite — closed [#88](https://github.com/vlang/vtl/issues/88) (PR #94)
 - [x] `benchmarks/vs_numpy/` matmul + conv2d + `bench_util`
-- [ ] `autograd_bench.v` MLP backprop; PyTorch baseline
+- [x] `autograd_bench.v` + `pytorch_baseline.py`
 - [x] PR comment workflow (`benchmark-pr-comment.yml`, PR #96)
 
 ### Phase E — Example Consolidation
 - [x] `nn_cifar10_cuda` — opt-in CUDA smoke (`VTL_USE_CUDA=1`, `-d cuda`)
-- [ ] `nn_cifar10_vulkan` variant using Vulkan backend
+- [x] `nn_cifar10_vulkan` — f32 smoke + `linear_forward_vulkan` check
 - [ ] All variants should pass `v check-md -fix -hide-warnings` from `~/.vmodules`
 
 ---
