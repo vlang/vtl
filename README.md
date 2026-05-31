@@ -13,6 +13,7 @@ and a full neural network module.
 
 [Documentation](docs/README.md) ·
 [Tutorials](docs/TUTORIAL.md) ·
+[ML Roadmap](docs/ML_ROADMAP.md) ·
 [VSL Backend](https://github.com/vlang/vsl)
 
 </div>

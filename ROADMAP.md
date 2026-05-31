@@ -56,19 +56,19 @@
 - [ ] **Open Issue**: Full `nn_cifar10` example crashes on this runner (OOM at compile time, ~9 GB V compiler memory); runs correctly on user's local machine
 
 ### Phase B — DataLoader Infrastructure
-- [ ] Implement `DataLoader[T]` struct with:
-  - `batch_size`, `shuffle`, `drop_last` options
-  - `next() ![]Tensor[f64]` method
-  - `len() int` method
-  - `reset()`
-- [ ] Connect to existing `Cifar10Config` for seamless mini-batch training
+- [x] `datasets/dataloader.v` — `DataLoader[T]` with batching, shuffle, labels ([issue #86](https://github.com/vlang/vtl/issues/86) closed)
+- [x] Used in `nn_cifar10_*` examples
 
 ### Phase C — Model Serialization Polish
-- [ ] `nn/models/serialization.v` — `to_json()` / `from_json()` round-trip test
-- [ ] Save/load CIFAR-10 model weights to disk
-- [ ] Integrate serialization into `nn_cifar10` example as checkpointing
+- [x] `nn/models/serialization.v` + `serialization_test.v` (round-trip, checkpoints)
+- [ ] Integrate checkpoint save/load into CIFAR example — [issue #87](https://github.com/vlang/vtl/issues/87)
 
-### Phase D — Numpy Benchmark Suite
+### Phase C2 — VTL ↔ VSL GPU Integration (ML launch critical path)
+- [ ] Wire `LinearLayer` to CUDA — [issue #89](https://github.com/vlang/vtl/issues/89)
+- [ ] Wire `Conv2D` to `vsl.cuda` cuDNN — [issue #90](https://github.com/vlang/vtl/issues/90)
+- [ ] Device-resident autograd / training loop — [issue #91](https://github.com/vlang/vtl/issues/91)
+
+### Phase D — Numpy Benchmark Suite — [issue #88](https://github.com/vlang/vtl/issues/88)
 - [ ] `vtl/benchmarks/` directory with:
   - `matmul_benchmark.v` — VTL vs NumPy: matrix multiplication (CPU + CUDA)
   - `conv2d_benchmark.v` — VTL vs NumPy: 2D convolution
@@ -95,8 +95,12 @@
 | [#60](https://github.com/vlang/vtl/issues/60) | Phase 3: VSL Integration + CUDA | 🟢 Done | |
 | [#59](https://github.com/vlang/vtl/issues/59) | Phase 2: Forward Pass on GPU | 🟢 Done | |
 | [#58](https://github.com/vlang/vtl/issues/58) | Phase 1: Vulkan Compute Foundation | 🟢 Done | |
-| [#57](https://github.com/vlang/vtl/issues/57) | GPU Architecture: Multi-Backend | 🟢 Done | |
-| [#52](https://github.com/vlang/vtl/issues/52) | Tracel-AI/Burn reference | 🟢 Done | Architecture aligned with Burn |
+| [#89](https://github.com/vlang/vtl/issues/89) | Wire LinearLayer to CUDA | 🔴 P0 | ML launch |
+| [#90](https://github.com/vlang/vtl/issues/90) | Wire Conv2D to vsl.cuda | 🔴 P0 | ML launch |
+| [#91](https://github.com/vlang/vtl/issues/91) | Device-resident autograd | 🔴 P0 | ML launch |
+| [#88](https://github.com/vlang/vtl/issues/88) | vs NumPy/PyTorch benchmarks | 🔴 High | |
+| [#87](https://github.com/vlang/vtl/issues/87) | Checkpointing in CIFAR example | 🟡 Medium | |
+| [#52](https://github.com/vlang/vtl/issues/52) | Tracel-AI/Burn reference | 🟢 Research | |
 | [#43](https://github.com/vlang/vtl/issues/43) | `stats.to_array` performance fix | 🔴 High | Prevent allocation overhead |
 | [#40](https://github.com/vlang/vtl/issues/40) | YOLO for autograd gates | 🟡 Medium | Loop-once pattern for gates |
 | [#39](https://github.com/vlang/vtl/issues/39) | Remove continue-on-error in v fmt | 🔴 High | |
@@ -139,6 +143,7 @@ b = np.random.rand(1024, 1024)
 ```v
 // VTL benchmark
 import vtl
+
 a := vtl.rand[f64]([1024, 1024])
 b := vtl.rand[f64]([1024, 1024])
 sw := stats.new_stopwatch()
