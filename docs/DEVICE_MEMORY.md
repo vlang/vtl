@@ -1,6 +1,7 @@
 # Device memory model (VTL autograd + CUDA)
 
-Status: **Phase 1** — opt-in CUDA compute with CPU-resident activations for autograd.
+Status: **Phase 1** complete · **Phase 2** opt-in (`VTL_GPU_ACTIVATIONS=1`) — chained
+Linear forwards keep activations on GPU between layers; CPU tensor still produced for autograd.
 
 ## Policy
 
@@ -25,6 +26,7 @@ Phase 1 removes redundant **allocations** via `DeviceSession` buffer reuse on th
 | Variable | Effect |
 |----------|--------|
 | `VTL_USE_CUDA=1` | Enable GPU forward for eligible ops |
+| `VTL_GPU_ACTIVATIONS=1` | Phase 2: chain GPU activations across Linear layers |
 | `VTL_TEST_CUDA=1` | Run GPU tests |
 
 Build: `-d cuda` required for GPU code paths.
@@ -44,7 +46,7 @@ mut model := models.sequential_from_ctx[f64](ctx)
 
 ## Roadmap (issue #91 follow-ups)
 
-- **Phase 2**: GPU-resident `Variable` for forward-only tensors (sum-type storage)
+- **Phase 2**: GPU-resident `Variable` (`gpu_activation` on `Variable`, #101) — in progress
 - **Phase 3**: CUDA backward for Linear / Conv2D
 - **Phase 4**: Optimizer state on device (fused Adam step)
 

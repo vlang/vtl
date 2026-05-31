@@ -26,7 +26,7 @@ fn test_linear_cuda_matches_cpu_reference() ! {
 	bias_t := vars[1].value
 
 	mut no_session := &autograd.DeviceSession(unsafe { nil })
-	cpu := linear_forward_f64(input, w, bias_t, mut no_session)!
+	cpu := linear_forward_f64(input, w, bias_t, unsafe { nil }, mut no_session)!
 	gpu := linear_forward_cuda_f64(input, w, bias_t)!
 
 	assert cpu.shape == gpu.shape

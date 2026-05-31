@@ -9,6 +9,8 @@ import vtl.la
 pub struct DeviceSession {
 pub mut:
 	enabled bool
+	// Phase 2: opaque GPU activation chain (`DeviceGpuChain` in CUDA builds).
+	gpu_chain voidptr = unsafe { nil }
 	// Staging buffers for cuBLAS GEMM (column-major staging, row-major output)
 	gemm_x_col   []f64
 	gemm_w_col   []f64

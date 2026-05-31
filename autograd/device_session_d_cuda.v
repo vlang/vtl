@@ -13,7 +13,9 @@ pub fn (mut s DeviceSession) init_device() {
 }
 
 // linear_forward_f64 runs cuBLAS GEMM with reused session buffers; returns CPU tensor.
-pub fn (mut s DeviceSession) linear_forward_f64(x &vtl.Tensor[f64], weights &vtl.Tensor[f64], bias &vtl.Tensor[f64]) !&vtl.Tensor[f64] {
+// When `VTL_GPU_ACTIVATIONS=1`, reuses `input_gpu` (`&CudaTensor[f64]`) to skip input H2D.
+pub fn (mut s DeviceSession) linear_forward_f64(x &vtl.Tensor[f64], weights &vtl.Tensor[f64],
+	bias &vtl.Tensor[f64], input_gpu voidptr) !&vtl.Tensor[f64] {
 	if !s.enabled {
 		return error('device session: CUDA not enabled (set VTL_USE_CUDA=1)')
 	}
@@ -22,6 +24,10 @@ pub fn (mut s DeviceSession) linear_forward_f64(x &vtl.Tensor[f64], weights &vtl
 	}
 	if !(bias.is_vector() || (bias.is_matrix() && bias.shape[0] == 1)) {
 		return error('device session linear: bias must be vector or [1, N]')
+	}
+
+	if gpu_activations_enabled() {
+		return s.linear_forward_gpu_chain(x, weights, bias, input_gpu)
 	}
 
 	dev := cuda.get_default_device()!
@@ -34,7 +40,6 @@ pub fn (mut s DeviceSession) linear_forward_f64(x &vtl.Tensor[f64], weights &vtl
 	w_arr := weights.to_array()
 	wt_row := transpose_weights_row(w_arr, n, k)
 
-	// gemm_cuda expects row-major inputs; reuse output buffer across forwards.
 	mut out_row := compute.gemm_cuda(dev, x_arr, wt_row, m, n, k)!
 
 	s.gemm_out_row = resize_f64(mut s.gemm_out_row, out_row.len)
