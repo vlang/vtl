@@ -40,8 +40,9 @@ pub fn (layer &LinearLayer[T]) variables() []&autograd.Variable[T] {
 
 pub fn (layer &LinearLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	mut output := if sizeof(T) == 8 {
+		mut session := input.context.device_session
 		linear_forward_f64(unsafe { &vtl.Tensor[f64](input.value) }, unsafe { &vtl.Tensor[f64](layer.weights.value) },
-			unsafe { &vtl.Tensor[f64](layer.bias.value) })!
+			unsafe { &vtl.Tensor[f64](layer.bias.value) }, mut session)!
 	} else {
 		la.matmul[T](input.value, layer.weights.value.t()!)!.add[T](layer.bias.value)!
 	}
