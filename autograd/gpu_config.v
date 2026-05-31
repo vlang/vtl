@@ -15,7 +15,7 @@ pub fn cuda_backward_enabled() bool {
 	return os.getenv('VTL_USE_CUDA') == '1' && os.getenv('VTL_CUDA_BACKWARD') == '1'
 }
 
-// cuda_optimizer_enabled runs Adam moment updates on GPU (Phase 4, #106); sqrt step on CPU.
+// cuda_optimizer_enabled runs Adam on GPU with persistent m/v/theta in DeviceSession (#106).
 @[inline]
 pub fn cuda_optimizer_enabled() bool {
 	return os.getenv('VTL_USE_CUDA') == '1' && os.getenv('VTL_CUDA_OPTIMIZER') == '1'

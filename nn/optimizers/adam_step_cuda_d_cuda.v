@@ -1,14 +1,13 @@
 module optimizers
 
-import math
 import vsl.cuda
 import vsl.cuda.compute
 import vtl.autograd
 
-// adam_step_f64 runs Adam moment updates on GPU when cuda_optimizer_enabled; final
-// bias-corrected step uses CPU sqrt (no GPU sqrt kernel in VSL yet).
-pub fn adam_step_f64(grad []f64, mut theta []f64, mut m []f64, mut v []f64, p AdamStepParams) {
-	if !autograd.cuda_optimizer_enabled() {
+// adam_step_f64 with DeviceSession persistent m/v/theta on GPU (#106).
+pub fn adam_step_f64(grad []f64, mut theta []f64, mut m []f64, mut v []f64, p AdamStepParams,
+	mut session autograd.DeviceSession, slot int) {
+	if !autograd.cuda_optimizer_enabled() || !session.enabled {
 		adam_step_f64_cpu(grad, mut theta, mut m, mut v, p)
 		return
 	}
@@ -16,18 +15,102 @@ pub fn adam_step_f64(grad []f64, mut theta []f64, mut m []f64, mut v []f64, p Ad
 		adam_step_f64_cpu(grad, mut theta, mut m, mut v, p)
 		return
 	}
+	n := grad.len
+	mut sl := session.ensure_opt_slot(slot, n) or {
+		adam_step_f64_cpu(grad, mut theta, mut m, mut v, p)
+		return
+	}
+	if !sl.gpu_sync {
+		sl.d_m.upload(m) or {
+			adam_step_f64_cpu(grad, mut theta, mut m, mut v, p)
+			return
+		}
+		sl.d_v.upload(v) or {
+			adam_step_f64_cpu(grad, mut theta, mut m, mut v, p)
+			return
+		}
+		sl.d_theta.upload(theta) or {
+			adam_step_f64_cpu(grad, mut theta, mut m, mut v, p)
+			return
+		}
+		sl.gpu_sync = true
+	}
+	sl.d_g.upload(grad) or {
+		adam_step_f64_cpu(grad, mut theta, mut m, mut v, p)
+		return
+	}
 	// m = beta1*m + (1-beta1)*g
-	mut m_gpu := compute.mul_scalar_cuda(dev, m, p.beta1)!
-	m_part := compute.mul_scalar_cuda(dev, grad, 1.0 - p.beta1)!
-	m_gpu = compute.add_vec_cuda(dev, m_part, m_gpu)!
+	compute.gpu_buf_f64_dscal(dev, mut sl.d_m, n, p.beta1) or {
+		adam_step_f64_cpu(grad, mut theta, mut m, mut v, p)
+		return
+	}
+	compute.gpu_buf_f64_axpy(dev, 1.0 - p.beta1, &sl.d_g, mut sl.d_m, n) or {
+		adam_step_f64_cpu(grad, mut theta, mut m, mut v, p)
+		return
+	}
 	// v = beta2*v + (1-beta2)*g^2
-	g_sq := compute.mul_vec_cuda(dev, grad, grad)!
-	mut v_gpu := compute.mul_scalar_cuda(dev, v, p.beta2)!
-	v_part := compute.mul_scalar_cuda(dev, g_sq, 1.0 - p.beta2)!
-	v_gpu = compute.add_vec_cuda(dev, v_part, v_gpu)!
-	m = m_gpu
-	v = v_gpu
-	for i in 0 .. theta.len {
-		theta[i] -= p.lr_t * m[i] / (math.sqrt(v[i]) + p.epsilon)
+	compute.gpu_buf_f64_mul_vec(dev, &sl.d_g, &sl.d_g, mut sl.d_work, n) or {
+		adam_step_f64_cpu(grad, mut theta, mut m, mut v, p)
+		return
+	}
+	compute.gpu_buf_f64_dscal(dev, mut sl.d_v, n, p.beta2) or {
+		adam_step_f64_cpu(grad, mut theta, mut m, mut v, p)
+		return
+	}
+	compute.gpu_buf_f64_axpy(dev, 1.0 - p.beta2, &sl.d_work, mut sl.d_v, n) or {
+		adam_step_f64_cpu(grad, mut theta, mut m, mut v, p)
+		return
+	}
+	// theta -= lr * m / (sqrt(v) + eps) — d_work = sqrt(v)+eps, then m/d_work, axpy to theta
+	compute.gpu_buf_f64_copy(mut sl.d_work, &sl.d_v, n) or {
+		adam_step_f64_cpu(grad, mut theta, mut m, mut v, p)
+		return
+	}
+	compute.gpu_buf_f64_sqrt_inplace(mut sl.d_work, n) or {
+		adam_step_f64_cpu(grad, mut theta, mut m, mut v, p)
+		return
+	}
+	compute.gpu_buf_f64_add_scalar_inplace(mut sl.d_work, n, p.epsilon) or {
+		adam_step_f64_cpu(grad, mut theta, mut m, mut v, p)
+		return
+	}
+	// inv_denom on host (small sync), upload to d_work, m/denom -> d_work, theta -= lr * d_work
+	mut inv_host := []f64{len: n}
+	sl.d_work.download(mut inv_host) or {
+		adam_step_f64_cpu(grad, mut theta, mut m, mut v, p)
+		return
+	}
+	for i in 0 .. n {
+		inv_host[i] = 1.0 / inv_host[i]
+	}
+	sl.d_work.upload(inv_host) or {
+		adam_step_f64_cpu(grad, mut theta, mut m, mut v, p)
+		return
+	}
+	compute.gpu_buf_f64_mul_vec(dev, &sl.d_m, &sl.d_work, mut sl.d_work, n) or {
+		adam_step_f64_cpu(grad, mut theta, mut m, mut v, p)
+		return
+	}
+	neg_lr := -p.lr_t
+	compute.gpu_buf_f64_dscal(dev, mut sl.d_work, n, neg_lr) or {
+		adam_step_f64_cpu(grad, mut theta, mut m, mut v, p)
+		return
+	}
+	compute.gpu_buf_f64_axpy(dev, 1.0, &sl.d_work, mut sl.d_theta, n) or {
+		adam_step_f64_cpu(grad, mut theta, mut m, mut v, p)
+		return
+	}
+	// Sync back to CPU tensors (checkpointing / serialization)
+	sl.d_m.download(mut m) or {
+		adam_step_f64_cpu(grad, mut theta, mut m, mut v, p)
+		return
+	}
+	sl.d_v.download(mut v) or {
+		adam_step_f64_cpu(grad, mut theta, mut m, mut v, p)
+		return
+	}
+	sl.d_theta.download(mut theta) or {
+		adam_step_f64_cpu(grad, mut theta, mut m, mut v, p)
+		return
 	}
 }

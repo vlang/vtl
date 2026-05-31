@@ -15,6 +15,8 @@ pub mut:
 	gemm_x_col   []f64
 	gemm_w_col   []f64
 	gemm_out_row []f64
+	// Phase 4 (#106): opaque DeviceOptimizerState in CUDA builds.
+	optimizer_state voidptr = unsafe { nil }
 }
 
 // new_device_session creates an empty session (CUDA init is build-specific).
