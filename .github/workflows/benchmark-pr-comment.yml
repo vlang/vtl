@@ -1,0 +1,47 @@
+name: vs NumPy PR comment
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'benchmarks/**'
+      - '.github/workflows/benchmark-pr-comment.yml'
+
+permissions:
+  pull-requests: write
+
+jobs:
+  comment:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: vtl
+
+      - uses: vlang/setup-v@v1.4
+        with:
+          check-latest: true
+
+      - name: Install deps
+        run: |
+          v install vsl
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y libopenblas-dev liblapacke-dev gfortran python3 python3-numpy
+
+      - name: Install module
+        run: cp -rf ./vtl ~/.vmodules/vtl
+
+      - name: Run vs NumPy harness
+        run: |
+          cd ~/.vmodules
+          {
+            echo '## VTL vs NumPy (CPU matmul via vsl.la)'
+            v -d vsl_blas_cblas run vtl/benchmarks/vs_numpy/matmul_bench.v
+            v run vtl/benchmarks/vs_numpy/conv2d_bench.v
+          } 2>&1 | tee vs_numpy_pr.md
+
+      - name: Post sticky PR comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: vtl-vs-numpy
+          path: ~/.vmodules/vs_numpy_pr.md
