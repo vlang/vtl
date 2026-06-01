@@ -1,0 +1,69 @@
+name: Docs Check
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '**.md'
+      - '.github/workflows/docs-check.yml'
+  pull_request:
+    paths:
+      - '**.md'
+      - '.github/workflows/docs-check.yml'
+
+jobs:
+  check-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout VTL
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          path: vtl
+
+      - name: Setup V
+        uses: vlang/setup-v@v1.4
+        with:
+          check-latest: true
+
+      - name: Install VSL dependency
+        run: v install vsl
+
+      - name: Copy VTL source code to V Modules
+        run: cp -rf ./vtl ~/.vmodules/vtl
+
+      - name: Detect changed Markdown
+        id: markdown
+        run: |
+          cd vtl
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            base="${{ github.event.pull_request.base.sha }}"
+          else
+            base="${{ github.event.before }}"
+          fi
+
+          if [ -z "${base}" ] || [ "${base}" = "0000000000000000000000000000000000000000" ]; then
+            files="$(git ls-files '*.md')"
+          else
+            files="$(git diff --name-only --diff-filter=ACMR "${base}" HEAD -- '*.md')"
+          fi
+
+          {
+            echo 'files<<EOF'
+            echo "${files}"
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Validate changed Markdown
+        if: steps.markdown.outputs.files != ''
+        run: |
+          cd ~/.vmodules/vtl
+          printf '%s\n' "${{ steps.markdown.outputs.files }}" | xargs v check-md -hide-warnings
+
+      - name: Skip when no Markdown changed
+        if: steps.markdown.outputs.files == ''
+        run: echo "No Markdown files changed."

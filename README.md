@@ -10,7 +10,13 @@
 
 [![Mentioned in Awesome V][awesomevbadge]][awesomevurl]
 [![CI][workflowbadge]][workflowurl]
+[![Docs][docsbadge]][docsurl]
+[![Full ML][fullmlbadge]][fullmlurl]
+[![Benchmarks][benchmarksbadge]][benchmarksurl]
 [![License: MIT][licensebadge]][licenseurl]
+![VSL Backed][vslbackedbadge]
+![CUDA Optional][cudaoptionalbadge]
+![Vulkan f32][vulkanbadge]
 
 **VTL** is a pure-[V](https://vlang.io) tensor library for numerical computing
 and machine learning — n-dimensional arrays, autograd, linear algebra via
@@ -165,7 +171,16 @@ Made with [contributors-img](https://contrib.rocks).
 
 [awesomevbadge]: https://awesome.re/mentioned-badge.svg
 [workflowbadge]: https://github.com/vlang/vtl/actions/workflows/ci.yml/badge.svg
+[docsbadge]: https://github.com/vlang/vtl/actions/workflows/deploy-docs.yml/badge.svg
+[fullmlbadge]: https://github.com/vlang/vtl/actions/workflows/ci-full-ml.yml/badge.svg
+[benchmarksbadge]: https://github.com/vlang/vtl/actions/workflows/benchmark-pr-comment.yml/badge.svg
 [licensebadge]: https://img.shields.io/badge/License-MIT-blue.svg
+[vslbackedbadge]: https://img.shields.io/badge/VSL-backed-027d9c?logo=v
+[cudaoptionalbadge]: https://img.shields.io/badge/CUDA-optional-76b900?logo=nvidia
+[vulkanbadge]: https://img.shields.io/badge/Vulkan-f32-ac162c?logo=vulkan
 [awesomevurl]: https://github.com/vlang/awesome-v/blob/master/README.md#scientific-computing
 [workflowurl]: https://github.com/vlang/vtl/actions/workflows/ci.yml
+[docsurl]: https://github.com/vlang/vtl/actions/workflows/deploy-docs.yml
+[fullmlurl]: https://github.com/vlang/vtl/actions/workflows/ci-full-ml.yml
+[benchmarksurl]: https://github.com/vlang/vtl/actions/workflows/benchmark-pr-comment.yml
 [licenseurl]: https://github.com/vlang/vtl/blob/main/LICENSE
