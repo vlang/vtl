@@ -1,6 +1,10 @@
 module vtl
 
 // set copies a scalar value into a Tensor at the provided index
+
+// set exposes this operation as part of the public API.
+
+// set exposes this operation as part of the public API.
 @[inline]
 pub fn (mut t Tensor[T]) set[T](index []int, val T) {
 	offset := t.offset_index(index)
@@ -8,6 +12,10 @@ pub fn (mut t Tensor[T]) set[T](index []int, val T) {
 }
 
 // set_nth copies a scalar value into a Tensor at the provided offset
+
+// set_nth exposes this operation as part of the public API.
+
+// set_nth exposes this operation as part of the public API.
 @[inline]
 pub fn (mut t Tensor[T]) set_nth[T](n int, val T) {
 	index := t.nth_index(n)
@@ -15,6 +23,10 @@ pub fn (mut t Tensor[T]) set_nth[T](n int, val T) {
 }
 
 // fill fills an entire Tensor with a given value
+
+// fill exposes this operation as part of the public API.
+
+// fill exposes this operation as part of the public API.
 @[inline]
 pub fn (mut t Tensor[T]) fill[T](val T) &Tensor[T] {
 	t.data.fill[T](val)

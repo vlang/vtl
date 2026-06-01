@@ -36,6 +36,10 @@ pub mut:
 //   - `beta1`         — exponential decay rate for first moment estimates (default: 0.9)
 //   - `beta2`         — exponential decay rate for second moment estimates (default: 0.999)
 //   - `epsilon`       — small constant for numerical stability (default: 1e-8)
+
+// AdamOptimizerConfig defines a public data structure for this module.
+
+// AdamOptimizerConfig defines a public data structure for this module.
 @[params]
 pub struct AdamOptimizerConfig {
 pub:

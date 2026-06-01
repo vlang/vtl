@@ -13,6 +13,7 @@ pub struct MaxPool2DLayer[T] {
 	stride      []int
 }
 
+// maxpool2d_layer exposes this operation as part of the public API.
 pub fn maxpool2d_layer[T](ctx &autograd.Context[T], input_shape []int, kernel []int, padding []int, stride []int) types.Layer[T] {
 	return types.Layer[T](&MaxPool2DLayer[T]{
 		input_shape: input_shape.clone()
@@ -22,6 +23,7 @@ pub fn maxpool2d_layer[T](ctx &autograd.Context[T], input_shape []int, kernel []
 	})
 }
 
+// output_shape exposes this operation as part of the public API.
 pub fn (layer &MaxPool2DLayer[T]) output_shape() []int {
 	c := layer.input_shape[0]
 	h := layer.input_shape[1]
@@ -36,10 +38,12 @@ pub fn (layer &MaxPool2DLayer[T]) output_shape() []int {
 	return [c, (h - kh + 2 * ph) / sh + 1, (w - kw + 2 * pw) / sw + 1]
 }
 
+// variables exposes this operation as part of the public API.
 pub fn (layer &MaxPool2DLayer[T]) variables() []&autograd.Variable[T] {
 	return []&autograd.Variable[T]{}
 }
 
+// forward exposes this operation as part of the public API.
 pub fn (layer &MaxPool2DLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	max_indices, output := internal.maxpool2d[T](input.value, layer.kernel, layer.padding,
 		layer.stride)

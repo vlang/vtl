@@ -109,6 +109,10 @@ pub fn (t &Tensor[T]) diagonal[T]() &Tensor[T] {
 
 // ravel returns a flattened view of an Tensor if possible,
 // otherwise a flattened copy
+
+// ravel exposes this operation as part of the public API.
+
+// ravel exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) ravel[T]() !&Tensor[T] {
 	return t.reshape([-1])
@@ -135,6 +139,10 @@ pub fn (t &Tensor[T]) as_strided[T](shape []int, strides []int) !&Tensor[T] {
 
 // transpose permutes the axes of an tensor in a specified
 // order and returns a view of the data
+
+// transpose exposes this operation as part of the public API.
+
+// transpose exposes this operation as part of the public API.
 @[direct_array_access]
 pub fn (t &Tensor[T]) transpose[T](order []int) !&Tensor[T] {
 	mut ret := t.view()
@@ -188,6 +196,10 @@ fn fabs(x f64) f64 {
 }
 
 // slice returns a tensor from a variadic list of indexing operations
+
+// slice exposes this operation as part of the public API.
+
+// slice exposes this operation as part of the public API.
 @[direct_array_access]
 pub fn (t &Tensor[T]) slice[T](idx ...[]int) !&Tensor[T] {
 	mut newshape := t.shape.clone()
@@ -268,6 +280,10 @@ pub fn (t &Tensor[T]) slice[T](idx ...[]int) !&Tensor[T] {
 
 // slice_hilo returns a view of an array from a list of starting
 // indices and a list of closing indices.
+
+// slice_hilo exposes this operation as part of the public API.
+
+// slice_hilo exposes this operation as part of the public API.
 @[direct_array_access]
 pub fn (t &Tensor[T]) slice_hilo[T](idx1 []int, idx2 []int) !&Tensor[T] {
 	mut newshape := t.shape.clone()

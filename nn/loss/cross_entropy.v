@@ -15,12 +15,14 @@ pub:
 	reduction    string         = 'mean' // 'mean' | 'sum' | 'none'
 }
 
+// cross_entropy_loss exposes this operation as part of the public API.
 pub fn cross_entropy_loss[T]() &CrossEntropyLoss[T] {
 	return &CrossEntropyLoss[T]{
 		reduction: 'mean'
 	}
 }
 
+// loss exposes this operation as part of the public API.
 pub fn (_ &CrossEntropyLoss[T]) loss(input &autograd.Variable[T], target &vtl.Tensor[T]) !&autograd.Variable[T] {
 	output := internal.cross_entropy[T](input.value, target)!
 	mut result := input.context.variable(output)
@@ -32,23 +34,27 @@ pub fn (_ &CrossEntropyLoss[T]) loss(input &autograd.Variable[T], target &vtl.Te
 	return result
 }
 
+// CrossEntropyLossGate defines a public data structure for this module.
 pub struct CrossEntropyLossGate[T] {
 pub:
 	target &vtl.Tensor[T] = unsafe { nil }
 }
 
+// cross_entropy_loss_gate exposes this operation as part of the public API.
 pub fn cross_entropy_loss_gate[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) &CrossEntropyLossGate[T] {
 	return &CrossEntropyLossGate[T]{
 		target: target
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &CrossEntropyLossGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	r0 := internal.cross_entropy_backward[T](gradient, payload.variable.value, g.target)!
 	return [r0]
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &CrossEntropyLossGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
 	match a {

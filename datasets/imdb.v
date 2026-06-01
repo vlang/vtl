@@ -3,7 +3,9 @@ module datasets
 import vtl
 import os
 
+// imdb_file_name is a public constant used by this module.
 pub const imdb_file_name = 'aclImdb_v1.tar.gz'
+// imdb_base_url is a public constant used by this module.
 pub const imdb_base_url = 'http://ai.stanford.edu/~amaas/data/sentiment/'
 
 const imdb_label_files_count = 12500

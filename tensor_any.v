@@ -3,6 +3,7 @@ module vtl
 // TensorDataType is a sum type that lists the possible types to be used to define storage
 pub type TensorDataType = bool | f32 | f64 | i16 | i64 | i8 | int | string | u16 | u32 | u64 | u8
 
+// td exposes this operation as part of the public API.
 pub fn td[T](x T) TensorDataType {
 	$if T is bool {
 		return TensorDataType(x)
@@ -33,6 +34,7 @@ pub fn td[T](x T) TensorDataType {
 	}
 }
 
+// cast exposes this operation as part of the public API.
 pub fn cast[T](x TensorDataType) T {
 	$if T is bool {
 		return x.bool()

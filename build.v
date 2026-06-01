@@ -2,6 +2,9 @@ module vtl
 
 import vtl.storage
 
+// TensorData defines a public data structure for this module.
+
+// TensorData defines a public data structure for this module.
 @[params]
 pub struct TensorData {
 pub:

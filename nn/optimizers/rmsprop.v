@@ -33,6 +33,10 @@ pub mut:
 //   - `alpha`         — smoothing constant for squared-gradient moving average (default: 0.99)
 //   - `epsilon`       — numerical stability constant (default: 1e-8)
 //   - `weight_decay`  — L2 regularisation coefficient (default: 0.0)
+
+// RMSPropOptimizerConfig defines a public data structure for this module.
+
+// RMSPropOptimizerConfig defines a public data structure for this module.
 @[params]
 pub struct RMSPropOptimizerConfig {
 pub:

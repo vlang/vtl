@@ -7,6 +7,7 @@ pub fn conv2d_vulkan_eligible(kernel_size []int, config Conv2DConfig) bool {
 	return false
 }
 
+// conv2d_vulkan_backward_eligible exposes this operation as part of the public API.
 pub fn conv2d_vulkan_backward_eligible(kernel_size []int, config Conv2DConfig) bool {
 	return false
 }

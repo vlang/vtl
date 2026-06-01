@@ -4,17 +4,20 @@ import arrays
 import math
 import vtl
 
+// FanMode lists the supported public values for this module.
 pub enum FanMode {
 	fan_avg
 	fan_in
 	fan_out
 }
 
+// Distribution lists the supported public values for this module.
 pub enum Distribution {
 	uniform
 	normal
 }
 
+// compute_fans exposes this operation as part of the public API.
 pub fn compute_fans(shape []int) (int, int) {
 	f0 := shape[0]
 	f1 := shape[1]
@@ -29,6 +32,7 @@ pub fn compute_fans(shape []int) (int, int) {
 	return f0 * product, f1 * product
 }
 
+// variance_scaled exposes this operation as part of the public API.
 pub fn variance_scaled[T](shape []int, scale T, fan_mode FanMode, distribution Distribution) &vtl.Tensor[T] {
 	f0, f1 := compute_fans(shape)
 
@@ -55,10 +59,12 @@ pub fn variance_scaled[T](shape []int, scale T, fan_mode FanMode, distribution D
 	}
 }
 
+// kaiming_uniform exposes this operation as part of the public API.
 pub fn kaiming_uniform[T](shape []int) &vtl.Tensor[T] {
 	return variance_scaled(shape, vtl.cast[T](2), .fan_in, .uniform)
 }
 
+// kaiming_normal exposes this operation as part of the public API.
 pub fn kaiming_normal[T](shape []int) &vtl.Tensor[T] {
 	return variance_scaled(shape, vtl.cast[T](2), .fan_in, .normal)
 }

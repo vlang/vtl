@@ -15,6 +15,7 @@ pub struct SerializationError {
 	msg string
 }
 
+// msg exposes this operation as part of the public API.
 pub fn (e &SerializationError) msg() string {
 	return e.msg
 }

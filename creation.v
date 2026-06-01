@@ -1,18 +1,30 @@
 module vtl
 
 // empty returns a new Tensor of given shape and type, without initializing entries
+
+// empty exposes this operation as part of the public API.
+
+// empty exposes this operation as part of the public API.
 @[inline]
 pub fn empty[T](shape []int, params TensorData) &Tensor[T] {
 	return tensor[T](cast[T](0), shape, params)
 }
 
 // empty_like returns a new Tensor of given shape and type as a given Tensor
+
+// empty_like exposes this operation as part of the public API.
+
+// empty_like exposes this operation as part of the public API.
 @[inline]
 pub fn empty_like[T](t &Tensor[T]) &Tensor[T] {
 	return tensor_like[T](t)
 }
 
 // identity returns an array is a square array with ones on the main diagonal
+
+// identity exposes this operation as part of the public API.
+
+// identity exposes this operation as part of the public API.
 @[inline]
 pub fn identity[T](n int, params TensorData) &Tensor[T] {
 	return eye[T](n, n, 0, params)
@@ -32,30 +44,50 @@ pub fn eye[T](m int, n int, k int, params TensorData) &Tensor[T] {
 }
 
 // zeros returns a new tensor of a given shape and type, filled with zeros
+
+// zeros exposes this operation as part of the public API.
+
+// zeros exposes this operation as part of the public API.
 @[inline]
 pub fn zeros[T](shape []int, params TensorData) &Tensor[T] {
 	return tensor[T](cast[T](0), shape, params)
 }
 
 // zeros_like returns a new Tensor of given shape and type as a given Tensor, filled with zeros
+
+// zeros_like exposes this operation as part of the public API.
+
+// zeros_like exposes this operation as part of the public API.
 @[inline]
 pub fn zeros_like[T](t &Tensor[T]) &Tensor[T] {
 	return tensor_like[T](t)
 }
 
 // ones returns a new tensor of a given shape and type, filled with ones
+
+// ones exposes this operation as part of the public API.
+
+// ones exposes this operation as part of the public API.
 @[inline]
 pub fn ones[T](shape []int, params TensorData) &Tensor[T] {
 	return full[T](shape, cast[T](1), params)
 }
 
 // ones_like returns a new tensor of a given shape and type, filled with ones
+
+// ones_like exposes this operation as part of the public API.
+
+// ones_like exposes this operation as part of the public API.
 @[inline]
 pub fn ones_like[T](t &Tensor[T]) &Tensor[T] {
 	return full_like[T](t, cast[T](1))
 }
 
 // full returns a new tensor of a given shape and type, filled with the given value
+
+// full exposes this operation as part of the public API.
+
+// full exposes this operation as part of the public API.
 @[inline]
 pub fn full[T](shape []int, val T, params TensorData) &Tensor[T] {
 	return tensor[T](val, shape, params)
@@ -80,6 +112,10 @@ pub fn range[T](from int, to int, params TensorData) &Tensor[T] {
 }
 
 // seq returns a Tensor containing values ranging from [0, to)
+
+// seq exposes this operation as part of the public API.
+
+// seq exposes this operation as part of the public API.
 @[inline]
 pub fn seq[T](n int, params TensorData) &Tensor[T] {
 	return range[T](0, n, params)
@@ -93,6 +129,10 @@ pub fn from_1d[T](arr []T, params TensorData) !&Tensor[T] {
 
 // from_2d takes a two dimensional array of floating point values
 // and returns a two-dimensional Tensor if possible
+
+// from_2d exposes this operation as part of the public API.
+
+// from_2d exposes this operation as part of the public API.
 @[direct_array_access]
 pub fn from_2d[T](a [][]T, params TensorData) !&Tensor[T] {
 	mut arr := []T{cap: a.len * a[0].len}

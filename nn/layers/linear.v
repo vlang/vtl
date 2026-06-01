@@ -30,14 +30,17 @@ pub fn linear_layer[T](ctx &autograd.Context[T], input_dim int, output_dim int) 
 	})
 }
 
+// output_shape exposes this operation as part of the public API.
 pub fn (layer &LinearLayer[T]) output_shape() []int {
 	return [layer.weights.value.shape[0]]
 }
 
+// variables exposes this operation as part of the public API.
 pub fn (layer &LinearLayer[T]) variables() []&autograd.Variable[T] {
 	return [layer.weights, layer.bias]
 }
 
+// forward exposes this operation as part of the public API.
 pub fn (layer &LinearLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	mut output := &vtl.Tensor[T](unsafe { nil })
 	$if sizeof(T) == 8 {

@@ -6,6 +6,9 @@ import vtl.nn.internal
 import vtl.nn.gates.layers
 import vtl.nn.types
 
+// DropoutLayerConfig defines a public data structure for this module.
+
+// DropoutLayerConfig defines a public data structure for this module.
 @[params]
 pub struct DropoutLayerConfig {
 	prob f64 = 0.5
@@ -17,6 +20,7 @@ pub struct DropoutLayer[T] {
 	prob         f64
 }
 
+// dropout_layer exposes this operation as part of the public API.
 pub fn dropout_layer[T](ctx &autograd.Context[T], output_shape []int, data DropoutLayerConfig) types.Layer[T] {
 	return types.Layer[T](&DropoutLayer[T]{
 		output_shape: output_shape.clone()
@@ -24,14 +28,17 @@ pub fn dropout_layer[T](ctx &autograd.Context[T], output_shape []int, data Dropo
 	})
 }
 
+// output_shape exposes this operation as part of the public API.
 pub fn (layer &DropoutLayer[T]) output_shape() []int {
 	return layer.output_shape
 }
 
+// variables exposes this operation as part of the public API.
 pub fn (_ &DropoutLayer[T]) variables() []&autograd.Variable[T] {
 	return []&autograd.Variable[T]{}
 }
 
+// forward exposes this operation as part of the public API.
 pub fn (layer &DropoutLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	mask := vtl.binomial[T](1, layer.prob, input.value.shape)!
 	output := internal.dropout[T](input.value, mask, layer.prob)!

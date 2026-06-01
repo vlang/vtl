@@ -36,6 +36,10 @@ pub mut:
 //   - `beta2`         — second-moment decay rate (default: 0.999)
 //   - `epsilon`       — numerical stability constant (default: 1e-8)
 //   - `weight_decay`  — decoupled weight-decay coefficient λ (default: 0.01)
+
+// AdamWOptimizerConfig defines a public data structure for this module.
+
+// AdamWOptimizerConfig defines a public data structure for this module.
 @[params]
 pub struct AdamWOptimizerConfig {
 pub:

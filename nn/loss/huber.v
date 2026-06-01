@@ -28,6 +28,10 @@ pub struct HuberLoss[T] {
 //
 // Fields:
 //   - `delta` — transition threshold between L2 (below) and L1 (above) behaviour. Default: 1.0.
+
+// HuberLossConfig defines a public data structure for this module.
+
+// HuberLossConfig defines a public data structure for this module.
 @[params]
 pub struct HuberLossConfig {
 	delta f64 = 1.0
@@ -40,6 +44,7 @@ pub fn huber_loss[T](config HuberLossConfig) &HuberLoss[T] {
 	}
 }
 
+// loss exposes this operation as part of the public API.
 pub fn (l &HuberLoss[T]) loss(input &autograd.Variable[T], target &vtl.Tensor[T]) !&autograd.Variable[T] {
 	output := internal.huber[T](input.value, target, l.delta)!
 	mut result := input.context.variable(output)

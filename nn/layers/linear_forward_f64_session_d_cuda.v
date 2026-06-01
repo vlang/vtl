@@ -3,6 +3,7 @@ module layers
 import vtl
 import vtl.autograd_cuda
 
+// linear_forward_f64_session exposes this operation as part of the public API.
 pub fn linear_forward_f64_session(input &vtl.Tensor[f64], weights &vtl.Tensor[f64], bias &vtl.Tensor[f64],
 	input_gpu voidptr, session voidptr) !&vtl.Tensor[f64] {
 	if session == unsafe { nil } {

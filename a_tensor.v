@@ -9,6 +9,10 @@ pub enum MemoryFormat {
 }
 
 // Tensor is the main structure defined by VTL to manage N Dimensional data
+
+// Tensor defines a public data structure for this module.
+
+// Tensor defines a public data structure for this module.
 @[heap]
 pub struct Tensor[T] {
 pub mut:
@@ -20,12 +24,20 @@ pub mut:
 }
 
 // cpu returns a Tensor from a Tensor
+
+// cpu exposes this operation as part of the public API.
+
+// cpu exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) cpu() !&Tensor[T] {
 	return t
 }
 
 // str returns the string representation of a Tensor
+
+// str exposes this operation as part of the public API.
+
+// str exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) str() string {
 	return tensor_str[T](t, ', ', '') or { '' }
@@ -42,18 +54,30 @@ pub fn (t &Tensor[T]) size() int {
 }
 
 // is_matrix returns if a Tensor is a nxm matrix or not
+
+// is_matrix exposes this operation as part of the public API.
+
+// is_matrix exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) is_matrix() bool {
 	return t.rank() == 2
 }
 
 // is_matrix returns if a Tensor is a square matrix or not
+
+// is_square_matrix exposes this operation as part of the public API.
+
+// is_square_matrix exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) is_square_matrix() bool {
 	return t.rank() == 2 && t.shape[0] == t.shape[1]
 }
 
 // is_matrix returns if a Tensor is a square 1D vector or not
+
+// is_vector exposes this operation as part of the public API.
+
+// is_vector exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) is_vector() bool {
 	return t.rank() == 1
@@ -61,6 +85,10 @@ pub fn (t &Tensor[T]) is_vector() bool {
 
 // is_row_major returns if a Tensor is supposed to store its data in Row-Major
 // order
+
+// is_row_major exposes this operation as part of the public API.
+
+// is_row_major exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) is_row_major() bool {
 	// TODO: we need to ensure that t.memory is the source of truth
@@ -69,6 +97,10 @@ pub fn (t &Tensor[T]) is_row_major() bool {
 
 // is_col_major returns if a Tensor is supposed to store its data in Col-Major
 // order
+
+// is_col_major exposes this operation as part of the public API.
+
+// is_col_major exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) is_col_major() bool {
 	// TODO: we need to ensure that t.memory is the source of truth
@@ -77,6 +109,10 @@ pub fn (t &Tensor[T]) is_col_major() bool {
 
 // is_row_major verifies if a Tensor stores its data in Row-Major
 // order
+
+// is_row_major_contiguous exposes this operation as part of the public API.
+
+// is_row_major_contiguous exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) is_row_major_contiguous() bool {
 	return is_row_major_contiguous(t.shape, t.strides, t.rank())
@@ -84,6 +120,10 @@ pub fn (t &Tensor[T]) is_row_major_contiguous() bool {
 
 // is_col_major verifies if a Tensor stores its data in Col-Major
 // order
+
+// is_col_major_contiguous exposes this operation as part of the public API.
+
+// is_col_major_contiguous exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) is_col_major_contiguous() bool {
 	return is_col_major_contiguous(t.shape, t.strides, t.rank())
@@ -91,6 +131,10 @@ pub fn (t &Tensor[T]) is_col_major_contiguous() bool {
 
 // is_contiguous verifies that a Tensor is contiguous independent of
 // memory layout
+
+// is_contiguous exposes this operation as part of the public API.
+
+// is_contiguous exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) is_contiguous() bool {
 	return t.is_row_major_contiguous() || t.is_col_major_contiguous()
@@ -110,6 +154,10 @@ pub fn (t &Tensor[T]) to_array() []T {
 
 // copy returns a copy of a Tensor with a particular memory
 // layout, either row_major-contiguous or col_major-contiguous
+
+// copy exposes this operation as part of the public API.
+
+// copy exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) copy(memory MemoryFormat) &Tensor[T] {
 	strides := strides_from_shape(t.shape, memory)
@@ -127,6 +175,10 @@ pub fn (t &Tensor[T]) copy(memory MemoryFormat) &Tensor[T] {
 
 // view returns a view of a Tensor, identical to the
 // parent but not owning its own data
+
+// view exposes this operation as part of the public API.
+
+// view exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) view() &Tensor[T] {
 	return &Tensor[T]{

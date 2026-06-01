@@ -1,6 +1,10 @@
 module vtl
 
 // argmax_axis returns the indices of the maximum values along the given axis.
+
+// argmax_axis exposes this operation as part of the public API.
+
+// argmax_axis exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) argmax_axis[T](axis int) !&Tensor[int] {
 	shape := t.shape
@@ -74,6 +78,10 @@ pub fn (t &Tensor[T]) argmax_axis[T](axis int) !&Tensor[int] {
 }
 
 // argmin_axis returns the indices of the minimum values along the given axis.
+
+// argmin_axis exposes this operation as part of the public API.
+
+// argmin_axis exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) argmin_axis[T](axis int) !&Tensor[int] {
 	shape := t.shape
@@ -147,6 +155,10 @@ pub fn (t &Tensor[T]) argmin_axis[T](axis int) !&Tensor[int] {
 }
 
 // max_axis returns the maximum value along the given axis as a reduced tensor.
+
+// max_axis exposes this operation as part of the public API.
+
+// max_axis exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) max_axis[T](axis int) !&Tensor[T] {
 	shape := t.shape
@@ -220,6 +232,10 @@ pub fn (t &Tensor[T]) max_axis[T](axis int) !&Tensor[T] {
 }
 
 // min_axis returns the minimum value along the given axis as a reduced tensor.
+
+// min_axis exposes this operation as part of the public API.
+
+// min_axis exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) min_axis[T](axis int) !&Tensor[T] {
 	shape := t.shape
@@ -288,12 +304,20 @@ pub fn (t &Tensor[T]) min_axis[T](axis int) !&Tensor[T] {
 }
 
 // argmax returns the indices of the maximum values along the given axis.
+
+// argmax exposes this operation as part of the public API.
+
+// argmax exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) argmax[T](axis int) !&Tensor[int] {
 	return t.argmax_axis(axis)
 }
 
 // argmin returns the indices of the minimum values along the given axis.
+
+// argmin exposes this operation as part of the public API.
+
+// argmin exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) argmin[T](axis int) !&Tensor[int] {
 	return t.argmin_axis(axis)
@@ -301,6 +325,10 @@ pub fn (t &Tensor[T]) argmin[T](axis int) !&Tensor[int] {
 
 // cumsum returns the cumulative sum along the given axis.
 // Only meaningful for numeric types; bool and string follow their respective + semantics.
+
+// cumsum exposes this operation as part of the public API.
+
+// cumsum exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) cumsum[T](axis int) !&Tensor[T] {
 	shape := t.shape
@@ -372,6 +400,10 @@ pub fn (t &Tensor[T]) cumsum[T](axis int) !&Tensor[T] {
 
 // cumprod returns the cumulative product along the given axis.
 // Only meaningful for numeric types; bool follows && semantics.
+
+// cumprod exposes this operation as part of the public API.
+
+// cumprod exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) cumprod[T](axis int) !&Tensor[T] {
 	shape := t.shape

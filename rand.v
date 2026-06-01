@@ -43,6 +43,10 @@ pub fn exponential[T](lambda f64, shape []int, params TensorData) &Tensor[T] {
 }
 
 // NormalTensorData is the data for a normal distribution.
+
+// NormalTensorData defines a public data structure for this module.
+
+// NormalTensorData defines a public data structure for this module.
 @[params]
 pub struct NormalTensorData {
 	TensorData
@@ -74,6 +78,7 @@ pub fn random[T](min T, max T, shape []int, params TensorData) &Tensor[T] {
 	return t
 }
 
+// random_seed exposes this operation as part of the public API.
 pub fn random_seed(i int) {
 	rand.seed(seed.time_seed_array(2))
 }

@@ -30,6 +30,10 @@ pub struct BCELoss[T] {
 // Fields:
 //   - `from_logits` — when `true` (default) a sigmoid is applied to the raw model output
 //     before computing the loss. Recommended for numerical stability.
+
+// BCELossConfig defines a public data structure for this module.
+
+// BCELossConfig defines a public data structure for this module.
 @[params]
 pub struct BCELossConfig {
 	from_logits bool = true // apply sigmoid to input (recommended for numerical stability)
@@ -42,6 +46,7 @@ pub fn bce_loss[T](config BCELossConfig) &BCELoss[T] {
 	}
 }
 
+// loss exposes this operation as part of the public API.
 pub fn (l &BCELoss[T]) loss(input &autograd.Variable[T], target &vtl.Tensor[T]) !&autograd.Variable[T] {
 	mut input_val := input.value
 	if l.from_logits {

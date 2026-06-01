@@ -3,6 +3,10 @@ module vtl
 import vtl.storage
 
 // VclTensor is the main structure defined by VTL to manage N Dimensional data
+
+// VclTensor defines a public data structure for this module.
+
+// VclTensor defines a public data structure for this module.
 @[heap]
 pub struct VclTensor[T] {
 pub mut:
@@ -39,6 +43,10 @@ pub fn (t &VclTensor[T]) cpu() !&Tensor[T] {
 }
 
 // vcl returns a VclTensor from a VclTensor
+
+// vcl exposes this operation as part of the public API.
+
+// vcl exposes this operation as part of the public API.
 @[inline]
 pub fn (t &VclTensor[T]) vcl() !&VclTensor[T] {
 	return t
@@ -66,18 +74,30 @@ pub fn (t &VclTensor[T]) size() int {
 }
 
 // is_matrix returns if a VclTensor is a nxm matrix or not
+
+// is_matrix exposes this operation as part of the public API.
+
+// is_matrix exposes this operation as part of the public API.
 @[inline]
 pub fn (t &VclTensor[T]) is_matrix() bool {
 	return t.rank() == 2
 }
 
 // is_matrix returns if a VclTensor is a square matrix or not
+
+// is_square_matrix exposes this operation as part of the public API.
+
+// is_square_matrix exposes this operation as part of the public API.
 @[inline]
 pub fn (t &VclTensor[T]) is_square_matrix() bool {
 	return t.rank() == 2 && t.shape[0] == t.shape[1]
 }
 
 // is_matrix returns if a VclTensor is a square 1D vector or not
+
+// is_vector exposes this operation as part of the public API.
+
+// is_vector exposes this operation as part of the public API.
 @[inline]
 pub fn (t &VclTensor[T]) is_vector() bool {
 	return t.rank() == 1
@@ -85,6 +105,10 @@ pub fn (t &VclTensor[T]) is_vector() bool {
 
 // is_row_major returns if a VclTensor is supposed to store its data in Row-Major
 // order
+
+// is_row_major exposes this operation as part of the public API.
+
+// is_row_major exposes this operation as part of the public API.
 @[inline]
 pub fn (t &VclTensor[T]) is_row_major() bool {
 	// TODO: we need to ensure that t.memory is the source of truth
@@ -93,6 +117,10 @@ pub fn (t &VclTensor[T]) is_row_major() bool {
 
 // is_col_major returns if a VclTensor is supposed to store its data in Col-Major
 // order
+
+// is_col_major exposes this operation as part of the public API.
+
+// is_col_major exposes this operation as part of the public API.
 @[inline]
 pub fn (t &VclTensor[T]) is_col_major() bool {
 	// TODO: we need to ensure that t.memory is the source of truth
@@ -101,6 +129,10 @@ pub fn (t &VclTensor[T]) is_col_major() bool {
 
 // is_row_major verifies if a VclTensor stores its data in Row-Major
 // order
+
+// is_row_major_contiguous exposes this operation as part of the public API.
+
+// is_row_major_contiguous exposes this operation as part of the public API.
 @[inline]
 pub fn (t &VclTensor[T]) is_row_major_contiguous() bool {
 	return is_row_major_contiguous(t.shape, t.strides, t.rank())
@@ -108,6 +140,10 @@ pub fn (t &VclTensor[T]) is_row_major_contiguous() bool {
 
 // is_col_major verifies if a VclTensor stores its data in Col-Major
 // order
+
+// is_col_major_contiguous exposes this operation as part of the public API.
+
+// is_col_major_contiguous exposes this operation as part of the public API.
 @[inline]
 pub fn (t &VclTensor[T]) is_col_major_contiguous() bool {
 	return is_col_major_contiguous(t.shape, t.strides, t.rank())
@@ -115,6 +151,10 @@ pub fn (t &VclTensor[T]) is_col_major_contiguous() bool {
 
 // is_contiguous verifies that a VclTensor is contiguous independent of
 // memory layout
+
+// is_contiguous exposes this operation as part of the public API.
+
+// is_contiguous exposes this operation as part of the public API.
 @[inline]
 pub fn (t &VclTensor[T]) is_contiguous() bool {
 	return t.is_row_major_contiguous() || t.is_col_major_contiguous()

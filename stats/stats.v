@@ -4,6 +4,7 @@ import vtl
 import math
 import math.stats as math_stats
 
+// AxisData defines a public data structure for this module.
 pub struct AxisData {
 pub:
 	axis int
@@ -199,6 +200,10 @@ pub fn rms[T](t &vtl.Tensor[T]) T {
 // Population Variance of the given input array
 // Based on
 // https://www.mathsisfun.com/data/standard-deviation.html
+
+// population_variance exposes this operation as part of the public API.
+
+// population_variance exposes this operation as part of the public API.
 @[inline]
 pub fn population_variance[T](t &vtl.Tensor[T]) T {
 	if t.size == 0 {
@@ -227,6 +232,10 @@ pub fn population_variance_mean[T](t &vtl.Tensor[T], provided_mean T) T {
 // Sample Variance of the given input array
 // Based on
 // https://www.mathsisfun.com/data/standard-deviation.html
+
+// sample_variance exposes this operation as part of the public API.
+
+// sample_variance exposes this operation as part of the public API.
 @[inline]
 pub fn sample_variance[T](t &vtl.Tensor[T]) T {
 	if t.size == 0 {
@@ -255,6 +264,10 @@ pub fn sample_variance_mean[T](t &vtl.Tensor[T], provided_mean T) T {
 // Population Standard Deviation of the given input array
 // Based on
 // https://www.mathsisfun.com/data/standard-deviation.html
+
+// population_stddev exposes this operation as part of the public API.
+
+// population_stddev exposes this operation as part of the public API.
 @[inline]
 pub fn population_stddev[T](t &vtl.Tensor[T]) T {
 	if t.size == 0 {
@@ -269,6 +282,10 @@ pub fn population_stddev[T](t &vtl.Tensor[T]) T {
 // Population Standard Deviation of the given input array
 // Based on
 // https://www.mathsisfun.com/data/standard-deviation.html
+
+// population_stddev_mean exposes this operation as part of the public API.
+
+// population_stddev_mean exposes this operation as part of the public API.
 @[inline]
 pub fn population_stddev_mean[T](t &vtl.Tensor[T], mean T) T {
 	if t.size == 0 {
@@ -282,6 +299,10 @@ pub fn population_stddev_mean[T](t &vtl.Tensor[T], mean T) T {
 // Sample Standard Deviation of the given input array
 // Based on
 // https://www.mathsisfun.com/data/standard-deviation.html
+
+// sample_stddev exposes this operation as part of the public API.
+
+// sample_stddev exposes this operation as part of the public API.
 @[inline]
 pub fn sample_stddev[T](t &vtl.Tensor[T]) T {
 	if t.size == 0 {
@@ -296,6 +317,10 @@ pub fn sample_stddev[T](t &vtl.Tensor[T]) T {
 // Sample Standard Deviation of the given input array
 // Based on
 // https://www.mathsisfun.com/data/standard-deviation.html
+
+// sample_stddev_mean exposes this operation as part of the public API.
+
+// sample_stddev_mean exposes this operation as part of the public API.
 @[inline]
 pub fn sample_stddev_mean[T](t &vtl.Tensor[T], mean T) T {
 	if t.size == 0 {
@@ -309,6 +334,10 @@ pub fn sample_stddev_mean[T](t &vtl.Tensor[T], mean T) T {
 // Mean Absolute Deviation of the given input array
 // Based on
 // https://en.wikipedia.org/wiki/Average_absolute_deviation
+
+// absdev exposes this operation as part of the public API.
+
+// absdev exposes this operation as part of the public API.
 @[inline]
 pub fn absdev[T](t &vtl.Tensor[T]) T {
 	if t.size == 0 {
@@ -334,6 +363,10 @@ pub fn absdev_mean[T](t &vtl.Tensor[T], provided_mean T) T {
 }
 
 // Sum of squares
+
+// tss exposes this operation as part of the public API.
+
+// tss exposes this operation as part of the public API.
 @[inline]
 pub fn tss[T](t &vtl.Tensor[T]) T {
 	if t.size == 0 {
@@ -422,6 +455,9 @@ pub fn range[T](t &vtl.Tensor[T]) T {
 	return max - min
 }
 
+// covariance exposes this operation as part of the public API.
+
+// covariance exposes this operation as part of the public API.
 @[inline]
 pub fn covariance[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) T {
 	mean1 := mean[T](a)
@@ -445,6 +481,9 @@ pub fn covariance_mean[T](a &vtl.Tensor[T], b &vtl.Tensor[T], mean1 T, mean2 T) 
 	return cov / vtl.cast[T](n)
 }
 
+// lag1_autocorrelation exposes this operation as part of the public API.
+
+// lag1_autocorrelation exposes this operation as part of the public API.
 @[inline]
 pub fn lag1_autocorrelation[T](t &vtl.Tensor[T]) T {
 	data_mean := mean[T](t)
@@ -469,6 +508,9 @@ pub fn lag1_autocorrelation_mean[T](t &vtl.Tensor[T], provided_mean T) T {
 	return lag1_autocorrelation / lag1_denominator
 }
 
+// kurtosis exposes this operation as part of the public API.
+
+// kurtosis exposes this operation as part of the public API.
 @[inline]
 pub fn kurtosis[T](t &vtl.Tensor[T]) T {
 	data_mean := mean[T](t)
@@ -492,6 +534,9 @@ pub fn kurtosis_mean_stddev[T](t &vtl.Tensor[T], mean T, sd T) T {
 	return kurtosis / math.pow(sd, vtl.cast[T](4))
 }
 
+// skew exposes this operation as part of the public API.
+
+// skew exposes this operation as part of the public API.
 @[inline]
 pub fn skew[T](t &vtl.Tensor[T]) T {
 	data_mean := mean[T](t)
@@ -499,6 +544,7 @@ pub fn skew[T](t &vtl.Tensor[T]) T {
 	return skew_mean_stddev(t, data_mean, data_sd)
 }
 
+// skew_mean_stddev exposes this operation as part of the public API.
 pub fn skew_mean_stddev[T](t &vtl.Tensor[T], mean T, sd T) T {
 	n := t.size
 	if n == 0 {
@@ -513,6 +559,7 @@ pub fn skew_mean_stddev[T](t &vtl.Tensor[T], mean T, sd T) T {
 	return skew / math.pow(sd, vtl.cast[T](3))
 }
 
+// quantile exposes this operation as part of the public API.
 pub fn quantile[T](sorted_t &vtl.Tensor[T], f T) T {
 	n := sorted_t.size
 	if n == 0 {

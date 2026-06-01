@@ -7,6 +7,10 @@ import vtl.nn.types
 
 // Conv2D layer: 2D convolution over a 4D input tensor [batch, in_channels, H, W].
 // Produces [batch, out_channels, out_H, out_W] output.
+
+// Conv2DConfig defines a public data structure for this module.
+
+// Conv2DConfig defines a public data structure for this module.
 @[params]
 pub struct Conv2DConfig {
 pub:
@@ -55,6 +59,7 @@ pub fn conv2d_layer[T](ctx &autograd.Context[T], in_ch int, out_ch int, kernel_s
 	})
 }
 
+// output_shape exposes this operation as part of the public API.
 pub fn (layer &Conv2DLayer[T]) output_shape() []int {
 	if layer.input_shape.len >= 3 && layer.input_shape[1] > 0 && layer.input_shape[2] > 0 {
 		in_h := layer.input_shape[1]
@@ -72,10 +77,12 @@ pub fn (layer &Conv2DLayer[T]) output_shape() []int {
 	return [layer.out_channels, -1, -1]
 }
 
+// variables exposes this operation as part of the public API.
 pub fn (layer &Conv2DLayer[T]) variables() []&autograd.Variable[T] {
 	return [layer.weight, layer.bias]
 }
 
+// forward exposes this operation as part of the public API.
 pub fn (layer &Conv2DLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	cfg := internal.Conv2DConfig{
 		padding:  layer.config.padding
@@ -95,6 +102,7 @@ pub fn (layer &Conv2DLayer[T]) forward(input &autograd.Variable[T]) !&autograd.V
 	return result
 }
 
+// Conv2DGate defines a public data structure for this module.
 pub struct Conv2DGate[T] {
 	input       &vtl.Tensor[T] = unsafe { nil }
 	weight      &vtl.Tensor[T] = unsafe { nil }
@@ -103,6 +111,7 @@ pub struct Conv2DGate[T] {
 	config      Conv2DConfig
 }
 
+// conv2d_gate exposes this operation as part of the public API.
 pub fn conv2d_gate[T](input &vtl.Tensor[T], weight &vtl.Tensor[T], bias &vtl.Tensor[T], kernel_size []int, config Conv2DConfig) &Conv2DGate[T] {
 	return &Conv2DGate[T]{
 		input:       input
@@ -113,6 +122,7 @@ pub fn conv2d_gate[T](input &vtl.Tensor[T], weight &vtl.Tensor[T], bias &vtl.Ten
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &Conv2DGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	cfg := internal.Conv2DConfig{
 		padding:  g.config.padding
@@ -124,6 +134,7 @@ pub fn (g &Conv2DGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[
 		g.kernel_size, cfg)
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &Conv2DGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	if args.len < 3 {
 		return error('Conv2DGate.cache: expected input, weight, bias variables')

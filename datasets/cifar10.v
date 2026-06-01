@@ -3,7 +3,9 @@ module datasets
 import vtl
 import os
 
+// cifar10_base_url is a public constant used by this module.
 pub const cifar10_base_url = 'https://www.cs.toronto.edu/~kriz/'
+// cifar10_file is a public constant used by this module.
 pub const cifar10_file = 'cifar-10-binary.tar.gz'
 
 // Cifar10Dataset holds the CIFAR-10 dataset.

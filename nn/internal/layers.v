@@ -3,18 +3,21 @@ module internal
 import math
 import vtl
 
+// dropout exposes this operation as part of the public API.
 pub fn dropout[T](input &vtl.Tensor[T], mask &vtl.Tensor[T], prob f64) !&vtl.Tensor[T] {
 	return input.nmap([mask], fn [T](vals []T, i []int) T {
 		return vals[0] * vals[1] / vtl.cast[T](prob)
 	})
 }
 
+// dropout_backwards exposes this operation as part of the public API.
 pub fn dropout_backwards[T](gradient &vtl.Tensor[T], mask &vtl.Tensor[T], prob f64) !&vtl.Tensor[T] {
 	return gradient.nmap([mask], fn [T](vals []T, i []int) T {
 		return vals[0] * vals[1] / vtl.cast[T](prob)
 	})
 }
 
+// maxpool2d exposes this operation as part of the public API.
 pub fn maxpool2d[T](input &vtl.Tensor[T], kernel []int, padding []int, stride []int) (&vtl.Tensor[int], &vtl.Tensor[T]) {
 	nn := input.shape[0]
 	cc := input.shape[1]
@@ -66,6 +69,7 @@ pub fn maxpool2d[T](input &vtl.Tensor[T], kernel []int, padding []int, stride []
 	return max_indices, output
 }
 
+// maxpool2d_backward exposes this operation as part of the public API.
 pub fn maxpool2d_backward[T](shape []int, max_indices &vtl.Tensor[int], grad_output &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	if grad_output.size != max_indices.size {
 		return error('maxpool2d_backward: grad_output and max_indices must have the same size')

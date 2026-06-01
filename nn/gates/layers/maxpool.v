@@ -4,6 +4,7 @@ import vtl
 import vtl.autograd
 import vtl.nn.internal
 
+// MaxPool2DGate defines a public data structure for this module.
 pub struct MaxPool2DGate[T] {
 pub:
 	max_indices &vtl.Tensor[int] = unsafe { nil }
@@ -13,6 +14,7 @@ pub:
 	padding     []int
 }
 
+// maxpool2d_gate exposes this operation as part of the public API.
 pub fn maxpool2d_gate[T](max_indices &vtl.Tensor[int], kernel []int, shape []int, stride []int, padding []int) &MaxPool2DGate[T] {
 	return &MaxPool2DGate[T]{
 		max_indices: max_indices
@@ -23,6 +25,7 @@ pub fn maxpool2d_gate[T](max_indices &vtl.Tensor[int], kernel []int, shape []int
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &MaxPool2DGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 
@@ -31,6 +34,7 @@ pub fn (g &MaxPool2DGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tens
 	return [r0]
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &MaxPool2DGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
 

@@ -24,6 +24,7 @@ pub fn mse_loss[T]() &MSELoss[T] {
 	return &MSELoss[T]{}
 }
 
+// loss exposes this operation as part of the public API.
 pub fn (_ &MSELoss[T]) loss(input &autograd.Variable[T], target &vtl.Tensor[T]) !&autograd.Variable[T] {
 	output := internal.mse[T](input.value, target)!
 

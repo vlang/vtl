@@ -1,5 +1,8 @@
 module vtl
 
+// VclParams defines a public data structure for this module.
+
+// VclParams defines a public data structure for this module.
 @[params]
 pub struct VclParams {}
 

@@ -41,6 +41,7 @@ pub fn nll_loss[T](weight &vtl.Tensor[T]) &NLLLoss[T] {
 	}
 }
 
+// loss exposes this operation as part of the public API.
 pub fn (_ &NLLLoss[T]) loss(input &autograd.Variable[T], target &vtl.Tensor[T]) !&autograd.Variable[T] {
 	output := internal.nll[T](input.value, target)!
 	mut result := input.context.variable(output)

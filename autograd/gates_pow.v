@@ -3,11 +3,13 @@ module autograd
 import math
 import vtl
 
+// PowGate defines a public data structure for this module.
 pub struct PowGate[T] {
 	a &Variable[T] = unsafe { nil }
 	b &Variable[T] = unsafe { nil }
 }
 
+// pow_gate exposes this operation as part of the public API.
 pub fn pow_gate[T](a &Variable[T], b &Variable[T]) &PowGate[T] {
 	return &PowGate[T]{
 		a: a
@@ -15,6 +17,7 @@ pub fn pow_gate[T](a &Variable[T], b &Variable[T]) &PowGate[T] {
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &PowGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	mut iters, shape := gradient.iterators[T]([g.a.value, g.b.value])!
@@ -30,6 +33,7 @@ pub fn (g &PowGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0, r1]
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &PowGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	b := args[1]

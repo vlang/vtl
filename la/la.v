@@ -3,6 +3,7 @@ module la
 import vsl.la as vsl_la
 import vtl
 
+// dot exposes this operation as part of the public API.
 pub fn dot[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 	if !a.is_vector() || !b.is_vector() {
 		return error('Tensors must be one dimensional')
@@ -13,6 +14,7 @@ pub fn dot[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 	return vtl.from_1d([res])
 }
 
+// det exposes this operation as part of the public API.
 pub fn det[T](t &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 	t.assert_square_matrix()!
 	m := t.shape[0]
@@ -21,6 +23,7 @@ pub fn det[T](t &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 	return vtl.from_1d([vsl_la.matrix_det(mat)])
 }
 
+// inv exposes this operation as part of the public API.
 pub fn inv[T](t &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 	t.assert_square_matrix()!
 	mut colmajort := t.copy(.col_major)
@@ -31,6 +34,7 @@ pub fn inv[T](t &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 	return vtl.from_2d[f64](ret_m.get_deep2())
 }
 
+// matmul exposes this operation as part of the public API.
 pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	a.assert_matrix()!
 	b.assert_matrix()!

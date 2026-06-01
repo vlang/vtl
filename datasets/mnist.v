@@ -3,10 +3,15 @@ module datasets
 import vtl
 import os
 
+// mnist_base_url is a public constant used by this module.
 pub const mnist_base_url = 'https://github.com/golbin/TensorFlow-MNIST/raw/master/mnist/data/'
+// mnist_train_images_file is a public constant used by this module.
 pub const mnist_train_images_file = 'train-images-idx3-ubyte.gz'
+// mnist_train_labels_file is a public constant used by this module.
 pub const mnist_train_labels_file = 'train-labels-idx1-ubyte.gz'
+// mnist_test_images_file is a public constant used by this module.
 pub const mnist_test_images_file = 't10k-images-idx3-ubyte.gz'
+// mnist_test_labels_file is a public constant used by this module.
 pub const mnist_test_labels_file = 't10k-labels-idx1-ubyte.gz'
 
 // MnistDataset is a dataset of MNIST handwritten digits.

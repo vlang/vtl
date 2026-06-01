@@ -14,6 +14,10 @@ pub interface Dataset[T] {
 }
 
 // Subset wraps a Dataset and provides indices for a subset of the data
+
+// Subset defines a public data structure for this module.
+
+// Subset defines a public data structure for this module.
 @[heap]
 pub struct Subset[T] {
 pub:
@@ -56,6 +60,10 @@ pub fn (s &Subset[T]) split(train_ratio f64) !(&Subset[T], &Subset[T]) {
 }
 
 // DataLoader provides mini-batch iteration over data
+
+// DataLoader defines a public data structure for this module.
+
+// DataLoader defines a public data structure for this module.
 @[heap]
 pub struct DataLoader[T] {
 pub:
@@ -145,6 +153,10 @@ fn (mut dl DataLoader[T]) shuffle_indices() {
 }
 
 // TensorDataset implements Dataset for matrix data
+
+// TensorDataset defines a public data structure for this module.
+
+// TensorDataset defines a public data structure for this module.
 @[heap]
 pub struct TensorDataset[T] {
 pub mut:

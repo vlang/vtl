@@ -9,6 +9,10 @@ import vtl
 // This is the fundamental object used in automatic
 // differentiation, as well as the neural network aspects
 // of VTL
+
+// Variable defines a public data structure for this module.
+
+// Variable defines a public data structure for this module.
 @[heap]
 pub struct Variable[T] {
 pub mut:
@@ -32,6 +36,9 @@ pub mut:
 	gpu_activation voidptr = unsafe { nil }
 }
 
+// VariableData defines a public data structure for this module.
+
+// VariableData defines a public data structure for this module.
 @[params]
 pub struct VariableData {
 	requires_grad bool = true
@@ -48,20 +55,24 @@ pub fn variable[T](context &Context[T], value &vtl.Tensor[T], data VariableData)
 	}
 }
 
+// slice exposes this operation as part of the public API.
 pub fn (v &Variable[T]) slice(idx ...[]int) !&Variable[T] {
 	value := v.value.slice(...idx)!
 	return variable[T](v.context, value, requires_grad: v.requires_grad)
 }
 
+// slice_hilo exposes this operation as part of the public API.
 pub fn (v &Variable[T]) slice_hilo(idx1 []int, idx2 []int) !&Variable[T] {
 	value := v.value.slice_hilo(idx1, idx2)!
 	return variable[T](v.context, value, requires_grad: v.requires_grad)
 }
 
+// is_grad_needed exposes this operation as part of the public API.
 pub fn (v &Variable[T]) is_grad_needed() bool {
 	return v.requires_grad && !v.context.no_grad
 }
 
+// str exposes this operation as part of the public API.
 pub fn (v &Variable[T]) str() string {
 	return v.value.str()
 }

@@ -27,6 +27,7 @@ fn (mut s DeviceSession) opt_state_mut() &DeviceOptimizerState {
 	return unsafe { &DeviceOptimizerState(s.optimizer_state) }
 }
 
+// ensure_opt_slot exposes this operation as part of the public API.
 pub fn (mut s DeviceSession) ensure_opt_slot(slot int, n int) !&DeviceOptimizerSlot {
 	mut st := s.opt_state_mut()
 	for st.slots.len <= slot {
@@ -42,6 +43,7 @@ pub fn (mut s DeviceSession) ensure_opt_slot(slot int, n int) !&DeviceOptimizerS
 	return sl
 }
 
+// reset_optimizer_state exposes this operation as part of the public API.
 pub fn (mut s DeviceSession) reset_optimizer_state() {
 	if s.optimizer_state != unsafe { nil } {
 		mut st := unsafe { &DeviceOptimizerState(s.optimizer_state) }

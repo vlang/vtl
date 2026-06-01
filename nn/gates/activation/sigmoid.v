@@ -4,23 +4,27 @@ import vtl
 import vtl.autograd
 import vtl.nn.internal
 
+// SigmoidGate defines a public data structure for this module.
 pub struct SigmoidGate[T] {
 pub:
 	cache &vtl.Tensor[T] = unsafe { nil }
 }
 
+// sigmoid_gate exposes this operation as part of the public API.
 pub fn sigmoid_gate[T](cache &vtl.Tensor[T]) &SigmoidGate[T] {
 	return &SigmoidGate[T]{
 		cache: cache
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &SigmoidGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	r0 := internal.deriv_sigmoid[T](gradient, g.cache)!
 	return [r0]
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &SigmoidGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
 

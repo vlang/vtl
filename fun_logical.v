@@ -115,6 +115,10 @@ fn handle_equal[T](vals []T, _ []int) bool {
 }
 
 // equal compares two tensors elementwise
+
+// equal exposes this operation as part of the public API.
+
+// equal exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) equal[T](other &Tensor[T]) !&Tensor[bool] {
 	// TODO: Implement using nmap
@@ -129,6 +133,10 @@ pub fn (t &Tensor[T]) equal[T](other &Tensor[T]) !&Tensor[bool] {
 }
 
 // not_equal compares two tensors elementwise
+
+// not_equal exposes this operation as part of the public API.
+
+// not_equal exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) not_equal[T](other &Tensor[T]) !&Tensor[bool] {
 	// TODO: Implement using nmap
@@ -143,6 +151,10 @@ pub fn (t &Tensor[T]) not_equal[T](other &Tensor[T]) !&Tensor[bool] {
 }
 
 // tolerance compares two tensors elementwise with a given tolerance
+
+// tolerance exposes this operation as part of the public API.
+
+// tolerance exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) tolerance[T](other &Tensor[T], tol T) !&Tensor[bool] {
 	// TODO: Implement using nmap
@@ -157,6 +169,10 @@ pub fn (t &Tensor[T]) tolerance[T](other &Tensor[T], tol T) !&Tensor[bool] {
 }
 
 // close compares two tensors elementwise
+
+// close exposes this operation as part of the public API.
+
+// close exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) close[T](other &Tensor[T]) !&Tensor[bool] {
 	// TODO: Implement using nmap
@@ -171,6 +187,10 @@ pub fn (t &Tensor[T]) close[T](other &Tensor[T]) !&Tensor[bool] {
 }
 
 // veryclose compares two tensors elementwise
+
+// veryclose exposes this operation as part of the public API.
+
+// veryclose exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) veryclose[T](other &Tensor[T]) !&Tensor[bool] {
 	// TODO: Implement using nmap
@@ -185,6 +205,10 @@ pub fn (t &Tensor[T]) veryclose[T](other &Tensor[T]) !&Tensor[bool] {
 }
 
 // alike compares two tensors elementwise
+
+// alike exposes this operation as part of the public API.
+
+// alike exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) alike[T](other &Tensor[T]) !&Tensor[bool] {
 	// TODO: Implement using nmap

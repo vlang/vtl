@@ -2,6 +2,9 @@ module layers
 
 import vtl
 
+// VulkanParams defines a public data structure for this module.
+
+// VulkanParams defines a public data structure for this module.
 @[params]
 pub struct VulkanParams {}
 

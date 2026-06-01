@@ -33,6 +33,7 @@ pub fn kl_div_loss[T]() &KLDivLoss[T] {
 	}
 }
 
+// loss exposes this operation as part of the public API.
 pub fn (_ &KLDivLoss[T]) loss(input &autograd.Variable[T], target &vtl.Tensor[T]) !&autograd.Variable[T] {
 	output := internal.kl_div[T](input.value, target)!
 	mut result := input.context.variable(output)

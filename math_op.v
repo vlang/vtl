@@ -1,6 +1,10 @@
 module vtl
 
 // add adds two tensors elementwise
+
+// add exposes this operation as part of the public API.
+
+// add exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) add[T](b &Tensor[T]) !&Tensor[T] {
 	return a.nmap([b], fn [T](xs []T, _ []int) T {
@@ -17,6 +21,10 @@ pub fn (a &Tensor[T]) add[T](b &Tensor[T]) !&Tensor[T] {
 }
 
 // add adds a scalar to a tensor elementwise
+
+// add_scalar exposes this operation as part of the public API.
+
+// add_scalar exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) add_scalar[T](scalar T) !&Tensor[T] {
 	return a.map(fn [scalar] [T](x T, _ []int) T {
@@ -31,6 +39,10 @@ pub fn (a &Tensor[T]) add_scalar[T](scalar T) !&Tensor[T] {
 }
 
 // subtract subtracts two tensors elementwise
+
+// subtract exposes this operation as part of the public API.
+
+// subtract exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) subtract[T](b &Tensor[T]) !&Tensor[T] {
 	return a.nmap([b], fn [T](xs []T, _ []int) T {
@@ -47,6 +59,10 @@ pub fn (a &Tensor[T]) subtract[T](b &Tensor[T]) !&Tensor[T] {
 }
 
 // subtract subtracts a scalar to a tensor elementwise
+
+// subtract_scalar exposes this operation as part of the public API.
+
+// subtract_scalar exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) subtract_scalar[T](scalar T) !&Tensor[T] {
 	return a.map(fn [scalar] [T](x T, _ []int) T {
@@ -61,6 +77,10 @@ pub fn (a &Tensor[T]) subtract_scalar[T](scalar T) !&Tensor[T] {
 }
 
 // divide divides two tensors elementwise
+
+// divide exposes this operation as part of the public API.
+
+// divide exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) divide[T](b &Tensor[T]) !&Tensor[T] {
 	return a.nmap([b], fn [T](xs []T, _ []int) T {
@@ -75,6 +95,10 @@ pub fn (a &Tensor[T]) divide[T](b &Tensor[T]) !&Tensor[T] {
 }
 
 // divide divides a scalar to a tensor elementwise
+
+// divide_scalar exposes this operation as part of the public API.
+
+// divide_scalar exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) divide_scalar[T](scalar T) !&Tensor[T] {
 	return a.map(fn [scalar] [T](x T, _ []int) T {
@@ -87,6 +111,10 @@ pub fn (a &Tensor[T]) divide_scalar[T](scalar T) !&Tensor[T] {
 }
 
 // multiply multiplies two tensors elementwise
+
+// multiply exposes this operation as part of the public API.
+
+// multiply exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) multiply[T](b &Tensor[T]) !&Tensor[T] {
 	return a.nmap([b], fn [T](xs []T, _ []int) T {
@@ -101,6 +129,10 @@ pub fn (a &Tensor[T]) multiply[T](b &Tensor[T]) !&Tensor[T] {
 }
 
 // multiply multiplies a scalar to a tensor elementwise
+
+// multiply_scalar exposes this operation as part of the public API.
+
+// multiply_scalar exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) multiply_scalar[T](scalar T) !&Tensor[T] {
 	return a.map(fn [scalar] [T](x T, _ []int) T {

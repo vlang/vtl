@@ -6,6 +6,10 @@ import vtl
 // a number of operations. Variables that interact with each
 // other must belong to the same context, or state will be
 // lost while tracking operations done.
+
+// Context defines a public data structure for this module.
+
+// Context defines a public data structure for this module.
 @[heap]
 pub struct Context[T] {
 pub mut:
@@ -25,14 +29,17 @@ pub fn ctx[T]() &Context[T] {
 	return &Context[T]{}
 }
 
+// len exposes this operation as part of the public API.
 pub fn (ctx &Context[T]) len() int {
 	return ctx.nodes.len
 }
 
+// push exposes this operation as part of the public API.
 pub fn (mut ctx Context[T]) push(node &Node[T]) {
 	ctx.nodes << node
 }
 
+// last exposes this operation as part of the public API.
 pub fn (ctx &Context[T]) last() !&Node[T] {
 	if ctx.nodes.len == 0 {
 		return error(@FN + ': context is empty')
@@ -40,6 +47,7 @@ pub fn (ctx &Context[T]) last() !&Node[T] {
 	return ctx.nodes.last()
 }
 
+// pop exposes this operation as part of the public API.
 pub fn (mut ctx Context[T]) pop() !&Node[T] {
 	if ctx.nodes.len == 0 {
 		return error(@FN + ': context is empty')
@@ -47,16 +55,21 @@ pub fn (mut ctx Context[T]) pop() !&Node[T] {
 	return ctx.nodes.pop()
 }
 
+// ContextVariableData defines a public data structure for this module.
+
+// ContextVariableData defines a public data structure for this module.
 @[params]
 pub struct ContextVariableData {
 pub:
 	requires_grad bool = true
 }
 
+// variable exposes this operation as part of the public API.
 pub fn (ctx &Context[T]) variable(value &vtl.Tensor[T], data ContextVariableData) &Variable[T] {
 	return variable[T](ctx, value, requires_grad: data.requires_grad)
 }
 
+// str exposes this operation as part of the public API.
 pub fn (ctx &Context[T]) str() string {
 	mut str := ''
 	for i, node in ctx.nodes {
@@ -80,6 +93,7 @@ pub fn (ctx &Context[T]) str() string {
 	return str
 }
 
+// register exposes this operation as part of the public API.
 pub fn register[T](name string, gate Gate[T], result &Variable[T], parents []&Variable[T]) ! {
 	assert parents.len > 0
 	if parents.len == 0 {

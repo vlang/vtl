@@ -47,14 +47,17 @@ pub fn multihead_attention_layer[T](ctx &autograd.Context[T], embed_dim int, num
 	})
 }
 
+// output_shape exposes this operation as part of the public API.
 pub fn (layer &MultiHeadAttentionLayer[T]) output_shape() []int {
 	return [layer.embed_dim]
 }
 
+// variables exposes this operation as part of the public API.
 pub fn (layer &MultiHeadAttentionLayer[T]) variables() []&autograd.Variable[T] {
 	return [layer.w_q, layer.w_k, layer.w_v, layer.w_o]
 }
 
+// forward exposes this operation as part of the public API.
 pub fn (layer &MultiHeadAttentionLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	q := la.matmul[T](input.value, layer.w_q.value)!
 	k := la.matmul[T](input.value, layer.w_k.value)!
@@ -108,6 +111,7 @@ pub fn (layer &MultiHeadAttentionLayer[T]) forward(input &autograd.Variable[T]) 
 	return result
 }
 
+// AttentionGate defines a public data structure for this module.
 pub struct AttentionGate[T] {
 	input     &vtl.Tensor[T] = unsafe { nil }
 	w_q       &vtl.Tensor[T] = unsafe { nil }
@@ -118,6 +122,7 @@ pub struct AttentionGate[T] {
 	head_dim  int
 }
 
+// attention_gate exposes this operation as part of the public API.
 pub fn attention_gate[T](input &vtl.Tensor[T], w_q &vtl.Tensor[T], w_k &vtl.Tensor[T], w_v &vtl.Tensor[T], w_o &vtl.Tensor[T], num_heads int, head_dim int) &AttentionGate[T] {
 	return &AttentionGate[T]{
 		input:     input
@@ -130,6 +135,7 @@ pub fn attention_gate[T](input &vtl.Tensor[T], w_q &vtl.Tensor[T], w_k &vtl.Tens
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &AttentionGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	grad := payload.variable.grad
 	d_w_o := la.matmul[T](g.input.transpose([1, 0])!, grad)!
@@ -137,6 +143,7 @@ pub fn (g &AttentionGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tens
 	return [d_input, d_w_o, d_w_o, d_w_o, d_w_o]
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &AttentionGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
 	match a {

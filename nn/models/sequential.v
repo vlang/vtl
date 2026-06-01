@@ -7,6 +7,7 @@ import vtl.nn.layers
 
 fn init() {}
 
+// Sequential defines a public data structure for this module.
 pub struct Sequential[T] {
 pub mut:
 	info &SequentialInfo[T] = unsafe { nil }
@@ -199,6 +200,7 @@ pub fn (mut nn Sequential[T]) kl_div_loss() {
 	nn.info.kl_div_loss()
 }
 
+// forward exposes this operation as part of the public API.
 pub fn (mut nn Sequential[T]) forward(train &autograd.Variable[T]) !&autograd.Variable[T] {
 	mut cur := &autograd.Variable[T]{
 		context:       train.context
@@ -212,6 +214,7 @@ pub fn (mut nn Sequential[T]) forward(train &autograd.Variable[T]) !&autograd.Va
 	return cur
 }
 
+// loss exposes this operation as part of the public API.
 pub fn (mut nn Sequential[T]) loss(output &autograd.Variable[T], target &vtl.Tensor[T]) !&autograd.Variable[T] {
 	return nn.info.loss.loss(output, target)
 }

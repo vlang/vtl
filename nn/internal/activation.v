@@ -4,12 +4,20 @@ import math
 import vtl
 
 // tanh squashes a real-valued number to the range [-1, 1]
+
+// tanh exposes this operation as part of the public API.
+
+// tanh exposes this operation as part of the public API.
 @[inline]
 pub fn tanh[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 	return x.tanh()
 }
 
 // deriv_tanh computes the derivative of tanh
+
+// deriv_tanh exposes this operation as part of the public API.
+
+// deriv_tanh exposes this operation as part of the public API.
 @[inline]
 pub fn deriv_tanh[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	return gradient.nmap([cached], fn [T](vals []T, i []int) T {
@@ -19,6 +27,10 @@ pub fn deriv_tanh[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tenso
 }
 
 // sigmoid takes a real-valued number and squashes it to the range [0, 1]
+
+// sigmoid exposes this operation as part of the public API.
+
+// sigmoid exposes this operation as part of the public API.
 @[inline]
 pub fn sigmoid[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 	return x.map(fn [T](val T, i []int) T {
@@ -30,6 +42,10 @@ pub fn sigmoid[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 // deriv_sigmoid computes the derivative of sigmoid
 // sigmoid'(x) = sigmoid(x) * (1 - sigmoid(x))
 // The gate caches the sigmoid output, so vals[1] = sigmoid(x).
+
+// deriv_sigmoid exposes this operation as part of the public API.
+
+// deriv_sigmoid exposes this operation as part of the public API.
 @[inline]
 pub fn deriv_sigmoid[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	return gradient.nmap([cached], fn [T](vals []T, i []int) T {
@@ -39,6 +55,10 @@ pub fn deriv_sigmoid[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Te
 }
 
 // relu activation function
+
+// relu exposes this operation as part of the public API.
+
+// relu exposes this operation as part of the public API.
 @[inline]
 pub fn relu[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 	return x.map(fn [T](val T, i []int) T {
@@ -50,6 +70,10 @@ pub fn relu[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 }
 
 // deriv_relu computes the derivate of relu
+
+// deriv_relu exposes this operation as part of the public API.
+
+// deriv_relu exposes this operation as part of the public API.
 @[inline]
 pub fn deriv_relu[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	return gradient.nmap([cached], fn [T](vals []T, i []int) T {
@@ -63,6 +87,10 @@ pub fn deriv_relu[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tenso
 }
 
 // leaky_relu activation function
+
+// leaky_relu exposes this operation as part of the public API.
+
+// leaky_relu exposes this operation as part of the public API.
 @[inline]
 pub fn leaky_relu[T](x &vtl.Tensor[T], alpha T) &vtl.Tensor[T] {
 	return x.map(fn [alpha] [T](val T, i []int) T {
@@ -74,6 +102,10 @@ pub fn leaky_relu[T](x &vtl.Tensor[T], alpha T) &vtl.Tensor[T] {
 }
 
 // deriv_leaky_relu computes the derivative of leaky_relu
+
+// deriv_leaky_relu exposes this operation as part of the public API.
+
+// deriv_leaky_relu exposes this operation as part of the public API.
 @[inline]
 pub fn deriv_leaky_relu[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T], alpha T) !&vtl.Tensor[T] {
 	return gradient.nmap([cached], fn [alpha] [T](vals []T, i []int) T {
@@ -87,6 +119,10 @@ pub fn deriv_leaky_relu[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T], alpha
 }
 
 // elu activation function
+
+// elu exposes this operation as part of the public API.
+
+// elu exposes this operation as part of the public API.
 @[inline]
 pub fn elu[T](x &vtl.Tensor[T], alpha T) &vtl.Tensor[T] {
 	return x.map(fn [alpha] [T](val T, i []int) T {
@@ -100,6 +136,10 @@ pub fn elu[T](x &vtl.Tensor[T], alpha T) &vtl.Tensor[T] {
 // deriv_elu computes the derivative of elu
 // For x >= 0: d/dx = 1  → upstream * 1
 // For x <  0: d/dx = alpha * exp(x) = elu(x) + alpha = cached + alpha
+
+// deriv_elu exposes this operation as part of the public API.
+
+// deriv_elu exposes this operation as part of the public API.
 @[inline]
 pub fn deriv_elu[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T], alpha T) !&vtl.Tensor[T] {
 	return gradient.nmap([cached], fn [alpha] [T](vals []T, i []int) T {
@@ -114,6 +154,10 @@ pub fn deriv_elu[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T], alpha T) !&v
 
 // gelu applies the Gaussian Error Linear Unit activation.
 // GELU(x) = 0.5 * x * (1 + tanh(sqrt(2/pi) * (x + 0.044715 * x^3)))
+
+// gelu exposes this operation as part of the public API.
+
+// gelu exposes this operation as part of the public API.
 @[inline]
 pub fn gelu[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 	return x.map(fn [T](val T, i []int) T {
@@ -132,6 +176,10 @@ pub fn gelu[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 // d/dx GELU(x) = 0.5 * (1 + tanh(z)) + 0.5 * x * sech^2(z) * dz/dx
 // where z = sqrt(2/pi) * (x + 0.044715 * x^3)
 // and dz/dx = sqrt(2/pi) * (1 + 3 * 0.044715 * x^2)
+
+// deriv_gelu exposes this operation as part of the public API.
+
+// deriv_gelu exposes this operation as part of the public API.
 @[inline]
 pub fn deriv_gelu[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	return gradient.nmap([cached], fn [T](vals []T, i []int) T {
@@ -150,6 +198,10 @@ pub fn deriv_gelu[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tenso
 }
 
 // swish applies the Swish activation: x * sigmoid(beta * x), beta=1.
+
+// swish exposes this operation as part of the public API.
+
+// swish exposes this operation as part of the public API.
 @[inline]
 pub fn swish[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 	return x.map(fn [T](val T, i []int) T {
@@ -163,6 +215,10 @@ pub fn swish[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 // deriv_swish computes the derivative of Swish(x) = x * sigmoid(x).
 // d/dx Swish = sigmoid(x) + x * sigmoid(x) * (1 - sigmoid(x))
 //            = sigmoid(x) * (1 + x * (1 - sigmoid(x)))
+
+// deriv_swish exposes this operation as part of the public API.
+
+// deriv_swish exposes this operation as part of the public API.
 @[inline]
 pub fn deriv_swish[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	return gradient.nmap([cached], fn [T](vals []T, i []int) T {
@@ -177,6 +233,10 @@ pub fn deriv_swish[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tens
 
 // mish applies the Mish activation: x * tanh(softplus(x)).
 // softplus(x) = log(1 + exp(x))
+
+// mish exposes this operation as part of the public API.
+
+// mish exposes this operation as part of the public API.
 @[inline]
 pub fn mish[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 	return x.map(fn [T](val T, i []int) T {
@@ -190,6 +250,10 @@ pub fn mish[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 
 // deriv_mish computes the derivative of Mish(x) = x * tanh(softplus(x)).
 // d/dx Mish = tanh(softplus(x)) + x * (1 - tanh^2(softplus(x))) * sigmoid(x)
+
+// deriv_mish exposes this operation as part of the public API.
+
+// deriv_mish exposes this operation as part of the public API.
 @[inline]
 pub fn deriv_mish[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	return gradient.nmap([cached], fn [T](vals []T, i []int) T {
@@ -213,6 +277,10 @@ pub fn deriv_mish[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tenso
 // We implement the fast "jacobian * grad" version: grad_out * J^T gives
 //   dL/dx_k = sum_i grad_out_i * ds_i/dx_k = grad_out_i * s_i * (delta_ik - s_k)
 //           = s_k * (grad_out_k - sum_i grad_out_i * s_i)
+
+// deriv_softmax exposes this operation as part of the public API.
+
+// deriv_softmax exposes this operation as part of the public API.
 @[inline]
 pub fn deriv_softmax[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], dim int) !&vtl.Tensor[T] {
 	shape := input.shape
@@ -268,6 +336,10 @@ pub fn deriv_softmax[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], dim int) 
 // the labels and the predictions.
 // Uses the numerically stable logsumexp formulation (Arraymancer source of truth):
 //   loss = mean( -y*x + max(x,0) + log1p(exp(-|x|)) )
+
+// sigmoid_cross_entropy exposes this operation as part of the public API.
+
+// sigmoid_cross_entropy exposes this operation as part of the public API.
 @[inline]
 pub fn sigmoid_cross_entropy[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	batch_size := input.shape[0]
@@ -285,6 +357,10 @@ pub fn sigmoid_cross_entropy[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) !&v
 }
 
 // mse squared error between the labels and the predictions
+
+// mse exposes this operation as part of the public API.
+
+// mse exposes this operation as part of the public API.
 @[inline]
 pub fn mse[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	sum := input.nreduce([target], vtl.cast[T](0), fn [T](acc T, vals []T, i []int) T {
@@ -308,6 +384,10 @@ pub fn mse[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Tensor[T] {
 //     lse_i = log( sum_j exp(logit_ij - max_i) ) + max_i
 //     loss_i = lse_i - sum_j(target_ij * logit_ij)
 //   mean_loss = mean over batch
+
+// softmax_cross_entropy exposes this operation as part of the public API.
+
+// softmax_cross_entropy exposes this operation as part of the public API.
 @[inline]
 pub fn softmax_cross_entropy[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	batch_size := input.shape[0]

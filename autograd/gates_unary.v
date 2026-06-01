@@ -9,18 +9,21 @@ pub:
 	a &Variable[T] = unsafe { nil }
 }
 
+// log_gate exposes this operation as part of the public API.
 pub fn log_gate[T](a &Variable[T]) &LogGate[T] {
 	return &LogGate[T]{
 		a: a
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &LogGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	r0 := gradient.divide[T](g.a.value)!
 	return [r0]
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &LogGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {
@@ -42,12 +45,14 @@ pub:
 	a &Variable[T] = unsafe { nil }
 }
 
+// abs_gate exposes this operation as part of the public API.
 pub fn abs_gate[T](a &Variable[T]) &AbsGate[T] {
 	return &AbsGate[T]{
 		a: a
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &AbsGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	eps := vtl.cast[T](1e-8)
@@ -60,6 +65,7 @@ pub fn (g &AbsGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0]
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &AbsGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {
@@ -81,12 +87,14 @@ pub:
 	a &Variable[T] = unsafe { nil }
 }
 
+// sqrt_gate exposes this operation as part of the public API.
 pub fn sqrt_gate[T](a &Variable[T]) &SqrtGate[T] {
 	return &SqrtGate[T]{
 		a: a
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &SqrtGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	// d/dx sqrt(x) = 1/(2*sqrt(x)) = gradient * (0.5 / sqrt(x))
@@ -96,6 +104,7 @@ pub fn (g &SqrtGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0]
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &SqrtGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {
@@ -117,12 +126,14 @@ pub:
 	cache &vtl.Tensor[T] = unsafe { nil }
 }
 
+// tanh_gate exposes this operation as part of the public API.
 pub fn tanh_gate[T](cache &vtl.Tensor[T]) &TanhGate[T] {
 	return &TanhGate[T]{
 		cache: cache
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &TanhGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	r0 := gradient.nmap([g.cache], fn [T](vals []T, _ []int) T {
@@ -131,6 +142,7 @@ pub fn (g &TanhGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0]
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &TanhGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {
@@ -154,6 +166,7 @@ pub:
 	a       &vtl.Tensor[T] = unsafe { nil }
 }
 
+// clamp_gate exposes this operation as part of the public API.
 pub fn clamp_gate[T](min_val T, max_val T, a &vtl.Tensor[T]) &ClampGate[T] {
 	return &ClampGate[T]{
 		min_val: min_val
@@ -162,6 +175,7 @@ pub fn clamp_gate[T](min_val T, max_val T, a &vtl.Tensor[T]) &ClampGate[T] {
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &ClampGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	input := g.a
@@ -176,6 +190,7 @@ pub fn (g &ClampGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0]
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &ClampGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {

@@ -2,12 +2,19 @@ module storage
 
 import vsl.cuda
 
+// CudaParams defines a public data structure for this module.
+
+// CudaParams defines a public data structure for this module.
 @[params]
 pub struct CudaParams {
 	device_id int = 0
 }
 
 // CudaStorage holds tensor data on GPU memory
+
+// CudaStorage defines a public data structure for this module.
+
+// CudaStorage defines a public data structure for this module.
 @[heap]
 pub struct CudaStorage[T] {
 pub mut:
@@ -48,6 +55,10 @@ pub fn (cpu &CpuStorage[T]) cuda(params CudaParams) !&CudaStorage[T] {
 }
 
 // from_cuda returns the same CudaStorage (identity function for chaining)
+
+// cuda exposes this operation as part of the public API.
+
+// cuda exposes this operation as part of the public API.
 @[inline]
 pub fn (storage &CudaStorage[T]) cuda(params CudaParams) !&CudaStorage[T] {
 	return storage
