@@ -21,7 +21,7 @@ or `v test vtl` can spike **RAM into the 10–20+ GB** range during compilation 
 | `VTL_CUDA_BACKWARD` | off | Phase 3: cuBLAS GEMM for Linear gate backward. |
 | `VTL_CUDA_OPTIMIZER` | off | Phase 4: cuBLAS moment updates for Adam. |
 | `VTL_TEST_CUDA` | off | Set to `1` to run GPU tests (`linear_cuda_test.v`, `device_session_test.v`). |
-| `VTL_USE_VULKAN` | off | f32 Linear forward via Vulkan (`-d vulkan` build). |
+| `VTL_USE_VULKAN` | off | f32 Linear forward/backward via Vulkan (`-d vulkan` build). Use `v -prod` for GPU (debug instance crash on V 0.5.1). |
 | `VTL_TEST_VULKAN` | off | Optional Vulkan integration tests. |
 | `VJOBS` | (V auto) | Cap parallel compile jobs, e.g. `VJOBS=2`. |
 

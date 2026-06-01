@@ -93,16 +93,16 @@ pub fn (t &VulkanTensor[T]) is_contiguous() bool {
 	return t.is_row_major_contiguous() || t.is_col_major_contiguous()
 }
 
-// relu_vulkan applies ReLU in-place on the GPU buffer.
-// T must be f32.
+// relu applies ReLU in-place on the GPU buffer.
 pub fn (t &VulkanTensor[f32]) relu() ! {
-	vulkan.relu(t.data.data, t.data.data)!
+	dev := t.data.data.device
+	vulkan.relu(dev, t.data.data, t.data.data)!
 }
 
-// sigmoid_vulkan applies sigmoid in-place on the GPU buffer.
-// T must be f32.
+// sigmoid applies sigmoid in-place on the GPU buffer.
 pub fn (t &VulkanTensor[f32]) sigmoid() ! {
-	vulkan.sigmoid(t.data.data, t.data.data)!
+	dev := t.data.data.device
+	vulkan.sigmoid(dev, t.data.data, t.data.data)!
 }
 
 // gemm_vulkan computes dst = a * b (row-major, no transpose).
@@ -111,24 +111,60 @@ pub fn gemm_vulkan(dst &VulkanTensor[f32], a &VulkanTensor[f32], b &VulkanTensor
 	if a.rank() != 2 || b.rank() != 2 || dst.rank() != 2 {
 		return error('gemm_vulkan: all tensors must be rank-2 matrices')
 	}
+	dev := a.data.data.device
 	m := u32(a.shape[0])
 	k := u32(a.shape[1])
 	n := u32(b.shape[1])
-	vulkan.gemm(dst.data.data, a.data.data, b.data.data, m, n, k)!
+	vulkan.gemm(dev, dst.data.data, a.data.data, b.data.data, m, n, k)!
 }
 
 // gemv_vulkan computes y = A * x (matrix-vector product).
-// Shapes: a is [m, n], x is [n], y is [m].
 pub fn gemv_vulkan(y &VulkanTensor[f32], a &VulkanTensor[f32], x &VulkanTensor[f32]) ! {
 	if a.rank() != 2 || x.rank() != 1 || y.rank() != 1 {
 		return error('gemv_vulkan: a must be rank-2, x and y must be rank-1')
 	}
+	dev := a.data.data.device
 	m := a.shape[0]
 	n := a.shape[1]
-	vulkan.gemv(y.data.data, a.data.data, x.data.data, m, n)!
+	vulkan.gemv(dev, y.data.data, a.data.data, x.data.data, m, n)!
 }
 
 // vector_add_vulkan computes dst = a + b element-wise.
 pub fn vector_add_vulkan(dst &VulkanTensor[f32], a &VulkanTensor[f32], b &VulkanTensor[f32]) ! {
-	vulkan.vector_add(dst.data.data, a.data.data, b.data.data)!
+	dev := a.data.data.device
+	vulkan.vector_add(dev, dst.data.data, a.data.data, b.data.data)!
+}
+
+// vulkan_tensor_zeros_f32 allocates a zero-filled f32 tensor on the given Vulkan device.
+pub fn vulkan_tensor_zeros_f32(shape []int, dev &vulkan.Device) !&VulkanTensor[f32] {
+	mut t := vtl.zeros[f32](shape)
+	return t.vulkan(storage.vulkan_params_for_device(dev))!
+}
+
+// t transposes a 2-D Vulkan matrix (row-major).
+pub fn (t &VulkanTensor[f32]) t() !&VulkanTensor[f32] {
+	if t.rank() != 2 {
+		return error('VulkanTensor.t: rank must be 2')
+	}
+	dev := t.data.data.device
+	host := t.cpu()!
+	th := host.t()!
+	return th.vulkan(storage.vulkan_params_for_device(dev))!
+}
+
+// gemm computes dst = self * b (row-major GEMM).
+pub fn (a &VulkanTensor[f32]) gemm(b &VulkanTensor[f32]) !&VulkanTensor[f32] {
+	if a.rank() != 2 || b.rank() != 2 {
+		return error('VulkanTensor.gemm: operands must be rank-2')
+	}
+	m := a.shape[0]
+	k := a.shape[1]
+	n := b.shape[1]
+	if k != b.shape[0] {
+		return error('VulkanTensor.gemm: inner dimensions mismatch')
+	}
+	dev := a.data.data.device
+	mut dst := vulkan_tensor_zeros_f32([m, n], dev)!
+	gemm_vulkan(dst, a, b)!
+	return dst
 }

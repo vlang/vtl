@@ -90,7 +90,7 @@ pub fn (layer &Conv2DLayer[T]) forward(input &autograd.Variable[T]) !&autograd.V
 	if input.requires_grad || layer.weight.requires_grad || layer.bias.requires_grad {
 		gate := conv2d_gate[T](input.value, layer.weight.value, layer.bias.value,
 			layer.kernel_size, layer.config)
-		gate.cache(mut result, input)!
+		gate.cache(mut result, input, layer.weight, layer.bias)!
 	}
 	return result
 }
@@ -125,13 +125,34 @@ pub fn (g &Conv2DGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[
 }
 
 pub fn (g &Conv2DGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
-	a := args[0]
-	match a {
+	if args.len < 3 {
+		return error('Conv2DGate.cache: expected input, weight, bias variables')
+	}
+	input := args[0]
+	weight := args[1]
+	bias := args[2]
+	match input {
 		autograd.Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
-			autograd.register[T]('Conv2D', g, result, [a])!
+			match weight {
+				autograd.Variable[T] {
+					match bias {
+						autograd.Variable[T] {
+							result.grad = vtl.zeros_like[T](result.value)
+							result.requires_grad = true
+							autograd.register[T]('Conv2D', g, result, [input, weight, bias])!
+						}
+						else {
+							return error('Conv2DGate: bias must be a Variable')
+						}
+					}
+				}
+				else {
+					return error('Conv2DGate: weight must be a Variable')
+				}
+			}
 		}
-		else {}
+		else {
+			return error('Conv2DGate: input must be a Variable')
+		}
 	}
 }
