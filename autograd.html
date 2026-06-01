@@ -171,6 +171,14 @@
 
 </section>
 
+		<section id="cuda_backward_enabled" class="doc-node">
+			<div class="title"><h2>fn cuda_backward_enabled <a href="#cuda_backward_enabled">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/gpu_config.v#L14"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">cuda_backward_enabled</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">bool</span></code></pre>
+<p>cuda_backward_enabled runs Linear gate GEMMs on GPU (Phase 3).</p>
+
+</section>
+
 		<section id="divide_gate" class="doc-node">
 			<div class="title"><h2>fn divide_gate <a href="#divide_gate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/gates_basic.v#L126"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -200,6 +208,24 @@
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token function">gpu_activations_enabled</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">bool</span></code></pre>
 <p>gpu_activations_enabled is true when Phase 2 device-resident forwards are allowed. Requires <code>VTL_USE_CUDA=1</code>, <code>VTL_GPU_ACTIVATIONS=1</code>, and build flag <code>-d cuda</code>.</p>
+
+</section>
+
+		<section id="linear_backward_f64" class="doc-node">
+			<div class="title"><h2>fn linear_backward_f64 <a href="#linear_backward_f64">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/linear_backward_cuda_notd_cuda.v#L5"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">linear_backward_f64</span><span class="token punctuation">(</span>grad <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> weight <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+	bias_needs_grad <span class="token builtin">bool</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> session DeviceSession<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="linear_backward_f64_cpu" class="doc-node">
+			<div class="title"><h2>fn linear_backward_f64_cpu <a href="#linear_backward_f64_cpu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/linear_backward_f64.v#L7"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">linear_backward_f64_cpu</span><span class="token punctuation">(</span>grad <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+	weight <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> bias_needs_grad <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
+<p>linear_backward_f64_cpu implements Linear gate gradients on CPU.</p>
 
 </section>
 
@@ -1363,7 +1389,7 @@ y <span class="token operator">:=</span> x<span class="token punctuation">.</spa
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 1 Jun 2026 00:21:24</div>
+						<div class="footer">Powered by vdoc. Generated on: 1 Jun 2026 00:40:17</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_autograd">README</a></li>
 <li class="open"><a href="#abs_gate">fn abs_gate</a>        <ul>
@@ -1384,6 +1410,9 @@ y <span class="token operator">:=</span> x<span class="token punctuation">.</spa
 <li class="open"><a href="#ctx">fn ctx</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#cuda_backward_enabled">fn cuda_backward_enabled</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#divide_gate">fn divide_gate</a>        <ul>
 </ul>
 </li>
@@ -1394,6 +1423,12 @@ y <span class="token operator">:=</span> x<span class="token punctuation">.</spa
 </ul>
 </li>
 <li class="open"><a href="#gpu_activations_enabled">fn gpu_activations_enabled</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#linear_backward_f64">fn linear_backward_f64</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#linear_backward_f64_cpu">fn linear_backward_f64_cpu</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#linear_forward_f64_cpu">fn linear_forward_f64_cpu</a>        <ul>
