@@ -39,7 +39,7 @@
 - [x] Issue [#62](https://github.com/vlang/vtl/issues/62) — Phase 5: OpenCL Backend (VCL unified into Compute abstraction)
 
 ### Phase 6 — ARM GPU Support
-- [x] Issue [#63](https://github.com/vlang/vtl/issues/63) — Phase 6: ARM GPU Support (Android, iOS, Embedded)
+- [ ] Issue [#63](https://github.com/vlang/vtl/issues/63) — Phase 6: ARM GPU Support (Android, iOS, Embedded)
 
 ### Phase 7+ — Performance Engineering
 - [x] Issue [#64](https://github.com/vlang/vtl/issues/64) — Phase 7+: Kernel Fusion, Mixed Precision, Computation Graph Optimization
@@ -75,7 +75,7 @@
 
 ### Phase E — Example Consolidation
 - [x] `nn_cifar10_cuda` — opt-in CUDA smoke (`VTL_USE_CUDA=1`, `-d cuda`)
-- [x] `nn_cifar10_vulkan` — f32 smoke + `linear_forward_vulkan` check
+- [x] `nn_cifar10_vulkan` — f32 smoke with Vulkan Linear, Conv2D, ReLU/Sigmoid, Adam
 - [x] Root `README.md` passes `v check-md -hide-warnings`
 - [x] All example READMEs pass `v check-md -hide-warnings`
 
@@ -98,7 +98,7 @@ See [docs/DEVICE_MEMORY.md](docs/DEVICE_MEMORY.md).
 | P2 | Label `full-ml` for optional heavy CI workflow |
 | P2 | Vulkan persistent GPU activation chain (optional; per-layer GPU activations work today) |
 
-**Project board:** [vlang org project #8](https://github.com/orgs/vlang/projects/8)
+**Maintainer project board:** [vlang org project #8](https://github.com/orgs/vlang/projects/8) (may require access)
 
 ---
 
@@ -205,4 +205,4 @@ vtl/
 
 ---
 
-*Last updated: 2026-05-31* · Board: [project #8](https://github.com/orgs/vlang/projects/8)
+*Last updated: 2026-05-31* · Maintainer board: [project #8](https://github.com/orgs/vlang/projects/8)

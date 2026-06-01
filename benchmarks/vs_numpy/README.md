@@ -35,3 +35,15 @@ python3 vtl/benchmarks/vs_numpy/pytorch_baseline.py autograd
 - Use the same matrix sizes when comparing manually.
 - Report GFLOPS from the VTL script output for PR comments.
 - CUDA paths require `VTL_USE_CUDA=1` and `-d cuda` where applicable.
+- Vulkan paths require `VTL_USE_VULKAN=1`, `-d vulkan`, and usually `v -prod`.
+- Autograd comparisons use PyTorch as the reference; record CPU/GPU model and flags.
+
+## Suggested report fields
+
+| Field | Example |
+|-------|---------|
+| Operation | `matmul`, `conv2d`, `autograd` |
+| Backend | CPU, CUDA, Vulkan |
+| Shape | Matrix size or model dimensions |
+| V flags | `-d cuda`, `-d vulkan`, `-prod` |
+| Baseline | NumPy or PyTorch timing |
