@@ -119,7 +119,7 @@
 					<div class="doc-content">
 								<section id="readme_autograd" class="doc-node">
 			<div class="title"><h1> autograd <a href="#readme_autograd">#</a></h1></div>
-<p>Node is a member of a computational graph that contains a reference to a gate, as well as the parents of the operation and the payload that resulted from the operation. Payload is a simple wrapper around a Variable.  It is only abstracted out to be a bit more explicit that it is being passed around through an operation</p>
+<p>Node is a member of a computational graph that contains a reference to a gate, as well as the parents of the operation and the payload that resulted from the operation. Payload is a simple wrapper around a Variable.  It is only abstracted out to be a bit more explicit that it is being passed around through an operation Stubs when not built with <code>-d cuda</code>.</p>
 
 </section>
 
@@ -195,8 +195,16 @@
 
 </section>
 
+		<section id="gpu_activations_enabled" class="doc-node">
+			<div class="title"><h2>fn gpu_activations_enabled <a href="#gpu_activations_enabled">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/gpu_config.v#L8"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">gpu_activations_enabled</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">bool</span></code></pre>
+<p>gpu_activations_enabled is true when Phase 2 device-resident forwards are allowed. Requires <code>VTL_USE_CUDA=1</code>, <code>VTL_GPU_ACTIVATIONS=1</code>, and build flag <code>-d cuda</code>.</p>
+
+</section>
+
 		<section id="linear_forward_f64_cpu" class="doc-node">
-			<div class="title"><h2>fn linear_forward_f64_cpu <a href="#linear_forward_f64_cpu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/device_session.v#L25"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn linear_forward_f64_cpu <a href="#linear_forward_f64_cpu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/device_session.v#L27"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token function">linear_forward_f64_cpu</span><span class="token punctuation">(</span>x <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> weights <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> bias <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
 <p>linear_forward_f64_cpu is the CPU fallback used by all builds. Uses an explicit Wᵀ buffer (weights.t() is a non-contiguous view; matmul copy is unsafe).</p>
@@ -236,7 +244,7 @@
 </section>
 
 		<section id="new_device_session" class="doc-node">
-			<div class="title"><h2>fn new_device_session <a href="#new_device_session">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/device_session.v#L19"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn new_device_session <a href="#new_device_session">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/device_session.v#L21"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token function">new_device_session</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>DeviceSession</code></pre>
 <p>new_device_session creates an empty session (CUDA init is build-specific).</p>
@@ -340,7 +348,7 @@
 </section>
 
 		<section id="variable" class="doc-node">
-			<div class="title"><h2>fn variable <a href="#variable">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/variable.v#L39"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn variable <a href="#variable">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/variable.v#L41"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>context <span class="token operator">&amp;</span>Context<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> value <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> data VariableData<span class="token punctuation">)</span> <span class="token operator">&amp;</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 <p>variable</p>
@@ -757,7 +765,7 @@ y <span class="token operator">:=</span> x<span class="token punctuation">.</spa
 </section>
 
 		<section id="Variable[T].backprop" class="doc-node">
-			<div class="title"><h2>fn (Variable[T]) backprop <a href="#Variable[T].backprop">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/variable.v#L74"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (Variable[T]) backprop <a href="#Variable[T].backprop">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/variable.v#L76"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> v Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> backprop<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
 <p>backprop Back propagates an operation along a computational graph. This operation will destroy the operational graph, populating the gradients for all variables that are predecessors of the Variable this is called on. Even if this is called on the first node in a graph, it will destroy all descendents of this variable stored by the Context</p>
@@ -803,7 +811,7 @@ y <span class="token operator">:=</span> x<span class="token punctuation">.</spa
 </section>
 
 		<section id="Variable[T].is_grad_needed" class="doc-node">
-			<div class="title"><h2>fn (Variable[T]) is_grad_needed <a href="#Variable[T].is_grad_needed">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/variable.v#L59"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (Variable[T]) is_grad_needed <a href="#Variable[T].is_grad_needed">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/variable.v#L61"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>v <span class="token operator">&amp;</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">is_grad_needed</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">bool</span></code></pre>
 
@@ -872,7 +880,7 @@ y <span class="token operator">:=</span> x<span class="token punctuation">.</spa
 </section>
 
 		<section id="Variable[T].slice" class="doc-node">
-			<div class="title"><h2>fn (Variable[T]) slice <a href="#Variable[T].slice">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/variable.v#L49"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (Variable[T]) slice <a href="#Variable[T].slice">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/variable.v#L51"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>v <span class="token operator">&amp;</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> slice<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>idx <span class="token punctuation">...</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 
@@ -880,7 +888,7 @@ y <span class="token operator">:=</span> x<span class="token punctuation">.</spa
 </section>
 
 		<section id="Variable[T].slice_hilo" class="doc-node">
-			<div class="title"><h2>fn (Variable[T]) slice_hilo <a href="#Variable[T].slice_hilo">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/variable.v#L54"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (Variable[T]) slice_hilo <a href="#Variable[T].slice_hilo">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/variable.v#L56"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>v <span class="token operator">&amp;</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> slice_hilo<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>idx1 <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> idx2 <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
 
@@ -904,7 +912,7 @@ y <span class="token operator">:=</span> x<span class="token punctuation">.</spa
 </section>
 
 		<section id="Variable[T].str" class="doc-node">
-			<div class="title"><h2>fn (Variable[T]) str <a href="#Variable[T].str">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/variable.v#L63"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (Variable[T]) str <a href="#Variable[T].str">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/variable.v#L65"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>v <span class="token operator">&amp;</span>Variable<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">str</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">string</span></code></pre>
 
@@ -955,6 +963,30 @@ y <span class="token operator">:=</span> x<span class="token punctuation">.</spa
 y <span class="token operator">:=</span> x<span class="token punctuation">.</span>transpose_op<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token operator">!</span>
 <span class="token comment">// y.value.shape = [3, 2]</span></code></pre>
 </section>
+</section>
+
+		<section id="Variable[f64].clear_gpu_activation" class="doc-node">
+			<div class="title"><h2>fn (Variable[f64]) clear_gpu_activation <a href="#Variable[f64].clear_gpu_activation">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/variable_gpu_notd_cuda.v#L5"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> v Variable<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">clear_gpu_activation</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+
+
+</section>
+
+		<section id="Variable[f64].set_gpu_activation" class="doc-node">
+			<div class="title"><h2>fn (Variable[f64]) set_gpu_activation <a href="#Variable[f64].set_gpu_activation">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/variable_gpu_notd_cuda.v#L7"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> v Variable<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">set_gpu_activation</span><span class="token punctuation">(</span>_ <span class="token builtin">voidptr</span><span class="token punctuation">)</span></code></pre>
+
+
+</section>
+
+		<section id="Variable[f64].take_gpu_activation_input" class="doc-node">
+			<div class="title"><h2>fn (Variable[f64]) take_gpu_activation_input <a href="#Variable[f64].take_gpu_activation_input">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/variable_gpu_notd_cuda.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> v Variable<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">take_gpu_activation_input</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">voidptr</span></code></pre>
+
+
 </section>
 
 		<section id="AbsGate" class="doc-node">
@@ -1050,12 +1082,22 @@ y <span class="token operator">:=</span> x<span class="token punctuation">.</spa
 <code><span class="token keyword">struct</span> <span class="token symbol">DeviceSession</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span> <span class="token keyword">mut</span><span class="token punctuation">:</span>
 	enabled <span class="token builtin">bool</span>
+	<span class="token comment">// Phase 2: opaque GPU activation chain (`DeviceGpuChain` in CUDA builds).</span>
+	gpu_chain <span class="token builtin">voidptr</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
 	<span class="token comment">// Staging buffers for cuBLAS GEMM (column-major staging, row-major output)</span>
 	gemm_x_col   <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span>
 	gemm_w_col   <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span>
 	gemm_out_row <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span>
 <span class="token punctuation">}</span></code></pre>
 <p>DeviceSession holds reusable staging buffers for CUDA forward ops on one Context. Activations remain CPU-backed for autograd; this only reduces alloc/copy overhead.</p>
+
+</section>
+
+		<section id="DeviceSession.bind_gpu_activation_to_variable" class="doc-node">
+			<div class="title"><h2>fn (DeviceSession) bind_gpu_activation_to_variable <a href="#DeviceSession.bind_gpu_activation_to_variable">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/variable_gpu_notd_cuda.v#L13"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> s DeviceSession<span class="token punctuation">)</span> <span class="token function">bind_gpu_activation_to_variable</span><span class="token punctuation">(</span><span class="token keyword">mut</span> v Variable<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+
 
 </section>
 
@@ -1070,7 +1112,8 @@ y <span class="token operator">:=</span> x<span class="token punctuation">.</spa
 		<section id="DeviceSession.linear_forward_f64" class="doc-node">
 			<div class="title"><h2>fn (DeviceSession) linear_forward_f64 <a href="#DeviceSession.linear_forward_f64">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/device_session_notd_cuda.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> s DeviceSession<span class="token punctuation">)</span> <span class="token function">linear_forward_f64</span><span class="token punctuation">(</span>x <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> weights <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> bias <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> s DeviceSession<span class="token punctuation">)</span> <span class="token function">linear_forward_f64</span><span class="token punctuation">(</span>x <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> weights <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+	bias <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> _input_gpu <span class="token builtin">voidptr</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
 <p>linear_forward_f64 without CUDA build always errors so callers fall back to CPU.</p>
 
 </section>
@@ -1301,13 +1344,15 @@ y <span class="token operator">:=</span> x<span class="token punctuation">.</spa
 	<span class="token comment">// otherwise it will act similar to a vtl.Tensor, only calculating</span>
 	<span class="token comment">// forward operations</span>
 	requires_grad <span class="token builtin">bool</span>
+	<span class="token comment">// Phase 2: optional forward-only GPU activation (`&amp;vtl.CudaTensor[f64]` when `-d cuda`).</span>
+	gpu_activation <span class="token builtin">voidptr</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
 <span class="token punctuation">}</span></code></pre>
 <p>Variable is an abstraction of a vtl.Tensor that tracks the operations done to the vtl.Tensor. It also keeps track of the gradient of the operation if a Variable needs to backpropagate. This is the fundamental object used in automatic differentiation, as well as the neural network aspects of VTL</p>
 
 </section>
 
 		<section id="VariableData" class="doc-node">
-			<div class="title"><h2>struct VariableData <a href="#VariableData">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/variable.v#L34"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>struct VariableData <a href="#VariableData">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd/variable.v#L36"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <div class="attributes"><div class="attribute">@[params]</div></div>
 <pre class="signature">
 <code><span class="token keyword">struct</span> <span class="token symbol">VariableData</span> <span class="token punctuation">{</span>
@@ -1318,7 +1363,7 @@ y <span class="token operator">:=</span> x<span class="token punctuation">.</spa
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 1 Jun 2026 00:18:15</div>
+						<div class="footer">Powered by vdoc. Generated on: 1 Jun 2026 00:21:24</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_autograd">README</a></li>
 <li class="open"><a href="#abs_gate">fn abs_gate</a>        <ul>
@@ -1346,6 +1391,9 @@ y <span class="token operator">:=</span> x<span class="token punctuation">.</spa
 </ul>
 </li>
 <li class="open"><a href="#gate_backward">fn gate_backward</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#gpu_activations_enabled">fn gpu_activations_enabled</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#linear_forward_f64_cpu">fn linear_forward_f64_cpu</a>        <ul>
@@ -1545,6 +1593,12 @@ y <span class="token operator">:=</span> x<span class="token punctuation">.</spa
 <li><a href="#Variable[T].transpose_op">fn transpose_op</a></li>
 </ul>
 </li>
+<li class="open"><a href="#Variable[f64].clear_gpu_activation">type Variable[f64]</a>        <ul>
+<li><a href="#Variable[f64].clear_gpu_activation">fn clear_gpu_activation</a></li>
+<li><a href="#Variable[f64].set_gpu_activation">fn set_gpu_activation</a></li>
+<li><a href="#Variable[f64].take_gpu_activation_input">fn take_gpu_activation_input</a></li>
+</ul>
+</li>
 <li class="open"><a href="#AbsGate">struct AbsGate</a>        <ul>
 </ul>
 </li>
@@ -1567,6 +1621,7 @@ y <span class="token operator">:=</span> x<span class="token punctuation">.</spa
 </ul>
 </li>
 <li class="open"><a href="#DeviceSession">struct DeviceSession</a>        <ul>
+<li><a href="#DeviceSession.bind_gpu_activation_to_variable">fn bind_gpu_activation_to_variable</a></li>
 <li><a href="#DeviceSession.init_device">fn init_device</a></li>
 <li><a href="#DeviceSession.linear_forward_f64">fn linear_forward_f64</a></li>
 </ul>
