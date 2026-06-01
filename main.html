@@ -120,73 +120,32 @@
 			<div class="doc-scrollview" tabindex="-1" id="main-content">
 				<div class="doc-container">
 					<div class="doc-content">
-								<section id="readme_main" class="doc-node">
-			<div class="title"><h1> main <a href="#readme_main">#</a></h1></div>
-<h1 id="vtlvandermont">vtl_vandermont</h1>
-<p>Builds a 5×5 Vandermonde matrix, then demonstrates tensor slicing and in-place assignment.</p>
-<h2 id="what-it-demonstrates">What it demonstrates</h2>
-<ul>
-<li>Creating a 2-D tensor from a nested V array with <code>vtl.from_2d</code></li>
-<li>Slicing a sub-tensor by row/column range with <code>.slice_hilo()</code></li>
-<li>Inspecting tensor shape with <code>.shape</code></li>
-<li>Assigning into a slice with <code>.assign()</code> (modifies the underlying tensor)</li></ul>
-<h2 id="how-to-run">How to run</h2>
-<pre><code class="language-sh">v run main<span class="token punctuation">.</span>v</code></pre>
-<h2 id="expected-output">Expected output</h2>
-<pre><code>[[   1,    1,    1,    1,    1],
- [   2,    4,    8,   16,   32],
- [   3,    9,   27,   81,  243],
- [   4,   16,   64,  256, 1024],
- [   5,   25,  125,  625, 3125]]
-[5, 5]
-slice:
-[[ 27,   81],
- [ 64,  256]]
-[2, 2]
-span slice:
-[[ 4,   16,   64,  256, 1024],
- [ 5,   25,  125,  625, 3125]]
-[2, 5]
-slice until:
-[[1, 1, 1, 1, 1],
- [2, 4, 8, 16, 32],
- [3, 9, 27, 81, 243]]
-[3, 5]
-assign:
-[[   1,    1,    1,    1,    1],
- [   2,    4,    8,   16,   32],
- [   3,    9,  999,  999,  243],
- [   4,   16,  999,  999, 1024],
- [   5,   25,  125,  625, 3125]]
-</code></pre>
-<h2 id="key-api">Key API</h2>
-<table>
-<thead>
-<tr>
-<th>Function / method</th>
-<th>Description</th></tr></thead>
-<tbody>
-<tr>
-<td><code>vtl.from_2d(arr)</code></td>
-<td>Create a 2-D tensor from a nested V array</td></tr>
-<tr>
-<td><code>t.slice_hilo(rows, cols)</code></td>
-<td>Slice by [start, end) row and column ranges</td></tr>
-<tr>
-<td><code>t.shape</code></td>
-<td><code>[]int</code> with the size of each dimension</td></tr>
-<tr>
-<td><code>slice.assign(t)</code></td>
-<td>Write values from <code>t</code> into the slice's memory</td></tr></tbody></table>
-<h2 id="related-examples">Related examples</h2>
-<ul>
-<li><a href="https://github.com/vlang/vtl/blob/master/examples/vtl_basic_usage"><code>vtl_basic_usage</code></a> — 1-D tensors and basic operations</li>
-<li><a href="https://github.com/vlang/vtl/blob/master/examples/autograd_backprop"><code>autograd_backprop</code></a> — automatic differentiation</li></ul>
+								<section id="main" class="doc-node">
+			<div class="title"><h1> main</h1></div>
+
 
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 1 Jun 2026 06:04:21</div>
+						<div class="footer">Powered by vdoc. Generated on: 1 Jun 2026 07:14:00</div>
+					</div>
+					<div class="doc-toc"><ul></ul></div>
+				</div>
+			</div>
+		</div>
+		<script src="doc.js"></script>
+		<script async src="search_index.js"></script>
+	</body>
+</html>
+l">VCL docs</a> and the OpenCL backend guide.</p>
+<h2 id="running-the-example">Running the example</h2>
+<p>To run the example, execute the following command:</p>
+<pre><code class="language-sh">v <span class="token operator">-</span>d vcl run examples<span class="token operator">/</span>opencl_vcl_support<span class="token operator">/</span>main_not_ci<span class="token punctuation">.</span>v</code></pre>
+
+</section>
+
+
+						<div class="footer">Powered by vdoc. Generated on: 1 Jun 2026 07:14:00</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_main">README</a></li>
 </ul></div>
