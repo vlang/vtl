@@ -112,6 +112,18 @@ pub fn (mut o AdamOptimizer[T]) update() ! {
 				o.first_moments[i] = vtl.from_array(m_arr, v.value.shape) or { return err }
 				o.second_moments[i] = vtl.from_array(v_arr, v.value.shape) or { return err }
 			} $else $if sizeof(T) == 4 {
+				$if vulkan ? {
+					if adam_use_vulkan_optimizer() {
+						mut m_t := o.first_moments[i]
+						mut v_t := o.second_moments[i]
+						if try_adam_update_f32_vulkan(mut v, mut m_t, mut v_t, step) {
+							o.first_moments[i] = m_t
+							o.second_moments[i] = v_t
+							v.grad = vtl.zeros_like[T](v.value)
+							continue
+						}
+					}
+				}
 				grad := v.grad.to_array()
 				mut theta := v.value.to_array()
 				mut m_arr := o.first_moments[i].to_array()
