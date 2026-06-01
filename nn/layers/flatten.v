@@ -3,7 +3,6 @@ module layers
 import vtl.autograd
 import vtl.nn.gates.layers
 import vtl.nn.types
-import arrays
 
 // FlattenLayer is a layer
 pub struct FlattenLayer[T] {
@@ -17,9 +16,12 @@ pub fn flatten_layer[T](ctx &autograd.Context[T], shape []int) types.Layer[T] {
 }
 
 pub fn (layer &FlattenLayer[T]) output_shape() []int {
-	product := arrays.fold(layer.shape, 1, fn (a int, b int) int {
-		return a * b
-	})
+	mut product := 1
+	for s in layer.shape {
+		if s > 0 {
+			product *= s
+		}
+	}
 	return [product]
 }
 

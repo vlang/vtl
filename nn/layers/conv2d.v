@@ -32,13 +32,15 @@ pub:
 	out_channels int
 	kernel_size  []int
 	config       Conv2DConfig
+	// [C, H, W] from the previous layer when known (for output_shape / flatten).
+	input_shape []int
 pub mut:
 	weight &autograd.Variable[T] = unsafe { nil }
 	bias   &autograd.Variable[T] = unsafe { nil }
 }
 
 // conv2d_layer creates a Conv2DLayer.
-pub fn conv2d_layer[T](ctx &autograd.Context[T], in_ch int, out_ch int, kernel_size []int, config Conv2DConfig) types.Layer[T] {
+pub fn conv2d_layer[T](ctx &autograd.Context[T], in_ch int, out_ch int, kernel_size []int, config Conv2DConfig, input_shape []int) types.Layer[T] {
 	weight_shape := [out_ch, in_ch / config.groups, kernel_size[0], kernel_size[1]]
 	weight := internal.kaiming_normal[T](weight_shape)
 	bias := vtl.zeros[T]([1, out_ch])
@@ -47,14 +49,27 @@ pub fn conv2d_layer[T](ctx &autograd.Context[T], in_ch int, out_ch int, kernel_s
 		out_channels: out_ch
 		kernel_size:  kernel_size
 		config:       config
+		input_shape:  input_shape.clone()
 		weight:       ctx.variable(weight)
 		bias:         ctx.variable(bias)
 	})
 }
 
 pub fn (layer &Conv2DLayer[T]) output_shape() []int {
-	shapes := [layer.out_channels, -1, -1]
-	return shapes
+	if layer.input_shape.len >= 3 && layer.input_shape[1] > 0 && layer.input_shape[2] > 0 {
+		in_h := layer.input_shape[1]
+		in_w := layer.input_shape[2]
+		kh := layer.kernel_size[0]
+		kw := layer.kernel_size[1]
+		ph := layer.config.padding[0]
+		pw := layer.config.padding[1]
+		sh := layer.config.stride[0]
+		sw := layer.config.stride[1]
+		out_h := (in_h - kh + 2 * ph) / sh + 1
+		out_w := (in_w - kw + 2 * pw) / sw + 1
+		return [layer.out_channels, out_h, out_w]
+	}
+	return [layer.out_channels, -1, -1]
 }
 
 pub fn (layer &Conv2DLayer[T]) variables() []&autograd.Variable[T] {
