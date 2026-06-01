@@ -1146,7 +1146,7 @@ var searchModuleData = [
 ["CIFAR-10 training with conservative batch/epoch defaults for local dev.","main.html"],
 ["Small **real** CIFAR-10 subset (64 train / 16 test). Heavier than `tiny_synth`.","main.html"],
 ["Synthetic CIFAR-shaped batches (no dataset download). **Default CI smoke.**","main.html"],
-["Tiny synthetic CIFAR-shaped **f32** forward smoke. **Linear** uses Vulkan GEMM w","main.html"],
+["CIFAR-shaped **f32** training smoke (`[3,8,8]` → flatten → Linear → MSE). ","main.html"],
 ["Feedforward network on MNIST (auto-download).","main.html"],
 ["Trains a two-layer MLP on a synthetic 3-class dataset using softmax cross-entrop","main.html"],
 ["Trains a small MLP to approximate the `sin(x)` function over `[−π, π]`.","main.html"],
