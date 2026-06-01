@@ -52,11 +52,16 @@ t.get([1, 1])
 
 ## ML Release Highlights
 
+The ML beta scope is the high-level VTL API: tensors, autograd, layers, losses,
+optimizers, datasets, and CPU training. CUDA and Vulkan paths are available for
+opt-in validation and early adopters, but remain experimental backend
+accelerators rather than stable user contracts.
+
 | Area | Status |
 |------|--------|
 | f32 training | `Sequential` + MSE + Adam smoke tests |
-| CUDA | Linear/Conv2D forward, CUDA backward, GPU activation chain, Adam optimizer slots |
-| Vulkan | f32 Linear, Conv2D same-padding, ReLU/Sigmoid, fused Adam shader |
+| CUDA | Experimental opt-in Linear/Conv2D forward, CUDA backward, activation chain, Adam slots |
+| Vulkan | Experimental opt-in f32 Linear, Conv2D same-padding, ReLU/Sigmoid, fused Adam shader |
 | Datasets | MNIST, IMDB, CIFAR-10 loaders plus CI-safe synthetic examples |
 | Benchmarks | VTL vs NumPy/PyTorch scripts and PR benchmark workflow |
 
@@ -71,21 +76,22 @@ import vtl.nn.layers
 import vtl.nn.models
 import vtl.nn.optimizers
 
-mut ctx := autograd.ctx[f64]()
-mut model := models.sequential_from_ctx[f64](ctx)
+mut ctx := autograd.ctx[f32]()
+mut model := models.sequential_from_ctx[f32](ctx)
 model.input([784])
 model.linear(256)
 model.linear(10)
+model.mse_loss()
 
-input_tensor := vtl.zeros[f64]([64, 784])
+input_tensor := vtl.zeros[f32]([64, 784])
 mut x := ctx.variable(input_tensor)
 y_pred := model.forward(x)!
 
-target := vtl.zeros[f64]([64, 10])
+target := vtl.zeros[f32]([64, 10])
 mut loss_val := model.loss(y_pred, target)!
 loss_val.backprop()!
 
-mut opt := optimizers.adam_optimizer[f64](optimizers.AdamOptimizerConfig{
+mut opt := optimizers.adam_optimizer[f32](optimizers.AdamOptimizerConfig{
 	learning_rate: 0.001
 })
 opt.build_params(model.info.layers)

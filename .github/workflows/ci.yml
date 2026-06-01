@@ -138,3 +138,37 @@ jobs:
           fi
           # Default: scoped tests + tiny_synth smoke (see bin/test, issue #109)
           ~/.vmodules/vtl/bin/test ${{ matrix.flags }} $backend_flag
+
+  windows-smoke:
+    name: Windows tensor creation smoke
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout VTL
+        uses: actions/checkout@v4
+        with:
+          path: vtl
+
+      - name: Setup V
+        uses: vlang/setup-v@v1.4
+        with:
+          check-latest: true
+
+      - name: V doctor
+        run: v doctor
+
+      - name: Install VSL dependency
+        shell: bash
+        run: v install vsl
+
+      - name: Move VTL source code to V Modules
+        shell: bash
+        run: |
+          mkdir -p ~/.vmodules
+          mv ./vtl ~/.vmodules/vtl
+
+      - name: Run Windows creation regression
+        shell: bash
+        env:
+          VJOBS: '1'
+        run: v test ~/.vmodules/vtl/tests/core/creation_test.v
