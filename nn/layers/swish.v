@@ -13,9 +13,11 @@ pub struct SwishLayer[T] {
 
 // swish_layer exposes this operation as part of the public API.
 pub fn swish_layer[T](ctx &autograd.Context[T], output_shape []int) types.Layer[T] {
-	return types.Layer[T](&SwishLayer[T]{
+	layer := &SwishLayer[T]{
 		output_shape: output_shape.clone()
-	})
+	}
+	return types.layer[T](voidptr(layer), swish_layer_output_shape_dispatch[T],
+		swish_layer_variables_dispatch[T], swish_layer_forward_dispatch[T])
 }
 
 // output_shape exposes this operation as part of the public API.
@@ -38,4 +40,19 @@ pub fn (layer &SwishLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Va
 		gate.cache(mut result, input)!
 	}
 	return result
+}
+
+fn swish_layer_output_shape_dispatch[T](layer voidptr) []int {
+	return unsafe { (&SwishLayer[T](layer)).output_shape() }
+}
+
+fn swish_layer_variables_dispatch[T](layer voidptr) []voidptr {
+	vars := unsafe { (&SwishLayer[T](layer)).variables() }
+	return types.variable_ptrs_to_voidptrs[T](vars)
+}
+
+fn swish_layer_forward_dispatch[T](layer voidptr, input voidptr) !voidptr {
+	typed_input := unsafe { &autograd.Variable[T](input) }
+	result := unsafe { (&SwishLayer[T](layer)).forward(typed_input)! }
+	return voidptr(result)
 }

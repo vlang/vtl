@@ -22,10 +22,12 @@ pub struct DropoutLayer[T] {
 
 // dropout_layer exposes this operation as part of the public API.
 pub fn dropout_layer[T](ctx &autograd.Context[T], output_shape []int, data DropoutLayerConfig) types.Layer[T] {
-	return types.Layer[T](&DropoutLayer[T]{
+	layer := &DropoutLayer[T]{
 		output_shape: output_shape.clone()
 		prob:         1.0 - data.prob
-	})
+	}
+	return types.layer[T](voidptr(layer), dropout_layer_output_shape_dispatch[T],
+		dropout_layer_variables_dispatch[T], dropout_layer_forward_dispatch[T])
 }
 
 // output_shape exposes this operation as part of the public API.
@@ -49,4 +51,19 @@ pub fn (layer &DropoutLayer[T]) forward(input &autograd.Variable[T]) !&autograd.
 		gate.cache(mut result, input)!
 	}
 	return result
+}
+
+fn dropout_layer_output_shape_dispatch[T](layer voidptr) []int {
+	return unsafe { (&DropoutLayer[T](layer)).output_shape() }
+}
+
+fn dropout_layer_variables_dispatch[T](layer voidptr) []voidptr {
+	vars := unsafe { (&DropoutLayer[T](layer)).variables() }
+	return types.variable_ptrs_to_voidptrs[T](vars)
+}
+
+fn dropout_layer_forward_dispatch[T](layer voidptr, input voidptr) !voidptr {
+	typed_input := unsafe { &autograd.Variable[T](input) }
+	result := unsafe { (&DropoutLayer[T](layer)).forward(typed_input)! }
+	return voidptr(result)
 }

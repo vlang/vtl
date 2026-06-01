@@ -29,7 +29,6 @@ pub fn sequential_info[T](ctx &autograd.Context[T], layers_ []types.Layer[T]) &S
 		layers:        layers_
 		layer_types:   layer_types
 		layer_configs: layer_configs
-		loss:          unsafe { nil }
 	}
 }
 

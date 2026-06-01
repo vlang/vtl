@@ -13,9 +13,11 @@ pub struct SigmoidLayer[T] {
 
 // sigmoid_layer exposes this operation as part of the public API.
 pub fn sigmoid_layer[T](ctx &autograd.Context[T], output_shape []int) types.Layer[T] {
-	return types.Layer[T](&SigmoidLayer[T]{
+	layer := &SigmoidLayer[T]{
 		output_shape: output_shape.clone()
-	})
+	}
+	return types.layer[T](voidptr(layer), sigmoid_layer_output_shape_dispatch[T],
+		sigmoid_layer_variables_dispatch[T], sigmoid_layer_forward_dispatch[T])
 }
 
 // output_shape exposes this operation as part of the public API.
@@ -44,4 +46,19 @@ pub fn (layer &SigmoidLayer[T]) forward(input &autograd.Variable[T]) !&autograd.
 		gate.cache(mut result, input)!
 	}
 	return result
+}
+
+fn sigmoid_layer_output_shape_dispatch[T](layer voidptr) []int {
+	return unsafe { (&SigmoidLayer[T](layer)).output_shape() }
+}
+
+fn sigmoid_layer_variables_dispatch[T](layer voidptr) []voidptr {
+	vars := unsafe { (&SigmoidLayer[T](layer)).variables() }
+	return types.variable_ptrs_to_voidptrs[T](vars)
+}
+
+fn sigmoid_layer_forward_dispatch[T](layer voidptr, input voidptr) !voidptr {
+	typed_input := unsafe { &autograd.Variable[T](input) }
+	result := unsafe { (&SigmoidLayer[T](layer)).forward(typed_input)! }
+	return voidptr(result)
 }

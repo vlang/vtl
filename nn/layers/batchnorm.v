@@ -35,14 +35,16 @@ pub mut:
 pub fn batchnorm1d_layer[T](ctx &autograd.Context[T], num_features int, config BatchNorm1DConfig) types.Layer[T] {
 	gamma := ctx.variable(vtl.ones[T]([1, num_features]))
 	beta := ctx.variable(vtl.zeros[T]([1, num_features]))
-	return types.Layer[T](&BatchNorm1DLayer[T]{
+	layer := &BatchNorm1DLayer[T]{
 		eps:          config.eps
 		momentum:     config.momentum
 		gamma:        gamma
 		beta:         beta
 		running_mean: vtl.zeros[T]([1, num_features])
 		running_var:  vtl.ones[T]([1, num_features])
-	})
+	}
+	return types.layer[T](voidptr(layer), batch_norm1_d_layer_output_shape_dispatch[T],
+		batch_norm1_d_layer_variables_dispatch[T], batch_norm1_d_layer_forward_dispatch[T])
 }
 
 // output_shape exposes this operation as part of the public API.
@@ -90,6 +92,21 @@ pub fn (layer &BatchNorm1DLayer[T]) forward(input &autograd.Variable[T]) !&autog
 	return result
 }
 
+fn batch_norm1_d_layer_output_shape_dispatch[T](layer voidptr) []int {
+	return unsafe { (&BatchNorm1DLayer[T](layer)).output_shape() }
+}
+
+fn batch_norm1_d_layer_variables_dispatch[T](layer voidptr) []voidptr {
+	vars := unsafe { (&BatchNorm1DLayer[T](layer)).variables() }
+	return types.variable_ptrs_to_voidptrs[T](vars)
+}
+
+fn batch_norm1_d_layer_forward_dispatch[T](layer voidptr, input voidptr) !voidptr {
+	typed_input := unsafe { &autograd.Variable[T](input) }
+	result := unsafe { (&BatchNorm1DLayer[T](layer)).forward(typed_input)! }
+	return voidptr(result)
+}
+
 // BatchNorm1DGate defines a public data structure for this module.
 pub struct BatchNorm1DGate[T] {
 	input &vtl.Tensor[T] = unsafe { nil }
@@ -118,6 +135,12 @@ pub fn (g &BatchNorm1DGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Te
 		g.mean, g.var_, g.eps)
 }
 
+fn batch_norm1_d_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &autograd.Payload[T](payload) }
+	tensors := unsafe { (&BatchNorm1DGate[T](gate)).backward(typed_payload)! }
+	return autograd.tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &BatchNorm1DGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
@@ -125,7 +148,8 @@ pub fn (g &BatchNorm1DGate[T]) cache(mut result autograd.Variable[T], args ...au
 		autograd.Variable[T] {
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
-			autograd.register[T]('BatchNorm1D', g, result, [a])!
+			autograd.register[T]('BatchNorm1D', voidptr(g),
+				batch_norm1_d_gate_backward_dispatch[T], result, [a])!
 		}
 		else {}
 	}

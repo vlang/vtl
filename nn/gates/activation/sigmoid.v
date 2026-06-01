@@ -24,6 +24,12 @@ pub fn (g &SigmoidGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor
 	return [r0]
 }
 
+fn sigmoid_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &autograd.Payload[T](payload) }
+	tensors := unsafe { (&SigmoidGate[T](gate)).backward(typed_payload)! }
+	return autograd.tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &SigmoidGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
@@ -33,7 +39,9 @@ pub fn (g &SigmoidGate[T]) cache(mut result autograd.Variable[T], args ...autogr
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
 
-			autograd.register[T]('Sigmoid', g, result, [a])!
+			autograd.register[T]('Sigmoid', voidptr(g), sigmoid_gate_backward_dispatch[T], result, [
+				a,
+			])!
 		}
 		else {
 			return error('Sigmoid: cache: invalid argument')

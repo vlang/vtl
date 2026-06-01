@@ -26,6 +26,12 @@ pub fn (g &EluGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] 
 	return [r0]
 }
 
+fn elu_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &autograd.Payload[T](payload) }
+	tensors := unsafe { (&EluGate[T](gate)).backward(typed_payload)! }
+	return autograd.tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &EluGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
@@ -35,7 +41,9 @@ pub fn (g &EluGate[T]) cache(mut result autograd.Variable[T], args ...autograd.C
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
 
-			autograd.register[T]('Elu', g, result, [a])!
+			autograd.register[T]('Elu', voidptr(g), elu_gate_backward_dispatch[T], result, [
+				a,
+			])!
 		}
 		else {
 			return error('Elu: cache: invalid argument')

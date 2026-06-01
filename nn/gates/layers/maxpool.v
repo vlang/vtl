@@ -34,6 +34,12 @@ pub fn (g &MaxPool2DGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tens
 	return [r0]
 }
 
+fn max_pool2_d_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &autograd.Payload[T](payload) }
+	tensors := unsafe { (&MaxPool2DGate[T](gate)).backward(typed_payload)! }
+	return autograd.tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &MaxPool2DGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
@@ -43,7 +49,8 @@ pub fn (g &MaxPool2DGate[T]) cache(mut result autograd.Variable[T], args ...auto
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
 
-			autograd.register[T]('MaxPool2D', g, result, [a])!
+			autograd.register[T]('MaxPool2D', voidptr(g), max_pool2_d_gate_backward_dispatch[T],
+				result, [a])!
 		}
 		else {
 			return error('MaxPool2DGate: cache: invalid argument')

@@ -6,7 +6,7 @@ import vtl.nn.layers
 import vtl.nn.models
 import vtl.nn.optimizers
 
-const batch_size = 4
+const batch_size = 2
 const epochs = 1
 const batches = 2
 
@@ -16,22 +16,21 @@ fn main() {
 	}
 	ctx := autograd.ctx[f64]()
 	mut model := models.sequential_from_ctx[f64](ctx)
-	model.input([3, 32, 32])
+	model.input([3, 8, 8])
 	model.flatten()
-	model.linear(10)
-	model.softmax()
+	model.linear(4)
 	model.mse_loss()
 
 	mut opt := optimizers.adam_optimizer[f64](optimizers.AdamOptimizerConfig{
-		learning_rate: 0.001
+		learning_rate: 0.01
 	})
 	opt.build_params(model.info.layers)
 
 	for epoch := 0; epoch < epochs; epoch++ {
 		for b := 0; b < batches; b++ {
 			// Synthetic CIFAR-like batch: [B, C, H, W]
-			x_tensor := vtl.ones[f64]([batch_size, 3, 32, 32])
-			y_tensor := vtl.zeros[f64]([batch_size, 10])
+			x_tensor := vtl.ones[f64]([batch_size, 3, 8, 8])
+			y_tensor := vtl.zeros[f64]([batch_size, 4])
 
 			x := ctx.variable(x_tensor, requires_grad: true)
 			pred := model.forward(x)!

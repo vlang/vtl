@@ -94,6 +94,12 @@ pub fn (g &LinearGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[
 	}
 }
 
+fn linear_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &autograd.Payload[T](payload) }
+	tensors := unsafe { (&LinearGate[T](gate)).backward(typed_payload)! }
+	return autograd.tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &LinearGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	input := args[0]
@@ -109,7 +115,8 @@ pub fn (g &LinearGate[T]) cache(mut result autograd.Variable[T], args ...autogra
 							result.grad = vtl.zeros_like[T](result.value)
 							result.requires_grad = true
 
-							autograd.register[T]('Linear', g, result, [input, weight, bias])!
+							autograd.register[T]('Linear', voidptr(g),
+								linear_gate_backward_dispatch[T], result, [input, weight, bias])!
 						}
 						else {
 							return error('LinearGate: bias must be a Variable')

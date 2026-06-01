@@ -15,12 +15,14 @@ pub struct MaxPool2DLayer[T] {
 
 // maxpool2d_layer exposes this operation as part of the public API.
 pub fn maxpool2d_layer[T](ctx &autograd.Context[T], input_shape []int, kernel []int, padding []int, stride []int) types.Layer[T] {
-	return types.Layer[T](&MaxPool2DLayer[T]{
+	layer := &MaxPool2DLayer[T]{
 		input_shape: input_shape.clone()
 		kernel:      kernel.clone()
 		padding:     padding.clone()
 		stride:      stride.clone()
-	})
+	}
+	return types.layer[T](voidptr(layer), max_pool2_d_layer_output_shape_dispatch[T],
+		max_pool2_d_layer_variables_dispatch[T], max_pool2_d_layer_forward_dispatch[T])
 }
 
 // output_shape exposes this operation as part of the public API.
@@ -56,4 +58,19 @@ pub fn (layer &MaxPool2DLayer[T]) forward(input &autograd.Variable[T]) !&autogra
 	}
 
 	return result
+}
+
+fn max_pool2_d_layer_output_shape_dispatch[T](layer voidptr) []int {
+	return unsafe { (&MaxPool2DLayer[T](layer)).output_shape() }
+}
+
+fn max_pool2_d_layer_variables_dispatch[T](layer voidptr) []voidptr {
+	vars := unsafe { (&MaxPool2DLayer[T](layer)).variables() }
+	return types.variable_ptrs_to_voidptrs[T](vars)
+}
+
+fn max_pool2_d_layer_forward_dispatch[T](layer voidptr, input voidptr) !voidptr {
+	typed_input := unsafe { &autograd.Variable[T](input) }
+	result := unsafe { (&MaxPool2DLayer[T](layer)).forward(typed_input)! }
+	return voidptr(result)
 }

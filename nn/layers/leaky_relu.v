@@ -22,10 +22,12 @@ pub struct LeakyReluLayer[T] {
 
 // leaky_relu_layer exposes this operation as part of the public API.
 pub fn leaky_relu_layer[T](ctx &autograd.Context[T], output_shape []int, data LeakyReluLayerConfig) types.Layer[T] {
-	return types.Layer[T](&LeakyReluLayer[T]{
+	layer := &LeakyReluLayer[T]{
 		output_shape: output_shape.clone()
 		slope:        data.slope
-	})
+	}
+	return types.layer[T](voidptr(layer), leaky_relu_layer_output_shape_dispatch[T],
+		leaky_relu_layer_variables_dispatch[T], leaky_relu_layer_forward_dispatch[T])
 }
 
 // output_shape exposes this operation as part of the public API.
@@ -48,4 +50,19 @@ pub fn (layer &LeakyReluLayer[T]) forward(input &autograd.Variable[T]) !&autogra
 		gate.cache(mut result, input)!
 	}
 	return result
+}
+
+fn leaky_relu_layer_output_shape_dispatch[T](layer voidptr) []int {
+	return unsafe { (&LeakyReluLayer[T](layer)).output_shape() }
+}
+
+fn leaky_relu_layer_variables_dispatch[T](layer voidptr) []voidptr {
+	vars := unsafe { (&LeakyReluLayer[T](layer)).variables() }
+	return types.variable_ptrs_to_voidptrs[T](vars)
+}
+
+fn leaky_relu_layer_forward_dispatch[T](layer voidptr, input voidptr) !voidptr {
+	typed_input := unsafe { &autograd.Variable[T](input) }
+	result := unsafe { (&LeakyReluLayer[T](layer)).forward(typed_input)! }
+	return voidptr(result)
 }

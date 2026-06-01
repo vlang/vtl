@@ -81,9 +81,13 @@ high-level tensor/model APIs and environment/config flags.
   package boundaries, document them as internal support APIs and avoid tutorial
   references.
 - Optimizer and training examples should prefer `f32` for the beta path.
-  `f64` tensor math remains available, but generic `f64` autograd/training
-  should stay outside the stable beta contract until the generic `Gate[T]`
-  interface no longer specializes mixed `Payload[f32]`/`Payload[f64]` types.
+  `f64` tensor math and autograd/training now have mixed `f32`/`f64` regression
+  coverage, but `f32` remains the primary beta training path advertised in user
+  docs.
+- Custom `Gate`, `Layer`, and `Loss` extension points use opaque dispatch
+  wrappers internally to avoid V generic interface specialization drift. The
+  high-level user APIs remain stable, while third-party custom extension
+  implementations should be treated as experimental during beta.
 
 ### Breaking-Change Candidates
 

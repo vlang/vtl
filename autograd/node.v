@@ -10,10 +10,10 @@ module autograd
 @[heap]
 pub struct Node[T] {
 pub:
-	// A Gate[T] containing a backward function for this node.
-	// Using the generic interface allows any gate (core math or nn)
-	// to participate in backpropagation without circular imports.
-	gate Gate[T]
+	// Opaque pointer to the concrete gate instance for this node.
+	gate voidptr
+	// Callback that knows how to cast and run the gate.
+	backward BackwardFn = unsafe { nil }
 pub mut:
 	// The variables that created this node
 	parents []&Variable[T]
@@ -24,11 +24,12 @@ pub mut:
 }
 
 // node
-pub fn node[T](gate Gate[T], parents []&Variable[T], payload &Payload[T], name string) &Node[T] {
+pub fn node[T](gate voidptr, backward BackwardFn, parents []&Variable[T], payload &Payload[T], name string) &Node[T] {
 	return &Node[T]{
-		gate:    gate
-		parents: parents
-		payload: payload
-		name:    name
+		gate:     gate
+		backward: backward
+		parents:  parents
+		payload:  payload
+		name:     name
 	}
 }

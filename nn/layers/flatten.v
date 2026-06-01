@@ -11,9 +11,11 @@ pub struct FlattenLayer[T] {
 
 // flatten_layer exposes this operation as part of the public API.
 pub fn flatten_layer[T](ctx &autograd.Context[T], shape []int) types.Layer[T] {
-	return types.Layer[T](&FlattenLayer[T]{
+	layer := &FlattenLayer[T]{
 		shape: shape.clone()
-	})
+	}
+	return types.layer[T](voidptr(layer), flatten_layer_output_shape_dispatch[T],
+		flatten_layer_variables_dispatch[T], flatten_layer_forward_dispatch[T])
 }
 
 // output_shape exposes this operation as part of the public API.
@@ -43,4 +45,19 @@ pub fn (layer &FlattenLayer[T]) forward(input &autograd.Variable[T]) !&autograd.
 		gate.cache(mut result, input)!
 	}
 	return result
+}
+
+fn flatten_layer_output_shape_dispatch[T](layer voidptr) []int {
+	return unsafe { (&FlattenLayer[T](layer)).output_shape() }
+}
+
+fn flatten_layer_variables_dispatch[T](layer voidptr) []voidptr {
+	vars := unsafe { (&FlattenLayer[T](layer)).variables() }
+	return types.variable_ptrs_to_voidptrs[T](vars)
+}
+
+fn flatten_layer_forward_dispatch[T](layer voidptr, input voidptr) !voidptr {
+	typed_input := unsafe { &autograd.Variable[T](input) }
+	result := unsafe { (&FlattenLayer[T](layer)).forward(typed_input)! }
+	return voidptr(result)
 }

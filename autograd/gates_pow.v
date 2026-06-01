@@ -33,6 +33,12 @@ pub fn (g &PowGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0, r1]
 }
 
+fn pow_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := unsafe { (&PowGate[T](gate)).backward(typed_payload)! }
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &PowGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
@@ -45,7 +51,10 @@ pub fn (g &PowGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 					result.grad = vtl.zeros_like[T](result.value)
 					result.requires_grad = true
 
-					register[T]('Pow', g, result, [a, b])!
+					register[T]('Pow', voidptr(g), pow_gate_backward_dispatch[T], result, [
+						a,
+						b,
+					])!
 				}
 				else {
 					return error('PowGate: b must be a Variable')

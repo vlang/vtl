@@ -94,14 +94,14 @@ pub fn (ctx &Context[T]) str() string {
 }
 
 // register exposes this operation as part of the public API.
-pub fn register[T](name string, gate Gate[T], result &Variable[T], parents []&Variable[T]) ! {
+pub fn register[T](name string, gate voidptr, backward BackwardFn, result &Variable[T], parents []&Variable[T]) ! {
 	assert parents.len > 0
 	if parents.len == 0 {
 		return error(@FN + ': it is needed to specify at least one parent')
 	}
 
 	new_payload := payload[T](result)
-	new_node := node[T](gate, parents, new_payload, name)
-	mut ctx := parents[0].context
-	ctx.push(new_node)
+	new_node := node[T](gate, backward, parents, new_payload, name)
+	mut graph_ctx := parents[0].context
+	graph_ctx.push(new_node)
 }

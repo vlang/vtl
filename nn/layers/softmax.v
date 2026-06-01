@@ -22,9 +22,11 @@ pub struct SoftmaxLayerConfig {
 
 // softmax_layer exposes this operation as part of the public API.
 pub fn softmax_layer[T](ctx &autograd.Context[T], config SoftmaxLayerConfig) types.Layer[T] {
-	return types.Layer[T](&SoftmaxLayer[T]{
+	layer := &SoftmaxLayer[T]{
 		dim: config.dim
-	})
+	}
+	return types.layer[T](voidptr(layer), softmax_layer_output_shape_dispatch[T],
+		softmax_layer_variables_dispatch[T], softmax_layer_forward_dispatch[T])
 }
 
 // output_shape exposes this operation as part of the public API.
@@ -49,4 +51,19 @@ pub fn (layer &SoftmaxLayer[T]) forward(input &autograd.Variable[T]) !&autograd.
 		gate.cache(mut result, input)!
 	}
 	return result
+}
+
+fn softmax_layer_output_shape_dispatch[T](layer voidptr) []int {
+	return unsafe { (&SoftmaxLayer[T](layer)).output_shape() }
+}
+
+fn softmax_layer_variables_dispatch[T](layer voidptr) []voidptr {
+	vars := unsafe { (&SoftmaxLayer[T](layer)).variables() }
+	return types.variable_ptrs_to_voidptrs[T](vars)
+}
+
+fn softmax_layer_forward_dispatch[T](layer voidptr, input voidptr) !voidptr {
+	typed_input := unsafe { &autograd.Variable[T](input) }
+	result := unsafe { (&SoftmaxLayer[T](layer)).forward(typed_input)! }
+	return voidptr(result)
 }

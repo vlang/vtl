@@ -45,6 +45,12 @@ pub fn (g &MatMulGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0, r1]
 }
 
+fn mat_mul_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := unsafe { (&MatMulGate[T](gate)).backward(typed_payload)! }
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &MatMulGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
@@ -57,7 +63,10 @@ pub fn (g &MatMulGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 					result.grad = vtl.zeros_like[T](result.value)
 					result.requires_grad = true
 
-					register[T]('MatMul', g, result, [a, b])!
+					register[T]('MatMul', voidptr(g), mat_mul_gate_backward_dispatch[T], result, [
+						a,
+						b,
+					])!
 				}
 				else {
 					return error('MatMulGate: b must be a Variable')

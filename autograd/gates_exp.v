@@ -22,6 +22,12 @@ pub fn (g &ExpGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0]
 }
 
+fn exp_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := unsafe { (&ExpGate[T](gate)).backward(typed_payload)! }
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &ExpGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
@@ -31,7 +37,7 @@ pub fn (g &ExpGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
 
-			register[T]('Exp', g, result, [a])!
+			register[T]('Exp', voidptr(g), exp_gate_backward_dispatch[T], result, [a])!
 		}
 		else {
 			return error('ExpGate: a must be a Variable')
