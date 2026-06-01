@@ -16,6 +16,9 @@
 and machine learning — n-dimensional arrays, autograd, linear algebra via
 [VSL](https://github.com/vlang/vsl), and a full neural network module.
 
+Train small neural networks, experiment with autograd, and use VSL-backed CPU,
+CUDA, and Vulkan compute paths from one V-native API.
+
 [vlang.io](https://vlang.io) |
 [Docs](https://vlang.github.io/vtl) |
 [Tutorials](docs/TUTORIAL.md) |
@@ -39,11 +42,23 @@ t.get([1, 1])
 - **Neural networks** — `Sequential` API; Linear, Conv2D, LSTM, Attention, …
 - **Losses & optimizers** — MSE, BCE, CrossEntropy, Huber; Adam, AdamW, SGD, …
 - **Linear algebra** — VSL-backed matmul, solve, QR, LU, Cholesky, SVD, pinv
-- **Hardware** — zero-copy `Tensor.data` for C libs; optional CUDA paths
+- **Hardware** — zero-copy `Tensor.data` for C libs; optional CUDA and Vulkan training paths
+
+## ML Release Highlights
+
+| Area | Status |
+|------|--------|
+| f32 training | `Sequential` + MSE + Adam smoke tests |
+| CUDA | Linear/Conv2D forward, CUDA backward, GPU activation chain, Adam optimizer slots |
+| Vulkan | f32 Linear, Conv2D same-padding, ReLU/Sigmoid, fused Adam shader |
+| Datasets | MNIST, IMDB, CIFAR-10 loaders plus CI-safe synthetic examples |
+| Benchmarks | VTL vs NumPy/PyTorch scripts and PR benchmark workflow |
+
+For memory-safe local commands, see [DEV_LIGHTWEIGHT.md](docs/DEV_LIGHTWEIGHT.md).
 
 ## Quick start
 
-```v
+```v ignore
 import vtl
 import vtl.autograd
 import vtl.nn.layers
@@ -104,6 +119,18 @@ v test ~/.vmodules/vtl
 See [DEV_LIGHTWEIGHT.md](docs/DEV_LIGHTWEIGHT.md) for memory-safe subsets in CI.
 
 ## Documentation
+
+### Start Here
+
+| Goal | Read |
+|------|------|
+| Learn tensors | [First steps](docs/TUTORIAL_FIRST_STEPS.md) |
+| Learn autograd | [Autograd tutorial](docs/TUTORIAL_AUTOGRAD.md) |
+| Build neural networks | [Neural networks](docs/TUTORIAL_NEURAL_NETWORKS.md) |
+| Pick optimizers | [Optimizers](docs/TUTORIAL_OPTIMIZERS.md) |
+| Run examples | [Examples catalog](examples/README.md) |
+| Use datasets | [Datasets](datasets/README.md) |
+| Use GPU paths safely | [DEV_LIGHTWEIGHT.md](docs/DEV_LIGHTWEIGHT.md), [DEVICE_MEMORY.md](docs/DEVICE_MEMORY.md) |
 
 | Tutorial | Topic |
 |----------|-------|

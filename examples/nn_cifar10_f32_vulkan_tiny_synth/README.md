@@ -1,6 +1,7 @@
 # nn_cifar10_f32_vulkan_tiny_synth
 
-f32 **training** smoke (forward, MSE, backprop, Adam). **Linear** forward/backward can use Vulkan GEMM.
+f32 **training** smoke (forward, MSE, backprop, Adam). Vulkan builds can use
+VSL GEMM and fused Adam where eligible.
 
 ## Run
 
@@ -15,8 +16,8 @@ VTL_USE_VULKAN=1 v -prod -d vulkan run vtl/examples/nn_cifar10_f32_vulkan_tiny_s
 ## Test
 
 ```bash
-VJOBS=1 v test vtl/nn/f32_vulkan_training_smoke_test.v
-VTL_USE_VULKAN=1 VTL_TEST_VULKAN=1 v -prod -d vulkan test vtl/nn/layers/linear_vulkan_gpu_d_vulkan_test.v
+VTL_USE_VULKAN=1 VTL_TEST_VULKAN=1 VJOBS=1 v -prod -d vulkan test vtl/nn/f32_vulkan_training_smoke_d_vulkan_test.v
+VTL_USE_VULKAN=1 VJOBS=1 v -prod -d vulkan test vtl/nn/optimizers/adam_f32_vulkan_d_vulkan_test.v
 ```
 
 CPU-only f32 training (no Vulkan SDK): `examples/nn_cifar10_f32_tiny_synth/`.

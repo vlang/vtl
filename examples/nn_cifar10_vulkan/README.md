@@ -1,6 +1,12 @@
 # nn_cifar10_vulkan
 
-CIFAR-shaped **f32** training smoke (`[3,8,8]` → Conv2D → ReLU → flatten → Linear → MSE). **Linear**, **Conv2D** (same-padding), and **ReLU** use Vulkan compute when opted in; Conv2D `d_input` stays CPU.
+CIFAR-shaped **f32** training smoke:
+
+`[3,8,8]` → Conv2D → ReLU → flatten → Linear → MSE.
+
+**Linear**, **Conv2D** (same-padding), **ReLU/Sigmoid**, and **Adam** use
+Vulkan compute when opted in; tensors remain CPU-backed for autograd
+compatibility.
 
 ## Run
 
@@ -8,7 +14,7 @@ CIFAR-shaped **f32** training smoke (`[3,8,8]` → Conv2D → ReLU → flatten �
 # CPU Linear (no Vulkan SDK required)
 v run vtl/examples/nn_cifar10_vulkan/main.v
 
-# GPU Linear via Vulkan (use -prod on V 0.5.1+ to avoid debug-instance crash)
+# GPU f32 stack via Vulkan (use -prod on V 0.5.1+ to avoid debug-instance crash)
 VTL_USE_VULKAN=1 v -prod -d vulkan run vtl/examples/nn_cifar10_vulkan/main.v
 ```
 

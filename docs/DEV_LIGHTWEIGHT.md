@@ -42,7 +42,7 @@ VJOBS=1 v test vtl/nn/f32_training_smoke_test.v vtl/nn/f32_autograd_smoke_test.v
 VTL_USE_CUDA=1 VTL_TEST_CUDA=1 VJOBS=1 v -d cuda test vtl/nn/cuda_training_smoke_test.v
 VTL_USE_CUDA=1 VJOBS=1 v -d cuda run vtl/examples/nn_cifar10_cuda/main.v
 VJOBS=2 v run vtl/examples/nn_cifar10_f32_vulkan_tiny_synth/main.v
-# VTL_USE_VULKAN=1 VTL_TEST_VULKAN=1 VJOBS=1 v -d vulkan test vtl/nn/f32_vulkan_training_smoke_test.v
+# VTL_USE_VULKAN=1 VTL_TEST_VULKAN=1 VJOBS=1 v -prod -d vulkan test vtl/nn/f32_vulkan_training_smoke_d_vulkan_test.v
 
 # Single-file CUDA test (only when you want GPU)
 VTL_USE_CUDA=1 VTL_TEST_CUDA=1 VJOBS=1 v -d cuda test vtl/nn/layers/linear_cuda_test.v
@@ -70,6 +70,8 @@ VSL_TEST_VULKAN=1 VJOBS=1 v -prod -d vulkan test vsl/vulkan/compute/adam_step_vu
 
 ## CI split (implemented, #109)
 
-- **PR default (`ci.yml`):** `bin/test` — scoped `v test` (nn, autograd, datasets, …) + compile examples except `nn_cifar10/main.v` + run `nn_cifar10_tiny_synth` and `nn_cifar10_f32_tiny_synth`
-- **Label `full-ml`:** workflow `ci-full-ml.yml` — `bin/test --full` (weekly schedule + manual dispatch)
+- **PR default (`ci.yml`):** `bin/test` — scoped `v test`, compile examples
+  except `nn_cifar10/main.v`, and run tiny synthetic CIFAR examples.
+- **Label `full-ml`:** workflow `ci-full-ml.yml` — `bin/test --full`
+  (weekly schedule + manual dispatch)
 - **Local full suite:** `VJOBS=1 ~/.vmodules/vtl/bin/test --full`
