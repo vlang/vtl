@@ -97,6 +97,7 @@ See [docs/DEVICE_MEMORY.md](docs/DEVICE_MEMORY.md).
 | P2 | Label `full-ml` for optional heavy CI workflow |
 | P1 | Phases 2–4 in `DEVICE_MEMORY.md` |
 | — | Vulkan wired into training (`nn_cifar10_vulkan` f32 forward+backprop+Adam) |
+| P2 | Vulkan Conv2D forward f32 (no padding); GPU backward / activations / Adam TBD |
 | P2 | [#63](https://github.com/vlang/vtl/issues/63) ARM GPU |
 
 **Project board:** [vlang org project #8](https://github.com/orgs/vlang/projects/8)

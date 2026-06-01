@@ -1,6 +1,6 @@
 # nn_cifar10_vulkan
 
-CIFAR-shaped **f32** training smoke (`[3,8,8]` → flatten → Linear → MSE). **Linear** forward/backward use Vulkan GEMM when opted in.
+CIFAR-shaped **f32** training smoke (`[3,8,8]` → Conv2D → flatten → Linear → MSE). **Linear** and **Conv2D** (no padding) use Vulkan when opted in; backward stays CPU for Conv2D.
 
 ## Run
 
