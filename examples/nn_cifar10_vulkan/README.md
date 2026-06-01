@@ -1,6 +1,6 @@
 # nn_cifar10_vulkan
 
-CIFAR-shaped **f32** training smoke (`[3,8,8]` → Conv2D → flatten → Linear → MSE). **Linear** and **Conv2D** (no padding) use Vulkan when opted in; backward stays CPU for Conv2D.
+CIFAR-shaped **f32** training smoke (`[3,8,8]` → Conv2D → ReLU → flatten → Linear → MSE). **Linear**, **Conv2D** (same-padding), and **ReLU** use Vulkan compute when opted in; Conv2D `d_input` stays CPU.
 
 ## Run
 

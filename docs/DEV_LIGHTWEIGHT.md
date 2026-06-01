@@ -58,6 +58,7 @@ VJOBS=2 v test vtl/nn/layers/linear_vulkan_integration_test.v
 v run vtl/examples/nn_cifar10_vulkan/main.v
 # VTL_USE_VULKAN=1 v -prod -d vulkan run vtl/examples/nn_cifar10_vulkan/main.v
 # VTL_USE_VULKAN=1 VJOBS=1 v -prod -d vulkan test vtl/nn/internal/conv2d_vulkan_forward_f32_d_vulkan_test.v vtl/nn/internal/conv2d_vulkan_backward_f32_d_vulkan_test.v
+# VTL_USE_VULKAN=1 VJOBS=1 v -prod -d vulkan test vtl/nn/layers/activation_vulkan_relu_f32_d_vulkan_test.v
 ```
 
 ## CI split (implemented, #109)
