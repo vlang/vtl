@@ -1,6 +1,6 @@
 # nn_cifar10_vulkan
 
-Tiny synthetic CIFAR-shaped **f32** forward smoke. **Linear** uses Vulkan GEMM when opted in.
+CIFAR-shaped **f32** training smoke (`[3,8,8]` → flatten → Linear → MSE). **Linear** forward/backward use Vulkan GEMM when opted in.
 
 ## Run
 
@@ -8,13 +8,11 @@ Tiny synthetic CIFAR-shaped **f32** forward smoke. **Linear** uses Vulkan GEMM w
 # CPU Linear (no Vulkan SDK required)
 v run vtl/examples/nn_cifar10_vulkan/main.v
 
-# GPU Linear via Vulkan
-VTL_USE_VULKAN=1 v -d vulkan run vtl/examples/nn_cifar10_vulkan/main.v
+# GPU Linear via Vulkan (use -prod on V 0.5.1+ to avoid debug-instance crash)
+VTL_USE_VULKAN=1 v -prod -d vulkan run vtl/examples/nn_cifar10_vulkan/main.v
 ```
 
-f32 training with optional Vulkan Linear forward:
-`examples/nn_cifar10_f32_vulkan_tiny_synth/`.
-This example only benchmarks forward Linear GEMM.
+Smaller synthetic variant: `examples/nn_cifar10_f32_vulkan_tiny_synth/`.
 
 ## Notes
 
