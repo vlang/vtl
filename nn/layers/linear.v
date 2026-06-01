@@ -41,8 +41,7 @@ pub fn (layer &LinearLayer[T]) variables() []&autograd.Variable[T] {
 pub fn (layer &LinearLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	mut output := &vtl.Tensor[T](unsafe { nil })
 	$if sizeof(T) == 8 {
-		// GPU activation chain input is passed via session; take-from-variable needs mut input (follow-up).
-		in_gpu := unsafe { nil }
+		in_gpu := linear_take_gpu_input(voidptr(unsafe { input }))
 		out := linear_forward_f64(unsafe { &vtl.Tensor[f64](input.value) },
 			unsafe { &vtl.Tensor[f64](layer.weights.value) },
 			unsafe { &vtl.Tensor[f64](layer.bias.value) }, in_gpu, input.context.device_session)!

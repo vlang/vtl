@@ -12,7 +12,8 @@ v run vtl/examples/nn_cifar10_vulkan/main.v
 VTL_USE_VULKAN=1 v -d vulkan run vtl/examples/nn_cifar10_vulkan/main.v
 ```
 
-Full f32 training (loss, backprop, Adam) is not in this example yet; only forward Linear is GPU-accelerated when opted in.
+Full f32 training (loss, backprop, Adam) is not in this example yet.
+Only forward Linear is GPU-accelerated when opted in.
 
 ## Notes
 
