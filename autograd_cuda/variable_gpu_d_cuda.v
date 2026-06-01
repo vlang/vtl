@@ -10,7 +10,9 @@ pub fn session_bind_gpu_activation(mut s DeviceSession, act_field &voidptr) {
 	if *act_field != unsafe { nil } {
 		unsafe { &vtl.CudaTensor[f64](*act_field) }.release()
 	}
-	*act_field = voidptr(t)
+	unsafe {
+		*act_field = voidptr(t)
+	}
 }
 
 fn take_chain_activation(mut s DeviceSession) !&vtl.CudaTensor[f64] {

@@ -28,7 +28,7 @@ fn (mut s DeviceSession) opt_state_mut() &DeviceOptimizerState {
 }
 
 pub fn (mut s DeviceSession) ensure_opt_slot(slot int, n int) !&DeviceOptimizerSlot {
-	st := s.opt_state_mut()
+	mut st := s.opt_state_mut()
 	for st.slots.len <= slot {
 		st.slots << DeviceOptimizerSlot{}
 	}
