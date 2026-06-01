@@ -1135,7 +1135,7 @@ var searchModuleData = [
 ["","main.html"],
 ["Trains a simple autoencoder that compresses a 4-D input to a 2-D bottleneck","main.html"],
 ["A CNN example for CIFAR-10 image classification using the V Tensor Library (VTL)","main.html"],
-["Tiny synthetic CIFAR-shaped pipeline for **opt-in** GPU Conv2D + Linear forward.","main.html"],
+["Synthetic mini-CIFAR f64 training: Conv2D + ReLU + Linear + MSE,","main.html"],
 ["Synthetic mini-CIFAR batches in **f32**: `Sequential` forward, MSE, `backprop()`","main.html"],
 ["CIFAR-10 training with conservative batch/epoch defaults for local dev.","main.html"],
 ["Small **real** CIFAR-10 subset (64 train / 16 test). Heavier than `tiny_synth`.","main.html"],
