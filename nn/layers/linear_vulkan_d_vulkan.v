@@ -2,8 +2,6 @@ module layers
 
 import vtl
 import vtl.storage
-import vtl.la
-import vsl.vulkan
 
 // linear_forward_vulkan_f32 is the Sequential f32 entry point (opt-in via VTL_USE_VULKAN=1).
 pub fn linear_forward_vulkan_f32(x &vtl.Tensor[f32], weights &vtl.Tensor[f32], bias &vtl.Tensor[f32]) !&vtl.Tensor[f32] {

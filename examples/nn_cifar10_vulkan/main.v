@@ -1,27 +1,54 @@
 module main
 
 import vtl
+import vtl.autograd
 import vtl.nn.layers
+import vtl.nn.models
+import vtl.nn.optimizers
 
-// Minimal Vulkan f32 Linear forward smoke (no autograd / Sequential — f32 models still compile-heavy).
+// CIFAR-shaped f32 training smoke: flatten + Linear (Vulkan GEMM when opted in).
 //
-//   VTL_USE_VULKAN=1 v -d vulkan run vtl/examples/nn_cifar10_vulkan/main.v
+//   v run vtl/examples/nn_cifar10_vulkan/main.v
+//   VTL_USE_VULKAN=1 v -prod -d vulkan run vtl/examples/nn_cifar10_vulkan/main.v
 //
-// Without VTL_USE_VULKAN=1, stays on CPU la.matmul path.
+// Linear backward uses Vulkan GEMM when VTL_USE_VULKAN=1; Adam stays on CPU.
+
+const batch_size = 2
+const epochs = 1
+const batches = 2
 
 fn main() {
 	use_vk := layers.vulkan_linear_enabled()
-	println('nn_cifar10_vulkan: VTL_USE_VULKAN=${use_vk} (build with -d vulkan for GPU GEMM)')
+	println('nn_cifar10_vulkan: VTL_USE_VULKAN=${use_vk} (build with -d vulkan; use -prod for GPU)')
 
-	// CIFAR-shaped flattened batch: [4, 3072] @ [3072, 10] + bias
-	m := 4
-	k := 3 * 32 * 32
-	n := 10
-	x := vtl.ones[f32]([m, k])
-	w := vtl.zeros[f32]([n, k])
-	b := vtl.zeros[f32]([1, n])
-	out := layers.linear_forward_f32(x, w, b) or { panic(err) }
-	assert out.shape == [m, n]
+	ctx := autograd.ctx[f32]()
+	mut model := models.sequential_from_ctx[f32](ctx)
+	model.input([3, 8, 8])
+	model.flatten()
+	model.linear(10)
+	model.mse_loss()
 
-	println('Linear forward OK shape=${out.shape} ✅')
+	mut opt := optimizers.adam_optimizer[f32](optimizers.AdamOptimizerConfig{
+		learning_rate: 0.01
+	})
+	opt.build_params(model.info.layers)
+
+	for epoch := 0; epoch < epochs; epoch++ {
+		for b := 0; b < batches; b++ {
+			x_tensor := vtl.ones[f32]([batch_size, 3, 8, 8])
+			y_tensor := vtl.zeros[f32]([batch_size, 10])
+
+			x := ctx.variable(x_tensor, requires_grad: true)
+			pred := model.forward(x)!
+			mut loss := model.loss(pred, y_tensor)!
+			loss_val := loss.value.get([0])
+
+			loss.backprop()!
+			opt.update()!
+
+			println('epoch ${epoch + 1}/${epochs} batch ${b + 1}/${batches} loss=${loss_val:.4f}')
+		}
+	}
+
+	println('f32 Vulkan CIFAR-shaped training smoke OK ✅')
 }

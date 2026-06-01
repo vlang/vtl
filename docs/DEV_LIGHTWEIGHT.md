@@ -53,10 +53,10 @@ VJOBS=2 v test vtl/autograd/device_session_test.v
 # VSL CUDA ops (one file)
 VJOBS=1 v -d cuda test vsl/cuda/examples/cuda_ops_test.v
 
-# Vulkan f32 Linear (CPU path; no SDK required)
+# Vulkan f32 training (CPU path; no SDK required)
 VJOBS=2 v test vtl/nn/layers/linear_vulkan_integration_test.v
 v run vtl/examples/nn_cifar10_vulkan/main.v
-# VTL_USE_VULKAN=1 v -d vulkan run vtl/examples/nn_cifar10_vulkan/main.v
+# VTL_USE_VULKAN=1 v -prod -d vulkan run vtl/examples/nn_cifar10_vulkan/main.v
 ```
 
 ## CI split (implemented, #109)
