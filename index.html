@@ -4,7 +4,7 @@
 		<meta charset="UTF-8" />
 		<meta http-equiv="x-ua-compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>README | vdoc</title>
+		<title> | vdoc</title>
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
@@ -59,7 +59,7 @@
 				<nav class="search hidden"></nav>
 				<nav class="content hidden">
 					<ul>
-						<li class="open active">
+						<li class="open">
 <div class="menu-row"><a href="./index.html">README</a></div>
 </li>
 <li class="open">
@@ -92,6 +92,9 @@
 <li><a href="./ml.metrics.html">metrics</a></li>
 </ul>
 </li>
+<li class="open active">
+<div class="menu-row"><a href="./.html"></a></div>
+</li>
 <li class="open">
 <div class="menu-row"><svg xmlns="http://www.w3.org/2000/svg" class="dropdown-arrow" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M7 10l5 5 5-5z"/></svg><a>nn</a></div>
 <ul>
@@ -120,146 +123,15 @@
 			<div class="doc-scrollview" tabindex="-1" id="main-content">
 				<div class="doc-container">
 					<div class="doc-content">
-								<section id="readme_README" class="doc-node">
-			<div class="title"><h1> README <a href="#readme_README">#</a></h1></div>
-<div align="center"> <p>
-    <img
-      style="width: 200px"
-      width="200"
-      src="https://github.com/vlang/vtl/blob/main/static/vtl-logo.png?sanitize=true&raw=true"
-    >
-  </p> <h1>The V Tensor Library</h1>
+								<section id="" class="doc-node">
 
-<p>[![Mentioned in Awesome V][awesomevbadge]][awesomevurl] [![CI][workflowbadge]][workflowurl] [![License: MIT][licensebadge]][licenseurl]</p>
-<p><strong>VTL</strong> is a pure-<a href="https://vlang.io">V</a> tensor library for numerical computing and machine learning — n-dimensional arrays, autograd, linear algebra via <a href="https://github.com/vlang/vsl">VSL</a>, and a full neural network module.</p>
-<p><a href="https://vlang.io">vlang.io</a> | <a href="https://vlang.github.io/vtl">Docs</a> | <a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL.md">Tutorials</a> | <a href="https://github.com/vlang/vtl/blob/master/docs/ML_ROADMAP.md">ML Roadmap</a> | <a href="https://github.com/vlang/vtl/blob/master/CONTRIBUTING.md">Contributing</a> | <a href="https://github.com/vlang/vsl">VSL</a></p></div>
-
-<pre><code class="language-v"><span class="token keyword">import</span> vtl
-t <span class="token operator">:=</span> vtl<span class="token punctuation">.</span><span class="token function">from_array</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">1.0</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token operator">!</span>
-t<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-<span class="token comment">// 4.0</span></code></pre>
-<h2 id="features">Features</h2>
-<ul>
-<li><strong>Tensors</strong> — create, slice, reshape, transpose, broadcast, map/reduce</li>
-<li><strong>Autograd</strong> — reverse-mode AD; arbitrary computational graphs</li>
-<li><strong>Neural networks</strong> — <code>Sequential</code> API; Linear, Conv2D, LSTM, Attention, …</li>
-<li><strong>Losses &amp; optimizers</strong> — MSE, BCE, CrossEntropy, Huber; Adam, AdamW, SGD, …</li>
-<li><strong>Linear algebra</strong> — VSL-backed matmul, solve, QR, LU, Cholesky, SVD, pinv</li>
-<li><strong>Hardware</strong> — zero-copy <code>Tensor.data</code> for C libs; optional CUDA paths</li></ul>
-<h2 id="quick-start">Quick start</h2>
-<pre><code class="language-v"><span class="token keyword">import</span> vtl
-<span class="token keyword">import</span> vtl<span class="token punctuation">.</span>autograd
-<span class="token keyword">import</span> vtl<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>layers
-<span class="token keyword">import</span> vtl<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>models
-<span class="token keyword">import</span> vtl<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>optimizers
-
-<span class="token keyword">mut</span> ctx <span class="token operator">:=</span> autograd<span class="token punctuation">.</span>ctx<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token keyword">mut</span> model <span class="token operator">:=</span> models<span class="token punctuation">.</span>sequential_from_ctx<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span>ctx<span class="token punctuation">)</span>
-model<span class="token punctuation">.</span><span class="token function">input</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">784</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-model<span class="token punctuation">.</span><span class="token function">linear</span><span class="token punctuation">(</span><span class="token number">256</span><span class="token punctuation">)</span>
-model<span class="token punctuation">.</span><span class="token function">linear</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span>
-
-input_tensor <span class="token operator">:=</span> vtl<span class="token punctuation">.</span>zeros<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">64</span><span class="token punctuation">,</span> <span class="token number">784</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-<span class="token keyword">mut</span> x <span class="token operator">:=</span> ctx<span class="token punctuation">.</span><span class="token function">variable</span><span class="token punctuation">(</span>input_tensor<span class="token punctuation">)</span>
-y_pred <span class="token operator">:=</span> model<span class="token punctuation">.</span><span class="token function">forward</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token operator">!</span>
-
-target <span class="token operator">:=</span> vtl<span class="token punctuation">.</span>zeros<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">64</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-<span class="token keyword">mut</span> loss_val <span class="token operator">:=</span> model<span class="token punctuation">.</span><span class="token function">loss</span><span class="token punctuation">(</span>y_pred<span class="token punctuation">,</span> target<span class="token punctuation">)</span><span class="token operator">!</span>
-loss_val<span class="token punctuation">.</span><span class="token function">backprop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">!</span>
-
-<span class="token keyword">mut</span> opt <span class="token operator">:=</span> optimizers<span class="token punctuation">.</span>adam_optimizer<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span>optimizers<span class="token punctuation">.</span><span class="token symbol">AdamOptimizerConfig</span><span class="token punctuation">{</span>
-    learning_rate<span class="token punctuation">:</span> <span class="token number">0.001</span>
-<span class="token punctuation">}</span><span class="token punctuation">)</span>
-opt<span class="token punctuation">.</span><span class="token function">build_params</span><span class="token punctuation">(</span>model<span class="token punctuation">.</span>info<span class="token punctuation">.</span>layers<span class="token punctuation">)</span>
-opt<span class="token punctuation">.</span><span class="token function">update</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">!</span></code></pre>
-<h2 id="module-overview">Module overview</h2>
-<table>
-<thead>
-<tr>
-<th>Module</th>
-<th>Purpose</th></tr></thead>
-<tbody>
-<tr>
-<td><code>vtl</code></td>
-<td>Core <code>Tensor[T]</code>; creation, slicing, broadcasting</td></tr>
-<tr>
-<td><code>vtl.autograd</code></td>
-<td><code>Context</code>, <code>Variable</code>, gates, <code>backprop()</code></td></tr>
-<tr>
-<td><code>vtl.la</code></td>
-<td>Linear algebra (wraps VSL)</td></tr>
-<tr>
-<td><code>vtl.nn</code></td>
-<td>Layers, losses, optimizers</td></tr>
-<tr>
-<td><code>vtl.nn.models</code></td>
-<td><code>Sequential</code> model API</td></tr>
-<tr>
-<td><code>vtl.nn.internal</code></td>
-<td>Weight init (Kaiming, Xavier)</td></tr>
-<tr>
-<td><code>vtl.nn.gates</code></td>
-<td>Autograd gate implementations</td></tr></tbody></table>
-<h2 id="installation">Installation</h2>
-<p>VTL uses <a href="https://github.com/vlang/vsl">VSL</a> for linear algebra. The core <code>vtl</code> module works without optional system BLAS/LAPACK, but LA features need VSL.</p>
-<p>Follow <a href="https://github.com/vlang/vsl#install-vsl-locally">VSL install instructions</a>, then:</p>
-<pre><code class="language-sh">v install vtl</code></pre>
-<h2 id="testing">Testing</h2>
-<pre><code class="language-sh">v test <span class="token operator">~</span><span class="token operator">/</span><span class="token punctuation">.</span>vmodules<span class="token operator">/</span>vtl</code></pre>
-<p>See <a href="https://github.com/vlang/vtl/blob/master/docs/DEV_LIGHTWEIGHT.md">DEV_LIGHTWEIGHT.md</a> for memory-safe subsets in CI.</p>
-<h2 id="documentation">Documentation</h2>
-<table>
-<thead>
-<tr>
-<th>Tutorial</th>
-<th>Topic</th></tr></thead>
-<tbody>
-<tr>
-<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_FIRST_STEPS.md">TUTORIAL_FIRST_STEPS.md</a></td>
-<td>Tensor creation, indexing, slicing</td></tr>
-<tr>
-<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_MAP_REDUCE.md">TUTORIAL_MAP_REDUCE.md</a></td>
-<td><code>map</code> / <code>nmap</code> and reductions</td></tr>
-<tr>
-<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_AUTOGRAD.md">TUTORIAL_AUTOGRAD.md</a></td>
-<td><code>Variable</code>, gates, backprop</td></tr>
-<tr>
-<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_REDUCTIONS.md">TUTORIAL_REDUCTIONS.md</a></td>
-<td>argmax / argmin / cumsum</td></tr>
-<tr>
-<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_NEURAL_NETWORKS.md">TUTORIAL_NEURAL_NETWORKS.md</a></td>
-<td>Layers, losses, <code>Sequential</code></td></tr>
-<tr>
-<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_OPTIMIZERS.md">TUTORIAL_OPTIMIZERS.md</a></td>
-<td>Adam, AdamW, RMSProp, schedulers</td></tr>
-<tr>
-<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_LINEAR_ALGEBRA.md">TUTORIAL_LINEAR_ALGEBRA.md</a></td>
-<td>LA basics via VSL</td></tr>
-<tr>
-<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_ADVANCED_LA.md">TUTORIAL_ADVANCED_LA.md</a></td>
-<td>QR, LU, Cholesky, pinv</td></tr>
-<tr>
-<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_BROADCASTING.md">TUTORIAL_BROADCASTING.md</a></td>
-<td>Broadcasting rules</td></tr>
-<tr>
-<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_SLICING.md">TUTORIAL_SLICING.md</a></td>
-<td>Slicing and views</td></tr></tbody></table>
-<p>Full index: <a href="https://github.com/vlang/vtl/blob/master/docs/README.md"><code>docs/README.md</code></a>.</p>
-<h2 id="contributors">Contributors</h2>
-<blockquote>
-<p>Originally based on work by<br /><a href="https://github.com/christopherzimmerman">christopherzimmerman</a>.<br />The core was reimplemented while keeping that lineage and inspiration.</p></blockquote>
-<p><a href="https://github.com/vlang/vtl/contributors"> <img src="https://contrib.rocks/image?repo=vlang/vtl"/> </a></p>
-<p>Made with <a href="https://contrib.rocks">contributors-img</a>.</p>
-<h2 id="license">License</h2>
-<p><a href="https://github.com/vlang/vtl/blob/master/LICENSE">MIT</a></p>
-<p>[awesomevbadge]: <a href="https://awesome.re/mentioned-badge.svg">https://awesome.re/mentioned-badge.svg</a> [workflowbadge]: <a href="https://github.com/vlang/vtl/actions/workflows/ci.yml/badge.svg">https://github.com/vlang/vtl/actions/workflows/ci.yml/badge.svg</a> [licensebadge]: <a href="https://img.shields.io/badge/License-MIT-blue.svg">https://img.shields.io/badge/License-MIT-blue.svg</a> [awesomevurl]: <a href="https://github.com/vlang/awesome-v/blob/master/README.md#scientific-computing">https://github.com/vlang/awesome-v/blob/master/README.md#scientific-computing</a> [workflowurl]: <a href="https://github.com/vlang/vtl/actions/workflows/ci.yml">https://github.com/vlang/vtl/actions/workflows/ci.yml</a> [licenseurl]: <a href="https://github.com/vlang/vtl/blob/main/LICENSE">https://github.com/vlang/vtl/blob/main/LICENSE</a></p>
 
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 1 Jun 2026 07:13:59</div>
+						<div class="footer">Powered by vdoc. Generated on: 1 Jun 2026 07:16:05</div>
 					</div>
-					
+					<div class="doc-toc"><ul></ul></div>
 				</div>
 			</div>
 		</div>
