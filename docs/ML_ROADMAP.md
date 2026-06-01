@@ -35,7 +35,7 @@ GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 | P1 | [#41](https://github.com/vlang/vtl/issues/41) | Windows example crash |
 | P2 | [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support |
 | — | Vulkan f32 activations via `relu_vulkan_f32` / `sigmoid_vulkan_f32` (compute path) |
-| P2 | — | Vulkan Adam f32 GPU (blocked: VSL needs `vector_mul` / `sqrt` shaders; f32 Adam uses flat CPU step) |
+| — | Vulkan Adam f32 fused shader (`adam_step` + VSL 8 binding layout; `VTL_USE_VULKAN=1`) |
 | P2 | — | `v check-md -hide-warnings` on remaining docs (example READMEs done) |
 
 ## Local development
