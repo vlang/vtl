@@ -1,14 +1,18 @@
 # nn_cifar10_vulkan
 
-Tiny synthetic CIFAR-shaped **f32** pipeline with an explicit `linear_forward_vulkan` smoke step.
+Tiny synthetic CIFAR-shaped **f32** forward smoke. **Linear** uses Vulkan GEMM when opted in.
 
 ## Run
 
 ```bash
-v -d vulkan run vtl/examples/nn_cifar10_vulkan/main.v
+# CPU Linear (no Vulkan SDK required)
+v run vtl/examples/nn_cifar10_vulkan/main.v
+
+# GPU Linear via Vulkan
+VTL_USE_VULKAN=1 v -d vulkan run vtl/examples/nn_cifar10_vulkan/main.v
 ```
 
-Training uses CPU autograd; Vulkan is validated via a small GEMM linear forward at the end.
+Full f32 training (loss, backprop, Adam) is not in this example yet; only forward Linear is GPU-accelerated when opted in.
 
 ## Notes
 

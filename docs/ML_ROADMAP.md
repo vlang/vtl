@@ -17,6 +17,7 @@ GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 | [#105](https://github.com/vlang/vtl/pull/105) | Linear CUDA backward (`VTL_CUDA_BACKWARD=1`, Phase 3) |
 | [#107](https://github.com/vlang/vtl/issues/107) | Conv2D CUDA backward (cuDNN, same eligibility as forward) |
 | [#111](https://github.com/vlang/vtl/pull/111)/[#114](https://github.com/vlang/vtl/pull/114) | Adam on GPU + persistent `DeviceSession` slots (#106) |
+| [#110](https://github.com/vlang/vtl/issues/110) | Vulkan f32 Linear in `Sequential` forward (`VTL_USE_VULKAN=1`, `-d vulkan`) |
 | [#86](https://github.com/vlang/vtl/issues/86) | `DataLoader` |
 
 **VSL (downstream):** [#280](https://github.com/vlang/vsl/issues/280)–[#285](https://github.com/vlang/vsl/issues/285).
@@ -27,7 +28,6 @@ GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 |----------|-------|--------|
 | P1 | [#41](https://github.com/vlang/vtl/issues/41) | Windows example crash |
 | [#109](https://github.com/vlang/vtl/issues/109) | CI scoped tests + `full-ml` optional workflow |
-| P2 | [#110](https://github.com/vlang/vtl/issues/110) | Vulkan in `Sequential` training |
 | P2 | [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support |
 | P2 | — | `v check-md -hide-warnings` on all example READMEs |
 
@@ -42,8 +42,9 @@ v test vtl/nn vtl/datasets
 v run vtl/examples/nn_cifar10_tiny_synth/main.v
 # CUDA (opt-in)
 # VTL_USE_CUDA=1 v -d cuda run vtl/examples/nn_cifar10_cuda/main.v
-# Vulkan smoke
-# v -d vulkan run vtl/examples/nn_cifar10_vulkan/main.v
+# Vulkan f32 Linear forward smoke
+# v run vtl/examples/nn_cifar10_vulkan/main.v
+# VTL_USE_VULKAN=1 v -d vulkan run vtl/examples/nn_cifar10_vulkan/main.v
 ```
 
 ## CI

@@ -8,6 +8,14 @@ import vtl.nn.gates.layers
 import vtl.nn.types
 import vsl.vulkan
 
+// linear_forward_vulkan_f32 is the Sequential f32 entry point (opt-in via VTL_USE_VULKAN=1).
+pub fn linear_forward_vulkan_f32(x &vtl.Tensor[f32], weights &vtl.Tensor[f32], bias &vtl.Tensor[f32]) !&vtl.Tensor[f32] {
+	if !vulkan_linear_enabled() {
+		return error('linear_forward_vulkan_f32: set VTL_USE_VULKAN=1 to enable')
+	}
+	return linear_forward_vulkan(x, weights, bias)
+}
+
 // linear_forward_vulkan computes y = x * W^T + b using Vulkan GEMM
 // x: [M, K] (input matrix)
 // W: [N, K] (weights matrix)
