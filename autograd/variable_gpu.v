@@ -4,12 +4,12 @@ import vtl
 
 // variable_gpu_activation_ptr returns a pointer to the gpu_activation voidptr field.
 @[inline]
-pub fn variable_gpu_activation_ptr[T](mut v &Variable[T]) &voidptr {
+pub fn variable_gpu_activation_ptr[T](mut v Variable[T]) &voidptr {
 	return &v.gpu_activation
 }
 
 // variable_take_gpu_activation_input moves the pending GPU activation out (f64 CUDA builds only).
-pub fn variable_take_gpu_activation_input[T](mut v &Variable[T]) voidptr {
+pub fn variable_take_gpu_activation_input[T](mut v Variable[T]) voidptr {
 	if sizeof(T) != 8 {
 		return unsafe { nil }
 	}
@@ -22,7 +22,7 @@ pub fn variable_take_gpu_activation_input[T](mut v &Variable[T]) voidptr {
 }
 
 // variable_release_gpu_activation releases a stored GPU tensor handle (f64 CUDA).
-pub fn variable_release_gpu_activation[T](mut v &Variable[T]) {
+pub fn variable_release_gpu_activation[T](mut v Variable[T]) {
 	if sizeof(T) != 8 {
 		return
 	}
@@ -37,7 +37,7 @@ pub fn variable_release_gpu_activation[T](mut v &Variable[T]) {
 }
 
 // variable_set_gpu_activation stores a GPU tensor handle (f64 CUDA).
-pub fn variable_set_gpu_activation[T](mut v &Variable[T], ptr voidptr) {
+pub fn variable_set_gpu_activation[T](mut v Variable[T], ptr voidptr) {
 	if sizeof(T) != 8 {
 		return
 	}

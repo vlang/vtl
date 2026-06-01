@@ -1,6 +1,6 @@
 module autograd_tests
-import vtl.autograd
 
+import vtl.autograd
 import math
 import vtl
 

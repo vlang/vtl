@@ -164,7 +164,7 @@ fn (mut s DeviceSession) linear_forward_gpu_chain(x &vtl.Tensor[f64], weights &v
 	chain.d_c.ptr = unsafe { nil }
 	chain.d_c.size = 0
 	chain.pending = &vtl.CudaTensor[f64]{
-		data: &storage.CudaStorage[f64]{
+		data:    &storage.CudaStorage[f64]{
 			device: dev
 			ptr:    out_ptr
 			size:   int(sizeof(f64)) * m * n

@@ -21,8 +21,8 @@ pub fn conv2d_backward_f64(grad_out &vtl.Tensor[f64], input &vtl.Tensor[f64], we
 	stride_w := config.stride[1]
 
 	dev := cuda.get_default_device()!
-	bwd := compute.conv2d_backward_cuda(dev, grad_out.to_array(), input.to_array(), weight.to_array(),
-		batch, in_h, in_w, in_ch, out_ch, k_h, k_w, stride_h, stride_w)!
+	bwd := compute.conv2d_backward_cuda(dev, grad_out.to_array(), input.to_array(),
+		weight.to_array(), batch, in_h, in_w, in_ch, out_ch, k_h, k_w, stride_h, stride_w)!
 
 	d_input := vtl.from_array(bwd.d_input, input.shape)!
 	d_weight := vtl.from_array(bwd.d_weight, weight.shape)!

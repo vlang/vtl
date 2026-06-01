@@ -2,6 +2,7 @@ module layers
 
 import os
 import vtl
+
 fn test_linear_forward_f32_cpu_path() ! {
 	if os.getenv('VTL_USE_VULKAN') == '1' {
 		return

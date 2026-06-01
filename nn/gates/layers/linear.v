@@ -26,15 +26,15 @@ pub fn (g &LinearGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[
 		$if cuda ? {
 			if linear_gate_use_cuda_backward() {
 				tensors := linear_gate_backward_f64_cuda(voidptr(g), voidptr(payload))!
-			if g.input.requires_grad {
-				result[0] = unsafe { &vtl.Tensor[T](tensors[0]) }
-			}
-			if g.weight.requires_grad {
-				result[1] = unsafe { &vtl.Tensor[T](tensors[1]) }
-			}
-			if g.bias.requires_grad {
-				result[2] = unsafe { &vtl.Tensor[T](tensors[2]) }
-			}
+				if g.input.requires_grad {
+					result[0] = unsafe { &vtl.Tensor[T](tensors[0]) }
+				}
+				if g.weight.requires_grad {
+					result[1] = unsafe { &vtl.Tensor[T](tensors[1]) }
+				}
+				if g.bias.requires_grad {
+					result[2] = unsafe { &vtl.Tensor[T](tensors[2]) }
+				}
 				return result
 			}
 		}

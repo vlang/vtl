@@ -1,6 +1,6 @@
 module autograd_tests
-import vtl.autograd
 
+import vtl.autograd
 import vtl
 
 fn test_log_forward_backward() {
