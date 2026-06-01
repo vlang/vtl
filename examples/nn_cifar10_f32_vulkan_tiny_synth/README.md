@@ -8,14 +8,15 @@ f32 **training** smoke (forward, MSE, backprop, Adam). **Linear** forward/backwa
 # CPU Linear (default)
 v run vtl/examples/nn_cifar10_f32_vulkan_tiny_synth/main.v
 
-# Vulkan Linear forward
-VTL_USE_VULKAN=1 v -d vulkan run vtl/examples/nn_cifar10_f32_vulkan_tiny_synth/main.v
+# Vulkan GPU (requires SDK; use -prod — debug Vulkan instance crashes on V 0.5.1)
+VTL_USE_VULKAN=1 v -prod -d vulkan run vtl/examples/nn_cifar10_f32_vulkan_tiny_synth/main.v
 ```
 
 ## Test
 
 ```bash
-VTL_TEST_VULKAN=1 VJOBS=1 v -d vulkan test vtl/nn/f32_vulkan_training_smoke_test.v
+VJOBS=1 v test vtl/nn/f32_vulkan_training_smoke_test.v
+VTL_USE_VULKAN=1 VTL_TEST_VULKAN=1 v -prod -d vulkan test vtl/nn/layers/linear_vulkan_gpu_d_vulkan_test.v
 ```
 
 CPU-only f32 training (no Vulkan SDK): `examples/nn_cifar10_f32_tiny_synth/`.

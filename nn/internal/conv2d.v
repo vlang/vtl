@@ -93,9 +93,9 @@ pub fn conv2d_backward[T](grad_out &vtl.Tensor[T],
 		tensors := conv2d_backward_f64(unsafe { &vtl.Tensor[f64](grad_out) },
 			unsafe { &vtl.Tensor[f64](input) }, unsafe { &vtl.Tensor[f64](weight) },
 			unsafe { &vtl.Tensor[f64](bias) }, kernel_size, config)!
-		mut out := []&vtl.Tensor[T]{len: tensors.len}
-		for i, t in tensors {
-			out[i] = unsafe { &vtl.Tensor[T](t) }
+		mut out := []&vtl.Tensor[T]{cap: tensors.len}
+		for t in tensors {
+			out << unsafe { &vtl.Tensor[T](t) }
 		}
 		return out
 	}
