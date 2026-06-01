@@ -2,6 +2,7 @@ module loss
 
 import vtl
 import vtl.autograd
+import vtl.nn.types
 import vtl.nn.gates.loss as loss_gates
 import vtl.nn.internal
 
@@ -40,10 +41,11 @@ pub struct BCELossConfig {
 }
 
 // bce_loss creates a new BCELoss instance.
-pub fn bce_loss[T](config BCELossConfig) &BCELoss[T] {
-	return &BCELoss[T]{
+pub fn bce_loss[T](config BCELossConfig) types.Loss[T] {
+	concrete := &BCELoss[T]{
 		from_logits: config.from_logits
 	}
+	return types.loss[T](voidptr(concrete), bce_loss_loss_dispatch[T])
 }
 
 // loss exposes this operation as part of the public API.
@@ -60,4 +62,11 @@ pub fn (l &BCELoss[T]) loss(input &autograd.Variable[T], target &vtl.Tensor[T]) 
 		gate.cache(mut result, input)!
 	}
 	return result
+}
+
+fn bce_loss_loss_dispatch[T](loss_ptr voidptr, input voidptr, target voidptr) !voidptr {
+	typed_input := unsafe { &autograd.Variable[T](input) }
+	typed_target := unsafe { &vtl.Tensor[T](target) }
+	result := unsafe { (&BCELoss[T](loss_ptr)).loss(typed_input, typed_target)! }
+	return voidptr(result)
 }

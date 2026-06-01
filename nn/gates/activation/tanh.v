@@ -24,6 +24,12 @@ pub fn (g &TanhGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T]
 	return [r0]
 }
 
+fn tanh_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &autograd.Payload[T](payload) }
+	tensors := unsafe { (&TanhGate[T](gate)).backward(typed_payload)! }
+	return autograd.tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &TanhGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
@@ -31,7 +37,9 @@ pub fn (g &TanhGate[T]) cache(mut result autograd.Variable[T], args ...autograd.
 		autograd.Variable[T] {
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
-			autograd.register[T]('Tanh', g, result, [a])!
+			autograd.register[T]('Tanh', voidptr(g), tanh_gate_backward_dispatch[T], result, [
+				a,
+			])!
 		}
 		else {
 			return error('Tanh: cache: invalid argument')

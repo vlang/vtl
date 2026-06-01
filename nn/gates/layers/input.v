@@ -17,6 +17,12 @@ pub fn (g &InputGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T
 	return [gradient]
 }
 
+fn input_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &autograd.Payload[T](payload) }
+	tensors := unsafe { (&InputGate[T](gate)).backward(typed_payload)! }
+	return autograd.tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &InputGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
@@ -26,7 +32,9 @@ pub fn (g &InputGate[T]) cache(mut result autograd.Variable[T], args ...autograd
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
 
-			autograd.register[T]('Input', g, result, [a])!
+			autograd.register[T]('Input', voidptr(g), input_gate_backward_dispatch[T], result, [
+				a,
+			])!
 		}
 		else {
 			return error('InputGate: cache: invalid argument')

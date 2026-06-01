@@ -34,11 +34,14 @@ pub fn positional_encoding_layer[T](ctx &autograd.Context[T], embed_dim int, max
 		}
 	}
 	pe := vtl.from_array[T](pe_data.map(vtl.cast[T](it)), [max_len, embed_dim])!
-	return types.Layer[T](&PositionalEncodingLayer[T]{
+	layer := &PositionalEncodingLayer[T]{
 		max_len:   max_len
 		embed_dim: embed_dim
 		pe:        pe
-	})
+	}
+	return types.layer[T](voidptr(layer), positional_encoding_layer_output_shape_dispatch[T],
+		positional_encoding_layer_variables_dispatch[T],
+		positional_encoding_layer_forward_dispatch[T])
 }
 
 // output_shape exposes this operation as part of the public API.
@@ -69,4 +72,19 @@ pub fn (layer &PositionalEncodingLayer[T]) forward(input &autograd.Variable[T]) 
 	}
 	output := vtl.from_array(out_data.map(vtl.cast[T](it)), [batch, seq_len, layer.embed_dim])!
 	return input.context.variable(output)
+}
+
+fn positional_encoding_layer_output_shape_dispatch[T](layer voidptr) []int {
+	return unsafe { (&PositionalEncodingLayer[T](layer)).output_shape() }
+}
+
+fn positional_encoding_layer_variables_dispatch[T](layer voidptr) []voidptr {
+	vars := unsafe { (&PositionalEncodingLayer[T](layer)).variables() }
+	return types.variable_ptrs_to_voidptrs[T](vars)
+}
+
+fn positional_encoding_layer_forward_dispatch[T](layer voidptr, input voidptr) !voidptr {
+	typed_input := unsafe { &autograd.Variable[T](input) }
+	result := unsafe { (&PositionalEncodingLayer[T](layer)).forward(typed_input)! }
+	return voidptr(result)
 }

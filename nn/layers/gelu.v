@@ -14,9 +14,11 @@ pub struct GELULayer[T] {
 
 // gelu_layer exposes this operation as part of the public API.
 pub fn gelu_layer[T](ctx &autograd.Context[T], output_shape []int) types.Layer[T] {
-	return types.Layer[T](&GELULayer[T]{
+	layer := &GELULayer[T]{
 		output_shape: output_shape.clone()
-	})
+	}
+	return types.layer[T](voidptr(layer), gelu_layer_output_shape_dispatch[T],
+		gelu_layer_variables_dispatch[T], gelu_layer_forward_dispatch[T])
 }
 
 // output_shape exposes this operation as part of the public API.
@@ -39,4 +41,19 @@ pub fn (layer &GELULayer[T]) forward(input &autograd.Variable[T]) !&autograd.Var
 		gate.cache(mut result, input)!
 	}
 	return result
+}
+
+fn gelu_layer_output_shape_dispatch[T](layer voidptr) []int {
+	return unsafe { (&GELULayer[T](layer)).output_shape() }
+}
+
+fn gelu_layer_variables_dispatch[T](layer voidptr) []voidptr {
+	vars := unsafe { (&GELULayer[T](layer)).variables() }
+	return types.variable_ptrs_to_voidptrs[T](vars)
+}
+
+fn gelu_layer_forward_dispatch[T](layer voidptr, input voidptr) !voidptr {
+	typed_input := unsafe { &autograd.Variable[T](input) }
+	result := unsafe { (&GELULayer[T](layer)).forward(typed_input)! }
+	return voidptr(result)
 }

@@ -36,7 +36,7 @@ pub fn multihead_attention_layer[T](ctx &autograd.Context[T], embed_dim int, num
 	w_k := ctx.variable(internal.kaiming_uniform[T]([embed_dim, embed_dim]))
 	w_v := ctx.variable(internal.kaiming_uniform[T]([embed_dim, embed_dim]))
 	w_o := ctx.variable(internal.kaiming_uniform[T]([embed_dim, embed_dim]))
-	return types.Layer[T](&MultiHeadAttentionLayer[T]{
+	layer := &MultiHeadAttentionLayer[T]{
 		embed_dim: embed_dim
 		num_heads: num_heads
 		head_dim:  head_dim
@@ -44,7 +44,10 @@ pub fn multihead_attention_layer[T](ctx &autograd.Context[T], embed_dim int, num
 		w_k:       w_k
 		w_v:       w_v
 		w_o:       w_o
-	})
+	}
+	return types.layer[T](voidptr(layer), multi_head_attention_layer_output_shape_dispatch[T],
+		multi_head_attention_layer_variables_dispatch[T],
+		multi_head_attention_layer_forward_dispatch[T])
 }
 
 // output_shape exposes this operation as part of the public API.
@@ -111,6 +114,21 @@ pub fn (layer &MultiHeadAttentionLayer[T]) forward(input &autograd.Variable[T]) 
 	return result
 }
 
+fn multi_head_attention_layer_output_shape_dispatch[T](layer voidptr) []int {
+	return unsafe { (&MultiHeadAttentionLayer[T](layer)).output_shape() }
+}
+
+fn multi_head_attention_layer_variables_dispatch[T](layer voidptr) []voidptr {
+	vars := unsafe { (&MultiHeadAttentionLayer[T](layer)).variables() }
+	return types.variable_ptrs_to_voidptrs[T](vars)
+}
+
+fn multi_head_attention_layer_forward_dispatch[T](layer voidptr, input voidptr) !voidptr {
+	typed_input := unsafe { &autograd.Variable[T](input) }
+	result := unsafe { (&MultiHeadAttentionLayer[T](layer)).forward(typed_input)! }
+	return voidptr(result)
+}
+
 // AttentionGate defines a public data structure for this module.
 pub struct AttentionGate[T] {
 	input     &vtl.Tensor[T] = unsafe { nil }
@@ -143,6 +161,12 @@ pub fn (g &AttentionGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tens
 	return [d_input, d_w_o, d_w_o, d_w_o, d_w_o]
 }
 
+fn attention_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &autograd.Payload[T](payload) }
+	tensors := unsafe { (&AttentionGate[T](gate)).backward(typed_payload)! }
+	return autograd.tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &AttentionGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
@@ -150,7 +174,8 @@ pub fn (g &AttentionGate[T]) cache(mut result autograd.Variable[T], args ...auto
 		autograd.Variable[T] {
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
-			autograd.register[T]('Attention', g, result, [a])!
+			autograd.register[T]('Attention', voidptr(g), attention_gate_backward_dispatch[T],
+				result, [a])!
 		}
 		else {}
 	}

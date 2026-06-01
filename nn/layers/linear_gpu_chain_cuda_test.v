@@ -5,6 +5,11 @@ import vtl
 import vtl.autograd
 import vtl.autograd_cuda
 
+// Placeholder for `v test` without `-d cuda` (CI scoped nn/layers tests).
+fn test_linear_gpu_activation_chain_needs_cuda_build() {
+	assert true
+}
+
 $if cuda ? {
 	// Chained Linear forwards reuse device activations when VTL_GPU_ACTIVATIONS=1 (`-d cuda` only).
 	fn test_linear_gpu_activation_chain_two_layers() ! {

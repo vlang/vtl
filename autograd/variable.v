@@ -97,8 +97,9 @@ pub fn (mut v Variable[T]) backprop() ! {
 		$if debug {
 			print(cur_node.name)
 		}
-		diffs := cur_node.gate.backward(cur_node.payload)!
-		for i, diff in diffs {
+		diff_ptrs := cur_node.backward(cur_node.gate, voidptr(cur_node.payload))!
+		for i, diff_ptr in diff_ptrs {
+			diff := unsafe { &vtl.Tensor[T](diff_ptr) }
 			mut parent_i := cur_node.parents[i]
 			if parent_i.requires_grad {
 				parent_i.grad = parent_i.grad.add(diff)!

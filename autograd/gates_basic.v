@@ -16,6 +16,12 @@ pub fn (g &AddGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [gradient, gradient]
 }
 
+fn add_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := unsafe { (&AddGate[T](gate)).backward(typed_payload)! }
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &AddGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
@@ -28,7 +34,10 @@ pub fn (g &AddGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 					result.grad = vtl.zeros_like[T](result.value)
 					result.requires_grad = true
 
-					register[T]('Add', g, result, [a, b])!
+					register[T]('Add', voidptr(g), add_gate_backward_dispatch[T], result, [
+						a,
+						b,
+					])!
 				}
 				else {
 					return error('AddGate: b must be a Variable')
@@ -56,6 +65,12 @@ pub fn (g &SubtractGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [gradient, opposite]
 }
 
+fn subtract_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := unsafe { (&SubtractGate[T](gate)).backward(typed_payload)! }
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &SubtractGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
@@ -68,7 +83,10 @@ pub fn (g &SubtractGate[T]) cache(mut result Variable[T], args ...CacheParam) ! 
 					result.grad = vtl.zeros_like[T](result.value)
 					result.requires_grad = true
 
-					register[T]('Sub', g, result, [a, b])!
+					register[T]('Sub', voidptr(g), subtract_gate_backward_dispatch[T], result, [
+						a,
+						b,
+					])!
 				}
 				else {
 					return error('SubtractGate: b must be a Variable')
@@ -104,6 +122,12 @@ pub fn (g &MultiplyGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0, r1]
 }
 
+fn multiply_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := unsafe { (&MultiplyGate[T](gate)).backward(typed_payload)! }
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &MultiplyGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
@@ -116,7 +140,10 @@ pub fn (g &MultiplyGate[T]) cache(mut result Variable[T], args ...CacheParam) ! 
 					result.grad = vtl.zeros_like[T](result.value)
 					result.requires_grad = true
 
-					register[T]('Multiply', g, result, [a, b])!
+					register[T]('Multiply', voidptr(g), multiply_gate_backward_dispatch[T], result, [
+						a,
+						b,
+					])!
 				}
 				else {
 					return error('MultiplyGate: b must be a Variable')
@@ -155,6 +182,12 @@ pub fn (g &DivideGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0, r1]
 }
 
+fn divide_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := unsafe { (&DivideGate[T](gate)).backward(typed_payload)! }
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &DivideGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
@@ -167,7 +200,10 @@ pub fn (g &DivideGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 					result.grad = vtl.zeros_like[T](result.value)
 					result.requires_grad = true
 
-					register[T]('Divide', g, result, [a, b])!
+					register[T]('Divide', voidptr(g), divide_gate_backward_dispatch[T], result, [
+						a,
+						b,
+					])!
 				}
 				else {
 					return error('DivideGate: b must be a Variable')

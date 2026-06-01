@@ -24,10 +24,12 @@ pub:
 pub fn linear_layer[T](ctx &autograd.Context[T], input_dim int, output_dim int) types.Layer[T] {
 	weights := internal.kaiming_normal[T]([output_dim, input_dim])
 	bias := vtl.zeros[T]([1, output_dim])
-	return types.Layer[T](&LinearLayer[T]{
+	layer := &LinearLayer[T]{
 		weights: ctx.variable(weights)
 		bias:    ctx.variable(bias)
-	})
+	}
+	return types.layer[T](voidptr(layer), linear_layer_output_shape_dispatch[T],
+		linear_layer_variables_dispatch[T], linear_layer_forward_dispatch[T])
 }
 
 // output_shape exposes this operation as part of the public API.
@@ -69,4 +71,19 @@ pub fn (layer &LinearLayer[T]) forward(input &autograd.Variable[T]) !&autograd.V
 	}
 
 	return result
+}
+
+fn linear_layer_output_shape_dispatch[T](layer voidptr) []int {
+	return unsafe { (&LinearLayer[T](layer)).output_shape() }
+}
+
+fn linear_layer_variables_dispatch[T](layer voidptr) []voidptr {
+	vars := unsafe { (&LinearLayer[T](layer)).variables() }
+	return types.variable_ptrs_to_voidptrs[T](vars)
+}
+
+fn linear_layer_forward_dispatch[T](layer voidptr, input voidptr) !voidptr {
+	typed_input := unsafe { &autograd.Variable[T](input) }
+	result := unsafe { (&LinearLayer[T](layer)).forward(typed_input)! }
+	return voidptr(result)
 }

@@ -25,6 +25,12 @@ pub fn (g &MseGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] 
 	return internal.mse_backward[T](gradient, g.cache.value, g.target)
 }
 
+fn mse_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &autograd.Payload[T](payload) }
+	tensors := unsafe { (&MseGate[T](gate)).backward(typed_payload)! }
+	return autograd.tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &MseGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
@@ -34,7 +40,9 @@ pub fn (g &MseGate[T]) cache(mut result autograd.Variable[T], args ...autograd.C
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
 
-			autograd.register[T]('MSE', g, result, [a])!
+			autograd.register[T]('MSE', voidptr(g), mse_gate_backward_dispatch[T], result, [
+				a,
+			])!
 		}
 		else {
 			return error('MSEGate: cache: invalid argument')

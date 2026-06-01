@@ -2,6 +2,7 @@ module loss
 
 import vtl
 import vtl.autograd
+import vtl.nn.types
 import vtl.nn.gates.loss as loss_gates
 import vtl.nn.internal
 
@@ -27,10 +28,11 @@ pub:
 }
 
 // kl_div_loss creates a new KLDivLoss instance with `reduction = 'mean'`.
-pub fn kl_div_loss[T]() &KLDivLoss[T] {
-	return &KLDivLoss[T]{
+pub fn kl_div_loss[T]() types.Loss[T] {
+	concrete := &KLDivLoss[T]{
 		reduction: 'mean'
 	}
+	return types.loss[T](voidptr(concrete), kl_div_loss_loss_dispatch[T])
 }
 
 // loss exposes this operation as part of the public API.
@@ -43,4 +45,11 @@ pub fn (_ &KLDivLoss[T]) loss(input &autograd.Variable[T], target &vtl.Tensor[T]
 		gate.cache(mut result, input)!
 	}
 	return result
+}
+
+fn kl_div_loss_loss_dispatch[T](loss_ptr voidptr, input voidptr, target voidptr) !voidptr {
+	typed_input := unsafe { &autograd.Variable[T](input) }
+	typed_target := unsafe { &vtl.Tensor[T](target) }
+	result := unsafe { (&KLDivLoss[T](loss_ptr)).loss(typed_input, typed_target)! }
+	return voidptr(result)
 }

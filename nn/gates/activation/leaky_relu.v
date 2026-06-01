@@ -26,6 +26,12 @@ pub fn (g &LeakyReluGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tens
 	return [r0]
 }
 
+fn leaky_relu_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &autograd.Payload[T](payload) }
+	tensors := unsafe { (&LeakyReluGate[T](gate)).backward(typed_payload)! }
+	return autograd.tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &LeakyReluGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
@@ -35,7 +41,8 @@ pub fn (g &LeakyReluGate[T]) cache(mut result autograd.Variable[T], args ...auto
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
 
-			autograd.register[T]('LeakyRelu', g, result, [a])!
+			autograd.register[T]('LeakyRelu', voidptr(g), leaky_relu_gate_backward_dispatch[T],
+				result, [a])!
 		}
 		else {
 			return error('LeakyRelu: cache: invalid argument')

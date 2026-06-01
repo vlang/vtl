@@ -37,12 +37,14 @@ pub fn layer_norm_layer[T](ctx &autograd.Context[T], normalized_shape []int, con
 		gamma = ctx.variable(vtl.ones[T](normalized_shape))
 		beta = ctx.variable(vtl.zeros[T](normalized_shape))
 	}
-	return types.Layer[T](&LayerNormLayer[T]{
+	layer := &LayerNormLayer[T]{
 		normalized_shape: normalized_shape
 		eps:              config.eps
 		gamma:            gamma
 		beta:             beta
-	})
+	}
+	return types.layer[T](voidptr(layer), layer_norm_layer_output_shape_dispatch[T],
+		layer_norm_layer_variables_dispatch[T], layer_norm_layer_forward_dispatch[T])
 }
 
 // output_shape exposes this operation as part of the public API.
@@ -70,6 +72,21 @@ pub fn (layer &LayerNormLayer[T]) forward(input &autograd.Variable[T]) !&autogra
 	return result
 }
 
+fn layer_norm_layer_output_shape_dispatch[T](layer voidptr) []int {
+	return unsafe { (&LayerNormLayer[T](layer)).output_shape() }
+}
+
+fn layer_norm_layer_variables_dispatch[T](layer voidptr) []voidptr {
+	vars := unsafe { (&LayerNormLayer[T](layer)).variables() }
+	return types.variable_ptrs_to_voidptrs[T](vars)
+}
+
+fn layer_norm_layer_forward_dispatch[T](layer voidptr, input voidptr) !voidptr {
+	typed_input := unsafe { &autograd.Variable[T](input) }
+	result := unsafe { (&LayerNormLayer[T](layer)).forward(typed_input)! }
+	return voidptr(result)
+}
+
 // LayerNormGate defines a public data structure for this module.
 pub struct LayerNormGate[T] {
 	input &vtl.Tensor[T] = unsafe { nil }
@@ -93,6 +110,12 @@ pub fn (g &LayerNormGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tens
 	return internal.layer_norm_backward[T](payload.variable.grad, g.input, g.gamma, g.beta, g.eps)
 }
 
+fn layer_norm_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &autograd.Payload[T](payload) }
+	tensors := unsafe { (&LayerNormGate[T](gate)).backward(typed_payload)! }
+	return autograd.tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &LayerNormGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
@@ -100,7 +123,8 @@ pub fn (g &LayerNormGate[T]) cache(mut result autograd.Variable[T], args ...auto
 		autograd.Variable[T] {
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
-			autograd.register[T]('LayerNorm', g, result, [a])!
+			autograd.register[T]('LayerNorm', voidptr(g), layer_norm_gate_backward_dispatch[T],
+				result, [a])!
 		}
 		else {}
 	}

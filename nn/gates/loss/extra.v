@@ -26,6 +26,12 @@ pub fn (g &BCEGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] 
 	return [r0]
 }
 
+fn bce_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &autograd.Payload[T](payload) }
+	tensors := unsafe { (&BCEGate[T](gate)).backward(typed_payload)! }
+	return autograd.tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &BCEGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
@@ -33,7 +39,9 @@ pub fn (g &BCEGate[T]) cache(mut result autograd.Variable[T], args ...autograd.C
 		autograd.Variable[T] {
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
-			autograd.register[T]('BCE', g, result, [a])!
+			autograd.register[T]('BCE', voidptr(g), bce_gate_backward_dispatch[T], result, [
+				a,
+			])!
 		}
 		else {
 			return error('BCE: cache: invalid argument')
@@ -63,6 +71,12 @@ pub fn (g &HuberLossGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tens
 	return [r0]
 }
 
+fn huber_loss_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &autograd.Payload[T](payload) }
+	tensors := unsafe { (&HuberLossGate[T](gate)).backward(typed_payload)! }
+	return autograd.tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &HuberLossGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
@@ -70,7 +84,9 @@ pub fn (g &HuberLossGate[T]) cache(mut result autograd.Variable[T], args ...auto
 		autograd.Variable[T] {
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
-			autograd.register[T]('Huber', g, result, [a])!
+			autograd.register[T]('Huber', voidptr(g), huber_loss_gate_backward_dispatch[T], result, [
+				a,
+			])!
 		}
 		else {
 			return error('Huber: cache: invalid argument')
@@ -98,6 +114,12 @@ pub fn (g &NLLLossGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor
 	return [r0]
 }
 
+fn nll_loss_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &autograd.Payload[T](payload) }
+	tensors := unsafe { (&NLLLossGate[T](gate)).backward(typed_payload)! }
+	return autograd.tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &NLLLossGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
@@ -105,7 +127,9 @@ pub fn (g &NLLLossGate[T]) cache(mut result autograd.Variable[T], args ...autogr
 		autograd.Variable[T] {
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
-			autograd.register[T]('NLL', g, result, [a])!
+			autograd.register[T]('NLL', voidptr(g), nll_loss_gate_backward_dispatch[T], result, [
+				a,
+			])!
 		}
 		else {
 			return error('NLL: cache: invalid argument')
@@ -133,6 +157,12 @@ pub fn (g &KLDivLossGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tens
 	return [r0]
 }
 
+fn kl_div_loss_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &autograd.Payload[T](payload) }
+	tensors := unsafe { (&KLDivLossGate[T](gate)).backward(typed_payload)! }
+	return autograd.tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &KLDivLossGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
@@ -140,7 +170,8 @@ pub fn (g &KLDivLossGate[T]) cache(mut result autograd.Variable[T], args ...auto
 		autograd.Variable[T] {
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
-			autograd.register[T]('KLDiv', g, result, [a])!
+			autograd.register[T]('KLDiv', voidptr(g), kl_div_loss_gate_backward_dispatch[T],
+				result, [a])!
 		}
 		else {
 			return error('KLDiv: cache: invalid argument')

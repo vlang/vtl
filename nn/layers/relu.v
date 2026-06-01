@@ -13,9 +13,11 @@ pub struct ReLULayer[T] {
 
 // relu_layer exposes this operation as part of the public API.
 pub fn relu_layer[T](ctx &autograd.Context[T], output_shape []int) types.Layer[T] {
-	return types.Layer[T](&ReLULayer[T]{
+	layer := &ReLULayer[T]{
 		output_shape: output_shape.clone()
-	})
+	}
+	return types.layer[T](voidptr(layer), re_lu_layer_output_shape_dispatch[T],
+		re_lu_layer_variables_dispatch[T], re_lu_layer_forward_dispatch[T])
 }
 
 // output_shape exposes this operation as part of the public API.
@@ -44,4 +46,19 @@ pub fn (layer &ReLULayer[T]) forward(input &autograd.Variable[T]) !&autograd.Var
 		gate.cache(mut result, input)!
 	}
 	return result
+}
+
+fn re_lu_layer_output_shape_dispatch[T](layer voidptr) []int {
+	return unsafe { (&ReLULayer[T](layer)).output_shape() }
+}
+
+fn re_lu_layer_variables_dispatch[T](layer voidptr) []voidptr {
+	vars := unsafe { (&ReLULayer[T](layer)).variables() }
+	return types.variable_ptrs_to_voidptrs[T](vars)
+}
+
+fn re_lu_layer_forward_dispatch[T](layer voidptr, input voidptr) !voidptr {
+	typed_input := unsafe { &autograd.Variable[T](input) }
+	result := unsafe { (&ReLULayer[T](layer)).forward(typed_input)! }
+	return voidptr(result)
 }

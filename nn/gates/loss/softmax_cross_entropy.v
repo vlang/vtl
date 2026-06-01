@@ -25,6 +25,12 @@ pub fn (g &SoftmaxCrossEntropyGate[T]) backward(payload &autograd.Payload[T]) ![
 	return internal.softmax_cross_entropy_backward[T](gradient, g.cache.value, g.target)
 }
 
+fn softmax_cross_entropy_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &autograd.Payload[T](payload) }
+	tensors := unsafe { (&SoftmaxCrossEntropyGate[T](gate)).backward(typed_payload)! }
+	return autograd.tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &SoftmaxCrossEntropyGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
@@ -34,7 +40,8 @@ pub fn (g &SoftmaxCrossEntropyGate[T]) cache(mut result autograd.Variable[T], ar
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
 
-			autograd.register[T]('SoftmaxCrossEntropy', g, result, [a])!
+			autograd.register[T]('SoftmaxCrossEntropy', voidptr(g),
+				softmax_cross_entropy_gate_backward_dispatch[T], result, [a])!
 		}
 		else {
 			return error('SoftmaxCrossEntropyGate: cache: invalid argument')

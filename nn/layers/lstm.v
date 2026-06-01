@@ -44,7 +44,8 @@ pub fn lstm_layer[T](ctx &autograd.Context[T], input_size int, hidden_size int, 
 			hidden_size: hidden_size
 			num_layers:  num_layers
 		}
-		return types.Layer[T](layer)
+		return types.layer[T](voidptr(layer), lstm_layer_output_shape_dispatch[T],
+			lstm_layer_variables_dispatch[T], lstm_layer_forward_dispatch[T])
 	}
 }
 
@@ -68,4 +69,19 @@ fn (l &LSTMLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T]
 
 		return l.ctx.variable(output)
 	}
+}
+
+fn lstm_layer_output_shape_dispatch[T](layer voidptr) []int {
+	return unsafe { (&LSTMLayer[T](layer)).output_shape() }
+}
+
+fn lstm_layer_variables_dispatch[T](layer voidptr) []voidptr {
+	vars := unsafe { (&LSTMLayer[T](layer)).variables() }
+	return types.variable_ptrs_to_voidptrs[T](vars)
+}
+
+fn lstm_layer_forward_dispatch[T](layer voidptr, input voidptr) !voidptr {
+	typed_input := unsafe { &autograd.Variable[T](input) }
+	result := unsafe { (&LSTMLayer[T](layer)).forward(typed_input)! }
+	return voidptr(result)
 }

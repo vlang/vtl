@@ -48,7 +48,7 @@ pub fn conv2d_layer[T](ctx &autograd.Context[T], in_ch int, out_ch int, kernel_s
 	weight_shape := [out_ch, in_ch / config.groups, kernel_size[0], kernel_size[1]]
 	weight := internal.kaiming_normal[T](weight_shape)
 	bias := vtl.zeros[T]([1, out_ch])
-	return types.Layer[T](&Conv2DLayer[T]{
+	layer := &Conv2DLayer[T]{
 		in_channels:  in_ch
 		out_channels: out_ch
 		kernel_size:  kernel_size
@@ -56,7 +56,9 @@ pub fn conv2d_layer[T](ctx &autograd.Context[T], in_ch int, out_ch int, kernel_s
 		input_shape:  input_shape.clone()
 		weight:       ctx.variable(weight)
 		bias:         ctx.variable(bias)
-	})
+	}
+	return types.layer[T](voidptr(layer), conv2_d_layer_output_shape_dispatch[T],
+		conv2_d_layer_variables_dispatch[T], conv2_d_layer_forward_dispatch[T])
 }
 
 // output_shape exposes this operation as part of the public API.
@@ -102,6 +104,21 @@ pub fn (layer &Conv2DLayer[T]) forward(input &autograd.Variable[T]) !&autograd.V
 	return result
 }
 
+fn conv2_d_layer_output_shape_dispatch[T](layer voidptr) []int {
+	return unsafe { (&Conv2DLayer[T](layer)).output_shape() }
+}
+
+fn conv2_d_layer_variables_dispatch[T](layer voidptr) []voidptr {
+	vars := unsafe { (&Conv2DLayer[T](layer)).variables() }
+	return types.variable_ptrs_to_voidptrs[T](vars)
+}
+
+fn conv2_d_layer_forward_dispatch[T](layer voidptr, input voidptr) !voidptr {
+	typed_input := unsafe { &autograd.Variable[T](input) }
+	result := unsafe { (&Conv2DLayer[T](layer)).forward(typed_input)! }
+	return voidptr(result)
+}
+
 // Conv2DGate defines a public data structure for this module.
 pub struct Conv2DGate[T] {
 	input       &vtl.Tensor[T] = unsafe { nil }
@@ -134,6 +151,12 @@ pub fn (g &Conv2DGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[
 		g.kernel_size, cfg)
 }
 
+fn conv2_d_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &autograd.Payload[T](payload) }
+	tensors := unsafe { (&Conv2DGate[T](gate)).backward(typed_payload)! }
+	return autograd.tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &Conv2DGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	if args.len < 3 {
@@ -150,7 +173,8 @@ pub fn (g &Conv2DGate[T]) cache(mut result autograd.Variable[T], args ...autogra
 						autograd.Variable[T] {
 							result.grad = vtl.zeros_like[T](result.value)
 							result.requires_grad = true
-							autograd.register[T]('Conv2D', g, result, [input, weight, bias])!
+							autograd.register[T]('Conv2D', voidptr(g),
+								conv2_d_gate_backward_dispatch[T], result, [input, weight, bias])!
 						}
 						else {
 							return error('Conv2DGate: bias must be a Variable')

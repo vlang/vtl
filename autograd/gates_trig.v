@@ -22,6 +22,12 @@ pub fn (g &SinGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0]
 }
 
+fn sin_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := unsafe { (&SinGate[T](gate)).backward(typed_payload)! }
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &SinGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
@@ -31,7 +37,7 @@ pub fn (g &SinGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
 
-			register[T]('Sin', g, result, [a])!
+			register[T]('Sin', voidptr(g), sin_gate_backward_dispatch[T], result, [a])!
 		}
 		else {
 			return error('SinGate: a must be a Variable')
@@ -59,6 +65,12 @@ pub fn (g &CosGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0]
 }
 
+fn cos_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := unsafe { (&CosGate[T](gate)).backward(typed_payload)! }
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &CosGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
@@ -68,7 +80,7 @@ pub fn (g &CosGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
 
-			register[T]('Cos', g, result, [a])!
+			register[T]('Cos', voidptr(g), cos_gate_backward_dispatch[T], result, [a])!
 		}
 		else {
 			return error('CosGate: a must be a Variable')
@@ -97,6 +109,12 @@ pub fn (g &TanGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0]
 }
 
+fn tan_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := unsafe { (&TanGate[T](gate)).backward(typed_payload)! }
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &TanGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
@@ -106,7 +124,7 @@ pub fn (g &TanGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
 
-			register[T]('Tan', g, result, [a])!
+			register[T]('Tan', voidptr(g), tan_gate_backward_dispatch[T], result, [a])!
 		}
 		else {
 			return error('TanGate: a must be a Variable')

@@ -23,10 +23,12 @@ pub struct EluLayer[T] {
 
 // elu_layer exposes this operation as part of the public API.
 pub fn elu_layer[T](ctx &autograd.Context[T], output_shape []int, data EluLayerConfig) types.Layer[T] {
-	return types.Layer[T](&EluLayer[T]{
+	layer := &EluLayer[T]{
 		output_shape: output_shape.clone()
 		alpha:        data.alpha
-	})
+	}
+	return types.layer[T](voidptr(layer), elu_layer_output_shape_dispatch[T],
+		elu_layer_variables_dispatch[T], elu_layer_forward_dispatch[T])
 }
 
 // output_shape exposes this operation as part of the public API.
@@ -49,4 +51,19 @@ pub fn (layer &EluLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Vari
 		gate.cache(mut result, input)!
 	}
 	return result
+}
+
+fn elu_layer_output_shape_dispatch[T](layer voidptr) []int {
+	return unsafe { (&EluLayer[T](layer)).output_shape() }
+}
+
+fn elu_layer_variables_dispatch[T](layer voidptr) []voidptr {
+	vars := unsafe { (&EluLayer[T](layer)).variables() }
+	return types.variable_ptrs_to_voidptrs[T](vars)
+}
+
+fn elu_layer_forward_dispatch[T](layer voidptr, input voidptr) !voidptr {
+	typed_input := unsafe { &autograd.Variable[T](input) }
+	result := unsafe { (&EluLayer[T](layer)).forward(typed_input)! }
+	return voidptr(result)
 }

@@ -23,6 +23,12 @@ pub fn (g &LogGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0]
 }
 
+fn log_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := unsafe { (&LogGate[T](gate)).backward(typed_payload)! }
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &LogGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
@@ -30,7 +36,7 @@ pub fn (g &LogGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 		Variable[T] {
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
-			register[T]('Log', g, result, [a])!
+			register[T]('Log', voidptr(g), log_gate_backward_dispatch[T], result, [a])!
 		}
 		else {
 			return error('LogGate: a must be a Variable')
@@ -65,6 +71,12 @@ pub fn (g &AbsGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0]
 }
 
+fn abs_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := unsafe { (&AbsGate[T](gate)).backward(typed_payload)! }
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &AbsGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
@@ -72,7 +84,7 @@ pub fn (g &AbsGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 		Variable[T] {
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
-			register[T]('Abs', g, result, [a])!
+			register[T]('Abs', voidptr(g), abs_gate_backward_dispatch[T], result, [a])!
 		}
 		else {
 			return error('AbsGate: a must be a Variable')
@@ -104,6 +116,12 @@ pub fn (g &SqrtGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0]
 }
 
+fn sqrt_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := unsafe { (&SqrtGate[T](gate)).backward(typed_payload)! }
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &SqrtGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
@@ -111,7 +129,9 @@ pub fn (g &SqrtGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 		Variable[T] {
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
-			register[T]('Sqrt', g, result, [a])!
+			register[T]('Sqrt', voidptr(g), sqrt_gate_backward_dispatch[T], result, [
+				a,
+			])!
 		}
 		else {
 			return error('SqrtGate: a must be a Variable')
@@ -142,6 +162,12 @@ pub fn (g &TanhGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0]
 }
 
+fn tanh_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := unsafe { (&TanhGate[T](gate)).backward(typed_payload)! }
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &TanhGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
@@ -149,7 +175,9 @@ pub fn (g &TanhGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 		Variable[T] {
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
-			register[T]('Tanh', g, result, [a])!
+			register[T]('Tanh', voidptr(g), tanh_gate_backward_dispatch[T], result, [
+				a,
+			])!
 		}
 		else {
 			return error('TanhGate: a must be a Variable')
@@ -190,6 +218,12 @@ pub fn (g &ClampGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0]
 }
 
+fn clamp_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := unsafe { (&ClampGate[T](gate)).backward(typed_payload)! }
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &ClampGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
@@ -197,7 +231,9 @@ pub fn (g &ClampGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 		Variable[T] {
 			result.grad = vtl.zeros_like[T](result.value)
 			result.requires_grad = true
-			register[T]('Clamp', g, result, [a])!
+			register[T]('Clamp', voidptr(g), clamp_gate_backward_dispatch[T], result, [
+				a,
+			])!
 		}
 		else {
 			return error('ClampGate: a must be a Variable')
