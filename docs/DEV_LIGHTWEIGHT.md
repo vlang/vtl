@@ -21,8 +21,8 @@ or `v test vtl` can spike **RAM into the 10–20+ GB** range during compilation 
 | `VTL_CUDA_BACKWARD` | off | Phase 3: cuBLAS GEMM for Linear gate backward. |
 | `VTL_CUDA_OPTIMIZER` | off | Phase 4: cuBLAS moment updates for Adam. |
 | `VTL_TEST_CUDA` | off | Set to `1` to run GPU tests (`linear_cuda_test.v`, `device_session_test.v`). |
-| `VTL_USE_VULKAN` | off | f32 Linear forward/backward via Vulkan (`-d vulkan` build). Use `v -prod` for GPU (debug instance crash on V 0.5.1). |
-| `VTL_TEST_VULKAN` | off | Optional Vulkan integration tests. |
+| `VTL_USE_VULKAN` | off | f32 Linear/Conv2D/activations/Adam via Vulkan (`-d vulkan`). Use `v -prod` for GPU (debug instance crash on V 0.5.1). |
+| `VTL_TEST_VULKAN` | off | Optional Vulkan integration tests (conv2d, activations, Adam, training smoke). |
 | `VJOBS` | (V auto) | Cap parallel compile jobs, e.g. `VJOBS=2`. |
 
 CUDA is **opt-in** so normal CPU work never touches the GPU driver.
@@ -53,12 +53,19 @@ VJOBS=2 v test vtl/autograd/device_session_test.v
 # VSL CUDA ops (one file)
 VJOBS=1 v -d cuda test vsl/cuda/examples/cuda_ops_test.v
 
-# Vulkan f32 training (CPU path; no SDK required)
+# Vulkan f32 (CPU compile path without SDK)
 VJOBS=2 v test vtl/nn/layers/linear_vulkan_integration_test.v
 v run vtl/examples/nn_cifar10_vulkan/main.v
-# VTL_USE_VULKAN=1 v -prod -d vulkan run vtl/examples/nn_cifar10_vulkan/main.v
-# VTL_USE_VULKAN=1 VJOBS=1 v -prod -d vulkan test vtl/nn/internal/conv2d_vulkan_forward_f32_d_vulkan_test.v vtl/nn/internal/conv2d_vulkan_backward_f32_d_vulkan_test.v
-# VTL_USE_VULKAN=1 VJOBS=1 v -prod -d vulkan test vtl/nn/layers/activation_vulkan_relu_f32_d_vulkan_test.v
+
+# Vulkan f32 GPU full stack (Linear + Conv2D + ReLU + Adam)
+VTL_USE_VULKAN=1 VJOBS=1 v -prod -d vulkan run vtl/examples/nn_cifar10_vulkan/main.v
+VTL_USE_VULKAN=1 VJOBS=1 v -prod -d vulkan test vtl/nn/f32_vulkan_training_smoke_test_d_vulkan.v
+VTL_USE_VULKAN=1 VJOBS=1 v -prod -d vulkan test \
+  vtl/nn/internal/conv2d_vulkan_forward_f32_d_vulkan_test.v \
+  vtl/nn/internal/conv2d_vulkan_backward_f32_d_vulkan_test.v \
+  vtl/nn/layers/activation_vulkan_relu_f32_d_vulkan_test.v \
+  vtl/nn/optimizers/adam_f32_vulkan_d_vulkan_test.v
+VSL_TEST_VULKAN=1 VJOBS=1 v -prod -d vulkan test vsl/vulkan/compute/adam_step_vulkan_test.v
 ```
 
 ## CI split (implemented, #109)

@@ -56,3 +56,12 @@ mut model := models.sequential_from_ctx[f64](ctx)
 - **Phase 4**: Adam on GPU with persistent m/v/θ in `DeviceSession` (#106, #111 follow-up)
 
 See [DEV_LIGHTWEIGHT.md](DEV_LIGHTWEIGHT.md) for safe test commands.
+
+## Vulkan (f32, opt-in)
+
+| Variable | Effect |
+|----------|--------|
+| `VTL_USE_VULKAN=1` | GPU forward/backward for Linear, Conv2D (same-padding), ReLU/Sigmoid, Adam |
+| `VTL_TEST_VULKAN=1` | Run Vulkan integration tests |
+
+Build: `-d vulkan` and `v -prod` for GPU execution. Tensors remain CPU-backed; ops sync via host buffers (same policy as CUDA Phase 1).

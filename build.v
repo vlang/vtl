@@ -26,9 +26,10 @@ pub fn from_array[T](arr []T, shape []int, params TensorData) !&Tensor[T] {
 			data:    data_storage
 		}
 	}
-	strides := strides_from_shape(shape, params.memory)
+	sh := shape.clone()
+	strides := strides_from_shape(sh, params.memory)
 	return &Tensor[T]{
-		shape:   shape
+		shape:   sh
 		strides: strides
 		memory:  params.memory
 		size:    size

@@ -125,6 +125,15 @@ fn test_from_1d() {
 	assert t.array_equal(expected)
 }
 
+// Regression for #41: shape slice must be owned (Windows heap corruption if aliased).
+fn test_from_array_shape_not_aliased() {
+	mut sh := [4]
+	t := vtl.from_array([f32(1), 2, 3, 4], sh)!
+	sh[0] = 99
+	assert t.shape[0] == 4
+	assert t.get_nth(3) == 4
+}
+
 fn test_from_2d() {
 	t := vtl.from_2d[f64]([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])!
 	expected := vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [2, 3])!

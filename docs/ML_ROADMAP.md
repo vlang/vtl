@@ -6,7 +6,7 @@ Detailed roadmap: [ROADMAP.md](../ROADMAP.md)
 
 GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 
-## Done (2026-05-31)
+## Done (2026-06-01)
 
 | Issue | Topic |
 |-------|--------|
@@ -21,22 +21,24 @@ GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 | [#116](https://github.com/vlang/vtl/issues/116) | f32 autograd: `Sequential` + MSE forward/backprop compile |
 | — | f32 tiny training: `nn_cifar10_f32_tiny_synth` + `f32_training_smoke_test` |
 | — | CUDA training smoke: `nn_cifar10_cuda` + `nn/cuda_training_smoke_test` |
-| — | f32 Vulkan training: `nn_cifar10_vulkan` + `nn_cifar10_f32_vulkan_tiny_synth` + `f32_vulkan_training_smoke_test` (forward + backward GEMM) |
-| — | Vulkan Conv2D f32 forward/backward (same-padding): im2col+GEMM; backward `d_weight` GEMM layout fix in VSL |
+| — | f32 Vulkan training: `nn_cifar10_vulkan` + `f32_vulkan_training_smoke_test` |
+| — | Vulkan Conv2D f32 forward/backward (same-padding, im2col+GEMM) |
+| — | Vulkan ReLU/Sigmoid f32 (`relu_vulkan_f32` / `sigmoid_vulkan_f32`) |
+| — | Vulkan Adam f32 fused shader (`VTL_USE_VULKAN=1`, VSL `adam_step`) |
 | — | Conv2D autograd: register weight/bias parents (`conv2d_autograd_smoke_test`) |
 | [#86](https://github.com/vlang/vtl/issues/86) | `DataLoader` |
+| — | `from_array` clones shape (fixes [#41](https://github.com/vlang/vtl/issues/41) aliasing) |
 
-**VSL (downstream):** [#280](https://github.com/vlang/vsl/issues/280)–[#285](https://github.com/vlang/vsl/issues/285).
+**VSL (downstream):** [#280](https://github.com/vlang/vsl/issues/280)–[#285](https://github.com/vlang/vsl/issues/285), [#304](https://github.com/vlang/vsl/pull/304) conv2d backward GEMM, [#305](https://github.com/vlang/vsl/pull/305) Adam shaders.
 
 ## Critical path (open)
 
 | Priority | Issue | Topic |
 |----------|-------|--------|
-| P1 | [#41](https://github.com/vlang/vtl/issues/41) | Windows example crash |
+| P1 | [#41](https://github.com/vlang/vtl/issues/41) | Windows example crash — shape clone landed; needs Windows CI confirmation |
 | P2 | [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support |
-| — | Vulkan f32 activations via `relu_vulkan_f32` / `sigmoid_vulkan_f32` (compute path) |
-| — | Vulkan Adam f32 fused shader (`adam_step` + VSL 8 binding layout; `VTL_USE_VULKAN=1`) |
 | P2 | — | `v check-md -hide-warnings` on remaining docs (example READMEs done) |
+| P2 | — | Vulkan: persistent GPU activation chain between layers (CUDA has `VTL_GPU_ACTIVATIONS`) |
 
 ## Local development
 
@@ -48,11 +50,8 @@ cd ~/.vmodules
 v test vtl/nn vtl/datasets
 v run vtl/examples/nn_cifar10_tiny_synth/main.v
 v run vtl/examples/nn_cifar10_f32_tiny_synth/main.v
-# CUDA (opt-in)
-# VTL_USE_CUDA=1 v -d cuda run vtl/examples/nn_cifar10_cuda/main.v
-# Vulkan f32 Linear forward smoke
-# v run vtl/examples/nn_cifar10_vulkan/main.v
-# VTL_USE_VULKAN=1 v -d vulkan run vtl/examples/nn_cifar10_vulkan/main.v
+# Vulkan f32 full stack (use -prod for GPU)
+# VTL_USE_VULKAN=1 v -prod -d vulkan run vtl/examples/nn_cifar10_vulkan/main.v
 ```
 
 ## CI
