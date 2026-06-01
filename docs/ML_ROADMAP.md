@@ -33,7 +33,7 @@ GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 |----------|-------|--------|
 | P1 | [#41](https://github.com/vlang/vtl/issues/41) | Windows example crash |
 | P2 | [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support |
-| P2 | — | Vulkan Conv2D forward f32 (`VTL_USE_VULKAN`, padding=0); backward/activations/Adam GPU |
+| P2 | — | Vulkan: Conv2D backward d_weight GPU (padding=0); forward same-pad; activations/Adam GPU TBD |
 | P2 | — | `v check-md -hide-warnings` on remaining docs (example READMEs done) |
 
 ## Local development
