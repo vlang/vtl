@@ -20,6 +20,7 @@ GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 | [#110](https://github.com/vlang/vtl/issues/110) | Vulkan f32 Linear in `Sequential` forward (`VTL_USE_VULKAN=1`, `-d vulkan`) |
 | [#116](https://github.com/vlang/vtl/issues/116) | f32 autograd: `Sequential` + MSE forward/backprop compile |
 | — | f32 tiny training: `nn_cifar10_f32_tiny_synth` + `f32_training_smoke_test` |
+| — | CUDA training smoke: `nn_cifar10_cuda` + `autograd_cuda/training_smoke_test` |
 | [#86](https://github.com/vlang/vtl/issues/86) | `DataLoader` |
 
 **VSL (downstream):** [#280](https://github.com/vlang/vsl/issues/280)–[#285](https://github.com/vlang/vsl/issues/285).

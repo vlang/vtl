@@ -5,7 +5,7 @@ import vtl.autograd
 import vtl.autograd_cuda
 
 pub fn adam_update_f64_cuda(param voidptr, m_tensor voidptr, v_tensor voidptr, step AdamStepParams, slot int) ! {
-	v := unsafe { &autograd.Variable[f64](param) }
+	mut v := unsafe { &autograd.Variable[f64](param) }
 	mut m := unsafe { &vtl.Tensor[f64](m_tensor) }
 	mut v_mom := unsafe { &vtl.Tensor[f64](v_tensor) }
 	grad := v.grad.to_array()

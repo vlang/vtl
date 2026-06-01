@@ -166,8 +166,8 @@ pub fn (mut ls SequentialInfo[T]) conv2d(in_channels int, out_channels int, kern
 	} else {
 		in_channels
 	}
-	ls.add_layer(layers.conv2d_layer[T](ls.ctx, in_ch, out_channels, kernel_size, config),
-		'Conv2DLayer', {
+	ls.add_layer(layers.conv2d_layer[T](ls.ctx, in_ch, out_channels, kernel_size, config,
+		prev_layer.output_shape()), 'Conv2DLayer', {
 		'in_channels':  in_ch
 		'out_channels': out_channels
 		'kernel_h':     kernel_size[0]
