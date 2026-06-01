@@ -27,7 +27,7 @@ GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 | Priority | Issue | Topic |
 |----------|-------|--------|
 | P1 | [#41](https://github.com/vlang/vtl/issues/41) | Windows example crash |
-| [#109](https://github.com/vlang/vtl/issues/109) | CI scoped tests + `full-ml` optional workflow |
+| P1 | TBD | f32 autograd: `Sequential` training compile (see new issue) |
 | P2 | [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support |
 | P2 | — | `v check-md -hide-warnings` on all example READMEs |
 
