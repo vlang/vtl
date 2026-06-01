@@ -147,6 +147,22 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 </section>
 </section>
 
+		<section id="adam_step_f64" class="doc-node">
+			<div class="title"><h2>fn adam_step_f64 <a href="#adam_step_f64">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/optimizers/adam_step_cuda_notd_cuda.v#L4"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">adam_step_f64</span><span class="token punctuation">(</span>grad <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> theta <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> m <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> v <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> p AdamStepParams<span class="token punctuation">)</span></code></pre>
+<p>adam_step_f64 without CUDA build delegates to CPU.</p>
+
+</section>
+
+		<section id="adam_step_f64_cpu" class="doc-node">
+			<div class="title"><h2>fn adam_step_f64_cpu <a href="#adam_step_f64_cpu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/optimizers/adam_step_f64.v#L15"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">adam_step_f64_cpu</span><span class="token punctuation">(</span>grad <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> theta <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> m <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> v <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> p AdamStepParams<span class="token punctuation">)</span></code></pre>
+<p>adam_step_f64_cpu performs one Adam update on flat CPU buffers.</p>
+
+</section>
+
 		<section id="adamw" class="doc-node">
 			<div class="title"><h2>fn adamw <a href="#adamw">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/optimizers/adamw.v#L50"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -396,6 +412,20 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 
 </section>
 
+		<section id="AdamStepParams" class="doc-node">
+			<div class="title"><h2>struct AdamStepParams <a href="#AdamStepParams">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/optimizers/adam_step_f64.v#L6"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token symbol">AdamStepParams</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	beta1   <span class="token builtin">f64</span>
+	beta2   <span class="token builtin">f64</span>
+	lr_t    <span class="token builtin">f64</span>
+	epsilon <span class="token builtin">f64</span>
+<span class="token punctuation">}</span></code></pre>
+<p>AdamStepParams holds scalar Adam state for one flat parameter vector.</p>
+
+</section>
+
 		<section id="AdamWOptimizer" class="doc-node">
 			<div class="title"><h2>struct AdamWOptimizer <a href="#AdamWOptimizer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/nn/optimizers/adamw.v#L17"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -572,12 +602,18 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 1 Jun 2026 00:56:25</div>
+						<div class="footer">Powered by vdoc. Generated on: 1 Jun 2026 01:03:34</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#adagrad">fn adagrad</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#adam_optimizer">fn adam_optimizer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#adam_step_f64">fn adam_step_f64</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#adam_step_f64_cpu">fn adam_step_f64_cpu</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#adamw">fn adamw</a>        <ul>
@@ -655,6 +691,9 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 </ul>
 </li>
 <li class="open"><a href="#AdamOptimizerConfig">struct AdamOptimizerConfig</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#AdamStepParams">struct AdamStepParams</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#AdamWOptimizer">struct AdamWOptimizer</a>        <ul>
