@@ -7,6 +7,10 @@ pub fn conv2d_vulkan_eligible(kernel_size []int, config Conv2DConfig) bool {
 	return false
 }
 
+pub fn conv2d_vulkan_backward_eligible(kernel_size []int, config Conv2DConfig) bool {
+	return false
+}
+
 // conv2d_forward_vulkan_f32 stub when not built with `-d vulkan`.
 pub fn conv2d_forward_vulkan_f32(input &vtl.Tensor[f32],
 	weight &vtl.Tensor[f32],
