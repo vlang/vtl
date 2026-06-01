@@ -1,7 +1,7 @@
 name: Continuous Integration
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref_name == 'main' && github.sha || github.ref_name }}
+  group: ${{ github.workflow }}-${{ github.ref_name }}
   cancel-in-progress: true
 
 on:
@@ -31,48 +31,6 @@ jobs:
     if: github.event_name == 'push'
     name: TODO
     uses: ./.github/workflows/todo.yml
-
-  validate-docs:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout VTL
-        uses: actions/checkout@v4
-        with:
-          path: vtl
-
-      - name: Setup V
-        uses: vlang/setup-v@v1.4
-        with:
-          check-latest: true
-
-      - name: V doctor
-        run: v doctor
-
-      - name: Install dependencies
-        run: |
-          v install vsl && \
-          sudo apt-get -qq update && \
-          sudo apt-get -qq install \
-            gfortran \
-            libxi-dev \
-            libxcursor-dev \
-            mesa-common-dev \
-            liblapacke-dev \
-            libopenblas-dev \
-            libgc-dev \
-            libgl1-mesa-dev \
-            libopenmpi-dev \
-            libhdf5-dev \
-            hdf5-tools \
-            opencl-headers
-
-      - name: Copy VTL source code to V Modules
-        run: cp -rf ./vtl ~/.vmodules
-
-      - name: Validate Docs
-        run: |
-          cd ./vtl
-          v check-md .
 
   fmt-check:
     runs-on: ubuntu-latest

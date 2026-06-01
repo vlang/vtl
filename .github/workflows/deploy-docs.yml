@@ -1,21 +1,30 @@
 name: Deploy Documentation
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: true
+
 on:
   push:
     branches:
       - main
+    paths:
+      - '**.v'
+      - '**.md'
+      - '.github/workflows/deploy-docs.yml'
+  workflow_dispatch:
 
 jobs:
   deploy-docs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout vtl
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: vtl
 
       - name: Setup V
-        uses: vlang/setup-v@v1
+        uses: vlang/setup-v@v1.4
         with:
           check-latest: true
 
