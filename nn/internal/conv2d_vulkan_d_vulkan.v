@@ -24,12 +24,9 @@ pub fn conv2d_vulkan_eligible(kernel_size []int, config Conv2DConfig) bool {
 	return config.padding == [expected_pad_h, expected_pad_w]
 }
 
-// conv2d_vulkan_backward_eligible: GPU d_weight GEMM validated for padding=0 only.
+// conv2d_vulkan_backward_eligible: same rules as forward (GPU d_weight via im2col+GEMM).
 pub fn conv2d_vulkan_backward_eligible(kernel_size []int, config Conv2DConfig) bool {
-	if !conv2d_vulkan_eligible(kernel_size, config) {
-		return false
-	}
-	return config.padding == [0, 0]
+	return conv2d_vulkan_eligible(kernel_size, config)
 }
 
 fn f32_flat_to_f64(arr []f32) []f64 {

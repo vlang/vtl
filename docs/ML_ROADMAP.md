@@ -22,6 +22,7 @@ GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 | — | f32 tiny training: `nn_cifar10_f32_tiny_synth` + `f32_training_smoke_test` |
 | — | CUDA training smoke: `nn_cifar10_cuda` + `nn/cuda_training_smoke_test` |
 | — | f32 Vulkan training: `nn_cifar10_vulkan` + `nn_cifar10_f32_vulkan_tiny_synth` + `f32_vulkan_training_smoke_test` (forward + backward GEMM) |
+| — | Vulkan Conv2D f32 forward/backward (same-padding): im2col+GEMM; backward `d_weight` GEMM layout fix in VSL |
 | — | Conv2D autograd: register weight/bias parents (`conv2d_autograd_smoke_test`) |
 | [#86](https://github.com/vlang/vtl/issues/86) | `DataLoader` |
 
@@ -34,7 +35,7 @@ GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 | P1 | [#41](https://github.com/vlang/vtl/issues/41) | Windows example crash |
 | P2 | [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support |
 | — | Vulkan f32 activations via `relu_vulkan_f32` / `sigmoid_vulkan_f32` (compute path) |
-| P2 | — | Vulkan: Conv2D backward d_weight with same-padding; Adam f32 GPU |
+| P2 | — | Vulkan: Adam f32 GPU |
 | P2 | — | `v check-md -hide-warnings` on remaining docs (example READMEs done) |
 
 ## Local development
