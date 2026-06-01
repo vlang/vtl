@@ -130,7 +130,7 @@
     >
   </p> <h1>The V Tensor Library</h1>
 
-<p>[![Mentioned in Awesome V][awesomevbadge]][awesomevurl] [![CI][workflowbadge]][workflowurl] [![License: MIT][licensebadge]][licenseurl]</p>
+<p>[![Mentioned in Awesome V][awesomevbadge]][awesomevurl] [![CI][workflowbadge]][workflowurl] [![Docs][docsbadge]][docsurl] [![Full ML][fullmlbadge]][fullmlurl] [![Benchmarks][benchmarksbadge]][benchmarksurl] [![License: MIT][licensebadge]][licenseurl] ![VSL Backed][vslbackedbadge] ![CUDA Optional][cudaoptionalbadge] ![Vulkan f32][vulkanbadge]</p>
 <p><strong>VTL</strong> is a pure-<a href="https://vlang.io">V</a> tensor library for numerical computing and machine learning — n-dimensional arrays, autograd, linear algebra via <a href="https://github.com/vlang/vsl">VSL</a>, and a full neural network module.</p>
 <p>Train small neural networks, experiment with autograd, and use VSL-backed CPU, CUDA, and Vulkan compute paths from one V-native API.</p>
 <p><a href="https://vlang.io">vlang.io</a> | <a href="https://vlang.github.io/vtl">Docs</a> | <a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL.md">Tutorials</a> | <a href="https://github.com/vlang/vtl/blob/master/docs/ML_ROADMAP.md">ML Roadmap</a> | <a href="https://github.com/vlang/vtl/blob/master/CONTRIBUTING.md">Contributing</a> | <a href="https://github.com/vlang/vsl">VSL</a></p></div>
@@ -148,6 +148,7 @@ t<span class="token punctuation">.</span><span class="token function">get</span>
 <li><strong>Linear algebra</strong> — VSL-backed matmul, solve, QR, LU, Cholesky, SVD, pinv</li>
 <li><strong>Hardware</strong> — zero-copy <code>Tensor.data</code> for C libs; optional CUDA and Vulkan training paths</li></ul>
 <h2 id="ml-release-highlights">ML Release Highlights</h2>
+<p>The ML beta scope is the high-level VTL API: tensors, autograd, layers, losses, optimizers, datasets, and CPU training. CUDA and Vulkan paths are available for opt-in validation and early adopters, but remain experimental backend accelerators rather than stable user contracts.</p>
 <table>
 <thead>
 <tr>
@@ -159,10 +160,10 @@ t<span class="token punctuation">.</span><span class="token function">get</span>
 <td><code>Sequential</code> + MSE + Adam smoke tests</td></tr>
 <tr>
 <td>CUDA</td>
-<td>Linear/Conv2D forward, CUDA backward, GPU activation chain, Adam optimizer slots</td></tr>
+<td>Experimental opt-in Linear/Conv2D forward, CUDA backward, activation chain, Adam slots</td></tr>
 <tr>
 <td>Vulkan</td>
-<td>f32 Linear, Conv2D same-padding, ReLU/Sigmoid, fused Adam shader</td></tr>
+<td>Experimental opt-in f32 Linear, Conv2D same-padding, ReLU/Sigmoid, fused Adam shader</td></tr>
 <tr>
 <td>Datasets</td>
 <td>MNIST, IMDB, CIFAR-10 loaders plus CI-safe synthetic examples</td></tr>
@@ -177,21 +178,22 @@ t<span class="token punctuation">.</span><span class="token function">get</span>
 <span class="token keyword">import</span> vtl<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>models
 <span class="token keyword">import</span> vtl<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>optimizers
 
-<span class="token keyword">mut</span> ctx <span class="token operator">:=</span> autograd<span class="token punctuation">.</span>ctx<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token keyword">mut</span> model <span class="token operator">:=</span> models<span class="token punctuation">.</span>sequential_from_ctx<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span>ctx<span class="token punctuation">)</span>
+<span class="token keyword">mut</span> ctx <span class="token operator">:=</span> autograd<span class="token punctuation">.</span>ctx<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">mut</span> model <span class="token operator">:=</span> models<span class="token punctuation">.</span>sequential_from_ctx<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">(</span>ctx<span class="token punctuation">)</span>
 model<span class="token punctuation">.</span><span class="token function">input</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">784</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
 model<span class="token punctuation">.</span><span class="token function">linear</span><span class="token punctuation">(</span><span class="token number">256</span><span class="token punctuation">)</span>
 model<span class="token punctuation">.</span><span class="token function">linear</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span>
+model<span class="token punctuation">.</span><span class="token function">mse_loss</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 
-input_tensor <span class="token operator">:=</span> vtl<span class="token punctuation">.</span>zeros<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">64</span><span class="token punctuation">,</span> <span class="token number">784</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+input_tensor <span class="token operator">:=</span> vtl<span class="token punctuation">.</span>zeros<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">64</span><span class="token punctuation">,</span> <span class="token number">784</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
 <span class="token keyword">mut</span> x <span class="token operator">:=</span> ctx<span class="token punctuation">.</span><span class="token function">variable</span><span class="token punctuation">(</span>input_tensor<span class="token punctuation">)</span>
 y_pred <span class="token operator">:=</span> model<span class="token punctuation">.</span><span class="token function">forward</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token operator">!</span>
 
-target <span class="token operator">:=</span> vtl<span class="token punctuation">.</span>zeros<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">64</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+target <span class="token operator">:=</span> vtl<span class="token punctuation">.</span>zeros<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">64</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
 <span class="token keyword">mut</span> loss_val <span class="token operator">:=</span> model<span class="token punctuation">.</span><span class="token function">loss</span><span class="token punctuation">(</span>y_pred<span class="token punctuation">,</span> target<span class="token punctuation">)</span><span class="token operator">!</span>
 loss_val<span class="token punctuation">.</span><span class="token function">backprop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">!</span>
 
-<span class="token keyword">mut</span> opt <span class="token operator">:=</span> optimizers<span class="token punctuation">.</span>adam_optimizer<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span>optimizers<span class="token punctuation">.</span><span class="token symbol">AdamOptimizerConfig</span><span class="token punctuation">{</span>
+<span class="token keyword">mut</span> opt <span class="token operator">:=</span> optimizers<span class="token punctuation">.</span>adam_optimizer<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">(</span>optimizers<span class="token punctuation">.</span><span class="token symbol">AdamOptimizerConfig</span><span class="token punctuation">{</span>
     learning_rate<span class="token punctuation">:</span> <span class="token number">0.001</span>
 <span class="token punctuation">}</span><span class="token punctuation">)</span>
 opt<span class="token punctuation">.</span><span class="token function">build_params</span><span class="token punctuation">(</span>model<span class="token punctuation">.</span>info<span class="token punctuation">.</span>layers<span class="token punctuation">)</span>
@@ -304,12 +306,12 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 <p>Made with <a href="https://contrib.rocks">contributors-img</a>.</p>
 <h2 id="license">License</h2>
 <p><a href="https://github.com/vlang/vtl/blob/master/LICENSE">MIT</a></p>
-<p>[awesomevbadge]: <a href="https://awesome.re/mentioned-badge.svg">https://awesome.re/mentioned-badge.svg</a> [workflowbadge]: <a href="https://github.com/vlang/vtl/actions/workflows/ci.yml/badge.svg">https://github.com/vlang/vtl/actions/workflows/ci.yml/badge.svg</a> [licensebadge]: <a href="https://img.shields.io/badge/License-MIT-blue.svg">https://img.shields.io/badge/License-MIT-blue.svg</a> [awesomevurl]: <a href="https://github.com/vlang/awesome-v/blob/master/README.md#scientific-computing">https://github.com/vlang/awesome-v/blob/master/README.md#scientific-computing</a> [workflowurl]: <a href="https://github.com/vlang/vtl/actions/workflows/ci.yml">https://github.com/vlang/vtl/actions/workflows/ci.yml</a> [licenseurl]: <a href="https://github.com/vlang/vtl/blob/main/LICENSE">https://github.com/vlang/vtl/blob/main/LICENSE</a></p>
+<p>[awesomevbadge]: <a href="https://awesome.re/mentioned-badge.svg">https://awesome.re/mentioned-badge.svg</a> [workflowbadge]: <a href="https://github.com/vlang/vtl/actions/workflows/ci.yml/badge.svg">https://github.com/vlang/vtl/actions/workflows/ci.yml/badge.svg</a> [docsbadge]: <a href="https://github.com/vlang/vtl/actions/workflows/deploy-docs.yml/badge.svg">https://github.com/vlang/vtl/actions/workflows/deploy-docs.yml/badge.svg</a> [fullmlbadge]: <a href="https://github.com/vlang/vtl/actions/workflows/ci-full-ml.yml/badge.svg">https://github.com/vlang/vtl/actions/workflows/ci-full-ml.yml/badge.svg</a> [benchmarksbadge]: <a href="https://github.com/vlang/vtl/actions/workflows/benchmark-pr-comment.yml/badge.svg">https://github.com/vlang/vtl/actions/workflows/benchmark-pr-comment.yml/badge.svg</a> [licensebadge]: <a href="https://img.shields.io/badge/License-MIT-blue.svg">https://img.shields.io/badge/License-MIT-blue.svg</a> [vslbackedbadge]: <a href="https://img.shields.io/badge/VSL-backed-027d9c?logo=v">https://img.shields.io/badge/VSL-backed-027d9c?logo=v</a> [cudaoptionalbadge]: <a href="https://img.shields.io/badge/CUDA-optional-76b900?logo=nvidia">https://img.shields.io/badge/CUDA-optional-76b900?logo=nvidia</a> [vulkanbadge]: <a href="https://img.shields.io/badge/Vulkan-f32-ac162c?logo=vulkan">https://img.shields.io/badge/Vulkan-f32-ac162c?logo=vulkan</a> [awesomevurl]: <a href="https://github.com/vlang/awesome-v/blob/master/README.md#scientific-computing">https://github.com/vlang/awesome-v/blob/master/README.md#scientific-computing</a> [workflowurl]: <a href="https://github.com/vlang/vtl/actions/workflows/ci.yml">https://github.com/vlang/vtl/actions/workflows/ci.yml</a> [docsurl]: <a href="https://github.com/vlang/vtl/actions/workflows/deploy-docs.yml">https://github.com/vlang/vtl/actions/workflows/deploy-docs.yml</a> [fullmlurl]: <a href="https://github.com/vlang/vtl/actions/workflows/ci-full-ml.yml">https://github.com/vlang/vtl/actions/workflows/ci-full-ml.yml</a> [benchmarksurl]: <a href="https://github.com/vlang/vtl/actions/workflows/benchmark-pr-comment.yml">https://github.com/vlang/vtl/actions/workflows/benchmark-pr-comment.yml</a> [licenseurl]: <a href="https://github.com/vlang/vtl/blob/main/LICENSE">https://github.com/vlang/vtl/blob/main/LICENSE</a></p>
 
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 1 Jun 2026 18:23:28</div>
+						<div class="footer">Powered by vdoc. Generated on: 1 Jun 2026 19:47:47</div>
 					</div>
 					
 				</div>
