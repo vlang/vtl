@@ -1,5 +1,6 @@
 module layers
 
+import vtl
 import vtl.autograd
 import vtl.nn.internal
 import vtl.nn.gates.activation
@@ -25,7 +26,13 @@ pub fn (_ &ReLULayer[T]) variables() []&autograd.Variable[T] {
 }
 
 pub fn (layer &ReLULayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
-	output := internal.relu[T](input.value)
+	mut output := &vtl.Tensor[T](unsafe { nil })
+	$if sizeof(T) == 4 {
+		out_f32 := relu_forward_f32(unsafe { &vtl.Tensor[f32](input.value) })!
+		output = unsafe { &vtl.Tensor[T](out_f32) }
+	} $else {
+		output = internal.relu[T](input.value)
+	}
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {

@@ -9,7 +9,7 @@ fn test_conv2d_forward_vulkan_f32_matches_cpu() ! {
 		return
 	}
 	cfg := Conv2DConfig{
-		padding: [0, 0]
+		padding: [1, 1]
 		stride:  [1, 1]
 	}
 	k := [3, 3]

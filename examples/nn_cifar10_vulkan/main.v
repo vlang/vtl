@@ -24,8 +24,7 @@ fn main() {
 	ctx := autograd.ctx[f32]()
 	mut model := models.sequential_from_ctx[f32](ctx)
 	model.input([3, 8, 8])
-	// Vulkan conv2d: no padding (VSL im2col path); same as CUDA smoke spatial size with k=3, stride=1.
-	model.conv2d(3, 8, [3, 3], layers.Conv2DConfig{padding: [0, 0], stride: [1, 1]})
+	model.conv2d(3, 8, [3, 3], layers.Conv2DConfig{padding: [1, 1], stride: [1, 1]})
 	model.flatten()
 	model.linear(10)
 	model.mse_loss()

@@ -6,7 +6,7 @@ import vtl.storage
 import vsl.vulkan
 import vsl.vulkan.compute
 
-// conv2d_vulkan_eligible: VSL path has no padding, groups=1, dilation=1.
+// conv2d_vulkan_eligible: same-padding as CUDA/cuDNN path (groups=1, dilation=1) for forward.
 pub fn conv2d_vulkan_eligible(kernel_size []int, config Conv2DConfig) bool {
 	if os.getenv('VTL_USE_VULKAN') != '1' {
 		return false
@@ -15,6 +15,18 @@ pub fn conv2d_vulkan_eligible(kernel_size []int, config Conv2DConfig) bool {
 		return false
 	}
 	if config.dilation != [1, 1] {
+		return false
+	}
+	k_h := kernel_size[0]
+	k_w := kernel_size[1]
+	expected_pad_h := (k_h - 1) / 2
+	expected_pad_w := (k_w - 1) / 2
+	return config.padding == [expected_pad_h, expected_pad_w]
+}
+
+// conv2d_vulkan_backward_eligible: GPU d_weight GEMM validated for padding=0 only.
+pub fn conv2d_vulkan_backward_eligible(kernel_size []int, config Conv2DConfig) bool {
+	if !conv2d_vulkan_eligible(kernel_size, config) {
 		return false
 	}
 	return config.padding == [0, 0]
@@ -59,11 +71,13 @@ pub fn conv2d_forward_vulkan_f32(input &vtl.Tensor[f32],
 	in_flat := f32_flat_to_f64(input.to_array())
 	w_flat := f32_flat_to_f64(weight.to_array())
 
+	pad_h := config.padding[0]
+	pad_w := config.padding[1]
 	out_flat := compute.conv2d_vulkan(dev, in_flat, w_flat, batch, in_h, in_w, in_ch, out_ch, k_h,
-		k_w, stride_h, stride_w)!
+		k_w, stride_h, stride_w, pad_h, pad_w)!
 
-	out_h := (in_h - k_h) / stride_h + 1
-	out_w := (in_w - k_w) / stride_w + 1
+	out_h := (in_h + 2 * pad_h - k_h) / stride_h + 1
+	out_w := (in_w + 2 * pad_w - k_w) / stride_w + 1
 
 	mut out_f32 := []f32{len: out_flat.len}
 	for i, v in out_flat {
