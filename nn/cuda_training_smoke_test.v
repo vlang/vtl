@@ -23,7 +23,7 @@ $if cuda ? {
 		autograd_cuda.attach_context_session(mut ctx)
 		mut model := models.sequential_from_ctx[f64](ctx)
 		model.input([3, 4, 4])
-		model.conv2d(3, 4, [2, 2], layers.Conv2DConfig{padding: [0, 0]})
+		model.conv2d(3, 4, [2, 2], layers.Conv2DConfig{ padding: [0, 0] })
 		model.flatten()
 		model.linear(3)
 		model.mse_loss()

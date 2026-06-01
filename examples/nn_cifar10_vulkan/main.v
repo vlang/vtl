@@ -24,7 +24,7 @@ fn main() {
 	ctx := autograd.ctx[f32]()
 	mut model := models.sequential_from_ctx[f32](ctx)
 	model.input([3, 8, 8])
-	model.conv2d(3, 8, [3, 3], layers.Conv2DConfig{padding: [1, 1], stride: [1, 1]})
+	model.conv2d(3, 8, [3, 3], layers.Conv2DConfig{ padding: [1, 1], stride: [1, 1] })
 	model.relu()
 	model.flatten()
 	model.linear(10)

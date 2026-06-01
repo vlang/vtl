@@ -31,8 +31,8 @@ pub fn conv2d_backward_vulkan_f32(grad_out &vtl.Tensor[f32], input &vtl.Tensor[f
 	in_flat := f32_flat_to_f64(input.to_array())
 	w_flat := f32_flat_to_f64(weight.to_array())
 
-	bwd := compute.conv2d_backward_vulkan(dev, grad_flat, in_flat, w_flat, batch, in_h, in_w, in_ch,
-		out_ch, k_h, k_w, stride_h, stride_w, pad_h, pad_w)!
+	bwd := compute.conv2d_backward_vulkan(dev, grad_flat, in_flat, w_flat, batch, in_h, in_w,
+		in_ch, out_ch, k_h, k_w, stride_h, stride_w, pad_h, pad_w)!
 
 	mut d_weight_f32 := []f32{len: bwd.d_weight.len}
 	for i, v in bwd.d_weight {

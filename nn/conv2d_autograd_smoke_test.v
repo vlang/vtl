@@ -10,7 +10,7 @@ fn test_conv2d_sequential_backprop_smoke() ! {
 	mut ctx := autograd.ctx[f64]()
 	mut model := models.sequential_from_ctx[f64](ctx)
 	model.input([3, 8, 8])
-	model.conv2d(3, 4, [3, 3], layers.Conv2DConfig{padding: [1, 1]})
+	model.conv2d(3, 4, [3, 3], layers.Conv2DConfig{ padding: [1, 1] })
 	model.flatten()
 	model.linear(6)
 	model.mse_loss()

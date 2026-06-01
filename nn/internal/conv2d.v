@@ -29,8 +29,7 @@ pub fn conv2d_forward[T](input &vtl.Tensor[T],
 		return unsafe { &vtl.Tensor[T](out) }
 	}
 	out_f32 := conv2d_forward_f32(unsafe { &vtl.Tensor[f32](input) },
-		unsafe { &vtl.Tensor[f32](weight) }, unsafe { &vtl.Tensor[f32](bias) }, kernel_size,
-		config)!
+		unsafe { &vtl.Tensor[f32](weight) }, unsafe { &vtl.Tensor[f32](bias) }, kernel_size, config)!
 	return unsafe { &vtl.Tensor[T](out_f32) }
 }
 

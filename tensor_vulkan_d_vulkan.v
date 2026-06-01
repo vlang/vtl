@@ -137,7 +137,7 @@ pub fn vector_add_vulkan(dst &VulkanTensor[f32], a &VulkanTensor[f32], b &Vulkan
 
 // vulkan_tensor_zeros_f32 allocates a zero-filled f32 tensor on the given Vulkan device.
 pub fn vulkan_tensor_zeros_f32(shape []int, dev &vulkan.Device) !&VulkanTensor[f32] {
-	mut t := vtl.zeros[f32](shape)
+	mut t := zeros[f32](shape)
 	return t.vulkan(storage.vulkan_params_for_device(dev))!
 }
 

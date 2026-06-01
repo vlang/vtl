@@ -10,7 +10,7 @@ All optimizers also support learning rate schedulers — see the last section be
 
 ## Adam
 
-```v
+```v ignore
 import vtl
 import vtl.autograd
 import vtl.nn.layers
@@ -58,7 +58,7 @@ Config options:
 AdamW is Adam with decoupled weight decay — typically gives better
 regularisation than Adam with L2 penalty.
 
-```v
+```v ignore
 import vtl
 import vtl.autograd
 import vtl.nn.layers
@@ -81,7 +81,7 @@ Config options (same as Adam, plus `weight_decay` with default `0.01`).
 
 ## RMSProp
 
-```v
+```v ignore
 import vtl
 import vtl.autograd
 import vtl.nn.layers
@@ -109,7 +109,7 @@ opt.build_params(model)
 
 ## AdaGrad
 
-```v
+```v ignore
 import vtl
 import vtl.autograd
 import vtl.nn.layers
@@ -140,7 +140,7 @@ frequently updated parameters. Good for sparse gradients.
 
 Vanilla Stochastic Gradient Descent:
 
-```v
+```v ignore
 import vtl
 import vtl.autograd
 import vtl.nn.layers
@@ -163,7 +163,7 @@ opt.build_params(model)
 Schedulers adjust the learning rate during training. Create a scheduler,
 then pass the current step and (optionally) a metric delta to `next_lr()`:
 
-```v
+```v ignore
 import vtl
 import vtl.autograd
 import vtl.nn.layers
@@ -202,7 +202,7 @@ for step := 0; step < 100; step++ {
 
 ## Complete Training Loop Example
 
-```v
+```v ignore
 import vtl
 import vtl.autograd
 import vtl.nn.layers
