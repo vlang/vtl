@@ -50,6 +50,31 @@ pub fn (g &LinearGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[
 			result[2] = la.matmul[f64](ones, grad)!
 		}
 		return result
+	} $else $if sizeof(T) == 4 {
+		if tensors := linear_gate_backward_f32_try(voidptr(g), voidptr(payload)) {
+			if g.input.requires_grad {
+				result[0] = tensors[0]
+			}
+			if g.weight.requires_grad {
+				result[1] = tensors[1]
+			}
+			if g.bias.requires_grad {
+				result[2] = tensors[2]
+			}
+			return result
+		}
+		if g.input.requires_grad {
+			result[0] = la.matmul[f32](grad, g.weight.value)!
+		}
+		if g.weight.requires_grad {
+			result[1] = la.matmul[f32](grad.t()!, g.input.value)!
+		}
+		if g.bias.requires_grad {
+			batch_size := grad.shape[0]
+			ones := vtl.ones[f32]([1, batch_size])
+			result[2] = la.matmul[f32](ones, grad)!
+		}
+		return result
 	} $else {
 		if g.input.requires_grad {
 			result[0] = la.matmul[T](grad, g.weight.value)!

@@ -34,7 +34,8 @@ pub fn (layer &FlattenLayer[T]) forward(input &autograd.Variable[T]) !&autograd.
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {
-		gate := layers.flatten_gate[T](result, layer.shape)
+		mut feat_shape := input.value.shape[1..].clone()
+		gate := layers.flatten_gate[T](input, feat_shape)
 		gate.cache(mut result, input)!
 	}
 	return result

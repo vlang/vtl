@@ -1,6 +1,6 @@
 # nn_cifar10_f32_vulkan_tiny_synth
 
-f32 **training** smoke (forward, MSE, backprop, Adam). **Linear** forward can use Vulkan GEMM.
+f32 **training** smoke (forward, MSE, backprop, Adam). **Linear** forward/backward can use Vulkan GEMM.
 
 ## Run
 

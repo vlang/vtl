@@ -22,7 +22,9 @@ $if cuda ? {
 		mut ctx := autograd.ctx[f64]()
 		autograd_cuda.attach_context_session(mut ctx)
 		mut model := models.sequential_from_ctx[f64](ctx)
-		model.input([4])
+		model.input([3, 4, 4])
+		model.conv2d(3, 4, [2, 2], layers.Conv2DConfig{padding: [0, 0]})
+		model.flatten()
 		model.linear(3)
 		model.mse_loss()
 
@@ -32,7 +34,7 @@ $if cuda ? {
 		opt.build_params(model.info.layers)
 
 		for b in 0 .. 2 {
-			x := ctx.variable(vtl.ones[f64]([1, 4]), requires_grad: true)
+			x := ctx.variable(vtl.ones[f64]([1, 3, 4, 4]), requires_grad: true)
 			y := vtl.zeros[f64]([1, 3])
 			pred := model.forward(x)!
 			mut loss := model.loss(pred, y)!

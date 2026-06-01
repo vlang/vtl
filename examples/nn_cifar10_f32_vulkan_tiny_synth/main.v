@@ -10,7 +10,7 @@ import vtl.nn.optimizers
 //
 //   VTL_USE_VULKAN=1 v -d vulkan run vtl/examples/nn_cifar10_f32_vulkan_tiny_synth/main.v
 //
-// Backprop and Adam stay on CPU (Vulkan path is forward-only for Linear today).
+// Linear backward uses Vulkan GEMM when VTL_USE_VULKAN=1 (-d vulkan); Adam on CPU.
 
 const batch_size = 2
 const epochs = 1

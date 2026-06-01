@@ -21,7 +21,8 @@ GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 | [#116](https://github.com/vlang/vtl/issues/116) | f32 autograd: `Sequential` + MSE forward/backprop compile |
 | — | f32 tiny training: `nn_cifar10_f32_tiny_synth` + `f32_training_smoke_test` |
 | — | CUDA training smoke: `nn_cifar10_cuda` + `nn/cuda_training_smoke_test` |
-| — | f32 Vulkan training smoke: `nn_cifar10_f32_vulkan_tiny_synth` + `f32_vulkan_training_smoke_test` |
+| — | f32 Vulkan training smoke: `nn_cifar10_f32_vulkan_tiny_synth` + `f32_vulkan_training_smoke_test` (forward + backward GEMM) |
+| — | Conv2D autograd: register weight/bias parents (`conv2d_autograd_smoke_test`) |
 | [#86](https://github.com/vlang/vtl/issues/86) | `DataLoader` |
 
 **VSL (downstream):** [#280](https://github.com/vlang/vsl/issues/280)–[#285](https://github.com/vlang/vsl/issues/285).

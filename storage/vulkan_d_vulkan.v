@@ -4,7 +4,15 @@ import vsl.vulkan
 
 @[params]
 pub struct VulkanParams {
+pub mut:
 	device &vulkan.Device = unsafe { nil }
+}
+
+// vulkan_params_for_device builds params so all uploads share one Vulkan device.
+pub fn vulkan_params_for_device(device &vulkan.Device) VulkanParams {
+	return VulkanParams{
+		device: device
+	}
 }
 
 @[heap]
