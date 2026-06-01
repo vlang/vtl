@@ -38,10 +38,12 @@ Build: `-d cuda` required for GPU code paths.
 
 ```v
 import vtl.autograd
+import vtl.autograd_cuda
 import vtl.nn.models
 
 mut ctx := autograd.ctx[f64]()
-// ctx.device_session is initialized; reuses buffers across forwards on this ctx
+autograd_cuda.attach_context_session(mut ctx)
+// ctx.device_session reuses buffers across forwards on this ctx
 
 mut model := models.sequential_from_ctx[f64](ctx)
 // ... train — Linear layers use session when f64 + CUDA enabled
