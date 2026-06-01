@@ -1,4 +1,4 @@
-module autograd
+module autograd_cuda
 
 import os
 import vtl

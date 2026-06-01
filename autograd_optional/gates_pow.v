@@ -1,4 +1,4 @@
-module autograd
+module autograd_optional
 
 import math
 import vtl
@@ -15,7 +15,7 @@ pub fn pow_gate[T](a &Variable[T], b &Variable[T]) &PowGate[T] {
 	}
 }
 
-pub fn (g &PowGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &PowGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	mut iters, shape := gradient.iterators[T]([g.a.value, g.b.value])!
 	mut r0 := vtl.tensor_like_with_shape[T](gradient, shape)
@@ -30,7 +30,7 @@ pub fn (g &PowGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0, r1]
 }
 
-pub fn (g &PowGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
+pub fn (g &PowGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	b := args[1]
 

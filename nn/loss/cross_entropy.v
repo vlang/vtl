@@ -43,13 +43,13 @@ pub fn cross_entropy_loss_gate[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) &
 	}
 }
 
-pub fn (g &CrossEntropyLossGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &CrossEntropyLossGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	r0 := internal.cross_entropy_backward[T](gradient, payload.variable.value, g.target)!
 	return [r0]
 }
 
-pub fn (g &CrossEntropyLossGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
+pub fn (g &CrossEntropyLossGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
 	match a {
 		autograd.Variable[T] {

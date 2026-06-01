@@ -18,13 +18,13 @@ pub fn softmax_gate[T](input &vtl.Tensor[T], dim int) &SoftmaxGate[T] {
 	}
 }
 
-pub fn (g &SoftmaxGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &SoftmaxGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	r0 := internal.deriv_softmax[T](gradient, g.input, g.dim)!
 	return [r0]
 }
 
-pub fn (g &SoftmaxGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
+pub fn (g &SoftmaxGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
 	match a {
 		autograd.Variable[T] {

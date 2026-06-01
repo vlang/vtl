@@ -34,7 +34,7 @@ pub fn (_ &EluLayer[T]) variables() []&autograd.Variable[T] {
 }
 
 pub fn (layer &EluLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
-	output := internal.elu[T](input.value, layer.alpha)
+	output := internal.elu[T](input.value, vtl.cast[T](layer.alpha))
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {

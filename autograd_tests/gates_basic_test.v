@@ -1,9 +1,10 @@
-module autograd
+module autograd_tests
+import vtl.autograd
 
 import vtl
 
 fn test_add() {
-	f64_ctx := ctx[f64]()
+	f64_ctx := autograd.ctx[f64]()
 
 	x := f64_ctx.variable(vtl.from_1d([1.0])!)
 	y := f64_ctx.variable(vtl.from_1d([1.0])!)
@@ -18,7 +19,7 @@ fn test_add() {
 }
 
 fn test_subtract() {
-	f64_ctx := ctx[f64]()
+	f64_ctx := autograd.ctx[f64]()
 
 	x := f64_ctx.variable(vtl.from_1d([1.0])!)
 	y := f64_ctx.variable(vtl.from_1d([1.0])!)
@@ -33,7 +34,7 @@ fn test_subtract() {
 }
 
 fn test_multiply() {
-	f64_ctx := ctx[f64]()
+	f64_ctx := autograd.ctx[f64]()
 
 	x := f64_ctx.variable(vtl.from_1d([3.0])!)
 	y := f64_ctx.variable(vtl.from_1d([2.0])!)
@@ -48,7 +49,7 @@ fn test_multiply() {
 }
 
 fn test_divide() {
-	f64_ctx := ctx[f64]()
+	f64_ctx := autograd.ctx[f64]()
 
 	x := f64_ctx.variable(vtl.from_1d([3.0])!)
 	y := f64_ctx.variable(vtl.from_1d([2.0])!)

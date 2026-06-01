@@ -3,11 +3,11 @@ module internal
 import vsl.cuda
 import vsl.cuda.compute
 import vtl
-import vtl.autograd
+import vtl.autograd_cuda
 
 pub fn conv2d_backward_f64(grad_out &vtl.Tensor[f64], input &vtl.Tensor[f64], weight &vtl.Tensor[f64],
 	bias &vtl.Tensor[f64], kernel_size []int, config Conv2DConfig) ![]&vtl.Tensor[f64] {
-	if !autograd.cuda_backward_enabled() || !conv2d_cuda_eligible(kernel_size, config) {
+	if !autograd_cuda.cuda_backward_enabled() || !conv2d_cuda_eligible(kernel_size, config) {
 		return conv2d_backward_cpu_f64(grad_out, input, weight, bias, kernel_size, config)
 	}
 	batch := input.shape[0]

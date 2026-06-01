@@ -130,14 +130,14 @@ pub fn attention_gate[T](input &vtl.Tensor[T], w_q &vtl.Tensor[T], w_k &vtl.Tens
 	}
 }
 
-pub fn (g &AttentionGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &AttentionGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	grad := payload.variable.grad
 	d_w_o := la.matmul[T](g.input.transpose([1, 0])!, grad)!
 	d_input := la.matmul[T](grad, g.w_o.transpose([1, 0])!)!
 	return [d_input, d_w_o, d_w_o, d_w_o, d_w_o]
 }
 
-pub fn (g &AttentionGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
+pub fn (g &AttentionGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
 	match a {
 		autograd.Variable[T] {

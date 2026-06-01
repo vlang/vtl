@@ -60,11 +60,11 @@ pub fn embedding_gate[T](input &vtl.Tensor[T], weight &vtl.Tensor[T]) &Embedding
 	}
 }
 
-pub fn (g &EmbeddingGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &EmbeddingGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	return internal.embedding_backward[T](payload.variable.grad, g.input, g.weight)
 }
 
-pub fn (g &EmbeddingGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
+pub fn (g &EmbeddingGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
 	match a {
 		autograd.Variable[T] {

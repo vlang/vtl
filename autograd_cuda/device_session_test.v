@@ -1,11 +1,13 @@
-module autograd
+module autograd_cuda
 
 import os
 import vtl
+import vtl.autograd
 import math
 
 fn test_ctx_f64_has_device_session() {
-	c := ctx[f64]()
+	mut c := autograd.ctx[f64]()
+	attach_context_session(mut c)
 	assert c.device_session != unsafe { nil }
 }
 

@@ -33,13 +33,13 @@ pub fn lstm_gate[T](input_ &vtl.Tensor[T],
 	}
 }
 
-pub fn (g &LSTMGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &LSTMGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	// Simplified: return gradient w.r.t. input (full LSTM backward is complex)
 	grad := payload.variable.grad
 	return [grad, grad, grad, grad, grad]
 }
 
-pub fn (g &LSTMGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
+pub fn (g &LSTMGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
 	match a {
 		autograd.Variable[T] {

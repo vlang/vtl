@@ -78,11 +78,11 @@ pub fn layernorm_gate[T](input &vtl.Tensor[T], gamma &vtl.Tensor[T], beta &vtl.T
 	}
 }
 
-pub fn (g &LayerNormGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &LayerNormGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	return internal.layer_norm_backward[T](payload.variable.grad, g.input, g.gamma, g.beta, g.eps)
 }
 
-pub fn (g &LayerNormGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
+pub fn (g &LayerNormGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
 	match a {
 		autograd.Variable[T] {

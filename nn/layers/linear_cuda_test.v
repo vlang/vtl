@@ -2,11 +2,13 @@ module layers
 
 import vtl
 import vtl.autograd
+import vtl.autograd_cuda
 import math
 
 fn test_linear_forward_cpu_without_cuda_env() ! {
 	// Default: no VTL_USE_CUDA — must match CPU matmul path
-	c := autograd.ctx[f64]()
+	mut c := autograd.ctx[f64]()
+	autograd_cuda.attach_context_session(mut c)
 	layer := linear_layer[f64](c, 4, 2)
 	input := vtl.from_array([1.0, 0.0, -1.0, 0.5], [1, 4])!
 	x := c.variable(input)
@@ -18,15 +20,15 @@ fn test_linear_cuda_matches_cpu_reference() ! {
 	if !cuda_tests_enabled() {
 		return
 	}
-	c := autograd.ctx[f64]()
+	mut c := autograd.ctx[f64]()
+	autograd_cuda.attach_context_session(mut c)
 	layer_iface := linear_layer[f64](c, 3, 2)
 	input := vtl.from_array([1.0, 2.0, 3.0], [1, 3])!
 	vars := layer_iface.variables()
 	w := vars[0].value
 	bias_t := vars[1].value
 
-	mut no_session := &autograd.DeviceSession(unsafe { nil })
-	cpu := linear_forward_f64(input, w, bias_t, unsafe { nil }, mut no_session)!
+	cpu := linear_forward_f64(input, w, bias_t, unsafe { nil }, unsafe { nil })!
 	gpu := linear_forward_cuda_f64(input, w, bias_t)!
 
 	assert cpu.shape == gpu.shape
@@ -40,7 +42,8 @@ fn test_linear_layer_forward_with_cuda_env() ! {
 	if !cuda_tests_enabled() {
 		return
 	}
-	c := autograd.ctx[f64]()
+	mut c := autograd.ctx[f64]()
+	autograd_cuda.attach_context_session(mut c)
 	layer := linear_layer[f64](c, 4, 3)
 	input := vtl.from_array([1.0, 0.0, -1.0, 0.5], [1, 4])!
 	x := c.variable(input)

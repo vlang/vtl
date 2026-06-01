@@ -1,4 +1,4 @@
-module autograd
+module autograd_cuda
 
 import vtl
 import vtl.la
@@ -22,6 +22,13 @@ pub mut:
 // new_device_session creates an empty session (CUDA init is build-specific).
 pub fn new_device_session() &DeviceSession {
 	return &DeviceSession{}
+}
+
+// new_device_session_ptr returns a session as voidptr for Context[f64] (avoids autograd↔autograd_cuda cycle).
+pub fn new_device_session_ptr() voidptr {
+	mut s := new_device_session()
+	s.init_device()
+	return unsafe { s }
 }
 
 // linear_forward_f64_cpu is the CPU fallback used by all builds.

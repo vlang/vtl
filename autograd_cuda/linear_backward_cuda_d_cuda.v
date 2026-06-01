@@ -1,4 +1,4 @@
-module autograd
+module autograd_cuda
 
 import vsl.cuda
 import vsl.cuda.compute
@@ -7,7 +7,7 @@ import vtl.la
 
 // linear_backward_f64 runs Linear gradients; uses cuBLAS GEMM when cuda_backward_enabled.
 pub fn linear_backward_f64(grad &vtl.Tensor[f64], input &vtl.Tensor[f64], weight &vtl.Tensor[f64],
-	bias_needs_grad bool, mut session DeviceSession) ![]&vtl.Tensor[f64] {
+	bias_needs_grad bool, mut session &DeviceSession) ![]&vtl.Tensor[f64] {
 	if !cuda_backward_enabled() || !session.enabled {
 		return linear_backward_f64_cpu(grad, input, weight, bias_needs_grad)
 	}

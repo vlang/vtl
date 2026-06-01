@@ -1,9 +1,9 @@
 module optimizers
 
 import math
+import vtl
 import vtl.autograd
 import vtl.nn.types
-import vtl
 
 // AdamOptimizer implements the Adam optimiser (Adaptive Moment Estimation).
 //
@@ -95,15 +95,22 @@ pub fn (mut o AdamOptimizer[T]) update() ! {
 	for i, mut v in o.params {
 		if v.requires_grad {
 			if sizeof(T) == 8 {
-				mut session := v.context.device_session
+				$if cuda ? {
+					if adam_use_cuda_optimizer() {
+						adam_update_f64_cuda(voidptr(v), voidptr(o.first_moments[i]),
+							voidptr(o.second_moments[i]), step, i) or { return err }
+						v.grad = vtl.zeros_like[T](v.value)
+						continue
+					}
+				}
 				grad := v.grad.to_array()
 				mut theta := v.value.to_array()
-				mut m := o.first_moments[i].to_array()
-				mut v_mom := o.second_moments[i].to_array()
-				adam_step_f64(grad, mut theta, mut m, mut v_mom, step, mut session, i)
+				mut m_arr := o.first_moments[i].to_array()
+				mut v_arr := o.second_moments[i].to_array()
+				adam_step_f64_cpu(grad, mut theta, mut m_arr, mut v_arr, step)
 				v.value = vtl.from_array(theta, v.value.shape) or { return err }
-				o.first_moments[i] = vtl.from_array(m, v.value.shape) or { return err }
-				o.second_moments[i] = vtl.from_array(v_mom, v.value.shape) or { return err }
+				o.first_moments[i] = vtl.from_array(m_arr, v.value.shape) or { return err }
+				o.second_moments[i] = vtl.from_array(v_arr, v.value.shape) or { return err }
 			} else {
 				o.first_moments[i].napply([v.grad], fn [o] [T](vals []T, idx []int) T {
 					return vtl.cast[T](o.beta1 * f64(vals[0]) + (1.0 - o.beta1) * f64(vals[1]))

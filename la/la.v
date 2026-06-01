@@ -31,7 +31,7 @@ pub fn inv[T](t &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 	return vtl.from_2d[f64](ret_m.get_deep2())
 }
 
-pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[f64] {
+pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	a.assert_matrix()!
 	b.assert_matrix()!
 	if a.shape[1] != b.shape[0] {
@@ -43,7 +43,11 @@ pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 	mam := vsl_la.Matrix.raw(a.shape[0], a.shape[1], tensor_to_f64_array[T](ma))
 	mbm := vsl_la.Matrix.raw(b.shape[0], b.shape[1], tensor_to_f64_array[T](mb))
 	vsl_la.matrix_matrix_mul(mut dm, 1.0, mam, mbm)
-	return vtl.from_2d[f64](dm.get_deep2())
+	res := vtl.from_2d[f64](dm.get_deep2())!
+	if sizeof(T) == 4 {
+		return unsafe { &vtl.Tensor[T](res.as_f32()) }
+	}
+	return unsafe { &vtl.Tensor[T](res) }
 }
 
 fn tensor_to_f64_array[T](t &vtl.Tensor[T]) []f64 {

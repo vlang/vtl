@@ -15,38 +15,32 @@ pub mut:
 	// If no_grad is set to true, operations will not
 	// be cached, and backpropagation will not be possible
 	no_grad bool
-	// Reusable CUDA staging for f64 forwards (nil for other T).
-	device_session &DeviceSession = unsafe { nil }
+	// Reusable CUDA staging for f64 forwards (nil for other T); see autograd_cuda.DeviceSession.
+	device_session voidptr = unsafe { nil }
 }
 
 // Contexts can only be initialized as empty, and
 // a generic type must be provided
 pub fn ctx[T]() &Context[T] {
-	mut c := &Context[T]{}
-	if sizeof(T) == 8 {
-		mut session := new_device_session()
-		session.init_device()
-		c.device_session = session
-	}
-	return c
+	return &Context[T]{}
 }
 
 pub fn (ctx &Context[T]) len() int {
 	return ctx.nodes.len
 }
 
-pub fn (mut ctx Context[T]) push[T](node &Node[T]) {
+pub fn (mut ctx Context[T]) push(node &Node[T]) {
 	ctx.nodes << node
 }
 
-pub fn (ctx &Context[T]) last[T]() !&Node[T] {
+pub fn (ctx &Context[T]) last() !&Node[T] {
 	if ctx.nodes.len == 0 {
 		return error(@FN + ': context is empty')
 	}
 	return ctx.nodes.last()
 }
 
-pub fn (mut ctx Context[T]) pop[T]() !&Node[T] {
+pub fn (mut ctx Context[T]) pop() !&Node[T] {
 	if ctx.nodes.len == 0 {
 		return error(@FN + ': context is empty')
 	}
@@ -59,7 +53,7 @@ pub:
 	requires_grad bool = true
 }
 
-pub fn (ctx &Context[T]) variable[T](value &vtl.Tensor[T], data ContextVariableData) &Variable[T] {
+pub fn (ctx &Context[T]) variable(value &vtl.Tensor[T], data ContextVariableData) &Variable[T] {
 	return variable[T](ctx, value, requires_grad: data.requires_grad)
 }
 

@@ -4,6 +4,7 @@ import math
 import os
 import vtl
 import vtl.autograd
+import vtl.autograd_cuda
 
 fn ctx[T]() &autograd.Context[T] {
 	return autograd.ctx[T]()
@@ -70,8 +71,9 @@ fn test_adam_step_cuda_matches_cpu_when_enabled() {
 		lr_t:    0.01
 		epsilon: 1e-8
 	}
-	c := ctx[f64]()
-	mut session := c.device_session
+	mut c := autograd.ctx[f64]()
+	autograd_cuda.attach_context_session(mut c)
+	mut session := unsafe { &autograd_cuda.DeviceSession(c.device_session) }
 	adam_step_f64_cpu(grad, mut theta_cpu, mut m_cpu, mut v_cpu, p)
 	adam_step_f64(grad, mut theta_gpu, mut m_gpu, mut v_gpu, p, mut session, 0)
 	for i in 0 .. grad.len {
@@ -85,8 +87,9 @@ fn test_adam_step_persistent_gpu_second_step_matches_cpu() {
 	if os.getenv('VTL_TEST_CUDA') != '1' || os.getenv('VTL_CUDA_OPTIMIZER') != '1' {
 		return
 	}
-	c := ctx[f64]()
-	mut session := c.device_session
+	mut c := autograd.ctx[f64]()
+	autograd_cuda.attach_context_session(mut c)
+	mut session := unsafe { &autograd_cuda.DeviceSession(c.device_session) }
 	grad := [0.5, -0.25]
 	p := AdamStepParams{
 		beta1:   0.9

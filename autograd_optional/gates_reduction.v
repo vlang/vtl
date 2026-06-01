@@ -1,4 +1,4 @@
-module autograd
+module autograd_optional
 
 import vtl
 
@@ -17,14 +17,14 @@ pub fn sum_gate[T](shape []int, axis int) &SumGate[T] {
 	}
 }
 
-pub fn (g &SumGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &SumGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	// Broadcast gradient back to original shape
 	r0 := gradient.broadcast_to[T](g.shape)!
 	return [r0]
 }
 
-pub fn (g &SumGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
+pub fn (g &SumGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {
 		Variable[T] {
@@ -55,7 +55,7 @@ pub fn mean_gate[T](shape []int, axis int, num_elems int) &MeanGate[T] {
 	}
 }
 
-pub fn (g &MeanGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &MeanGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	broadcasted := gradient.broadcast_to[T](g.shape)!
 	scale := vtl.cast[T](g.num_elems)
@@ -63,7 +63,7 @@ pub fn (g &MeanGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0]
 }
 
-pub fn (g &MeanGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
+pub fn (g &MeanGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {
 		Variable[T] {
@@ -90,13 +90,13 @@ pub fn reshape_gate[T](orig_shape []int) &ReshapeGate[T] {
 	}
 }
 
-pub fn (g &ReshapeGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &ReshapeGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	r0 := gradient.reshape[T](g.orig_shape)!
 	return [r0]
 }
 
-pub fn (g &ReshapeGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
+pub fn (g &ReshapeGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {
 		Variable[T] {
@@ -130,14 +130,14 @@ pub fn transpose_gate[T](perm []int) &TransposeGate[T] {
 	}
 }
 
-pub fn (g &TransposeGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &TransposeGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	// Transpose with inverse permutation to get original gradient
 	r0 := gradient.transpose(g.iperm)!
 	return [r0]
 }
 
-pub fn (g &TransposeGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
+pub fn (g &TransposeGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {
 		Variable[T] {
@@ -166,7 +166,7 @@ pub fn concat_gate[T](axis int, splits []int) &ConcatGate[T] {
 	}
 }
 
-pub fn (g &ConcatGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &ConcatGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	// Split gradient back into len(splits) tensors
 	mut results := []&vtl.Tensor[T]{}
@@ -190,7 +190,7 @@ pub fn (g &ConcatGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return results
 }
 
-pub fn (g &ConcatGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
+pub fn (g &ConcatGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	result.grad = vtl.zeros_like[T](result.value)
 	result.requires_grad = true
 	mut vars := []&Variable[T]{}
