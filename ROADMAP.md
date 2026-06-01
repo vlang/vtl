@@ -93,12 +93,10 @@ See [docs/DEVICE_MEMORY.md](docs/DEVICE_MEMORY.md).
 
 | Priority | Work item |
 |----------|-----------|
-| P1 | [#41](https://github.com/vlang/vtl/issues/41) Windows crash |
-| P2 | Label `full-ml` for optional heavy CI workflow |
-| P1 | Phases 2–4 in `DEVICE_MEMORY.md` |
-| — | Vulkan wired into training (`nn_cifar10_vulkan` f32 forward+backprop+Adam) |
-| P2 | Vulkan Conv2D forward f32 (no padding); GPU backward / activations / Adam TBD |
+| P1 | [#41](https://github.com/vlang/vtl/issues/41) Windows crash — `from_array` shape clone fix; verify on Windows |
 | P2 | [#63](https://github.com/vlang/vtl/issues/63) ARM GPU |
+| P2 | Label `full-ml` for optional heavy CI workflow |
+| P2 | Vulkan persistent GPU activation chain (optional; per-layer GPU activations work today) |
 
 **Project board:** [vlang org project #8](https://github.com/orgs/vlang/projects/8)
 
@@ -108,7 +106,7 @@ See [docs/DEVICE_MEMORY.md](docs/DEVICE_MEMORY.md).
 
 | # | Title | Priority | Notes |
 |---|-------|----------|-------|
-| [#41](https://github.com/vlang/vtl/issues/41) | Windows example crash | 🔴 P1 | |
+| [#41](https://github.com/vlang/vtl/issues/41) | Windows example crash | 🔴 P1 | shape.clone in `from_array` (needs Win CI) |
 | [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support | 🟡 P2 | Open |
 | [#43](https://github.com/vlang/vtl/issues/43) | `stats.to_array` performance | 🟡 Medium | |
 | [#40](https://github.com/vlang/vtl/issues/40) | YOLO for autograd gates | 🟡 Medium | |
