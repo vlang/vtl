@@ -98,7 +98,7 @@ pub fn conv2d_gate[T](input &vtl.Tensor[T], weight &vtl.Tensor[T], bias &vtl.Ten
 	}
 }
 
-pub fn (g &Conv2DGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &Conv2DGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	cfg := internal.Conv2DConfig{
 		padding:  g.config.padding
 		stride:   g.config.stride
@@ -109,7 +109,7 @@ pub fn (g &Conv2DGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tens
 		g.kernel_size, cfg)
 }
 
-pub fn (g &Conv2DGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
+pub fn (g &Conv2DGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
 	match a {
 		autograd.Variable[T] {

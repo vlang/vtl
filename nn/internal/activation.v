@@ -123,7 +123,7 @@ pub fn gelu[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 		tanh_arg := sqrt_2_over_pi * (val + coef * val * val * val)
 		// tanh via epsilon-approximation: (exp(z)-exp(-z))/(exp(z)+exp(-z))
 		exp_2z := math.exp(vtl.cast[f64](2.0 * tanh_arg))
-		tanh_z := (exp_2z - vtl.cast[T](1)) / (exp_2z + vtl.cast[T](1))
+		tanh_z := vtl.cast[T]((exp_2z - 1.0) / (exp_2z + 1.0))
 		return vtl.cast[T](0.5) * val * (one + tanh_z)
 	})
 }
@@ -142,7 +142,7 @@ pub fn deriv_gelu[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tenso
 		// compute tanh(z) and z for cached x
 		z := sqrt_2_over_pi * (x + coef * x * x * x)
 		exp_2z := math.exp(vtl.cast[f64](2.0 * z))
-		tanh_z := (exp_2z - one) / (exp_2z + one)
+		tanh_z := vtl.cast[T]((exp_2z - 1.0) / (exp_2z + 1.0))
 		dz_dx := sqrt_2_over_pi * (one + vtl.cast[T](3.0 * 0.044715) * x * x)
 		sech2_z := one - tanh_z * tanh_z
 		return vals[0] * vtl.cast[T](0.5) * (one + tanh_z + x * sech2_z * dz_dx)
@@ -180,11 +180,10 @@ pub fn deriv_swish[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tens
 @[inline]
 pub fn mish[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 	return x.map(fn [T](val T, i []int) T {
-		one := vtl.cast[T](1)
 		sp := vtl.cast[T](math.log1p(math.exp(vtl.cast[f64](val))))
 		// tanh(sp) via (exp(2sp)-1)/(exp(2sp)+1)
 		exp_2sp := math.exp(vtl.cast[f64](2.0 * sp))
-		tanh_sp := (exp_2sp - one) / (exp_2sp + one)
+		tanh_sp := vtl.cast[T]((exp_2sp - 1.0) / (exp_2sp + 1.0))
 		return val * tanh_sp
 	})
 }
@@ -197,10 +196,10 @@ pub fn deriv_mish[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tenso
 		x := vals[0]
 		one := vtl.cast[T](1)
 		exp_x := math.exp(vtl.cast[f64](x))
-		sig := exp_x / (exp_x + vtl.cast[T](1))
+		sig := vtl.cast[T](exp_x / (exp_x + 1.0))
 		sp := vtl.cast[T](math.log1p(exp_x))
 		exp_2sp := math.exp(vtl.cast[f64](2.0 * sp))
-		tanh_sp := (exp_2sp - one) / (exp_2sp + one)
+		tanh_sp := vtl.cast[T]((exp_2sp - 1.0) / (exp_2sp + 1.0))
 		// derivative: gradient * [tanh_sp + x * (1-tanh_sp^2) * sigmoid(x)]
 		return vals[0] * (tanh_sp + x * (one - tanh_sp * tanh_sp) * sig)
 	})

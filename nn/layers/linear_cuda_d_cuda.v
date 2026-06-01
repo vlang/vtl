@@ -1,7 +1,7 @@
 module layers
 
 import vtl
-import vtl.autograd
+import vtl.autograd_cuda
 import vsl.cuda
 import vsl.cuda.compute
 
@@ -12,7 +12,7 @@ pub fn linear_forward_cuda_f64(x &vtl.Tensor[f64], weights &vtl.Tensor[f64], bia
 	if !cuda_linear_enabled() {
 		return error('linear_forward_cuda_f64: set VTL_USE_CUDA=1 to enable')
 	}
-	mut session := autograd.new_device_session()
+	mut session := autograd_cuda.new_device_session()
 	session.init_device()
 	return session.linear_forward_f64(x, weights, bias, unsafe { nil })
 }

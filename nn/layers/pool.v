@@ -74,12 +74,12 @@ pub fn avgpool2d_gate[T](input &vtl.Tensor[T], kernel []int, padding []int, stri
 	}
 }
 
-pub fn (g &AvgPool2DGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &AvgPool2DGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	grad := internal.avgpool2d_backward[T](payload.variable.grad, g.kernel, g.padding, g.stride)!
 	return [grad]
 }
 
-pub fn (g &AvgPool2DGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
+pub fn (g &AvgPool2DGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
 	match a {
 		autograd.Variable[T] {
@@ -130,12 +130,12 @@ pub fn global_avgpool2d_gate[T](input &vtl.Tensor[T]) &GlobalAvgPool2DGate[T] {
 	}
 }
 
-pub fn (g &GlobalAvgPool2DGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &GlobalAvgPool2DGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	grad := internal.global_avgpool2d_backward[T](payload.variable.grad, g.input)!
 	return [grad]
 }
 
-pub fn (g &GlobalAvgPool2DGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
+pub fn (g &GlobalAvgPool2DGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
 	match a {
 		autograd.Variable[T] {

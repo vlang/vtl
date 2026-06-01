@@ -1,13 +1,11 @@
 module autograd
 
-import vtl.la
-
 // add Adds two variables together.
-pub fn (v &Variable[T]) add[T](other &Variable[T]) !&Variable[T] {
-	mut result := v.context.variable[T](v.value.add[T](other.value)!)
+pub fn (v &Variable[T]) add(other &Variable[T]) !&Variable[T] {
+	mut result := v.context.variable(v.value.add(other.value)!)
 
 	if v.requires_grad || other.requires_grad {
-		gate := add_gate[T]()
+		gate := &AddGate[T]{}
 		gate.cache(mut result, v, other)!
 	}
 
@@ -15,11 +13,11 @@ pub fn (v &Variable[T]) add[T](other &Variable[T]) !&Variable[T] {
 }
 
 // subtract Subtracts two variables.
-pub fn (v &Variable[T]) subtract[T](other &Variable[T]) !&Variable[T] {
-	mut result := v.context.variable[T](v.value.subtract[T](other.value)!)
+pub fn (v &Variable[T]) subtract(other &Variable[T]) !&Variable[T] {
+	mut result := v.context.variable(v.value.subtract(other.value)!)
 
 	if v.requires_grad || other.requires_grad {
-		gate := subtract_gate[T]()
+		gate := &SubtractGate[T]{}
 		gate.cache(mut result, v, other)!
 	}
 
@@ -27,11 +25,14 @@ pub fn (v &Variable[T]) subtract[T](other &Variable[T]) !&Variable[T] {
 }
 
 // multiply Multiplies two variables.
-pub fn (v &Variable[T]) multiply[T](other &Variable[T]) !&Variable[T] {
-	mut result := v.context.variable[T](v.value.multiply[T](other.value)!)
+pub fn (v &Variable[T]) multiply(other &Variable[T]) !&Variable[T] {
+	mut result := v.context.variable(v.value.multiply(other.value)!)
 
 	if v.requires_grad || other.requires_grad {
-		gate := multiply_gate[T](v, other)
+		gate := &MultiplyGate[T]{
+			a: v
+			b: other
+		}
 		gate.cache(mut result, v, other)!
 	}
 
@@ -39,11 +40,14 @@ pub fn (v &Variable[T]) multiply[T](other &Variable[T]) !&Variable[T] {
 }
 
 // divide Divides two variables.
-pub fn (v &Variable[T]) divide[T](other &Variable[T]) !&Variable[T] {
-	mut result := v.context.variable[T](v.value.divide[T](other.value)!)
+pub fn (v &Variable[T]) divide(other &Variable[T]) !&Variable[T] {
+	mut result := v.context.variable(v.value.divide(other.value)!)
 
 	if v.requires_grad || other.requires_grad {
-		gate := divide_gate[T](v, other)
+		gate := &DivideGate[T]{
+			a: v
+			b: other
+		}
 		gate.cache(mut result, v, other)!
 	}
 
@@ -51,8 +55,8 @@ pub fn (v &Variable[T]) divide[T](other &Variable[T]) !&Variable[T] {
 }
 
 // pow raises a variable to a power.
-pub fn (v &Variable[T]) pow[T](other &Variable[T]) !&Variable[T] {
-	mut result := v.context.variable[T](v.value.pow[T](other.value)!)
+pub fn (v &Variable[T]) pow(other &Variable[T]) !&Variable[T] {
+	mut result := v.context.variable(v.value.pow(other.value)!)
 
 	if v.requires_grad || other.requires_grad {
 		gate := pow_gate[T](v, other)
@@ -63,8 +67,8 @@ pub fn (v &Variable[T]) pow[T](other &Variable[T]) !&Variable[T] {
 }
 
 // exp Exponentiates a variable.
-pub fn (v &Variable[T]) exp[T]() !&Variable[T] {
-	mut result := v.context.variable[T](v.value.exp[T]())
+pub fn (v &Variable[T]) exp() !&Variable[T] {
+	mut result := v.context.variable(v.value.exp())
 
 	if v.requires_grad {
 		gate := exp_gate[T](v)
@@ -75,11 +79,14 @@ pub fn (v &Variable[T]) exp[T]() !&Variable[T] {
 }
 
 // matmul Multiplies two matrices.
-pub fn (v &Variable[T]) matmul[T](other &Variable[T]) !&Variable[T] {
-	mut result := v.context.variable[T](la.matmul[T](v.value, other.value)!)
+pub fn (v &Variable[T]) matmul(other &Variable[T]) !&Variable[T] {
+	mut result := v.context.variable(gate_matmul[T](v.value, other.value)!)
 
 	if v.requires_grad || other.requires_grad {
-		gate := matmul_gate[T](v, other)
+		gate := &MatMulGate[T]{
+			a: v
+			b: other
+		}
 		gate.cache(mut result, v, other)!
 	}
 
@@ -87,8 +94,8 @@ pub fn (v &Variable[T]) matmul[T](other &Variable[T]) !&Variable[T] {
 }
 
 // sin Sine of a variable.
-pub fn (v &Variable[T]) sin[T]() !&Variable[T] {
-	mut result := v.context.variable[T](v.value.sin[T]())
+pub fn (v &Variable[T]) sin() !&Variable[T] {
+	mut result := v.context.variable(v.value.sin())
 
 	if v.requires_grad {
 		gate := sin_gate[T](v)
@@ -99,8 +106,8 @@ pub fn (v &Variable[T]) sin[T]() !&Variable[T] {
 }
 
 // cos Cosine of a variable.
-pub fn (v &Variable[T]) cos[T]() !&Variable[T] {
-	mut result := v.context.variable[T](v.value.cos[T]())
+pub fn (v &Variable[T]) cos() !&Variable[T] {
+	mut result := v.context.variable(v.value.cos())
 
 	if v.requires_grad {
 		gate := cos_gate[T](v)
@@ -111,8 +118,8 @@ pub fn (v &Variable[T]) cos[T]() !&Variable[T] {
 }
 
 // tan Tan of a variable.
-pub fn (v &Variable[T]) tan[T]() !&Variable[T] {
-	mut result := v.context.variable[T](v.value.tan[T]())
+pub fn (v &Variable[T]) tan() !&Variable[T] {
+	mut result := v.context.variable(v.value.tan())
 
 	if v.requires_grad {
 		gate := tan_gate[T](v)
@@ -132,9 +139,9 @@ pub fn (v &Variable[T]) tan[T]() !&Variable[T] {
 // y := x.log[f64]()!
 // // y.value ≈ [0.0, 1.0, 2.0]
 // ```
-pub fn (v &Variable[T]) log[T]() !&Variable[T] {
+pub fn (v &Variable[T]) log() !&Variable[T] {
 	g := log_gate[T](v)
-	t := v.value.log[T]()
+	t := v.value.log()
 	mut result := v.context.variable(t)
 	if v.requires_grad {
 		g.cache(mut result, v)!
@@ -154,9 +161,9 @@ pub fn (v &Variable[T]) log[T]() !&Variable[T] {
 // y := x.abs_op[f64]()!
 // // y.value = [3.0, 0.0, 4.0]
 // ```
-pub fn (v &Variable[T]) abs_op[T]() !&Variable[T] {
+pub fn (v &Variable[T]) abs_op() !&Variable[T] {
 	g := abs_gate[T](v)
-	t := v.value.abs[T]()
+	t := v.value.abs()
 	mut result := v.context.variable(t)
 	if v.requires_grad {
 		g.cache(mut result, v)!
@@ -177,7 +184,7 @@ pub fn (v &Variable[T]) abs_op[T]() !&Variable[T] {
 // y := x.sqrt_op[f64]()!
 // // y.value = [1.0, 2.0, 3.0]
 // ```
-pub fn (v &Variable[T]) sqrt_op[T]() !&Variable[T] {
+pub fn (v &Variable[T]) sqrt_op() !&Variable[T] {
 	g := sqrt_gate[T](v)
 	t := v.value.sqrt[T]()
 	mut result := v.context.variable(t)
@@ -199,7 +206,7 @@ pub fn (v &Variable[T]) sqrt_op[T]() !&Variable[T] {
 // y := x.tanh_op[f64]()!
 // // y.value ≈ [0.0, 0.762, -0.762]
 // ```
-pub fn (v &Variable[T]) tanh_op[T]() !&Variable[T] {
+pub fn (v &Variable[T]) tanh_op() !&Variable[T] {
 	t := v.value.tanh[T]()
 	g := tanh_gate[T](t)
 	mut result := v.context.variable(t)
@@ -218,7 +225,7 @@ pub fn (v &Variable[T]) tanh_op[T]() !&Variable[T] {
 // y := x.clamp[f64](-1.0, 1.0)!
 // // y.value = [-1.0, 0.5, 1.0]
 // ```
-pub fn (v &Variable[T]) clamp[T](min_val T, max_val T) !&Variable[T] {
+pub fn (v &Variable[T]) clamp(min_val T, max_val T) !&Variable[T] {
 	g := clamp_gate[T](min_val, max_val, v.value)
 	t := v.value.map(fn [min_val, max_val] [T](x T, _ []int) T {
 		$if T is f64 || T is f32 || T is i16 || T is i8 || T is int {
@@ -250,9 +257,9 @@ pub fn (v &Variable[T]) clamp[T](min_val T, max_val T) !&Variable[T] {
 // y := x.reshape[f64]([4])!
 // // y.value.shape = [4]
 // ```
-pub fn (v &Variable[T]) reshape[T](new_shape []int) !&Variable[T] {
+pub fn (v &Variable[T]) reshape(new_shape []int) !&Variable[T] {
 	g := reshape_gate[T](v.value.shape)
-	t := v.value.reshape[T](new_shape)!
+	t := v.value.reshape(new_shape)!
 	mut result := v.context.variable(t)
 	if v.requires_grad {
 		g.cache(mut result, v)!
@@ -272,7 +279,7 @@ pub fn (v &Variable[T]) reshape[T](new_shape []int) !&Variable[T] {
 // y := x.transpose_op[f64]([1, 0])!
 // // y.value.shape = [3, 2]
 // ```
-pub fn (v &Variable[T]) transpose_op[T](perm []int) !&Variable[T] {
+pub fn (v &Variable[T]) transpose_op(perm []int) !&Variable[T] {
 	g := transpose_gate[T](perm)
 	t := v.value.transpose(perm)!
 	mut result := v.context.variable(t)

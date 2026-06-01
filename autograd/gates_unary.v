@@ -15,13 +15,13 @@ pub fn log_gate[T](a &Variable[T]) &LogGate[T] {
 	}
 }
 
-pub fn (g &LogGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &LogGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	r0 := gradient.divide[T](g.a.value)!
 	return [r0]
 }
 
-pub fn (g &LogGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
+pub fn (g &LogGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {
 		Variable[T] {
@@ -48,7 +48,7 @@ pub fn abs_gate[T](a &Variable[T]) &AbsGate[T] {
 	}
 }
 
-pub fn (g &AbsGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &AbsGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	eps := vtl.cast[T](1e-8)
 	abs_a := g.a.value.abs[T]()
@@ -60,7 +60,7 @@ pub fn (g &AbsGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0]
 }
 
-pub fn (g &AbsGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
+pub fn (g &AbsGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {
 		Variable[T] {
@@ -87,7 +87,7 @@ pub fn sqrt_gate[T](a &Variable[T]) &SqrtGate[T] {
 	}
 }
 
-pub fn (g &SqrtGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &SqrtGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	// d/dx sqrt(x) = 1/(2*sqrt(x)) = gradient * (0.5 / sqrt(x))
 	sqrt_a := g.a.value.sqrt[T]()
@@ -96,7 +96,7 @@ pub fn (g &SqrtGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0]
 }
 
-pub fn (g &SqrtGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
+pub fn (g &SqrtGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {
 		Variable[T] {
@@ -123,7 +123,7 @@ pub fn tanh_gate[T](cache &vtl.Tensor[T]) &TanhGate[T] {
 	}
 }
 
-pub fn (g &TanhGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &TanhGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	r0 := gradient.nmap([g.cache], fn [T](vals []T, _ []int) T {
 		return vals[0] * (vtl.cast[T](1) - vals[1] * vals[1])
@@ -131,7 +131,7 @@ pub fn (g &TanhGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0]
 }
 
-pub fn (g &TanhGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
+pub fn (g &TanhGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {
 		Variable[T] {
@@ -162,7 +162,7 @@ pub fn clamp_gate[T](min_val T, max_val T, a &vtl.Tensor[T]) &ClampGate[T] {
 	}
 }
 
-pub fn (g &ClampGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &ClampGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	input := g.a
 	min_val := g.min_val
@@ -176,7 +176,7 @@ pub fn (g &ClampGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0]
 }
 
-pub fn (g &ClampGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
+pub fn (g &ClampGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {
 		Variable[T] {

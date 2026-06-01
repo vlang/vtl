@@ -41,6 +41,7 @@ pub fn conv2d_backward_cpu_f64(grad_out &vtl.Tensor[f64], input &vtl.Tensor[f64]
 									if ih >= 0 && ih < in_h && iw >= 0 && iw < in_w {
 										w_val := weight.get([global_oc, ic, kh, kw])
 										d_input.set([b, g * g_in_ch + ic, ih, iw],
+
 											d_input.get([b, g * g_in_ch + ic, ih, iw]) + goh * w_val)
 									}
 								}
@@ -64,7 +65,12 @@ pub fn conv2d_backward_cpu_f64(grad_out &vtl.Tensor[f64], input &vtl.Tensor[f64]
 								ih := oh * stride_h - pad_h + kh * dil_h
 								iw := ow * stride_w - pad_w + kw * dil_w
 								if ih >= 0 && ih < in_h && iw >= 0 && iw < in_w {
-									sum += input.get([b, ic, ih, iw]) * grad_out.get([b, oc, oh, ow])
+									sum += input.get([b, ic, ih, iw]) * grad_out.get([
+										b,
+										oc,
+										oh,
+										ow,
+									])
 								}
 							}
 						}

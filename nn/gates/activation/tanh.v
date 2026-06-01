@@ -15,13 +15,13 @@ pub fn tanh_gate[T](cache &vtl.Tensor[T]) &TanhGate[T] {
 	}
 }
 
-pub fn (g &TanhGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &TanhGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	r0 := internal.deriv_tanh[T](gradient, g.cache)!
 	return [r0]
 }
 
-pub fn (g &TanhGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
+pub fn (g &TanhGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
 	match a {
 		autograd.Variable[T] {

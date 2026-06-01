@@ -16,7 +16,7 @@ pub fn dropout_gate[T](mask &vtl.Tensor[T], prob f64) &DropoutGate[T] {
 	}
 }
 
-pub fn (g &DropoutGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &DropoutGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	prob := g.prob
 	result := gradient.nmap([g.mask], fn [prob] [T](xs []T, i []int) {
@@ -26,7 +26,7 @@ pub fn (g &DropoutGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Ten
 	return [result]
 }
 
-pub fn (g &DropoutGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
+pub fn (g &DropoutGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
 
 	match a {

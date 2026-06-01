@@ -1,9 +1,10 @@
-module autograd
+module autograd_tests
 
+import vtl.autograd
 import vtl
 
 fn test_exp() {
-	f64_ctx := ctx[f64]()
+	f64_ctx := autograd.ctx[f64]()
 
 	vals := []f64{len: 10, init: f64(index) / 10.0}
 

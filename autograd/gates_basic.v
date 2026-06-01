@@ -8,12 +8,12 @@ pub fn add_gate[T]() &AddGate[T] {
 	return &AddGate[T]{}
 }
 
-pub fn (g &AddGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &AddGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	return [gradient, gradient]
 }
 
-pub fn (g &AddGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
+pub fn (g &AddGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	b := args[1]
 
@@ -43,13 +43,13 @@ pub fn subtract_gate[T]() &SubtractGate[T] {
 	return &SubtractGate[T]{}
 }
 
-pub fn (g &SubtractGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &SubtractGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	opposite := gradient.multiply_scalar[T](vtl.cast[T](-1))!
 	return [gradient, opposite]
 }
 
-pub fn (g &SubtractGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
+pub fn (g &SubtractGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	b := args[1]
 
@@ -86,14 +86,14 @@ pub fn multiply_gate[T](a &Variable[T], b &Variable[T]) &MultiplyGate[T] {
 	}
 }
 
-pub fn (g &MultiplyGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &MultiplyGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	r0 := gradient.multiply[T](g.b.value)!
 	r1 := gradient.multiply[T](g.a.value)!
 	return [r0, r1]
 }
 
-pub fn (g &MultiplyGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
+pub fn (g &MultiplyGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	b := args[1]
 
@@ -130,7 +130,7 @@ pub fn divide_gate[T](a &Variable[T], b &Variable[T]) &DivideGate[T] {
 	}
 }
 
-pub fn (g &DivideGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &DivideGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	r0 := gradient.divide[T](g.b.value)!
 	bx2 := g.b.value.multiply_scalar[T](vtl.cast[T](2))!
@@ -140,7 +140,7 @@ pub fn (g &DivideGate[T]) backward[T](payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0, r1]
 }
 
-pub fn (g &DivideGate[T]) cache[T](mut result Variable[T], args ...CacheParam) ! {
+pub fn (g &DivideGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	b := args[1]
 

@@ -1,4 +1,4 @@
-module autograd
+module autograd_cuda
 
 import vsl.cuda
 import vsl.cuda.compute

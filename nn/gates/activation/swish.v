@@ -15,13 +15,13 @@ pub fn swish_gate[T](cache &vtl.Tensor[T]) &SwishGate[T] {
 	}
 }
 
-pub fn (g &SwishGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &SwishGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	r0 := internal.deriv_swish[T](gradient, g.cache)!
 	return [r0]
 }
 
-pub fn (g &SwishGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
+pub fn (g &SwishGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
 	match a {
 		autograd.Variable[T] {

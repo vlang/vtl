@@ -23,9 +23,10 @@ pub fn conv2d_forward[T](input &vtl.Tensor[T],
 	kernel_size []int,
 	config Conv2DConfig) !&vtl.Tensor[T] {
 	if sizeof(T) == 8 {
-		return conv2d_forward_f64(unsafe { &vtl.Tensor[f64](input) },
+		out := conv2d_forward_f64(unsafe { &vtl.Tensor[f64](input) },
 			unsafe { &vtl.Tensor[f64](weight) }, unsafe { &vtl.Tensor[f64](bias) }, kernel_size,
-			config)
+			config)!
+		return unsafe { &vtl.Tensor[T](out) }
 	}
 	batch := input.shape[0]
 	in_ch := input.shape[1]
@@ -89,9 +90,14 @@ pub fn conv2d_backward[T](grad_out &vtl.Tensor[T],
 	kernel_size []int,
 	config Conv2DConfig) ![]&vtl.Tensor[T] {
 	if sizeof(T) == 8 {
-		return conv2d_backward_f64(unsafe { &vtl.Tensor[f64](grad_out) },
+		tensors := conv2d_backward_f64(unsafe { &vtl.Tensor[f64](grad_out) },
 			unsafe { &vtl.Tensor[f64](input) }, unsafe { &vtl.Tensor[f64](weight) },
-			unsafe { &vtl.Tensor[f64](bias) }, kernel_size, config)
+			unsafe { &vtl.Tensor[f64](bias) }, kernel_size, config)!
+		mut out := []&vtl.Tensor[T]{len: tensors.len}
+		for i, t in tensors {
+			out[i] = unsafe { &vtl.Tensor[T](t) }
+		}
+		return out
 	}
 	batch := input.shape[0]
 	in_ch := input.shape[1]

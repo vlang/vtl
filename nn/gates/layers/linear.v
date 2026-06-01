@@ -19,43 +19,54 @@ pub fn linear_gate[T](input &autograd.Variable[T], weight &autograd.Variable[T],
 	}
 }
 
-pub fn (g &LinearGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &LinearGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	grad := payload.variable.grad
-
-	if sizeof(T) == 8 {
-		mut session := g.input.context.device_session
-		tensors := autograd.linear_backward_f64(unsafe { &vtl.Tensor[f64](grad) },
-			unsafe { &vtl.Tensor[f64](g.input.value) },
-			unsafe { &vtl.Tensor[f64](g.weight.value) }, g.bias.requires_grad, mut session)!
-		mut result := [grad, grad, grad]
+	mut result := [grad, grad, grad]
+	$if sizeof(T) == 8 {
+		$if cuda ? {
+			if linear_gate_use_cuda_backward() {
+				tensors := linear_gate_backward_f64_cuda(voidptr(g), voidptr(payload))!
+				if g.input.requires_grad {
+					result[0] = unsafe { &vtl.Tensor[T](tensors[0]) }
+				}
+				if g.weight.requires_grad {
+					result[1] = unsafe { &vtl.Tensor[T](tensors[1]) }
+				}
+				if g.bias.requires_grad {
+					result[2] = unsafe { &vtl.Tensor[T](tensors[2]) }
+				}
+				return result
+			}
+		}
 		if g.input.requires_grad {
-			result[0] = unsafe { &vtl.Tensor[T](tensors[0]) }
+			result[0] = la.matmul[f64](grad, g.weight.value)!
 		}
 		if g.weight.requires_grad {
-			result[1] = unsafe { &vtl.Tensor[T](tensors[1]) }
+			result[1] = la.matmul[f64](grad.t()!, g.input.value)!
 		}
 		if g.bias.requires_grad {
-			result[2] = unsafe { &vtl.Tensor[T](tensors[2]) }
+			batch_size := grad.shape[0]
+			ones := vtl.ones[f64]([1, batch_size])
+			result[2] = la.matmul[f64](ones, grad)!
+		}
+		return result
+	} $else {
+		if g.input.requires_grad {
+			result[0] = la.matmul[T](grad, g.weight.value)!
+		}
+		if g.weight.requires_grad {
+			result[1] = la.matmul[T](grad.t()!, g.input.value)!
+		}
+		if g.bias.requires_grad {
+			batch_size := grad.shape[0]
+			ones := vtl.ones[T]([1, batch_size])
+			result[2] = la.matmul[T](ones, grad)!
 		}
 		return result
 	}
-
-	mut result := [grad, grad, grad]
-	if g.input.requires_grad {
-		result[0] = la.matmul[T](grad, g.weight.value)!
-	}
-	if g.weight.requires_grad {
-		result[1] = la.matmul[T](grad.t()!, g.input.value)!
-	}
-	if g.bias.requires_grad {
-		batch_size := grad.shape[0]
-		ones := vtl.ones[T]([1, batch_size])
-		result[2] = la.matmul[T](ones, grad)!
-	}
-	return result
 }
 
-pub fn (g &LinearGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
+pub fn (g &LinearGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	input := args[0]
 	weight := args[1]
 	bias := args[2]

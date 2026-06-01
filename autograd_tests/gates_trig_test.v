@@ -1,10 +1,11 @@
-module autograd
+module autograd_tests
 
+import vtl.autograd
 import math
 import vtl
 
 fn test_sin() {
-	f64_ctx := ctx[f64]()
+	f64_ctx := autograd.ctx[f64]()
 
 	x := f64_ctx.variable(vtl.from_1d([1.0])!)
 
@@ -19,7 +20,7 @@ fn test_sin() {
 }
 
 fn test_cos() {
-	f64_ctx := ctx[f64]()
+	f64_ctx := autograd.ctx[f64]()
 
 	x := f64_ctx.variable(vtl.from_1d([1.0])!)
 
@@ -34,7 +35,7 @@ fn test_cos() {
 }
 
 fn test_tan() {
-	f64_ctx := ctx[f64]()
+	f64_ctx := autograd.ctx[f64]()
 
 	x := f64_ctx.variable(vtl.from_1d([1.0])!)
 

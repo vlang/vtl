@@ -17,13 +17,13 @@ pub fn elu_gate[T](cache &vtl.Tensor[T], alpha T) &EluGate[T] {
 	}
 }
 
-pub fn (g &EluGate[T]) backward[T](payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
+pub fn (g &EluGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	r0 := internal.deriv_elu[T](gradient, g.cache, g.alpha)!
 	return [r0]
 }
 
-pub fn (g &EluGate[T]) cache[T](mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
+pub fn (g &EluGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
 
 	match a {

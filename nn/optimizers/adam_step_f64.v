@@ -5,10 +5,10 @@ import math
 // AdamStepParams holds scalar Adam state for one flat parameter vector.
 pub struct AdamStepParams {
 pub:
-	beta1     f64
-	beta2     f64
-	lr_t      f64
-	epsilon   f64
+	beta1   f64
+	beta2   f64
+	lr_t    f64
+	epsilon f64
 }
 
 // adam_step_f64_cpu performs one Adam update on flat CPU buffers.

@@ -3,11 +3,11 @@ module internal
 import vsl.cuda
 import vsl.cuda.compute
 import vtl
-import vtl.autograd
+import vtl.autograd_cuda
 
 pub fn conv2d_backward_f64(grad_out &vtl.Tensor[f64], input &vtl.Tensor[f64], weight &vtl.Tensor[f64],
 	bias &vtl.Tensor[f64], kernel_size []int, config Conv2DConfig) ![]&vtl.Tensor[f64] {
-	if !autograd.cuda_backward_enabled() || !conv2d_cuda_eligible(kernel_size, config) {
+	if !autograd_cuda.cuda_backward_enabled() || !conv2d_cuda_eligible(kernel_size, config) {
 		return conv2d_backward_cpu_f64(grad_out, input, weight, bias, kernel_size, config)
 	}
 	batch := input.shape[0]
@@ -21,8 +21,8 @@ pub fn conv2d_backward_f64(grad_out &vtl.Tensor[f64], input &vtl.Tensor[f64], we
 	stride_w := config.stride[1]
 
 	dev := cuda.get_default_device()!
-	bwd := compute.conv2d_backward_cuda(dev, grad_out.to_array(), input.to_array(), weight.to_array(),
-		batch, in_h, in_w, in_ch, out_ch, k_h, k_w, stride_h, stride_w)!
+	bwd := compute.conv2d_backward_cuda(dev, grad_out.to_array(), input.to_array(),
+		weight.to_array(), batch, in_h, in_w, in_ch, out_ch, k_h, k_w, stride_h, stride_w)!
 
 	d_input := vtl.from_array(bwd.d_input, input.shape)!
 	d_weight := vtl.from_array(bwd.d_weight, weight.shape)!
