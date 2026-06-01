@@ -94,7 +94,7 @@ pub fn (mut o AdamOptimizer[T]) update() ! {
 	}
 	for i, mut v in o.params {
 		if v.requires_grad {
-			if sizeof(T) == 8 {
+			$if sizeof(T) == 8 {
 				$if cuda ? {
 					if adam_use_cuda_optimizer() {
 						adam_update_f64_cuda(voidptr(v), voidptr(o.first_moments[i]),
@@ -111,7 +111,7 @@ pub fn (mut o AdamOptimizer[T]) update() ! {
 				v.value = vtl.from_array(theta, v.value.shape) or { return err }
 				o.first_moments[i] = vtl.from_array(m_arr, v.value.shape) or { return err }
 				o.second_moments[i] = vtl.from_array(v_arr, v.value.shape) or { return err }
-			} else {
+			} $else $if sizeof(T) == 4 {
 				o.first_moments[i].napply([v.grad], fn [o] [T](vals []T, idx []int) T {
 					return vtl.cast[T](o.beta1 * f64(vals[0]) + (1.0 - o.beta1) * f64(vals[1]))
 				}) or { return err }
@@ -127,6 +127,8 @@ pub fn (mut o AdamOptimizer[T]) update() ! {
 					vv := f64(vals[2])
 					return vtl.cast[T](theta - lr_t * m / (math.sqrt(vv) + o.epsilon))
 				}) or { return err }
+			} $else {
+				return error('AdamOptimizer.update: unsupported element type size ${sizeof(T)}')
 			}
 			v.grad = vtl.zeros_like[T](v.value)
 		}
