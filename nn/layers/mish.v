@@ -11,20 +11,24 @@ pub struct MishLayer[T] {
 	output_shape []int
 }
 
+// mish_layer exposes this operation as part of the public API.
 pub fn mish_layer[T](ctx &autograd.Context[T], output_shape []int) types.Layer[T] {
 	return types.Layer[T](&MishLayer[T]{
 		output_shape: output_shape.clone()
 	})
 }
 
+// output_shape exposes this operation as part of the public API.
 pub fn (layer &MishLayer[T]) output_shape() []int {
 	return layer.output_shape
 }
 
+// variables exposes this operation as part of the public API.
 pub fn (_ &MishLayer[T]) variables() []&autograd.Variable[T] {
 	return []&autograd.Variable[T]{}
 }
 
+// forward exposes this operation as part of the public API.
 pub fn (layer &MishLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	output := internal.mish[T](input.value)
 	mut result := input.context.variable(output)

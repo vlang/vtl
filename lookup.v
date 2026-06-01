@@ -1,6 +1,10 @@
 module vtl
 
 // get returns a scalar value from a Tensor at the provided index
+
+// get exposes this operation as part of the public API.
+
+// get exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) get[T](index []int) T {
 	offset := t.offset_index(index)
@@ -8,6 +12,10 @@ pub fn (t &Tensor[T]) get[T](index []int) T {
 }
 
 // get_nth returns a scalar value from a Tensor at the provided index
+
+// get_nth exposes this operation as part of the public API.
+
+// get_nth exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) get_nth[T](n int) T {
 	index := t.nth_index(n)
@@ -16,6 +24,10 @@ pub fn (t &Tensor[T]) get_nth[T](n int) T {
 
 // offset_index returns the index to a Tensor's data at
 // a given index
+
+// offset_index exposes this operation as part of the public API.
+
+// offset_index exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) offset_index[T](index []int) int {
 	mut offset := 0

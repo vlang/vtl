@@ -61,6 +61,7 @@ fn (mut s DeviceSession) gpu_chain_mut() &DeviceGpuChain {
 	return unsafe { &DeviceGpuChain(s.gpu_chain) }
 }
 
+// reset_gpu_chain exposes this operation as part of the public API.
 pub fn (mut s DeviceSession) reset_gpu_chain() {
 	if s.gpu_chain != unsafe { nil } {
 		mut chain := unsafe { &DeviceGpuChain(s.gpu_chain) }

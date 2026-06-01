@@ -15,6 +15,7 @@ pub struct LSTMGate[T] {
 	b_hh    &vtl.Tensor[T] = unsafe { nil }
 }
 
+// lstm_gate exposes this operation as part of the public API.
 pub fn lstm_gate[T](input_ &vtl.Tensor[T],
 	hidden_ &vtl.Tensor[T],
 	cell_ &vtl.Tensor[T],
@@ -33,12 +34,14 @@ pub fn lstm_gate[T](input_ &vtl.Tensor[T],
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &LSTMGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	// Simplified: return gradient w.r.t. input (full LSTM backward is complex)
 	grad := payload.variable.grad
 	return [grad, grad, grad, grad, grad]
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &LSTMGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
 	match a {

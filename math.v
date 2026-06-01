@@ -3,6 +3,10 @@ module vtl
 import math
 
 // abs returns the elementwise abs of an tensor
+
+// abs exposes this operation as part of the public API.
+
+// abs exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) abs[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -12,6 +16,10 @@ pub fn (t &Tensor[T]) abs[T]() &Tensor[T] {
 }
 
 // acos returns the elementwise acos of an tensor
+
+// acos exposes this operation as part of the public API.
+
+// acos exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) acos[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -20,6 +28,10 @@ pub fn (t &Tensor[T]) acos[T]() &Tensor[T] {
 }
 
 // acosh returns the elementwise acosh of an tensor
+
+// acosh exposes this operation as part of the public API.
+
+// acosh exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) acosh[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -28,6 +40,10 @@ pub fn (t &Tensor[T]) acosh[T]() &Tensor[T] {
 }
 
 // asin returns the elementwise asin of an tensor
+
+// asin exposes this operation as part of the public API.
+
+// asin exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) asin[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -36,6 +52,10 @@ pub fn (t &Tensor[T]) asin[T]() &Tensor[T] {
 }
 
 // asinh returns the elementwise asinh of an tensor
+
+// asinh exposes this operation as part of the public API.
+
+// asinh exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) asinh[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -44,6 +64,10 @@ pub fn (t &Tensor[T]) asinh[T]() &Tensor[T] {
 }
 
 // atan returns the elementwise atan of an tensor
+
+// atan exposes this operation as part of the public API.
+
+// atan exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) atan[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -52,6 +76,10 @@ pub fn (t &Tensor[T]) atan[T]() &Tensor[T] {
 }
 
 // atan2 returns the atan2 elementwise of two tensors
+
+// atan2 exposes this operation as part of the public API.
+
+// atan2 exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) atan2[T](b &Tensor[T]) !&Tensor[T] {
 	return a.nmap([b], fn [T](xs []T, _ []int) T {
@@ -62,6 +90,10 @@ pub fn (a &Tensor[T]) atan2[T](b &Tensor[T]) !&Tensor[T] {
 }
 
 // atanh returns the elementwise atanh of an tensor
+
+// atanh exposes this operation as part of the public API.
+
+// atanh exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) atanh[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -70,6 +102,10 @@ pub fn (t &Tensor[T]) atanh[T]() &Tensor[T] {
 }
 
 // cbrt returns the elementwise cbrt of an tensor
+
+// cbrt exposes this operation as part of the public API.
+
+// cbrt exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) cbrt[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -78,6 +114,10 @@ pub fn (t &Tensor[T]) cbrt[T]() &Tensor[T] {
 }
 
 // ceil returns the elementwise ceil of an tensor
+
+// ceil exposes this operation as part of the public API.
+
+// ceil exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) ceil[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -86,6 +126,10 @@ pub fn (t &Tensor[T]) ceil[T]() &Tensor[T] {
 }
 
 // cos returns the elementwise cos of an tensor
+
+// cos exposes this operation as part of the public API.
+
+// cos exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) cos[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -94,6 +138,10 @@ pub fn (t &Tensor[T]) cos[T]() &Tensor[T] {
 }
 
 // cosh returns the elementwise cosh of an tensor
+
+// cosh exposes this operation as part of the public API.
+
+// cosh exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) cosh[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -102,6 +150,10 @@ pub fn (t &Tensor[T]) cosh[T]() &Tensor[T] {
 }
 
 // cot returns the elementwise cot of an tensor
+
+// cot exposes this operation as part of the public API.
+
+// cot exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) cot[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -110,6 +162,10 @@ pub fn (t &Tensor[T]) cot[T]() &Tensor[T] {
 }
 
 // degrees returns the elementwise degrees of an tensor
+
+// degrees exposes this operation as part of the public API.
+
+// degrees exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) degrees[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -118,6 +174,10 @@ pub fn (t &Tensor[T]) degrees[T]() &Tensor[T] {
 }
 
 // erf returns the elementwise erf of an tensor
+
+// erf exposes this operation as part of the public API.
+
+// erf exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) erf[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -126,6 +186,10 @@ pub fn (t &Tensor[T]) erf[T]() &Tensor[T] {
 }
 
 // erfc returns the elementwise erfc of an tensor
+
+// erfc exposes this operation as part of the public API.
+
+// erfc exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) erfc[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -134,6 +198,10 @@ pub fn (t &Tensor[T]) erfc[T]() &Tensor[T] {
 }
 
 // exp returns the elementwise exp of an tensor
+
+// exp exposes this operation as part of the public API.
+
+// exp exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) exp[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -142,6 +210,10 @@ pub fn (t &Tensor[T]) exp[T]() &Tensor[T] {
 }
 
 // exp2 returns the elementwise exp2 of an tensor
+
+// exp2 exposes this operation as part of the public API.
+
+// exp2 exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) exp2[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -150,6 +222,10 @@ pub fn (t &Tensor[T]) exp2[T]() &Tensor[T] {
 }
 
 // expm1 returns the elementwise expm1 of an tensor
+
+// expm1 exposes this operation as part of the public API.
+
+// expm1 exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) expm1[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -158,6 +234,10 @@ pub fn (t &Tensor[T]) expm1[T]() &Tensor[T] {
 }
 
 // f32_bits returns the elementwise f32_bits of an tensor
+
+// f32_bits exposes this operation as part of the public API.
+
+// f32_bits exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) f32_bits[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -166,6 +246,10 @@ pub fn (t &Tensor[T]) f32_bits[T]() &Tensor[T] {
 }
 
 // f32_from_bits returns the elementwise f32_from_bits of an tensor
+
+// f32_from_bits exposes this operation as part of the public API.
+
+// f32_from_bits exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) f32_from_bits[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -174,6 +258,10 @@ pub fn (t &Tensor[T]) f32_from_bits[T]() &Tensor[T] {
 }
 
 // f64_bits returns the elementwise f64_bits of an tensor
+
+// f64_bits exposes this operation as part of the public API.
+
+// f64_bits exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) f64_bits[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -182,6 +270,10 @@ pub fn (t &Tensor[T]) f64_bits[T]() &Tensor[T] {
 }
 
 // f64_from_bits returns the elementwise f64_from_bits of an tensor
+
+// f64_from_bits exposes this operation as part of the public API.
+
+// f64_from_bits exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) f64_from_bits[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -190,6 +282,10 @@ pub fn (t &Tensor[T]) f64_from_bits[T]() &Tensor[T] {
 }
 
 // factorial returns the elementwise factorial of an tensor
+
+// factorial exposes this operation as part of the public API.
+
+// factorial exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) factorial[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -198,6 +294,10 @@ pub fn (t &Tensor[T]) factorial[T]() &Tensor[T] {
 }
 
 // floor returns the elementwise floor of an tensor
+
+// floor exposes this operation as part of the public API.
+
+// floor exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) floor[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -206,6 +306,10 @@ pub fn (t &Tensor[T]) floor[T]() &Tensor[T] {
 }
 
 // fmod returns the fmod elementwise of two tensors
+
+// fmod exposes this operation as part of the public API.
+
+// fmod exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) fmod[T](b &Tensor[T]) !&Tensor[T] {
 	return a.nmap[T]([b], fn [T](xs []T, _ []int) T {
@@ -216,6 +320,10 @@ pub fn (a &Tensor[T]) fmod[T](b &Tensor[T]) !&Tensor[T] {
 }
 
 // gamma returns the elementwise gamma of an tensor
+
+// gamma exposes this operation as part of the public API.
+
+// gamma exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) gamma[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -224,6 +332,10 @@ pub fn (t &Tensor[T]) gamma[T]() &Tensor[T] {
 }
 
 // gcd returns the gcd elementwise of two tensors
+
+// gcd exposes this operation as part of the public API.
+
+// gcd exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) gcd[T](b &Tensor[T]) !&Tensor[T] {
 	return a.nmap[T]([b], fn [T](xs []T, _ []int) T {
@@ -234,6 +346,10 @@ pub fn (a &Tensor[T]) gcd[T](b &Tensor[T]) !&Tensor[T] {
 }
 
 // hypot returns the hypot elementwise of two tensors
+
+// hypot exposes this operation as part of the public API.
+
+// hypot exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) hypot[T](b &Tensor[T]) !&Tensor[T] {
 	return a.nmap[T]([b], fn [T](xs []T, _ []int) T {
@@ -244,6 +360,10 @@ pub fn (a &Tensor[T]) hypot[T](b &Tensor[T]) !&Tensor[T] {
 }
 
 // lcm returns the lcm elementwise of two tensors
+
+// lcm exposes this operation as part of the public API.
+
+// lcm exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) lcm[T](b &Tensor[T]) !&Tensor[T] {
 	return a.nmap[T]([b], fn [T](xs []T, _ []int) T {
@@ -254,6 +374,10 @@ pub fn (a &Tensor[T]) lcm[T](b &Tensor[T]) !&Tensor[T] {
 }
 
 // log returns the elementwise log of an tensor
+
+// log exposes this operation as part of the public API.
+
+// log exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) log[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -262,6 +386,10 @@ pub fn (t &Tensor[T]) log[T]() &Tensor[T] {
 }
 
 // log10 returns the elementwise log10 of an tensor
+
+// log10 exposes this operation as part of the public API.
+
+// log10 exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) log10[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -270,6 +398,10 @@ pub fn (t &Tensor[T]) log10[T]() &Tensor[T] {
 }
 
 // log1p returns the elementwise log1p of an tensor
+
+// log1p exposes this operation as part of the public API.
+
+// log1p exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) log1p[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -278,6 +410,10 @@ pub fn (t &Tensor[T]) log1p[T]() &Tensor[T] {
 }
 
 // log2 returns the elementwise log2 of an tensor
+
+// log2 exposes this operation as part of the public API.
+
+// log2 exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) log2[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -286,6 +422,10 @@ pub fn (t &Tensor[T]) log2[T]() &Tensor[T] {
 }
 
 // log_factorial returns the elementwise log_factorial of an tensor
+
+// log_factorial exposes this operation as part of the public API.
+
+// log_factorial exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) log_factorial[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -294,6 +434,10 @@ pub fn (t &Tensor[T]) log_factorial[T]() &Tensor[T] {
 }
 
 // log_gamma returns the elementwise log_gamma of an tensor
+
+// log_gamma exposes this operation as part of the public API.
+
+// log_gamma exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) log_gamma[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -302,6 +446,10 @@ pub fn (t &Tensor[T]) log_gamma[T]() &Tensor[T] {
 }
 
 // log_n returns the log_n elementwise of two tensors
+
+// log_n exposes this operation as part of the public API.
+
+// log_n exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) log_n[T](b &Tensor[T]) !&Tensor[T] {
 	return a.nmap[T]([b], fn [T](xs []T, _ []int) T {
@@ -312,6 +460,10 @@ pub fn (a &Tensor[T]) log_n[T](b &Tensor[T]) !&Tensor[T] {
 }
 
 // max returns the max elementwise of two tensors
+
+// max exposes this operation as part of the public API.
+
+// max exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) max[T](b &Tensor[T]) !&Tensor[T] {
 	return a.nmap[T]([b], fn [T](xs []T, _ []int) T {
@@ -320,6 +472,10 @@ pub fn (a &Tensor[T]) max[T](b &Tensor[T]) !&Tensor[T] {
 }
 
 // min returns the min elementwise of two tensors
+
+// min exposes this operation as part of the public API.
+
+// min exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) min[T](b &Tensor[T]) !&Tensor[T] {
 	return a.nmap[T]([b], fn [T](xs []T, _ []int) T {
@@ -328,6 +484,10 @@ pub fn (a &Tensor[T]) min[T](b &Tensor[T]) !&Tensor[T] {
 }
 
 // nextafter returns the nextafter elementwise of two tensors
+
+// nextafter exposes this operation as part of the public API.
+
+// nextafter exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) nextafter[T](b &Tensor[T]) !&Tensor[T] {
 	return a.nmap[T]([b], fn [T](xs []T, _ []int) T {
@@ -338,6 +498,10 @@ pub fn (a &Tensor[T]) nextafter[T](b &Tensor[T]) !&Tensor[T] {
 }
 
 // nextafter32 returns the nextafter32 elementwise of two tensors
+
+// nextafter32 exposes this operation as part of the public API.
+
+// nextafter32 exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) nextafter32[T](b &Tensor[T]) !&Tensor[T] {
 	return a.nmap[T]([b], fn [T](xs []T, _ []int) T {
@@ -348,6 +512,10 @@ pub fn (a &Tensor[T]) nextafter32[T](b &Tensor[T]) !&Tensor[T] {
 }
 
 // pow returns the pow elementwise of two tensors
+
+// pow exposes this operation as part of the public API.
+
+// pow exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) pow[T](b &Tensor[T]) !&Tensor[T] {
 	return a.nmap[T]([b], fn [T](xs []T, _ []int) T {
@@ -358,6 +526,10 @@ pub fn (a &Tensor[T]) pow[T](b &Tensor[T]) !&Tensor[T] {
 }
 
 // pow10 returns the elementwise pow10 of an tensor
+
+// pow10 exposes this operation as part of the public API.
+
+// pow10 exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) pow10[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -366,6 +538,10 @@ pub fn (t &Tensor[T]) pow10[T]() &Tensor[T] {
 }
 
 // radians returns the elementwise deg2rad of an tensor
+
+// radians exposes this operation as part of the public API.
+
+// radians exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) radians[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -374,6 +550,10 @@ pub fn (t &Tensor[T]) radians[T]() &Tensor[T] {
 }
 
 // round rounds elements of an tensor elementwise
+
+// round exposes this operation as part of the public API.
+
+// round exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) round[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -382,6 +562,10 @@ pub fn (t &Tensor[T]) round[T]() &Tensor[T] {
 }
 
 // round_to_even round_to_evens elements of an tensor elementwise
+
+// round_to_even exposes this operation as part of the public API.
+
+// round_to_even exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) round_to_even[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -390,6 +574,10 @@ pub fn (t &Tensor[T]) round_to_even[T]() &Tensor[T] {
 }
 
 // sin returns the elementwise sin of an tensor
+
+// sin exposes this operation as part of the public API.
+
+// sin exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) sin[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -398,6 +586,10 @@ pub fn (t &Tensor[T]) sin[T]() &Tensor[T] {
 }
 
 // sinh returns the elementwise sinh of an tensor
+
+// sinh exposes this operation as part of the public API.
+
+// sinh exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) sinh[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -406,6 +598,10 @@ pub fn (t &Tensor[T]) sinh[T]() &Tensor[T] {
 }
 
 // sqrt returns the elementwise square root of an tensor
+
+// sqrt exposes this operation as part of the public API.
+
+// sqrt exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) sqrt[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -414,6 +610,10 @@ pub fn (t &Tensor[T]) sqrt[T]() &Tensor[T] {
 }
 
 // tan returns the elementwise tan of an tensor
+
+// tan exposes this operation as part of the public API.
+
+// tan exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) tan[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -422,6 +622,10 @@ pub fn (t &Tensor[T]) tan[T]() &Tensor[T] {
 }
 
 // tanh returns the elementwise tanh of an tensor
+
+// tanh exposes this operation as part of the public API.
+
+// tanh exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) tanh[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {
@@ -430,6 +634,10 @@ pub fn (t &Tensor[T]) tanh[T]() &Tensor[T] {
 }
 
 // trunc returns the elementwise trunc of an tensor
+
+// trunc exposes this operation as part of the public API.
+
+// trunc exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) trunc[T]() &Tensor[T] {
 	return t.map(fn [T](x T, _ []int) T {

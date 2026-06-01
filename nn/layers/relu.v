@@ -11,20 +11,24 @@ pub struct ReLULayer[T] {
 	output_shape []int
 }
 
+// relu_layer exposes this operation as part of the public API.
 pub fn relu_layer[T](ctx &autograd.Context[T], output_shape []int) types.Layer[T] {
 	return types.Layer[T](&ReLULayer[T]{
 		output_shape: output_shape.clone()
 	})
 }
 
+// output_shape exposes this operation as part of the public API.
 pub fn (layer &ReLULayer[T]) output_shape() []int {
 	return layer.output_shape
 }
 
+// variables exposes this operation as part of the public API.
 pub fn (_ &ReLULayer[T]) variables() []&autograd.Variable[T] {
 	return []&autograd.Variable[T]{}
 }
 
+// forward exposes this operation as part of the public API.
 pub fn (layer &ReLULayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	mut output := &vtl.Tensor[T](unsafe { nil })
 	$if sizeof(T) == 4 {

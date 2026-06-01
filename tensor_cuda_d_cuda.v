@@ -5,6 +5,10 @@ import vsl.cuda
 import vsl.cuda.compute
 
 // CudaTensor holds tensor data on GPU memory
+
+// CudaTensor defines a public data structure for this module.
+
+// CudaTensor defines a public data structure for this module.
 @[heap]
 pub struct CudaTensor[T] {
 pub mut:
@@ -41,6 +45,10 @@ pub fn (t &CudaTensor[T]) cpu() !&Tensor[T] {
 }
 
 // cuda returns the same CudaTensor (identity function for chaining)
+
+// cuda exposes this operation as part of the public API.
+
+// cuda exposes this operation as part of the public API.
 @[inline]
 pub fn (t &CudaTensor[T]) cuda(params storage.CudaParams) !&CudaTensor[T] {
 	return t
@@ -62,48 +70,80 @@ pub fn (t &CudaTensor[T]) numel() int {
 }
 
 // is_matrix returns true if the tensor is a 2D matrix
+
+// is_matrix exposes this operation as part of the public API.
+
+// is_matrix exposes this operation as part of the public API.
 @[inline]
 pub fn (t &CudaTensor[T]) is_matrix() bool {
 	return t.rank() == 2
 }
 
 // is_square_matrix returns true if the tensor is a square matrix
+
+// is_square_matrix exposes this operation as part of the public API.
+
+// is_square_matrix exposes this operation as part of the public API.
 @[inline]
 pub fn (t &CudaTensor[T]) is_square_matrix() bool {
 	return t.rank() == 2 && t.shape[0] == t.shape[1]
 }
 
 // is_vector returns true if the tensor is a 1D vector
+
+// is_vector exposes this operation as part of the public API.
+
+// is_vector exposes this operation as part of the public API.
 @[inline]
 pub fn (t &CudaTensor[T]) is_vector() bool {
 	return t.rank() == 1
 }
 
 // is_row_major returns true if the tensor uses row-major memory layout
+
+// is_row_major exposes this operation as part of the public API.
+
+// is_row_major exposes this operation as part of the public API.
 @[inline]
 pub fn (t &CudaTensor[T]) is_row_major() bool {
 	return t.memory == .row_major
 }
 
 // is_col_major returns true if the tensor uses column-major memory layout
+
+// is_col_major exposes this operation as part of the public API.
+
+// is_col_major exposes this operation as part of the public API.
 @[inline]
 pub fn (t &CudaTensor[T]) is_col_major() bool {
 	return t.memory == .col_major
 }
 
 // is_row_major_contiguous returns true if the tensor is row-major and contiguous
+
+// is_row_major_contiguous exposes this operation as part of the public API.
+
+// is_row_major_contiguous exposes this operation as part of the public API.
 @[inline]
 pub fn (t &CudaTensor[T]) is_row_major_contiguous() bool {
 	return is_row_major_contiguous(t.shape, t.strides, t.rank())
 }
 
 // is_col_major_contiguous returns true if the tensor is column-major and contiguous
+
+// is_col_major_contiguous exposes this operation as part of the public API.
+
+// is_col_major_contiguous exposes this operation as part of the public API.
 @[inline]
 pub fn (t &CudaTensor[T]) is_col_major_contiguous() bool {
 	return is_col_major_contiguous(t.shape, t.strides, t.rank())
 }
 
 // is_contiguous returns true if the tensor is contiguous in either memory layout
+
+// is_contiguous exposes this operation as part of the public API.
+
+// is_contiguous exposes this operation as part of the public API.
 @[inline]
 pub fn (t &CudaTensor[T]) is_contiguous() bool {
 	return t.is_row_major_contiguous() || t.is_col_major_contiguous()

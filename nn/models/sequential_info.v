@@ -5,6 +5,7 @@ import vtl.nn.layers
 import vtl.nn.loss
 import vtl.nn.types
 
+// SequentialInfo defines a public data structure for this module.
 pub struct SequentialInfo[T] {
 	ctx &autograd.Context[T] = unsafe { nil }
 pub mut:

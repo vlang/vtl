@@ -6,6 +6,10 @@ module vtl
 // integer that does not equally divide the axis. For an array of length
 // l that should be split into n sections, it returns l % n sub-arrays of
 // size l//n + 1 and the rest of size l//n.
+
+// array_split exposes this operation as part of the public API.
+
+// array_split exposes this operation as part of the public API.
 @[direct_array_access]
 pub fn (t &Tensor[T]) array_split[T](ind int, axis int) ![]&Tensor[T] {
 	ntotal := t.shape[axis]

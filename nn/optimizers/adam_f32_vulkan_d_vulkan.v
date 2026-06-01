@@ -7,6 +7,7 @@ import vtl.storage
 import vsl.vulkan
 import vsl.vulkan.compute
 
+// adam_use_vulkan_optimizer exposes this operation as part of the public API.
 pub fn adam_use_vulkan_optimizer() bool {
 	return os.getenv('VTL_USE_VULKAN') == '1'
 }

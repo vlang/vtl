@@ -3,6 +3,9 @@ module vtl
 import vtl.storage
 import vsl.vulkan
 
+// VulkanTensor defines a public data structure for this module.
+
+// VulkanTensor defines a public data structure for this module.
 @[heap]
 pub struct VulkanTensor[T] {
 pub mut:
@@ -13,6 +16,7 @@ pub mut:
 	strides []int
 }
 
+// vulkan exposes this operation as part of the public API.
 pub fn (t &Tensor[T]) vulkan(params storage.VulkanParams) !&VulkanTensor[T] {
 	row_tensor := t.copy(.row_major)
 	vkdata := row_tensor.data.vulkan(params)!
@@ -25,6 +29,7 @@ pub fn (t &Tensor[T]) vulkan(params storage.VulkanParams) !&VulkanTensor[T] {
 	}
 }
 
+// cpu exposes this operation as part of the public API.
 pub fn (t &VulkanTensor[T]) cpu() !&Tensor[T] {
 	data := t.data.cpu()!
 	return &Tensor[T]{
@@ -36,58 +41,88 @@ pub fn (t &VulkanTensor[T]) cpu() !&Tensor[T] {
 	}
 }
 
+// vulkan exposes this operation as part of the public API.
+
+// vulkan exposes this operation as part of the public API.
 @[inline]
 pub fn (t &VulkanTensor[T]) vulkan(params storage.VulkanParams) !&VulkanTensor[T] {
 	return t
 }
 
+// release exposes this operation as part of the public API.
 pub fn (t &VulkanTensor[T]) release() {
 	t.data.release()
 }
 
+// rank exposes this operation as part of the public API.
 pub fn (t &VulkanTensor[T]) rank() int {
 	return t.shape.len
 }
 
+// numel exposes this operation as part of the public API.
 pub fn (t &VulkanTensor[T]) numel() int {
 	return t.size
 }
 
+// is_matrix exposes this operation as part of the public API.
+
+// is_matrix exposes this operation as part of the public API.
 @[inline]
 pub fn (t &VulkanTensor[T]) is_matrix() bool {
 	return t.rank() == 2
 }
 
+// is_square_matrix exposes this operation as part of the public API.
+
+// is_square_matrix exposes this operation as part of the public API.
 @[inline]
 pub fn (t &VulkanTensor[T]) is_square_matrix() bool {
 	return t.rank() == 2 && t.shape[0] == t.shape[1]
 }
 
+// is_vector exposes this operation as part of the public API.
+
+// is_vector exposes this operation as part of the public API.
 @[inline]
 pub fn (t &VulkanTensor[T]) is_vector() bool {
 	return t.rank() == 1
 }
 
+// is_row_major exposes this operation as part of the public API.
+
+// is_row_major exposes this operation as part of the public API.
 @[inline]
 pub fn (t &VulkanTensor[T]) is_row_major() bool {
 	return t.memory == .row_major
 }
 
+// is_col_major exposes this operation as part of the public API.
+
+// is_col_major exposes this operation as part of the public API.
 @[inline]
 pub fn (t &VulkanTensor[T]) is_col_major() bool {
 	return t.memory == .col_major
 }
 
+// is_row_major_contiguous exposes this operation as part of the public API.
+
+// is_row_major_contiguous exposes this operation as part of the public API.
 @[inline]
 pub fn (t &VulkanTensor[T]) is_row_major_contiguous() bool {
 	return is_row_major_contiguous(t.shape, t.strides, t.rank())
 }
 
+// is_col_major_contiguous exposes this operation as part of the public API.
+
+// is_col_major_contiguous exposes this operation as part of the public API.
 @[inline]
 pub fn (t &VulkanTensor[T]) is_col_major_contiguous() bool {
 	return is_col_major_contiguous(t.shape, t.strides, t.rank())
 }
 
+// is_contiguous exposes this operation as part of the public API.
+
+// is_contiguous exposes this operation as part of the public API.
 @[inline]
 pub fn (t &VulkanTensor[T]) is_contiguous() bool {
 	return t.is_row_major_contiguous() || t.is_col_major_contiguous()

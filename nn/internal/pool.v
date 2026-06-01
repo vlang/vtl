@@ -2,6 +2,7 @@ module internal
 
 import vtl
 
+// avgpool2d_forward exposes this operation as part of the public API.
 pub fn avgpool2d_forward[T](input &vtl.Tensor[T], kernel []int, padding []int, stride []int) !&vtl.Tensor[T] {
 	n := input.shape[0]
 	c := input.shape[1]
@@ -42,6 +43,7 @@ pub fn avgpool2d_forward[T](input &vtl.Tensor[T], kernel []int, padding []int, s
 	return output
 }
 
+// avgpool2d_backward exposes this operation as part of the public API.
 pub fn avgpool2d_backward[T](grad_out &vtl.Tensor[T], kernel []int, padding []int, stride []int) !&vtl.Tensor[T] {
 	n := grad_out.shape[0]
 	c := grad_out.shape[1]
@@ -54,6 +56,7 @@ pub fn avgpool2d_backward[T](grad_out &vtl.Tensor[T], kernel []int, padding []in
 	return d_input
 }
 
+// global_avgpool2d_forward exposes this operation as part of the public API.
 pub fn global_avgpool2d_forward[T](input &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	n := input.shape[0]
 	c := input.shape[1]
@@ -74,6 +77,7 @@ pub fn global_avgpool2d_forward[T](input &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	return output
 }
 
+// global_avgpool2d_backward exposes this operation as part of the public API.
 pub fn global_avgpool2d_backward[T](grad_out &vtl.Tensor[T], input &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	n := input.shape[0]
 	c := input.shape[1]

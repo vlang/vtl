@@ -2,6 +2,9 @@ module storage
 
 import vsl.vulkan
 
+// VulkanParams defines a public data structure for this module.
+
+// VulkanParams defines a public data structure for this module.
 @[params]
 pub struct VulkanParams {
 pub mut:
@@ -15,6 +18,9 @@ pub fn vulkan_params_for_device(device &vulkan.Device) VulkanParams {
 	}
 }
 
+// VulkanStorage defines a public data structure for this module.
+
+// VulkanStorage defines a public data structure for this module.
 @[heap]
 pub struct VulkanStorage[T] {
 pub mut:
@@ -22,6 +28,7 @@ pub mut:
 	length int
 }
 
+// vulkan exposes this operation as part of the public API.
 pub fn (cpu &CpuStorage[T]) vulkan(params VulkanParams) !&VulkanStorage[T] {
 	mut device := params.device
 
@@ -41,11 +48,15 @@ pub fn (cpu &CpuStorage[T]) vulkan(params VulkanParams) !&VulkanStorage[T] {
 	}
 }
 
+// vulkan exposes this operation as part of the public API.
+
+// vulkan exposes this operation as part of the public API.
 @[inline]
 pub fn (storage &VulkanStorage[T]) vulkan(params VulkanParams) !&VulkanStorage[T] {
 	return storage
 }
 
+// cpu exposes this operation as part of the public API.
 pub fn (storage &VulkanStorage[T]) cpu() !&CpuStorage[T] {
 	size := u64(storage.length) * u64(sizeof(T))
 	mut raw := []u8{len: int(size)}
@@ -57,6 +68,7 @@ pub fn (storage &VulkanStorage[T]) cpu() !&CpuStorage[T] {
 	}
 }
 
+// to_array exposes this operation as part of the public API.
 pub fn (storage &VulkanStorage[T]) to_array() ![]T {
 	size := u64(storage.length) * u64(sizeof(T))
 	mut raw := []u8{len: int(size)}
@@ -66,6 +78,7 @@ pub fn (storage &VulkanStorage[T]) to_array() ![]T {
 	return arr
 }
 
+// release exposes this operation as part of the public API.
 pub fn (storage &VulkanStorage[T]) release() {
 	storage.data.release()
 }

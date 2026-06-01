@@ -3,6 +3,10 @@ module vtl
 import arrays
 
 // assert_square_matrix panics if the given tensor is not a square matrix
+
+// assert_square_matrix exposes this operation as part of the public API.
+
+// assert_square_matrix exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) assert_square_matrix[T]() ! {
 	if !t.is_square_matrix() {
@@ -11,6 +15,10 @@ pub fn (t &Tensor[T]) assert_square_matrix[T]() ! {
 }
 
 // assert_square_matrix panics if the given tensor is not a matrix
+
+// assert_matrix exposes this operation as part of the public API.
+
+// assert_matrix exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) assert_matrix[T]() ! {
 	if !t.is_matrix() {
@@ -44,6 +52,10 @@ fn (t &Tensor[T]) assert_min_rank[T](n int) ! {
 }
 
 // ensure_memory sets a correct memory layout to a given tensor
+
+// ensure_memory exposes this operation as part of the public API.
+
+// ensure_memory exposes this operation as part of the public API.
 @[inline]
 pub fn (mut t Tensor[T]) ensure_memory[T]() {
 	if t.is_col_major() {

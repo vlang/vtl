@@ -3,6 +3,7 @@ module layers
 import vtl.autograd
 import vtl.autograd_cuda
 
+// linear_bind_output_gpu exposes this operation as part of the public API.
 pub fn linear_bind_output_gpu(result voidptr) {
 	if result == unsafe { nil } {
 		return

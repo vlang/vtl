@@ -7,6 +7,10 @@ import vtl.nn.types
 
 // LayerNorm normalizes over the last D dimensions of the input.
 // E.g. for input [..., D] it computes mean and variance over the last D dims.
+
+// LayerNormConfig defines a public data structure for this module.
+
+// LayerNormConfig defines a public data structure for this module.
 @[params]
 pub struct LayerNormConfig {
 pub:
@@ -14,6 +18,7 @@ pub:
 	affine bool = true
 }
 
+// LayerNormLayer defines a public data structure for this module.
 pub struct LayerNormLayer[T] {
 pub:
 	normalized_shape []int
@@ -40,10 +45,12 @@ pub fn layer_norm_layer[T](ctx &autograd.Context[T], normalized_shape []int, con
 	})
 }
 
+// output_shape exposes this operation as part of the public API.
 pub fn (layer &LayerNormLayer[T]) output_shape() []int {
 	return layer.normalized_shape
 }
 
+// variables exposes this operation as part of the public API.
 pub fn (layer &LayerNormLayer[T]) variables() []&autograd.Variable[T] {
 	if layer.gamma != unsafe { nil } {
 		return [layer.gamma, layer.beta]
@@ -51,6 +58,7 @@ pub fn (layer &LayerNormLayer[T]) variables() []&autograd.Variable[T] {
 	return []&autograd.Variable[T]{}
 }
 
+// forward exposes this operation as part of the public API.
 pub fn (layer &LayerNormLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	output := internal.layer_norm_forward[T](input.value, layer.gamma.value, layer.beta.value,
 		layer.eps)!
@@ -62,6 +70,7 @@ pub fn (layer &LayerNormLayer[T]) forward(input &autograd.Variable[T]) !&autogra
 	return result
 }
 
+// LayerNormGate defines a public data structure for this module.
 pub struct LayerNormGate[T] {
 	input &vtl.Tensor[T] = unsafe { nil }
 	gamma &vtl.Tensor[T] = unsafe { nil }
@@ -69,6 +78,7 @@ pub struct LayerNormGate[T] {
 	eps   f64
 }
 
+// layernorm_gate exposes this operation as part of the public API.
 pub fn layernorm_gate[T](input &vtl.Tensor[T], gamma &vtl.Tensor[T], beta &vtl.Tensor[T], eps f64) &LayerNormGate[T] {
 	return &LayerNormGate[T]{
 		input: input
@@ -78,10 +88,12 @@ pub fn layernorm_gate[T](input &vtl.Tensor[T], gamma &vtl.Tensor[T], beta &vtl.T
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &LayerNormGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	return internal.layer_norm_backward[T](payload.variable.grad, g.input, g.gamma, g.beta, g.eps)
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &LayerNormGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
 	match a {

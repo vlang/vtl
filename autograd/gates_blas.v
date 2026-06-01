@@ -22,12 +22,14 @@ fn gate_matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	return unsafe { &vtl.Tensor[T](res) }
 }
 
+// MatMulGate defines a public data structure for this module.
 pub struct MatMulGate[T] {
 pub:
 	a &Variable[T] = unsafe { nil }
 	b &Variable[T] = unsafe { nil }
 }
 
+// matmul_gate exposes this operation as part of the public API.
 pub fn matmul_gate[T](a &Variable[T], b &Variable[T]) &MatMulGate[T] {
 	return &MatMulGate[T]{
 		a: a
@@ -35,6 +37,7 @@ pub fn matmul_gate[T](a &Variable[T], b &Variable[T]) &MatMulGate[T] {
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &MatMulGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	r0 := gate_matmul[T](gradient, g.b.value.t()!)!
@@ -42,6 +45,7 @@ pub fn (g &MatMulGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0, r1]
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &MatMulGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	b := args[1]

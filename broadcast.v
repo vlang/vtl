@@ -120,6 +120,10 @@ fn broadcast_shapes(args ...[]int) []int {
 }
 
 // broadcast2 broadcasts two Tensors against each other
+
+// broadcast2 exposes this operation as part of the public API.
+
+// broadcast2 exposes this operation as part of the public API.
 @[inline]
 pub fn broadcast2[T](a &Tensor[T], b &Tensor[T]) !(&Tensor[T], &Tensor[T]) {
 	shape := a.broadcastable(b)!
@@ -129,6 +133,10 @@ pub fn broadcast2[T](a &Tensor[T], b &Tensor[T]) !(&Tensor[T], &Tensor[T]) {
 }
 
 // broadcast3 broadcasts three Tensors against each other
+
+// broadcast3 exposes this operation as part of the public API.
+
+// broadcast3 exposes this operation as part of the public API.
 @[inline]
 pub fn broadcast3[T](a &Tensor[T], b &Tensor[T], c &Tensor[T]) !(&Tensor[T], &Tensor[T], &Tensor[T]) {
 	shape := broadcast_shapes(a.shape, b.shape, c.shape)
@@ -139,6 +147,10 @@ pub fn broadcast3[T](a &Tensor[T], b &Tensor[T], c &Tensor[T]) !(&Tensor[T], &Te
 }
 
 // broadcast_n broadcasts N Tensors against each other
+
+// broadcast_n exposes this operation as part of the public API.
+
+// broadcast_n exposes this operation as part of the public API.
 @[inline]
 pub fn broadcast_n[T](ts []&Tensor[T]) ![]&Tensor[T] {
 	shapes := ts.map(it.shape)

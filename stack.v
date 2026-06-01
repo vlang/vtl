@@ -1,5 +1,8 @@
 module vtl
 
+// AxisData defines a public data structure for this module.
+
+// AxisData defines a public data structure for this module.
 @[params]
 pub struct AxisData {
 pub:

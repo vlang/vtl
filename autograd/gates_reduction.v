@@ -10,6 +10,7 @@ pub:
 	axis  int
 }
 
+// sum_gate exposes this operation as part of the public API.
 pub fn sum_gate[T](shape []int, axis int) &SumGate[T] {
 	return &SumGate[T]{
 		shape: shape
@@ -17,6 +18,7 @@ pub fn sum_gate[T](shape []int, axis int) &SumGate[T] {
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &SumGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	// Broadcast gradient back to original shape
@@ -24,6 +26,7 @@ pub fn (g &SumGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0]
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &SumGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {
@@ -47,6 +50,7 @@ pub:
 	num_elems int
 }
 
+// mean_gate exposes this operation as part of the public API.
 pub fn mean_gate[T](shape []int, axis int, num_elems int) &MeanGate[T] {
 	return &MeanGate[T]{
 		shape:     shape
@@ -55,6 +59,7 @@ pub fn mean_gate[T](shape []int, axis int, num_elems int) &MeanGate[T] {
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &MeanGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	broadcasted := gradient.broadcast_to[T](g.shape)!
@@ -63,6 +68,7 @@ pub fn (g &MeanGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0]
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &MeanGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {
@@ -84,18 +90,21 @@ pub:
 	orig_shape []int
 }
 
+// reshape_gate exposes this operation as part of the public API.
 pub fn reshape_gate[T](orig_shape []int) &ReshapeGate[T] {
 	return &ReshapeGate[T]{
 		orig_shape: orig_shape
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &ReshapeGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	r0 := gradient.reshape[T](g.orig_shape)!
 	return [r0]
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &ReshapeGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {
@@ -118,6 +127,7 @@ pub:
 	iperm []int
 }
 
+// transpose_gate exposes this operation as part of the public API.
 pub fn transpose_gate[T](perm []int) &TransposeGate[T] {
 	// Compute inverse permutation
 	mut iperm := []int{len: perm.len}
@@ -130,6 +140,7 @@ pub fn transpose_gate[T](perm []int) &TransposeGate[T] {
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &TransposeGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	// Transpose with inverse permutation to get original gradient
@@ -137,6 +148,7 @@ pub fn (g &TransposeGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0]
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &TransposeGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {
@@ -159,6 +171,7 @@ pub:
 	splits []int // size of each input along the concat axis
 }
 
+// concat_gate exposes this operation as part of the public API.
 pub fn concat_gate[T](axis int, splits []int) &ConcatGate[T] {
 	return &ConcatGate[T]{
 		axis:   axis
@@ -166,6 +179,7 @@ pub fn concat_gate[T](axis int, splits []int) &ConcatGate[T] {
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &ConcatGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	// Split gradient back into len(splits) tensors
@@ -190,6 +204,7 @@ pub fn (g &ConcatGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return results
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &ConcatGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	result.grad = vtl.zeros_like[T](result.value)
 	result.requires_grad = true

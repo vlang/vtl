@@ -1,5 +1,8 @@
 module storage
 
+// CudaParams defines a public data structure for this module.
+
+// CudaParams defines a public data structure for this module.
 @[params]
 pub struct CudaParams {
 	device_id int

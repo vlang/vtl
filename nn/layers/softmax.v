@@ -12,25 +12,32 @@ pub struct SoftmaxLayer[T] {
 	dim int
 }
 
+// SoftmaxLayerConfig defines a public data structure for this module.
+
+// SoftmaxLayerConfig defines a public data structure for this module.
 @[params]
 pub struct SoftmaxLayerConfig {
 	dim int = -1 // dimension to apply softmax over; -1 means last dimension
 }
 
+// softmax_layer exposes this operation as part of the public API.
 pub fn softmax_layer[T](ctx &autograd.Context[T], config SoftmaxLayerConfig) types.Layer[T] {
 	return types.Layer[T](&SoftmaxLayer[T]{
 		dim: config.dim
 	})
 }
 
+// output_shape exposes this operation as part of the public API.
 pub fn (layer &SoftmaxLayer[T]) output_shape() []int {
 	return []int{}
 }
 
+// variables exposes this operation as part of the public API.
 pub fn (layer &SoftmaxLayer[T]) variables() []&autograd.Variable[T] {
 	return []&autograd.Variable[T]{}
 }
 
+// forward exposes this operation as part of the public API.
 pub fn (layer &SoftmaxLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	// Compute softmax along dim (-1 means last dim)
 	dim := if layer.dim == -1 { input.value.shape.len - 1 } else { layer.dim }

@@ -9,6 +9,10 @@ pub enum IteratorStrategy {
 
 // TensorIterator is a struct to hold a Tensors
 // iteration state while iterating through a Tensor
+
+// TensorIterator defines a public data structure for this module.
+
+// TensorIterator defines a public data structure for this module.
 @[heap]
 pub struct TensorIterator[T] {
 pub:
@@ -26,6 +30,7 @@ pub fn (t &Tensor[T]) iterator[T]() &TensorIterator[T] {
 	return t.strided_iterator()
 }
 
+// IteratorBuildData defines a public data structure for this module.
 pub struct IteratorBuildData[T] {
 	next_handler IteratorStrategy
 	start        int
@@ -42,6 +47,10 @@ pub fn (t &Tensor[T]) custom_iterator[T](data IteratorBuildData[T]) &TensorItera
 
 // next calls the iteration type for a given iterator
 // which is either flat or strided and returns a Num containing the current value
+
+// next exposes this operation as part of the public API.
+
+// next exposes this operation as part of the public API.
 @[inline]
 pub fn (mut s TensorIterator[T]) next[T]() ?(T, []int) {
 	if s.iteration >= s.tensor.size() {
@@ -56,6 +65,7 @@ pub fn (mut s TensorIterator[T]) next[T]() ?(T, []int) {
 	return handle_strided_iteration[T](mut s), s.tensor.nth_index(s.iteration)
 }
 
+// TensorsIterator defines a public data structure for this module.
 pub struct TensorsIterator[T] {
 mut:
 	iters []&TensorIterator[T]
@@ -87,6 +97,10 @@ pub fn (t &Tensor[T]) iterators[T](ts []&Tensor[T]) !(&TensorsIterator[T], []int
 
 // next calls the iteration type for a given list of iterators
 // which is either flat or strided and returns a list of Nums containing the current values
+
+// next exposes this operation as part of the public API.
+
+// next exposes this operation as part of the public API.
 @[inline]
 pub fn (mut its TensorsIterator[T]) next[T]() ?([]T, []int) {
 	mut nums := []T{cap: its.iters.len}

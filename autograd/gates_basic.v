@@ -2,17 +2,21 @@ module autograd
 
 import vtl
 
+// AddGate defines a public data structure for this module.
 pub struct AddGate[T] {}
 
+// add_gate exposes this operation as part of the public API.
 pub fn add_gate[T]() &AddGate[T] {
 	return &AddGate[T]{}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &AddGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	return [gradient, gradient]
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &AddGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	b := args[1]
@@ -37,18 +41,22 @@ pub fn (g &AddGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	}
 }
 
+// SubtractGate defines a public data structure for this module.
 pub struct SubtractGate[T] {}
 
+// subtract_gate exposes this operation as part of the public API.
 pub fn subtract_gate[T]() &SubtractGate[T] {
 	return &SubtractGate[T]{}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &SubtractGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	opposite := gradient.multiply_scalar[T](vtl.cast[T](-1))!
 	return [gradient, opposite]
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &SubtractGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	b := args[1]
@@ -73,12 +81,14 @@ pub fn (g &SubtractGate[T]) cache(mut result Variable[T], args ...CacheParam) ! 
 	}
 }
 
+// MultiplyGate defines a public data structure for this module.
 pub struct MultiplyGate[T] {
 pub:
 	a &Variable[T] = unsafe { nil }
 	b &Variable[T] = unsafe { nil }
 }
 
+// multiply_gate exposes this operation as part of the public API.
 pub fn multiply_gate[T](a &Variable[T], b &Variable[T]) &MultiplyGate[T] {
 	return &MultiplyGate[T]{
 		a: a
@@ -86,6 +96,7 @@ pub fn multiply_gate[T](a &Variable[T], b &Variable[T]) &MultiplyGate[T] {
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &MultiplyGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	r0 := gradient.multiply[T](g.b.value)!
@@ -93,6 +104,7 @@ pub fn (g &MultiplyGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0, r1]
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &MultiplyGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	b := args[1]
@@ -117,12 +129,14 @@ pub fn (g &MultiplyGate[T]) cache(mut result Variable[T], args ...CacheParam) ! 
 	}
 }
 
+// DivideGate defines a public data structure for this module.
 pub struct DivideGate[T] {
 pub:
 	a &Variable[T] = unsafe { nil }
 	b &Variable[T] = unsafe { nil }
 }
 
+// divide_gate exposes this operation as part of the public API.
 pub fn divide_gate[T](a &Variable[T], b &Variable[T]) &DivideGate[T] {
 	return &DivideGate[T]{
 		a: a
@@ -130,6 +144,7 @@ pub fn divide_gate[T](a &Variable[T], b &Variable[T]) &DivideGate[T] {
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &DivideGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	r0 := gradient.divide[T](g.b.value)!
@@ -140,6 +155,7 @@ pub fn (g &DivideGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0, r1]
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &DivideGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	b := args[1]

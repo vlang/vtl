@@ -5,6 +5,10 @@ import vtl.la
 
 // DeviceSession holds reusable staging buffers for CUDA forward ops on one Context.
 // Activations remain CPU-backed for autograd; this only reduces alloc/copy overhead.
+
+// DeviceSession defines a public data structure for this module.
+
+// DeviceSession defines a public data structure for this module.
 @[heap]
 pub struct DeviceSession {
 pub mut:

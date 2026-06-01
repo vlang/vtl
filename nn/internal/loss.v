@@ -3,6 +3,7 @@ module internal
 import math
 import vtl
 
+// mse_backward exposes this operation as part of the public API.
 pub fn mse_backward[T](gradient &vtl.Tensor[T], cache &vtl.Tensor[T], target &vtl.Tensor[T]) ![]&vtl.Tensor[T] {
 	ret := gradient.nmap([cache, target], fn [gradient] [T](vals []T, i []int) T {
 		return vals[0] * (vals[1] - vals[2]) / vtl.cast[T](gradient.size())
@@ -10,6 +11,7 @@ pub fn mse_backward[T](gradient &vtl.Tensor[T], cache &vtl.Tensor[T], target &vt
 	return [ret]
 }
 
+// sigmoid_cross_entropy_backward exposes this operation as part of the public API.
 pub fn sigmoid_cross_entropy_backward[T](gradient &vtl.Tensor[T], cache &vtl.Tensor[T], target &vtl.Tensor[T]) ![]&vtl.Tensor[T] {
 	batch_size := cache.shape[0]
 	// Reshape target from [batch_size] → [batch_size, 1] so shapes align with cache [batch_size, 1].
@@ -64,6 +66,10 @@ pub fn softmax_cross_entropy_backward[T](gradient &vtl.Tensor[T], cache &vtl.Ten
 
 // bce computes binary cross entropy between input and target.
 // input values should be in (0,1) — caller is responsible for clamping/sigmoid.
+
+// bce exposes this operation as part of the public API.
+
+// bce exposes this operation as part of the public API.
 @[inline]
 pub fn bce[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	one := vtl.cast[T](1)

@@ -28,14 +28,17 @@ pub fn embedding_layer[T](ctx &autograd.Context[T], vocab_size int, embedding_di
 	})
 }
 
+// output_shape exposes this operation as part of the public API.
 pub fn (layer &EmbeddingLayer[T]) output_shape() []int {
 	return [layer.embedding_dim]
 }
 
+// variables exposes this operation as part of the public API.
 pub fn (layer &EmbeddingLayer[T]) variables() []&autograd.Variable[T] {
 	return [layer.weight]
 }
 
+// forward exposes this operation as part of the public API.
 pub fn (layer &EmbeddingLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	// input: [batch, seq_len] of integer indices
 	// output: [batch, seq_len, embedding_dim]
@@ -48,11 +51,13 @@ pub fn (layer &EmbeddingLayer[T]) forward(input &autograd.Variable[T]) !&autogra
 	return result
 }
 
+// EmbeddingGate defines a public data structure for this module.
 pub struct EmbeddingGate[T] {
 	input  &vtl.Tensor[T] = unsafe { nil }
 	weight &vtl.Tensor[T] = unsafe { nil }
 }
 
+// embedding_gate exposes this operation as part of the public API.
 pub fn embedding_gate[T](input &vtl.Tensor[T], weight &vtl.Tensor[T]) &EmbeddingGate[T] {
 	return &EmbeddingGate[T]{
 		input:  input
@@ -60,10 +65,12 @@ pub fn embedding_gate[T](input &vtl.Tensor[T], weight &vtl.Tensor[T]) &Embedding
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &EmbeddingGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	return internal.embedding_backward[T](payload.variable.grad, g.input, g.weight)
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &EmbeddingGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
 	match a {

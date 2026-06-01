@@ -16,6 +16,10 @@ pub mut:
 //
 // Fields:
 //   - `learning_rate` — step size α (default: 0.001)
+
+// SgdOptimizerConfig defines a public data structure for this module.
+
+// SgdOptimizerConfig defines a public data structure for this module.
 @[params]
 pub struct SgdOptimizerConfig {
 pub:

@@ -11,6 +11,7 @@ $if cuda ? {
 		return ptr
 	}
 
+	// has_gpu_activation exposes this operation as part of the public API.
 	pub fn (v Variable[f64]) has_gpu_activation() bool {
 		return v.gpu_activation != unsafe { nil }
 	}

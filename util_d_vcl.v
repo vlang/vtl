@@ -33,6 +33,10 @@ fn (t &VclTensor[T]) assert_min_rank[T](n int) ! {
 }
 
 // ensure_memory sets a correct memory layout to a given tensor
+
+// ensure_memory exposes this operation as part of the public API.
+
+// ensure_memory exposes this operation as part of the public API.
 @[inline]
 pub fn (mut t VclTensor[T]) ensure_memory[T]() {
 	if t.is_col_major() {

@@ -11,6 +11,10 @@ import vtl
 // - Configurable: batch_size, shuffle, drop_last
 // - Deterministic: optional seed for reproducible shuffling
 // - Supports optional labels tensor for supervised learning
+
+// DataLoader defines a public data structure for this module.
+
+// DataLoader defines a public data structure for this module.
 @[heap]
 pub struct DataLoader[T] {
 pub:

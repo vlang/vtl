@@ -4,6 +4,7 @@ import vtl
 import vtl.autograd
 import vtl.la
 
+// LinearGate defines a public data structure for this module.
 pub struct LinearGate[T] {
 pub:
 	input  &autograd.Variable[T] = unsafe { nil }
@@ -11,6 +12,7 @@ pub:
 	bias   &autograd.Variable[T] = unsafe { nil }
 }
 
+// linear_gate exposes this operation as part of the public API.
 pub fn linear_gate[T](input &autograd.Variable[T], weight &autograd.Variable[T], bias &autograd.Variable[T]) &LinearGate[T] {
 	return &LinearGate[T]{
 		input:  input
@@ -19,6 +21,7 @@ pub fn linear_gate[T](input &autograd.Variable[T], weight &autograd.Variable[T],
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &LinearGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	grad := payload.variable.grad
 	mut result := [grad, grad, grad]
@@ -91,6 +94,7 @@ pub fn (g &LinearGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[
 	}
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &LinearGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	input := args[0]
 	weight := args[1]

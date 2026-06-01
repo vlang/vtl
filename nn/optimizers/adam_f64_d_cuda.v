@@ -4,6 +4,7 @@ import vtl
 import vtl.autograd
 import vtl.autograd_cuda
 
+// adam_update_f64_cuda exposes this operation as part of the public API.
 pub fn adam_update_f64_cuda(param voidptr, m_tensor voidptr, v_tensor voidptr, step AdamStepParams, slot int) ! {
 	mut v := unsafe { &autograd.Variable[f64](param) }
 	mut m := unsafe { &vtl.Tensor[f64](m_tensor) }

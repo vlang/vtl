@@ -11,20 +11,24 @@ pub struct SwishLayer[T] {
 	output_shape []int
 }
 
+// swish_layer exposes this operation as part of the public API.
 pub fn swish_layer[T](ctx &autograd.Context[T], output_shape []int) types.Layer[T] {
 	return types.Layer[T](&SwishLayer[T]{
 		output_shape: output_shape.clone()
 	})
 }
 
+// output_shape exposes this operation as part of the public API.
 pub fn (layer &SwishLayer[T]) output_shape() []int {
 	return layer.output_shape
 }
 
+// variables exposes this operation as part of the public API.
 pub fn (_ &SwishLayer[T]) variables() []&autograd.Variable[T] {
 	return []&autograd.Variable[T]{}
 }
 
+// forward exposes this operation as part of the public API.
 pub fn (layer &SwishLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	output := internal.swish[T](input.value)
 	mut result := input.context.variable(output)

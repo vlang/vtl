@@ -41,14 +41,17 @@ pub fn positional_encoding_layer[T](ctx &autograd.Context[T], embed_dim int, max
 	})
 }
 
+// output_shape exposes this operation as part of the public API.
 pub fn (layer &PositionalEncodingLayer[T]) output_shape() []int {
 	return [layer.embed_dim]
 }
 
+// variables exposes this operation as part of the public API.
 pub fn (layer &PositionalEncodingLayer[T]) variables() []&autograd.Variable[T] {
 	return []
 }
 
+// forward exposes this operation as part of the public API.
 pub fn (layer &PositionalEncodingLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	// input: [batch, seq_len, embed_dim]
 	batch := input.value.shape[0]

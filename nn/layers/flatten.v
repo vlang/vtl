@@ -9,12 +9,14 @@ pub struct FlattenLayer[T] {
 	shape []int
 }
 
+// flatten_layer exposes this operation as part of the public API.
 pub fn flatten_layer[T](ctx &autograd.Context[T], shape []int) types.Layer[T] {
 	return types.Layer[T](&FlattenLayer[T]{
 		shape: shape.clone()
 	})
 }
 
+// output_shape exposes this operation as part of the public API.
 pub fn (layer &FlattenLayer[T]) output_shape() []int {
 	mut product := 1
 	for s in layer.shape {
@@ -25,10 +27,12 @@ pub fn (layer &FlattenLayer[T]) output_shape() []int {
 	return [product]
 }
 
+// variables exposes this operation as part of the public API.
 pub fn (_ &FlattenLayer[T]) variables() []&autograd.Variable[T] {
 	return []&autograd.Variable[T]{}
 }
 
+// forward exposes this operation as part of the public API.
 pub fn (layer &FlattenLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	output := input.value.reshape([input.value.shape[0], -1])!
 	mut result := input.context.variable(output)

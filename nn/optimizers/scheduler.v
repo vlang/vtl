@@ -24,6 +24,7 @@ pub fn step_lr[T](step_size int, gamma f64) &StepLR[T] {
 	}
 }
 
+// next_lr exposes this operation as part of the public API.
 pub fn (s &StepLR[T]) next_lr(current_lr f64, step int) f64 {
 	return current_lr * math.pow(s.gamma, f64(step / s.step_size))
 }
@@ -41,6 +42,7 @@ pub fn exponential_lr[T](gamma f64) &ExponentialLR[T] {
 	}
 }
 
+// next_lr exposes this operation as part of the public API.
 pub fn (s &ExponentialLR[T]) next_lr(current_lr f64, step int) f64 {
 	return current_lr * math.pow(s.gamma, f64(step))
 }
@@ -61,6 +63,7 @@ pub fn cosine_annealing_lr[T](t_max int, lrd f64) &CosineAnnealingLR[T] {
 	}
 }
 
+// next_lr exposes this operation as part of the public API.
 pub fn (s &CosineAnnealingLR[T]) next_lr(current_lr f64, step int) f64 {
 	if step >= s.t_max {
 		return s.lrd
@@ -80,6 +83,9 @@ pub mut:
 	current_lr f64
 }
 
+// ReduceLROnPlateauConfig defines a public data structure for this module.
+
+// ReduceLROnPlateauConfig defines a public data structure for this module.
 @[params]
 pub struct ReduceLROnPlateauConfig {
 pub:
@@ -104,6 +110,7 @@ pub fn reduce_lr_on_plateau[T](config ReduceLROnPlateauConfig) &ReduceLROnPlatea
 	}
 }
 
+// next_lr exposes this operation as part of the public API.
 pub fn (mut s ReduceLROnPlateau[T]) next_lr(current_lr f64, step int, metric_delta f64) f64 {
 	s.current_lr = current_lr
 	if s.wait > 0 {

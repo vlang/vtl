@@ -12,20 +12,24 @@ pub struct InputLayer[T] {
 	shape []int
 }
 
+// input_layer exposes this operation as part of the public API.
 pub fn input_layer[T](ctx &autograd.Context[T], shape []int) types.Layer[T] {
 	return types.Layer[T](&InputLayer[T]{
 		shape: shape.clone()
 	})
 }
 
+// output_shape exposes this operation as part of the public API.
 pub fn (layer &InputLayer[T]) output_shape() []int {
 	return layer.shape
 }
 
+// variables exposes this operation as part of the public API.
 pub fn (_ &InputLayer[T]) variables() []&autograd.Variable[T] {
 	return []&autograd.Variable[T]{}
 }
 
+// forward exposes this operation as part of the public API.
 pub fn (layer &InputLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	mut result := input.context.variable(input.value, requires_grad: input.requires_grad)
 	if input.requires_grad {

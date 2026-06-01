@@ -31,6 +31,7 @@ pub fn avgpool2d_layer[T](ctx &autograd.Context[T], input_shape []int, kernel []
 	})
 }
 
+// output_shape exposes this operation as part of the public API.
 pub fn (layer &AveragePool2DLayer[T]) output_shape() []int {
 	c := layer.input_shape[0]
 	h := layer.input_shape[1]
@@ -44,10 +45,12 @@ pub fn (layer &AveragePool2DLayer[T]) output_shape() []int {
 	return [c, (h - kh + 2 * ph) / sh + 1, (w - kw + 2 * pw) / sw + 1]
 }
 
+// variables exposes this operation as part of the public API.
 pub fn (layer &AveragePool2DLayer[T]) variables() []&autograd.Variable[T] {
 	return []
 }
 
+// forward exposes this operation as part of the public API.
 pub fn (layer &AveragePool2DLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	output := internal.avgpool2d_forward[T](input.value, layer.kernel, layer.padding, layer.stride)!
 	mut result := input.context.variable(output)
@@ -58,6 +61,7 @@ pub fn (layer &AveragePool2DLayer[T]) forward(input &autograd.Variable[T]) !&aut
 	return result
 }
 
+// AvgPool2DGate defines a public data structure for this module.
 pub struct AvgPool2DGate[T] {
 	input   &vtl.Tensor[T] = unsafe { nil }
 	kernel  []int
@@ -65,6 +69,7 @@ pub struct AvgPool2DGate[T] {
 	stride  []int
 }
 
+// avgpool2d_gate exposes this operation as part of the public API.
 pub fn avgpool2d_gate[T](input &vtl.Tensor[T], kernel []int, padding []int, stride []int) &AvgPool2DGate[T] {
 	return &AvgPool2DGate[T]{
 		input:   input
@@ -74,11 +79,13 @@ pub fn avgpool2d_gate[T](input &vtl.Tensor[T], kernel []int, padding []int, stri
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &AvgPool2DGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	grad := internal.avgpool2d_backward[T](payload.variable.grad, g.kernel, g.padding, g.stride)!
 	return [grad]
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &AvgPool2DGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
 	match a {
@@ -102,14 +109,17 @@ pub fn global_avgpool2d_layer[T](ctx &autograd.Context[T]) types.Layer[T] {
 	return types.Layer[T](&GlobalAvgPool2DLayer[T]{})
 }
 
+// output_shape exposes this operation as part of the public API.
 pub fn (layer &GlobalAvgPool2DLayer[T]) output_shape() []int {
 	return [-1, -1]
 }
 
+// variables exposes this operation as part of the public API.
 pub fn (layer &GlobalAvgPool2DLayer[T]) variables() []&autograd.Variable[T] {
 	return []
 }
 
+// forward exposes this operation as part of the public API.
 pub fn (layer &GlobalAvgPool2DLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
 	output := internal.global_avgpool2d_forward[T](input.value)!
 	mut result := input.context.variable(output)
@@ -120,21 +130,25 @@ pub fn (layer &GlobalAvgPool2DLayer[T]) forward(input &autograd.Variable[T]) !&a
 	return result
 }
 
+// GlobalAvgPool2DGate defines a public data structure for this module.
 pub struct GlobalAvgPool2DGate[T] {
 	input &vtl.Tensor[T] = unsafe { nil }
 }
 
+// global_avgpool2d_gate exposes this operation as part of the public API.
 pub fn global_avgpool2d_gate[T](input &vtl.Tensor[T]) &GlobalAvgPool2DGate[T] {
 	return &GlobalAvgPool2DGate[T]{
 		input: input
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &GlobalAvgPool2DGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	grad := internal.global_avgpool2d_backward[T](payload.variable.grad, g.input)!
 	return [grad]
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &GlobalAvgPool2DGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]
 	match a {

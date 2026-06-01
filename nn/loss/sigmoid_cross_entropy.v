@@ -8,10 +8,12 @@ import vtl.nn.internal
 // SigmoidCrossEntropyLoss
 pub struct SigmoidCrossEntropyLoss[T] {}
 
+// sigmoid_cross_entropy_loss exposes this operation as part of the public API.
 pub fn sigmoid_cross_entropy_loss[T]() &SigmoidCrossEntropyLoss[T] {
 	return &SigmoidCrossEntropyLoss[T]{}
 }
 
+// loss exposes this operation as part of the public API.
 pub fn (_ &SigmoidCrossEntropyLoss[T]) loss(input &autograd.Variable[T], target &vtl.Tensor[T]) !&autograd.Variable[T] {
 	output := internal.sigmoid_cross_entropy[T](input.value, target)!
 

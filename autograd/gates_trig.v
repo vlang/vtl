@@ -2,23 +2,27 @@ module autograd
 
 import vtl
 
+// SinGate defines a public data structure for this module.
 pub struct SinGate[T] {
 pub:
 	a &Variable[T] = unsafe { nil }
 }
 
+// sin_gate exposes this operation as part of the public API.
 pub fn sin_gate[T](a &Variable[T]) &SinGate[T] {
 	return &SinGate[T]{
 		a: a
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &SinGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	r0 := gradient.multiply[T](g.a.value.cos[T]())!
 	return [r0]
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &SinGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 
@@ -35,23 +39,27 @@ pub fn (g &SinGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	}
 }
 
+// CosGate defines a public data structure for this module.
 pub struct CosGate[T] {
 pub:
 	a &Variable[T] = unsafe { nil }
 }
 
+// cos_gate exposes this operation as part of the public API.
 pub fn cos_gate[T](a &Variable[T]) &CosGate[T] {
 	return &CosGate[T]{
 		a: a
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &CosGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	r0 := gradient.multiply[T](g.a.value.sin[T]().multiply_scalar[T](vtl.cast[T](-1))!)!
 	return [r0]
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &CosGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 
@@ -68,17 +76,20 @@ pub fn (g &CosGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	}
 }
 
+// TanGate defines a public data structure for this module.
 pub struct TanGate[T] {
 pub:
 	a &Variable[T] = unsafe { nil }
 }
 
+// tan_gate exposes this operation as part of the public API.
 pub fn tan_gate[T](a &Variable[T]) &TanGate[T] {
 	return &TanGate[T]{
 		a: a
 	}
 }
 
+// backward exposes this operation as part of the public API.
 pub fn (g &TanGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	cos := g.a.value.cos[T]()
@@ -86,6 +97,7 @@ pub fn (g &TanGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	return [r0]
 }
 
+// cache exposes this operation as part of the public API.
 pub fn (g &TanGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 

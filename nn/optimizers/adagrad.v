@@ -16,6 +16,9 @@ pub mut:
 	accumulated_sq_grads []&vtl.Tensor[T]
 }
 
+// AdaGradOptimizerConfig defines a public data structure for this module.
+
+// AdaGradOptimizerConfig defines a public data structure for this module.
 @[params]
 pub struct AdaGradOptimizerConfig {
 pub:

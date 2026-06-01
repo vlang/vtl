@@ -3,6 +3,10 @@ module autograd
 import vtl
 
 // variable_gpu_activation_ptr returns a pointer to the gpu_activation voidptr field.
+
+// variable_gpu_activation_ptr exposes this operation as part of the public API.
+
+// variable_gpu_activation_ptr exposes this operation as part of the public API.
 @[inline]
 pub fn variable_gpu_activation_ptr[T](mut v Variable[T]) &voidptr {
 	return &v.gpu_activation

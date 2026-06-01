@@ -2,6 +2,7 @@ module autograd
 
 import vtl
 
+// CacheParam defines a public behavior contract for this module.
 pub interface CacheParam {}
 
 // Gate is a generic interface for autograd operations.
