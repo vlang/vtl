@@ -11,7 +11,7 @@ import vtl.nn.optimizers
 //   v run vtl/examples/nn_cifar10_vulkan/main.v
 //   VTL_USE_VULKAN=1 v -prod -d vulkan run vtl/examples/nn_cifar10_vulkan/main.v
 //
-// Linear backward uses Vulkan GEMM when VTL_USE_VULKAN=1; Adam stays on CPU.
+// Linear/Conv2D use Vulkan GEMM when VTL_USE_VULKAN=1; Adam f32 uses flat CPU step.
 
 const batch_size = 2
 const epochs = 1

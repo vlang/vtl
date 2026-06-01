@@ -39,6 +39,21 @@ fn test_sgd_zeros_grad_after_update() ! {
 	assert g == 0.0, 'grad should be zeroed after update, got ${g}'
 }
 
+fn test_adam_step_f32_cpu_moves_theta() {
+	grad := [f32(1.0), f32(2.0)]
+	mut theta := [f32(5.0), f32(5.0)]
+	mut m := [f32(0.0), f32(0.0)]
+	mut v := [f32(0.0), f32(0.0)]
+	adam_step_f32_cpu(grad, mut theta, mut m, mut v, AdamStepParams{
+		beta1:   0.9
+		beta2:   0.999
+		lr_t:    0.001
+		epsilon: 1e-8
+	})
+	assert theta[0] < 5.0
+	assert m[0] > 0.0
+}
+
 fn test_adam_step_f64_cpu() {
 	grad := [1.0, 2.0]
 	mut theta := [5.0, 5.0]
