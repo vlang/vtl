@@ -8,7 +8,8 @@ import vtl.nn.layers
 import vtl.nn.models
 import vtl.nn.optimizers
 
-// GPU smoke: synthetic mini-CIFAR, Conv2D + Linear, backprop + Adam on DeviceSession.
+// GPU smoke: f64 Sequential (flatten + Linear), backprop + Adam on DeviceSession.
+// Conv2D CUDA is covered in device_session / nn tests; full conv+attach backprop is heavy on CPU.
 //
 //   VTL_USE_CUDA=1 v -d cuda run vtl/examples/nn_cifar10_cuda/main.v
 //
@@ -30,10 +31,6 @@ fn main() {
 
 	mut model := models.sequential_from_ctx[f64](ctx)
 	model.input([3, 8, 8])
-	model.conv2d(3, 8, [3, 3], layers.Conv2DConfig{
-		padding: [1, 1]
-	})
-	model.relu()
 	model.flatten()
 	model.linear(10)
 	model.mse_loss()

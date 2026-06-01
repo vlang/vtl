@@ -4,8 +4,8 @@ import vsl.cuda
 import vsl.cuda.compute
 
 // DeviceOptimizerSlot holds persistent GPU buffers for one parameter tensor (Adam #106).
-struct DeviceOptimizerSlot {
-mut:
+pub struct DeviceOptimizerSlot {
+pub mut:
 	d_m      compute.GpuBufF64
 	d_v      compute.GpuBufF64
 	d_g      compute.GpuBufF64

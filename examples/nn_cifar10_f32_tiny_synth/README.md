@@ -3,7 +3,7 @@
 Synthetic mini-CIFAR batches in **f32**: `Sequential` forward, MSE, `backprop()`, and **Adam**.
 
 No dataset download.
-Complements `nn_cifar10_tiny_synth` (f64) and `nn_cifar10_vulkan` (forward-only).
+Vulkan Linear forward: `examples/nn_cifar10_f32_vulkan_tiny_synth/`.
 
 ## Run
 
