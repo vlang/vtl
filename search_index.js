@@ -1507,7 +1507,7 @@ var searchData = [
 ["autograd","","autograd.html#ClampGate[T].cache","fn (ClampGate[T])"],
 ["autograd","gpu_activations_enabled is true when Phase 2 device-resident forwards are allowe","autograd.html#gpu_activations_enabled","fn "],
 ["autograd","cuda_backward_enabled runs Linear gate GEMMs on GPU (Phase 3).","autograd.html#cuda_backward_enabled","fn "],
-["autograd","cuda_optimizer_enabled runs Adam moment updates on GPU (Phase 4, #106); sqrt ste","autograd.html#cuda_optimizer_enabled","fn "],
+["autograd","cuda_optimizer_enabled runs Adam on GPU with persistent m/v/theta in DeviceSessi","autograd.html#cuda_optimizer_enabled","fn "],
 ["autograd","","autograd.html#linear_backward_f64","fn "],
 ["autograd","linear_backward_f64_cpu implements Linear gate gradients on CPU.","autograd.html#linear_backward_f64_cpu","fn "],
 ["autograd","","autograd.html#Node","struct "],
