@@ -35,7 +35,7 @@ through the beta unless a breaking change is explicitly approved:
 - `vtl.nn.loss`: MSE, BCE, cross-entropy, sigmoid/softmax cross-entropy, Huber,
   KL divergence, and NLL helpers.
 - `vtl.nn.optimizers`: Adam, AdamW, SGD, RMSProp, AdaGrad, schedulers, and
-  CPU/GPU Adam step helpers used by the training path.
+  CPU optimizer steps used by the f32 training path.
 - `vtl.datasets` and `vtl.nn.data`: loaders and dataloader utilities.
 - `vtl.storage`: CPU and optional backend storage abstractions used by tensors.
 
@@ -46,6 +46,7 @@ rather than stable end-user contracts:
 
 - CUDA/Vulkan hook functions in `nn/layers/*cuda*`, `nn/layers/*vulkan*`,
   `nn/gates/**`, `autograd_cuda/**`, `tensor_cuda_*`, and `tensor_vulkan_*`.
+- CUDA/Vulkan optimizer step helpers, including low-level Adam GPU parity paths.
 - Public fallback functions with names like `try_*`, `*_hooks_*`, `*_bind_*`, and
   `*_notd_*`.
 - Low-level storage constructors in `storage/cuda_*`, `storage/vcl_*`, and
@@ -79,8 +80,10 @@ high-level tensor/model APIs and environment/config flags.
 - `nn/internal/**` still has public functions. If V currently requires this for
   package boundaries, document them as internal support APIs and avoid tutorial
   references.
-- Optimizer examples should prefer `f32` for GPU-backed beta paths and explain
-  when CUDA uses `f64` vs Vulkan uses `f32`.
+- Optimizer and training examples should prefer `f32` for the beta path.
+  `f64` tensor math remains available, but generic `f64` autograd/training
+  should stay outside the stable beta contract until the generic `Gate[T]`
+  interface no longer specializes mixed `Payload[f32]`/`Payload[f64]` types.
 
 ### Breaking-Change Candidates
 
@@ -99,9 +102,14 @@ Do not change these without explicit approval:
 VTL is suitable for an ML beta if the public contract is described as:
 
 1. Stable: tensors, autograd, high-level layers/losses/optimizers/models,
-   datasets, and CPU training.
+   datasets, and f32 CPU training.
 2. Beta/experimental: CUDA and Vulkan acceleration hooks, low-level storage, and
    conditional backend dispatch.
 3. Internal support: `nn/internal/**` and backend-specific glue that remains
    public for compilation reasons.
+
+Windows, ARM GPU, persistent Vulkan activation chaining, and backend-specific
+performance work are tracked as validation or post-beta work. They should not be
+advertised as part of the stable beta contract until dedicated CI or hardware
+coverage proves them.
 

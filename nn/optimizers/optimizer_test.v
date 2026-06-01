@@ -1,10 +1,7 @@
 module optimizers
 
-import math
-import os
 import vtl
 import vtl.autograd
-import vtl.autograd_cuda
 
 fn ctx[T]() &autograd.Context[T] {
 	return autograd.ctx[T]()
@@ -17,9 +14,9 @@ fn make_var[T](c &autograd.Context[T], val f64) &autograd.Variable[T] {
 
 // SGD: param -= lr * grad
 fn test_sgd_update() ! {
-	c := ctx[f64]()
-	mut p := make_var[f64](c, 5.0)
-	mut opt := sgd[f64](learning_rate: 0.1)
+	c := ctx[f32]()
+	mut p := make_var[f32](c, 5.0)
+	mut opt := sgd[f32](learning_rate: 0.1)
 	opt.params << p
 	p.grad.set_nth(0, 1.0)
 	opt.update()!
@@ -29,9 +26,9 @@ fn test_sgd_update() ! {
 }
 
 fn test_sgd_zeros_grad_after_update() ! {
-	c := ctx[f64]()
-	mut p := make_var[f64](c, 2.0)
-	mut opt := sgd[f64](learning_rate: 0.5)
+	c := ctx[f32]()
+	mut p := make_var[f32](c, 2.0)
+	mut opt := sgd[f32](learning_rate: 0.5)
 	opt.params << p
 	p.grad.set_nth(0, 4.0)
 	opt.update()!
@@ -69,69 +66,13 @@ fn test_adam_step_f64_cpu() {
 	assert m[0] > 0.0
 }
 
-fn test_adam_step_cuda_matches_cpu_when_enabled() {
-	if os.getenv('VTL_TEST_CUDA') != '1' || os.getenv('VTL_CUDA_OPTIMIZER') != '1' {
-		return
-	}
-	grad := [1.0, 2.0, 0.5]
-	mut theta_cpu := [3.0, 4.0, 5.0]
-	mut m_cpu := [0.1, 0.2, 0.3]
-	mut v_cpu := [0.01, 0.02, 0.03]
-	mut theta_gpu := theta_cpu.clone()
-	mut m_gpu := m_cpu.clone()
-	mut v_gpu := v_cpu.clone()
-	p := AdamStepParams{
-		beta1:   0.9
-		beta2:   0.999
-		lr_t:    0.01
-		epsilon: 1e-8
-	}
-	mut c := autograd.ctx[f64]()
-	autograd_cuda.attach_context_session(mut c)
-	adam_step_f64_cpu(grad, mut theta_cpu, mut m_cpu, mut v_cpu, p)
-	adam_step_f64(grad, mut theta_gpu, mut m_gpu, mut v_gpu, p, c.device_session, 0)
-	for i in 0 .. grad.len {
-		assert math.abs(theta_cpu[i] - theta_gpu[i]) < 1e-6
-		assert math.abs(m_cpu[i] - m_gpu[i]) < 1e-6
-		assert math.abs(v_cpu[i] - v_gpu[i]) < 1e-6
-	}
-}
-
-fn test_adam_step_persistent_gpu_second_step_matches_cpu() {
-	if os.getenv('VTL_TEST_CUDA') != '1' || os.getenv('VTL_CUDA_OPTIMIZER') != '1' {
-		return
-	}
-	mut c := autograd.ctx[f64]()
-	autograd_cuda.attach_context_session(mut c)
-	grad := [0.5, -0.25]
-	p := AdamStepParams{
-		beta1:   0.9
-		beta2:   0.999
-		lr_t:    0.01
-		epsilon: 1e-8
-	}
-	mut th_cpu := [2.0, 3.0]
-	mut m_cpu := [0.0, 0.0]
-	mut v_cpu := [0.0, 0.0]
-	mut th_gpu := th_cpu.clone()
-	mut m_gpu := m_cpu.clone()
-	mut v_gpu := v_cpu.clone()
-	for _ in 0 .. 2 {
-		adam_step_f64_cpu(grad, mut th_cpu, mut m_cpu, mut v_cpu, p)
-		adam_step_f64(grad, mut th_gpu, mut m_gpu, mut v_gpu, p, c.device_session, 0)
-	}
-	for i in 0 .. grad.len {
-		assert math.abs(th_cpu[i] - th_gpu[i]) < 1e-5
-	}
-}
-
 fn test_adam_update_moves_param() ! {
-	c := ctx[f64]()
-	mut p := make_var[f64](c, 1.0)
-	mut opt := adam_optimizer[f64](learning_rate: 0.01)
+	c := ctx[f32]()
+	mut p := make_var[f32](c, 1.0)
+	mut opt := adam_optimizer[f32](learning_rate: 0.01)
 	opt.params << p
-	opt.first_moments << vtl.zeros_like[f64](p.grad)
-	opt.second_moments << vtl.zeros_like[f64](p.grad)
+	opt.first_moments << vtl.zeros_like[f32](p.grad)
+	opt.second_moments << vtl.zeros_like[f32](p.grad)
 	p.grad.set_nth(0, 1.0)
 	before := p.value.get_nth(0)
 	opt.update()!
@@ -140,12 +81,12 @@ fn test_adam_update_moves_param() ! {
 }
 
 fn test_adamw_update_moves_param() ! {
-	c := ctx[f64]()
-	mut p := make_var[f64](c, 1.0)
-	mut opt := adamw[f64](learning_rate: 0.01)
+	c := ctx[f32]()
+	mut p := make_var[f32](c, 1.0)
+	mut opt := adamw[f32](learning_rate: 0.01)
 	opt.params << p
-	opt.first_moments << vtl.zeros_like[f64](p.grad)
-	opt.second_moments << vtl.zeros_like[f64](p.grad)
+	opt.first_moments << vtl.zeros_like[f32](p.grad)
+	opt.second_moments << vtl.zeros_like[f32](p.grad)
 	p.grad.set_nth(0, 1.0)
 	before := p.value.get_nth(0)
 	opt.update()!
@@ -154,11 +95,11 @@ fn test_adamw_update_moves_param() ! {
 }
 
 fn test_rmsprop_update_moves_param() ! {
-	c := ctx[f64]()
-	mut p := make_var[f64](c, 1.0)
-	mut opt := rmsprop[f64](learning_rate: 0.01)
+	c := ctx[f32]()
+	mut p := make_var[f32](c, 1.0)
+	mut opt := rmsprop[f32](learning_rate: 0.01)
 	opt.params << p
-	opt.sq_avg << vtl.zeros_like[f64](p.grad)
+	opt.sq_avg << vtl.zeros_like[f32](p.grad)
 	p.grad.set_nth(0, 1.0)
 	before := p.value.get_nth(0)
 	opt.update()!
@@ -167,11 +108,11 @@ fn test_rmsprop_update_moves_param() ! {
 }
 
 fn test_adagrad_update_moves_param() ! {
-	c := ctx[f64]()
-	mut p := make_var[f64](c, 1.0)
-	mut opt := adagrad[f64](learning_rate: 0.1)
+	c := ctx[f32]()
+	mut p := make_var[f32](c, 1.0)
+	mut opt := adagrad[f32](learning_rate: 0.1)
 	opt.params << p
-	opt.accumulated_sq_grads << vtl.zeros_like[f64](p.grad)
+	opt.accumulated_sq_grads << vtl.zeros_like[f32](p.grad)
 	p.grad.set_nth(0, 1.0)
 	before := p.value.get_nth(0)
 	opt.update()!

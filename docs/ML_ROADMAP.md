@@ -31,14 +31,24 @@ GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 
 **VSL (downstream):** [#280](https://github.com/vlang/vsl/issues/280)–[#285](https://github.com/vlang/vsl/issues/285), [#304](https://github.com/vlang/vsl/pull/304) conv2d backward GEMM, [#305](https://github.com/vlang/vsl/pull/305) Adam shaders.
 
-## Critical path (open)
+## Beta gate (open)
 
 | Priority | Issue | Topic |
 |----------|-------|--------|
 | P1 | [#41](https://github.com/vlang/vtl/issues/41) | Windows example crash — shape clone landed; needs Windows CI confirmation |
+
+## Post-beta tracking
+
+| Priority | Issue | Topic |
+|----------|-------|--------|
 | P2 | [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support |
-| P2 | — | `v check-md -hide-warnings` on remaining docs (example READMEs done) |
 | P2 | — | Vulkan: persistent GPU activation chain between layers (CUDA has `VTL_GPU_ACTIVATIONS`) |
+
+The beta contract is tensors, autograd, high-level layers/losses/optimizers,
+datasets, and f32 CPU training. CUDA and Vulkan remain opt-in experimental
+backend paths during beta. Generic f64 training is tracked as post-beta until
+the autograd `Gate[T]` interface compiles without mixed `Payload[f32]` and
+`Payload[f64]` specialization.
 
 ## Local development
 
@@ -58,6 +68,7 @@ v run vtl/examples/nn_cifar10_f32_tiny_synth/main.v
 ## CI
 
 - **Default PR:** `bin/test` (scoped modules + `nn_cifar10_tiny_synth`)
+- **f32 beta smoke:** `nn_cifar10_f32_tiny_synth` and f32 autograd/training tests
 - **`full-ml` label:** `ci-full-ml.yml` runs `bin/test --full`
 - **CUDA / Vulkan:** local or future labeled workflows
 

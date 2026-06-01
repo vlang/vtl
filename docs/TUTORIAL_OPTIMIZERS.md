@@ -13,33 +13,28 @@ All optimizers also support learning rate schedulers — see the last section be
 ```v ignore
 import vtl
 import vtl.autograd
-import vtl.nn.layers
+import vtl.nn.models
 import vtl.nn.optimizers
-import vtl.nn.types
 
-mut ctx := autograd.ctx[f64]()
+mut ctx := autograd.ctx[f32]()
+mut model := models.sequential_from_ctx[f32](ctx)
+model.input([784])
+model.linear(256)
+model.linear(10)
+model.mse_loss()
 
-lin1 := layers.linear_layer[f64](ctx, 784, 256)
-lin2 := layers.linear_layer[f64](ctx, 256, 10)
-model := [types.Layer[f64](lin1), types.Layer[f64](lin2)]
-
-mut opt := optimizers.adam_optimizer[f64](optimizers.AdamOptimizerConfig{
+mut opt := optimizers.adam_optimizer[f32](optimizers.AdamOptimizerConfig{
 	learning_rate: 0.001
 })
-opt.build_params(model)
+opt.build_params(model.info.layers)
 
 // Dummy data — replace with real training data
-input_vals := vtl.zeros[f64]([64, 784])
-target_vals := vtl.zeros[f64]([64, 10])
+input_vals := vtl.zeros[f32]([64, 784])
+target_vals := vtl.zeros[f32]([64, 10])
 
 mut x := ctx.variable(input_vals)
-for layer in model {
-	x = layer.forward(x)!
-}
-target := ctx.variable(target_vals)
-_ = target
-
-mut loss_val := model[1].forward(x)!
+pred := model.forward(x)!
+mut loss_val := model.loss(pred, target_vals)!
 loss_val.backprop()!
 opt.update()!
 ```
@@ -65,12 +60,12 @@ import vtl.nn.layers
 import vtl.nn.optimizers
 import vtl.nn.types
 
-mut ctx := autograd.ctx[f64]()
-lin1 := layers.linear_layer[f64](ctx, 784, 256)
-lin2 := layers.linear_layer[f64](ctx, 256, 10)
-model := [types.Layer[f64](lin1), types.Layer[f64](lin2)]
+mut ctx := autograd.ctx[f32]()
+lin1 := layers.linear_layer[f32](ctx, 784, 256)
+lin2 := layers.linear_layer[f32](ctx, 256, 10)
+model := [types.Layer[f32](lin1), types.Layer[f32](lin2)]
 
-mut opt := optimizers.adamw[f64](optimizers.AdamWOptimizerConfig{
+mut opt := optimizers.adamw[f32](optimizers.AdamWOptimizerConfig{
 	learning_rate: 0.001
 	weight_decay:  0.01
 })
@@ -88,12 +83,12 @@ import vtl.nn.layers
 import vtl.nn.optimizers
 import vtl.nn.types
 
-mut ctx := autograd.ctx[f64]()
-lin1 := layers.linear_layer[f64](ctx, 784, 256)
-lin2 := layers.linear_layer[f64](ctx, 256, 10)
-model := [types.Layer[f64](lin1), types.Layer[f64](lin2)]
+mut ctx := autograd.ctx[f32]()
+lin1 := layers.linear_layer[f32](ctx, 784, 256)
+lin2 := layers.linear_layer[f32](ctx, 256, 10)
+model := [types.Layer[f32](lin1), types.Layer[f32](lin2)]
 
-mut opt := optimizers.rmsprop[f64](optimizers.RMSPropOptimizerConfig{
+mut opt := optimizers.rmsprop[f32](optimizers.RMSPropOptimizerConfig{
 	learning_rate: 0.001
 	alpha:         0.99
 })
@@ -116,12 +111,12 @@ import vtl.nn.layers
 import vtl.nn.optimizers
 import vtl.nn.types
 
-mut ctx := autograd.ctx[f64]()
-lin1 := layers.linear_layer[f64](ctx, 784, 256)
-lin2 := layers.linear_layer[f64](ctx, 256, 10)
-model := [types.Layer[f64](lin1), types.Layer[f64](lin2)]
+mut ctx := autograd.ctx[f32]()
+lin1 := layers.linear_layer[f32](ctx, 784, 256)
+lin2 := layers.linear_layer[f32](ctx, 256, 10)
+model := [types.Layer[f32](lin1), types.Layer[f32](lin2)]
 
-mut opt := optimizers.adagrad[f64](optimizers.AdaGradOptimizerConfig{
+mut opt := optimizers.adagrad[f32](optimizers.AdaGradOptimizerConfig{
 	learning_rate: 0.01
 })
 opt.build_params(model)
@@ -147,12 +142,12 @@ import vtl.nn.layers
 import vtl.nn.optimizers
 import vtl.nn.types
 
-mut ctx := autograd.ctx[f64]()
-lin1 := layers.linear_layer[f64](ctx, 784, 256)
-lin2 := layers.linear_layer[f64](ctx, 256, 10)
-model := [types.Layer[f64](lin1), types.Layer[f64](lin2)]
+mut ctx := autograd.ctx[f32]()
+lin1 := layers.linear_layer[f32](ctx, 784, 256)
+lin2 := layers.linear_layer[f32](ctx, 256, 10)
+model := [types.Layer[f32](lin1), types.Layer[f32](lin2)]
 
-mut opt := optimizers.sgd[f64](optimizers.SgdOptimizerConfig{
+mut opt := optimizers.sgd[f32](optimizers.SgdOptimizerConfig{
 	learning_rate: 0.01
 })
 opt.build_params(model)
@@ -170,24 +165,24 @@ import vtl.nn.layers
 import vtl.nn.optimizers
 import vtl.nn.types
 
-mut ctx := autograd.ctx[f64]()
-lin1 := layers.linear_layer[f64](ctx, 784, 256)
-lin2 := layers.linear_layer[f64](ctx, 256, 10)
-model := [types.Layer[f64](lin1), types.Layer[f64](lin2)]
-mut opt := optimizers.sgd[f64](optimizers.SgdOptimizerConfig{ learning_rate: 0.01 })
+mut ctx := autograd.ctx[f32]()
+lin1 := layers.linear_layer[f32](ctx, 784, 256)
+lin2 := layers.linear_layer[f32](ctx, 256, 10)
+model := [types.Layer[f32](lin1), types.Layer[f32](lin2)]
+mut opt := optimizers.sgd[f32](optimizers.SgdOptimizerConfig{ learning_rate: 0.01 })
 opt.build_params(model)
 
 // StepLR: reduce LR by gamma every step_size steps
-mut scheduler := optimizers.step_lr[f64](30, 0.1)
+mut scheduler := optimizers.step_lr[f32](30, 0.1)
 
 // ExponentialLR: multiply LR by gamma every step
-mut scheduler2 := optimizers.exponential_lr[f64](0.95)
+mut scheduler2 := optimizers.exponential_lr[f32](0.95)
 
 // CosineAnnealingLR: cosine decay from initial_lr to lrd
-mut scheduler3 := optimizers.cosine_annealing_lr[f64](100, 1e-5)
+mut scheduler3 := optimizers.cosine_annealing_lr[f32](100, 1e-5)
 
 // ReduceLROnPlateau: reduce when metric stops improving
-mut scheduler4 := optimizers.reduce_lr_on_plateau[f64](optimizers.ReduceLROnPlateauConfig{
+mut scheduler4 := optimizers.reduce_lr_on_plateau[f32](optimizers.ReduceLROnPlateauConfig{
 	patience: 10
 	factor:   0.1
 })
@@ -205,36 +200,32 @@ for step := 0; step < 100; step++ {
 ```v ignore
 import vtl
 import vtl.autograd
-import vtl.nn.layers
+import vtl.nn.models
 import vtl.nn.optimizers
-import vtl.nn.types
 
-mut ctx := autograd.ctx[f64]()
+mut ctx := autograd.ctx[f32]()
+mut model := models.sequential_from_ctx[f32](ctx)
+model.input([784])
+model.linear(256)
+model.linear(10)
+model.mse_loss()
 
-lin1 := layers.linear_layer[f64](ctx, 784, 256)
-lin2 := layers.linear_layer[f64](ctx, 256, 10)
-model := [types.Layer[f64](lin1), types.Layer[f64](lin2)]
-
-mut opt := optimizers.adam_optimizer[f64](optimizers.AdamOptimizerConfig{
+mut opt := optimizers.adam_optimizer[f32](optimizers.AdamOptimizerConfig{
 	learning_rate: 0.001
 })
-opt.build_params(model)
+opt.build_params(model.info.layers)
 
-mut scheduler := optimizers.step_lr[f64](30, 0.1)
+mut scheduler := optimizers.step_lr[f32](30, 0.1)
 
 for epoch := 0; epoch < 10; epoch++ {
 	// Replace with real data batches
-	input_batch := vtl.zeros[f64]([64, 784])
-	target_batch := vtl.zeros[f64]([64, 10])
+	input_batch := vtl.zeros[f32]([64, 784])
+	target_batch := vtl.zeros[f32]([64, 10])
 
 	mut x := ctx.variable(input_batch)
-	for layer in model {
-		x = layer.forward(x)!
-	}
-	target := ctx.variable(target_batch)
-	_ = target
-
-	x.backprop()!
+	pred := model.forward(x)!
+	mut loss_val := model.loss(pred, target_batch)!
+	loss_val.backprop()!
 	opt.update()!
 
 	current_lr := scheduler.next_lr(0.001, epoch)
