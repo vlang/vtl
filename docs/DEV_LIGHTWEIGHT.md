@@ -59,7 +59,7 @@ v run vtl/examples/nn_cifar10_vulkan/main.v
 
 # Vulkan f32 GPU full stack (Linear + Conv2D + ReLU + Adam)
 VTL_USE_VULKAN=1 VJOBS=1 v -prod -d vulkan run vtl/examples/nn_cifar10_vulkan/main.v
-VTL_USE_VULKAN=1 VJOBS=1 v -prod -d vulkan test vtl/nn/f32_vulkan_training_smoke_test_d_vulkan.v
+VTL_USE_VULKAN=1 VJOBS=1 v -prod -d vulkan test vtl/nn/f32_vulkan_training_smoke_d_vulkan_test.v
 VTL_USE_VULKAN=1 VJOBS=1 v -prod -d vulkan test \
   vtl/nn/internal/conv2d_vulkan_forward_f32_d_vulkan_test.v \
   vtl/nn/internal/conv2d_vulkan_backward_f32_d_vulkan_test.v \
