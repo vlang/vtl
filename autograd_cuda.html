@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="x-ua-compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>autograd_cuda | vdoc</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link
+			href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+		<link rel="manifest" href="site.webmanifest" />
+		<link rel="mask-icon" href="safari-pinned-tab.svg" color="#5bbad5" />
+		<meta name="msapplication-TileColor" content="#da532c" />
+		<meta name="theme-color" content="#ffffff" />
+		<link rel="stylesheet" href="doc.css" />
+		<link rel="stylesheet" href="normalize.css" />
+		<script src="dark-mode.js"></script>
+	</head>
+
+	<body>
+		<div><a id="skip-to-content-link" href="#main-content">Skip to content</a></div>
+		<div id="page">
+			<header class="doc-nav hidden">
+				<div class="heading-container">
+					<div class="heading">
+						<div class="info">
+							<div class="module">vtl</div>
+							<div class="toggle-version-container">
+								<span>0.2.0 </span>
+								<div
+									id="dark-mode-toggle"
+									role="switch"
+									aria-checked="false"
+									aria-label="Toggle dark mode"
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" class="light-icon" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" class="dark-icon" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><g><rect fill="none" height="24" width="24"/></g><g><g><g><path d="M11.1,12.08C8.77,7.57,10.6,3.6,11.63,2.01C6.27,2.2,1.98,6.59,1.98,12c0,0.14,0.02,0.28,0.02,0.42 C2.62,12.15,3.29,12,4,12c1.66,0,3.18,0.83,4.1,2.15C9.77,14.63,11,16.17,11,18c0,1.52-0.87,2.83-2.12,3.51 c0.98,0.32,2.03,0.5,3.11,0.5c3.5,0,6.58-1.8,8.37-4.52C18,17.72,13.38,16.52,11.1,12.08z"/></g><path d="M7,16l-0.18,0C6.4,14.84,5.3,14,4,14c-1.66,0-3,1.34-3,3s1.34,3,3,3c0.62,0,2.49,0,3,0c1.1,0,2-0.9,2-2 C9,16.9,8.1,16,7,16z"/></g></g></svg>
+
+								</div>
+							</div>
+							<svg xmlns="http://www.w3.org/2000/svg" id="toggle-menu" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+
+						</div>
+						<div id="search">
+							<input type="text" placeholder="Search... (beta)" autocomplete="off" />
+						</div>
+					</div>
+				</div>
+				<nav class="search hidden"></nav>
+				<nav class="content hidden">
+					<ul>
+						<li class="open">
+<div class="menu-row"><a href="./index.html">README</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./vtl.html">vtl</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./autograd.html">autograd</a></div>
+</li>
+<li class="open active">
+<div class="menu-row"><a href="./autograd_cuda.html">autograd_cuda</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><svg xmlns="http://www.w3.org/2000/svg" class="dropdown-arrow" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M7 10l5 5 5-5z"/></svg><a>benchmarks</a></div>
+<ul>
+<li><a href="./benchmarks.util.html">util</a></li>
+</ul>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./main.html">main</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./datasets.html">datasets</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./la.html">la</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><svg xmlns="http://www.w3.org/2000/svg" class="dropdown-arrow" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M7 10l5 5 5-5z"/></svg><a>ml</a></div>
+<ul>
+<li><a href="./ml.metrics.html">metrics</a></li>
+</ul>
+</li>
+<li class="open">
+<div class="menu-row"><svg xmlns="http://www.w3.org/2000/svg" class="dropdown-arrow" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M7 10l5 5 5-5z"/></svg><a>nn</a></div>
+<ul>
+<li><a href="./nn.data.html">data</a></li>
+<li><a href="./nn.gates.activation.html">gates.activation</a></li>
+<li><a href="./nn.gates.layers.html">gates.layers</a></li>
+<li><a href="./nn.gates.loss.html">gates.loss</a></li>
+<li><a href="./nn.internal.html">internal</a></li>
+<li><a href="./nn.layers.html">layers</a></li>
+<li><a href="./nn.loss.html">loss</a></li>
+<li><a href="./nn.models.html">models</a></li>
+<li><a href="./nn.optimizers.html">optimizers</a></li>
+<li><a href="./nn.types.html">types</a></li>
+</ul>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./stats.html">stats</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./storage.html">storage</a></div>
+</li>
+
+					</ul>
+				</nav>
+			</header>
+			<div class="doc-scrollview" tabindex="-1" id="main-content">
+				<div class="doc-container">
+					<div class="doc-content">
+								<section id="readme_autograd_cuda" class="doc-node">
+			<div class="title"><h1> autograd_cuda <a href="#readme_autograd_cuda">#</a></h1></div>
+<p>Stubs when not built with <code>-d cuda</code>.</p>
+
+</section>
+
+		<section id="attach_context_session" class="doc-node">
+			<div class="title"><h2>fn attach_context_session <a href="#attach_context_session">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd_cuda/context_attach.v#L6"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">attach_context_session</span><span class="token punctuation">(</span><span class="token keyword">mut</span> ctx autograd<span class="token punctuation">.</span>Context<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+<p>attach_context_session initializes Context[f64].device_session when nil.</p>
+
+</section>
+
+		<section id="cuda_backward_enabled" class="doc-node">
+			<div class="title"><h2>fn cuda_backward_enabled <a href="#cuda_backward_enabled">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd_cuda/gpu_config.v#L14"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">cuda_backward_enabled</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">bool</span></code></pre>
+<p>cuda_backward_enabled runs Linear gate GEMMs on GPU (Phase 3).</p>
+
+</section>
+
+		<section id="cuda_optimizer_enabled" class="doc-node">
+			<div class="title"><h2>fn cuda_optimizer_enabled <a href="#cuda_optimizer_enabled">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd_cuda/gpu_config.v#L20"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">cuda_optimizer_enabled</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">bool</span></code></pre>
+<p>cuda_optimizer_enabled runs Adam on GPU with persistent m/v/theta in DeviceSession (#106).</p>
+
+</section>
+
+		<section id="gpu_activations_enabled" class="doc-node">
+			<div class="title"><h2>fn gpu_activations_enabled <a href="#gpu_activations_enabled">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd_cuda/gpu_config.v#L8"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">gpu_activations_enabled</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">bool</span></code></pre>
+<p>gpu_activations_enabled is true when Phase 2 device-resident forwards are allowed. Requires <code>VTL_USE_CUDA=1</code>, <code>VTL_GPU_ACTIVATIONS=1</code>, and build flag <code>-d cuda</code>.</p>
+
+</section>
+
+		<section id="linear_backward_f64" class="doc-node">
+			<div class="title"><h2>fn linear_backward_f64 <a href="#linear_backward_f64">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd_cuda/linear_backward_cuda_notd_cuda.v#L5"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">linear_backward_f64</span><span class="token punctuation">(</span>grad <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> weight <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+	bias_needs_grad <span class="token builtin">bool</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> session DeviceSession<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="linear_backward_f64_cpu" class="doc-node">
+			<div class="title"><h2>fn linear_backward_f64_cpu <a href="#linear_backward_f64_cpu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd_cuda/linear_backward_f64.v#L7"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">linear_backward_f64_cpu</span><span class="token punctuation">(</span>grad <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+	weight <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> bias_needs_grad <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
+<p>linear_backward_f64_cpu implements Linear gate gradients on CPU.</p>
+
+</section>
+
+		<section id="linear_forward_f64_cpu" class="doc-node">
+			<div class="title"><h2>fn linear_forward_f64_cpu <a href="#linear_forward_f64_cpu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd_cuda/device_session.v#L36"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">linear_forward_f64_cpu</span><span class="token punctuation">(</span>x <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> weights <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> bias <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
+<p>linear_forward_f64_cpu is the CPU fallback used by all builds. Uses an explicit Wᵀ buffer (weights.t() is a non-contiguous view; matmul copy is unsafe).</p>
+
+</section>
+
+		<section id="new_device_session" class="doc-node">
+			<div class="title"><h2>fn new_device_session <a href="#new_device_session">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd_cuda/device_session.v#L23"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">new_device_session</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>DeviceSession</code></pre>
+<p>new_device_session creates an empty session (CUDA init is build-specific).</p>
+
+</section>
+
+		<section id="new_device_session_ptr" class="doc-node">
+			<div class="title"><h2>fn new_device_session_ptr <a href="#new_device_session_ptr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd_cuda/device_session.v#L28"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">new_device_session_ptr</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">voidptr</span></code></pre>
+<p>new_device_session_ptr returns a session as voidptr for Context[f64] (avoids autograd↔autograd_cuda cycle).</p>
+
+</section>
+
+		<section id="session_bind_gpu_activation" class="doc-node">
+			<div class="title"><h2>fn session_bind_gpu_activation <a href="#session_bind_gpu_activation">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd_cuda/variable_gpu_notd_cuda.v#L5"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">session_bind_gpu_activation</span><span class="token punctuation">(</span><span class="token keyword">mut</span> s DeviceSession<span class="token punctuation">,</span> act_field <span class="token operator">&amp;</span><span class="token builtin">voidptr</span><span class="token punctuation">)</span></code></pre>
+
+
+</section>
+
+		<section id="DeviceSession" class="doc-node">
+			<div class="title"><h2>struct DeviceSession <a href="#DeviceSession">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd_cuda/device_session.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[heap]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token symbol">DeviceSession</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span> <span class="token keyword">mut</span><span class="token punctuation">:</span>
+	enabled <span class="token builtin">bool</span>
+	<span class="token comment">// Phase 2: opaque GPU activation chain (`DeviceGpuChain` in CUDA builds).</span>
+	gpu_chain <span class="token builtin">voidptr</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	<span class="token comment">// Staging buffers for cuBLAS GEMM (column-major staging, row-major output)</span>
+	gemm_x_col   <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span>
+	gemm_w_col   <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span>
+	gemm_out_row <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span>
+	<span class="token comment">// Phase 4 (#106): opaque DeviceOptimizerState in CUDA builds.</span>
+	optimizer_state <span class="token builtin">voidptr</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<p>DeviceSession holds reusable staging buffers for CUDA forward ops on one Context. Activations remain CPU-backed for autograd; this only reduces alloc/copy overhead.</p>
+
+</section>
+
+		<section id="DeviceSession.init_device" class="doc-node">
+			<div class="title"><h2>fn (DeviceSession) init_device <a href="#DeviceSession.init_device">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd_cuda/device_session_notd_cuda.v#L6"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> s DeviceSession<span class="token punctuation">)</span> <span class="token function">init_device</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<p>init_device is a no-op without <code>-d cuda</code>.</p>
+
+</section>
+
+		<section id="DeviceSession.linear_forward_f64" class="doc-node">
+			<div class="title"><h2>fn (DeviceSession) linear_forward_f64 <a href="#DeviceSession.linear_forward_f64">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/autograd_cuda/device_session_notd_cuda.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> s DeviceSession<span class="token punctuation">)</span> <span class="token function">linear_forward_f64</span><span class="token punctuation">(</span>x <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> weights <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+	bias <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> _input_gpu <span class="token builtin">voidptr</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
+<p>linear_forward_f64 without CUDA build always errors so callers fall back to CPU.</p>
+
+</section>
+
+
+						<div class="footer">Powered by vdoc. Generated on: 1 Jun 2026 04:03:02</div>
+					</div>
+					<div class="doc-toc"><ul><li class="open"><a href="#readme_autograd_cuda">README</a></li>
+<li class="open"><a href="#attach_context_session">fn attach_context_session</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#cuda_backward_enabled">fn cuda_backward_enabled</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#cuda_optimizer_enabled">fn cuda_optimizer_enabled</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#gpu_activations_enabled">fn gpu_activations_enabled</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#linear_backward_f64">fn linear_backward_f64</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#linear_backward_f64_cpu">fn linear_backward_f64_cpu</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#linear_forward_f64_cpu">fn linear_forward_f64_cpu</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#new_device_session">fn new_device_session</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#new_device_session_ptr">fn new_device_session_ptr</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#session_bind_gpu_activation">fn session_bind_gpu_activation</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#DeviceSession">struct DeviceSession</a>        <ul>
+<li><a href="#DeviceSession.init_device">fn init_device</a></li>
+<li><a href="#DeviceSession.linear_forward_f64">fn linear_forward_f64</a></li>
+</ul>
+</li>
+</ul></div>
+				</div>
+			</div>
+		</div>
+		<script src="doc.js"></script>
+		<script async src="search_index.js"></script>
+	</body>
+</html>
