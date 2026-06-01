@@ -142,6 +142,9 @@ jobs:
   windows-smoke:
     name: Windows tensor creation smoke
     runs-on: windows-latest
+    # Keep this smoke on latest V, but do not block beta CI while setup-v/V
+    # cannot bootstrap current master on the GitHub Windows image.
+    continue-on-error: true
 
     steps:
       - name: Checkout VTL
