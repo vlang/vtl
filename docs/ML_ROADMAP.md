@@ -19,6 +19,7 @@ GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 | [#111](https://github.com/vlang/vtl/pull/111)/[#114](https://github.com/vlang/vtl/pull/114) | Adam on GPU + persistent `DeviceSession` slots (#106) |
 | [#110](https://github.com/vlang/vtl/issues/110) | Vulkan f32 Linear in `Sequential` forward (`VTL_USE_VULKAN=1`, `-d vulkan`) |
 | [#116](https://github.com/vlang/vtl/issues/116) | f32 autograd: `Sequential` + MSE forward/backprop compile |
+| — | f32 tiny training: `nn_cifar10_f32_tiny_synth` + `f32_training_smoke_test` |
 | [#86](https://github.com/vlang/vtl/issues/86) | `DataLoader` |
 
 **VSL (downstream):** [#280](https://github.com/vlang/vsl/issues/280)–[#285](https://github.com/vlang/vsl/issues/285).
@@ -40,6 +41,7 @@ v up
 cd ~/.vmodules
 v test vtl/nn vtl/datasets
 v run vtl/examples/nn_cifar10_tiny_synth/main.v
+v run vtl/examples/nn_cifar10_f32_tiny_synth/main.v
 # CUDA (opt-in)
 # VTL_USE_CUDA=1 v -d cuda run vtl/examples/nn_cifar10_cuda/main.v
 # Vulkan f32 Linear forward smoke

@@ -97,6 +97,8 @@ for file in $(find "${vtl_dir_path}" -wholename '*/examples/*/main.v' | sort); d
 done
 
 if [[ -z "${full}" ]]; then
-    echo "Running nn_cifar10_tiny_synth smoke"
+    echo "Running nn_cifar10_tiny_synth smoke (f64)"
     v ${flags} run ${vtl_dir_path}/examples/nn_cifar10_tiny_synth/main.v
+    echo "Running nn_cifar10_f32_tiny_synth smoke (f32)"
+    v ${flags} run ${vtl_dir_path}/examples/nn_cifar10_f32_tiny_synth/main.v
 fi

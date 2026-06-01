@@ -6,8 +6,13 @@ import vtl.autograd_cuda
 
 // adam_step_f64 with DeviceSession persistent m/v/theta on GPU (#106).
 pub fn adam_step_f64(grad []f64, mut theta []f64, mut m []f64, mut v []f64, p AdamStepParams,
-	mut session autograd_cuda.DeviceSession, slot int) {
-	if !autograd_cuda.cuda_optimizer_enabled() || !session.enabled {
+	session voidptr, slot int) {
+	if session == unsafe { nil } {
+		adam_step_f64_cpu(grad, mut theta, mut m, mut v, p)
+		return
+	}
+	mut s := unsafe { &autograd_cuda.DeviceSession(session) }
+	if !autograd_cuda.cuda_optimizer_enabled() || !s.enabled {
 		adam_step_f64_cpu(grad, mut theta, mut m, mut v, p)
 		return
 	}
@@ -16,7 +21,7 @@ pub fn adam_step_f64(grad []f64, mut theta []f64, mut m []f64, mut v []f64, p Ad
 		return
 	}
 	n := grad.len
-	mut sl := session.ensure_opt_slot(slot, n) or {
+	mut sl := s.ensure_opt_slot(slot, n) or {
 		adam_step_f64_cpu(grad, mut theta, mut m, mut v, p)
 		return
 	}
