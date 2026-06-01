@@ -123,10 +123,42 @@
 								<section id="readme_datasets" class="doc-node">
 			<div class="title"><h1> datasets <a href="#readme_datasets">#</a></h1></div>
 <h1 id="vtl-datasets">VTL Datasets</h1>
-<p>This module exposes some functionalities to download and use the VTL datasets. For this we created some batch based iterators to load the datasets. We expose the following datasets:</p>
+<p>VTL provides dataset loaders and batching utilities for ML examples and tests.</p>
+<h2 id="available-datasets">Available datasets</h2>
+<table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th>Loader</th>
+<th>Purpose</th></tr></thead>
+<tbody>
+<tr>
+<td>MNIST</td>
+<td><code>datasets.load_mnist()</code></td>
+<td>Handwritten digit images (<code>28x28</code>)</td></tr>
+<tr>
+<td>IMDB</td>
+<td><code>datasets.load_imdb()</code></td>
+<td>Sentiment analysis reviews</td></tr>
+<tr>
+<td>CIFAR-10</td>
+<td><code>datasets.load_cifar10(...)</code></td>
+<td>Image classification examples</td></tr>
+<tr>
+<td>DataLoader</td>
+<td><code>datasets.DataLoader[T]</code></td>
+<td>Batch, shuffle, and iterate tensors/labels</td></tr></tbody></table>
+<h2 id="examples">Examples</h2>
+<p>Run from <code>~/.vmodules</code>:</p>
+<pre><code class="language-bash">v run vtl<span class="token operator">/</span>examples<span class="token operator">/</span>datasets_mnist<span class="token operator">/</span>main<span class="token punctuation">.</span>v
+v run vtl<span class="token operator">/</span>examples<span class="token operator">/</span>datasets_imdb<span class="token operator">/</span>main<span class="token punctuation">.</span>v
+v run vtl<span class="token operator">/</span>examples<span class="token operator">/</span>nn_cifar10_tiny_synth<span class="token operator">/</span>main<span class="token punctuation">.</span>v</code></pre>
+<p>Use synthetic examples (<code>nn_cifar10_tiny_synth</code>, <code>nn_cifar10_f32_tiny_synth</code>) for CI and quick local checks. Real dataset examples may download/cache data and should be treated as local integration tests.</p>
+<h2 id="related-docs">Related docs</h2>
 <ul>
-<li><strong>Mnist</strong>: A dataset of handwritten digits.</li>
-<li><strong>Imdb</strong>: A dataset of IMDB reviews for sentiment analysis.</li></ul>
+<li><a href="https://github.com/vlang/vtl/blob/master/examples/README.md">Examples catalog</a></li>
+<li><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_NEURAL_NETWORKS.md">Neural network tutorial</a></li>
+<li><a href="https://github.com/vlang/vtl/blob/master/docs/DEV_LIGHTWEIGHT.md">Lightweight development commands</a></li></ul>
 
 </section>
 
@@ -454,7 +486,7 @@
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 1 Jun 2026 18:22:11</div>
+						<div class="footer">Powered by vdoc. Generated on: 1 Jun 2026 18:23:28</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_datasets">README</a></li>
 <li class="open"><a href="#Constants">Constants</a></li>

@@ -132,6 +132,7 @@
 
 <p>[![Mentioned in Awesome V][awesomevbadge]][awesomevurl] [![CI][workflowbadge]][workflowurl] [![License: MIT][licensebadge]][licenseurl]</p>
 <p><strong>VTL</strong> is a pure-<a href="https://vlang.io">V</a> tensor library for numerical computing and machine learning — n-dimensional arrays, autograd, linear algebra via <a href="https://github.com/vlang/vsl">VSL</a>, and a full neural network module.</p>
+<p>Train small neural networks, experiment with autograd, and use VSL-backed CPU, CUDA, and Vulkan compute paths from one V-native API.</p>
 <p><a href="https://vlang.io">vlang.io</a> | <a href="https://vlang.github.io/vtl">Docs</a> | <a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL.md">Tutorials</a> | <a href="https://github.com/vlang/vtl/blob/master/docs/ML_ROADMAP.md">ML Roadmap</a> | <a href="https://github.com/vlang/vtl/blob/master/CONTRIBUTING.md">Contributing</a> | <a href="https://github.com/vlang/vsl">VSL</a></p></div>
 
 <pre><code class="language-v"><span class="token keyword">import</span> vtl
@@ -145,7 +146,30 @@ t<span class="token punctuation">.</span><span class="token function">get</span>
 <li><strong>Neural networks</strong> — <code>Sequential</code> API; Linear, Conv2D, LSTM, Attention, …</li>
 <li><strong>Losses &amp; optimizers</strong> — MSE, BCE, CrossEntropy, Huber; Adam, AdamW, SGD, …</li>
 <li><strong>Linear algebra</strong> — VSL-backed matmul, solve, QR, LU, Cholesky, SVD, pinv</li>
-<li><strong>Hardware</strong> — zero-copy <code>Tensor.data</code> for C libs; optional CUDA paths</li></ul>
+<li><strong>Hardware</strong> — zero-copy <code>Tensor.data</code> for C libs; optional CUDA and Vulkan training paths</li></ul>
+<h2 id="ml-release-highlights">ML Release Highlights</h2>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Status</th></tr></thead>
+<tbody>
+<tr>
+<td>f32 training</td>
+<td><code>Sequential</code> + MSE + Adam smoke tests</td></tr>
+<tr>
+<td>CUDA</td>
+<td>Linear/Conv2D forward, CUDA backward, GPU activation chain, Adam optimizer slots</td></tr>
+<tr>
+<td>Vulkan</td>
+<td>f32 Linear, Conv2D same-padding, ReLU/Sigmoid, fused Adam shader</td></tr>
+<tr>
+<td>Datasets</td>
+<td>MNIST, IMDB, CIFAR-10 loaders plus CI-safe synthetic examples</td></tr>
+<tr>
+<td>Benchmarks</td>
+<td>VTL vs NumPy/PyTorch scripts and PR benchmark workflow</td></tr></tbody></table>
+<p>For memory-safe local commands, see <a href="https://github.com/vlang/vtl/blob/master/docs/DEV_LIGHTWEIGHT.md">DEV_LIGHTWEIGHT.md</a>.</p>
 <h2 id="quick-start">Quick start</h2>
 <pre><code class="language-v"><span class="token keyword">import</span> vtl
 <span class="token keyword">import</span> vtl<span class="token punctuation">.</span>autograd
@@ -208,6 +232,34 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 <pre><code class="language-sh">v test <span class="token operator">~</span><span class="token operator">/</span><span class="token punctuation">.</span>vmodules<span class="token operator">/</span>vtl</code></pre>
 <p>See <a href="https://github.com/vlang/vtl/blob/master/docs/DEV_LIGHTWEIGHT.md">DEV_LIGHTWEIGHT.md</a> for memory-safe subsets in CI.</p>
 <h2 id="documentation">Documentation</h2>
+<h3 id="start-here">Start Here</h3>
+<table>
+<thead>
+<tr>
+<th>Goal</th>
+<th>Read</th></tr></thead>
+<tbody>
+<tr>
+<td>Learn tensors</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_FIRST_STEPS.md">First steps</a></td></tr>
+<tr>
+<td>Learn autograd</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_AUTOGRAD.md">Autograd tutorial</a></td></tr>
+<tr>
+<td>Build neural networks</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_NEURAL_NETWORKS.md">Neural networks</a></td></tr>
+<tr>
+<td>Pick optimizers</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_OPTIMIZERS.md">Optimizers</a></td></tr>
+<tr>
+<td>Run examples</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/examples/README.md">Examples catalog</a></td></tr>
+<tr>
+<td>Use datasets</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/datasets/README.md">Datasets</a></td></tr>
+<tr>
+<td>Use GPU paths safely</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/DEV_LIGHTWEIGHT.md">DEV_LIGHTWEIGHT.md</a>, <a href="https://github.com/vlang/vtl/blob/master/docs/DEVICE_MEMORY.md">DEVICE_MEMORY.md</a></td></tr></tbody></table>
 <table>
 <thead>
 <tr>
@@ -257,7 +309,7 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 1 Jun 2026 18:22:10</div>
+						<div class="footer">Powered by vdoc. Generated on: 1 Jun 2026 18:23:28</div>
 					</div>
 					
 				</div>
