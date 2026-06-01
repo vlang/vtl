@@ -1,6 +1,6 @@
 # nn_cifar10_cuda
 
-Synthetic mini-CIFAR f64 training: Conv2D + ReLU + Linear + MSE,
+Synthetic mini-CIFAR f64 training: Flatten + Linear + MSE,
 `backprop()`, Adam, and `DeviceSession` via `autograd_cuda.attach_context_session`.
 
 ## Run (local, CUDA build)
@@ -23,7 +23,7 @@ Without `VTL_USE_CUDA`, the example still runs on CPU (same shape as this smoke)
 ## Test
 
 ```bash
-VTL_USE_CUDA=1 VTL_TEST_CUDA=1 VJOBS=1 v -d cuda test vtl/autograd_cuda/training_smoke_test.v
+VTL_USE_CUDA=1 VTL_TEST_CUDA=1 VJOBS=1 v -d cuda test vtl/nn/cuda_training_smoke_test.v
 ```
 
 ## Notes

@@ -39,8 +39,10 @@ VJOBS=2 v test vtl/nn/models/serialization_test.v
 v run vtl/examples/nn_cifar10_tiny_synth/main.v
 VJOBS=2 v run vtl/examples/nn_cifar10_f32_tiny_synth/main.v
 VJOBS=1 v test vtl/nn/f32_training_smoke_test.v vtl/nn/f32_autograd_smoke_test.v
-VTL_USE_CUDA=1 VTL_TEST_CUDA=1 VJOBS=1 v -d cuda test vtl/autograd_cuda/training_smoke_test.v
+VTL_USE_CUDA=1 VTL_TEST_CUDA=1 VJOBS=1 v -d cuda test vtl/nn/cuda_training_smoke_test.v
 VTL_USE_CUDA=1 VJOBS=1 v -d cuda run vtl/examples/nn_cifar10_cuda/main.v
+VJOBS=2 v run vtl/examples/nn_cifar10_f32_vulkan_tiny_synth/main.v
+# VTL_USE_VULKAN=1 VTL_TEST_VULKAN=1 VJOBS=1 v -d vulkan test vtl/nn/f32_vulkan_training_smoke_test.v
 
 # Single-file CUDA test (only when you want GPU)
 VTL_USE_CUDA=1 VTL_TEST_CUDA=1 VJOBS=1 v -d cuda test vtl/nn/layers/linear_cuda_test.v
