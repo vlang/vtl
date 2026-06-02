@@ -50,9 +50,9 @@ fi
 
 if [[ -n "${prod}" ]]; then
     echo "Running tests with prod"
-    flags="${flags} -prod"
-    # Disable LTO to avoid ELF section overflows/corruption in GitHub runner toolchains.
-    flags="${flags} -cflags -fno-lto"
+    # Keep prod optimizations but avoid LTO, which overflows/corrupts objects on
+    # GitHub runner toolchains.
+    flags="${flags} -prod -no-prod-options -cflags -O3 -cflags -fno-lto"
 fi
 
 # Examples that OOM default GitHub runners at compile time (see docs/DEV_LIGHTWEIGHT.md).
