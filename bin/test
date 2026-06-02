@@ -50,7 +50,9 @@ fi
 
 if [[ -n "${prod}" ]]; then
     echo "Running tests with prod"
-    flags="${flags} -prod"
+    # Keep prod optimizations but avoid LTO, which overflows/corrupts objects on
+    # GitHub runner toolchains.
+    flags="${flags} -prod -no-prod-options -cflags -O3 -cflags -fno-lto"
 fi
 
 # Examples that OOM default GitHub runners at compile time (see docs/DEV_LIGHTWEIGHT.md).
@@ -80,6 +82,11 @@ else
 fi
 
 find ${vtl_dir_path} -name '*_test' -exec rm -f {} + 2>/dev/null || true
+
+if [[ -n "${prod}" ]]; then
+    echo "Skipping example compilation in prod mode (covered by non-prod CI matrix)"
+    exit 0
+fi
 
 echo "Compiling Examples with flags ${flags}"
 for file in $(find "${vtl_dir_path}" -wholename '*/examples/*/main.v' | sort); do
