@@ -30,7 +30,7 @@ jobs:
         with:
           path: vtl
 
-      - uses: vlang/setup-v@v1.4
+      - uses: vlang/setup-v@v1.5
         with:
           check-latest: true
 
