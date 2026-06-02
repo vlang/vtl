@@ -18,7 +18,7 @@ jobs:
         with:
           path: vtl
 
-      - uses: vlang/setup-v@v1.5
+      - uses: vlang/setup-v@v1.6
         with:
           check-latest: true
 
