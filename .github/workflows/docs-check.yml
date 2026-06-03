@@ -31,7 +31,7 @@ jobs:
           check-latest: true
 
       - name: Install VSL dependency
-        run: v install vsl
+        run: v install vsl@v0.2.0-beta.1
 
       - name: Copy VTL source code to V Modules
         run: cp -rf ./vtl ~/.vmodules/vtl
