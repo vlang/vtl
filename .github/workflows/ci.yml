@@ -51,7 +51,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          v install vsl && \
+          v install vsl@v0.2.0-beta.1 && \
           sudo apt-get -qq update && \
           sudo apt-get -qq install \
             gfortran \
@@ -80,7 +80,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04, macos-12, macos-14]
+        os: [ubuntu-22.04, ubuntu-24.04, macos-14]
         flags: ['', '--prod']
         backend: ['pure-v', 'cblas']
       fail-fast: false
@@ -124,7 +124,7 @@ jobs:
           else
             brew install coreutils hdf5 open-mpi openblas lapack opencl-headers
           fi
-          v install vsl
+          v install vsl@v0.2.0-beta.1
 
       - name: Move VTL source code to V Modules
         run: mv ./vtl ~/.vmodules
@@ -159,7 +159,7 @@ jobs:
 
       - name: Install VSL dependency
         shell: bash
-        run: v install vsl
+        run: v install vsl@v0.2.0-beta.1
 
       - name: Move VTL source code to V Modules
         shell: bash
