@@ -4,5 +4,5 @@ Module {
 	version: '0.2.0-beta.1'
 	license: 'MIT'
 	repo_url: 'https://github.com/vlang/vtl'
-	dependencies: ['vsl@0.2.0-beta.1']
+	dependencies: ['vsl@v0.2.0-beta.1']
 }
