@@ -386,7 +386,7 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 			<div class="title"><h2>fn empty <a href="#empty">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/creation.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> empty<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> params TensorData<span class="token punctuation">)</span> <span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
-
+<p>empty exposes this operation as part of the public API.</p>
 
 </section>
 
@@ -644,7 +644,7 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 			<div class="title"><h2>type TensorDataType <a href="#TensorDataType">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/tensor_any.v#L4"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">type</span> TensorDataType <span class="token operator">=</span> <span class="token builtin">bool</span> <span class="token operator">|</span> <span class="token builtin">f32</span> <span class="token operator">|</span> <span class="token builtin">f64</span> <span class="token operator">|</span> <span class="token builtin">i16</span> <span class="token operator">|</span> <span class="token builtin">i64</span> <span class="token operator">|</span> <span class="token builtin">i8</span> <span class="token operator">|</span> <span class="token builtin">int</span> <span class="token operator">|</span> <span class="token builtin">string</span> <span class="token operator">|</span> <span class="token builtin">u16</span> <span class="token operator">|</span> <span class="token builtin">u32</span> <span class="token operator">|</span> <span class="token builtin">u64</span> <span class="token operator">|</span> <span class="token builtin">u8</span></code></pre>
-<p>TensorDataType is a sum type that lists the possible types to be used to define storage</p>
+
 
 </section>
 
@@ -780,7 +780,7 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 			<div class="title"><h2>fn (Tensor[T]) add <a href="#Tensor[T].add">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/math_op.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>a <span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> add<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>b <span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
-
+<p>add exposes this operation as part of the public API.</p>
 
 </section>
 
@@ -836,7 +836,7 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 			<div class="title"><h2>fn (Tensor[T]) argmax_axis <a href="#Tensor[T].argmax_axis">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/reduction.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> argmax_axis<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>axis <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span></code></pre>
-
+<p>argmax_axis exposes this operation as part of the public API.</p>
 
 </section>
 
@@ -876,7 +876,7 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 			<div class="title"><h2>fn (Tensor[T]) array_split <a href="#Tensor[T].array_split">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/split.v#L14"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> array_split<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>ind <span class="token builtin">int</span><span class="token punctuation">,</span> axis <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span></code></pre>
-
+<p>array_split exposes this operation as part of the public API.</p>
 
 </section>
 
@@ -892,7 +892,7 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 			<div class="title"><h2>fn (Tensor[T]) as_bool <a href="#Tensor[T].as_bool">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/cast.v#L11"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> as_bool<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">bool</span><span class="token punctuation">]</span></code></pre>
-
+<p>as_bool exposes this operation as part of the public API.</p>
 
 </section>
 
@@ -1364,7 +1364,7 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 			<div class="title"><h2>fn (Tensor[T]) get <a href="#Tensor[T].get">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/lookup.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&amp;</span>Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> get<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>index <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">T</span></code></pre>
-
+<p>get exposes this operation as part of the public API.</p>
 
 </section>
 
@@ -1764,7 +1764,7 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 			<div class="title"><h2>fn (Tensor[T]) set <a href="#Tensor[T].set">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/vtl/assignment.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> t Tensor<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> set<span class="token punctuation">[</span><span class="token builtin">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>index <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> val <span class="token builtin">T</span><span class="token punctuation">)</span></code></pre>
-
+<p>set exposes this operation as part of the public API.</p>
 
 </section>
 
@@ -2102,7 +2102,7 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
 	axis <span class="token builtin">int</span>
 <span class="token punctuation">}</span></code></pre>
-
+<p>AxisData defines a public data structure for this module.</p>
 
 </section>
 
@@ -2169,7 +2169,7 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 	iteration <span class="token builtin">int</span>
 	pos       <span class="token builtin">int</span>
 <span class="token punctuation">}</span></code></pre>
-
+<p>TensorAxisIterator defines a public data structure for this module.</p>
 
 </section>
 
@@ -2216,12 +2216,12 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 <div class="attributes"><div class="attribute">@[params]</div></div>
 <pre class="signature">
 <code><span class="token keyword">struct</span> <span class="token symbol">VclParams</span> <span class="token punctuation">{</span><span class="token punctuation">}</span></code></pre>
-
+<p>VclParams defines a public data structure for this module.</p>
 
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 8 Jun 2026 22:02:52</div>
+						<div class="footer">Powered by vdoc. Generated on: 9 Jul 2026 22:09:26</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_vtl">README</a></li>
 <li class="open"><a href="#bernoulli">fn bernoulli</a>        <ul>
