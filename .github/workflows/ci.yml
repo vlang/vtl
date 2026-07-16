@@ -44,7 +44,10 @@ jobs:
       - name: Setup V
         uses: vlang/setup-v@v1.6
         with:
-          check-latest: true
+          # Pin to weekly.2026.08 (Feb 16, 2026) — newer V commits (>=mid-July
+          # 2026) deprecated the `json` module that vtl/nn/models/serialization.v
+          # still uses. Migrating to `json2` is a separate tracked effort.
+          version: weekly.2026.08
 
       - name: V doctor
         run: v doctor
@@ -99,7 +102,10 @@ jobs:
       - name: Setup V
         uses: vlang/setup-v@v1.6
         with:
-          check-latest: true
+          # Pin to weekly.2026.08 (Feb 16, 2026) — newer V commits (>=mid-July
+          # 2026) deprecated the `json` module that vtl/nn/models/serialization.v
+          # still uses. Migrating to `json2` is a separate tracked effort.
+          version: weekly.2026.08
 
       - name: V doctor
         run: v doctor
@@ -152,7 +158,10 @@ jobs:
       - name: Setup V
         uses: vlang/setup-v@v1.6
         with:
-          check-latest: true
+          # Pin to weekly.2026.08 (Feb 16, 2026) — newer V commits (>=mid-July
+          # 2026) deprecated the `json` module that vtl/nn/models/serialization.v
+          # still uses. Migrating to `json2` is a separate tracked effort.
+          version: weekly.2026.08
 
       - name: V doctor
         run: v doctor
