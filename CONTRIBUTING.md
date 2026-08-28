@@ -101,3 +101,62 @@ which tests have failed and then fix them by making more changes. Just use
 `git push pullrequest` to publish your changes. The CI tests will
 run with your updated code. Use `hub ci-status --verbose` to monitor
 their status.
+
+## Coding standards
+
+- Run `v fmt -w .` before committing; CI runs `v fmt` checks.
+- Prefer clear, descriptive names over clever abbreviations. Public API
+  functions are `snake_case` like the rest of V.
+- Keep functions small and focused; document public API with `fn` doc
+  comments where the intent is not obvious from the name.
+- Follow the surrounding file's style — VTL mixes tensor ops, math, and
+  autograd, so match the conventions of the module you touch.
+
+## Test-writing conventions
+
+- Tests live in `tests/` and use the `_test.v` suffix (e.g.
+  `tests/math_op_test.v`). A test file for `foo.v` is `foo_test.v` next to
+  it or in `tests/` for integration-style coverage.
+- Use `assert` with a clear message; for float comparisons use a tolerance
+  (`assert abs(a - b) < 1e-6`) instead of exact equality — tensor math is
+  not bit-exact across backends.
+- When a test is expected to fail or is backend-specific (CUDA/Vulkan),
+  gate it with `$if cuda ? { ... }` blocks or a skip pattern rather than
+  deleting it. Broken CI on one backend should be visible, not silent.
+- Run the full suite locally before pushing: `./bin/test` (see README).
+
+## Commit message format
+
+- Prefix commits by area: `math:`, `nn:`, `autograd:`, `la:`, `docs:`,
+  `tests:`, `ci:` — e.g. `math: add a new function copysign`.
+- One logical change per commit; reference the issue number when one
+  exists (`nn: fix dropout mask for eval mode (#123)`).
+- Keep the message imperative and under ~72 characters for the subject.
+
+## Adding a new layer / optimizer / loss
+
+1. Place the implementation in the matching module (`nn/`, `autograd/`,
+   `ml/`), following the pattern of the closest existing layer.
+2. Add a `_test.v` covering forward, backward (if autograd), shape
+   mismatches, and a tolerance-based numerical check.
+3. Wire it into the module's public re-exports if other layers are exposed
+   there.
+4. Update `README.md` / docs when the layer is part of the public API.
+
+## Required CI gates before PR
+
+All of these must pass for a PR to be merge-ready:
+
+- `./bin/test` locally (or the equivalent `v test` on the modules you changed)
+- `v fmt` (formatting check)
+- The `.github/workflows/ci.yml` job matrix (multiple platforms/backends)
+- `ci-full-ml.yml` for changes touching `ml/` or `nn/`
+
+Use `hub ci-status --verbose` after pushing to track the jobs; fix failures
+and push again rather than dismissing a red job.
+
+## Hacktoberfest
+
+Hacktoberfest-related PRs follow the same process and gates above. A PR
+with a valid `hacktoberfest-accepted` label is one that has passed CI and
+was reviewed — quality rules are identical regardless of the month.
