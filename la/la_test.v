@@ -69,3 +69,11 @@ fn test_matmul_zero_sized_dimensions() {
 	assert result_with_empty_inner.shape == [2, 3, 4]
 	assert result_with_empty_inner.array_equal(expected)
 }
+
+fn test_matmul_column_major_operand() {
+	a := vtl.from_array([1.0, 2, 3, 4], [1, 2, 2], memory: .col_major)!
+	b := vtl.from_array([1.0, 0, 0, 1], [1, 2, 2])!
+	result := matmul(a, b)!
+	expected := vtl.from_array([1.0, 2, 3, 4], [1, 2, 2], memory: .col_major)!
+	assert result.array_equal(expected)
+}
