@@ -36,6 +36,38 @@ pub fn inv[T](t &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 
 // matmul exposes this operation as part of the public API.
 pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	if a.rank() > 2 || b.rank() > 2 {
+		if a.rank() < 2 || b.rank() < 2 || a.shape[a.rank() - 1] != b.shape[b.rank() - 2] {
+			return error('Invalid shapes for matrix multiplication ${a.shape} and ${b.shape}')
+		}
+		if b.rank() > 2 && a.shape[..a.rank() - 2] != b.shape[..b.rank() - 2] {
+			return error('Batch shapes must match for matrix multiplication ${a.shape} and ${b.shape}')
+		}
+
+		mut result_shape := a.shape[..a.rank() - 2].clone()
+		result_shape << a.shape[a.rank() - 2]
+		result_shape << b.shape[b.rank() - 1]
+		batch_size := a.size / (a.shape[a.rank() - 2] * a.shape[a.rank() - 1])
+		rows := a.shape[a.rank() - 2]
+		inner := a.shape[a.rank() - 1]
+		columns := b.shape[b.rank() - 1]
+		mut result_data := []T{len: batch_size * rows * columns}
+		for batch in 0 .. batch_size {
+			for row in 0 .. rows {
+				for column in 0 .. columns {
+					mut value := T(0)
+					for index in 0 .. inner {
+						a_offset := batch * rows * inner + row * inner + index
+						b_batch := if b.rank() > 2 { batch } else { 0 }
+						b_offset := b_batch * inner * columns + index * columns + column
+						value += a.get_nth(a_offset) * b.get_nth(b_offset)
+					}
+					result_data[batch * rows * columns + row * columns + column] = value
+				}
+			}
+		}
+		return vtl.from_array(result_data, result_shape)
+	}
 	a.assert_matrix()!
 	b.assert_matrix()!
 	if a.shape[1] != b.shape[0] {

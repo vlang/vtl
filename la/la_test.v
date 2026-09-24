@@ -39,11 +39,10 @@ fn test_matmul_1() {
 fn test_matmul_2() {
 	a := vtl.seq[f64](2 * 2 * 4).reshape([2, 2, 4])!
 	b := vtl.seq[f64](2 * 2 * 4).reshape([2, 4, 2])!
-	if _ := matmul(a, b) {
-		assert false
-	} else {
-		assert true
-	}
+	expected := vtl.from_array([28.0, 34, 76, 98, 428, 466, 604, 658], [2, 2, 2])!
+	result := matmul(a, b)!
+	assert result.shape == [2, 2, 2]
+	assert result.array_equal(expected)
 }
 
 fn test_matmul_3() {
