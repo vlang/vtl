@@ -41,6 +41,8 @@ fn test_matmul_2() {
 	b := vtl.seq[f64](2 * 2 * 4).reshape([2, 4, 2])!
 	result := matmul(a, b)!
 	assert result.shape == [2, 2, 2]
+	expected := vtl.from_array([28.0, 34, 76, 98, 428, 466, 604, 658], [2, 2, 2])!
+	assert result.array_equal(expected)
 }
 
 fn test_matmul_broadcasts_batch_dimensions() {
