@@ -54,3 +54,18 @@ fn test_matmul_3() {
 		assert true
 	}
 }
+
+fn test_matmul_zero_sized_dimensions() {
+	a := vtl.from_array([]f64{}, [2, 0, 4])!
+	b := vtl.seq[f64](2 * 4 * 3).reshape([2, 4, 3])!
+	result := matmul(a, b)!
+	assert result.shape == [2, 0, 3]
+	assert result.size == 0
+
+	c := vtl.from_array([]f64{}, [2, 3, 0])!
+	d := vtl.from_array([]f64{}, [2, 0, 4])!
+	expected := vtl.zeros[f64]([2, 3, 4])
+	result_with_empty_inner := matmul(c, d)!
+	assert result_with_empty_inner.shape == [2, 3, 4]
+	assert result_with_empty_inner.array_equal(expected)
+}

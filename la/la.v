@@ -47,10 +47,15 @@ pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
 		mut result_shape := a.shape[..a.rank() - 2].clone()
 		result_shape << a.shape[a.rank() - 2]
 		result_shape << b.shape[b.rank() - 1]
-		batch_size := a.size / (a.shape[a.rank() - 2] * a.shape[a.rank() - 1])
+		mut batch_size := 1
+		for dimension in a.shape[..a.rank() - 2] {
+			batch_size *= dimension
+		}
 		rows := a.shape[a.rank() - 2]
 		inner := a.shape[a.rank() - 1]
 		columns := b.shape[b.rank() - 1]
+		a_data := a.copy(.row_major).to_array()
+		b_data := b.copy(.row_major).to_array()
 		mut result_data := []T{len: batch_size * rows * columns}
 		for batch in 0 .. batch_size {
 			for row in 0 .. rows {
@@ -60,7 +65,7 @@ pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
 						a_offset := batch * rows * inner + row * inner + index
 						b_batch := if b.rank() > 2 { batch } else { 0 }
 						b_offset := b_batch * inner * columns + index * columns + column
-						value += a.get_nth(a_offset) * b.get_nth(b_offset)
+						value += a_data[a_offset] * b_data[b_offset]
 					}
 					result_data[batch * rows * columns + row * columns + column] = value
 				}
