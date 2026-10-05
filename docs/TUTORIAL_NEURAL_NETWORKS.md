@@ -126,9 +126,7 @@ and scheduler usage.
 
 ## Conv1D for sequence data
 
-`Sequential.conv1d` consumes channel-first tensors shaped `[batch, channels,
-length]`. The layer supports stride, padding, dilation, and grouped channels;
-its CPU backward computes gradients for the input, kernel, and bias.
+`Sequential.conv1d` consumes channel-first tensors shaped `[batch, channels, length]`. The layer supports stride, padding, dilation, and grouped channels; its CPU backward computes gradients for the input, kernel, and bias.
 
 ```v
 import vtl
@@ -140,15 +138,35 @@ ctx := autograd.ctx[f64]()
 mut model := models.sequential_from_ctx[f64](ctx)
 model.input([1, 5])
 model.conv1d(2, 3, layers.Conv1DConfig{padding: 1})
-model.tanh()
-mut sequence := ctx.variable(vtl.from_array([0.1, 0.2, 0.3, 0.4, 0.5], [1, 1, 5])!)
-mut output := model.forward(sequence)!
+sequence := vtl.from_array([0.1, 0.2, 0.3, 0.4, 0.5], [1, 1, 5])!
+mut input := ctx.variable(sequence)
+mut output := model.forward(input)!
 println(output.value.shape) // [1, 2, 5]
 output.backprop()!
 ```
 
-See the runnable [Conv1D example](../examples/nn_conv1d/) for a complete
-forward and backward pass.
+See the runnable [Conv1D example](../examples/nn_conv1d/) for a complete forward and backward pass.
+
+## Recurrent GRU layer
+
+The standalone `vtl.nn.layers.gru_layer` API accepts `[sequence, batch, input_features]` and returns `[sequence, batch, hidden_size]`. Its reset, update, and candidate weights use PyTorch's `[reset, update, new]` gate order. The layer starts with a zero hidden state; the lower-level `vtl.nn.internal.gru_forward_single` also accepts an explicit initial state. CPU backpropagation computes gradients for the input and four parameter tensors.
+
+```v
+import vtl
+import vtl.autograd
+import vtl.nn.layers
+
+ctx := autograd.ctx[f64]()
+layer := layers.gru_layer[f64](ctx, 2, 4)
+sequence := vtl.from_array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6], [3, 1, 2])!
+mut input := ctx.variable(sequence)
+mut output := layer.forward(input)!
+println(output.value.shape) // [3, 1, 4]
+output.backprop()!
+println(input.grad.shape) // [3, 1, 2]
+```
+
+See the runnable [GRU example](../examples/nn_gru/) for a complete forward and backward smoke test. GRU is not yet wired into the `Sequential` builder.
 
 ## Training loop
 
