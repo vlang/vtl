@@ -221,3 +221,56 @@ pub fn (t &Tensor[T]) alike[T](other &Tensor[T]) !&Tensor[bool] {
 	}
 	return ret
 }
+
+// isclose compares tensors elementwise using NumPy's asymmetric tolerance rule:
+// abs(a - b) <= atol + rtol * abs(b). The returned tensor has the broadcast
+// shape of the inputs. NaNs compare false unless equal_nan is true.
+
+// IsCloseData configures relative and absolute tolerances and NaN comparison.
+@[params]
+pub struct IsCloseData {
+pub:
+	rtol      f64 = 1e-5
+	atol      f64 = 1e-8
+	equal_nan bool
+}
+
+pub fn (t &Tensor[T]) isclose[T](other &Tensor[T], params IsCloseData) !&Tensor[bool] {
+	if params.rtol < 0 || params.atol < 0 || math.is_nan(params.rtol) || math.is_nan(params.atol)
+		|| math.is_inf(params.rtol, 0) || math.is_inf(params.atol, 0) {
+		return error('rtol and atol must be non-negative finite numbers')
+	}
+	mut iters, shape := t.iterators[T]([other])!
+	mut ret := empty[bool](shape)
+	for {
+		vals, i := iters.next() or { break }
+		a := td[T](vals[0]).f64()
+		b := td[T](vals[1]).f64()
+		ret.set(i, isclose_values(a, b, params.rtol, params.atol, params.equal_nan))
+	}
+	return ret
+}
+
+// allclose returns true if all broadcasted elements satisfy isclose.
+pub fn (t &Tensor[T]) allclose[T](other &Tensor[T], params IsCloseData) !bool {
+	return t.isclose[T](other, params)!.all()
+}
+
+fn isclose_values(a f64, b f64, rtol f64, atol f64, equal_nan bool) bool {
+	if a == b {
+		return true
+	}
+	if math.is_nan(a) || math.is_nan(b) {
+		return equal_nan && math.is_nan(a) && math.is_nan(b)
+	}
+	if math.is_inf(a, 0) || math.is_inf(b, 0) {
+		return false
+	}
+	// Scale before subtracting so finite values near f64's maximum cannot
+	// overflow both sides of the comparison and incorrectly compare close.
+	scale := math.max(math.max(math.abs(a), math.abs(b)), atol)
+	if scale == 0 {
+		return true
+	}
+	return math.abs(a / scale - b / scale) <= atol / scale + rtol * math.abs(b / scale)
+}
