@@ -34,10 +34,11 @@ fn expect_clip_error(values &vtl.Tensor[f64], min_value f64, max_value f64) {
 fn test_isclose_numpy_rule_and_broadcast() {
 	a := vtl.from_array([100.0, 1.0, 3.0, 4.0], [2, 2])!
 	b := vtl.from_1d([100.0005, 2.0])!
-	got := a.isclose(b, 1e-5, 1e-8, false)!
+	got := a.isclose(b, rtol: 1e-5, atol: 1e-8)!
 	expected := vtl.from_array([true, false, false, false], [2, 2])!
 	assert got.array_equal(expected)
-	assert a.allclose(b, 1e-5, 1e-8, false)! == false
+	assert !a.allclose(b, rtol: 1e-5, atol: 1e-8)!
+	assert a.allclose(a)!
 }
 
 fn test_isclose_nan_infinity_and_large_finite_values() {
@@ -45,7 +46,7 @@ fn test_isclose_nan_infinity_and_large_finite_values() {
 	inf := math.inf(1)
 	left := vtl.from_1d([nan, nan, inf, inf, 1.7e308, -1.7e308])!
 	right := vtl.from_1d([nan, 1.0, inf, -inf, -1.7e308, 1.7e308])!
-	got := left.isclose(right, 1.0, 0.0, true)!
+	got := left.isclose(right, rtol: 1.0, atol: 0.0, equal_nan: true)!
 	expected := vtl.from_1d([true, false, true, false, false, false])!
 	assert got.array_equal(expected)
 }
@@ -57,7 +58,7 @@ fn test_isclose_rejects_invalid_tolerances() {
 }
 
 fn expect_isclose_error(a &vtl.Tensor[f64], rtol f64, atol f64) {
-	a.isclose(a, rtol, atol, false) or { return }
+	a.isclose(a, rtol: rtol, atol: atol) or { return }
 	panic('expected invalid tolerance to return an error')
 }
 }
