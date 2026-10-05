@@ -71,6 +71,16 @@ For example, adding a bias vector `[out_features]` to a batch of activations
 
 ## Common pitfalls
 
+Use `clip(min_value, max_value)` to bound every element. Bounds are scalar,
+inclusive, use the tensor element type, and the result preserves that type.
+
+```v
+import vtl
+
+values := vtl.from_1d([-2.0, 0.5, 8.0])!
+println(values.clip(0.0, 1.0)!) // [0.0, 0.5, 1.0]
+```
+
 | Mistake | Fix |
 |---------|-----|
 | Adding `[n]` to `[m, n]` when you mean column-wise | Reshape to `[n, 1]` first |
