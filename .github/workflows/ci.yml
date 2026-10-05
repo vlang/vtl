@@ -81,9 +81,28 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-22.04, ubuntu-24.04, macos-14]
-        flags: ['', '--prod']
-        backend: ['pure-v', 'cblas']
+        # Keep representative coverage for both supported OS families,
+        # Linux releases, pure-V/CBLAS, and optimized production builds
+        # without multiplying every dimension into twelve runner jobs.
+        include:
+          - os: ubuntu-22.04
+            flags: ''
+            backend: pure-v
+          - os: ubuntu-24.04
+            flags: ''
+            backend: pure-v
+          - os: ubuntu-24.04
+            flags: ''
+            backend: cblas
+          - os: ubuntu-24.04
+            flags: '--prod'
+            backend: pure-v
+          - os: ubuntu-24.04
+            flags: '--prod'
+            backend: cblas
+          - os: macos-14
+            flags: ''
+            backend: pure-v
       fail-fast: false
 
     env:
