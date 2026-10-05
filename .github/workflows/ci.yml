@@ -159,7 +159,7 @@ jobs:
           ~/.vmodules/vtl/bin/test ${{ matrix.flags }} $backend_flag
 
   windows-smoke:
-    name: Windows tensor creation smoke
+    name: Windows core and autograd tests
     runs-on: windows-latest
     env:
       VJOBS: '2'
@@ -188,6 +188,14 @@ jobs:
           mkdir -p ~/.vmodules
           mv ./vtl ~/.vmodules/vtl
 
-      - name: Run Windows creation regression
+      - name: Run Windows core tensor tests
         shell: bash
-        run: v test ~/.vmodules/vtl/tests/core/creation_test.v
+        run: |
+          cd ~/.vmodules
+          v test vtl/tests/core
+
+      - name: Run Windows autograd gate tests
+        shell: bash
+        run: |
+          cd ~/.vmodules
+          v test vtl/autograd_tests
