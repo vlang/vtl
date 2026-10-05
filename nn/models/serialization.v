@@ -1,6 +1,6 @@
 module models
 
-import json
+import json2
 import os
 import vtl
 import vtl.autograd
@@ -253,7 +253,7 @@ pub fn (nn &Sequential[T]) save_checkpoint(path string, epoch int, loss f64) ! {
 		metadata:   metadata
 	}
 
-	os.write_file(path, json.encode(model))!
+	os.write_file(path, json2.encode(model, escape_unicode: true, time_as_unix: true))!
 }
 
 // load_checkpoint restores a Sequential model's weights and training metadata from a JSON file.
@@ -262,7 +262,7 @@ pub fn (nn &Sequential[T]) save_checkpoint(path string, epoch int, loss f64) ! {
 // This method loads weights into an existing model.
 pub fn Sequential.load_checkpoint[T](path string) !(int, f64) {
 	data := os.read_file(path)!
-	model := json.decode(ModelFile, data)!
+	model := json2.decode[ModelFile](data)!
 
 	// Version compatibility check
 	if model.version != model_version {
@@ -276,7 +276,7 @@ pub fn Sequential.load_checkpoint[T](path string) !(int, f64) {
 // The model's layers must already be constructed in the same order as when saved.
 pub fn (nn &Sequential[T]) load_weights(path string) ! {
 	data := os.read_file(path)!
-	model := json.decode(ModelFile, data)!
+	model := json2.decode[ModelFile](data)!
 
 	// Version check
 	if model.version != model_version {
@@ -474,7 +474,7 @@ fn decode_tensor[T](encoded string, shape []int) !&vtl.Tensor[T] {
 // Returns an error with details if incompatible.
 pub fn validate_model_compatibility[T](saved_path string, model_layers []types.Layer[T]) !bool {
 	data := os.read_file(saved_path)!
-	model := json.decode(ModelFile, data)!
+	model := json2.decode[ModelFile](data)!
 
 	if model.version != model_version {
 		return error('Model version mismatch: expected ${model_version}, got ${model.version}')
