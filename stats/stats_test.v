@@ -238,6 +238,18 @@ fn test_max() {
 	assert o == f64(76.122)
 }
 
+fn test_minmax_indices_keep_first_tie_without_copying() {
+	data := vtl.from_1d([f64(3), f64(1), f64(4), f64(1)])!
+	min_value, max_value := minmax(data)
+	min_at, max_at := minmax_index(data)
+	assert min_value == 1
+	assert max_value == 4
+	assert min_at == 1
+	assert max_at == 2
+	assert min_index(data) == min_at
+	assert max_index(data) == max_at
+}
+
 fn test_range() {
 	// Tests were also verified on Wolfram Alpha
 	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)])!
