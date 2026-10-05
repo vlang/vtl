@@ -23,7 +23,7 @@ tests, documentation, and examples where users need them.
 |---|---|---|
 | Array creation | zeros/ones/full/eye/range/sequence, `arange` with start/stop/step, endpoint-aware `linspace`, configurable `logspace`, from arrays, two-vector 2-D `meshgrid` with `xy` indexing | Validate edge cases; add N-D mesh grids and consistent dtype/device options |
 | Shape and manipulation | reshape, transpose, squeeze/expand, move/roll axes, concatenate/stack/split | Add parity tests for flatten/ravel, repeat/tile, flip/rotations, broadcasting helpers, and copy-vs-view behavior |
-| Indexing | Integer indexing, slices, `take` gathers, lookup helpers, DataLoader gathers, exact-shape boolean `masked_select`/`masked_fill`, `take_along_axis` in PR #168 | Add general fancy indexing, broadcast masks, scatter/put, and document all bounds semantics |
+| Indexing | Integer indexing, slices, `take`/`take_along_axis` gathers, lookup helpers, DataLoader gathers, exact-shape boolean `masked_select`/`masked_fill` | Add general fancy indexing, broadcast masks, scatter/put, and document all bounds semantics |
 | Math and ufuncs | Broad elementwise math and broadcasting; scalar-bound `clip`, broadcast-aware `where`, `isclose`, and `allclose` | Audit the full unary/binary function families, `heaviside`, `sign`, and dtype promotion |
 | Reductions | Scalar population/sample variance and standard deviation; linearly interpolated `quantile_linear`; axis arg reductions | Add/verify `keepdims`, NaN-aware variants, accumulator dtype, per-axis statistical reductions, and percentile aliases |
 | Linear algebra | VSL-backed matmul, solve, QR/LU/Cholesky, pseudoinverse, trace | Add decomposition and norm coverage; specify singular and non-finite behavior; benchmark realistic shapes |

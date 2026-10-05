@@ -30,6 +30,38 @@ pub fn (t &Tensor[T]) take[T](indices []int, axis int) !&Tensor[T] {
 	return result
 }
 
+// take_along_axis gathers values using an index tensor with the same rank as
+// the receiver. Dimensions must match except along `axis`.
+pub fn (t &Tensor[T]) take_along_axis[T](indices &Tensor[int], axis int) !&Tensor[T] {
+	rank := t.rank()
+	axis_index := if axis < 0 { axis + rank } else { axis }
+	if axis_index < 0 || axis_index >= rank {
+		return error('take_along_axis axis ${axis} is out of range for rank ${rank}')
+	}
+	if indices.rank() != rank {
+		return error('take_along_axis index tensor must have rank ${rank}')
+	}
+	for dimension in 0 .. rank {
+		if dimension != axis_index && indices.shape[dimension] != t.shape[dimension] {
+			return error('take_along_axis index shape must match tensor shape outside the selected axis')
+		}
+	}
+
+	mut result := empty[T](indices.shape, memory: t.memory)
+	for flat_index in 0 .. result.size {
+		result_index := result.nth_index(flat_index)
+		mut input_index := result_index.clone()
+		selected := indices.get(result_index)
+		selected_index := if selected < 0 { selected + t.shape[axis_index] } else { selected }
+		if selected_index < 0 || selected_index >= t.shape[axis_index] {
+			return error('take_along_axis index ${selected} is out of range for axis size ${t.shape[axis_index]}')
+		}
+		input_index[axis_index] = selected_index
+		result.set(result_index, t.get(input_index))
+	}
+	return result
+}
+
 // get returns a scalar value from a Tensor at the provided index
 
 // get exposes this operation as part of the public API.
