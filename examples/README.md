@@ -50,7 +50,7 @@ CIFAR examples for CI-safe checks.
 | [nn_cifar10_cuda](./nn_cifar10_cuda) | CUDA/cuBLAS/cuDNN via VSL | `VTL_USE_CUDA=1 v -d cuda run vtl/examples/nn_cifar10_cuda/main.v` |
 | [nn_cifar10_vulkan](./nn_cifar10_vulkan) | Vulkan f32 Linear/Conv2D/ReLU/Adam via VSL | `VTL_USE_VULKAN=1 v -prod -d vulkan run vtl/examples/nn_cifar10_vulkan/main.v` |
 | [nn_cifar10_f32_vulkan_tiny_synth](./nn_cifar10_f32_vulkan_tiny_synth) | f32 Vulkan-shaped tiny smoke | `VTL_USE_VULKAN=1 v -prod -d vulkan run vtl/examples/nn_cifar10_f32_vulkan_tiny_synth/main.v` |
-| [vtl_opencl_vcl_support](./vtl_opencl_vcl_support) | OpenCL/VCL support notes | See example README |
+| [vtl_opencl_vcl_support](./vtl_opencl_vcl_support) | OpenCL VTL tensor transfer and VCL compute smoke | `v -d vcl run vtl/examples/vtl_opencl_vcl_support/main.v` |
 
 ## Datasets and plotting
 
