@@ -10,6 +10,7 @@ on:
   schedule:
     - cron: '31 1,12 * * *'
   push:
+    branches: [main]
     paths-ignore:
       - '**.md'
       - '**.yml'
