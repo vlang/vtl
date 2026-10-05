@@ -65,3 +65,40 @@ fn test_clip_grad_norm_rejects_invalid_limit() {
 	}
 	assert false, 'expected clip_grad_norm to reject a zero limit'
 }
+
+fn test_clip_grad_value_clamps_trainable_elements() ! {
+	context := autograd.ctx[f64]()
+	parameter := context.variable(vtl.from_1d([0.0, 0.0, 0.0])!)
+	parameter.grad.set_nth(0, -4.0)
+	parameter.grad.set_nth(1, 0.5)
+	parameter.grad.set_nth(2, 3.0)
+	mut parameters := [parameter]
+	clip_grad_value[f64](mut parameters, 1.0)!
+
+	assert parameter.grad.get_nth(0) == -1.0
+	assert parameter.grad.get_nth(1) == 0.5
+	assert parameter.grad.get_nth(2) == 1.0
+}
+
+fn test_clip_grad_value_rejects_invalid_limit() {
+	context := autograd.ctx[f64]()
+	parameter := context.variable(vtl.from_1d([0.0])!)
+	mut parameters := [parameter]
+	clip_grad_value[f64](mut parameters, 0.0) or {
+		assert err.msg().contains('max_value must be finite and greater than zero')
+		return
+	}
+	assert false, 'expected clip_grad_value to reject a zero limit'
+}
+
+fn test_clip_grad_norm_rejects_non_finite_gradients() {
+	context := autograd.ctx[f64]()
+	parameter := context.variable(vtl.from_1d([0.0])!)
+	parameter.grad.set_nth(0, math.inf(1))
+	mut parameters := [parameter]
+	_ := clip_grad_norm[f64](mut parameters, 1.0) or {
+		assert err.msg().contains('gradient norm must be finite')
+		return
+	}
+	assert false, 'expected clip_grad_norm to reject a non-finite norm'
+}
