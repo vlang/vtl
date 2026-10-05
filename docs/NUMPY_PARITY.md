@@ -23,7 +23,7 @@ tests, documentation, and examples where users need them.
 |---|---|---|
 | Array creation | zeros/ones/full/eye/range/sequence, from arrays | Validate edge cases, add `arange`-style start/step, `linspace`, `logspace`, mesh grids, and consistent dtype/device options |
 | Shape and manipulation | reshape, transpose, squeeze/expand, move/roll axes, concatenate/stack/split | Add parity tests for flatten/ravel, repeat/tile, flip/rotations, broadcasting helpers, and copy-vs-view behavior |
-| Indexing | Integer indexing, slices, `take` gathers, lookup helpers, DataLoader gathers | Add advanced/fancy indexing, boolean masks, `take_along_axis`, scatter/put, and documented bounds semantics |
+| Indexing | Integer indexing, slices, `take` gathers, lookup helpers, DataLoader gathers, exact-shape boolean `masked_select`/`masked_fill`, `take_along_axis` in PR #168 | Add general fancy indexing, broadcast masks, scatter/put, and document all bounds semantics |
 | Math and ufuncs | Broad elementwise math and broadcasting | Audit the full unary/binary function families, `where`, `clip`, `heaviside`, `sign`, `isclose`, `allclose`, and dtype promotion |
 | Reductions | Sum/product/min/max/mean and statistics | Add/verify variance, standard deviation, quantile/percentile, arg reductions, NaN-aware variants, accumulator dtype, and `keepdims` |
 | Linear algebra | VSL-backed matmul, solve, QR/LU/Cholesky, pseudoinverse, trace | Add decomposition and norm coverage; specify singular and non-finite behavior; benchmark realistic shapes |

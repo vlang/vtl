@@ -98,6 +98,26 @@ println(columns.to_array()) // [2, 0, 5, 3]
 An index outside the selected axis returns an error. Use `slice` when you
 need a range-based view instead of a gathered copy.
 
+## Boolean masks
+
+`masked_select` returns a one-dimensional tensor containing values where the
+same-shaped boolean mask is true, in row-major logical order. `masked_fill`
+returns a copy with matching positions replaced by a scalar value.
+
+```v
+import vtl
+
+values := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
+mask := vtl.from_2d([[true, false, true], [false, true, false]])!
+selected := values.masked_select(mask)!
+filled := values.masked_fill(mask, 0)!
+println(selected.to_array()) // [1, 3, 5]
+println(filled.to_array()) // [0, 2, 0, 4, 0, 6]
+```
+
+The mask shape must match the tensor shape exactly. These methods also respect
+logical iteration order for transposed and sliced views.
+
 ## Slice Mutations
 
 Slices can also be mutated with a single value, a nested sequence or array,
