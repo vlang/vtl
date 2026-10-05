@@ -115,6 +115,68 @@ fn test_transpose() {
 	assert tt.shape == [3, 2]
 }
 
+fn test_moveaxis() {
+	t := vtl.from_array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+		20, 21, 22, 23],
+		[2, 3, 4])!
+	moved := t.moveaxis([0], [1])!
+	assert moved.shape == [3, 2, 4]
+	assert moved.get([2, 1, 3]) == 23
+	assert t.get([1, 2, 3]) == 23
+
+	moved_multiple := t.moveaxis([0, -1], [-1, 0])!
+	assert moved_multiple.shape == [4, 3, 2]
+	assert moved_multiple.get([3, 2, 1]) == 23
+
+	mut base := vtl.from_array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+		19, 20, 21, 22, 23],
+		[2, 3, 4])!
+	mut view := base.moveaxis([0], [1])!
+	view.set([2, 1, 3], -1)
+	assert base.get([1, 2, 3]) == -1
+}
+
+fn test_moveaxis_rejects_invalid_axes() {
+	t := vtl.ones[int]([2, 3, 4])
+	if _ := t.moveaxis([0], [0, 1]) {
+		assert false, 'moveaxis must reject mismatched axis lists'
+	} else {
+		assert true
+	}
+	if _ := t.moveaxis([0, 0], [1, 2]) {
+		assert false, 'moveaxis must reject duplicate source axes'
+	} else {
+		assert true
+	}
+	if _ := t.moveaxis([0, 1], [2, 2]) {
+		assert false, 'moveaxis must reject duplicate destination axes'
+	} else {
+		assert true
+	}
+	if _ := t.moveaxis([3], [0]) {
+		assert false, 'moveaxis must reject out-of-range axes'
+	} else {
+		assert true
+	}
+}
+
+fn test_rollaxis() {
+	t := vtl.ones[int]([2, 3, 4])
+	assert t.rollaxis(2, 0)!.shape == [4, 2, 3]
+	assert t.rollaxis(0, 3)!.shape == [3, 4, 2]
+	assert t.rollaxis(-1, 1)!.shape == [2, 4, 3]
+	if _ := t.rollaxis(3, 0) {
+		assert false, 'rollaxis must reject out-of-range axes'
+	} else {
+		assert true
+	}
+	if _ := t.rollaxis(0, 4) {
+		assert false, 'rollaxis must reject out-of-range start positions'
+	} else {
+		assert true
+	}
+}
+
 fn test_slice() {
 	a := vtl.from_array([0.0, 1, 2, 3, 4, 5, 6, 7, 8], [3, 3])!
 	slice := a.slice([0])!

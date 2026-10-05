@@ -191,6 +191,76 @@ pub fn (t &Tensor[T]) swapaxes[T](a1 int, a2 int) !&Tensor[T] {
 	return t.transpose(order)
 }
 
+// moveaxis returns a view with the axes in `source` moved to `destination`.
+// Axis positions may be negative, and the remaining axes keep their order.
+pub fn (t &Tensor[T]) moveaxis[T](source []int, destination []int) !&Tensor[T] {
+	rank := t.rank()
+	if source.len != destination.len {
+		return error('moveaxis source and destination must have the same number of axes')
+	}
+	mut normalized_source := []int{cap: source.len}
+	mut destination_order := []int{len: rank, init: -1}
+	for i, source_axis in source {
+		source_index := if source_axis < 0 { source_axis + rank } else { source_axis }
+		destination_axis := destination[i]
+		destination_index := if destination_axis < 0 {
+			destination_axis + rank
+		} else {
+			destination_axis
+		}
+		if source_index < 0 || source_index >= rank {
+			return error('moveaxis source axis ${source_axis} is out of range for rank ${rank}')
+		}
+		if destination_index < 0 || destination_index >= rank {
+			return error('moveaxis destination axis ${destination_axis} is out of range for rank ${rank}')
+		}
+		if source_index in normalized_source {
+			return error('moveaxis source axes must be unique')
+		}
+		if destination_order[destination_index] != -1 {
+			return error('moveaxis destination axes must be unique')
+		}
+		normalized_source << source_index
+		destination_order[destination_index] = source_index
+	}
+
+	mut remaining := []int{cap: rank - normalized_source.len}
+	for axis in 0 .. rank {
+		if axis !in normalized_source {
+			remaining << axis
+		}
+	}
+	mut order := []int{cap: rank}
+	mut remaining_index := 0
+	for axis in 0 .. rank {
+		if destination_order[axis] >= 0 {
+			order << destination_order[axis]
+		} else {
+			order << remaining[remaining_index]
+			remaining_index++
+		}
+	}
+	return t.transpose(order)
+}
+
+// rollaxis moves `axis` backwards until it lies before `start` and returns a view.
+// Negative axis positions are counted from the end of the tensor.
+pub fn (t &Tensor[T]) rollaxis[T](axis int, start int) !&Tensor[T] {
+	rank := t.rank()
+	mut normalized_axis := if axis < 0 { axis + rank } else { axis }
+	mut normalized_start := if start < 0 { start + rank } else { start }
+	if normalized_axis < 0 || normalized_axis >= rank {
+		return error('rollaxis axis ${axis} is out of range for rank ${rank}')
+	}
+	if normalized_start < 0 || normalized_start > rank {
+		return error('rollaxis start ${start} is out of range for rank ${rank}')
+	}
+	if normalized_axis < normalized_start {
+		normalized_start--
+	}
+	return t.moveaxis([normalized_axis], [normalized_start])
+}
+
 fn fabs(x f64) f64 {
 	return if x > 0.0 { x } else { -x }
 }

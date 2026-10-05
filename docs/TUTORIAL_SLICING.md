@@ -60,6 +60,27 @@ println(slice3)
 println(slice3.shape) // [3, 5]
 ```
 
+## Moving axes
+
+Use `moveaxis` to move one or more dimensions while preserving the order of
+the others. `rollaxis` moves one dimension before a chosen position. Both
+return tensor views, so the data is not copied.
+
+```v
+import vtl
+
+video := vtl.from_array([]f32{len: 2 * 3 * 4, init: f32(index)}, [2, 3, 4])!
+batch_last := video.moveaxis([0], [-1])!
+println(batch_last.shape) // [3, 4, 2]
+
+frames_first := video.rollaxis(2, 0)!
+println(frames_first.shape) // [4, 2, 3]
+```
+
+Axes can be negative, counting from the end. For example,
+`moveaxis([0], [-1])` moves the first axis to the last position. The source
+and destination lists must have the same length and contain unique axes.
+
 ## Slice Mutations
 
 Slices can also be mutated with a single value, a nested sequence or array,
