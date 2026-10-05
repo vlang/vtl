@@ -83,11 +83,13 @@ jobs:
 
     strategy:
       matrix:
-        # Exercise the oldest supported Linux release, the current Linux
-        # release with CBLAS and an optimized pure-V build, and macOS. Each
-        # backend/build mode is covered without running the full cross product.
+        # Exercise both supported Linux releases, pure-V and CBLAS, an
+        # optimized pure-V build, and macOS without running the full cross product.
         include:
           - os: ubuntu-22.04
+            flags: ''
+            backend: pure-v
+          - os: ubuntu-24.04
             flags: ''
             backend: pure-v
           - os: ubuntu-24.04
