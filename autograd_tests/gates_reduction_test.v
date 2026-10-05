@@ -78,9 +78,9 @@ fn test_stack_variables_without_grad_tracking() {
 
 fn test_autograd_stack_rejects_different_input_shapes() {
 	f64_ctx := autograd.ctx[f64]()
-	x := f64_ctx.variable(vtl.from_1d([1.0, 2.0])!)
-	y := f64_ctx.variable(vtl.from_2d([[3.0, 4.0]])!)
-	_ := autograd.stack[f64]([x, y], axis: 0) or {
+	x := f64_ctx.variable(vtl.from_2d([[1.0, 2.0], [3.0, 4.0]])!)
+	y := f64_ctx.variable(vtl.from_1d([5.0, 6.0])!)
+	_ := autograd.stack[f64]([x, y], axis: 2) or {
 		assert err.msg().contains('same shape')
 		return
 	}
