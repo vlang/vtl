@@ -1,5 +1,7 @@
 module autograd
 
+import vtl
+
 // add Adds two variables together.
 pub fn (v &Variable[T]) add(other &Variable[T]) !&Variable[T] {
 	mut result := v.context.variable(v.value.add(other.value)!)
@@ -287,4 +289,57 @@ pub fn (v &Variable[T]) transpose_op(perm []int) !&Variable[T] {
 		g.cache(mut result, v)!
 	}
 	return result
+}
+
+// concatenate joins variables along an existing axis and routes gradients back
+// to each input. All variables must have compatible shapes and share a context.
+pub fn concatenate[T](variables []&Variable[T], data vtl.AxisData) !&Variable[T] {
+	if variables.len == 0 {
+		return error('cannot concatenate an empty list of variables')
+	}
+	first := variables[0]
+	mut tensors := []&vtl.Tensor[T]{cap: variables.len}
+	mut splits := []int{cap: variables.len}
+	mut track_gradient := false
+	for variable in variables {
+		if variable.context != first.context {
+			return error('all variables must share the same autograd context')
+		}
+		tensors << variable.value
+		track_gradient = track_gradient || variable.requires_grad
+	}
+	value := vtl.concatenate[T](tensors, data)!
+	axis := if data.axis < 0 { data.axis + value.rank() } else { data.axis }
+	for variable in variables {
+		splits << variable.value.shape[axis]
+	}
+	mut result := first.context.variable(value)
+	if track_gradient {
+		gate := concat_gate[T](axis, splits)
+		gate.cache(mut result, ...variables)!
+	}
+	return result
+}
+
+// stack inserts a new axis and joins variables along it. Its backward pass
+// removes that axis through each input's reshape gate.
+pub fn stack[T](variables []&Variable[T], data vtl.AxisData) !&Variable[T] {
+	if variables.len == 0 {
+		return error('cannot stack an empty list of variables')
+	}
+	first := variables[0]
+	axis := if data.axis < 0 { data.axis + first.value.rank() + 1 } else { data.axis }
+	if axis < 0 || axis > first.value.rank() {
+		return error('axis out of range')
+	}
+	mut expanded := []&Variable[T]{cap: variables.len}
+	for variable in variables {
+		if variable.context != first.context {
+			return error('all variables must share the same autograd context')
+		}
+		mut shape := variable.value.shape.clone()
+		shape.insert(axis, 1)
+		expanded << variable.reshape(shape)!
+	}
+	return concatenate[T](expanded, axis: axis)
 }
