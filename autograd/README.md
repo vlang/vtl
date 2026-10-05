@@ -31,8 +31,8 @@ fn square(input &autograd.Variable[f64]) !&autograd.Variable[f64] {
 }
 
 context := autograd.ctx[f64]()
-x := context.variable(vtl.from_1d([2.0])!)
-matches := autograd.grad_check[f64](x, square, 1e-5, 1e-6)!
+mut x := context.variable(vtl.from_1d([2.0])!)
+matches := autograd.grad_check[f64](mut x, square, 1e-5, 1e-6)!
 assert matches
 assert x.grad.get_nth(0) == 4.0
 ```
