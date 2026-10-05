@@ -25,7 +25,7 @@ tests, documentation, and examples where users need them.
 | Shape and manipulation | reshape, transpose, squeeze/expand, move/roll axes, concatenate/stack/split | Add parity tests for flatten/ravel, repeat/tile, flip/rotations, broadcasting helpers, and copy-vs-view behavior |
 | Indexing | Integer indexing, slices, `take` gathers, lookup helpers, DataLoader gathers | Add advanced/fancy indexing, boolean masks, `take_along_axis`, scatter/put, and documented bounds semantics |
 | Math and ufuncs | Broad elementwise math and broadcasting | Audit the full unary/binary function families, `where`, `clip`, `heaviside`, `sign`, `isclose`, `allclose`, and dtype promotion |
-| Reductions | Sum/product/min/max/mean and statistics | Add/verify variance, standard deviation, quantile/percentile, arg reductions, NaN-aware variants, accumulator dtype, and `keepdims` |
+| Reductions | Scalar population/sample variance and standard deviation; linearly interpolated `quantile_linear`; axis arg reductions | Add/verify `keepdims`, NaN-aware variants, accumulator dtype, per-axis statistical reductions, and percentile aliases |
 | Linear algebra | VSL-backed matmul, solve, QR/LU/Cholesky, pseudoinverse, trace | Add decomposition and norm coverage; specify singular and non-finite behavior; benchmark realistic shapes |
 | FFT | VSL FFT integration exists in the ecosystem | Expose a coherent VTL API for N-D transforms, real transforms, frequencies, and normalization with examples |
 | Random | Random tensor creation | Design explicit generator state and reproducibility, distributions, sampling, and seeding guarantees |

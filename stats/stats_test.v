@@ -37,6 +37,37 @@ fn test_mean() {
 	assert tst_res(o.str(), '37.708000')
 }
 
+fn test_quantile_linear_interpolates_and_sorts_copy() {
+	data := vtl.from_1d([30.0, 0.0, 20.0, 10.0])!
+	assert math.abs(quantile_linear(data, 0.25)! - 7.5) < 1e-12
+	assert math.abs(quantile_linear(data, 0.5)! - 15.0) < 1e-12
+	assert quantile_linear(data, 0.0)! == 0.0
+	assert quantile_linear(data, 1.0)! == 30.0
+	assert data.array_equal(vtl.from_1d([30.0, 0.0, 20.0, 10.0])!)
+}
+
+fn test_quantile_linear_supports_integer_tensors() {
+	data := vtl.from_1d([1, 3, 2, 4])!
+	assert quantile_linear(data, 0.5)! == 2.5
+}
+
+fn test_quantile_linear_rejects_invalid_input() {
+	data := vtl.from_1d([1.0, 2.0])!
+	expect_quantile_error(data, -0.1)
+	expect_quantile_error(data, 1.1)
+	empty := vtl.from_1d([]f64{})!
+	if _ := quantile_linear(empty, 0.5) {
+		assert false, 'empty input must return an error'
+	} else {
+		assert true
+	}
+}
+
+fn expect_quantile_error(data &vtl.Tensor[f64], q f64) {
+	quantile_linear(data, q) or { return }
+	panic('expected invalid quantile to return an error')
+}
+
 fn test_geometric_mean() {
 	// Tests were also verified on Wolfram Alpha
 	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)])!
