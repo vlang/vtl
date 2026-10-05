@@ -81,25 +81,19 @@ jobs:
 
     strategy:
       matrix:
-        # Keep representative coverage for both supported OS families,
-        # Linux releases, pure-V/CBLAS, and optimized production builds
-        # without multiplying every dimension into twelve runner jobs.
+        # Exercise the oldest supported Linux release, the current Linux
+        # release with CBLAS and an optimized pure-V build, and macOS. Each
+        # backend/build mode is covered without running the full cross product.
         include:
           - os: ubuntu-22.04
             flags: ''
             backend: pure-v
           - os: ubuntu-24.04
             flags: ''
-            backend: pure-v
-          - os: ubuntu-24.04
-            flags: ''
             backend: cblas
           - os: ubuntu-24.04
             flags: '--prod'
             backend: pure-v
-          - os: ubuntu-24.04
-            flags: '--prod'
-            backend: cblas
           - os: macos-14
             flags: ''
             backend: pure-v
@@ -190,5 +184,5 @@ jobs:
       - name: Run Windows creation regression
         shell: bash
         env:
-          VJOBS: '1'
+          VJOBS: '2'
         run: v test ~/.vmodules/vtl/tests/core/creation_test.v
