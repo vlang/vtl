@@ -24,3 +24,80 @@ fn test_transpose_forward_backward() {
 	f.backprop()!
 	assert x.grad.shape == [2, 2]
 }
+
+fn test_concat_gate_backward_splits_gradient() {
+	f64_ctx := autograd.ctx[f64]()
+	x := f64_ctx.variable(vtl.from_1d([1.0, 2.0])!)
+	y := f64_ctx.variable(vtl.from_1d([3.0, 4.0, 5.0])!)
+	mut result := autograd.concatenate[f64]([x, y], axis: 0)!
+	result.backprop()!
+	assert x.grad.shape == [2]
+	assert y.grad.shape == [3]
+	assert x.grad.get_nth(0) == f64(1)
+	assert x.grad.get_nth(1) == f64(1)
+	assert y.grad.get_nth(0) == f64(1)
+	assert y.grad.get_nth(1) == f64(1)
+	assert y.grad.get_nth(2) == f64(1)
+}
+
+fn test_autograd_concatenate_rejects_axis_out_of_range() {
+	f64_ctx := autograd.ctx[f64]()
+	x := f64_ctx.variable(vtl.from_1d([1.0, 2.0])!)
+	for axis in [1, -2] {
+		_ := autograd.concatenate[f64]([x], axis: axis) or {
+			assert err.msg().contains('axis out of range')
+			continue
+		}
+		assert false, 'expected concatenate to reject axis ${axis}'
+	}
+}
+
+fn test_stack_variables_backward_unstacks_gradient() {
+	f64_ctx := autograd.ctx[f64]()
+	x := f64_ctx.variable(vtl.from_1d([1.0, 2.0])!)
+	y := f64_ctx.variable(vtl.from_1d([3.0, 4.0])!)
+	mut result := autograd.stack[f64]([x, y], axis: 0)!
+	assert result.value.shape == [2, 2]
+	result.backprop()!
+	assert x.grad.shape == [2]
+	assert y.grad.shape == [2]
+	assert x.grad.get_nth(0) == f64(1)
+	assert x.grad.get_nth(1) == f64(1)
+	assert y.grad.get_nth(0) == f64(1)
+	assert y.grad.get_nth(1) == f64(1)
+}
+
+fn test_stack_variables_without_grad_tracking() {
+	f64_ctx := autograd.ctx[f64]()
+	x := f64_ctx.variable(vtl.from_1d([1.0, 2.0])!, requires_grad: false)
+	y := f64_ctx.variable(vtl.from_1d([3.0, 4.0])!, requires_grad: false)
+	result := autograd.stack[f64]([x, y], axis: 0)!
+	assert result.value.shape == [2, 2]
+	assert !result.requires_grad
+}
+
+fn test_autograd_stack_rejects_different_input_shapes() {
+	f64_ctx := autograd.ctx[f64]()
+	x := f64_ctx.variable(vtl.from_2d([[1.0, 2.0], [3.0, 4.0]])!)
+	y := f64_ctx.variable(vtl.from_1d([5.0, 6.0])!)
+	_ := autograd.stack[f64]([x, y], axis: 2) or {
+		assert err.msg().contains('same shape')
+		return
+	}
+	assert false, 'expected stack to reject different input shapes'
+}
+
+fn test_reshape_and_transpose_preserve_nonuniform_gradient_values() ! {
+	ctx := autograd.ctx[f64]()
+	mut reshaped := ctx.variable(vtl.from_array([0.0, 0, 0, 0], [4])!)
+	reshaped.grad = vtl.from_array([1.0, 2, 3, 4], [4])!
+	reshape_grads := autograd.reshape_gate[f64]([2, 2]).backward(autograd.payload(reshaped))!
+	assert reshape_grads[0].shape == [2, 2]
+	assert reshape_grads[0].to_array() == [1.0, 2, 3, 4]
+
+	mut transposed := ctx.variable(vtl.from_array([0.0, 0, 0, 0, 0, 0], [3, 2])!)
+	transposed.grad = vtl.from_array([1.0, 2, 3, 4, 5, 6], [3, 2])!
+	transpose_grads := autograd.transpose_gate[f64]([1, 0]).backward(autograd.payload(transposed))!
+	assert transpose_grads[0].shape == [2, 3]
+	assert transpose_grads[0].to_array() == [1.0, 3, 5, 2, 4, 6]
+}

@@ -158,7 +158,7 @@ fn clip_axis(axis int, size int) !int {
 	if next_axis < 0 {
 		next_axis += size
 	}
-	if next_axis < 0 || next_axis > size {
+	if next_axis < 0 || next_axis >= size {
 		return error('axis out of range')
 	}
 	return next_axis
