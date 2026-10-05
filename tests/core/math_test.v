@@ -31,6 +31,37 @@ fn expect_clip_error(values &vtl.Tensor[f64], min_value f64, max_value f64) {
 	panic('expected invalid clip bounds to return an error')
 }
 
+fn test_isclose_numpy_rule_and_broadcast() {
+	a := vtl.from_array([100.0, 1.0, 3.0, 4.0], [2, 2])!
+	b := vtl.from_1d([100.0005, 2.0])!
+	got := a.isclose(b, 1e-5, 1e-8, false)!
+	expected := vtl.from_array([true, false, false, false], [2, 2])!
+	assert got.array_equal(expected)
+	assert a.allclose(b, 1e-5, 1e-8, false)! == false
+}
+
+fn test_isclose_nan_infinity_and_large_finite_values() {
+	nan := math.nan()
+	inf := math.inf(1)
+	left := vtl.from_1d([nan, nan, inf, inf, 1.7e308, -1.7e308])!
+	right := vtl.from_1d([nan, 1.0, inf, -inf, -1.7e308, 1.7e308])!
+	got := left.isclose(right, 1.0, 0.0, true)!
+	expected := vtl.from_1d([true, false, true, false, false, false])!
+	assert got.array_equal(expected)
+}
+
+fn test_isclose_rejects_invalid_tolerances() {
+	a := vtl.from_1d([1.0])!
+	expect_isclose_error(a, -1.0, 0.0)
+	expect_isclose_error(a, 0.0, math.inf(1))
+}
+
+fn expect_isclose_error(a &vtl.Tensor[f64], rtol f64, atol f64) {
+	a.isclose(a, rtol, atol, false) or { return }
+	panic('expected invalid tolerance to return an error')
+}
+}
+
 fn test_acos() {
 	a := vtl.from_1d([-1.0, 0, 1])!
 	result := a.acos()
