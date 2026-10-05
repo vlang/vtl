@@ -101,15 +101,24 @@ opt.update()!
 
 ## Module overview
 
-| Module | Purpose |
-|--------|---------|
-| `vtl` | Core `Tensor[T]`; creation, slicing, broadcasting |
-| `vtl.autograd` | `Context`, `Variable`, gates, `backprop()` |
-| `vtl.la` | Linear algebra (wraps VSL) |
-| `vtl.nn` | Layers, losses, optimizers |
-| `vtl.nn.models` | `Sequential` model API |
-| `vtl.nn.internal` | Weight init (Kaiming, Xavier) |
-| `vtl.nn.gates` | Autograd gate implementations |
+| Module | Purpose | Guide / entry point |
+|--------|---------|---------------------|
+| `vtl` | Core `Tensor[T]`; creation, slicing, broadcasting, and reductions | [First steps](docs/TUTORIAL_FIRST_STEPS.md) · [API docs](https://vlang.github.io/vtl/vtl.html) |
+| `vtl.autograd` | `Context`, `Variable`, differentiable operations, and `backprop()` | [Autograd tutorial](docs/TUTORIAL_AUTOGRAD.md) · [API docs](https://vlang.github.io/vtl/vtl.autograd.html) |
+| `vtl.autograd_cuda` | Optional CUDA device sessions and GPU-backed autograd | [Device memory guide](docs/DEVICE_MEMORY.md) · [CUDA example](examples/nn_cifar10_cuda/README.md) · [Source](autograd_cuda/) |
+| `vtl.la` | Linear algebra operations backed by VSL | [Linear algebra tutorial](docs/TUTORIAL_LINEAR_ALGEBRA.md) · [Advanced LA](docs/TUTORIAL_ADVANCED_LA.md) · [API docs](https://vlang.github.io/vtl/vtl.la.html) |
+| `vtl.nn` | Neural-network layers, losses, optimizers, and training utilities | [Neural networks](docs/TUTORIAL_NEURAL_NETWORKS.md) · [API docs](https://vlang.github.io/vtl/vtl.nn.html) |
+| `vtl.nn.models` | `Sequential` model construction, training, and serialization | [Neural networks](docs/TUTORIAL_NEURAL_NETWORKS.md) · [API docs](https://vlang.github.io/vtl/vtl.nn.models.html) |
+| `vtl.nn.layers` | Reusable dense, convolutional, recurrent, attention, and activation layers | [Neural networks](docs/TUTORIAL_NEURAL_NETWORKS.md) · [API docs](https://vlang.github.io/vtl/vtl.nn.layers.html) |
+| `vtl.nn.loss` | Loss functions for regression and classification | [Neural networks](docs/TUTORIAL_NEURAL_NETWORKS.md) · [API docs](https://vlang.github.io/vtl/vtl.nn.loss.html) |
+| `vtl.nn.optimizers` | SGD, Adam, AdamW, RMSProp, AdaGrad, and schedulers | [Optimizer tutorial](docs/TUTORIAL_OPTIMIZERS.md) · [API docs](https://vlang.github.io/vtl/vtl.nn.optimizers.html) |
+| `vtl.nn.data` | Data loaders used by neural-network examples | [Examples](examples/README.md) · [API docs](https://vlang.github.io/vtl/vtl.nn.data.html) |
+| `vtl.nn.internal` | Internal tensor operations, activations, losses, and weight initialization | [API docs](https://vlang.github.io/vtl/vtl.nn.internal.html) |
+| `vtl.nn.gates` | Autograd gate implementations used by neural-network layers | [Autograd tutorial](docs/TUTORIAL_AUTOGRAD.md) · [API docs](https://vlang.github.io/vtl/vtl.nn.gates.html) |
+| `vtl.datasets` | MNIST, CIFAR-10, and IMDB dataset loaders | [Datasets guide](datasets/README.md) · [Examples](examples/README.md) · [API docs](https://vlang.github.io/vtl/vtl.datasets.html) |
+| `vtl.stats` | Descriptive statistics and statistical summaries | [Source](stats/stats.v) · [Tests](stats/stats_test.v) |
+| `vtl.ml.metrics` | Machine-learning metrics and evaluation helpers | [Source](ml/metrics/) · [Tests](ml/metrics/metrics_test.v) |
+| `vtl.storage` | CPU storage plus optional CUDA, VCL, and Vulkan storage backends | [Device memory guide](docs/DEVICE_MEMORY.md) · [Source](storage/) |
 
 ## Installation
 
