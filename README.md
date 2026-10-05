@@ -48,7 +48,7 @@ t.get([1, 1])
 - **Autograd** — reverse-mode AD; arbitrary computational graphs
 - **Neural networks** — `Sequential` API; Linear, Conv2D, LSTM, Attention, …
 - **Losses & optimizers** — MSE, MAE, BCE, Hinge, Focal, CrossEntropy, Huber;
-  Adam, AdamW, SGD, …
+  Adam, AdamW, NAdam, RAdam, SGD, …
 - **Linear algebra** — VSL-backed matmul, solve, QR, LU, Cholesky, SVD, pinv
 - **Hardware** — zero-copy `Tensor.data` for C libs; optional CUDA and Vulkan training paths
 
@@ -127,7 +127,7 @@ v install vtl
 ## Testing
 
 ```sh
-v test ~/.vmodules/vtl
+systemd-run --user --scope --quiet --property=MemoryMax=1000M --setenv=VJOBS=2 -- v test ./vtl
 ```
 
 See [DEV_LIGHTWEIGHT.md](docs/DEV_LIGHTWEIGHT.md) for memory-safe subsets in CI.
