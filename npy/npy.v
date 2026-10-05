@@ -26,7 +26,7 @@ pub fn write[T](path string, tensor &vtl.Tensor[T]) ! {
 	descriptor := '<${rune(npy_dtype.kind)}${npy_dtype.width}'
 	shape := format_shape(tensor.shape)
 	mut header := "{'descr': '${descriptor}', 'fortran_order': False, 'shape': ${shape}, }"
-	padding := (16 - ((10 + header.len + 1) % 16)) % 16
+	padding := (64 - ((10 + header.len + 1) % 64)) % 64
 	header += ' '.repeat(padding)
 	header += '\n'
 	if header.len > 0xffff {

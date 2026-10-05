@@ -11,6 +11,9 @@ fn test_npy_f64_round_trip_preserves_shape_and_values() {
 	}
 	original := vtl.from_array[f64]([1.5, -2.25, 3.0, 4.75], [2, 2])!
 	write(path, original)!
+	bytes := os.read_bytes(path)!
+	header_length := int(binary.little_endian_u16(bytes[8..]))
+	assert (10 + header_length) % 64 == 0
 	loaded := read[f64](path)!
 	assert loaded.shape == [2, 2]
 	assert loaded.to_array() == [1.5, -2.25, 3.0, 4.75]
@@ -158,7 +161,7 @@ fn assert_npy_read_error[T](path string) {
 fn write_test_npy(path string, major u8, raw_header string, payload []u8) {
 	mut header := raw_header
 	prefix_length := if major == 1 { 10 } else { 12 }
-	header += ' '.repeat((16 - ((prefix_length + header.len + 1) % 16)) % 16)
+	header += ' '.repeat((64 - ((prefix_length + header.len + 1) % 64)) % 64)
 	header += '\n'
 	mut bytes := []u8{}
 	bytes << magic
