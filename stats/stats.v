@@ -2,7 +2,6 @@ module stats
 
 import vtl
 import math
-import math.stats as math_stats
 
 // AxisData defines a public data structure for this module.
 pub struct AxisData {
@@ -393,8 +392,8 @@ pub fn min[T](t &vtl.Tensor[T]) T {
 	if t.size == 0 {
 		return vtl.cast[T](0)
 	}
-
-	return math_stats.min[T](t.to_array())
+	min_value, _ := min_with_index[T](t)
+	return min_value
 }
 
 // Maximum of the given input array
@@ -403,7 +402,8 @@ pub fn max[T](t &vtl.Tensor[T]) T {
 		return vtl.cast[T](0)
 	}
 
-	return math_stats.max[T](t.to_array())
+	max_value, _ := max_with_index[T](t)
+	return max_value
 }
 
 // Minimum and maximum of the given input array
@@ -412,7 +412,53 @@ pub fn minmax[T](t &vtl.Tensor[T]) (T, T) {
 		return vtl.cast[T](0), vtl.cast[T](0)
 	}
 
-	return math_stats.minmax[T](t.to_array())
+	min_value, max_value, _, _ := minmax_with_indices[T](t)
+	return min_value, max_value
+}
+
+fn minmax_with_indices[T](t &vtl.Tensor[T]) (T, T, int, int) {
+	mut min_value := t.get_nth[T](0)
+	mut max_value := min_value
+	mut min_at := 0
+	mut max_at := 0
+	for i in 1 .. t.size {
+		value := t.get_nth[T](i)
+		if value < min_value {
+			min_value = value
+			min_at = i
+		}
+		if value > max_value {
+			max_value = value
+			max_at = i
+		}
+	}
+	return min_value, max_value, min_at, max_at
+}
+
+fn min_with_index[T](t &vtl.Tensor[T]) (T, int) {
+	mut min_value := t.get_nth[T](0)
+	mut min_at := 0
+	for i in 1 .. t.size {
+		value := t.get_nth[T](i)
+		if value < min_value {
+			min_value = value
+			min_at = i
+		}
+	}
+	return min_value, min_at
+}
+
+fn max_with_index[T](t &vtl.Tensor[T]) (T, int) {
+	mut max_value := t.get_nth[T](0)
+	mut max_at := 0
+	for i in 1 .. t.size {
+		value := t.get_nth[T](i)
+		if value > max_value {
+			max_value = value
+			max_at = i
+		}
+	}
+	return max_value, max_at
 }
 
 // Minimum of the given input array
@@ -421,7 +467,8 @@ pub fn min_index[T](t &vtl.Tensor[T]) int {
 		return 0
 	}
 
-	return math_stats.min_index[T](t.to_array())
+	_, min_at := min_with_index[T](t)
+	return min_at
 }
 
 // Maximum of the given input array
@@ -430,7 +477,8 @@ pub fn max_index[T](t &vtl.Tensor[T]) int {
 		return 0
 	}
 
-	return math_stats.max_index[T](t.to_array())
+	_, max_at := max_with_index[T](t)
+	return max_at
 }
 
 // Minimum and maximum of the given input array
@@ -439,7 +487,8 @@ pub fn minmax_index[T](t &vtl.Tensor[T]) (int, int) {
 		return 0, 0
 	}
 
-	return math_stats.minmax_index[T](t.to_array())
+	_, _, min_at, max_at := minmax_with_indices[T](t)
+	return min_at, max_at
 }
 
 // Measure of Dispersion / Spread
