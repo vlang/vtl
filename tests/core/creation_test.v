@@ -163,6 +163,31 @@ fn test_arange_rejects_zero_and_non_finite_steps() {
 	}
 }
 
+fn test_linspace_includes_endpoint_by_default() ! {
+	values := vtl.linspace[f64](0.0, 1.0, 5)!
+	assert values.to_array() == [0.0, 0.25, 0.5, 0.75, 1.0]
+}
+
+fn test_linspace_can_exclude_endpoint() ! {
+	values := vtl.linspace[f64](0.0, 1.0, 4, endpoint: false)!
+	assert values.to_array() == [0.0, 0.25, 0.5, 0.75]
+}
+
+fn test_linspace_handles_zero_and_one_sample() ! {
+	empty := vtl.linspace[f64](0.0, 1.0, 0)!
+	assert empty.size() == 0
+	one := vtl.linspace[f64](2.0, 9.0, 1)!
+	assert one.to_array() == [2.0]
+}
+
+fn test_linspace_rejects_negative_sample_count() {
+	_ := vtl.linspace[f64](0.0, 1.0, -1) or {
+		assert err.msg().contains('num must be non-negative')
+		return
+	}
+	assert false, 'expected linspace to reject a negative sample count'
+}
+
 fn test_seq() {
 	t := vtl.seq[f64](10)
 	expected := vtl.from_array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0], [

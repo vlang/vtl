@@ -158,6 +158,39 @@ pub fn arange[T](start f64, stop f64, step f64, params TensorData) !&Tensor[T] {
 	return result
 }
 
+// LinspaceData configures linspace's endpoint and output memory layout.
+@[params]
+pub struct LinspaceData {
+pub:
+	endpoint bool         = true
+	memory   MemoryFormat = .row_major
+}
+
+// linspace returns `num` evenly spaced values between start and stop.
+// The endpoint is included by default; set endpoint: false to exclude stop.
+pub fn linspace[T](start f64, stop f64, num int, params LinspaceData) !&Tensor[T] {
+	if num < 0 {
+		return error('linspace num must be non-negative')
+	}
+	mut result := empty[T]([num], memory: params.memory)
+	if num == 0 {
+		return result
+	}
+	result.set([0], cast[T](start))
+	if num == 1 {
+		return result
+	}
+	denominator := if params.endpoint { num - 1 } else { num }
+	step := (stop - start) / f64(denominator)
+	for i in 1 .. num {
+		result.set([i], cast[T](start + f64(i) * step))
+	}
+	if params.endpoint {
+		result.set([num - 1], cast[T](stop))
+	}
+	return result
+}
+
 // seq returns a Tensor containing values ranging from [0, to)
 
 // seq exposes this operation as part of the public API.

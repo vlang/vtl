@@ -53,9 +53,10 @@ println(t.shape) // [2, 4]
 println(t.strides) // [4, 1] => next row is 4 elements away in memory while the next column is 1 element away in memory
 ```
 
-Use `range` for unit-spaced integer bounds or `arange` when the step or values
-are fractional. The stop value is excluded, and negative steps create a
-descending sequence.
+Use `range` for unit-spaced integer bounds, `arange` for a chosen step, and
+`linspace` when you need a fixed number of samples. `range` and `arange` exclude
+the stop value; `linspace` includes it by default. Negative steps create a
+descending `arange` sequence.
 
 ```v
 import vtl
@@ -63,10 +64,14 @@ import vtl
 integers := vtl.range[int](2, 6)
 fractions := vtl.arange[f64](0.0, 1.0, 0.25)!
 countdown := vtl.arange[int](5, 0, -2)!
+samples := vtl.linspace[f64](0.0, 1.0, 5)!
+interior_samples := vtl.linspace[f64](0.0, 1.0, 4, endpoint: false)!
 
 assert integers.to_array() == [2, 3, 4, 5]
 assert fractions.to_array() == [0.0, 0.25, 0.5, 0.75]
 assert countdown.to_array() == [5, 3, 1]
+assert samples.to_array() == [0.0, 0.25, 0.5, 0.75, 1.0]
+assert interior_samples.to_array() == [0.0, 0.25, 0.5, 0.75]
 ```
 
 Other ways to create a tensor are:
