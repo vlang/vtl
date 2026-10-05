@@ -9,12 +9,12 @@ const sequence_length = 4
 const embedding_dim = 8
 const attention_heads = 2
 
-//runs a small transformer-style self-attention block.
-//the input shape is [batch, sequence length, embedding dimension].
+// Runs a small transformer-style self-attention block.
+// The input shape is [batch, sequence length, embedding dimension].
 fn main() {
 	ctx := autograd.ctx[f64]()
 
-	//determinstic  token embeddings make this example easy to reproduce.
+	// Deterministic token embeddings make this example easy to reproduce.
 	mut values := []f64{cap: batch_size * sequence_length * embedding_dim}
 	for batch in 0 .. batch_size {
 		for position in 0 .. sequence_length {
