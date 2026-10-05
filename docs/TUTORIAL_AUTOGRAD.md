@@ -103,6 +103,40 @@ y := x.reshape[f64]([2, 2])!
 z := x.transpose_op[f64]([1, 0])!
 ```
 
+Variables can also be joined along an existing axis with `autograd.concatenate`,
+or along a new axis with `autograd.stack`. Both operations route the gradient to
+each input during backpropagation:
+
+```v
+import vtl
+import vtl.autograd
+
+ctx := autograd.ctx[f64]()
+left := ctx.variable(vtl.from_1d[f64]([1.0, 2.0])!)
+right := ctx.variable(vtl.from_1d[f64]([3.0, 4.0])!)
+
+mut rows := autograd.stack[f64]([left, right], axis: 0)!
+// rows.value.shape == [2, 2]
+rows.backprop()!
+// left.grad and right.grad each have shape [2]
+```
+
+For concatenation, inputs must share an autograd context and have equal sizes
+on every axis except the concatenation axis:
+
+```v
+import vtl
+import vtl.autograd
+
+ctx := autograd.ctx[f64]()
+left := ctx.variable(vtl.from_1d[f64]([1.0, 2.0])!)
+right := ctx.variable(vtl.from_1d[f64]([3.0, 4.0])!)
+
+mut joined := autograd.concatenate[f64]([left, right], axis: 0)!
+// joined.value == [1.0, 2.0, 3.0, 4.0]
+joined.backprop()!
+```
+
 ## Supported operations
 
 The autograd engine tracks every VTL tensor operation.  Common ones used
@@ -125,10 +159,10 @@ ctx := autograd.ctx[f64]()
 x := ctx.variable(vtl.from_1d([3.0])!)
 y := ctx.variable(vtl.from_1d([2.0])!)
 
-mut pow := x.pow(y)!
-pow.backprop()!
+mut result := x.pow(y)!
+result.backprop()!
 
-println(pow) // Variable(value: [9.0], ...)
+println(result) // Variable(value: [9.0], ...)
 println(x.grad) // [6.0]
 ```
 
