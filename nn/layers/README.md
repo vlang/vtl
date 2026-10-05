@@ -1,10 +1,15 @@
 # `vtl.nn.layers`
 
 Layers transform autograd variables and expose trainable parameters to
-optimizers. Available implementations include linear and convolution layers,
-pooling, normalization, dropout, embeddings, LSTM, attention, positional
-encoding, flattening, and activation layers such as ReLU, sigmoid, tanh, GELU,
-Swish, Mish, ELU, and Leaky ReLU.
+optimizers. Implementations on `main` include:
+
+| Category | Layers |
+| --- | --- |
+| Core | Input, Linear, Flatten, Embedding |
+| Convolution and pooling | Conv2D, MaxPool2D, Pool2D |
+| Normalization and regularization | BatchNorm, LayerNorm, Dropout |
+| Recurrent and attention | LSTM, multi-head attention, positional encoding |
+| Activations | ReLU, Sigmoid, Tanh, Softmax, Leaky ReLU, ELU, GELU, Swish, Mish |
 
 The common low-level constructor returns a `types.Layer[T]`:
 
@@ -16,7 +21,7 @@ ctx := autograd.ctx[f32]()
 layer := layers.linear_layer[f32](ctx, 4, 2)
 ```
 
-Inputs and outputs use the shapes documented by each layer. For sequential
-composition, prefer the [models API](../models/README.md). CUDA and Vulkan
-implementations are conditional and experimental; see their config types and
-the [device notes](../../docs/DEVICE_MEMORY.md).
+Shapes, parameters, and supported input ranks are layer-specific; follow each
+constructor's source comments and tests. Sequential composition is described
+in the [models reference](../models/README.md). CUDA and Vulkan paths are
+conditional and experimental; see the [device notes](../../docs/DEVICE_MEMORY.md).

@@ -3,7 +3,8 @@
 `Sequential[T]` composes layers and a loss around an autograd context. Its
 builder methods cover inputs, dense/convolutional layers, pooling, activations,
 normalization, embeddings, recurrent and attention layers, and loss selection.
-Models can also serialize and load weights.
+The architecture is an ordered list: each builder adds a layer whose output
+feeds the next layer. The context is supplied when constructing the model.
 
 ```v ignore
 import vtl.autograd
@@ -18,6 +19,16 @@ model.linear(2)
 model.mse_loss()
 ```
 
-The exact forward, loss, and serialization APIs are documented in
-[`sequential.v`](sequential.v) and [`serialization.v`](serialization.v). Start
-with the [neural-network tutorial](../../docs/TUTORIAL_NEURAL_NETWORKS.md).
+Use `forward` for inference and the model's loss/backpropagation methods for
+training; consult [`sequential.v`](sequential.v) for exact method signatures.
+
+`save(path)` writes model weights. `save_checkpoint(path, epoch, loss)` also
+stores epoch/loss metadata; `load_weights(path)` loads into an already-built
+compatible model and `Sequential.load_checkpoint[T](path)` reads checkpoint
+metadata. The JSON format has version `1.0`, ordered layer definitions,
+per-layer weight maps, optimizer metadata, and checkpoint metadata; tensor
+weights are base64 encoded. Loading rejects a version mismatch. The current
+save API does not promise restoration of optimizer moment buffers, so treat it
+as a model-weight checkpoint rather than a full training-state snapshot.
+
+Start with the [neural-network tutorial](../../docs/TUTORIAL_NEURAL_NETWORKS.md).
