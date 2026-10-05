@@ -36,6 +36,45 @@ pub fn inv[T](t &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 
 // matmul exposes this operation as part of the public API.
 pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	if a.rank() > 2 || b.rank() > 2 {
+		if a.rank() < 2 || b.rank() < 2 || a.shape[a.rank() - 1] != b.shape[b.rank() - 2] {
+			return error('Invalid shapes for matrix multiplication ${a.shape} and ${b.shape}')
+		}
+		a_batch_shape := a.shape[..a.rank() - 2]
+		b_batch_shape := b.shape[..b.rank() - 2]
+		batch_shape := matmul_broadcast_shape(a_batch_shape, b_batch_shape) or {
+			return error('Batch shapes ${a_batch_shape} and ${b_batch_shape} cannot be broadcast for matrix multiplication ${a.shape} and ${b.shape}')
+		}
+		mut result_shape := batch_shape.clone()
+		result_shape << a.shape[a.rank() - 2]
+		result_shape << b.shape[b.rank() - 1]
+		mut batch_size := 1
+		for dimension in batch_shape {
+			batch_size *= dimension
+		}
+		rows := a.shape[a.rank() - 2]
+		inner := a.shape[a.rank() - 1]
+		columns := b.shape[b.rank() - 1]
+		a_data := a.to_array()
+		b_data := b.to_array()
+		mut result_data := []T{len: batch_size * rows * columns}
+		for batch in 0 .. batch_size {
+			a_batch := matmul_broadcast_offset(batch, batch_shape, a_batch_shape)
+			b_batch := matmul_broadcast_offset(batch, batch_shape, b_batch_shape)
+			for row in 0 .. rows {
+				for column in 0 .. columns {
+					mut value := T(0)
+					for index in 0 .. inner {
+						a_offset := a_batch * rows * inner + row * inner + index
+						b_offset := b_batch * inner * columns + index * columns + column
+						value += a_data[a_offset] * b_data[b_offset]
+					}
+					result_data[batch * rows * columns + row * columns + column] = value
+				}
+			}
+		}
+		return vtl.from_array(result_data, result_shape)
+	}
 	a.assert_matrix()!
 	b.assert_matrix()!
 	if a.shape[1] != b.shape[0] {
@@ -52,6 +91,45 @@ pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
 		return unsafe { &vtl.Tensor[T](res.as_f32()) }
 	}
 	return unsafe { &vtl.Tensor[T](res) }
+}
+
+fn matmul_broadcast_shape(a []int, b []int) ![]int {
+	rank := if a.len > b.len { a.len } else { b.len }
+	mut result := []int{len: rank, init: 1}
+	for i in 0 .. rank {
+		a_index := i - (rank - a.len)
+		b_index := i - (rank - b.len)
+		a_dim := if a_index >= 0 { a[a_index] } else { 1 }
+		b_dim := if b_index >= 0 { b[b_index] } else { 1 }
+		if a_dim == b_dim {
+			result[i] = a_dim
+		} else if a_dim == 1 {
+			result[i] = b_dim
+		} else if b_dim == 1 {
+			result[i] = a_dim
+		} else {
+			return error('shapes ${a} and ${b} are not broadcastable')
+		}
+	}
+	return result
+}
+
+fn matmul_broadcast_offset(output_batch int, output_shape []int, input_shape []int) int {
+	mut remaining := output_batch
+	mut input_offset := 0
+	mut input_stride := 1
+	for axis := output_shape.len - 1; axis >= 0; axis-- {
+		coordinate := remaining % output_shape[axis]
+		remaining /= output_shape[axis]
+		input_axis := axis - (output_shape.len - input_shape.len)
+		if input_axis >= 0 {
+			if input_shape[input_axis] != 1 {
+				input_offset += coordinate * input_stride
+			}
+			input_stride *= input_shape[input_axis]
+		}
+	}
+	return input_offset
 }
 
 fn tensor_to_f64_array[T](t &vtl.Tensor[T]) []f64 {
