@@ -126,7 +126,10 @@ and scheduler usage.
 
 ## Conv1D for sequence data
 
-`Sequential.conv1d` consumes channel-first tensors shaped `[batch, channels, length]`. The layer supports stride, padding, dilation, and grouped channels; its CPU backward computes gradients for the input, kernel, and bias.
+`Sequential.conv1d` consumes channel-first tensors shaped
+`[batch, channels, length]`. The layer supports stride, padding, dilation,
+and grouped channels. Its CPU backward computes gradients for the input,
+kernel, and bias.
 
 ```v
 import vtl
@@ -137,7 +140,7 @@ import vtl.nn.models
 ctx := autograd.ctx[f64]()
 mut model := models.sequential_from_ctx[f64](ctx)
 model.input([1, 5])
-model.conv1d(2, 3, layers.Conv1DConfig{padding: 1})
+model.conv1d(2, 3, layers.Conv1DConfig{ padding: 1 })
 sequence := vtl.from_array([0.1, 0.2, 0.3, 0.4, 0.5], [1, 1, 5])!
 mut input := ctx.variable(sequence)
 mut output := model.forward(input)!
@@ -149,7 +152,14 @@ See the runnable [Conv1D example](../examples/nn_conv1d/) for a complete forward
 
 ## Recurrent GRU layer
 
-The standalone `vtl.nn.layers.gru_layer` API accepts `[sequence, batch, input_features]` and returns `[sequence, batch, hidden_size]`. Its reset, update, and candidate weights use PyTorch's `[reset, update, new]` gate order. The layer starts with a zero hidden state; the lower-level `vtl.nn.internal.gru_forward_single` also accepts an explicit initial state. CPU backpropagation computes gradients for the input and all four parameter tensors; the lower-level backward kernel also returns the gradient for the supplied initial state.
+The standalone `vtl.nn.layers.gru_layer` API accepts
+`[sequence, batch, input_features]` and returns
+`[sequence, batch, hidden_size]`. Its reset, update, and candidate weights use
+PyTorch's `[reset, update, new]` gate order. The layer starts with a zero
+hidden state; the lower-level `vtl.nn.internal.gru_forward_single` also accepts
+an explicit initial state. CPU backpropagation computes gradients for the input
+and all four parameter tensors. The lower-level backward kernel also returns
+the gradient for the supplied initial state.
 
 ```v
 import vtl
@@ -166,7 +176,8 @@ output.backprop()!
 println(input.grad.shape) // [3, 1, 2]
 ```
 
-See the runnable [GRU example](../examples/nn_gru/) for a complete forward and backward smoke test. GRU is not yet wired into the `Sequential` builder.
+See the runnable [GRU example](../examples/nn_gru/) for a complete forward
+and backward smoke test. GRU is not yet wired into the `Sequential` builder.
 
 ## Training loop
 
