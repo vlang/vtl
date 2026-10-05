@@ -18,6 +18,7 @@ CIFAR examples for CI-safe checks.
 | [vtl_vandermont](./vtl_vandermont) | Matrix construction and LA utilities | `v run vtl/examples/vtl_vandermont/main.v` |
 | [autograd_backprop](./autograd_backprop) | Manual autograd/backprop flow | `v run vtl/examples/autograd_backprop/main.v` |
 | [npy_round_trip](./npy_round_trip) | Read and write NumPy `.npy` arrays | `v run vtl/examples/npy_round_trip/main.v` |
+| [stats_variance](./stats_variance) | Stable population/sample variance and standard deviation | `v run vtl/examples/stats_variance/main.v` |
 
 ## Neural networks
 

@@ -3,6 +3,29 @@ module stats
 import vtl
 import math
 
+fn test_variance_uses_f64_for_integer_input_and_ddof() {
+	data := vtl.from_1d([1, 2, 3])!
+	population := variance(data, VarianceData{})!
+	sample := variance(data, VarianceData{
+		ddof: 1
+	})!
+	assert math.abs(population - (2.0 / 3.0)) < 1e-12
+	assert math.abs(sample - 1.0) < 1e-12
+	assert math.abs(std(data, VarianceData{})! - math.sqrt(2.0 / 3.0)) < 1e-12
+}
+
+fn test_variance_rejects_undefined_inputs() {
+	empty := vtl.from_1d([]f64{})!
+	assert variance(empty, VarianceData{}) or { -1.0 } == -1.0
+	data := vtl.from_1d([1.0, 2.0])!
+	assert variance(data, VarianceData{
+		ddof: 2
+	}) or { -1.0 } == -1.0
+	assert variance(data, VarianceData{
+		ddof: -1
+	}) or { -1.0 } == -1.0
+}
+
 fn test_freq() {
 	// Tests were also verified on Wolfram Alpha
 	data := vtl.from_1d([10.0, 10.0, 5.9, 2.7])!
