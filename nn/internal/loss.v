@@ -260,3 +260,144 @@ pub fn cross_entropy_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], 
 	}
 	return vtl.from_array(ret_data.map(vtl.cast[T](it)), [batch_size, n_classes])
 }
+
+// l1 computes mean absolute error and returns a scalar tensor.
+pub fn l1[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	if input.shape != target.shape {
+		return error('L1 loss requires input and target with identical shapes')
+	}
+	if input.size() == 0 { return error('L1 loss requires non-empty tensors') }
+	mut total := f64(0)
+	for i in 0 .. input.size() { total += math.abs(f64(input.get_nth(i)) - f64(target.get_nth(i))) }
+	return vtl.from_1d([vtl.cast[T](total / f64(input.size()))])
+}
+
+// l1_backward computes the mean absolute error gradient; the subgradient at zero is zero.
+pub fn l1_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	if input.shape != target.shape {
+		return error('L1 loss requires input and target with identical shapes')
+	}
+	if input.size() == 0 { return error('L1 loss requires non-empty tensors') }
+	upstream := f64(gradient.get([0]))
+	n := f64(input.size())
+	mut values := []T{len: input.size()}
+	for i in 0 .. input.size() {
+		diff := f64(input.get_nth(i)) - f64(target.get_nth(i))
+		sign := if diff > 0 {
+			1.0
+		} else if diff < 0 {
+			-1.0
+		} else {
+			0.0
+		}
+		values[i] = vtl.cast[T](upstream * sign / n)
+	}
+	return vtl.from_array(values, input.shape.clone())
+}
+
+// hinge computes mean max(0, 1 - target * score); labels must be -1 or +1.
+pub fn hinge[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	if input.shape != target.shape {
+		return error('Hinge loss requires input and target with identical shapes')
+	}
+	if input.size() == 0 { return error('Hinge loss requires non-empty tensors') }
+	mut total := f64(0)
+	for i in 0 .. input.size() {
+		ty := f64(target.get_nth(i))
+		if ty != -1.0 && ty != 1.0 { return error('Hinge loss labels must be -1 or +1') }
+		total += math.max(0.0, 1.0 - ty * f64(input.get_nth(i)))
+	}
+	return vtl.from_1d([vtl.cast[T](total / f64(input.size()))])
+}
+
+// hinge_backward computes the gradient of mean hinge loss.
+pub fn hinge_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	if input.shape != target.shape {
+		return error('Hinge loss requires input and target with identical shapes')
+	}
+	if input.size() == 0 { return error('Hinge loss requires non-empty tensors') }
+	upstream := f64(gradient.get([0])) / f64(input.size())
+	mut values := []T{len: input.size()}
+	for i in 0 .. input.size() {
+		ty := f64(target.get_nth(i))
+		if ty != -1.0 && ty != 1.0 { return error('Hinge loss labels must be -1 or +1') }
+		grad := if 1.0 - ty * f64(input.get_nth(i)) > 0.0 { -ty * upstream } else { 0.0 }
+		values[i] = vtl.cast[T](grad)
+	}
+	return vtl.from_array(values, input.shape.clone())
+}
+
+// focal computes mean binary focal loss. When from_logits is true input contains logits.
+pub fn focal[T](input &vtl.Tensor[T], target &vtl.Tensor[T], alpha f64, gamma f64, from_logits bool) !&vtl.Tensor[T] {
+	if input.shape != target.shape {
+		return error('Focal loss requires input and target with identical shapes')
+	}
+	if input.size() == 0 { return error('Focal loss requires non-empty tensors') }
+	if !math.is_finite(alpha) || !math.is_finite(gamma) || alpha < 0.0 || alpha > 1.0 || gamma < 0.0 {
+		return error('Focal loss requires finite alpha in [0, 1] and finite gamma >= 0')
+	}
+	mut total := f64(0)
+	for i in 0 .. input.size() {
+		y := f64(target.get_nth(i))
+		if y != 0.0 && y != 1.0 { return error('Focal loss targets must be 0 or +1') }
+		x := f64(input.get_nth(i))
+		if !from_logits && (x < 0.0 || x > 1.0) {
+			return error('Focal loss probabilities must be in [0, 1]')
+		}
+		mut p := if from_logits {
+			if x >= 0 {
+				1.0 / (1.0 + math.exp(-x))
+			} else {
+				ex := math.exp(x)
+				ex / (1.0 + ex)
+			}
+		} else {
+			x
+		}
+		p = math.max(1e-15, math.min(1.0 - 1e-15, p))
+		pt := if y == 1.0 { p } else { 1.0 - p }
+		alpha_t := if y == 1.0 { alpha } else { 1.0 - alpha }
+		total -= alpha_t * math.pow(1.0 - pt, gamma) * math.log(pt)
+	}
+	return vtl.from_1d([vtl.cast[T](total / f64(input.size()))])
+}
+
+// focal_backward computes the gradient of mean binary focal loss.
+pub fn focal_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], target &vtl.Tensor[T], alpha f64, gamma f64, from_logits bool) !&vtl.Tensor[T] {
+	if input.shape != target.shape {
+		return error('Focal loss requires input and target with identical shapes')
+	}
+	if input.size() == 0 { return error('Focal loss requires non-empty tensors') }
+	if !math.is_finite(alpha) || !math.is_finite(gamma) || alpha < 0.0 || alpha > 1.0 || gamma < 0.0 {
+		return error('Focal loss requires finite alpha in [0, 1] and finite gamma >= 0')
+	}
+	upstream := f64(gradient.get([0])) / f64(input.size())
+	mut values := []T{len: input.size()}
+	for i in 0 .. input.size() {
+		y := f64(target.get_nth(i))
+		if y != 0.0 && y != 1.0 { return error('Focal loss targets must be 0 or +1') }
+		x := f64(input.get_nth(i))
+		if !from_logits && (x < 0.0 || x > 1.0) {
+			return error('Focal loss probabilities must be in [0, 1]')
+		}
+		mut p := if from_logits {
+			if x >= 0 {
+				1.0 / (1.0 + math.exp(-x))
+			} else {
+				ex := math.exp(x)
+				ex / (1.0 + ex)
+			}
+		} else {
+			x
+		}
+		p = math.max(1e-15, math.min(1.0 - 1e-15, p))
+		pt := if y == 1.0 { p } else { 1.0 - p }
+		alpha_t := if y == 1.0 { alpha } else { 1.0 - alpha }
+		modulation := math.pow(1.0 - pt, gamma)
+		dloss_dpt := alpha_t * (gamma * math.pow(1.0 - pt, gamma - 1.0) * math.log(pt) - modulation / pt)
+		mut dloss_dp := if y == 1.0 { dloss_dpt } else { -dloss_dpt }
+		if from_logits { dloss_dp *= p * (1.0 - p) }
+		values[i] = vtl.cast[T](upstream * dloss_dp)
+	}
+	return vtl.from_array(values, input.shape.clone())
+}

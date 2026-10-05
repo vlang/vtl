@@ -54,8 +54,7 @@ pub fn batchnorm1d_training[T](input &vtl.Tensor[T], gamma &vtl.Tensor[T], beta 
 	mut output_data := []f64{len: batch_size * num_features}
 	for n in 0 .. batch_size {
 		for c in 0 .. num_features {
-			normalized := (f64(input.get([n, c])) - batch_mean_data[c]) / math.sqrt(
-				batch_var_data[c] + eps)
+			normalized := (f64(input.get([n, c])) - batch_mean_data[c]) / math.sqrt(batch_var_data[c] + eps)
 			output_data[n * num_features + c] = f64(gamma.get([0, c])) * normalized +
 				f64(beta.get([0, c]))
 		}

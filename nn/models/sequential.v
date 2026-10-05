@@ -190,6 +190,21 @@ pub fn (mut nn Sequential[T]) huber_loss() {
 	nn.info.huber_loss()
 }
 
+// l1_loss sets mean absolute error as the loss function.
+pub fn (mut nn Sequential[T]) l1_loss() {
+	nn.info.l1_loss()
+}
+
+// hinge_loss sets binary hinge loss as the loss function.
+pub fn (mut nn Sequential[T]) hinge_loss() {
+	nn.info.hinge_loss()
+}
+
+// focal_loss sets binary focal loss with its default configuration.
+pub fn (mut nn Sequential[T]) focal_loss() {
+	nn.info.focal_loss()
+}
+
 // nll_loss sets the loss function to negative log likelihood loss.
 pub fn (mut nn Sequential[T]) nll_loss() {
 	nn.info.nll_loss()

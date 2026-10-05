@@ -2,6 +2,7 @@ module loss
 
 import vtl
 import vtl.autograd
+import math
 
 fn ctx[T]() &autograd.Context[T] {
 	return autograd.ctx[T]()
@@ -86,4 +87,108 @@ fn test_huber_loss_forward_large_error() ! {
 	v := result.value.get_nth(0)
 	// 1.0*(3.0 - 0.5) = 2.5
 	assert v - 2.5 < 1e-6 && v - 2.5 > -1e-6, 'Huber large-error expected 2.5, got ${v}'
+}
+
+fn test_l1_loss_forward_and_backward() ! {
+	c := ctx[f64]()
+	pred := variable[f64](c, [1.0, 3.0], [2])!
+	target := tensor[f64]([0.0, 4.0], [2])!
+	mut result := l1_loss[f64]().loss(pred, target)!
+	assert math.abs(result.value.get_nth(0) - 1.0) < 1e-12
+	result.backprop()!
+	assert math.abs(pred.grad.get_nth(0) - 0.5) < 1e-12
+	assert math.abs(pred.grad.get_nth(1) + 0.5) < 1e-12
+}
+
+fn test_hinge_loss_forward_and_backward() ! {
+	c := ctx[f64]()
+	pred := variable[f64](c, [2.0, -0.5], [2])!
+	target := tensor[f64]([1.0, -1.0], [2])!
+	mut result := hinge_loss[f64]().loss(pred, target)!
+	assert math.abs(result.value.get_nth(0) - 0.25) < 1e-12
+	result.backprop()!
+	assert pred.grad.get_nth(0) == 0.0
+	assert math.abs(pred.grad.get_nth(1) - 0.5) < 1e-12
+}
+
+fn test_focal_loss_forward_and_backward_logits() ! {
+	c := ctx[f64]()
+	pred := variable[f64](c, [0.0], [1])!
+	target := tensor[f64]([1.0], [1])!
+	mut result := focal_loss[f64]().loss(pred, target)!
+	assert math.abs(result.value.get_nth(0) - 0.25 * 0.25 * math.log(2.0)) < 1e-12
+	result.backprop()!
+	want_grad := 0.25 * (2.0 * 0.5 * math.log(0.5) - 0.25 / 0.5) * 0.25
+	assert math.abs(pred.grad.get_nth(0) - want_grad) < 1e-12
+}
+
+fn test_l1_loss_rejects_incompatible_shapes() ! {
+	c := ctx[f64]()
+	pred := variable[f64](c, [0.0, 1.0], [2])!
+	bad_target := tensor[f64]([1.0], [1])!
+	l1_loss[f64]().loss(pred, bad_target) or {
+		assert err.msg().contains('identical shapes')
+		return
+	}
+	assert false, 'L1 loss should reject incompatible shapes'
+}
+
+fn test_hinge_loss_rejects_invalid_labels() ! {
+	c := ctx[f64]()
+	pred := variable[f64](c, [0.0, 1.0], [2])!
+	target := tensor[f64]([0.0, 1.0], [2])!
+	hinge_loss[f64]().loss(pred, target) or {
+		assert err.msg().contains('labels must be -1 or +1')
+		return
+	}
+	assert false, 'hinge loss should reject invalid labels'
+}
+
+fn test_focal_loss_rejects_invalid_targets() ! {
+	c := ctx[f64]()
+	pred := variable[f64](c, [0.0, 1.0], [2])!
+	target := tensor[f64]([1.0, 2.0], [2])!
+	focal_loss[f64]().loss(pred, target) or {
+		assert err.msg().contains('targets must be 0 or +1')
+		return
+	}
+	assert false, 'focal loss should reject invalid targets'
+}
+
+fn test_focal_loss_probability_inputs() ! {
+	c := ctx[f64]()
+	pred := variable[f64](c, [0.8], [1])!
+	target := tensor[f64]([1.0], [1])!
+	mut result := focal_loss[f64](from_logits: false, alpha: 0.25, gamma: 2.0).loss(pred, target)!
+	want := -0.25 * math.pow(0.2, 2.0) * math.log(0.8)
+	assert math.abs(result.value.get_nth(0) - want) < 1e-12
+	result.backprop()!
+	want_grad := 0.25 * (2.0 * 0.2 * math.log(0.8) - math.pow(0.2, 2.0) / 0.8)
+	assert math.abs(pred.grad.get_nth(0) - want_grad) < 1e-12
+}
+
+fn test_focal_loss_negative_class_gradient() ! {
+	c := ctx[f64]()
+	pred := variable[f64](c, [0.0], [1])!
+	target := tensor[f64]([0.0], [1])!
+	mut result := focal_loss[f64]().loss(pred, target)!
+	want := 0.75 * 0.25 * math.log(2.0)
+	assert math.abs(result.value.get_nth(0) - want) < 1e-12
+	result.backprop()!
+	want_grad := 0.75 * (2.0 * 0.5 * math.log(0.5) - 0.25 / 0.5) * -0.25
+	assert math.abs(pred.grad.get_nth(0) - want_grad) < 1e-12
+}
+
+fn test_focal_loss_rejects_non_finite_parameters() {
+	c := ctx[f64]()
+	pred := variable[f64](c, [0.0], [1])!
+	target := tensor[f64]([1.0], [1])!
+	for alpha in [math.nan(), math.inf(1)] {
+		focal_loss[f64](alpha: alpha, gamma: 2.0).loss(pred, target) or { continue }
+		assert false, 'focal loss should reject non-finite alpha'
+	}
+	for gamma in [math.nan(), math.inf(1)] {
+		focal_loss[f64](alpha: 0.25, gamma: gamma).loss(pred, target) or { continue }
+		assert false, 'focal loss should reject non-finite gamma'
+	}
 }
