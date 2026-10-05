@@ -1,6 +1,7 @@
 module main
 
 import vtl
+import math
 
 fn test_meshgrid_xy_coordinates() {
 	x := vtl.from_1d([1, 2, 3])!
@@ -129,6 +130,37 @@ fn test_range() {
 		12,
 	])!
 	assert t.array_equal(expected)
+}
+
+fn test_arange_float_step() ! {
+	t := vtl.arange[f64](0.0, 1.0, 0.2)!
+	assert t.size() == 5
+	assert t.get_nth(0) == 0.0
+	assert t.get_nth(1) == 0.2
+	assert t.get_nth(2) == 0.4
+	assert t.get_nth(3) == 0.6000000000000001
+	assert t.get_nth(4) == 0.8
+}
+
+fn test_arange_integer_and_descending_steps() ! {
+	ascending := vtl.arange[int](2, 8, 2)!
+	assert ascending.to_array() == [2, 4, 6]
+
+	descending := vtl.arange[int](5, 0, -2)!
+	assert descending.to_array() == [5, 3, 1]
+
+	empty := vtl.arange[int](0, 5, -1)!
+	assert empty.size() == 0
+}
+
+fn test_arange_rejects_zero_and_non_finite_steps() {
+	for step in [0.0, math.inf(1), math.nan()] {
+		_ := vtl.arange[f64](0.0, 1.0, step) or {
+			assert err.msg().contains('non-zero step')
+			continue
+		}
+		assert false, 'expected arange to reject step ${step}'
+	}
 }
 
 fn test_seq() {

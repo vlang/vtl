@@ -1,5 +1,7 @@
 module vtl
 
+import math
+
 // meshgrid builds dense two-dimensional XY coordinate grids from two vectors.
 // The output shape is [len(y), len(x)], matching NumPy's default indexing="xy".
 pub fn meshgrid[T](x &Tensor[T], y &Tensor[T]) !(&Tensor[T], &Tensor[T]) {
@@ -127,6 +129,33 @@ pub fn range[T](from int, to int, params TensorData) &Tensor[T] {
 		index++
 	}
 	return res
+}
+
+// arange returns evenly spaced values in the half-open interval [start, stop).
+// The direction of step determines whether the result is ascending or descending.
+pub fn arange[T](start f64, stop f64, step f64, params TensorData) !&Tensor[T] {
+	if !math.is_finite(start) || !math.is_finite(stop) || !math.is_finite(step) || step == 0.0 {
+		return error('arange start, stop, and non-zero step must be finite')
+	}
+	mut count := 0
+	if step > 0.0 && start < stop {
+		count_f64 := math.ceil((stop - start) / step)
+		if count_f64 >= f64(max_int) {
+			return error('arange result is too large')
+		}
+		count = int(count_f64)
+	} else if step < 0.0 && start > stop {
+		count_f64 := math.ceil((stop - start) / step)
+		if count_f64 >= f64(max_int) {
+			return error('arange result is too large')
+		}
+		count = int(count_f64)
+	}
+	mut result := empty[T]([count], params)
+	for i in 0 .. count {
+		result.set([i], cast[T](start + f64(i) * step))
+	}
+	return result
 }
 
 // seq returns a Tensor containing values ranging from [0, to)
