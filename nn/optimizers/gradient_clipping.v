@@ -22,15 +22,43 @@ pub fn clip_grad_norm[T](mut parameters []&autograd.Variable[T], max_norm f64) !
 		}
 	}
 	norm := math.sqrt(squared_norm)
+	if !math.is_finite(norm) {
+		return error('clip_grad_norm: gradient norm must be finite')
+	}
 	if norm <= max_norm || norm == 0.0 {
 		return norm
 	}
 
-	scale := vtl.cast[T](max_norm / norm)
+	scale := max_norm / norm
 	for mut parameter in parameters {
-		if parameter.requires_grad {
-			parameter.grad = parameter.grad.multiply_scalar[T](scale)!
+		if !parameter.requires_grad {
+			continue
 		}
+		parameter.grad.apply(fn [scale] [T](value T, _ []int) T {
+			return vtl.cast[T](f64(value) * scale)
+		})
 	}
 	return norm
+}
+
+// clip_grad_value clamps every trainable gradient element to [-max_value, max_value].
+pub fn clip_grad_value[T](mut parameters []&autograd.Variable[T], max_value f64) ! {
+	if max_value <= 0.0 || !math.is_finite(max_value) {
+		return error('clip_grad_value: max_value must be finite and greater than zero')
+	}
+	for mut parameter in parameters {
+		if !parameter.requires_grad {
+			continue
+		}
+		parameter.grad.apply(fn [max_value] [T](value T, _ []int) T {
+			x := f64(value)
+			if x < -max_value {
+				return vtl.cast[T](-max_value)
+			}
+			if x > max_value {
+				return vtl.cast[T](max_value)
+			}
+			return value
+		})
+	}
 }

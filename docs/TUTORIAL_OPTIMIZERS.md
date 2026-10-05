@@ -11,7 +11,6 @@ All optimizers also support learning rate schedulers — see the last section be
 ## Adam
 
 ```v
-import math
 import vtl
 import vtl.autograd
 import vtl.nn.models
@@ -244,6 +243,7 @@ before clipping. Gradients below the limit are left unchanged.
 import vtl
 import vtl.autograd
 import vtl.nn.optimizers
+import math
 
 context := autograd.ctx[f64]()
 parameter := context.variable(vtl.from_1d([0.0, 0.0])!)
@@ -257,7 +257,13 @@ original_norm := optimizers.clip_grad_norm[f64](mut parameters, 1.0)!
 assert original_norm == 5.0
 assert math.abs(parameter.grad.get_nth(0) - 0.6) < 1e-12
 assert math.abs(parameter.grad.get_nth(1) - 0.8) < 1e-12
+
+// Alternatively, clip each element independently to [-0.5, 0.5].
+optimizers.clip_grad_value[f64](mut parameters, 0.5)!
 ```
+
+Both limits must be finite and positive. Norm clipping rejects non-finite
+gradient norms instead of changing gradients to NaN.
 
 The autograd `Variable.clamp(min, max)` operation also supports element-wise
 clamping in a forward graph. Its backward pass passes gradients through values
