@@ -14,6 +14,11 @@ fn test_variance_uses_f64_for_integer_input_and_ddof() {
 	assert math.abs(std(data, VarianceData{})! - math.sqrt(2.0 / 3.0)) < 1e-12
 }
 
+fn test_variance_is_stable_for_values_with_large_offset() {
+	data := vtl.from_1d([1e15 + 1.0, 1e15 + 2.0, 1e15 + 3.0, 1e15 + 4.0])!
+	assert math.abs(variance(data, VarianceData{})! - 1.25) < 1e-6
+}
+
 fn test_variance_rejects_undefined_inputs() {
 	empty := vtl.from_1d([]f64{})!
 	assert_variance_error(empty, VarianceData{})
