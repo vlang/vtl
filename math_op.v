@@ -150,3 +150,19 @@ pub fn (a &Tensor[T]) multiply_scalar[T](scalar T) !&Tensor[T] {
 pub fn (a &Tensor[T]) + (b &Tensor[T]) &Tensor[T] {
 	return a.add(b) or { panic(err) }
 }
+
+// * multiplies two tensors elementwise, following broadcasting rules.
+// It panics when their shapes are not broadcastable; use multiply when shape
+// errors need to be handled explicitly.
+@[inline]
+pub fn (a &Tensor[T]) * (b &Tensor[T]) &Tensor[T] {
+	return a.multiply(b) or { panic(err) }
+}
+
+// / divides two tensors elementwise, following broadcasting rules.
+// It panics when their shapes are not broadcastable; use divide when shape
+// errors need to be handled explicitly.
+@[inline]
+pub fn (a &Tensor[T]) / (b &Tensor[T]) &Tensor[T] {
+	return a.divide(b) or { panic(err) }
+}

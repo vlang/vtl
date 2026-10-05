@@ -8,6 +8,10 @@ fn test_tensor_arithmetic_operators() {
 
 	add_result := a + b
 	assert add_result.array_equal(vtl.from_1d([f64(5), 7, 9])!)
+	multiply_result := a * b
+	assert multiply_result.array_equal(vtl.from_1d([f64(4), 10, 18])!)
+	divide_result := b / a
+	assert divide_result.array_equal(vtl.from_1d([f64(4), 2.5, 2])!)
 }
 
 fn test_tensor_add_operator_broadcasts() {
