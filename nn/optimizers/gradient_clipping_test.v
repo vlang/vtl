@@ -102,3 +102,18 @@ fn test_clip_grad_norm_rejects_non_finite_gradients() {
 	}
 	assert false, 'expected clip_grad_norm to reject a non-finite norm'
 }
+
+fn test_clip_grad_norm_rejects_integer_gradients_without_mutating() {
+	context := autograd.ctx[int]()
+	parameter := context.variable(vtl.from_1d([0, 0])!)
+	parameter.grad.set_nth(0, 3)
+	parameter.grad.set_nth(1, 4)
+	mut parameters := [parameter]
+	_ := clip_grad_norm[int](mut parameters, 2.0) or {
+		assert err.msg().contains('must use f32 or f64')
+		assert parameter.grad.get_nth(0) == 3
+		assert parameter.grad.get_nth(1) == 4
+		return
+	}
+	assert false, 'expected clip_grad_norm to reject integer gradients'
+}

@@ -4,9 +4,20 @@ import math
 import vtl
 import vtl.autograd
 
+fn is_float_gradient[T]() bool {
+	$if T is f32 || T is f64 {
+		return true
+	} $else {
+		return false
+	}
+}
+
 // clip_grad_norm scales trainable gradients in parameters in place when their
 // global L2 norm exceeds max_norm. It returns the norm before clipping.
 pub fn clip_grad_norm[T](mut parameters []&autograd.Variable[T], max_norm f64) !f64 {
+	if !is_float_gradient[T]() {
+		return error('clip_grad_norm: gradients must use f32 or f64 elements')
+	}
 	if max_norm <= 0.0 || !math.is_finite(max_norm) {
 		return error('clip_grad_norm: max_norm must be finite and greater than zero')
 	}
