@@ -1,6 +1,7 @@
 # `vtl.ml`
 
-Machine-learning utilities currently include metrics under `vtl.ml.metrics`.
+Machine-learning utilities currently include metrics under `vtl.ml.metrics`;
+see the [metrics guide](metrics/README.md) for examples.
 Training building blocks such as layers, losses, optimizers, and datasets live
 in their own modules; this package is not a complete estimator or preprocessing
 framework.
