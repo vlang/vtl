@@ -18,6 +18,15 @@ fn test_concatenate() {
 	assert result.array_equal(expected)
 }
 
+fn test_concatenate_rejects_axis_equal_to_rank() {
+	a := vtl.ones[f64]([2, 2])
+	_ := vtl.concatenate[f64]([a], axis: 2) or {
+		assert err.msg().contains('axis out of range')
+		return
+	}
+	assert false, 'expected concatenate to reject axis equal to rank'
+}
+
 fn test_vstack() {
 	a := vtl.ones[f64]([3])
 	b := vtl.zeros[f64]([2])

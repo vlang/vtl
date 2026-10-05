@@ -298,6 +298,11 @@ pub fn concatenate[T](variables []&Variable[T], data vtl.AxisData) !&Variable[T]
 		return error('cannot concatenate an empty list of variables')
 	}
 	first := variables[0]
+	rank := first.value.rank()
+	axis := if data.axis < 0 { data.axis + rank } else { data.axis }
+	if axis < 0 || axis >= rank {
+		return error('axis out of range')
+	}
 	mut tensors := []&vtl.Tensor[T]{cap: variables.len}
 	mut splits := []int{cap: variables.len}
 	mut track_gradient := false
@@ -308,8 +313,7 @@ pub fn concatenate[T](variables []&Variable[T], data vtl.AxisData) !&Variable[T]
 		tensors << variable.value
 		track_gradient = track_gradient || variable.requires_grad
 	}
-	value := vtl.concatenate[T](tensors, data)!
-	axis := if data.axis < 0 { data.axis + value.rank() } else { data.axis }
+	value := vtl.concatenate[T](tensors, axis: axis)!
 	for variable in variables {
 		splits << variable.value.shape[axis]
 	}
@@ -336,6 +340,9 @@ pub fn stack[T](variables []&Variable[T], data vtl.AxisData) !&Variable[T] {
 	for variable in variables {
 		if variable.context != first.context {
 			return error('all variables must share the same autograd context')
+		}
+		if variable.value.shape != first.value.shape {
+			return error('all variables must have the same shape to stack')
 		}
 		mut shape := variable.value.shape.clone()
 		shape.insert(axis, 1)
