@@ -81,6 +81,23 @@ Axes can be negative, counting from the end. For example,
 `moveaxis([0], [-1])` moves the first axis to the last position. The source
 and destination lists must have the same length and contain unique axes.
 
+## Gathering values with `take`
+
+`take` copies selected positions along an axis. Indices may be repeated or
+negative, and the selected axis keeps its position in the output shape.
+
+```v
+import vtl
+
+matrix := vtl.from_array([0, 1, 2, 3, 4, 5], [2, 3])!
+columns := matrix.take([2, 0], 1)!
+println(columns.shape) // [2, 2]
+println(columns.to_array()) // [2, 0, 5, 3]
+```
+
+An index outside the selected axis returns an error. Use `slice` when you
+need a range-based view instead of a gathered copy.
+
 ## Slice Mutations
 
 Slices can also be mutated with a single value, a nested sequence or array,

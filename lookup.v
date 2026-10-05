@@ -1,5 +1,35 @@
 module vtl
 
+// take returns a copy of the tensor with the values at `indices` selected
+// along `axis`. Negative axes and negative indices count from the end.
+// The indices are a one-dimensional list; use slice for range-based views.
+pub fn (t &Tensor[T]) take[T](indices []int, axis int) !&Tensor[T] {
+	rank := t.rank()
+	axis_index := if axis < 0 { axis + rank } else { axis }
+	if axis_index < 0 || axis_index >= rank {
+		return error('take axis ${axis} is out of range for rank ${rank}')
+	}
+	mut normalized_indices := []int{cap: indices.len}
+	for index in indices {
+		normalized := if index < 0 { index + t.shape[axis_index] } else { index }
+		if normalized < 0 || normalized >= t.shape[axis_index] {
+			return error('take index ${index} is out of range for axis size ${t.shape[axis_index]}')
+		}
+		normalized_indices << normalized
+	}
+
+	mut output_shape := t.shape.clone()
+	output_shape[axis_index] = indices.len
+	mut result := empty[T](output_shape, memory: t.memory)
+	for flat_index in 0 .. result.size {
+		mut output_index := result.nth_index(flat_index)
+		mut input_index := output_index.clone()
+		input_index[axis_index] = normalized_indices[output_index[axis_index]]
+		result.set(output_index, t.get(input_index))
+	}
+	return result
+}
+
 // get returns a scalar value from a Tensor at the provided index
 
 // get exposes this operation as part of the public API.

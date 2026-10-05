@@ -43,7 +43,8 @@ t.get([1, 1])
 
 ## Features
 
-- **Tensors** — create, slice, reshape, transpose, move/roll axes, broadcast, map/reduce
+- **Tensors** — create, slice, indexed `take`, reshape, transpose, move/roll axes,
+  broadcast, map/reduce
 - **Autograd** — reverse-mode AD; arbitrary computational graphs
 - **Neural networks** — `Sequential` API; Linear, Conv2D, LSTM, Attention, …
 - **Losses & optimizers** — MSE, BCE, CrossEntropy, Huber; Adam, AdamW, SGD, …
