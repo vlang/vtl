@@ -49,12 +49,18 @@ jobs:
         with:
           check-latest: true
 
+      - name: Move VTL source code to V Modules
+        run: |
+          mkdir -p ~/.vmodules
+          mv ./vtl ~/.vmodules/vtl
+
       - name: V doctor
-        run: v doctor
+        run: |
+          cd ~/.vmodules
+          v doctor
 
       - name: Install dependencies
         run: |
-          v install vsl@v0.2.0-beta.1 && \
           sudo apt-get -qq update && \
           sudo apt-get -qq install \
             gfortran \
@@ -70,13 +76,10 @@ jobs:
             hdf5-tools \
             opencl-headers
 
-      - name: Move VTL source code to V Modules
-        run: mv ./vtl ~/.vmodules
-
       - name: Verify Fmt
         run: |
-          cd ~
-          v fmt -verify ~/.vmodules/vtl
+          cd ~/.vmodules
+          v fmt -verify vtl
 
   run-tests:
     runs-on: ${{ matrix.os }}
@@ -115,13 +118,27 @@ jobs:
         with:
           path: vtl
 
+      - name: Checkout VSL
+        uses: actions/checkout@v4
+        with:
+          repository: vlang/vsl
+          path: vsl
+
       - name: Setup V
         uses: vlang/setup-v@v1.6
         with:
           check-latest: true
 
+      - name: Move VTL source code to V Modules
+        run: |
+          mkdir -p ~/.vmodules
+          mv ./vtl ~/.vmodules/vtl
+          mv ./vsl ~/.vmodules/vsl
+
       - name: V doctor
-        run: v doctor
+        run: |
+          cd ~/.vmodules
+          v doctor
 
       - name: Install dependencies
         run: |
@@ -143,20 +160,63 @@ jobs:
           else
             brew install coreutils hdf5 open-mpi openblas lapack opencl-headers
           fi
-          v install vsl@v0.2.0-beta.1
-
-      - name: Move VTL source code to V Modules
-        run: mv ./vtl ~/.vmodules
 
       - name: Execute Tests
         env:
           VJOBS: '2'
         run: |
+          cd ~/.vmodules
           if [[ "${{ matrix.backend }}" == "cblas" ]]; then
             backend_flag=--use-cblas
           fi
           # Default: scoped tests + tiny_synth smoke (see bin/test, issue #109)
           ~/.vmodules/vtl/bin/test ${{ matrix.flags }} $backend_flag
+
+  opencl-vcl-smoke:
+    name: OpenCL/VCL tensor smoke
+    runs-on: ubuntu-24.04
+    env:
+      VJOBS: '2'
+
+    steps:
+      - name: Checkout VTL
+        uses: actions/checkout@v4
+        with:
+          path: vtl
+
+      - name: Checkout VSL
+        uses: actions/checkout@v4
+        with:
+          repository: vlang/vsl
+          path: vsl
+
+      - name: Setup V
+        uses: vlang/setup-v@v1.6
+        with:
+          check-latest: true
+
+      - name: Move modules to V Modules
+        run: |
+          mkdir -p ~/.vmodules
+          mv ./vtl ~/.vmodules/vtl
+          mv ./vsl ~/.vmodules/vsl
+
+      - name: V doctor
+        run: |
+          cd ~/.vmodules
+          v doctor
+
+      - name: Install OpenCL CPU runtime
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get -qq install opencl-headers ocl-icd-opencl-dev pocl-opencl-icd
+
+      - name: Run VTL OpenCL/VCL smoke
+        env:
+          VJOBS: '2'
+        run: |
+          cd ~/.vmodules
+          v -d vcl run vtl/examples/vtl_opencl_vcl_support/main.v
 
   windows-smoke:
     name: Windows core and autograd tests
@@ -170,23 +230,29 @@ jobs:
         with:
           path: vtl
 
+      - name: Checkout VSL
+        uses: actions/checkout@v4
+        with:
+          repository: vlang/vsl
+          path: vsl
+
       - name: Setup V
         uses: vlang/setup-v@v1.6
         with:
           check-latest: true
-
-      - name: V doctor
-        run: v doctor
-
-      - name: Install VSL dependency
-        shell: bash
-        run: v install vsl@v0.2.0-beta.1
 
       - name: Move VTL source code to V Modules
         shell: bash
         run: |
           mkdir -p ~/.vmodules
           mv ./vtl ~/.vmodules/vtl
+          mv ./vsl ~/.vmodules/vsl
+
+      - name: V doctor
+        shell: bash
+        run: |
+          cd ~/.vmodules
+          v doctor
 
       - name: Run Windows core tensor tests
         shell: bash

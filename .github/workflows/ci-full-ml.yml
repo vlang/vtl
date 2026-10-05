@@ -30,20 +30,29 @@ jobs:
         with:
           path: vtl
 
+      - uses: actions/checkout@v4
+        with:
+          repository: vlang/vsl
+          path: vsl
+
       - uses: vlang/setup-v@v1.6
         with:
           check-latest: true
 
       - name: Install dependencies
         run: |
-          v install vsl@v0.2.0-beta.1
           sudo apt-get -qq update
           sudo apt-get -qq install \
             gfortran liblapacke-dev libopenblas-dev libgc-dev \
             libgl1-mesa-dev opencl-headers
 
       - name: Install VTL module
-        run: mv ./vtl ~/.vmodules
+        run: |
+          mkdir -p ~/.vmodules
+          mv ./vtl ~/.vmodules/vtl
+          mv ./vsl ~/.vmodules/vsl
 
       - name: Full test tree and examples
-        run: ~/.vmodules/vtl/bin/test --full
+        run: |
+          cd ~/.vmodules
+          vtl/bin/test --full

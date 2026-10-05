@@ -28,16 +28,22 @@ jobs:
           fetch-depth: 0
           path: vtl
 
+      - name: Checkout VSL
+        uses: actions/checkout@v4
+        with:
+          repository: vlang/vsl
+          path: vsl
+
       - name: Setup V
         uses: vlang/setup-v@v1.6
         with:
           check-latest: true
 
-      - name: Install VSL dependency
-        run: v install vsl@v0.2.0-beta.1
-
       - name: Copy VTL source code to V Modules
-        run: cp -rf ./vtl ~/.vmodules/vtl
+        run: |
+          mkdir -p ~/.vmodules
+          cp -rf ./vtl ~/.vmodules/vtl
+          cp -rf ./vsl ~/.vmodules/vsl
 
       - name: Detect changed Markdown
         id: markdown
@@ -64,7 +70,7 @@ jobs:
       - name: Validate changed Markdown
         if: steps.markdown.outputs.files != ''
         run: |
-          cd ~/.vmodules/vtl
+          cd ~/.vmodules
           printf '%s\n' "${{ steps.markdown.outputs.files }}" | xargs v check-md -hide-warnings
 
       - name: Skip when no Markdown changed

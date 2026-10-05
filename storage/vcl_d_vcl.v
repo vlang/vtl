@@ -7,6 +7,7 @@ import vsl.vcl
 // VclStorageParams defines a public data structure for this module.
 @[params]
 pub struct VclStorageParams {
+pub:
 	device &vcl.Device = unsafe { nil }
 }
 
@@ -41,8 +42,8 @@ pub fn (cpu &CpuStorage[T]) vcl(params VclStorageParams) !&VclStorage[T] {
 }
 
 // cpu exposes this operation as part of the public API.
-pub fn (storage &VclStorage[T]) cpu() !&CpuStorage[T] {
-	arr := storage.to_array()!
+pub fn (s &VclStorage[T]) cpu() !&CpuStorage[T] {
+	arr := s.to_array()!
 	return &CpuStorage[T]{
 		data: arr
 	}
@@ -52,14 +53,14 @@ pub fn (storage &VclStorage[T]) cpu() !&CpuStorage[T] {
 
 // to_array exposes this operation as part of the public API.
 @[inline]
-pub fn (storage &VclStorage[T]) to_array[T]() ![]T {
-	return storage.data.data()
+pub fn (s &VclStorage[T]) to_array[T]() ![]T {
+	return s.data.data()
 }
 
 // release exposes this operation as part of the public API.
 
 // release exposes this operation as part of the public API.
 @[inline]
-pub fn (storage &VclStorage[T]) release() ! {
-	return storage.data.release()
+pub fn (s &VclStorage[T]) release() ! {
+	return s.data.release()
 }

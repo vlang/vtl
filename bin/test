@@ -57,6 +57,7 @@ fi
 should_skip_example() {
     case "$1" in
         */examples/nn_cifar10/main.v) return 0 ;;
+        */examples/vtl_opencl_vcl_support/main.v) return 0 ;;
     esac
     return 1
 }
@@ -93,7 +94,11 @@ for file in $(find "${vtl_dir_path}" -wholename '*/examples/*/main.v' | sort); d
         continue
     fi
     if should_skip_example "${file}"; then
-        echo "Skipping ${file} (heavy; use bin/test --full or label full-ml)"
+        if [[ "${file}" == *"vtl_opencl_vcl_support/main.v" ]]; then
+            echo "Skipping ${file} (requires -d vcl; run the OpenCL CI smoke step)"
+        else
+            echo "Skipping ${file} (heavy; use bin/test --full or label full-ml)"
+        fi
         continue
     fi
     echo "Compiling ${file}"
