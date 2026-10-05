@@ -22,17 +22,31 @@ pub fn clip_grad_norm[T](mut parameters []&autograd.Variable[T], max_norm f64) !
 		return error('clip_grad_norm: max_norm must be finite and greater than zero')
 	}
 
-	mut squared_norm := 0.0
+	mut norm_scale := 0.0
+	mut scaled_squares := 1.0
 	for parameter in parameters {
 		if !parameter.requires_grad {
 			continue
 		}
 		for i in 0 .. parameter.grad.size {
-			gradient := f64(parameter.grad.get_nth(i))
-			squared_norm += gradient * gradient
+			gradient := math.abs(f64(parameter.grad.get_nth(i)))
+			if !math.is_finite(gradient) {
+				return error('clip_grad_norm: gradient norm must be finite')
+			}
+			if gradient == 0.0 {
+				continue
+			}
+			if norm_scale < gradient {
+				ratio := norm_scale / gradient
+				scaled_squares = 1.0 + scaled_squares * ratio * ratio
+				norm_scale = gradient
+			} else {
+				ratio := gradient / norm_scale
+				scaled_squares += ratio * ratio
+			}
 		}
 	}
-	norm := math.sqrt(squared_norm)
+	norm := norm_scale * math.sqrt(scaled_squares)
 	if !math.is_finite(norm) {
 		return error('clip_grad_norm: gradient norm must be finite')
 	}

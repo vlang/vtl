@@ -103,6 +103,19 @@ fn test_clip_grad_norm_rejects_non_finite_gradients() {
 	assert false, 'expected clip_grad_norm to reject a non-finite norm'
 }
 
+fn test_clip_grad_norm_handles_large_finite_gradients() ! {
+	context := autograd.ctx[f64]()
+	parameter := context.variable(vtl.from_1d([0.0, 0.0])!)
+	parameter.grad.set_nth(0, 1e200)
+	parameter.grad.set_nth(1, 2e200)
+	mut parameters := [parameter]
+
+	original_norm := clip_grad_norm[f64](mut parameters, 1.0)!
+	assert math.abs(original_norm / 1e200 - math.sqrt(5.0)) < 1e-12
+	assert math.abs(parameter.grad.get_nth(0) - 1.0 / math.sqrt(5.0)) < 1e-12
+	assert math.abs(parameter.grad.get_nth(1) - 2.0 / math.sqrt(5.0)) < 1e-12
+}
+
 fn test_clip_grad_norm_rejects_integer_gradients_without_mutating() {
 	context := autograd.ctx[int]()
 	parameter := context.variable(vtl.from_1d([0, 0])!)
