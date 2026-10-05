@@ -161,14 +161,9 @@ pub fn deriv_elu[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T], alpha T) !&v
 @[inline]
 pub fn gelu[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 	return x.map(fn [T](val T, i []int) T {
-		one := vtl.cast[T](1)
-		sqrt_2_over_pi := vtl.cast[T](0.7978845608028654)
-		coef := vtl.cast[T](0.044715)
-		tanh_arg := sqrt_2_over_pi * (val + coef * val * val * val)
-		// tanh via epsilon-approximation: (exp(z)-exp(-z))/(exp(z)+exp(-z))
-		exp_2z := math.exp(vtl.cast[f64](2.0 * tanh_arg))
-		tanh_z := vtl.cast[T]((exp_2z - 1.0) / (exp_2z + 1.0))
-		return vtl.cast[T](0.5) * val * (one + tanh_z)
+		value := vtl.cast[f64](val)
+		tanh_arg := 0.7978845608028654 * (value + 0.044715 * value * value * value)
+		return vtl.cast[T](0.5 * value * (1.0 + math.tanh(tanh_arg)))
 	})
 }
 
@@ -183,17 +178,12 @@ pub fn gelu[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 @[inline]
 pub fn deriv_gelu[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	return gradient.nmap([cached], fn [T](vals []T, i []int) T {
-		x := vals[0]
-		one := vtl.cast[T](1)
-		sqrt_2_over_pi := vtl.cast[T](0.7978845608028654)
-		coef := vtl.cast[T](0.044715)
-		// compute tanh(z) and z for cached x
-		z := sqrt_2_over_pi * (x + coef * x * x * x)
-		exp_2z := math.exp(vtl.cast[f64](2.0 * z))
-		tanh_z := vtl.cast[T]((exp_2z - 1.0) / (exp_2z + 1.0))
-		dz_dx := sqrt_2_over_pi * (one + vtl.cast[T](3.0 * 0.044715) * x * x)
-		sech2_z := one - tanh_z * tanh_z
-		return vals[0] * vtl.cast[T](0.5) * (one + tanh_z + x * sech2_z * dz_dx)
+		x := vtl.cast[f64](vals[1])
+		z := 0.7978845608028654 * (x + 0.044715 * x * x * x)
+		tanh_z := math.tanh(z)
+		dz_dx := 0.7978845608028654 * (1.0 + 3.0 * 0.044715 * x * x)
+		derivative := 0.5 * (1.0 + tanh_z + x * (1.0 - tanh_z * tanh_z) * dz_dx)
+		return vals[0] * vtl.cast[T](derivative)
 	})
 }
 
@@ -222,12 +212,15 @@ pub fn swish[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 @[inline]
 pub fn deriv_swish[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	return gradient.nmap([cached], fn [T](vals []T, i []int) T {
-		x := vals[0]
-		one := vtl.cast[T](1)
-		exp_neg := vtl.cast[T](math.exp(-vtl.cast[f64](x)))
-		sig := one / (one + exp_neg)
-		// derivative: gradient * [sigmoid + x * sigmoid * (1-sigmoid)]
-		return vals[0] * sig * (one + x * (one - sig))
+		x := vtl.cast[f64](vals[1])
+		sig := if x >= 0 {
+			1.0 / (1.0 + math.exp(-x))
+		} else {
+			exp_x := math.exp(x)
+			exp_x / (1.0 + exp_x)
+		}
+		derivative := sig * (1.0 + x * (1.0 - sig))
+		return vals[0] * vtl.cast[T](derivative)
 	})
 }
 
@@ -240,11 +233,13 @@ pub fn deriv_swish[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tens
 @[inline]
 pub fn mish[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 	return x.map(fn [T](val T, i []int) T {
-		sp := vtl.cast[T](math.log1p(math.exp(vtl.cast[f64](val))))
-		// tanh(sp) via (exp(2sp)-1)/(exp(2sp)+1)
-		exp_2sp := math.exp(vtl.cast[f64](2.0 * sp))
-		tanh_sp := vtl.cast[T]((exp_2sp - 1.0) / (exp_2sp + 1.0))
-		return val * tanh_sp
+		value := vtl.cast[f64](val)
+		softplus_value := if value > 0 {
+			value + math.log1p(math.exp(-value))
+		} else {
+			math.log1p(math.exp(value))
+		}
+		return vtl.cast[T](value * math.tanh(softplus_value))
 	})
 }
 
@@ -257,15 +252,21 @@ pub fn mish[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 @[inline]
 pub fn deriv_mish[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	return gradient.nmap([cached], fn [T](vals []T, i []int) T {
-		x := vals[0]
-		one := vtl.cast[T](1)
-		exp_x := math.exp(vtl.cast[f64](x))
-		sig := vtl.cast[T](exp_x / (exp_x + 1.0))
-		sp := vtl.cast[T](math.log1p(exp_x))
-		exp_2sp := math.exp(vtl.cast[f64](2.0 * sp))
-		tanh_sp := vtl.cast[T]((exp_2sp - 1.0) / (exp_2sp + 1.0))
-		// derivative: gradient * [tanh_sp + x * (1-tanh_sp^2) * sigmoid(x)]
-		return vals[0] * (tanh_sp + x * (one - tanh_sp * tanh_sp) * sig)
+		x := vtl.cast[f64](vals[1])
+		softplus_value := if x > 0 {
+			x + math.log1p(math.exp(-x))
+		} else {
+			math.log1p(math.exp(x))
+		}
+		tanh_softplus := math.tanh(softplus_value)
+		sigmoid := if x >= 0 {
+			1.0 / (1.0 + math.exp(-x))
+		} else {
+			exp_x := math.exp(x)
+			exp_x / (1.0 + exp_x)
+		}
+		derivative := tanh_softplus + x * (1.0 - tanh_softplus * tanh_softplus) * sigmoid
+		return vals[0] * vtl.cast[T](derivative)
 	})
 }
 

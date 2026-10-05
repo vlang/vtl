@@ -121,6 +121,58 @@ fn test_hardswish_forward_and_backward() ! {
 	assert input.grad.get_nth(5) == 1.0
 }
 
+fn test_gelu_swish_and_mish_backward_use_input_values() ! {
+	values := [-1.0, 0.0, 1.0]
+	gelu_ctx := ctx[f64]()
+	gelu_input := variable[f64](gelu_ctx, values, [3])!
+	mut gelu_output := gelu_layer[f64](gelu_ctx, [3]).forward(gelu_input)!
+	gelu_output.backprop()!
+	for i, x in values {
+		z := 0.7978845608028654 * (x + 0.044715 * x * x * x)
+		tanh_z := math.tanh(z)
+		dz_dx := 0.7978845608028654 * (1.0 + 3.0 * 0.044715 * x * x)
+		expected := 0.5 * (1.0 + tanh_z + x * (1.0 - tanh_z * tanh_z) * dz_dx)
+		assert math.abs(gelu_input.grad.get_nth(i) - expected) < 1e-12
+	}
+
+	swish_ctx := ctx[f64]()
+	swish_input := variable[f64](swish_ctx, values, [3])!
+	mut swish_output := swish_layer[f64](swish_ctx, [3]).forward(swish_input)!
+	swish_output.backprop()!
+	for i, x in values {
+		sigmoid := 1.0 / (1.0 + math.exp(-x))
+		expected := sigmoid * (1.0 + x * (1.0 - sigmoid))
+		assert math.abs(swish_input.grad.get_nth(i) - expected) < 1e-12
+	}
+
+	mish_ctx := ctx[f64]()
+	mish_input := variable[f64](mish_ctx, values, [3])!
+	mut mish_output := mish_layer[f64](mish_ctx, [3]).forward(mish_input)!
+	mish_output.backprop()!
+	for i, x in values {
+		softplus := math.log1p(math.exp(x))
+		tanh_softplus := math.tanh(softplus)
+		sigmoid := 1.0 / (1.0 + math.exp(-x))
+		expected := tanh_softplus + x * (1.0 - tanh_softplus * tanh_softplus) * sigmoid
+		assert math.abs(mish_input.grad.get_nth(i) - expected) < 1e-12
+	}
+}
+
+fn test_gelu_and_mish_are_finite_for_large_inputs() ! {
+	values := [-1000.0, 1000.0]
+	gelu_ctx := ctx[f64]()
+	gelu_input := variable[f64](gelu_ctx, values, [2])!
+	gelu_output := gelu_layer[f64](gelu_ctx, [2]).forward(gelu_input)!
+	assert gelu_output.value.get_nth(0) == 0.0
+	assert gelu_output.value.get_nth(1) == 1000.0
+
+	mish_ctx := ctx[f64]()
+	mish_input := variable[f64](mish_ctx, values, [2])!
+	mish_output := mish_layer[f64](mish_ctx, [2]).forward(mish_input)!
+	assert mish_output.value.get_nth(0) == 0.0
+	assert mish_output.value.get_nth(1) == 1000.0
+}
+
 fn test_activations_support_f32_forward_and_backward() ! {
 	softplus_ctx := ctx[f32]()
 	softplus_input := variable[f32](softplus_ctx, [-1.0, 1.0], [2])!
