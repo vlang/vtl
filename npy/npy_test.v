@@ -61,6 +61,18 @@ fn test_npy_native_int_uses_platform_width() {
 	assert dtype.width == sizeof(int)
 }
 
+fn test_npy_writer_uses_byte_order_independent_descriptor_for_bool() {
+	path := os.join_path(os.temp_dir(), 'vtl_npy_bool_descriptor.npy')
+	defer {
+		os.rm(path) or {}
+	}
+	write(path, vtl.from_1d([true, false])!)!
+	bytes := os.read_bytes(path)!
+	header_length := int(binary.little_endian_u16(bytes[8..]))
+	header := bytes[10..10 + header_length].bytestr()
+	assert header.contains("'descr': '|b1'")
+}
+
 fn check_npy_round_trip[T](suffix string, values []T) {
 	path := os.join_path(os.temp_dir(), 'vtl_npy_${suffix}_round_trip.npy')
 	defer {

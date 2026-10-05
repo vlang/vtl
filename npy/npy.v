@@ -23,7 +23,8 @@ struct NpyDescriptor {
 // Numeric primitive types and row-major logical tensor order are supported.
 pub fn write[T](path string, tensor &vtl.Tensor[T]) ! {
 	npy_dtype := npy_type[T]() or { return err }
-	descriptor := '<${rune(npy_dtype.kind)}${npy_dtype.width}'
+	byte_order := if npy_dtype.width == 1 { '|' } else { '<' }
+	descriptor := '${byte_order}${rune(npy_dtype.kind)}${npy_dtype.width}'
 	shape := format_shape(tensor.shape)
 	mut header := "{'descr': '${descriptor}', 'fortran_order': False, 'shape': ${shape}, }"
 	padding := (64 - ((10 + header.len + 1) % 64)) % 64
