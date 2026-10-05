@@ -12,3 +12,4 @@ module loss
 // - huber.v: HuberLoss, HuberLossConfig, huber_loss, HuberLossGate, huber_loss_gate
 // - nll.v: NLLLoss, nll_loss, NLLLossGate, nll_loss_gate
 // - kl.v: KLDivLoss, kl_div_loss, KLDivLossGate, kl_div_loss_gate
+// - additional.v: L1Loss, HingeLoss, FocalLoss and their constructors

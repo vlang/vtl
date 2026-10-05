@@ -201,8 +201,7 @@ fn test_triu_offset_0_matches_inplace() {
 	assert t.shape == [3, 3]
 	assert t.strides == [3, 1]
 	triu := t.triu_offset(0)
-	assert triu.array_equal(vtl.from_2d([[1, 2, 3], [0, 5, 6],
-		[0, 0, 9]])!)
+	assert triu.array_equal(vtl.from_2d([[1, 2, 3], [0, 5, 6], [0, 0, 9]])!)
 }
 
 fn test_triu_offset_1_matches_inplace() {
@@ -210,6 +209,5 @@ fn test_triu_offset_1_matches_inplace() {
 	assert t.shape == [3, 3]
 	assert t.strides == [3, 1]
 	triu := t.triu_offset(1)
-	assert triu.array_equal(vtl.from_2d([[0, 2, 3], [0, 0, 6],
-		[0, 0, 0]])!)
+	assert triu.array_equal(vtl.from_2d([[0, 2, 3], [0, 0, 6], [0, 0, 0]])!)
 }

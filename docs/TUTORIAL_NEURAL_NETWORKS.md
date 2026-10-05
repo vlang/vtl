@@ -66,8 +66,30 @@ model.mse_loss() // loss function
 | `softmax_cross_entropy_loss()` | `SoftmaxCrossEntropyLoss` | Softmax CE for multi-class |
 | `cross_entropy_loss()` | `CrossEntropyLoss` | Cross-Entropy |
 | `huber_loss(delta: 1.0)` | `HuberLoss` | Huber (smooth L1) loss |
+| `l1_loss()` | `L1Loss` | Mean Absolute Error (MAE); zero subgradient at exact matches |
+| `hinge_loss()` | `HingeLoss` | Binary SVM hinge loss; targets must be -1 or +1 |
+| `focal_loss()` | `FocalLoss` | Binary focal loss for imbalanced classes; default logits, alpha 0.25, gamma 2 |
 | `nll_loss(weight)` | `NLLLoss` | Negative Log Likelihood |
 | `kl_div_loss()` | `KLDivLoss` | KL Divergence D_KL(P‖Q) |
+
+### Binary focal loss with probabilities
+
+For precomputed probabilities, configure the standalone loss with `from_logits: false`.
+Targets are binary values in `[0, 1]`. The `Sequential.focal_loss()` builder uses
+logits and the default `alpha: 0.25`, `gamma: 2` configuration.
+
+```v
+import vtl
+import vtl.autograd
+import vtl.nn.loss
+
+ctx := autograd.ctx[f64]()
+prediction := ctx.variable(vtl.from_array([0.8], [1])!)
+target := vtl.from_array([1.0], [1])!
+criterion := loss.focal_loss[f64](from_logits: false, alpha: 0.25, gamma: 2.0)
+mut loss_value := criterion.loss(prediction, target)!
+loss_value.backprop()!
+```
 
 ### All available optimizers
 

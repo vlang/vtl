@@ -66,13 +66,13 @@ pub fn (mut ls SequentialInfo[T]) maxpool2d(kernel []int, padding []int, stride 
 	shape := layer.output_shape()
 	ls.add_layer(layers.maxpool2d_layer[T](ls.ctx, shape, kernel, padding, stride),
 		'MaxPool2DLayer', {
-		'kernel_h':  kernel[0]
-		'kernel_w':  kernel[1]
-		'padding_h': padding[0]
-		'padding_w': padding[1]
-		'stride_h':  stride[0]
-		'stride_w':  stride[1]
-	})
+			'kernel_h':  kernel[0]
+			'kernel_w':  kernel[1]
+			'padding_h': padding[0]
+			'padding_w': padding[1]
+			'stride_h':  stride[0]
+			'stride_w':  stride[1]
+		})
 }
 
 // mse_loss sets the loss function to the mean squared error loss.
@@ -195,13 +195,13 @@ pub fn (mut ls SequentialInfo[T]) avgpool2d(kernel []int, padding []int, stride 
 	shape := layer.output_shape()
 	ls.add_layer(layers.avgpool2d_layer[T](ls.ctx, shape, kernel, padding, stride),
 		'AvgPool2DLayer', {
-		'kernel_h':  kernel[0]
-		'kernel_w':  kernel[1]
-		'padding_h': padding[0]
-		'padding_w': padding[1]
-		'stride_h':  stride[0]
-		'stride_w':  stride[1]
-	})
+			'kernel_h':  kernel[0]
+			'kernel_w':  kernel[1]
+			'padding_h': padding[0]
+			'padding_w': padding[1]
+			'stride_h':  stride[0]
+			'stride_w':  stride[1]
+		})
 }
 
 // global_avgpool2d adds a new GlobalAveragePool2D layer to the network.
@@ -240,19 +240,19 @@ pub fn (mut ls SequentialInfo[T]) lstm(input_size int, hidden_size int, num_laye
 pub fn (mut ls SequentialInfo[T]) multihead_attention(embed_dim int, num_heads int) {
 	ls.add_layer(layers.multihead_attention_layer[T](ls.ctx, embed_dim, num_heads),
 		'MultiHeadAttentionLayer', {
-		'embed_dim': embed_dim
-		'num_heads': num_heads
-		'head_dim':  embed_dim / num_heads
-	})
+			'embed_dim': embed_dim
+			'num_heads': num_heads
+			'head_dim':  embed_dim / num_heads
+		})
 }
 
 // positional_encoding adds a new PositionalEncoding layer to the network.
 pub fn (mut ls SequentialInfo[T]) positional_encoding(embed_dim int, max_len int) {
 	ls.add_layer(layers.positional_encoding_layer[T](ls.ctx, embed_dim, max_len) or { panic(err) },
 		'PositionalEncodingLayer', {
-		'embed_dim': embed_dim
-		'max_len':   max_len
-	})
+			'embed_dim': embed_dim
+			'max_len':   max_len
+		})
 }
 
 // cross_entropy_loss sets the loss function to cross entropy loss.
@@ -268,6 +268,21 @@ pub fn (mut ls SequentialInfo[T]) bce_loss() {
 // huber_loss sets the loss function to Huber loss.
 pub fn (mut ls SequentialInfo[T]) huber_loss() {
 	ls.loss = loss.huber_loss[T](loss.HuberLossConfig{})
+}
+
+// l1_loss sets mean absolute error as the loss function.
+pub fn (mut ls SequentialInfo[T]) l1_loss() {
+	ls.loss = loss.l1_loss[T]()
+}
+
+// hinge_loss sets binary hinge loss as the loss function.
+pub fn (mut ls SequentialInfo[T]) hinge_loss() {
+	ls.loss = loss.hinge_loss[T]()
+}
+
+// focal_loss sets binary focal loss with its default configuration.
+pub fn (mut ls SequentialInfo[T]) focal_loss() {
+	ls.loss = loss.focal_loss[T](loss.FocalLossConfig{})
 }
 
 // nll_loss sets the loss function to negative log likelihood loss.

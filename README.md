@@ -47,7 +47,8 @@ t.get([1, 1])
   broadcast, map/reduce
 - **Autograd** — reverse-mode AD; arbitrary computational graphs
 - **Neural networks** — `Sequential` API; Linear, Conv2D, LSTM, Attention, …
-- **Losses & optimizers** — MSE, BCE, CrossEntropy, Huber; Adam, AdamW, SGD, …
+- **Losses & optimizers** — MSE, MAE, BCE, Hinge, Focal, CrossEntropy, Huber;
+  Adam, AdamW, SGD, …
 - **Linear algebra** — VSL-backed matmul, solve, QR, LU, Cholesky, SVD, pinv
 - **Hardware** — zero-copy `Tensor.data` for C libs; optional CUDA and Vulkan training paths
 
