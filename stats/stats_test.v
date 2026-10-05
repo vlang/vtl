@@ -3,6 +3,39 @@ module stats
 import vtl
 import math
 
+fn test_variance_uses_f64_for_integer_input_and_ddof() {
+	data := vtl.from_1d([1, 2, 3])!
+	population := variance(data, VarianceData{})!
+	sample := variance(data, VarianceData{
+		ddof: 1
+	})!
+	assert math.abs(population - (2.0 / 3.0)) < 1e-12
+	assert math.abs(sample - 1.0) < 1e-12
+	assert math.abs(std(data, VarianceData{})! - math.sqrt(2.0 / 3.0)) < 1e-12
+}
+
+fn test_variance_is_stable_for_values_with_large_offset() {
+	data := vtl.from_1d([1e15 + 1.0, 1e15 + 2.0, 1e15 + 3.0, 1e15 + 4.0])!
+	assert math.abs(variance(data, VarianceData{})! - 1.25) < 1e-6
+}
+
+fn test_variance_rejects_undefined_inputs() {
+	empty := vtl.from_1d([]f64{})!
+	assert_variance_error(empty, VarianceData{})
+	data := vtl.from_1d([1.0, 2.0])!
+	assert_variance_error(data, VarianceData{
+		ddof: 2
+	})
+	assert_variance_error(data, VarianceData{
+		ddof: -1
+	})
+}
+
+fn assert_variance_error[T](t &vtl.Tensor[T], data VarianceData) {
+	_ := variance(t, data) or { return }
+	assert false, 'expected variance to reject invalid input'
+}
+
 fn test_freq() {
 	// Tests were also verified on Wolfram Alpha
 	data := vtl.from_1d([10.0, 10.0, 5.9, 2.7])!

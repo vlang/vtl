@@ -3,6 +3,42 @@ module stats
 import vtl
 import math
 
+// VarianceData configures the degrees of freedom used by variance and std.
+pub struct VarianceData {
+pub:
+	ddof int
+}
+
+// variance calculates the variance using Welford's stable online algorithm.
+// It returns f64 even for integer tensors to preserve fractional results.
+// ddof is subtracted from the number of observations in the denominator;
+// the default (0) computes population variance.
+pub fn variance[T](t &vtl.Tensor[T], data VarianceData) !f64 {
+	if data.ddof < 0 {
+		return error('variance: ddof must be non-negative')
+	}
+	if t.size <= data.ddof {
+		return error('variance: observations must exceed ddof')
+	}
+	mut count := 0
+	mut average := 0.0
+	mut sum_squares := 0.0
+	mut iter := t.iterator()
+	for {
+		value, _ := iter.next() or { break }
+		count++
+		delta := f64(value) - average
+		average += delta / f64(count)
+		sum_squares += delta * (f64(value) - average)
+	}
+	return sum_squares / f64(count - data.ddof)
+}
+
+// std calculates the standard deviation using Welford's stable algorithm.
+pub fn std[T](t &vtl.Tensor[T], data VarianceData) !f64 {
+	return math.sqrt(variance(t, data)?)
+}
+
 // AxisData defines a public data structure for this module.
 pub struct AxisData {
 pub:

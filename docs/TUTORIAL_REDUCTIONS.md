@@ -17,13 +17,15 @@ t := vtl.from_array[f64]([3.0, 5.0, 1.0, 4.0], [2, 2])!
 
 // Along axis 1 (columns): which column holds the max per row?
 amax := t.argmax_axis[f64](1)!
+assert amax.shape == [2]
 // amax = [1, 1]  → row 0: max is at col 1 (5.0), row 1: max is at col 1 (4.0)
 
 amin := t.argmin_axis[f64](0)!
+assert amin.shape == [2]
 // amin = [1, 0]  → col 0: min is at row 1 (1.0), col 1: min is at row 0 (4.0)
 
 // Global: index of the largest element (no axis)
-global_max := t.argmax[int](0)!
+global_max := t.argmax[f64](0)!
 // global_max = 1  → t.data[1] == 5.0 is the largest element
 ```
 
@@ -91,6 +93,13 @@ information about automatic differentiation in VTL.
 NumPy's default linearly interpolated quantile. The quantile must be between
 0 and 1, and the result is `f64` even for integer input tensors.
 
+## Stable variance and standard deviation
+
+`stats.variance` uses Welford's online algorithm and returns `f64`, including
+for integer tensors. Its `ddof` parameter selects population variance (`0`, the
+default) or sample variance (`1`). The function returns an error when the
+effective denominator is not positive.
+
 ```v
 import vtl
 import vtl.stats
@@ -101,3 +110,18 @@ median := stats.quantile_linear(values, 0.5)! // 15.0
 
 Empty tensors and out-of-range quantiles return errors. NaNs propagate to the
 result.
+
+```v
+import vtl
+import vtl.stats
+
+samples := vtl.from_1d([1, 2, 3])!
+population := stats.variance(samples, stats.VarianceData{})!
+sample := stats.variance(samples, stats.VarianceData{
+	ddof: 1
+})!
+deviation := stats.std(samples, stats.VarianceData{})!
+assert population > 0.66 && population < 0.67
+assert sample == 1.0
+assert deviation > 0.81 && deviation < 0.82
+```
