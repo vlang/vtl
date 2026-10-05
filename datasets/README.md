@@ -11,6 +11,10 @@ VTL provides dataset loaders and batching utilities for ML examples and tests.
 | CIFAR-10 | `datasets.load_cifar10(...)` | Image classification examples |
 | DataLoader | `datasets.DataLoader[T]` | Batch, shuffle, and iterate tensors/labels |
 
+DataLoader returns a view when a batch's sample indices form a contiguous range.
+Shuffled, non-contiguous batches allocate tensors to preserve the requested
+sample order.
+
 ## Examples
 
 Run from `~/.vmodules`:
