@@ -44,6 +44,7 @@ fn test_npy_write_serializes_non_contiguous_views_in_logical_order() {
 fn test_npy_round_trips_all_primitive_numeric_types() {
 	check_npy_round_trip[f32]('f32', [f32(0.5), -2.25])
 	check_npy_round_trip[i8]('i8', [i8(-128), 127])
+	check_npy_round_trip[i32]('i32', [i32(-2147483648), 2147483647])
 	check_npy_round_trip[i64]('i64', [i64(-9223372036854775807), 42])
 	check_npy_round_trip[int]('int', [int(-7), 9])
 	check_npy_round_trip[u8]('u8', [u8(0), 255])

@@ -5,7 +5,8 @@ versions 1.0, 2.0, or 3.0. The reader handles C and Fortran order and converts
 big-endian data to VTL's logical row-major order.
 
 The file dtype must match the requested V type. Supported types are `bool`,
-`f32`, `f64`, signed `i8`/`i16`/`i64`/`int`, and unsigned `u8`/`u16`/`u32`/`u64`.
+`f32`, `f64`, signed `i8`/`i16`/`i32`/`i64`/`int`, and unsigned
+`u8`/`u16`/`u32`/`u64`.
 Object, string, structured, and complex dtypes are rejected.
 
 ```v

@@ -128,6 +128,8 @@ fn npy_type[T]() !NpyType {
 		return NpyType{u8(`i`), 1}
 	} $else $if T is i16 {
 		return NpyType{u8(`i`), 2}
+	} $else $if T is i32 {
+		return NpyType{u8(`i`), 4}
 	} $else $if T is i64 || T is int {
 		return NpyType{u8(`i`), 8}
 	} $else $if T is u8 {
@@ -176,6 +178,8 @@ fn value_from_bits[T](bits u64) T {
 		return i8(u8(bits))
 	} $else $if T is i16 {
 		return i16(u16(bits))
+	} $else $if T is i32 {
+		return i32(u32(bits))
 	} $else $if T is i64 {
 		return i64(bits)
 	} $else $if T is int {
