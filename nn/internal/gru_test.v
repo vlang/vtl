@@ -15,13 +15,13 @@ fn test_gru_forward_matches_reference_gate_equations() ! {
 }
 
 fn gru_test_objective(input_data []f64, wih_data []f64, whh_data []f64, bih_data []f64,
-	bhh_data []f64) !f64 {
+	bhh_data []f64, h0_data []f64) !f64 {
 	x := vtl.from_array(input_data, [2, 1, 2])!
 	wih := vtl.from_array(wih_data, [6, 2])!
 	whh := vtl.from_array(whh_data, [6, 2])!
 	bih := vtl.from_array(bih_data, [6])!
 	bhh := vtl.from_array(bhh_data, [6])!
-	h0 := vtl.from_array([0.1, -0.2], [1, 2])!
+	h0 := vtl.from_array(h0_data, [1, 2])!
 	y, _ := gru_forward_single[f64](x, wih, whh, bih, bhh, h0)!
 	mut total := f64(0)
 	for i, value in y.to_array() { total += value * f64(i + 1) }
@@ -34,12 +34,13 @@ fn test_gru_forward_shapes_and_finite_difference_gradients() ! {
 	whh_data := [0.2, 0.1, -0.15, 0.05, 0.1, -0.2, -0.1, 0.15, 0.3, -0.25, 0.05, 0.2]
 	bih_data := [0.01, -0.02, 0.03, 0.01, -0.01, 0.02]
 	bhh_data := [-0.01, 0.02, 0.01, -0.03, 0.02, -0.01]
+	h0_data := [0.1, -0.2]
 	x := vtl.from_array(input_data, [2, 1, 2])!
 	wih := vtl.from_array(wih_data, [6, 2])!
 	whh := vtl.from_array(whh_data, [6, 2])!
 	bih := vtl.from_array(bih_data, [6])!
 	bhh := vtl.from_array(bhh_data, [6])!
-	h0 := vtl.from_array([0.1, -0.2], [1, 2])!
+	h0 := vtl.from_array(h0_data, [1, 2])!
 	y, hn := gru_forward_single[f64](x, wih, whh, bih, bhh, h0)!
 	assert y.shape == [2, 1, 2]
 	assert hn.shape == [1, 2]
@@ -47,14 +48,15 @@ fn test_gru_forward_shapes_and_finite_difference_gradients() ! {
 	for i in 0 .. 4 { upstream_data[i] = f64(i + 1) }
 	upstream := vtl.from_array(upstream_data, [2, 1, 2])!
 	grads := gru_backward_single[f64](x, wih, whh, bih, bhh, h0, upstream)!
-	assert grads.len == 5
-	for item in 0 .. 5 {
+	assert grads.len == 6
+	for item in 0 .. 6 {
 		count := match item {
 			0 { input_data.len }
 			1 { wih_data.len }
 			2 { whh_data.len }
 			3 { bih_data.len }
-			else { bhh_data.len }
+			4 { bhh_data.len }
+			else { h0_data.len }
 		}
 		for index in 0 .. count {
 			mut xp, mut xm := input_data.clone(), input_data.clone()
@@ -62,6 +64,7 @@ fn test_gru_forward_shapes_and_finite_difference_gradients() ! {
 			mut hp, mut hm := whh_data.clone(), whh_data.clone()
 			mut bp, mut bm := bih_data.clone(), bih_data.clone()
 			mut cp, mut cm := bhh_data.clone(), bhh_data.clone()
+			mut sp, mut sm := h0_data.clone(), h0_data.clone()
 			eps := 1e-6
 			match item {
 				0 {
@@ -84,10 +87,14 @@ fn test_gru_forward_shapes_and_finite_difference_gradients() ! {
 					cp[index] += eps
 					cm[index] -= eps
 				}
+				5 {
+					sp[index] += eps
+					sm[index] -= eps
+				}
 				else {}
 			}
-			plus := gru_test_objective(xp, wp, hp, bp, cp)!
-			minus := gru_test_objective(xm, wm, hm, bm, cm)!
+			plus := gru_test_objective(xp, wp, hp, bp, cp, sp)!
+			minus := gru_test_objective(xm, wm, hm, bm, cm, sm)!
 			numerical := (plus - minus) / (2 * eps)
 			analytic := grads[item].get_nth(index)
 			delta := numerical - analytic
@@ -117,6 +124,6 @@ fn test_gru_f32_forward_and_backward() ! {
 	assert hn.shape == [1, 1]
 	grad := vtl.ones_like[f32](y)
 	grads := gru_backward_single[f32](x, wih, whh, bias, bias, h0, grad)!
-	assert grads.len == 5
+	assert grads.len == 6
 	assert grads[0].shape == x.shape
 }

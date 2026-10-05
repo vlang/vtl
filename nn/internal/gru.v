@@ -56,7 +56,7 @@ pub fn gru_forward_single[T](input &vtl.Tensor[T], w_ih &vtl.Tensor[T], w_hh &vt
 }
 
 // gru_backward_single differentiates the sum over timesteps supplied in grad_output.
-// It returns gradients for input, w_ih, w_hh, b_ih, and b_hh respectively.
+// It returns gradients for input, w_ih, w_hh, b_ih, b_hh, and h0 respectively.
 pub fn gru_backward_single[T](input &vtl.Tensor[T], w_ih &vtl.Tensor[T], w_hh &vtl.Tensor[T],
 	b_ih &vtl.Tensor[T], b_hh &vtl.Tensor[T], h0 &vtl.Tensor[T], grad_output &vtl.Tensor[T]) ![]&vtl.Tensor[T] {
 	output, _ := gru_forward_single[T](input, w_ih, w_hh, b_ih, b_hh, h0)!
@@ -150,7 +150,8 @@ pub fn gru_backward_single[T](input &vtl.Tensor[T], w_ih &vtl.Tensor[T], w_hh &v
 		vtl.from_array(dwx.map(vtl.cast[T](it)), [3 * hidden, input_size])!,
 		vtl.from_array(dwh.map(vtl.cast[T](it)), [3 * hidden, hidden])!,
 		vtl.from_array(dbx.map(vtl.cast[T](it)), [3 * hidden])!,
-		vtl.from_array(dbh.map(vtl.cast[T](it)), [3 * hidden])!]
+		vtl.from_array(dbh.map(vtl.cast[T](it)), [3 * hidden])!,
+		vtl.from_array(dh_next.map(vtl.cast[T](it)), [batch, hidden])!]
 }
 
 @[inline]

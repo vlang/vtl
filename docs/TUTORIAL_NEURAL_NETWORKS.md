@@ -149,7 +149,7 @@ See the runnable [Conv1D example](../examples/nn_conv1d/) for a complete forward
 
 ## Recurrent GRU layer
 
-The standalone `vtl.nn.layers.gru_layer` API accepts `[sequence, batch, input_features]` and returns `[sequence, batch, hidden_size]`. Its reset, update, and candidate weights use PyTorch's `[reset, update, new]` gate order. The layer starts with a zero hidden state; the lower-level `vtl.nn.internal.gru_forward_single` also accepts an explicit initial state. CPU backpropagation computes gradients for the input and four parameter tensors.
+The standalone `vtl.nn.layers.gru_layer` API accepts `[sequence, batch, input_features]` and returns `[sequence, batch, hidden_size]`. Its reset, update, and candidate weights use PyTorch's `[reset, update, new]` gate order. The layer starts with a zero hidden state; the lower-level `vtl.nn.internal.gru_forward_single` also accepts an explicit initial state. CPU backpropagation computes gradients for the input and all four parameter tensors; the lower-level backward kernel also returns the gradient for the supplied initial state.
 
 ```v
 import vtl

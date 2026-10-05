@@ -25,8 +25,9 @@ pub fn (g &GRUGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] 
 	input := g.input.value
 	hidden := g.w_hh.value.shape[1]
 	h0 := vtl.zeros[T]([input.shape[1], hidden])
-	return internal.gru_backward_single[T](input, g.w_ih.value, g.w_hh.value, g.b_ih.value,
+	gradients := internal.gru_backward_single[T](input, g.w_ih.value, g.w_hh.value, g.b_ih.value,
 		g.b_hh.value, h0, payload.variable.grad)!
+	return gradients[..5]
 }
 
 fn gru_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
