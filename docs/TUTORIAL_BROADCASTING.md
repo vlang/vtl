@@ -93,51 +93,16 @@ println(selected) // [1, 20, 3]
 
 measured := vtl.from_1d([1.0, 100.0005])!
 expected := vtl.from_1d([1.0, 100.0])!
-mask := measured.isclose(expected, 1e-5, 1e-8, false)!
+mask := measured.isclose(expected, rtol: 1e-5, atol: 1e-8)!
 println(mask) // [true, true]
-println(measured.allclose(expected, 1e-5, 1e-8, false)!) // true
+println(measured.allclose(expected, rtol: 1e-5, atol: 1e-8)!) // true
 ```
 
 `where` reports an error when any of the three shapes cannot broadcast. The
 comparison is `abs(a - b) <= atol + rtol * abs(b)`, so the second tensor
 provides the relative scale, matching NumPy's argument order.
-
-```v
-import vtl
-
-## Conditional selection
-
-`vtl.where(condition, x, y)` selects values from `x` where the boolean
-condition is true and from `y` otherwise. The condition and both value tensors
-are broadcast to a common output shape.
-
-## Approximate comparisons
-
-`isclose` applies the NumPy tolerance rule elementwise and returns a boolean
-tensor. `allclose` returns whether every broadcasted pair is close. Both take
-explicit relative and absolute tolerances; NaNs compare false unless
-`equal_nan` is enabled. Equal positive or negative infinities compare true.
-
-```v
-import vtl
-
-condition := vtl.from_1d([true, false, true])!
-x := vtl.from_1d([1, 2, 3])!
-y := vtl.from_1d([10, 20, 30])!
-selected := vtl.where(condition, x, y)!
-println(selected) // [1, 20, 3]
-
-measured := vtl.from_1d([1.0, 100.0005])!
-expected := vtl.from_1d([1.0, 100.0])!
-mask := measured.isclose(expected)!
-println(mask) // [true, true]
-println(measured.allclose(expected)!) // true
-```
-
-`where` reports an error when any of the three shapes cannot broadcast. The
-comparison is `abs(a - b) <= atol + rtol * abs(b)`, so the second tensor
-provides the relative scale, matching NumPy's argument order. The defaults are
-`rtol: 1e-5` and `atol: 1e-8`; override them with named options.
+The defaults are `rtol: 1e-5` and `atol: 1e-8`; override them with named
+options.
 
 ## Common pitfalls
 
