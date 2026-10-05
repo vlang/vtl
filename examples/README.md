@@ -56,6 +56,7 @@ CIFAR examples for CI-safe checks.
 | [datasets_mnist](./datasets_mnist) | MNIST loader shape smoke |
 | [datasets_imdb](./datasets_imdb) | IMDB loader shape smoke |
 | [vtl_plot_scatter_colorscale](./vtl_plot_scatter_colorscale) | VTL tensor data feeding VSL plot |
+| [stats_quantile](./stats_quantile) | Linearly interpolated quantiles |
 
 ## Safe validation
 

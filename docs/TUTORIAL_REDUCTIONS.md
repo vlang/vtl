@@ -84,3 +84,20 @@ t2.cumsum[f64](0)!
 All reduction operations above are differentiable when called through a
 `Variable`. See [TUTORIAL_AUTOGRAD.md](./TUTORIAL_AUTOGRAD.md) for general
 information about automatic differentiation in VTL.
+
+## Quantiles
+
+`vtl.stats.quantile_linear` sorts a copy of the tensor values and computes
+NumPy's default linearly interpolated quantile. The quantile must be between
+0 and 1, and the result is `f64` even for integer input tensors.
+
+```v
+import vtl
+import vtl.stats
+
+values := vtl.from_1d([30.0, 0.0, 20.0, 10.0])!
+median := stats.quantile_linear(values, 0.5)! // 15.0
+```
+
+Empty tensors and out-of-range quantiles return errors. NaNs propagate to the
+result.

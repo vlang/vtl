@@ -573,3 +573,30 @@ pub fn quantile[T](sorted_t &vtl.Tensor[T], f T) T {
 
 	return sorted_t[index]
 }
+
+// quantile_linear computes NumPy's default linearly interpolated quantile.
+// It sorts a copy of the tensor values and returns an f64, regardless of the
+// input element type. NaN input values propagate as NaN.
+pub fn quantile_linear[T](t &vtl.Tensor[T], q f64) !f64 {
+	if math.is_nan(q) || math.is_inf(q, 0) || q < 0 || q > 1 {
+		return error('quantile must be between 0 and 1')
+	}
+	if t.size == 0 {
+		return error('quantile is undefined for an empty tensor')
+	}
+	mut values := t.to_array().map(vtl.cast[f64](it))
+	for value in values {
+		if math.is_nan(value) {
+			return math.nan()
+		}
+	}
+	values.sort()
+	position := q * f64(values.len - 1)
+	lo := int(math.floor(position))
+	hi := math.min(lo + 1, values.len - 1)
+	if lo == hi {
+		return values[lo]
+	}
+	weight := position - f64(lo)
+	return values[lo] * (1 - weight) + values[hi] * weight
+}
