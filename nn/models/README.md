@@ -6,6 +6,11 @@ normalization, embeddings, recurrent and attention layers, and loss selection.
 The architecture is an ordered list: each builder adds a layer whose output
 feeds the next layer. The context is supplied when constructing the model.
 
+`gru(input_size, hidden_size)` adds a single-layer CPU GRU. It uses a zero
+initial hidden state and expects `[sequence, batch, features]` input. Its output
+keeps the sequence and batch dimensions and replaces the feature dimension with
+`hidden_size`.
+
 ```v ignore
 import vtl.autograd
 import vtl.nn.models

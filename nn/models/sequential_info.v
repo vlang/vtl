@@ -257,6 +257,14 @@ pub fn (mut ls SequentialInfo[T]) lstm(input_size int, hidden_size int, num_laye
 	})
 }
 
+// gru adds a single-layer, unidirectional GRU with a zero initial state.
+pub fn (mut ls SequentialInfo[T]) gru(input_size int, hidden_size int) {
+	ls.add_layer(layers.gru_layer[T](ls.ctx, input_size, hidden_size), 'GRULayer', {
+		'input_size':  input_size
+		'hidden_size': hidden_size
+	})
+}
+
 // conv1d adds a Conv1D layer using the previous layer's [channels, length] shape.
 pub fn (mut ls SequentialInfo[T]) conv1d(out_channels int, kernel_size int, config layers.Conv1DConfig) {
 	if ls.layers.len == 0 {

@@ -357,6 +357,40 @@ fn test_lstm_serialization() {
 	assert 'b_hh' in model.layer_data[1].weights
 }
 
+fn test_gru_serialization() {
+	test_dir := setup_test_dir()
+	defer {
+		cleanup_test_dir()
+	}
+
+	mut nn := sequential_with_layers[f64]([]types.Layer[f64]{})
+	nn.input([3, 1, 2])
+	nn.gru(2, 4)
+
+	path := '${test_dir}/gru_test.json'
+	nn.save(path)!
+	content := os.read_file(path)!
+	model := json2.decode[ModelFile](content)!
+
+	gru_layer := model.layers[1]
+	assert gru_layer.layer_type == 'GRULayer'
+	assert gru_layer.config['input_size'] == 2
+	assert gru_layer.config['hidden_size'] == 4
+	assert model.layer_data[1].weights.len == 4
+	assert 'w_ih' in model.layer_data[1].weights
+	assert 'w_hh' in model.layer_data[1].weights
+	assert 'b_ih' in model.layer_data[1].weights
+	assert 'b_hh' in model.layer_data[1].weights
+
+	mut restored := sequential_with_layers[f64]([]types.Layer[f64]{})
+	restored.input([3, 1, 2])
+	restored.gru(2, 4)
+	restored.load_weights(path)!
+	for i, variable in nn.info.layers[1].variables() {
+		assert variable.value.to_array() == restored.info.layers[1].variables()[i].value.to_array()
+	}
+}
+
 fn test_multilayer_perceptron_serialization() {
 	test_dir := setup_test_dir()
 	defer {
