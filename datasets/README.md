@@ -15,6 +15,21 @@ DataLoader returns a view when a batch's sample indices form a contiguous range.
 Shuffled, non-contiguous batches allocate tensors to preserve the requested
 sample order.
 
+`load_imdb()` returns the full 25,000 review training and test splits. Use
+`load_imdb_with_config` for a smaller, class-balanced subset. Review features
+remain raw strings; labels are binary (`1` positive, `0` negative).
+
+```v
+import vtl.datasets
+
+imdb := datasets.load_imdb_with_config(datasets.ImdbConfig{
+	train_count: 1000
+	test_count:  200
+})!
+assert imdb.train_features.shape == [1000]
+assert imdb.test_features.shape == [200]
+```
+
 ## Examples
 
 Run from `~/.vmodules`:
