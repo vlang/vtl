@@ -206,11 +206,7 @@ pub fn (g &AttentionGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tens
 	mut d_k := vtl.zeros[T](g.k.shape)
 	mut d_v := vtl.zeros[T](g.v.shape)
 	mut d_merged := vtl.zeros[T](g.merged.shape)
-	mut d_attn := vtl.zeros[T](g.attn_weights.shape)
 	mut d_scores := vtl.zeros[T](g.attn_weights.shape)
-	mut d_input_q := vtl.zeros[T](g.input.shape)
-	mut d_input_k := vtl.zeros[T](g.input.shape)
-	mut d_input_v := vtl.zeros[T](g.input.shape)
 
 	// Backpropagate the output projection: merged @ W_o.
 	for b in 0 .. batch {
@@ -237,6 +233,7 @@ pub fn (g &AttentionGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tens
 		for h in 0 .. g.num_heads {
 			for i in 0 .. seq_len {
 				mut softmax_dot := f64(0)
+				mut d_weights := []f64{len: seq_len}
 				for j in 0 .. seq_len {
 					mut d_weight := f64(0)
 					for d in 0 .. g.head_dim {
@@ -246,13 +243,12 @@ pub fn (g &AttentionGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tens
 						d_v.set([b, j, feature], vtl.cast[T](f64(d_v.get([b, j, feature])) +
 							f64(g.attn_weights.get([b, h, i, j])) * d_context))
 					}
-					d_attn.set([b, h, i, j], vtl.cast[T](d_weight))
+					d_weights[j] = d_weight
 					softmax_dot += d_weight * f64(g.attn_weights.get([b, h, i, j]))
 				}
 				for j in 0 .. seq_len {
 					a := f64(g.attn_weights.get([b, h, i, j]))
-					d_scores.set([b, h, i, j], vtl.cast[T](a * (f64(d_attn.get([b, h, i, j])) -
-						softmax_dot)))
+					d_scores.set([b, h, i, j], vtl.cast[T](a * (d_weights[j] - softmax_dot)))
 				}
 			}
 			for i in 0 .. seq_len {
@@ -282,6 +278,7 @@ pub fn (g &AttentionGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tens
 	for b in 0 .. batch {
 		for s in 0 .. seq_len {
 			for i in 0 .. embed_dim {
+				mut input_grad := f64(0)
 				for o in 0 .. embed_dim {
 					x := f64(g.input.get([b, s, i]))
 					dq := f64(d_q.get([b, s, o]))
@@ -290,21 +287,12 @@ pub fn (g &AttentionGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tens
 					d_w_q.set([i, o], vtl.cast[T](f64(d_w_q.get([i, o])) + x * dq))
 					d_w_k.set([i, o], vtl.cast[T](f64(d_w_k.get([i, o])) + x * dk))
 					d_w_v.set([i, o], vtl.cast[T](f64(d_w_v.get([i, o])) + x * dv))
-					d_input_q.set([b, s, i], vtl.cast[T](f64(d_input_q.get([b, s, i])) + dq * f64(g.w_q.get([
+					input_grad += dq * f64(g.w_q.get([i, o])) + dk * f64(g.w_k.get([i, o])) + dv * f64(g.w_v.get([
 						i,
 						o,
-					]))))
-					d_input_k.set([b, s, i], vtl.cast[T](f64(d_input_k.get([b, s, i])) + dk * f64(g.w_k.get([
-						i,
-						o,
-					]))))
-					d_input_v.set([b, s, i], vtl.cast[T](f64(d_input_v.get([b, s, i])) + dv * f64(g.w_v.get([
-						i,
-						o,
-					]))))
+					]))
 				}
-				d_input.set([b, s, i], vtl.cast[T](f64(d_input_q.get([b, s, i])) +
-					f64(d_input_k.get([b, s, i])) + f64(d_input_v.get([b, s, i]))))
+				d_input.set([b, s, i], vtl.cast[T](input_grad))
 			}
 		}
 	}
