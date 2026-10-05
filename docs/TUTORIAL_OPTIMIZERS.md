@@ -10,7 +10,8 @@ All optimizers also support learning rate schedulers — see the last section be
 
 ## Adam
 
-```v ignore
+```v
+import math
 import vtl
 import vtl.autograd
 import vtl.nn.models
@@ -232,3 +233,32 @@ for epoch := 0; epoch < 10; epoch++ {
 	println('Epoch ${epoch}: lr = ${current_lr}')
 }
 ```
+
+## Gradient Clipping
+
+Clip the global L2 norm after backpropagation and before the optimizer update.
+The function scales trainable parameter gradients in place and returns the norm
+before clipping. Gradients below the limit are left unchanged.
+
+```v ignore
+import vtl
+import vtl.autograd
+import vtl.nn.optimizers
+
+context := autograd.ctx[f64]()
+parameter := context.variable(vtl.from_1d([0.0, 0.0])!)
+mut parameters := [parameter]
+
+// Usually populated by loss.backprop().
+parameter.grad.set_nth(0, 3.0)
+parameter.grad.set_nth(1, 4.0)
+
+original_norm := optimizers.clip_grad_norm[f64](mut parameters, 1.0)!
+assert original_norm == 5.0
+assert math.abs(parameter.grad.get_nth(0) - 0.6) < 1e-12
+assert math.abs(parameter.grad.get_nth(1) - 0.8) < 1e-12
+```
+
+The autograd `Variable.clamp(min, max)` operation also supports element-wise
+clamping in a forward graph. Its backward pass passes gradients through values
+inside the inclusive bounds and zeroes gradients outside them.
