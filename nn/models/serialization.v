@@ -136,7 +136,7 @@ pub fn (nn &Sequential[T]) save_checkpoint(path string, epoch int, loss f64) ! {
 				encode_layer_var[T](mut weights, vars, 1, 'bias')!
 			}
 			'ReLULayer', 'SigmoidLayer', 'TanhLayer', 'LeakyReLULayer', 'ELULayer', 'SwishLayer',
-			'MishLayer', 'GELULayer', 'GeluLayer' {
+			'MishLayer', 'GELULayer', 'GeluLayer', 'SoftplusLayer', 'SELULayer', 'HardSwishLayer' {
 				// Activation layers have no weights - they just copy shapes
 			}
 			'BatchNorm1DLayer' {

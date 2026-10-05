@@ -43,6 +43,9 @@ model.mse_loss() // loss function
 | `gelu()` | Gaussian Error Linear Unit |
 | `swish()` | Swish activation |
 | `mish()` | Mish activation |
+| `softplus()` | Smooth approximation to ReLU, `log(1 + exp(x))` |
+| `selu()` | Scaled Exponential Linear Unit |
+| `hardswish()` | Efficient piecewise approximation to Swish |
 | `flatten()` | Flatten all non-batch dimensions |
 | `maxpool2d(kernel, padding, stride)` | 2D max pooling |
 | `avgpool2d(kernel, padding, stride)` | 2D average pooling |
@@ -55,6 +58,20 @@ model.mse_loss() // loss function
 | `multihead_attention(embed_dim, num_heads)` | Multi-head self-attention |
 | `positional_encoding(embed_dim, max_len)` | Sinusoidal positional encoding |
 | `dropout()` | Dropout (eval mode: no-op) |
+
+The three smooth/efficient activations can be selected directly in a Sequential
+model:
+
+```v
+import vtl.nn.models
+
+mut model := models.sequential[f64]()
+model.input([8])
+model.linear(16)
+model.softplus()
+model.linear(4)
+model.selu()
+```
 
 ### All available losses
 

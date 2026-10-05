@@ -40,3 +40,16 @@ fn test_new_sequential_losses() ! {
 	assert focal.value.shape == [1]
 	focal.backprop()!
 }
+
+fn test_added_activation_layers_in_sequential() {
+	mut nn := sequential[f64]()
+	nn.input([3])
+	nn.softplus()
+	nn.selu()
+	nn.hardswish()
+	assert nn.info.layers.len == 4
+	assert nn.info.layers[1].output_shape() == [3]
+	assert nn.info.layers[2].output_shape() == [3]
+	assert nn.info.layers[3].output_shape() == [3]
+}
+}

@@ -269,6 +269,95 @@ pub fn deriv_mish[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tenso
 	})
 }
 
+// softplus computes log(1 + exp(x)) using a stable formulation.
+@[inline]
+pub fn softplus[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
+	return x.map(fn [T](val T, _ []int) T {
+		v := vtl.cast[f64](val)
+		return if v > 0 {
+			vtl.cast[T](v + math.log1p(math.exp(-v)))
+		} else {
+			vtl.cast[T](math.log1p(math.exp(v)))
+		}
+	})
+}
+
+// deriv_softplus multiplies by sigmoid(x), the derivative of softplus.
+@[inline]
+pub fn deriv_softplus[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	return gradient.nmap([cached], fn [T](vals []T, _ []int) T {
+		x := vtl.cast[f64](vals[1])
+		sigmoid := if x >= 0 {
+			1.0 / (1.0 + math.exp(-x))
+		} else {
+			exp_x := math.exp(x)
+			exp_x / (1.0 + exp_x)
+		}
+		return vals[0] * vtl.cast[T](sigmoid)
+	})
+}
+
+const selu_alpha = 1.6732632423543772
+const selu_scale = 1.0507009873554805
+
+// selu applies the scaled exponential linear unit.
+@[inline]
+pub fn selu[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
+	return x.map(fn [T](val T, _ []int) T {
+		if val > vtl.cast[T](0) {
+			return vtl.cast[T](selu_scale) * val
+		}
+		return vtl.cast[T](selu_scale * selu_alpha) * vtl.cast[T](math.expm1(vtl.cast[f64](val)))
+	})
+}
+
+// deriv_selu multiplies by the derivative of SELU at the cached input.
+@[inline]
+pub fn deriv_selu[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	return gradient.nmap([cached], fn [T](vals []T, _ []int) T {
+		derivative := if vals[1] > vtl.cast[T](0) {
+			selu_scale
+		} else {
+			selu_scale * selu_alpha * math.exp(vtl.cast[f64](vals[1]))
+		}
+		return vals[0] * vtl.cast[T](derivative)
+	})
+}
+
+// hardswish applies x * clamp(x + 3, 0, 6) / 6.
+@[inline]
+pub fn hardswish[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
+	return x.map(fn [T](val T, _ []int) T {
+		v := vtl.cast[f64](val)
+		if v != v {
+			return val
+		}
+		if v <= -3.0 {
+			return vtl.cast[T](0)
+		}
+		if v >= 3.0 {
+			return val
+		}
+		return vtl.cast[T](v * math.max(0.0, math.min(v + 3.0, 6.0)) / 6.0)
+	})
+}
+
+// deriv_hardswish multiplies by the piecewise derivative of HardSwish.
+@[inline]
+pub fn deriv_hardswish[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	return gradient.nmap([cached], fn [T](vals []T, _ []int) T {
+		x := vtl.cast[f64](vals[1])
+		derivative := if x <= -3.0 {
+			0.0
+		} else if x >= 3.0 {
+			1.0
+		} else {
+			(2.0 * x + 3.0) / 6.0
+		}
+		return vals[0] * vtl.cast[T](derivative)
+	})
+}
+
 // deriv_softmax computes the Jacobian-vector product for softmax.
 // For a softmax slice s_i = exp(x_i) / sum_j exp(x_j), the Jacobian is:
 //   dL/dx_k = sum_i L_i * ds_i/dx_k
