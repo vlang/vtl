@@ -2,6 +2,21 @@ module vtl
 
 import math
 
+// clip limits tensor values to the inclusive scalar interval [min_value, max_value].
+// The tensor element type is preserved; NaN values remain NaN.
+pub fn (t &Tensor[T]) clip[T](min_value f64, max_value f64) !&Tensor[T] {
+	if math.is_nan(min_value) || math.is_nan(max_value) || min_value > max_value {
+		return error('clip bounds must be ordered and not NaN')
+	}
+	return t.map(fn [min_value, max_value] [T](value T, _ []int) T {
+		fvalue := td[T](value).f64()
+		if math.is_nan(fvalue) {
+			return value
+		}
+		return cast[T](math.min(math.max(fvalue, min_value), max_value))
+	})
+}
+
 // abs returns the elementwise abs of an tensor
 
 // abs exposes this operation as part of the public API.

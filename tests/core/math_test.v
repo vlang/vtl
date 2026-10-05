@@ -1,12 +1,34 @@
 module main
 
 import vtl
+import math
 
 fn test_abs() {
 	a := vtl.from_1d([-1, 2, -3, 4])!
 	result := a.abs()
 	expected := vtl.from_1d([1, 2, 3, 4])!
 	assert result.array_equal(expected)
+}
+
+fn test_clip_limits_values_and_preserves_type() {
+	ints := vtl.from_1d([-4, 2, 9])!
+	assert ints.clip(-1, 5)!.array_equal(vtl.from_1d([-1, 2, 5])!)
+	floats := vtl.from_1d([-4.0, 2.5, 9.0])!
+	assert floats.clip(-1.0, 5.0)!.array_equal(vtl.from_1d([-1.0, 2.5, 5.0])!)
+}
+
+fn test_clip_preserves_nan_and_rejects_invalid_bounds() {
+	values := vtl.from_1d([math.nan(), 1.0])!
+	clipped := values.clip(0.0, 2.0)!
+	assert math.is_nan(clipped.get_nth(0))
+	assert clipped.get_nth(1) == 1.0
+	expect_clip_error(values, 2.0, 1.0)
+	expect_clip_error(values, math.nan(), 1.0)
+}
+
+fn expect_clip_error(values &vtl.Tensor[f64], min_value f64, max_value f64) {
+	values.clip(min_value, max_value) or { return }
+	panic('expected invalid clip bounds to return an error')
 }
 
 fn test_acos() {
