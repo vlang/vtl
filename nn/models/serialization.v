@@ -287,6 +287,9 @@ pub fn (nn &Sequential[T]) load_weights(path string) ! {
 	if model.layers.len != nn.info.layers.len {
 		return error('Layer count mismatch: model has ${nn.info.layers.len}, checkpoint has ${model.layers.len}')
 	}
+	if model.layer_data.len != model.layers.len {
+		return error('Layer data count mismatch: expected ${model.layers.len}, got ${model.layer_data.len}')
+	}
 
 	for i, layer in nn.info.layers {
 		layer_def := model.layers[i]
@@ -482,6 +485,9 @@ pub fn validate_model_compatibility[T](saved_path string, model_layers []types.L
 
 	if model.layers.len != model_layers.len {
 		return error('Layer count mismatch: model has ${model_layers.len}, checkpoint has ${model.layers.len}')
+	}
+	if model.layer_data.len != model.layers.len {
+		return error('Layer data count mismatch: expected ${model.layers.len}, got ${model.layer_data.len}')
 	}
 
 	for i, layer in model_layers {

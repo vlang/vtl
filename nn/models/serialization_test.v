@@ -416,6 +416,52 @@ fn test_validate_model_compatibility() {
 	assert false
 }
 
+fn test_model_serialization_rejects_missing_layer_data() ! {
+	test_dir := setup_test_dir()
+	defer {
+		cleanup_test_dir()
+	}
+
+	mut nn := sequential_with_layers[f64]([]types.Layer[f64]{})
+	nn.input([2])
+	nn.linear(3)
+	path := '${test_dir}/missing_layer_data.json'
+	nn.save(path)!
+
+	mut model := json2.decode[ModelFile](os.read_file(path)!)!
+	model.layer_data.delete_last()
+	os.write_file(path, json2.encode(model))!
+
+	nn.load_weights(path) or {
+		assert err.msg().contains('Layer data count mismatch')
+		return
+	}
+	assert false, 'expected load_weights to reject missing layer data'
+}
+
+fn test_validate_model_compatibility_rejects_missing_layer_data() ! {
+	test_dir := setup_test_dir()
+	defer {
+		cleanup_test_dir()
+	}
+
+	mut nn := sequential_with_layers[f64]([]types.Layer[f64]{})
+	nn.input([2])
+	nn.linear(3)
+	path := '${test_dir}/compat_missing_layer_data.json'
+	nn.save(path)!
+
+	mut model := json2.decode[ModelFile](os.read_file(path)!)!
+	model.layer_data.delete_last()
+	os.write_file(path, json2.encode(model))!
+
+	validate_model_compatibility[f64](path, nn.info.layers) or {
+		assert err.msg().contains('Layer data count mismatch')
+		return
+	}
+	assert false, 'expected validation to reject missing layer data'
+}
+
 fn test_load_checkpoint_returns_metadata() {
 	test_dir := setup_test_dir()
 	defer {
