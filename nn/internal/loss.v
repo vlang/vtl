@@ -333,8 +333,8 @@ pub fn focal[T](input &vtl.Tensor[T], target &vtl.Tensor[T], alpha f64, gamma f6
 		return error('Focal loss requires input and target with identical shapes')
 	}
 	if input.size() == 0 { return error('Focal loss requires non-empty tensors') }
-	if alpha < 0.0 || alpha > 1.0 || gamma < 0.0 {
-		return error('Focal loss requires alpha in [0, 1] and gamma >= 0')
+	if !math.is_finite(alpha) || !math.is_finite(gamma) || alpha < 0.0 || alpha > 1.0 || gamma < 0.0 {
+		return error('Focal loss requires finite alpha in [0, 1] and finite gamma >= 0')
 	}
 	mut total := f64(0)
 	for i in 0 .. input.size() {
@@ -368,8 +368,8 @@ pub fn focal_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], target &
 		return error('Focal loss requires input and target with identical shapes')
 	}
 	if input.size() == 0 { return error('Focal loss requires non-empty tensors') }
-	if alpha < 0.0 || alpha > 1.0 || gamma < 0.0 {
-		return error('Focal loss requires alpha in [0, 1] and gamma >= 0')
+	if !math.is_finite(alpha) || !math.is_finite(gamma) || alpha < 0.0 || alpha > 1.0 || gamma < 0.0 {
+		return error('Focal loss requires finite alpha in [0, 1] and finite gamma >= 0')
 	}
 	upstream := f64(gradient.get([0])) / f64(input.size())
 	mut values := []T{len: input.size()}

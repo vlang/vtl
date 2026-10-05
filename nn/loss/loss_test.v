@@ -178,3 +178,17 @@ fn test_focal_loss_negative_class_gradient() ! {
 	want_grad := 0.75 * (2.0 * 0.5 * math.log(0.5) - 0.25 / 0.5) * -0.25
 	assert math.abs(pred.grad.get_nth(0) - want_grad) < 1e-12
 }
+
+fn test_focal_loss_rejects_non_finite_parameters() {
+	c := ctx[f64]()
+	pred := variable[f64](c, [0.0], [1])!
+	target := tensor[f64]([1.0], [1])!
+	for alpha in [math.nan(), math.inf(1)] {
+		focal_loss[f64](alpha: alpha, gamma: 2.0).loss(pred, target) or { continue }
+		assert false, 'focal loss should reject non-finite alpha'
+	}
+	for gamma in [math.nan(), math.inf(1)] {
+		focal_loss[f64](alpha: 0.25, gamma: gamma).loss(pred, target) or { continue }
+		assert false, 'focal loss should reject non-finite gamma'
+	}
+}
