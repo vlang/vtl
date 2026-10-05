@@ -21,6 +21,9 @@ fn test_conv1d_layer_rejects_wrong_channel_count() {
 	ctx := autograd.ctx[f64]()
 	layer := conv1d_layer[f64](ctx, 2, 3, 2, Conv1DConfig{}, 5)
 	input := ctx.variable(vtl.zeros[f64]([1, 1, 5]))
-	result := layer.forward(input) or { return }
-	assert result.value.shape == [1, 3, 4], 'expected mismatched channels to fail'
+	layer.forward(input) or {
+		assert err.msg().contains('shape')
+		return
+	}
+	assert false, 'expected mismatched channels to fail'
 }
