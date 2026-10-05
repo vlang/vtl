@@ -143,6 +143,7 @@ See [DEV_LIGHTWEIGHT.md](docs/DEV_LIGHTWEIGHT.md) for memory-safe subsets in CI.
 | Pick optimizers | [Optimizers](docs/TUTORIAL_OPTIMIZERS.md) |
 | Run examples | [Examples catalog](examples/README.md) |
 | Use datasets | [Datasets](datasets/README.md) |
+| Exchange NumPy `.npy` arrays | [`.npy` input/output](docs/TUTORIAL_NUMPY_IO.md) |
 | Use GPU paths safely | [DEV_LIGHTWEIGHT.md](docs/DEV_LIGHTWEIGHT.md), [DEVICE_MEMORY.md](docs/DEVICE_MEMORY.md) |
 
 | Tutorial | Topic |
