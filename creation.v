@@ -1,5 +1,23 @@
 module vtl
 
+// meshgrid builds dense two-dimensional XY coordinate grids from two vectors.
+// The output shape is [len(y), len(x)], matching NumPy's default indexing="xy".
+pub fn meshgrid[T](x &Tensor[T], y &Tensor[T]) !(&Tensor[T], &Tensor[T]) {
+	if x.rank() != 1 || y.rank() != 1 {
+		return error('meshgrid expects two one-dimensional tensors')
+	}
+	shape := [y.size(), x.size()]
+	mut x_grid := empty[T](shape, memory: .row_major)
+	mut y_grid := empty[T](shape, memory: .row_major)
+	for row in 0 .. y.size() {
+		for col in 0 .. x.size() {
+			x_grid.set([row, col], x.get_nth(col))
+			y_grid.set([row, col], y.get_nth(row))
+		}
+	}
+	return x_grid, y_grid
+}
+
 // empty returns a new Tensor of given shape and type, without initializing entries
 
 // empty exposes this operation as part of the public API.

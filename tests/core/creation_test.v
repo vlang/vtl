@@ -2,6 +2,26 @@ module main
 
 import vtl
 
+fn test_meshgrid_xy_coordinates() {
+	x := vtl.from_1d([1, 2, 3])!
+	y := vtl.from_1d([10, 20])!
+	x_grid, y_grid := vtl.meshgrid(x, y)!
+	assert x_grid.shape == [2, 3]
+	assert y_grid.shape == [2, 3]
+	assert x_grid.array_equal[int](vtl.from_2d[int]([[1, 2, 3], [1, 2, 3]])!)
+	assert y_grid.array_equal[int](vtl.from_2d[int]([[10, 10, 10], [20, 20, 20]])!)
+}
+
+fn test_meshgrid_requires_vectors() {
+	x := vtl.from_2d([[1, 2]])!
+	y := vtl.from_1d([1, 2])!
+	if _, _ := vtl.meshgrid(x, y) {
+		assert false, 'meshgrid must reject inputs above rank one'
+	} else {
+		assert true
+	}
+}
+
 fn test_empty() {
 	mut t := vtl.empty[f64]([3])
 	t.fill(1.0)

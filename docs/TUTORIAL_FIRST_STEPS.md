@@ -99,6 +99,21 @@ println(i)
 // [[1.0, 1.0], [1.0, 1.0]]
 ```
 
+## Coordinate grids
+
+`meshgrid(x, y)` makes dense 2-D coordinate matrices with NumPy's default
+`xy` indexing. The resulting shape is `[y.size, x.size]`.
+
+```v
+import vtl
+
+x := vtl.from_1d([1, 2, 3])!
+y := vtl.from_1d([10, 20])!
+x_grid, y_grid := vtl.meshgrid(x, y)!
+println(x_grid) // [[1, 2, 3], [1, 2, 3]]
+println(y_grid) // [[10, 10, 10], [20, 20, 20]]
+```
+
 ## Accessing and modifying a value
 
 ```v
