@@ -16,14 +16,19 @@ fn test_variance_uses_f64_for_integer_input_and_ddof() {
 
 fn test_variance_rejects_undefined_inputs() {
 	empty := vtl.from_1d([]f64{})!
-	assert variance(empty, VarianceData{}) or { -1.0 } == -1.0
+	assert_variance_error(empty, VarianceData{})
 	data := vtl.from_1d([1.0, 2.0])!
-	assert variance(data, VarianceData{
+	assert_variance_error(data, VarianceData{
 		ddof: 2
-	}) or { -1.0 } == -1.0
-	assert variance(data, VarianceData{
+	})
+	assert_variance_error(data, VarianceData{
 		ddof: -1
-	}) or { -1.0 } == -1.0
+	})
+}
+
+fn assert_variance_error[T](t &vtl.Tensor[T], data VarianceData) {
+	_ := variance(t, data) or { return }
+	assert false, 'expected variance to reject invalid input'
 }
 
 fn test_freq() {
