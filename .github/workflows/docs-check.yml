@@ -19,6 +19,8 @@ on:
 jobs:
   check-docs:
     runs-on: ubuntu-latest
+    env:
+      VJOBS: '2'
     steps:
       - name: Checkout VTL
         uses: actions/checkout@v4
