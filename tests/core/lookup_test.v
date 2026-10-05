@@ -41,6 +41,20 @@ fn test_take_rejects_invalid_axes_and_indices() {
 	}
 }
 
+fn test_take_along_axis() {
+	t := vtl.from_array([0, 1, 2, 3, 4, 5], [2, 3])!
+	indices := vtl.from_array([2, 0, 1, -1], [2, 2])!
+	taken := t.take_along_axis(indices, 1)!
+	assert taken.shape == [2, 2]
+	assert taken.to_array() == [2, 0, 4, 5]
+
+	if _ := t.take_along_axis(vtl.ones[int]([1, 2]), 1) {
+		assert false, 'take_along_axis must reject mismatched non-axis dimensions'
+	} else {
+		assert true
+	}
+}
+
 fn test_get() {
 	t := vtl.from_array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [5, 2])!
 	assert t.size() == 10

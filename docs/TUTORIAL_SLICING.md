@@ -103,6 +103,9 @@ need a range-based view instead of a gathered copy.
 `masked_select` returns a one-dimensional tensor containing values where the
 same-shaped boolean mask is true, in row-major logical order. `masked_fill`
 returns a copy with matching positions replaced by a scalar value.
+When every output position needs its own index, use `take_along_axis` with an
+integer index tensor. Its rank must match the input rank, and all dimensions
+outside the selected axis must have the same size.
 
 ```v
 import vtl
@@ -117,6 +120,15 @@ println(filled.to_array()) // [0, 2, 0, 4, 0, 6]
 
 The mask shape must match the tensor shape exactly. These methods also respect
 logical iteration order for transposed and sliced views.
+
+```v
+import vtl
+
+matrix := vtl.from_array([0, 1, 2, 3, 4, 5], [2, 3])!
+indices := vtl.from_array([2, 0, 1, -1], [2, 2])!
+selected := matrix.take_along_axis(indices, 1)!
+println(selected.to_array()) // [2, 0, 4, 5]
+```
 
 ## Slice Mutations
 
