@@ -3,12 +3,11 @@ module datasets
 import vtl
 
 // DataLoader provides an iterable over a dataset with batching and shuffling.
-// Contiguous batches are returned as zero-copy slice views. Shuffled batches
-// with non-contiguous indices are gathered into owned tensors.
+// Contiguous batches are zero-copy slice views. Batches whose indices are not
+// contiguous (usually shuffled batches) are gathered into a new tensor.
 //
 // Design principles (inspired by Arraymancer and PyTorch):
-// - Views: contiguous index ranges use tensor.slice(); arbitrary shuffled
-//   ranges preserve order by copying their selected rows
+// - Zero-copy for contiguous sample indices; shuffled batches may require copies
 // - Generic: works with any tensor element type T (f64, f32)
 // - Configurable: batch_size, shuffle, drop_last
 // - Deterministic: optional seed for reproducible shuffling
@@ -40,44 +39,21 @@ pub:
 	seed       u64
 }
 
-// batch returns batch `i`. Contiguous indices return a zero-copy view;
-// non-contiguous indices return a copy in the requested order.
-// Returns none if the index is out of range.
+// batch returns a batch at index `i`. Contiguous indices return a view into the
+// dataset; other index orders return a copy. Mutating a returned view also
+// mutates the corresponding dataset elements. Returns none for invalid indices
+// or a non-positive batch size.
 pub fn (dl &DataLoader[T]) batch(i int) ?&vtl.Tensor[T] {
-	if dl.indices.len == 0 {
-		return none
-	}
-	start := i * dl.batch_size
-	if start >= dl.indices.len {
-		return none
-	}
-	end := if dl.drop_last {
-		if start + dl.batch_size > dl.indices.len {
-			return none
-		}
-		start + dl.batch_size
-	} else {
-		if start + dl.batch_size > dl.indices.len {
-			dl.indices.len
-		} else {
-			start + dl.batch_size
-		}
-	}
-
-	batch_indices := dl.indices[start..end]
-
-	if indices_are_contiguous(batch_indices) {
-		view_tensor := dl.dataset.slice([batch_indices[0], batch_indices[batch_indices.len - 1] + 1]) or {
-			return none
-		}
-		return view_tensor
+	batch_indices := dl.batch_indices(i) or { return none }
+	if range := contiguous_range(batch_indices) {
+		return dl.dataset.slice_hilo([range[0]], [range[1] + 1]) or { return none }
 	}
 
 	mut result_shape := dl.dataset.shape.clone()
 	result_shape[0] = batch_indices.len
 
 	mut result := vtl.zeros[T](result_shape)
-	row_size := dl.dataset.strides[0]
+	row_size := dl.dataset.size / dl.dataset.shape[0]
 	for j, idx in batch_indices {
 		src_base := idx * row_size
 		dst_base := j * row_size
@@ -89,38 +65,16 @@ pub fn (dl &DataLoader[T]) batch(i int) ?&vtl.Tensor[T] {
 }
 
 // batch_with_labels returns both features and labels for batch `i`.
-// Contiguous index ranges return views; shuffled ranges are copied, preserving order.
+// Both tensors are extracted using the same index set.
 // Returns none if the index is out of range or if no labels tensor was provided.
 pub fn (dl &DataLoader[T]) batch_with_labels(i int) ?(&vtl.Tensor[T], &vtl.Tensor[T]) {
-	if dl.indices.len == 0 {
-		return none
-	}
 	if dl.labels == unsafe { nil } {
 		return none
 	}
-	start := i * dl.batch_size
-	if start >= dl.indices.len {
-		return none
-	}
-	end := if dl.drop_last {
-		if start + dl.batch_size > dl.indices.len {
-			return none
-		}
-		start + dl.batch_size
-	} else {
-		if start + dl.batch_size > dl.indices.len {
-			dl.indices.len
-		} else {
-			start + dl.batch_size
-		}
-	}
-
-	batch_indices := dl.indices[start..end]
-	if indices_are_contiguous(batch_indices) {
-		first := batch_indices[0]
-		last := batch_indices[batch_indices.len - 1] + 1
-		features := dl.dataset.slice([first, last]) or { return none }
-		labels := dl.labels.slice([first, last]) or { return none }
+	batch_indices := dl.batch_indices(i) or { return none }
+	if range := contiguous_range(batch_indices) {
+		features := dl.dataset.slice_hilo([range[0]], [range[1] + 1]) or { return none }
+		labels := dl.labels.slice_hilo([range[0]], [range[1] + 1]) or { return none }
 		return features, labels
 	}
 
@@ -128,7 +82,7 @@ pub fn (dl &DataLoader[T]) batch_with_labels(i int) ?(&vtl.Tensor[T], &vtl.Tenso
 	mut feat_shape := dl.dataset.shape.clone()
 	feat_shape[0] = batch_indices.len
 	mut feat_result := vtl.zeros[T](feat_shape)
-	feat_row_size := dl.dataset.strides[0]
+	feat_row_size := dl.dataset.size / dl.dataset.shape[0]
 	for j, idx in batch_indices {
 		src_base := idx * feat_row_size
 		dst_base := j * feat_row_size
@@ -138,7 +92,7 @@ pub fn (dl &DataLoader[T]) batch_with_labels(i int) ?(&vtl.Tensor[T], &vtl.Tenso
 	}
 
 	// Build labels batch (labels are 2D: [N, num_classes])
-	label_row_size := dl.labels.strides[0]
+	label_row_size := dl.labels.size / dl.labels.shape[0]
 	mut label_shape := dl.labels.shape.clone()
 	label_shape[0] = batch_indices.len
 	mut label_result := vtl.zeros[T](label_shape)
@@ -153,27 +107,43 @@ pub fn (dl &DataLoader[T]) batch_with_labels(i int) ?(&vtl.Tensor[T], &vtl.Tenso
 	return feat_result, label_result
 }
 
-fn indices_are_contiguous(indices []int) bool {
-	if indices.len < 2 {
-		return true
-	}
-	for i in 1 .. indices.len {
-		if indices[i] != indices[i - 1] + 1 {
-			return false
-		}
-	}
-	return true
-}
-
 // len returns the number of batches (drop_last affects count).
 pub fn (dl &DataLoader[T]) len() int {
-	if dl.indices.len == 0 {
+	if dl.indices.len == 0 || dl.batch_size <= 0 {
 		return 0
 	}
 	if dl.drop_last {
 		return dl.indices.len / dl.batch_size
 	}
-	return (dl.indices.len + dl.batch_size - 1) / dl.batch_size
+	return 1 + (dl.indices.len - 1) / dl.batch_size
+}
+
+fn (dl &DataLoader[T]) batch_indices(i int) ?[]int {
+	if i < 0 || i >= dl.len() {
+		return none
+	}
+	start := i * dl.batch_size
+	if start >= dl.indices.len {
+		return none
+	}
+	end := if dl.batch_size >= dl.indices.len - start {
+		dl.indices.len
+	} else {
+		start + dl.batch_size
+	}
+	return dl.indices[start..end]
+}
+
+fn contiguous_range(indices []int) ?[]int {
+	if indices.len == 0 {
+		return none
+	}
+	for i in 1 .. indices.len {
+		if indices[i] != indices[i - 1] + 1 {
+			return none
+		}
+	}
+	return [indices[0], indices[indices.len - 1]]
 }
 
 // total_samples returns the number of samples in the dataset.
@@ -202,7 +172,7 @@ fn (mut dl DataLoader[T]) shuffle_indices() {
 
 // new_data_loader creates a DataLoader from a dataset tensor (features only).
 pub fn new_data_loader[T](dataset &vtl.Tensor[T], config DataLoaderConfig) &DataLoader[T] {
-	n := dataset.shape[0]
+	n := if dataset.shape.len > 0 { dataset.shape[0] } else { 0 }
 	mut indices := []int{len: n}
 	for i := 0; i < n; i++ {
 		indices[i] = i
@@ -225,7 +195,7 @@ pub fn new_data_loader[T](dataset &vtl.Tensor[T], config DataLoaderConfig) &Data
 // new_data_loader_with_labels creates a DataLoader with both features and labels tensors.
 // Both tensors must have the same first dimension (number of samples).
 pub fn new_data_loader_with_labels[T](dataset &vtl.Tensor[T], labels &vtl.Tensor[T], config DataLoaderConfig) &DataLoader[T] {
-	n := dataset.shape[0]
+	n := if dataset.shape.len > 0 { dataset.shape[0] } else { 0 }
 	mut indices := []int{len: n}
 	for i := 0; i < n; i++ {
 		indices[i] = i

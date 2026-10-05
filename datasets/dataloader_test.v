@@ -68,3 +68,27 @@ fn test_batch_with_labels_gathers_shuffled_rows_as_copies() ! {
 	assert data.get([2, 0]) == 5
 	assert labels.get_nth(2) == 30
 }
+
+fn test_discontiguous_batches_preserve_column_major_logical_order() ! {
+	dataset := vtl.from_array([1.0, 3, 5, 2, 4, 6], [3, 2], memory: .col_major)!
+	mut loader := new_data_loader[f64](dataset, DataLoaderConfig{
+		batch_size: 2
+		shuffle:    false
+	})
+	loader.indices = [2, 0]
+	batch := loader.batch(0) or { panic('expected gathered column-major batch') }
+	assert batch.to_array() == [5.0, 6, 1, 2]
+}
+
+fn test_non_positive_batch_size_is_empty_and_safe() ! {
+	dataset := vtl.from_2d([[1.0, 2], [3, 4]])!
+	for batch_size in [0, -1] {
+		loader := new_data_loader[f64](dataset, DataLoaderConfig{
+			batch_size: batch_size
+			shuffle:    false
+		})
+		assert loader.len() == 0
+		assert loader.batch(0) == none
+		assert loader.batch(-1) == none
+	}
+}
