@@ -11,9 +11,9 @@ y := ctx.variable(vtl.from_1d([2.0])!)
 println(x)
 println(y)
 
-mut pow := x.pow(y)!
+mut pow_result := x.pow(y)!
 
-pow.backprop()!
+pow_result.backprop()!
 
-println(pow)
+println(pow_result)
 println(x.grad)
