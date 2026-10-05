@@ -69,6 +69,24 @@ Broadcasting is used internally by VTL's neural network layers.
 For example, adding a bias vector `[out_features]` to a batch of activations
 `[batch_size, out_features]` uses broadcasting automatically.
 
+## Conditional selection
+
+`vtl.where(condition, x, y)` selects values from `x` where the boolean
+condition is true and from `y` otherwise. The condition and both value tensors
+are broadcast to a common output shape.
+
+```v
+import vtl
+
+condition := vtl.from_1d([true, false, true])!
+x := vtl.from_1d([1, 2, 3])!
+y := vtl.from_1d([10, 20, 30])!
+selected := vtl.where(condition, x, y)!
+println(selected) // [1, 20, 3]
+```
+
+`where` reports an error when any of the three shapes cannot broadcast.
+
 ## Common pitfalls
 
 Use `clip(min_value, max_value)` to bound every element. Bounds are scalar,
