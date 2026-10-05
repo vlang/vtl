@@ -6,7 +6,7 @@ big-endian data to VTL's logical row-major order.
 
 The file dtype must match the requested V type. Supported types are `bool`,
 `f32`, `f64`, signed `i8`/`i16`/`i32`/`i64`/`int`, and unsigned
-`u8`/`u16`/`u32`/`u64`.
+`u8`/`u16`/`u32`/`u64`. V's native `int` uses the current platform width.
 Object, string, structured, and complex dtypes are rejected.
 
 ```v

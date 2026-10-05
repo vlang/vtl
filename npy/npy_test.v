@@ -53,6 +53,11 @@ fn test_npy_round_trips_all_primitive_numeric_types() {
 	check_npy_round_trip[bool]('bool', [true, false, true])
 }
 
+fn test_npy_native_int_uses_platform_width() {
+	dtype := npy_type[int]()!
+	assert dtype.width == sizeof(int)
+}
+
 fn check_npy_round_trip[T](suffix string, values []T) {
 	path := os.join_path(os.temp_dir(), 'vtl_npy_${suffix}_round_trip.npy')
 	defer {
