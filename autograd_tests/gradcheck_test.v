@@ -58,3 +58,30 @@ fn test_grad_check_rejects_invalid_tolerance() {
 	}
 	assert false, 'expected invalid tolerance to return an error'
 }
+
+fn test_grad_check_rejects_non_finite_parameters() {
+	context := autograd.ctx[f64]()
+	input := context.variable(vtl.from_1d([1.5])!)
+	for eps in [math.nan(), math.inf(1)] {
+		_ := autograd.grad_check[f64](input, square_f64, eps, 1e-7) or { continue }
+		assert false, 'expected grad_check to reject non-finite epsilon'
+	}
+	for tolerance in [math.nan(), math.inf(1)] {
+		_ := autograd.grad_check[f64](input, square_f64, 1e-5, tolerance) or { continue }
+		assert false, 'expected grad_check to reject non-finite tolerance'
+	}
+}
+
+fn square_int(input &autograd.Variable[int]) !&autograd.Variable[int] {
+	return input.multiply(input)!
+}
+
+fn test_grad_check_rejects_integer_inputs() {
+	context := autograd.ctx[int]()
+	input := context.variable(vtl.from_1d([2, 3])!)
+	_ := autograd.grad_check[int](input, square_int, 1e-5, 1e-7) or {
+		assert err.msg().contains('f32 or f64')
+		return
+	}
+	assert false, 'expected grad_check to reject integer input'
+}

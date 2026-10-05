@@ -11,8 +11,11 @@ import vtl
 // The input's gradient is replaced by the analytical gradient produced by this
 // check. The input value is restored before the function returns.
 pub fn grad_check[T](input &Variable[T], forward fn (&Variable[T]) !&Variable[T], eps f64, tolerance f64) !bool {
-	if eps <= 0.0 || tolerance < 0.0 {
-		return error('grad_check: eps must be positive and tolerance must be non-negative')
+	if !gradcheck_is_float[T]() {
+		return error('grad_check: input elements must use f32 or f64')
+	}
+	if eps <= 0.0 || !math.is_finite(eps) || tolerance < 0.0 || !math.is_finite(tolerance) {
+		return error('grad_check: eps must be positive and finite, and tolerance must be non-negative and finite')
 	}
 	if input.value.size == 0 {
 		return error('grad_check: input tensor must not be empty')
@@ -81,6 +84,14 @@ pub fn grad_check[T](input &Variable[T], forward fn (&Variable[T]) !&Variable[T]
 
 	restore_gradcheck_input[T](mut input_value, original_values)
 	return true
+}
+
+fn gradcheck_is_float[T]() bool {
+	$if T is f32 || T is f64 {
+		return true
+	} $else {
+		return false
+	}
 }
 
 fn tensor_sum_f64[T](tensor &vtl.Tensor[T]) f64 {
