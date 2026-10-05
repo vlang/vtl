@@ -20,3 +20,10 @@ fn test_tensor_add_operator_broadcasts() {
 	result := a + b
 	assert result.array_equal(vtl.from_2d([[11, 22, 33], [14, 25, 36]])!)
 }
+
+fn test_tensor_multiply_and_divide_operators_broadcast() {
+	a := vtl.from_2d([[1.0, 2, 3], [4, 5, 6]])!
+	b := vtl.from_1d([1.0, 2, 3])!
+	assert (a * b).array_equal(vtl.from_2d([[1.0, 4, 9], [4, 10, 18]])!)
+	assert (a / b).array_equal(vtl.from_2d([[1.0, 1, 1], [4, 2.5, 2]])!)
+}
