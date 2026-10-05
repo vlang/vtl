@@ -12,7 +12,7 @@ fn test_abs() {
 
 fn test_clip_limits_values_and_preserves_type() {
 	ints := vtl.from_1d([-4, 2, 9])!
-	assert ints.clip(-1, 5)!.array_equal(vtl.from_1d([-1, 2, 5])!)
+	assert ints.clip(-1, 5)!.array_equal[int](vtl.from_1d([-1, 2, 5])!)
 	floats := vtl.from_1d([-4.0, 2.5, 9.0])!
 	assert floats.clip(-1.0, 5.0)!.array_equal(vtl.from_1d([-1.0, 2.5, 5.0])!)
 }

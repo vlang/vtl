@@ -4,16 +4,28 @@ import math
 
 // clip limits tensor values to the inclusive scalar interval [min_value, max_value].
 // The tensor element type is preserved; NaN values remain NaN.
-pub fn (t &Tensor[T]) clip[T](min_value f64, max_value f64) !&Tensor[T] {
-	if math.is_nan(min_value) || math.is_nan(max_value) || min_value > max_value {
+pub fn (t &Tensor[T]) clip[T](min_value T, max_value T) !&Tensor[T] {
+	if min_value > max_value {
 		return error('clip bounds must be ordered and not NaN')
 	}
-	return t.map(fn [min_value, max_value] [T](value T, _ []int) T {
-		fvalue := td[T](value).f64()
-		if math.is_nan(fvalue) {
-			return value
+	$if T is f64 || T is f32 {
+		if math.is_nan(f64(min_value)) || math.is_nan(f64(max_value)) {
+			return error('clip bounds must be ordered and not NaN')
 		}
-		return cast[T](math.min(math.max(fvalue, min_value), max_value))
+	}
+	return t.map(fn [min_value, max_value] [T](value T, _ []int) T {
+		$if T is f64 || T is f32 {
+			if math.is_nan(f64(value)) {
+				return value
+			}
+		}
+		if value < min_value {
+			return min_value
+		}
+		if value > max_value {
+			return max_value
+		}
+		return value
 	})
 }
 
