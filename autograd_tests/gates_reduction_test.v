@@ -63,3 +63,18 @@ fn test_stack_variables_without_grad_tracking() {
 	assert result.value.shape == [2, 2]
 	assert !result.requires_grad
 }
+
+fn test_reshape_and_transpose_preserve_nonuniform_gradient_values() ! {
+	ctx := autograd.ctx[f64]()
+	mut reshaped := ctx.variable(vtl.from_array([0.0, 0, 0, 0], [4])!)
+	reshaped.grad = vtl.from_array([1.0, 2, 3, 4], [4])!
+	reshape_grads := autograd.reshape_gate[f64]([2, 2]).backward(autograd.payload(reshaped))!
+	assert reshape_grads[0].shape == [2, 2]
+	assert reshape_grads[0].to_array() == [1.0, 2, 3, 4]
+
+	mut transposed := ctx.variable(vtl.from_array([0.0, 0, 0, 0, 0, 0], [3, 2])!)
+	transposed.grad = vtl.from_array([1.0, 2, 3, 4, 5, 6], [3, 2])!
+	transpose_grads := autograd.transpose_gate[f64]([1, 0]).backward(autograd.payload(transposed))!
+	assert transpose_grads[0].shape == [2, 3]
+	assert transpose_grads[0].to_array() == [1.0, 3, 5, 2, 4, 6]
+}
