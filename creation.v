@@ -1,5 +1,7 @@
 module vtl
 
+import math
+
 // meshgrid builds dense two-dimensional XY coordinate grids from two vectors.
 // The output shape is [len(y), len(x)], matching NumPy's default indexing="xy".
 pub fn meshgrid[T](x &Tensor[T], y &Tensor[T]) !(&Tensor[T], &Tensor[T]) {
@@ -127,6 +129,104 @@ pub fn range[T](from int, to int, params TensorData) &Tensor[T] {
 		index++
 	}
 	return res
+}
+
+// arange returns evenly spaced values in the half-open interval [start, stop).
+// The direction of step determines whether the result is ascending or descending.
+pub fn arange[T](start f64, stop f64, step f64, params TensorData) !&Tensor[T] {
+	if !math.is_finite(start) || !math.is_finite(stop) || !math.is_finite(step) || step == 0.0 {
+		return error('arange start, stop, and non-zero step must be finite')
+	}
+	mut count := 0
+	if step > 0.0 && start < stop {
+		count_f64 := math.ceil((stop - start) / step)
+		if count_f64 >= f64(max_int) {
+			return error('arange result is too large')
+		}
+		count = int(count_f64)
+	} else if step < 0.0 && start > stop {
+		count_f64 := math.ceil((stop - start) / step)
+		if count_f64 >= f64(max_int) {
+			return error('arange result is too large')
+		}
+		count = int(count_f64)
+	}
+	mut result := empty[T]([count], params)
+	for i in 0 .. count {
+		result.set([i], cast[T](start + f64(i) * step))
+	}
+	return result
+}
+
+// LinspaceData configures linspace's endpoint and output memory layout.
+@[params]
+pub struct LinspaceData {
+pub:
+	endpoint bool         = true
+	memory   MemoryFormat = .row_major
+}
+
+// linspace returns `num` evenly spaced values between start and stop.
+// The endpoint is included by default; set endpoint: false to exclude stop.
+pub fn linspace[T](start f64, stop f64, num int, params LinspaceData) !&Tensor[T] {
+	if num < 0 {
+		return error('linspace num must be non-negative')
+	}
+	mut result := empty[T]([num], memory: params.memory)
+	if num == 0 {
+		return result
+	}
+	result.set([0], cast[T](start))
+	if num == 1 {
+		return result
+	}
+	denominator := if params.endpoint { num - 1 } else { num }
+	step := (stop - start) / f64(denominator)
+	for i in 1 .. num {
+		result.set([i], cast[T](start + f64(i) * step))
+	}
+	if params.endpoint {
+		result.set([num - 1], cast[T](stop))
+	}
+	return result
+}
+
+// LogspaceData configures logspace's endpoint, base, and output memory layout.
+@[params]
+pub struct LogspaceData {
+pub:
+	endpoint bool         = true
+	base     f64          = 10.0
+	memory   MemoryFormat = .row_major
+}
+
+// logspace returns `num` values spaced evenly on a logarithmic scale between
+// base^start and base^stop. The endpoint is included by default.
+pub fn logspace[T](start f64, stop f64, num int, params LogspaceData) !&Tensor[T] {
+	if !math.is_finite(start) || !math.is_finite(stop) || !math.is_finite(params.base)
+		|| params.base <= 0.0 {
+		return error('logspace exponents and positive base must be finite')
+	}
+	if num < 0 {
+		return error('logspace num must be non-negative')
+	}
+	mut result := empty[T]([num], memory: params.memory)
+	if num == 0 {
+		return result
+	}
+	result.set([0], cast[T](math.pow(params.base, start)))
+	if num == 1 {
+		return result
+	}
+	denominator := if params.endpoint { num - 1 } else { num }
+	step := (stop - start) / f64(denominator)
+	for i in 1 .. num {
+		result.set([i], cast[T](math.pow(params.base, start + f64(i) * step)))
+	}
+	if params.endpoint {
+		result.set([num - 1], cast[T](math.pow(params.base, stop)))
+	}
+	return result
 }
 
 // seq returns a Tensor containing values ranging from [0, to)

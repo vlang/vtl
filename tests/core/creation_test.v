@@ -1,6 +1,7 @@
 module main
 
 import vtl
+import math
 
 fn test_meshgrid_xy_coordinates() {
 	x := vtl.from_1d([1, 2, 3])!
@@ -129,6 +130,87 @@ fn test_range() {
 		12,
 	])!
 	assert t.array_equal(expected)
+}
+
+fn test_arange_float_step() ! {
+	t := vtl.arange[f64](0.0, 1.0, 0.2)!
+	assert t.size() == 5
+	assert t.get_nth(0) == 0.0
+	assert t.get_nth(1) == 0.2
+	assert t.get_nth(2) == 0.4
+	assert t.get_nth(3) == 0.6000000000000001
+	assert t.get_nth(4) == 0.8
+}
+
+fn test_arange_integer_and_descending_steps() ! {
+	ascending := vtl.arange[int](2, 8, 2)!
+	assert ascending.to_array() == [2, 4, 6]
+
+	descending := vtl.arange[int](5, 0, -2)!
+	assert descending.to_array() == [5, 3, 1]
+
+	empty := vtl.arange[int](0, 5, -1)!
+	assert empty.size() == 0
+}
+
+fn test_arange_rejects_zero_and_non_finite_steps() {
+	for step in [0.0, math.inf(1), math.nan()] {
+		_ := vtl.arange[f64](0.0, 1.0, step) or {
+			assert err.msg().contains('non-zero step')
+			continue
+		}
+		assert false, 'expected arange to reject step ${step}'
+	}
+}
+
+fn test_linspace_includes_endpoint_by_default() ! {
+	values := vtl.linspace[f64](0.0, 1.0, 5)!
+	assert values.to_array() == [0.0, 0.25, 0.5, 0.75, 1.0]
+}
+
+fn test_linspace_can_exclude_endpoint() ! {
+	values := vtl.linspace[f64](0.0, 1.0, 4, endpoint: false)!
+	assert values.to_array() == [0.0, 0.25, 0.5, 0.75]
+}
+
+fn test_linspace_handles_zero_and_one_sample() ! {
+	empty := vtl.linspace[f64](0.0, 1.0, 0)!
+	assert empty.size() == 0
+	one := vtl.linspace[f64](2.0, 9.0, 1)!
+	assert one.to_array() == [2.0]
+}
+
+fn test_linspace_rejects_negative_sample_count() {
+	_ := vtl.linspace[f64](0.0, 1.0, -1) or {
+		assert err.msg().contains('num must be non-negative')
+		return
+	}
+	assert false, 'expected linspace to reject a negative sample count'
+}
+
+fn test_logspace_uses_base_and_endpoint() ! {
+	values := vtl.logspace[f64](0.0, 3.0, 4)!
+	assert values.to_array() == [1.0, 10.0, 100.0, 1000.0]
+	base_two := vtl.logspace[f64](0.0, 4.0, 3, base: 2.0)!
+	assert base_two.to_array() == [1.0, 4.0, 16.0]
+}
+
+fn test_logspace_can_exclude_endpoint() ! {
+	values := vtl.logspace[f64](0.0, 3.0, 3, endpoint: false)!
+	assert values.to_array() == [1.0, 10.0, 100.0]
+}
+
+fn test_logspace_rejects_invalid_base_and_num() {
+	for base in [0.0, -2.0, math.inf(1)] {
+		_ := vtl.logspace[f64](0.0, 1.0, 3, base: base) or {
+			continue
+		}
+		assert false, 'expected invalid base ${base} to return an error'
+	}
+	_ := vtl.logspace[f64](0.0, 1.0, -1) or {
+		return
+	}
+	assert false, 'expected negative num to return an error'
 }
 
 fn test_seq() {
