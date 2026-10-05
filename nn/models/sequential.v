@@ -180,6 +180,11 @@ pub fn (mut nn Sequential[T]) lstm(input_size int, hidden_size int, num_layers i
 	nn.info.lstm(input_size, hidden_size, num_layers)
 }
 
+// conv1d adds a one-dimensional convolution over channel-first sequence input.
+pub fn (mut nn Sequential[T]) conv1d(out_channels int, kernel_size int, config layers.Conv1DConfig) {
+	nn.info.conv1d(out_channels, kernel_size, config)
+}
+
 // multihead_attention adds a new MultiHeadAttention layer to the network.
 pub fn (mut nn Sequential[T]) multihead_attention(embed_dim int, num_heads int) {
 	nn.info.multihead_attention(embed_dim, num_heads)

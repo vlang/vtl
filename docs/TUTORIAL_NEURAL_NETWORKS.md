@@ -51,6 +51,7 @@ model.mse_loss() // loss function
 | `avgpool2d(kernel, padding, stride)` | 2D average pooling |
 | `global_avgpool2d()` | Global average pooling (per channel) |
 | `conv2d(in, out, kernel_size, config)` | 2D convolution |
+| `conv1d(out, kernel_size, config)` | Grouped 1D convolution over channel-first sequences |
 | `batchnorm1d(num_features, config)` | 1D batch normalisation |
 | `layer_norm(normalized_shape, config)` | Layer normalisation |
 | `embedding(vocab_size, embed_dim)` | Token embedding (integer indices → vectors) |
@@ -122,6 +123,32 @@ loss_value.backprop()!
 
 See [TUTORIAL_OPTIMIZERS.md](./TUTORIAL_OPTIMIZERS.md) for full optimizer details
 and scheduler usage.
+
+## Conv1D for sequence data
+
+`Sequential.conv1d` consumes channel-first tensors shaped `[batch, channels,
+length]`. The layer supports stride, padding, dilation, and grouped channels;
+its CPU backward computes gradients for the input, kernel, and bias.
+
+```v
+import vtl
+import vtl.autograd
+import vtl.nn.layers
+import vtl.nn.models
+
+ctx := autograd.ctx[f64]()
+mut model := models.sequential_from_ctx[f64](ctx)
+model.input([1, 5])
+model.conv1d(2, 3, layers.Conv1DConfig{padding: 1})
+model.tanh()
+mut sequence := ctx.variable(vtl.from_array([0.1, 0.2, 0.3, 0.4, 0.5], [1, 1, 5])!)
+mut output := model.forward(sequence)!
+println(output.value.shape) // [1, 2, 5]
+output.backprop()!
+```
+
+See the runnable [Conv1D example](../examples/nn_conv1d/) for a complete
+forward and backward pass.
 
 ## Training loop
 
