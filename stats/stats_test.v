@@ -51,6 +51,11 @@ fn test_quantile_linear_supports_integer_tensors() {
 	assert quantile_linear(data, 0.5)! == 2.5
 }
 
+fn test_quantile_linear_propagates_nan() {
+	data := vtl.from_1d([1.0, math.nan(), 2.0])!
+	assert math.is_nan(quantile_linear(data, 0.5)!)
+}
+
 fn test_quantile_linear_rejects_invalid_input() {
 	data := vtl.from_1d([1.0, 2.0])!
 	expect_quantile_error(data, -0.1)
