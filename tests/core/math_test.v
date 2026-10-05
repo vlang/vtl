@@ -61,7 +61,6 @@ fn expect_isclose_error(a &vtl.Tensor[f64], rtol f64, atol f64) {
 	a.isclose(a, rtol: rtol, atol: atol) or { return }
 	panic('expected invalid tolerance to return an error')
 }
-}
 
 fn test_acos() {
 	a := vtl.from_1d([-1.0, 0, 1])!
