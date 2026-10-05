@@ -130,6 +130,21 @@ pub fn (mut nn Sequential[T]) mish() {
 	nn.info.mish()
 }
 
+// softplus adds a Softplus activation layer to the network.
+pub fn (mut nn Sequential[T]) softplus() {
+	nn.info.softplus()
+}
+
+// selu adds a SELU activation layer to the network.
+pub fn (mut nn Sequential[T]) selu() {
+	nn.info.selu()
+}
+
+// hardswish adds a HardSwish activation layer to the network.
+pub fn (mut nn Sequential[T]) hardswish() {
+	nn.info.hardswish()
+}
+
 // conv2d adds a new Conv2D layer to the network.
 pub fn (mut nn Sequential[T]) conv2d(in_channels int, out_channels int, kernel_size []int, config layers.Conv2DConfig) {
 	nn.info.conv2d(in_channels, out_channels, kernel_size, config)

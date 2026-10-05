@@ -158,6 +158,27 @@ pub fn (mut ls SequentialInfo[T]) mish() {
 	ls.add_layer(layers.mish_layer[T](ls.ctx, shape), 'MishLayer', {})
 }
 
+// softplus adds a Softplus layer to the network.
+pub fn (mut ls SequentialInfo[T]) softplus() {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.add_layer(layers.softplus_layer[T](ls.ctx, shape), 'SoftplusLayer', {})
+}
+
+// selu adds a SELU layer to the network.
+pub fn (mut ls SequentialInfo[T]) selu() {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.add_layer(layers.selu_layer[T](ls.ctx, shape), 'SELULayer', {})
+}
+
+// hardswish adds a HardSwish layer to the network.
+pub fn (mut ls SequentialInfo[T]) hardswish() {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.add_layer(layers.hardswish_layer[T](ls.ctx, shape), 'HardSwishLayer', {})
+}
+
 // conv2d adds a new Conv2D layer to the network.
 pub fn (mut ls SequentialInfo[T]) conv2d(in_channels int, out_channels int, kernel_size []int, config layers.Conv2DConfig) {
 	prev_layer := ls.layers[ls.layers.len - 1]
