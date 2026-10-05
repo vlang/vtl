@@ -42,6 +42,17 @@ fn test_multihead_attention_forward_supports_batched_sequences() ! {
 	}
 }
 
+fn test_multihead_attention_rejects_zero_heads_without_panicking() {
+	ctx := autograd.ctx[f64]()
+	layer := multihead_attention_layer[f64](ctx, 4, 0)
+	input := ctx.variable(vtl.ones[f64]([1, 2, 4]))
+	if _ := layer.forward(input) {
+		assert false, 'attention must reject zero heads'
+	} else {
+		assert true
+	}
+}
+
 fn test_multihead_attention_backward_matches_finite_differences() ! {
 	input_values := [f64(0.2), -0.4, 0.7, 0.3]
 	wq_values := [f64(0.1), 0.2, -0.3, 0.4]

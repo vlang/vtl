@@ -30,7 +30,7 @@ pub mut:
 
 // multihead_attention_layer creates a MultiHeadAttentionLayer.
 pub fn multihead_attention_layer[T](ctx &autograd.Context[T], embed_dim int, num_heads int) types.Layer[T] {
-	head_dim := embed_dim / num_heads
+	head_dim := if num_heads > 0 { embed_dim / num_heads } else { 0 }
 	w_q := ctx.variable(internal.kaiming_uniform[T]([embed_dim, embed_dim]))
 	w_k := ctx.variable(internal.kaiming_uniform[T]([embed_dim, embed_dim]))
 	w_v := ctx.variable(internal.kaiming_uniform[T]([embed_dim, embed_dim]))
