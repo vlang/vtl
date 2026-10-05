@@ -153,6 +153,38 @@ mut opt := optimizers.sgd[f32](optimizers.SgdOptimizerConfig{
 opt.build_params(model)
 ```
 
+## NAdam
+
+NAdam adds Nesterov momentum to Adam. VTL follows the momentum schedule and
+bias corrections used by PyTorch; defaults are `lr: 0.002`, `beta1: 0.9`,
+`beta2: 0.999`, `epsilon: 1e-8`, and `momentum_decay: 0.004`.
+
+```v ignore
+import vtl.nn.optimizers
+
+mut opt := optimizers.nadam_optimizer[f32](learning_rate: 0.002, momentum_decay: 0.004)
+```
+
+The configuration also supports `weight_decay` and
+`decoupled_weight_decay`. The latter applies decay to parameters separately
+from the gradient and moment estimates.
+
+## RAdam
+
+RAdam rectifies Adam's adaptive variance after its running estimate becomes
+reliable, while using a bias-corrected momentum update during its early steps.
+VTL uses the PyTorch rectification threshold and epsilon placement. Defaults
+are `lr: 0.001`, `beta1: 0.9`, `beta2: 0.999`, and `epsilon: 1e-8`.
+
+```v ignore
+import vtl.nn.optimizers
+
+mut opt := optimizers.radam_optimizer[f32](learning_rate: 0.001)
+```
+
+The configuration supports coupled `weight_decay` by default, with an optional
+`decoupled_weight_decay` mode.
+
 ## Learning Rate Schedulers
 
 Schedulers adjust the learning rate during training. Create a scheduler,

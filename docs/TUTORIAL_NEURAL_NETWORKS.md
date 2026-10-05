@@ -99,6 +99,8 @@ loss_value.backprop()!
 | `adamw(...)` | `optimizers` | Adam + decoupled weight decay |
 | `rmsprop(...)` | `optimizers` | Per-parameter learning rates |
 | `adagrad(...)` | `optimizers` | Accumulates squared grads |
+| `nadam_optimizer(...)` | `optimizers` | Adam with Nesterov momentum and momentum scheduling |
+| `radam_optimizer(...)` | `optimizers` | Rectifies Adam variance during early steps |
 | `sgd(...)` | `optimizers` | Vanilla stochastic gradient descent |
 
 See [TUTORIAL_OPTIMIZERS.md](./TUTORIAL_OPTIMIZERS.md) for full optimizer details
