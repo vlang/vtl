@@ -13,7 +13,7 @@ VTL provides dataset loaders and batching utilities for ML examples and tests.
 
 DataLoader returns a view when a batch's sample indices form a contiguous range.
 Shuffled, non-contiguous batches allocate tensors to preserve the requested
-sample order.
+sample order. A non-positive `batch_size` produces an empty loader.
 
 `load_imdb()` returns the full 25,000 review training and test splits. Use
 `load_imdb_with_config` for a smaller, class-balanced subset. Review features
