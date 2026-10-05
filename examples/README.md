@@ -27,6 +27,7 @@ CIFAR examples for CI-safe checks.
 | [nn_regression_sine](./nn_regression_sine) | Regression with synthetic data | CPU |
 | [nn_multiclass_iris](./nn_multiclass_iris) | Multiclass classifier | CPU |
 | [nn_autoencoder_simple](./nn_autoencoder_simple) | Simple autoencoder | CPU |
+| [nn_transformer_attention](./nn_transformer_attention) | Positional encoding and multi-head self-attention | CPU |
 | [nn_mnist](./nn_mnist) | MNIST training path | Dataset download/cache |
 
 ## CIFAR-10 release examples

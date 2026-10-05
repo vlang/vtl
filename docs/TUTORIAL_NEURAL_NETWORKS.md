@@ -163,6 +163,7 @@ _ = ctx
 | [`nn_simple_two_layer`](../examples/nn_simple_two_layer/) | Random target fitting | MSE |
 | [`nn_multiclass_iris`](../examples/nn_multiclass_iris/) | 3-class classification | Softmax CE |
 | [`nn_autoencoder_simple`](../examples/nn_autoencoder_simple/) | Reconstruction | MSE |
+| [`nn_transformer_attention`](../examples/nn_transformer_attention/) | Positional encoding and self-attention | Forward demo |
 
 ## See also
 
