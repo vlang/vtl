@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       TERM: xterm
-      VJOBS: '1'
+      VJOBS: '2'
 
     steps:
       - uses: actions/checkout@v4
