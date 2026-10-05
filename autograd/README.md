@@ -49,3 +49,36 @@ Call the V compiler from the parent of the `vtl` clone:
 systemd-run --user --scope --quiet --property=MemoryMax=1G --setenv=VJOBS=2 \
 	--working-directory="$HOME/.vmodules" -- v test ./vtl/autograd_tests
 ```
+
+`backprop()` seeds the output gradient with ones and accumulates gradients in
+its ancestors. It consumes the recorded graph, so run a fresh forward pass for
+each subsequent backward pass. Set `requires_grad: false` when creating a
+variable that should not receive gradients. See the
+[autograd tutorial](../docs/TUTORIAL_AUTOGRAD.md) and
+[backprop example](../examples/autograd_backprop/README.md).
+The module direction and planned work are summarized in the
+[VTL roadmap](../ROADMAP.md).
+
+The graph records operations that have an autograd gate; it does not promise to
+track every tensor API operation. Check the relevant operation and tests before
+depending on its gradient behavior. GPU autograd paths are backend-specific and
+experimental; see [device memory notes](../docs/DEVICE_MEMORY.md).
+
+## Tracked operations
+
+`Variable` methods record gates for elementwise add, subtract, multiply,
+divide, and power; exponential, logarithm, sine, cosine, tangent, absolute
+value, square root, hyperbolic tangent, and clamp; matrix multiplication; sum
+and mean reductions; reshape, permutation transpose, and concatenation. See
+[`variable_ops.v`](variable_ops.v) for method signatures and the
+[`gates` reference](../nn/gates/README.md) for the backward-rule adapters.
+
+The implementation is grouped by rule in `gates_basic.v` (arithmetic),
+`gates_pow.v`, `gates_exp.v`, `gates_trig.v`, `gates_unary.v`,
+`gates_blas.v`, and `gates_reduction.v`. This list describes registered
+autograd rules, not every operation available on `Tensor`.
+
+CUDA-specific variables and helpers are conditional builds. Accelerator
+coverage depends on the operation and backend; a GPU tensor does not imply
+that every forward operation or backward rule stays device-resident. See
+[`DEVICE_MEMORY.md`](../docs/DEVICE_MEMORY.md) for the current caveats.

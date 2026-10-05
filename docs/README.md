@@ -60,3 +60,15 @@ tensors, autograd, datasets, layers, losses, optimizers, and training loops.
 |----------|------|
 | VSL README | [vlang/vsl](https://github.com/vlang/vsl) |
 | VSL docs | [vlang.github.io/vsl](https://vlang.github.io/vsl) |
+
+## Module References
+
+| Area | Reference |
+|------|-----------|
+| Autograd | [API overview](../autograd/README.md) |
+| Linear algebra | [API overview](../la/README.md) |
+| Statistics | [API overview](../stats/README.md) |
+| Storage backends | [API overview](../storage/README.md) |
+| ML metrics | [API overview](../ml/README.md) |
+| Neural networks | [Overview](../nn/README.md), [layers](../nn/layers/README.md), [models](../nn/models/README.md), [losses](../nn/loss/README.md), [optimizers](../nn/optimizers/README.md) |
+| NN implementation | [gates](../nn/gates/README.md), [types](../nn/types/README.md), [internal kernels](../nn/internal/README.md) |
