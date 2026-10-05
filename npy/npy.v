@@ -108,14 +108,14 @@ pub fn read[T](path string) !&vtl.Tensor[T] {
 	if descriptor.endian == u8(`=`) {
 		little_endian = host_is_little_endian()
 	}
-	mut values := []T{len: count}
+	mut tensor := vtl.tensor[T](T(0), shape)
 	for i in 0 .. count {
 		source_index := if fortran { fortran_index(i, shape) } else { i }
 		offset := data_offset + source_index * descriptor.width
 		bits := read_bits(bytes, offset, descriptor.width, little_endian)
-		values[i] = value_from_bits[T](bits)
+		tensor.set_nth[T](i, value_from_bits[T](bits))
 	}
-	return vtl.from_array[T](values, shape)!
+	return tensor
 }
 
 fn npy_type[T]() !NpyType {
