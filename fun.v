@@ -107,15 +107,20 @@ pub fn (t &Tensor[T]) diagonal[T]() &Tensor[T] {
 	return ret
 }
 
-// ravel returns a flattened view of an Tensor if possible,
-// otherwise a flattened copy
-
-// ravel exposes this operation as part of the public API.
-
-// ravel exposes this operation as part of the public API.
+// ravel returns a one-dimensional tensor in row-major logical order. It shares
+// storage for row-major contiguous tensors and copies non-contiguous tensors.
 @[inline]
 pub fn (t &Tensor[T]) ravel[T]() !&Tensor[T] {
+	if !t.is_row_major_contiguous() {
+		return from_1d[T](t.to_array())
+	}
 	return t.reshape([-1])
+}
+
+// flatten returns a one-dimensional copy of a tensor in row-major logical
+// order, even when the input is already contiguous.
+pub fn (t &Tensor[T]) flatten[T]() !&Tensor[T] {
+	return from_1d[T](t.to_array())
 }
 
 // reshape returns an Tensor with a new shape
