@@ -56,10 +56,17 @@ fn download_cifar10(dataset string, baseurl string, file string, uncompressed_di
 
 // load_cifar10_batch loads a single batch file from CIFAR-10 binary format.
 fn load_cifar10_batch(path string, expected_count int) !([]f64, []int) {
+	if expected_count < 0 {
+		return error('CIFAR-10 expected count must not be negative')
+	}
 	if !os.exists(path) {
 		return error('CIFAR-10 batch not found: ${path}')
 	}
 	data := os.read_file(path)!
+	if data.len < expected_count * 3073 {
+		return error('CIFAR-10 batch is truncated: got ${data.len} bytes, need ${expected_count *
+			3073}')
+	}
 	mut labels := []int{len: expected_count}
 	mut images := []f64{len: expected_count * 3072}
 	for i := 0; i < expected_count; i++ {
@@ -82,8 +89,8 @@ fn load_cifar10_train_batches(data_dir string, total_count int) !([]f64, []int) 
 			break
 		}
 		batch_path := os.join_path(data_dir, 'data_batch_${batch_num}.bin')
-		images, labels := load_cifar10_batch(batch_path, 10000)!
 		take := if remaining < 10000 { remaining } else { 10000 }
+		images, labels := load_cifar10_batch(batch_path, take)!
 		all_images << images[..take * 3072]
 		all_labels << labels[..take]
 		remaining -= take
@@ -102,7 +109,23 @@ pub fn load_cifar10() !Cifar10Dataset {
 pub fn load_cifar10_with_config(cfg Cifar10Config) !Cifar10Dataset {
 	dataset_path := download_cifar10('cifar10', cifar10_base_url, cifar10_file,
 		'cifar-10-batches-bin')!
+	return load_cifar10_from_dir(dataset_path, cfg)
+}
 
+fn load_cifar10_from_dir(dataset_path string, cfg Cifar10Config) !Cifar10Dataset {
+	if cfg.channels <= 0 || cfg.height <= 0 || cfg.width <= 0
+		|| cfg.channels * cfg.height * cfg.width != 3072 {
+		return error('CIFAR-10 image dimensions must be positive and multiply to 3072')
+	}
+	if cfg.num_classes < 10 {
+		return error('CIFAR-10 requires at least 10 output classes')
+	}
+	if cfg.train_count < 1 || cfg.train_count > 50000 {
+		return error('CIFAR-10 train_count must be between 1 and 50000')
+	}
+	if cfg.test_count < 1 || cfg.test_count > 10000 {
+		return error('CIFAR-10 test_count must be between 1 and 10000')
+	}
 	// Load training data
 	train_images, train_labels := load_cifar10_train_batches(dataset_path, cfg.train_count)!
 
@@ -122,10 +145,8 @@ pub fn load_cifar10_with_config(cfg Cifar10Config) !Cifar10Dataset {
 
 	// Load test data
 	test_path := os.join_path(dataset_path, 'test_batch.bin')
-	all_test_images, all_test_labels := load_cifar10_batch(test_path, 10000)!
 	test_take := if cfg.test_count < 10000 { cfg.test_count } else { 10000 }
-	test_images := all_test_images[..test_take * 3072]
-	test_labels := all_test_labels[..test_take]
+	test_images, test_labels := load_cifar10_batch(test_path, test_take)!
 
 	// Reshape test images to [N, C, H, W]
 	test_features := vtl.from_1d(test_images)!.reshape([-1, cfg.channels, cfg.height, cfg.width])!
