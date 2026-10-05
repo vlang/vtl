@@ -39,6 +39,23 @@ fn test_matmul_1() {
 fn test_matmul_2() {
 	a := vtl.seq[f64](2 * 2 * 4).reshape([2, 2, 4])!
 	b := vtl.seq[f64](2 * 2 * 4).reshape([2, 4, 2])!
+	result := matmul(a, b)!
+	assert result.shape == [2, 2, 2]
+}
+
+fn test_matmul_broadcasts_batch_dimensions() {
+	a := vtl.seq[f64](8).reshape([2, 1, 2, 2])!
+	b := vtl.from_array([f64(1), 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1], [3, 2, 2])!
+	result := matmul(a, b)!
+	assert result.shape == [2, 3, 2, 2]
+	expected := vtl.from_array([f64(0), 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 4, 5, 6, 7, 4, 5, 6, 7,
+		4, 5, 6, 7], [2, 3, 2, 2])!
+	assert result.array_equal(expected)
+}
+
+fn test_matmul_rejects_incompatible_batch_dimensions() {
+	a := vtl.ones[f64]([2, 2, 3])
+	b := vtl.ones[f64]([3, 3, 2])
 	if _ := matmul(a, b) {
 		assert false
 	} else {
