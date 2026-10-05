@@ -22,8 +22,8 @@ struct NpyDescriptor {
 // write writes a CPU tensor as an uncompressed NumPy .npy v1.0 file.
 // Numeric primitive types and row-major logical tensor order are supported.
 pub fn write[T](path string, tensor &vtl.Tensor[T]) ! {
-	type := npy_type[T]() or { return err }
-	descriptor := '<${rune(type.kind)}${type.width}'
+	npy_dtype := npy_type[T]() or { return err }
+	descriptor := '<${rune(npy_dtype.kind)}${npy_dtype.width}'
 	shape := format_shape(tensor.shape)
 	mut header := "{'descr': '${descriptor}', 'fortran_order': False, 'shape': ${shape}, }"
 	padding := (16 - ((10 + header.len + 1) % 16)) % 16
@@ -32,10 +32,10 @@ pub fn write[T](path string, tensor &vtl.Tensor[T]) ! {
 	if header.len > 0xffff {
 		return error('npy.write: header exceeds the v1.0 size limit')
 	}
-	if tensor.size > (max_int - 10 - header.len) / type.width {
+	if tensor.size > (max_int - 10 - header.len) / npy_dtype.width {
 		return error('npy.write: array size overflows addressable memory')
 	}
-	mut bytes := []u8{cap: 10 + header.len + tensor.size * type.width}
+	mut bytes := []u8{cap: 10 + header.len + tensor.size * npy_dtype.width}
 	bytes << magic
 	bytes << u8(1)
 	bytes << u8(0)
@@ -46,7 +46,7 @@ pub fn write[T](path string, tensor &vtl.Tensor[T]) ! {
 	mut iter := tensor.iterator()
 	for {
 		value, _ := iter.next() or { break }
-		append_value[T](mut bytes, value, type.width)
+		append_value[T](mut bytes, value, npy_dtype.width)
 	}
 	os.write_file_array(path, bytes)!
 }
