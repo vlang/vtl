@@ -1,5 +1,67 @@
 module autograd
 
+import vtl
+
+// concat concatenates variables along an existing axis and tracks gradients
+// back to every input. All variables must share an autograd context.
+pub fn concat[T](inputs []&Variable[T], axis int) !&Variable[T] {
+	if inputs.len == 0 {
+		return error('autograd.concat: at least one input is required')
+	}
+	rank := inputs[0].value.rank()
+	normalized_axis := if axis < 0 { axis + rank } else { axis }
+	if normalized_axis < 0 || normalized_axis >= rank {
+		return error('autograd.concat: axis is out of bounds')
+	}
+	mut values := []&vtl.Tensor[T]{cap: inputs.len}
+	mut splits := []int{cap: inputs.len}
+	mut tracks_gradient := false
+	for input in inputs {
+		if input.context != inputs[0].context {
+			return error('autograd.concat: all inputs must share an autograd context')
+		}
+		values << input.value
+		splits << input.value.shape[normalized_axis]
+		tracks_gradient = tracks_gradient || input.requires_grad
+	}
+	value := vtl.concatenate[T](values, axis: normalized_axis)!
+	mut result := inputs[0].context.variable(value, requires_grad: tracks_gradient)
+	if tracks_gradient {
+		gate := concat_gate[T](normalized_axis, splits)
+		gate.cache(mut result, ...inputs)!
+	}
+	return result
+}
+
+// stack inserts a new axis and tracks gradients back to every input.
+// All inputs must have equal shapes and share an autograd context.
+pub fn stack[T](inputs []&Variable[T], axis int) !&Variable[T] {
+	if inputs.len == 0 {
+		return error('autograd.stack: at least one input is required')
+	}
+	rank := inputs[0].value.rank()
+	normalized_axis := if axis < 0 { axis + rank + 1 } else { axis }
+	if normalized_axis < 0 || normalized_axis > rank {
+		return error('autograd.stack: axis is out of bounds')
+	}
+	mut values := []&vtl.Tensor[T]{cap: inputs.len}
+	mut tracks_gradient := false
+	for input in inputs {
+		if input.context != inputs[0].context {
+			return error('autograd.stack: all inputs must share an autograd context')
+		}
+		values << input.value
+		tracks_gradient = tracks_gradient || input.requires_grad
+	}
+	value := vtl.stack[T](values, axis: normalized_axis)!
+	mut result := inputs[0].context.variable(value, requires_grad: tracks_gradient)
+	if tracks_gradient {
+		gate := stack_gate[T](normalized_axis, inputs.len)
+		gate.cache(mut result, ...inputs)!
+	}
+	return result
+}
+
 // add Adds two variables together.
 pub fn (v &Variable[T]) add(other &Variable[T]) !&Variable[T] {
 	mut result := v.context.variable(v.value.add(other.value)!)

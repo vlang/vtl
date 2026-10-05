@@ -103,6 +103,28 @@ y := x.reshape[f64]([2, 2])!
 z := x.transpose_op[f64]([1, 0])!
 ```
 
+`reshape` restores the original input shape in backward, while `transpose_op`
+applies the inverse axis permutation. To join variables while preserving the
+graph, use `autograd.concat` along an existing axis or `autograd.stack` to add
+a new axis. Stack inputs must have matching shapes, and all inputs must belong
+to the same context.
+
+```v
+import vtl
+import vtl.autograd
+
+ctx := autograd.ctx[f64]()
+a := ctx.variable(vtl.from_1d([1.0, 2])!)
+b := ctx.variable(vtl.from_1d([3.0, 4])!)
+mut joined := autograd.concat[f64]([a, b], 0)!
+joined.backprop()!
+// a.grad and b.grad each have shape [2]
+
+mut stacked := autograd.stack[f64]([a, b], 1)!
+stacked.backprop()!
+// stacked.value has shape [2, 2]; gradients return with shape [2]
+```
+
 ## Supported operations
 
 The autograd engine tracks every VTL tensor operation.  Common ones used

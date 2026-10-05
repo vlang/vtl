@@ -255,3 +255,55 @@ pub fn (g &ConcatGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	}
 	register[T]('Concat', voidptr(g), concat_gate_backward_dispatch[T], result, vars)!
 }
+
+// StackGate stores the axis and number of input tensors for backward.
+pub struct StackGate[T] {
+pub:
+	axis       int
+	num_inputs int
+}
+
+// stack_gate creates a backward gate that un-stacks the output gradient.
+pub fn stack_gate[T](axis int, num_inputs int) &StackGate[T] {
+	return &StackGate[T]{
+		axis:       axis
+		num_inputs: num_inputs
+	}
+}
+
+// backward splits the stacked gradient into one tensor per input.
+pub fn (g &StackGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
+	gradient := payload.variable.grad
+	mut results := []&vtl.Tensor[T]{cap: g.num_inputs}
+	for index in 0 .. g.num_inputs {
+		mut selection := [][]int{cap: gradient.rank()}
+		for axis in 0 .. gradient.rank() {
+			selection << if axis == g.axis { [index] } else { []int{} }
+		}
+		results << gradient.slice[T](...selection)!
+	}
+	return results
+}
+
+fn stack_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := unsafe { (&StackGate[T](gate)).backward(typed_payload)! }
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
+// cache registers the stack operation and all of its input variables.
+pub fn (g &StackGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
+	mut vars := []&Variable[T]{cap: args.len}
+	for arg in args {
+		match arg {
+			Variable[T] { vars << arg }
+			else { return error('StackGate.cache: every input must be a Variable') }
+		}
+	}
+	if vars.len != g.num_inputs {
+		return error('StackGate.cache: input count does not match the gate')
+	}
+	result.grad = vtl.zeros_like[T](result.value)
+	result.requires_grad = true
+	register[T]('Stack', voidptr(g), stack_gate_backward_dispatch[T], result, vars)!
+}
