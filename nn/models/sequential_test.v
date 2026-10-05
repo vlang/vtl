@@ -2,6 +2,7 @@ module models
 
 import vtl
 import vtl.autograd
+import vtl.nn.layers
 import vtl.nn.types
 
 fn test_nnc() {
@@ -51,4 +52,18 @@ fn test_added_activation_layers_in_sequential() {
 	assert nn.info.layers[1].output_shape() == [3]
 	assert nn.info.layers[2].output_shape() == [3]
 	assert nn.info.layers[3].output_shape() == [3]
+}
+
+fn test_conv1d_sequential_forward_backward() ! {
+	ctx := autograd.ctx[f64]()
+	mut nn := sequential_from_ctx[f64](ctx)
+	nn.input([1, 5])
+	nn.conv1d(2, 3, layers.Conv1DConfig{ padding: 1 })
+	mut input := ctx.variable(vtl.from_array([0.1, 0.2, 0.3, 0.4, 0.5], [1, 1, 5])!)
+	mut output := nn.forward(input)!
+	assert output.value.shape == [1, 2, 5]
+	output.backprop()!
+	assert input.grad.shape == input.value.shape
+	assert nn.info.layers[1].variables().len == 2
+}
 }

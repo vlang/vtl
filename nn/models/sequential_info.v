@@ -257,6 +257,29 @@ pub fn (mut ls SequentialInfo[T]) lstm(input_size int, hidden_size int, num_laye
 	})
 }
 
+// conv1d adds a Conv1D layer using the previous layer's [channels, length] shape.
+pub fn (mut ls SequentialInfo[T]) conv1d(out_channels int, kernel_size int, config layers.Conv1DConfig) {
+	if ls.layers.len == 0 {
+		panic('conv1d requires an input layer')
+	}
+	shape := ls.layers[ls.layers.len - 1].output_shape()
+	if shape.len != 2 {
+		panic('conv1d expects the previous layer shape to be [channels, length]')
+	}
+	in_channels, input_length := shape[0], shape[1]
+	ls.add_layer(layers.conv1d_layer[T](ls.ctx, in_channels, out_channels, kernel_size, config,
+		input_length), 'Conv1DLayer', {
+		'in_channels':  in_channels
+		'out_channels': out_channels
+		'kernel_size':  kernel_size
+		'stride':       config.stride
+		'padding':      config.padding
+		'dilation':     config.dilation
+		'groups':       config.groups
+		'input_length': input_length
+	})
+}
+
 // multihead_attention adds a new MultiHeadAttention layer to the network.
 pub fn (mut ls SequentialInfo[T]) multihead_attention(embed_dim int, num_heads int) {
 	ls.add_layer(layers.multihead_attention_layer[T](ls.ctx, embed_dim, num_heads),
