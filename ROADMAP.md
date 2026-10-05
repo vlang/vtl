@@ -93,12 +93,11 @@ See [docs/DEVICE_MEMORY.md](docs/DEVICE_MEMORY.md).
 
 | Priority | Work item |
 |----------|-----------|
-| P1 | [#41](https://github.com/vlang/vtl/issues/41) Windows crash — `from_array` shape clone fix; verify on Windows |
-| P2 | [#63](https://github.com/vlang/vtl/issues/63) ARM GPU |
-| P2 | Label `full-ml` for optional heavy CI workflow |
-| P2 | Vulkan persistent GPU activation chain (optional; per-layer GPU activations work today) |
-
-**Maintainer project board:** [vlang org project #8](https://github.com/orgs/vlang/projects/8) (may require access)
+| P1 | Close the remaining correctness and API gaps listed in [NumPy and Arraymancer parity](docs/NUMPY_PARITY.md) |
+| P1 | Expand cross-language tensor I/O, starting with NumPy NPY/NPZ interoperability |
+| P2 | [#63](https://github.com/vlang/vtl/issues/63) ARM GPU support |
+| P2 | Improve Windows CI coverage beyond the creation smoke test |
+| P2 | Add YOLO-oriented gate fusion and benchmark it against the current autograd path ([#40](https://github.com/vlang/vtl/issues/40)) |
 
 ---
 
@@ -106,11 +105,17 @@ See [docs/DEVICE_MEMORY.md](docs/DEVICE_MEMORY.md).
 
 | # | Title | Priority | Notes |
 |---|-------|----------|-------|
-| [#41](https://github.com/vlang/vtl/issues/41) | Windows example crash | 🔴 P1 | shape.clone in `from_array` (needs Win CI) |
+| [#41](https://github.com/vlang/vtl/issues/41) | Windows example crash | ✅ Closed | Confirmed closed; retain Windows coverage follow-up in #157 |
 | [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support | 🟡 P2 | Open |
-| [#43](https://github.com/vlang/vtl/issues/43) | `stats.to_array` performance | 🟡 Medium | |
+| [#43](https://github.com/vlang/vtl/issues/43) | `stats.to_array` performance | ✅ Closed | Confirmed closed |
 | [#40](https://github.com/vlang/vtl/issues/40) | YOLO for autograd gates | 🟡 Medium | |
 | [#52](https://github.com/vlang/vtl/issues/52) | Tracel-AI/Burn reference | Research | |
+| [#2](https://github.com/vlang/vtl/issues/2) | Float comparison undefined behavior | 🔴 Correctness | Open; review comparison semantics before expanding numeric APIs |
+| [#6](https://github.com/vlang/vtl/issues/6) | Tensor operator overloads | 🟡 API | Open; check V operator limitations and provide named alternatives |
+
+The complete NumPy and Arraymancer comparison is tracked in
+[docs/NUMPY_PARITY.md](docs/NUMPY_PARITY.md). The GitHub project board is not
+used as a source for this roadmap.
 
 **Closed ML epics:** #58–#64, #86–#91 — see [ML_ROADMAP.md](docs/ML_ROADMAP.md).
 
@@ -205,4 +210,4 @@ vtl/
 
 ---
 
-*Last updated: 2026-05-31* · Maintainer board: [project #8](https://github.com/orgs/vlang/projects/8)
+*Last updated: 2026-10-05*

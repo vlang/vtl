@@ -1,0 +1,67 @@
+# NumPy and Arraymancer Feature Parity
+
+VTL's long-term goal is to provide a more complete and more performant tensor
+and machine-learning toolkit than Arraymancer, then grow beyond NumPy for the
+array operations that make sense in V. This is a capability roadmap, not a
+claim of current parity. Every checked item must be backed by public API,
+tests, documentation, and examples where users need them.
+
+## Current strengths
+
+- Generic N-dimensional tensors, slicing, broadcasting, reshape, transpose,
+  axis swapping, and view-preserving `moveaxis`/`rollaxis`.
+- Elementwise math, reductions, mapping, stacking, splitting, random values,
+  statistics, and linear algebra through VSL.
+- Reverse-mode autograd, neural-network layers and losses, optimizers,
+  datasets, and CPU/CUDA/Vulkan/OpenCL paths.
+- Tutorials and runnable examples for tensors, linear algebra, autograd,
+  training, and GPU backends.
+
+## NumPy domains
+
+| Domain | Current VTL coverage | Work needed before calling it complete |
+|---|---|---|
+| Array creation | zeros/ones/full/eye/range/sequence, from arrays | Validate edge cases, add `arange`-style start/step, `linspace`, `logspace`, mesh grids, and consistent dtype/device options |
+| Shape and manipulation | reshape, transpose, squeeze/expand, move/roll axes, concatenate/stack/split | Add parity tests for flatten/ravel, repeat/tile, flip/rotations, broadcasting helpers, and copy-vs-view behavior |
+| Indexing | Integer indexing, slices, lookup helpers, DataLoader gathers | Add advanced/fancy indexing, boolean masks, `take`, `take_along_axis`, scatter/put, and documented bounds semantics |
+| Math and ufuncs | Broad elementwise math and broadcasting | Audit the full unary/binary function families, `where`, `clip`, `heaviside`, `sign`, `isclose`, `allclose`, and dtype promotion |
+| Reductions | Sum/product/min/max/mean and statistics | Add/verify variance, standard deviation, quantile/percentile, arg reductions, NaN-aware variants, accumulator dtype, and `keepdims` |
+| Linear algebra | VSL-backed matmul, solve, QR/LU/Cholesky, pseudoinverse, trace | Add decomposition and norm coverage; specify singular and non-finite behavior; benchmark realistic shapes |
+| FFT | VSL FFT integration exists in the ecosystem | Expose a coherent VTL API for N-D transforms, real transforms, frequencies, and normalization with examples |
+| Random | Random tensor creation | Design explicit generator state and reproducibility, distributions, sampling, and seeding guarantees |
+| Input/output | Model serialization and dataset loaders | Implement NPY/NPZ interoperability, then CSV/text helpers; document endian and dtype support |
+| Data types | V generic element types | Define promotion/casting rules, complex types, booleans, integer overflow, and structured data limits |
+| Masked and missing data | Not established as a general tensor feature | Define a mask representation and NaN/missing-value reduction behavior |
+| Structured/record arrays | Not supported as a general tensor feature | Decide whether this belongs in VTL or a companion table/dataframe package |
+| Performance and devices | CPU plus optional GPU backends | Publish reproducible benchmarks for each backend; optimize without changing numerical semantics |
+| Learning and examples | Autograd, NN, optimizers, datasets, tutorials | Add end-to-end examples for classical ML, transforms, batching, checkpointing, and deployment |
+
+The NumPy `.npy` format stores dtype, shape, and memory order alongside binary
+data; `.npz` is a ZIP container of `.npy` files. Initial support should define
+the accepted primitive dtypes and byte orders explicitly, reject unsupported
+object/structured data safely, and test round trips against NumPy-generated
+fixtures. Memory mapping and compressed archives can follow after the core
+format is reliable.
+
+## Arraymancer comparison
+
+Track these capabilities in addition to the NumPy table:
+
+- Multidimensional tensor math, slicing, broadcasting, reshape, concatenation,
+  permutation, and matrix algebra.
+- CSV/NPY/HDF5 data interchange and CPU/GPU backends.
+- Statistics, covariance, eigen/least-squares operations, PCA, and K-means.
+- Neural-network layers and recurrent models, with training examples.
+
+VTL already has more developed autograd, neural-network, optimizer, dataset,
+and multi-backend training infrastructure than a basic tensor library. The
+remaining comparison must verify operational feature behavior and performance
+against current upstream documentation; feature names alone are not evidence.
+
+## Acceptance rule
+
+For each capability, record its public API, correctness tests, edge cases,
+documentation/tutorial, example, and benchmark (when performance matters).
+Keep unsupported or partially supported features explicitly marked. Do not
+describe VTL as more complete than NumPy or Arraymancer until the applicable
+rows are implemented and independently verified.
