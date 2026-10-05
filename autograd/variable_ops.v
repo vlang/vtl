@@ -313,7 +313,7 @@ pub fn concatenate[T](variables []&Variable[T], data vtl.AxisData) !&Variable[T]
 	for variable in variables {
 		splits << variable.value.shape[axis]
 	}
-	mut result := first.context.variable(value)
+	mut result := first.context.variable(value, requires_grad: track_gradient)
 	if track_gradient {
 		gate := concat_gate[T](axis, splits)
 		gate.cache(mut result, ...variables)!
@@ -339,7 +339,13 @@ pub fn stack[T](variables []&Variable[T], data vtl.AxisData) !&Variable[T] {
 		}
 		mut shape := variable.value.shape.clone()
 		shape.insert(axis, 1)
-		expanded << variable.reshape(shape)!
+		if variable.requires_grad {
+			expanded << variable.reshape(shape)!
+		} else {
+			expanded << variable.context.variable(variable.value.reshape(shape)!,
+				requires_grad: false
+			)
+		}
 	}
 	return concatenate[T](expanded, axis: axis)
 }

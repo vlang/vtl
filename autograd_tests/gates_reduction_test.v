@@ -54,3 +54,12 @@ fn test_stack_variables_backward_unstacks_gradient() {
 	assert y.grad.get_nth(0) == f64(1)
 	assert y.grad.get_nth(1) == f64(1)
 }
+
+fn test_stack_variables_without_grad_tracking() {
+	f64_ctx := autograd.ctx[f64]()
+	x := f64_ctx.variable(vtl.from_1d([1.0, 2.0])!, requires_grad: false)
+	y := f64_ctx.variable(vtl.from_1d([3.0, 4.0])!, requires_grad: false)
+	result := autograd.stack[f64]([x, y], axis: 0)!
+	assert result.value.shape == [2, 2]
+	assert !result.requires_grad
+}
