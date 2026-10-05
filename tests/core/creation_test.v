@@ -188,6 +188,31 @@ fn test_linspace_rejects_negative_sample_count() {
 	assert false, 'expected linspace to reject a negative sample count'
 }
 
+fn test_logspace_uses_base_and_endpoint() ! {
+	values := vtl.logspace[f64](0.0, 3.0, 4)!
+	assert values.to_array() == [1.0, 10.0, 100.0, 1000.0]
+	base_two := vtl.logspace[f64](0.0, 4.0, 3, base: 2.0)!
+	assert base_two.to_array() == [1.0, 4.0, 16.0]
+}
+
+fn test_logspace_can_exclude_endpoint() ! {
+	values := vtl.logspace[f64](0.0, 3.0, 3, endpoint: false)!
+	assert values.to_array() == [1.0, 10.0, 100.0]
+}
+
+fn test_logspace_rejects_invalid_base_and_num() {
+	for base in [0.0, -2.0, math.inf(1)] {
+		_ := vtl.logspace[f64](0.0, 1.0, 3, base: base) or {
+			continue
+		}
+		assert false, 'expected invalid base ${base} to return an error'
+	}
+	_ := vtl.logspace[f64](0.0, 1.0, -1) or {
+		return
+	}
+	assert false, 'expected negative num to return an error'
+}
+
 fn test_seq() {
 	t := vtl.seq[f64](10)
 	expected := vtl.from_array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0], [

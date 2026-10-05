@@ -191,6 +191,44 @@ pub fn linspace[T](start f64, stop f64, num int, params LinspaceData) !&Tensor[T
 	return result
 }
 
+// LogspaceData configures logspace's endpoint, base, and output memory layout.
+@[params]
+pub struct LogspaceData {
+pub:
+	endpoint bool         = true
+	base     f64          = 10.0
+	memory   MemoryFormat = .row_major
+}
+
+// logspace returns `num` values spaced evenly on a logarithmic scale between
+// base^start and base^stop. The endpoint is included by default.
+pub fn logspace[T](start f64, stop f64, num int, params LogspaceData) !&Tensor[T] {
+	if !math.is_finite(start) || !math.is_finite(stop) || !math.is_finite(params.base)
+		|| params.base <= 0.0 {
+		return error('logspace exponents and positive base must be finite')
+	}
+	if num < 0 {
+		return error('logspace num must be non-negative')
+	}
+	mut result := empty[T]([num], memory: params.memory)
+	if num == 0 {
+		return result
+	}
+	result.set([0], cast[T](math.pow(params.base, start)))
+	if num == 1 {
+		return result
+	}
+	denominator := if params.endpoint { num - 1 } else { num }
+	step := (stop - start) / f64(denominator)
+	for i in 1 .. num {
+		result.set([i], cast[T](math.pow(params.base, start + f64(i) * step)))
+	}
+	if params.endpoint {
+		result.set([num - 1], cast[T](math.pow(params.base, stop)))
+	}
+	return result
+}
+
 // seq returns a Tensor containing values ranging from [0, to)
 
 // seq exposes this operation as part of the public API.
