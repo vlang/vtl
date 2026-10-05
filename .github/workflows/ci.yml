@@ -35,6 +35,8 @@ jobs:
 
   fmt-check:
     runs-on: ubuntu-latest
+    env:
+      VJOBS: '2'
 
     steps:
       - name: Checkout VTL
@@ -103,6 +105,7 @@ jobs:
       # Fixes complaints about $TERM not being set when running the vtl test script
       # (a warning on Linux, but an error on macOS).
       TERM: xterm
+      VJOBS: '2'
 
     steps:
       - name: Checkout VTL
@@ -156,6 +159,8 @@ jobs:
   windows-smoke:
     name: Windows tensor creation smoke
     runs-on: windows-latest
+    env:
+      VJOBS: '2'
 
     steps:
       - name: Checkout VTL
@@ -183,6 +188,4 @@ jobs:
 
       - name: Run Windows creation regression
         shell: bash
-        env:
-          VJOBS: '2'
         run: v test ~/.vmodules/vtl/tests/core/creation_test.v
