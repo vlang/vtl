@@ -185,6 +185,18 @@ pub fn (nn &Sequential[T]) save_checkpoint(path string, epoch int, loss f64) ! {
 				encode_layer_var[T](mut weights, vars, 2, 'b_ih')!
 				encode_layer_var[T](mut weights, vars, 3, 'b_hh')!
 			}
+			'GRULayer' {
+				if vars.len > 1 {
+					set_config_default(mut config, 'input_size', shape_value(vars[0].value.shape,
+						1, 0))
+					set_config_default(mut config, 'hidden_size', shape_value(vars[1].value.shape,
+						1, 0))
+				}
+				encode_layer_var[T](mut weights, vars, 0, 'w_ih')!
+				encode_layer_var[T](mut weights, vars, 1, 'w_hh')!
+				encode_layer_var[T](mut weights, vars, 2, 'b_ih')!
+				encode_layer_var[T](mut weights, vars, 3, 'b_hh')!
+			}
 			'MultiHeadAttentionLayer' {
 				if vars.len > 0 {
 					set_config_default(mut config, 'embed_dim', shape_value(vars[0].value.shape, 0,
@@ -321,6 +333,17 @@ pub fn (nn &Sequential[T]) load_weights(path string) ! {
 					}
 				}
 				'LSTMLayer' {
+					if j == 0 {
+						'w_ih'
+					} else if j == 1 {
+						'w_hh'
+					} else if j == 2 {
+						'b_ih'
+					} else {
+						'b_hh'
+					}
+				}
+				'GRULayer' {
 					if j == 0 {
 						'w_ih'
 					} else if j == 1 {

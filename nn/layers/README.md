@@ -8,8 +8,8 @@ optimizers. Implementations on `main` include:
 | Core | Input, Linear, Flatten, Embedding |
 | Convolution and pooling | Conv2D, MaxPool2D, Pool2D |
 | Normalization and regularization | BatchNorm, LayerNorm, Dropout |
-| Recurrent and attention | LSTM, multi-head attention, positional encoding |
-| Activations | ReLU, Sigmoid, Tanh, Softmax, Leaky ReLU, ELU, GELU, Swish, Mish |
+| Recurrent and attention | GRU, LSTM, multi-head attention, positional encoding |
+| Activations | ReLU, Sigmoid, Tanh, Softmax, Leaky ReLU, ELU, GELU, Swish, Mish, Softplus, SELU, HardSwish |
 
 The common low-level constructor returns a `types.Layer[T]`:
 

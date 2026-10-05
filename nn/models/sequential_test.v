@@ -66,3 +66,23 @@ fn test_conv1d_sequential_forward_backward() ! {
 	assert input.grad.shape == input.value.shape
 	assert nn.info.layers[1].variables().len == 2
 }
+
+fn test_gru_sequential_forward_backward() ! {
+	ctx := autograd.ctx[f64]()
+	mut nn := sequential_from_ctx[f64](ctx)
+	nn.input([2, 1, 2])
+	nn.gru(2, 3)
+	mut input := ctx.variable(vtl.from_array([0.2, -0.1, 0.4, 0.3], [2, 1, 2])!)
+	mut output := nn.forward(input)!
+	assert output.value.shape == [2, 1, 3]
+	assert nn.info.layers[1].variables().len == 4
+	output.backprop()!
+	assert input.grad.shape == input.value.shape
+	for parameter in nn.info.layers[1].variables() {
+		mut grad_norm := f64(0)
+		for value in parameter.grad.to_array() {
+			grad_norm += value * value
+		}
+		assert grad_norm > 0, 'Sequential GRU backward must update each parameter'
+	}
+}

@@ -152,32 +152,35 @@ See the runnable [Conv1D example](../examples/nn_conv1d/) for a complete forward
 
 ## Recurrent GRU layer
 
-The standalone `vtl.nn.layers.gru_layer` API accepts
+`Sequential.gru(input_size, hidden_size)` adds a single-layer, unidirectional
+GRU with a zero initial hidden state. It accepts
 `[sequence, batch, input_features]` and returns
 `[sequence, batch, hidden_size]`. Its reset, update, and candidate weights use
-PyTorch's `[reset, update, new]` gate order. The layer starts with a zero
-hidden state; the lower-level `vtl.nn.internal.gru_forward_single` also accepts
-an explicit initial state. CPU backpropagation computes gradients for the input
-and all four parameter tensors. The lower-level backward kernel also returns
-the gradient for the supplied initial state.
+PyTorch's `[reset, update, new]` gate order. The lower-level
+`vtl.nn.internal.gru_forward_single` also accepts an explicit initial state and
+returns the final state. CPU backpropagation computes gradients for the input
+and all four parameter tensors.
 
 ```v
 import vtl
 import vtl.autograd
-import vtl.nn.layers
+import vtl.nn.models
 
 ctx := autograd.ctx[f64]()
-layer := layers.gru_layer[f64](ctx, 2, 4)
+mut model := models.sequential_from_ctx[f64](ctx)
+model.input([3, 1, 2])
+model.gru(2, 4)
 sequence := vtl.from_array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6], [3, 1, 2])!
 mut input := ctx.variable(sequence)
-mut output := layer.forward(input)!
+mut output := model.forward(input)!
 println(output.value.shape) // [3, 1, 4]
 output.backprop()!
 println(input.grad.shape) // [3, 1, 2]
 ```
 
-See the runnable [GRU example](../examples/nn_gru/) for a complete forward
-and backward smoke test. GRU is not yet wired into the `Sequential` builder.
+See the runnable [GRU example](../examples/nn_gru/) for a complete
+`Sequential` forward and backward smoke test. Sequential checkpoints save and
+restore all four GRU parameter tensors.
 
 ## Training loop
 
