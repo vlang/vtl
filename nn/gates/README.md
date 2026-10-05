@@ -1,11 +1,18 @@
 # `vtl.nn.gates`
 
-Autograd gates implement backward rules for neural-network layers, activations,
-and losses. The submodules mirror those concerns (`activation`, `layers`, and
-`loss`) and are primarily used internally by `vtl.nn.layers` and
-`vtl.nn.loss`.
+Gates register reverse-mode backward rules with the autograd context. A gate
+must return one gradient per parent, in the same order used during caching,
+and preserve each parent's shape.
 
-Applications should normally compose the public layer and loss APIs instead of
-constructing gates directly. Custom gate work must preserve parent ordering,
-gradient shapes, context ownership, and cached forward intermediates. Existing
-finite-difference and gate regression tests are useful references.
+| Submodule | Rules |
+| --- | --- |
+| [`activation`](activation/) | ReLU, sigmoid, tanh, softmax, Leaky ReLU, ELU, GELU, Swish, Mish |
+| [`layers`](layers/) | Linear, flatten, input, max-pooling, dropout, and LSTM gates |
+| [`loss`](loss/) | MSE, extra losses, sigmoid cross entropy, and softmax cross entropy |
+
+These are implementation adapters for [`layers`](../layers/README.md) and
+[`loss`](../loss/README.md); application code should construct those public
+components instead of creating gates directly. Gate coverage is narrower than
+the complete tensor API. Check the corresponding gate tests before assuming a
+gradient path is supported. CUDA and Vulkan variants are compile-time-specific
+and experimental; see [device memory notes](../../docs/DEVICE_MEMORY.md).
