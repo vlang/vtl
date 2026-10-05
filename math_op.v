@@ -143,3 +143,10 @@ pub fn (a &Tensor[T]) multiply_scalar[T](scalar T) !&Tensor[T] {
 		}
 	})
 }
+
+// + adds two tensors elementwise. It panics when their shapes are not broadcastable;
+// use add when shape errors need to be handled explicitly.
+@[inline]
+pub fn (a &Tensor[T]) + (b &Tensor[T]) &Tensor[T] {
+	return a.add(b) or { panic(err) }
+}
