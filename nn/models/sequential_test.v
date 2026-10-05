@@ -66,4 +66,3 @@ fn test_conv1d_sequential_forward_backward() ! {
 	assert input.grad.shape == input.value.shape
 	assert nn.info.layers[1].variables().len == 2
 }
-}
