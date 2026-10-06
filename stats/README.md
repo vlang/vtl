@@ -21,7 +21,11 @@ axis removed. Explicit sample coordinates remain in their given order.
 `gradient_axis` estimates the numerical derivative along one axis using
 uniform sample spacing. It preserves the input shape, accepts negative axes,
 uses centered differences for interior points, and uses first-order one-sided
-differences at the boundaries. See the [gradient example](../examples/gradient).
+differences at the boundaries. `gradient_axis_with_coordinates` accepts
+strictly monotonic non-uniform sample coordinates and selects first- or
+second-order boundary differences with `edge_order`. Both functions preserve
+the input shape and support negative axes. See the
+[gradient example](../examples/gradient).
 
 NaN-aware reductions `nansum`, `nanprod`, `nanmin`, and `nanmax` ignore NaN
 values and promote results to `f64`. Their `_axis` variants reduce one axis
