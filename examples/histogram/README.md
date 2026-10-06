@@ -1,8 +1,8 @@
 # Histograms
 
-This example computes an unweighted histogram with evenly spaced bins, then a
-weighted probability density using custom, non-uniform bin edges. The last bin
-includes its right edge, following NumPy's histogram convention.
+This example computes evenly spaced and data-driven histograms, then a weighted
+probability density using custom, non-uniform bin edges. The last bin includes
+its right edge, following NumPy's histogram convention.
 
 Run it from the V module workspace:
 
