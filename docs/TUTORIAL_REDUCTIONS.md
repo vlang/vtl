@@ -33,6 +33,26 @@ series := vtl.from_1d([1.0, 2.0, 3.0])!
 assert stats.trapezoid[f64](series, 1.0)!.get_nth(0) == 4.0
 ```
 
+## Reduce several axes
+
+Use `sum_along_axes` or `product_along_axes` when one reduction should collapse
+multiple dimensions. Axes may be negative, and `keepdims` preserves each
+reduced dimension with length one:
+
+```v
+import vtl
+import vtl.stats
+
+values := vtl.from_array([1, 2, 3, 4, 5, 6, 7, 8], [2, 2, 2])!
+sums := stats.sum_along_axes[int](values, [0, -1], false)!
+assert sums.shape == [2]
+assert sums.to_array() == [14, 22]
+
+products := stats.product_along_axes[int](values, [0, -1], true)!
+assert products.shape == [1, 2, 1]
+assert products.to_array() == [60, 672]
+```
+
 ## argmax / argmin
 
 `argmax_axis(axis)` returns the index of the maximum value along `axis`.
@@ -127,6 +147,9 @@ NumPy's default linearly interpolated quantile. The quantile must be between
 Use `quantiles_linear` to calculate several quantiles from one sorted copy:
 
 ```v
+import vtl
+import vtl.stats
+
 values := vtl.from_1d([30.0, 0.0, 20.0, 10.0])!
 quartiles := stats.quantiles_linear(values, [0.0, 0.25, 0.5, 0.75, 1.0])!
 assert quartiles.to_array() == [0.0, 7.5, 15.0, 22.5, 30.0]
@@ -138,6 +161,9 @@ NumPy's default `quantile` shape. Each slice is sorted once for all requested
 quantiles:
 
 ```v
+import vtl
+import vtl.stats
+
 grid := vtl.from_array([9.0, 1.0, 8.0, 2.0, 7.0, 3.0], [2, 3])!
 quartiles_by_row := stats.quantiles_axis(grid, [0.25, 0.5, 0.75], 1)!
 assert quartiles_by_row.shape == [3, 2]
@@ -175,7 +201,10 @@ median_percentile := stats.percentile_linear(values, 50)! // 15.0
 rows := vtl.from_array([1.0, 3.0, 5.0, 7.0], [2, 2])!
 row_medians := stats.quantile_axis(rows, 0.5, 1)! // shape [2, 1]
 
-measurements := vtl.from_array([1.0, math.nan(), 3.0, 5.0, math.nan(), math.nan()], [3, 2])!
+measurements := vtl.from_array([1.0, math.nan(), 3.0, 5.0, math.nan(), math.nan()], [
+	3,
+	2,
+])!
 column_medians := stats.nanquantile_axis(measurements, 0.5, 0)! // [[2.0, 5.0]]
 ```
 
@@ -205,6 +234,9 @@ one-dimensional weight vector matching the selected axis; the result keeps
 that axis with length one.
 
 ```v
+import vtl
+import vtl.stats
+
 measurements := vtl.from_2d([[4.0, 5.0, 4.5], [3.0, 4.0, 5.0]])!
 reliability := vtl.from_1d([1.0, 2.0, 1.0])!
 row_means := stats.average_axis(measurements, reliability, 1)!
