@@ -55,8 +55,9 @@ systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env V
 	./vtl/benchmarks/vs_numpy/numpy_matmul_baseline.py
 ```
 
-With CBLAS enabled, the same VTL benchmark also measures single-precision
-matmul. Compare its `f32` rows against the matching NumPy end-to-end baseline;
+The same VTL benchmark measures single-precision matmul on the pure-V path
+for sizes 128, 256, and 512. With CBLAS enabled, it measures sizes through
+2048. Compare its `f32` rows against the matching NumPy end-to-end baseline;
 both allocate a fresh result on each timed call and use the same inputs:
 
 ```bash
@@ -75,9 +76,9 @@ V command. For OpenBLAS, use the existing `-d vsl_blas_cblas` flag when its
 development package is installed. Keep the compiler mode and thread settings
 in the report; results depend on both the V backend and NumPy's BLAS build.
 With either CBLAS flag, VTL `f32` matrix multiplication dispatches to
-single-precision `sgemm`; `f64` continues to use `dgemm`. The benchmark above
-reports both `f64` and `f32` results. `f32` timings are omitted when running
-without a CBLAS flag.
+single-precision CBLAS `sgemm`; without those flags, it uses VSL's pure-V
+`sgemm` implementation. `f64` continues to use `dgemm`. The benchmark reports
+both `f64` and `f32` results for either backend.
 
 ## Local CPU sample
 
