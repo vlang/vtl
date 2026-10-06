@@ -45,6 +45,8 @@ fn test_rfft_accepts_f32_and_returns_f64_complex_values() ! {
 	assert math.abs(frequencies.get_nth(0).re) < 1e-6
 	assert math.abs(frequencies.get_nth(1).re - 2) < 1e-6
 	assert math.abs(frequencies.get_nth(2).re) < 1e-6
+	mut plan := create_rfft_plan[f32](input.size)!
+	assert plan.forward(input)!.array_equal(frequencies)
 }
 
 fn test_rfft_plan_reuses_backend_and_validates_input_length() ! {
@@ -61,6 +63,25 @@ fn test_rfft_plan_reuses_backend_and_validates_input_length() ! {
 		return
 	}
 	assert false, 'expected reusable plan to reject a different input length'
+}
+
+fn test_rfft_plan_reuses_workspace_for_strided_inputs() ! {
+	base := vtl.from_array([f64(1), 99, 0, 99, -1, 99, 0, 99], [4, 2])!
+	view := base.slice([0, 2], []int{})!
+	strided := view.as_strided([4], [2])!
+	contiguous := vtl.from_1d([f64(1), 0, -1, 0])!
+	mut plan := create_rfft_plan[f64](4)!
+	before := strided.to_array()
+	first := plan.forward(strided)!
+	second := plan.forward(strided)!
+	expected := rfft(contiguous)!
+	assert first.array_equal(expected)
+	assert second.array_equal(expected)
+	assert strided.to_array() == before
+	offset_base := vtl.from_1d([f64(99), 1, 0, -1, 0, 99])!
+	offset_view := offset_base.slice([1, 5])!
+	assert offset_view.is_row_major_contiguous()
+	assert plan.forward(offset_view)!.array_equal(expected)
 }
 
 fn test_rfft_plan_rejects_use_after_destroy() ! {

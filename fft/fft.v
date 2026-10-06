@@ -11,8 +11,10 @@ pub struct RealFftPlan[T] {
 pub:
 	length int
 mut:
-	plan      vsl_fft.Fftplan
-	destroyed bool
+	plan        vsl_fft.Fftplan
+	destroyed   bool
+	scratch_f32 []f32
+	scratch_f64 []f64
 }
 
 // create_rfft_plan creates a reusable one-dimensional real FFT plan.
@@ -25,16 +27,18 @@ pub fn create_rfft_plan[T](length int) !RealFftPlan[T] {
 			return error('could not create an f32 FFT plan')
 		}
 		return RealFftPlan[T]{
-			length: length
-			plan:   plan
+			length:      length
+			plan:        plan
+			scratch_f32: []f32{len: length}
 		}
 	} $else $if T is f64 {
 		plan := vsl_fft.create_plan([]f64{len: length}) or {
 			return error('could not create an f64 FFT plan')
 		}
 		return RealFftPlan[T]{
-			length: length
-			plan:   plan
+			length:      length
+			plan:        plan
+			scratch_f64: []f64{len: length}
 		}
 	} $else {
 		return error('rfft supports f32 and f64 input tensors')
@@ -42,8 +46,10 @@ pub fn create_rfft_plan[T](length int) !RealFftPlan[T] {
 }
 
 // forward computes a compact real FFT using the plan. The input length must
-// match the plan length; a new output tensor is allocated for each call.
-pub fn (plan &RealFftPlan[T]) forward(input &vtl.Tensor[T]) !&vtl.Tensor[complex.Complex] {
+// match the plan length; a new output tensor is allocated for each call. The
+// plan reuses an internal mutable work buffer, so calls on one plan must not run
+// concurrently.
+pub fn (mut plan RealFftPlan[T]) forward(input &vtl.Tensor[T]) !&vtl.Tensor[complex.Complex] {
 	if plan.destroyed {
 		return error('FFT plan has been destroyed')
 	}
@@ -51,9 +57,9 @@ pub fn (plan &RealFftPlan[T]) forward(input &vtl.Tensor[T]) !&vtl.Tensor[complex
 		return error('FFT input must be a vector of length ${plan.length}')
 	}
 	$if T is f32 {
-		return rfft_f32_with_plan(unsafe { &vtl.Tensor[f32](input) }, plan.plan)
+		return rfft_f32_with_plan(unsafe { &vtl.Tensor[f32](input) }, plan.plan, mut plan.scratch_f32)
 	} $else $if T is f64 {
-		return rfft_f64_with_plan(unsafe { &vtl.Tensor[f64](input) }, plan.plan)
+		return rfft_f64_with_plan(unsafe { &vtl.Tensor[f64](input) }, plan.plan, mut plan.scratch_f64)
 	} $else {
 		return error('rfft supports f32 and f64 input tensors')
 	}
@@ -295,16 +301,28 @@ pub fn irfft(input &vtl.Tensor[complex.Complex], length int) !&vtl.Tensor[f64] {
 	return tensor_from_owned[f64](packed, [packed.len])
 }
 
-fn rfft_f32_with_plan(input &vtl.Tensor[f32], plan vsl_fft.Fftplan) !&vtl.Tensor[complex.Complex] {
-	mut packed := input.to_array()
+fn rfft_f32_with_plan(input &vtl.Tensor[f32], plan vsl_fft.Fftplan, mut packed []f32) !&vtl.Tensor[complex.Complex] {
+	if input.is_row_major_contiguous() {
+		unsafe { C.memcpy(packed.data, input.data.data.data, input.size * sizeof(f32)) }
+	} else {
+		for i in 0 .. input.size {
+			packed[i] = input.get_nth(i)
+		}
+	}
 	if vsl_fft.forward_fft(plan, mut packed) != 0 {
 		return error('rfft backend failed to compute the forward transform')
 	}
 	return unpack_rfft_f32(packed)
 }
 
-fn rfft_f64_with_plan(input &vtl.Tensor[f64], plan vsl_fft.Fftplan) !&vtl.Tensor[complex.Complex] {
-	mut packed := input.to_array()
+fn rfft_f64_with_plan(input &vtl.Tensor[f64], plan vsl_fft.Fftplan, mut packed []f64) !&vtl.Tensor[complex.Complex] {
+	if input.is_row_major_contiguous() {
+		unsafe { C.memcpy(packed.data, input.data.data.data, input.size * sizeof(f64)) }
+	} else {
+		for i in 0 .. input.size {
+			packed[i] = input.get_nth(i)
+		}
+	}
 	if vsl_fft.forward_fft(plan, mut packed) != 0 {
 		return error('rfft backend failed to compute the forward transform')
 	}

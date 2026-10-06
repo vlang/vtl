@@ -43,6 +43,10 @@ real_spectrum := fft.rfft2[f64](real_image)!
 real_restored := fft.irfft2(real_spectrum, real_image.shape)!
 ```
 
+`RealFftPlan.forward` reuses a per-plan work buffer and therefore takes a
+mutable plan. Do not call `forward` concurrently on the same plan; create one
+plan per concurrent worker.
+
 `irfft` takes the original real length because an even and an odd signal can
 have the same number of non-negative bins. It applies the NumPy-style inverse
 normalization. `fft2` and `ifft2` operate on two-dimensional complex tensors;
