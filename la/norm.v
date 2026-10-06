@@ -33,12 +33,14 @@ pub fn vector_norm_axis_keepdims[T](t &vtl.Tensor[T], ord f64, axis int) !&vtl.T
 }
 
 // vector_norm_axes computes a p-norm over one or more axes. Negative axes
-// count from the end; axes must be unique. With keepdims, reduced dimensions
-// remain with length one. An empty axes list returns elementwise absolute
-// values, matching a reduction over zero dimensions.
+// count from the end; axes must be unique. At least one axis is required. With
+// keepdims, reduced dimensions remain with length one.
 pub fn vector_norm_axes[T](t &vtl.Tensor[T], ord f64, axes []int, keepdims bool) !&vtl.Tensor[f64] {
 	if math.is_nan(ord) {
 		return error('vector_norm_axes order must not be NaN')
+	}
+	if axes.len == 0 {
+		return error('vector_norm_axes requires at least one axis')
 	}
 	mut normalized := []int{cap: axes.len}
 	for axis in axes {

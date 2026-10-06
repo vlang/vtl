@@ -28,9 +28,9 @@ first `axes` dimensions of `b`. Use `tensordot_axes(a, b, axes_a, axes_b)` to
 choose arbitrary axis pairs.
 
 `vector_norm_axes(t, ord, axes, keepdims)` reduces a tuple of axes in one
-operation. Axes may be negative but must be unique. An empty axes list returns
-elementwise absolute values. For example, `vector_norm_axes(t, 2, [0, 2], false)`
-reduces the first and last dimensions and keeps the middle dimension.
+operation. It requires at least one axis; axes may be negative but must be
+unique. For example, `vector_norm_axes(t, 2, [0, 2], false)` reduces the first
+and last dimensions and keeps the middle dimension.
 
 `covariance_matrix(data, rowvar, ddof)` and `correlation_matrix(data, rowvar)`
 accept rank-2 tensors. With `rowvar: true`, each row is a variable and columns
