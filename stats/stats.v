@@ -673,6 +673,22 @@ pub fn quantile_linear[T](t &vtl.Tensor[T], q f64) !f64 {
 	return interpolate_quantile(mut values, q)
 }
 
+// nanquantile_linear computes a linearly interpolated quantile while ignoring
+// NaN values. It returns NaN when the tensor has no non-NaN values.
+pub fn nanquantile_linear[T](t &vtl.Tensor[T], q f64) !f64 {
+	if math.is_nan(q) || math.is_inf(q, 0) || q < 0 || q > 1 {
+		return error('quantile must be between 0 and 1')
+	}
+	if t.size == 0 {
+		return error('quantile is undefined for an empty tensor')
+	}
+	mut values := t.to_array().map(vtl.cast[f64](it)).filter(!math.is_nan(it))
+	if values.len == 0 {
+		return math.nan()
+	}
+	return interpolate_quantile(mut values, q)
+}
+
 fn interpolate_quantile(mut values []f64, q f64) f64 {
 	for value in values {
 		if math.is_nan(value) {
@@ -699,9 +715,29 @@ pub fn percentile_linear[T](t &vtl.Tensor[T], percentile f64) !f64 {
 	return quantile_linear[T](t, percentile / 100)
 }
 
+// nanpercentile_linear computes a NaN-ignoring linearly interpolated
+// percentile on the 0..100 scale.
+pub fn nanpercentile_linear[T](t &vtl.Tensor[T], percentile f64) !f64 {
+	if math.is_nan(percentile) || math.is_inf(percentile, 0) || percentile < 0 || percentile > 100 {
+		return error('percentile must be between 0 and 100')
+	}
+	return nanquantile_linear[T](t, percentile / 100)
+}
+
 // quantile_axis computes linearly interpolated quantiles along axis and keeps
 // the reduced axis with length one. NaN values propagate within their slice.
 pub fn quantile_axis[T](t &vtl.Tensor[T], q f64, axis int) !&vtl.Tensor[f64] {
+	return quantile_axis_impl[T](t, q, axis, false)
+}
+
+// nanquantile_axis computes one linearly interpolated quantile per axis slice,
+// ignoring NaN values and retaining the reduced axis with length one. Slices
+// containing only NaNs produce NaN.
+pub fn nanquantile_axis[T](t &vtl.Tensor[T], q f64, axis int) !&vtl.Tensor[f64] {
+	return quantile_axis_impl[T](t, q, axis, true)
+}
+
+fn quantile_axis_impl[T](t &vtl.Tensor[T], q f64, axis int, ignore_nan bool) !&vtl.Tensor[f64] {
 	if math.is_nan(q) || math.is_inf(q, 0) || q < 0 || q > 1 {
 		return error('quantile must be between 0 and 1')
 	}
@@ -730,12 +766,20 @@ pub fn quantile_axis[T](t &vtl.Tensor[T], q f64, axis int) !&vtl.Tensor[f64] {
 	mut values := []f64{len: axis_size}
 	for slice in 0 .. slice_count {
 		decode_nan_slice(slice, t.shape, axis_index, mut index)
+		values.clear()
 		for position in 0 .. axis_size {
 			index[axis_index] = position
-			values[position] = f64(t.get(index))
+			value := f64(t.get(index))
+			if !ignore_nan || !math.is_nan(value) {
+				values << value
+			}
 		}
 		index[axis_index] = 0
-		result.set(index, interpolate_quantile(mut values, q))
+		result.set(index, if values.len == 0 {
+			math.nan()
+		} else {
+			interpolate_quantile(mut values, q)
+		})
 	}
 	return result
 }

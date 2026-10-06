@@ -9,8 +9,8 @@ import numpy as np
 def bench_matmul() -> None:
     for n in (128, 256, 512):
         i, j = np.indices((n, n), dtype=np.int64)
-        a = ((i + j) % 7).astype(np.float64) * 0.01
-        b = ((i * j) % 5).astype(np.float64) * 0.02
+        a = (((i * 17 + j * 13) % 997) + 1).astype(np.float64) / 997.0
+        b = (((i * 7 + j * 19) % 991) + 1).astype(np.float64) / 991.0
         for _ in range(3):
             result = a @ b
         samples = []

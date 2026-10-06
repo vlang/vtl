@@ -95,7 +95,9 @@ NumPy's default linearly interpolated quantile. The quantile must be between
 
 `vtl.stats.percentile_linear` accepts the equivalent 0..100 percentile scale.
 `vtl.stats.quantile_axis` computes one quantile per axis slice and retains the
-reduced axis with length one.
+reduced axis with length one. Ordinary quantiles propagate NaNs.
+The `nanquantile_linear`, `nanpercentile_linear`, and `nanquantile_axis`
+variants ignore NaN values; a slice containing only NaNs returns NaN.
 
 ## Stable variance and standard deviation
 
@@ -112,16 +114,20 @@ ordinary reductions; use the `nan*` variants to ignore them.
 ```v
 import vtl
 import vtl.stats
+import math
 
 values := vtl.from_1d([30.0, 0.0, 20.0, 10.0])!
 median := stats.quantile_linear(values, 0.5)! // 15.0
 median_percentile := stats.percentile_linear(values, 50)! // 15.0
 rows := vtl.from_array([1.0, 3.0, 5.0, 7.0], [2, 2])!
 row_medians := stats.quantile_axis(rows, 0.5, 1)! // shape [2, 1]
+
+measurements := vtl.from_array([1.0, math.nan(), 3.0, 5.0, math.nan(), math.nan()], [3, 2])!
+column_medians := stats.nanquantile_axis(measurements, 0.5, 0)! // [[2.0, 5.0]]
 ```
 
-Empty tensors and out-of-range quantiles return errors. NaNs propagate to the
-result.
+Empty tensors and out-of-range quantiles return errors. The NaN-aware variants
+return NaN when all values in a reduction slice are NaN.
 
 ```v
 import vtl
