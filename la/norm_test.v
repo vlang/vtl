@@ -78,6 +78,14 @@ fn test_vector_norm_axes_two_norm_scales_extreme_values_and_propagates_nan() ! {
 	assert math.is_nan(vector_norm_axes(nan_and_infinite, 2, [0], false)!.get([]))
 }
 
+fn test_vector_norm_uses_logical_start_for_contiguous_offset_views() ! {
+	base := vtl.from_1d([100.0, 3.0, 4.0, 200.0])!
+	view := base.slice([1, 3])!
+	assert view.is_row_major_contiguous()
+	assert vector_norm(view, 2)!.get_nth(0) == 5.0
+	assert vector_norm_axes(view, 2, [0], false)!.get([]) == 5.0
+}
+
 fn test_vector_norm_scales_large_finite_values() ! {
 	values := vtl.from_1d([1e308, 1e308])!
 	got := vector_norm(values, 2)!.get_nth(0)
