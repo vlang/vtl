@@ -9,6 +9,11 @@ selected reductions.
 `prod` follows the multiplicative identity convention: an empty input reduces
 to `1`, while an empty sum reduces to `0`.
 
+`sum_along_axis` and `product_along_axis` return tensors for a selected axis.
+Pass `true` for `keepdims` to retain that axis with length one; negative axes
+are accepted. Empty reduction axes return the corresponding identity for every
+output slice.
+
 `trapezoid`, `trapezoid_axis`, and `trapezoid_x_axis` integrate numeric tensors
 with the composite trapezoidal rule and return `f64` tensors with the reduced
 axis removed. Explicit sample coordinates remain in their given order.
@@ -36,6 +41,7 @@ import vtl.stats
 values := vtl.from_1d[f64]([1.0, 2.0, 3.0, 4.0])!
 average := stats.mean[f64](values)
 spread := stats.sample_stddev[f64](values)
+row_total := stats.sum_along_axis[f64](values, -1, true)!
 ```
 
 `quantile` currently expects its tensor argument to be sorted. See function
