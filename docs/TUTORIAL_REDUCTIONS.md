@@ -124,11 +124,20 @@ information about automatic differentiation in VTL.
 NumPy's default linearly interpolated quantile. The quantile must be between
 0 and 1, and the result is `f64` even for integer input tensors.
 
+Use `quantiles_linear` to calculate several quantiles from one sorted copy:
+
+```v
+values := vtl.from_1d([30.0, 0.0, 20.0, 10.0])!
+quartiles := stats.quantiles_linear(values, [0.0, 0.25, 0.5, 0.75, 1.0])!
+assert quartiles.to_array() == [0.0, 7.5, 15.0, 22.5, 30.0]
+```
+
 `vtl.stats.percentile_linear` accepts the equivalent 0..100 percentile scale.
 `vtl.stats.quantile_axis` computes one quantile per axis slice and retains the
 reduced axis with length one. Ordinary quantiles propagate NaNs.
-The `nanquantile_linear`, `nanpercentile_linear`, and `nanquantile_axis`
-variants ignore NaN values; a slice containing only NaNs returns NaN.
+The `nanquantile_linear`, `nanquantiles_linear`, `nanpercentile_linear`, and
+`nanquantile_axis` variants ignore NaN values; a slice containing only NaNs
+returns NaN.
 
 ## Stable variance and standard deviation
 
