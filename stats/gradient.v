@@ -47,10 +47,16 @@ pub fn gradient_axis[T](t &vtl.Tensor[T], spacing f64, axis int) !&vtl.Tensor[f6
 }
 
 // gradient_axis_with_coordinates computes a numerical gradient along one
-// tensor axis using the supplied sample coordinates. Coordinates may be
-// non-uniform, but must be strictly monotonic. edge_order selects first- or
-// second-order one-sided differences at the boundaries.
-pub fn gradient_axis_with_coordinates[T](t &vtl.Tensor[T], coordinates []f64, axis int, edge_order int) !&vtl.Tensor[f64] {
+// tensor axis using the supplied sample coordinates and first-order boundary
+// differences. Coordinates may be non-uniform, but must be strictly monotonic.
+pub fn gradient_axis_with_coordinates[T](t &vtl.Tensor[T], coordinates []f64, axis int) !&vtl.Tensor[f64] {
+	return gradient_axis_with_coordinates_edge_order[T](t, coordinates, axis, 1)
+}
+
+// gradient_axis_with_coordinates_edge_order computes a numerical gradient
+// along one tensor axis using the supplied sample coordinates. edge_order
+// selects first- or second-order one-sided differences at the boundaries.
+pub fn gradient_axis_with_coordinates_edge_order[T](t &vtl.Tensor[T], coordinates []f64, axis int, edge_order int) !&vtl.Tensor[f64] {
 	if t.rank() == 0 {
 		return error('gradient_axis_with_coordinates: input must have at least one dimension')
 	}
