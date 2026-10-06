@@ -84,20 +84,20 @@ fn normalize_shift_axis[T](input &vtl.Tensor[T], axis int, operation string) !in
 }
 
 fn shift_axes[T](input &vtl.Tensor[T], axes []int, inverse bool) !&vtl.Tensor[T] {
-	mut result := vtl.empty[T](input.shape, memory: .row_major)
+	mut output := []T{len: input.size}
+	mut input_index := []int{len: input.rank()}
 	for flat_index in 0 .. input.size {
-		output_index := result.nth_index(flat_index)
-		mut input_index := output_index.clone()
+		decode_row_major_index(flat_index, input.shape, mut input_index)
 		for axis in axes {
 			length := input.shape[axis]
 			if length > 0 {
 				shift := if inverse { length / 2 } else { (length + 1) / 2 }
-				input_index[axis] = (output_index[axis] + shift) % length
+				input_index[axis] = (input_index[axis] + shift) % length
 			}
 		}
-		result.set(output_index, input.get(input_index))
+		output[flat_index] = input.get(input_index)
 	}
-	return result
+	return tensor_from_owned[T](output, input.shape)
 }
 
 // RealFftPlan stores a reusable PocketFFT plan for one real input length.
