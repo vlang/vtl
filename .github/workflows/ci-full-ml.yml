@@ -11,7 +11,7 @@ on:
     types: [labeled]
 
 concurrency:
-  group: full-ml-${{ github.workflow }}-${{ github.ref }}
+  group: full-ml-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
