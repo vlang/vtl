@@ -21,6 +21,16 @@ assert coordinates.to_array() == [0, 1, 1, 0, 1, 1]
 
 As with NumPy's `argwhere`, these coordinate rows are useful for inspection and
 coordinate-based updates; they are not a tuple of per-axis index arrays.
+Use `nonzero` when you need one index tensor per axis:
+
+```v
+indices := vtl.nonzero[int](values)!
+assert indices[0].to_array() == [0, 1, 1]
+assert indices[1].to_array() == [1, 0, 1]
+```
+
+For a scalar input, `nonzero` returns one index tensor, using index `0` for a
+nonzero value and an empty tensor for zero.
 
 `put_along_axis` writes values into a mutable tensor. `scatter_add` adds values
 to the selected locations; duplicate indices accumulate in row-major order.

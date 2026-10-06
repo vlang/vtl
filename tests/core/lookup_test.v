@@ -30,6 +30,30 @@ fn test_argwhere_handles_views_empty_and_scalar_inputs() ! {
 	assert zero_coordinates.shape == [0, 0]
 }
 
+fn test_nonzero_returns_one_index_tensor_per_axis() ! {
+	tensor := vtl.from_2d([[0, 2, 0], [3, 0, 4]])!
+	indices := vtl.nonzero[int](tensor)!
+	assert indices.len == 2
+	assert indices[0].to_array() == [0, 1, 1]
+	assert indices[1].to_array() == [1, 0, 2]
+
+	transposed := vtl.nonzero[int](tensor.t()!)!
+	assert transposed[0].to_array() == [0, 1, 2]
+	assert transposed[1].to_array() == [1, 0, 1]
+
+	empty := vtl.nonzero[int](vtl.from_array([]int{}, [0, 3])!)!
+	assert empty.len == 2
+	assert empty[0].shape == [0]
+	assert empty[1].shape == [0]
+
+	true_scalar := vtl.nonzero[int](vtl.from_array([7], [])!)!
+	assert true_scalar.len == 1
+	assert true_scalar[0].to_array() == [0]
+	false_scalar := vtl.nonzero[int](vtl.from_array([0], [])!)!
+	assert false_scalar.len == 1
+	assert false_scalar[0].shape == [0]
+}
+
 fn test_take_axis() {
 	t := vtl.from_array([0, 1, 2, 3, 4, 5], [2, 3])!
 	taken := t.take([2, 0, -1], 1)!
