@@ -176,6 +176,35 @@ fn test_complex_fft2_handles_rectangular_tensors() ! {
 	}
 }
 
+fn test_complex_fft_axis_transforms_only_selected_axis_and_roundtrips() ! {
+	input := vtl.from_array[complex.Complex]([
+		complex.complex(0, 0),
+		complex.complex(1, 0),
+		complex.complex(0, 0),
+		complex.complex(0, 0),
+	], [2, 2])!
+	columns := fft_axis(input, -1)!
+	assert columns.shape == [2, 2]
+	assert math.abs(columns.get([0, 0]).re - 1) < 1e-12
+	assert math.abs(columns.get([0, 1]).re + 1) < 1e-12
+	assert math.abs(columns.get([1, 0]).re) < 1e-12
+	assert math.abs(columns.get([1, 1]).re) < 1e-12
+	rows := fft_axis(input, 0)!
+	assert rows.shape == input.shape
+	assert math.abs(rows.get([0, 1]).re - 1) < 1e-12
+	assert math.abs(rows.get([1, 1]).re - 1) < 1e-12
+	reconstructed := ifft_axis(columns, 1)!
+	for flat_index in 0 .. input.size {
+		assert math.abs(reconstructed.get_nth(flat_index).re - input.get_nth(flat_index).re) < 1e-12
+		assert math.abs(reconstructed.get_nth(flat_index).im - input.get_nth(flat_index).im) < 1e-12
+	}
+	if _ := fft_axis(input, 2) {
+		assert false, 'fft_axis must reject an axis outside the tensor rank'
+	} else {
+		assert true
+	}
+}
+
 fn test_fft2_rejects_wrong_rank() ! {
 	input := vtl.from_1d[complex.Complex]([complex.complex(1, 0)])!
 	_ := fft2(input) or {

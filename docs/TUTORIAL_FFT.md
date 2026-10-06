@@ -39,6 +39,8 @@ image := vtl.from_array[complex.Complex]([
 ], [2, 2])!
 image_spectrum := fft.fft2(image)!
 image_restored := fft.ifft2(image_spectrum)!
+column_spectrum := fft.fft_axis(image, -1)! // transform the final axis only
+column_restored := fft.ifft_axis(column_spectrum, 1)!
 
 real_image := vtl.from_array([f64(1), 0, 0, 0], [2, 2])!
 real_spectrum := fft.rfft2[f64](real_image)!
@@ -63,3 +65,6 @@ moves the zero-frequency component to the center of every axis, and
 `ifftshift` reverses it. The `_axis` variants shift only one selected axis and
 accept negative axis indices. Frequency helpers require a positive transform
 length and finite, non-zero sample spacing.
+
+`fft_axis` and `ifft_axis` transform just one axis of a complex tensor and
+preserve its shape. Negative axis indices count backward from the final axis.
