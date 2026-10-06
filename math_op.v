@@ -7,9 +7,7 @@ module vtl
 // add exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) add[T](b &Tensor[T]) !&Tensor[T] {
-	return a.nmap([b], fn [T](xs []T, _ []int) T {
-		a := xs[0]
-		b := xs[1]
+	return a.map_pair_values[T](b, fn [T](a T, b T) T {
 		$if T is bool {
 			return td[T](a).bool() || td[T](b).bool()
 		} $else $if T is string {
@@ -45,9 +43,7 @@ pub fn (a &Tensor[T]) add_scalar[T](scalar T) !&Tensor[T] {
 // subtract exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) subtract[T](b &Tensor[T]) !&Tensor[T] {
-	return a.nmap([b], fn [T](xs []T, _ []int) T {
-		a := xs[0]
-		b := xs[1]
+	return a.map_pair_values[T](b, fn [T](a T, b T) T {
 		$if T is bool {
 			return td[T](a).bool() && !td[T](b).bool()
 		} $else $if T is string {
@@ -83,9 +79,7 @@ pub fn (a &Tensor[T]) subtract_scalar[T](scalar T) !&Tensor[T] {
 // divide exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) divide[T](b &Tensor[T]) !&Tensor[T] {
-	return a.nmap([b], fn [T](xs []T, _ []int) T {
-		a := xs[0]
-		b := xs[1]
+	return a.map_pair_values[T](b, fn [T](a T, b T) T {
 		$if T is bool || T is string {
 			panic(@FN + ' is not supported for type ${typeof(a).name}')
 		} $else {
@@ -117,9 +111,7 @@ pub fn (a &Tensor[T]) divide_scalar[T](scalar T) !&Tensor[T] {
 // multiply exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) multiply[T](b &Tensor[T]) !&Tensor[T] {
-	return a.nmap([b], fn [T](xs []T, _ []int) T {
-		a := xs[0]
-		b := xs[1]
+	return a.map_pair_values[T](b, fn [T](a T, b T) T {
 		$if T is bool || T is string {
 			panic(@FN + ' is not supported for type ${typeof(a).name}')
 		} $else {

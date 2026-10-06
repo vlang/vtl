@@ -129,3 +129,11 @@ fn test_scalar_elementwise_operations_on_noncontiguous_views() {
 	expected := vtl.from_2d([[11, 14], [12, 15], [13, 16]])!
 	assert result.array_equal(expected)
 }
+
+fn test_binary_elementwise_operation_broadcast_fallback() {
+	a := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
+	b := vtl.from_1d([10, 20, 30])!
+	result := a.add(b)!
+	expected := vtl.from_2d([[11, 22, 33], [14, 25, 36]])!
+	assert result.array_equal(expected)
+}

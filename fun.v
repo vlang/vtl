@@ -38,6 +38,22 @@ fn (t &Tensor[T]) map_values[T](f fn (x T) T) &Tensor[T] {
 	})
 }
 
+// map_pair_values maps equal-shaped contiguous tensors without creating
+// coordinate arrays. Broadcasting and non-contiguous inputs use nmap.
+fn (a &Tensor[T]) map_pair_values[T](b &Tensor[T], f fn (x T, y T) T) !&Tensor[T] {
+	if a.shape == b.shape && a.is_row_major_contiguous() && b.is_row_major_contiguous()
+		&& a.data.data.len == a.size && b.data.data.len == b.size {
+		mut ret := tensor_like[T](a)
+		for i in 0 .. a.size {
+			ret.data.data[i] = f(a.data.data[i], b.data.data[i])
+		}
+		return ret
+	}
+	return a.nmap([b], fn [f] [T](xs []T, _ []int) T {
+		return f(xs[0], xs[1])
+	})
+}
+
 // reduce reduces a function to a given Tensor retuning a new aggregated value
 pub fn (t &Tensor[T]) reduce[T](init T, f fn (acc T, x T, i []int) T) T {
 	mut ret := init
