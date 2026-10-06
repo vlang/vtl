@@ -235,6 +235,9 @@ fn test_population_variance() {
 	o = population_variance(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '829.852282')
+	odd_length := vtl.from_1d([f64(1), 2, 3, 4, 5, 6, 7])!
+	assert population_variance(odd_length) == 4.0
+	assert sample_variance(odd_length) == f64(28) / 6.0
 }
 
 fn test_population_variance_matches_for_transposed_views() ! {
@@ -378,6 +381,11 @@ fn test_sum() {
 fn test_sum_preserves_logical_order_for_column_major_views() {
 	values := vtl.from_2d([[1e16, 1.0], [-1e16, 1.0]])!.transpose([1, 0])!
 	assert sum(values) == 2.0
+}
+
+fn test_contiguous_sum_handles_unrolled_tail() {
+	values := vtl.from_1d([f64(1), 2, 3, 4, 5, 6, 7])!
+	assert sum(values) == 28.0
 }
 
 fn test_prod() {

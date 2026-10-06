@@ -49,9 +49,31 @@ pub:
 @[direct_array_access]
 pub fn sum[T](t &vtl.Tensor[T]) T {
 	if is_flat_tensor_storage(t) {
-		mut total := vtl.cast[T](0)
-		for value in t.data.data {
-			total += value
+		data := t.data.data
+		mut total0 := vtl.cast[T](0)
+		mut total1 := vtl.cast[T](0)
+		mut total2 := vtl.cast[T](0)
+		mut total3 := vtl.cast[T](0)
+		mut total4 := vtl.cast[T](0)
+		mut total5 := vtl.cast[T](0)
+		mut total6 := vtl.cast[T](0)
+		mut total7 := vtl.cast[T](0)
+		mut index := 0
+		for index + 7 < data.len {
+			total0 += data[index]
+			total1 += data[index + 1]
+			total2 += data[index + 2]
+			total3 += data[index + 3]
+			total4 += data[index + 4]
+			total5 += data[index + 5]
+			total6 += data[index + 6]
+			total7 += data[index + 7]
+			index += 8
+		}
+		mut total := (((total0 + total1) + (total2 + total3)) + (total4 + total5)) + (total6 + total7)
+		for index < data.len {
+			total += data[index]
+			index++
 		}
 		return total
 	}
@@ -299,10 +321,40 @@ pub fn sample_variance_mean[T](t &vtl.Tensor[T], provided_mean T) T {
 @[direct_array_access]
 fn sum_squared_deviations[T](t &vtl.Tensor[T], provided_mean T) T {
 	if is_flat_tensor_storage(t) {
-		mut total := vtl.cast[T](0)
-		for value in t.data.data {
-			difference := value - provided_mean
+		data := t.data.data
+		mut total0 := vtl.cast[T](0)
+		mut total1 := vtl.cast[T](0)
+		mut total2 := vtl.cast[T](0)
+		mut total3 := vtl.cast[T](0)
+		mut total4 := vtl.cast[T](0)
+		mut total5 := vtl.cast[T](0)
+		mut total6 := vtl.cast[T](0)
+		mut total7 := vtl.cast[T](0)
+		mut index := 0
+		for index + 7 < data.len {
+			difference0 := data[index] - provided_mean
+			difference1 := data[index + 1] - provided_mean
+			difference2 := data[index + 2] - provided_mean
+			difference3 := data[index + 3] - provided_mean
+			difference4 := data[index + 4] - provided_mean
+			difference5 := data[index + 5] - provided_mean
+			difference6 := data[index + 6] - provided_mean
+			difference7 := data[index + 7] - provided_mean
+			total0 += difference0 * difference0
+			total1 += difference1 * difference1
+			total2 += difference2 * difference2
+			total3 += difference3 * difference3
+			total4 += difference4 * difference4
+			total5 += difference5 * difference5
+			total6 += difference6 * difference6
+			total7 += difference7 * difference7
+			index += 8
+		}
+		mut total := (((total0 + total1) + (total2 + total3)) + (total4 + total5)) + (total6 + total7)
+		for index < data.len {
+			difference := data[index] - provided_mean
 			total += difference * difference
+			index++
 		}
 		return total
 	}
