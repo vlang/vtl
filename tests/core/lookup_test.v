@@ -3,6 +3,41 @@ module core
 import vtl
 import math
 
+fn test_count_nonzero_globally_and_by_axis_with_keepdims() ! {
+	tensor := vtl.from_2d([[0, 2, 0], [3, 0, 4]])!
+	assert vtl.count_nonzero[int](tensor) == 3
+	rows := vtl.count_nonzero_axis[int](tensor, 1, false)!
+	assert rows.shape == [2]
+	assert rows.to_array() == [1, 2]
+	columns := vtl.count_nonzero_axis[int](tensor, 0, false)!
+	assert columns.shape == [3]
+	assert columns.to_array() == [1, 1, 1]
+	columns_keepdims := vtl.count_nonzero_axis[int](tensor, -2, true)!
+	assert columns_keepdims.shape == [1, 3]
+	assert columns_keepdims.to_array() == [1, 1, 1]
+	transposed := vtl.count_nonzero_axis[int](tensor.t()!, 1, true)!
+	assert transposed.shape == [3, 1]
+	assert transposed.to_array() == [1, 1, 1]
+	series := vtl.from_1d([0, 2, 3])!
+	assert vtl.count_nonzero_axis[int](series, 0, false)!.get_nth[int](0) == 2
+	assert vtl.count_nonzero_axis[int](series, 0, true)!.shape == [1]
+}
+
+fn test_count_nonzero_handles_empty_scalar_and_nan() ! {
+	empty := vtl.from_array([]int{}, [0, 3])!
+	assert vtl.count_nonzero[int](empty) == 0
+	assert vtl.count_nonzero_axis[int](empty, 1, false)!.shape == [0]
+	scalar := vtl.from_array([7], [])!
+	assert vtl.count_nonzero[int](scalar) == 1
+	values := vtl.from_1d([0.0, math.nan(), 2.0])!
+	assert vtl.count_nonzero[f64](values) == 2
+	if _ := vtl.count_nonzero_axis[int](scalar, 0, false) {
+		assert false, 'count_nonzero_axis must reject scalar input'
+	} else {
+		assert true
+	}
+}
+
 fn test_argwhere_groups_nonzero_coordinates_by_element() ! {
 	tensor := vtl.from_2d([[0, 2, 0], [3, 4, 0]])!
 	coordinates := vtl.argwhere[int](tensor)!
