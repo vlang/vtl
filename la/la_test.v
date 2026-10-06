@@ -52,7 +52,15 @@ fn test_matmul_preserves_f32_dtype() {
 	assert result.to_array() == [f32(19), 22, 43, 50]
 }
 
-fn test_matmul_broadcasts_f32_batch_for_cblas_path() {
+fn test_matmul_f32_rectangular_matrix() {
+	a := vtl.from_array([f32(1), 2, 3, 4, 5, 6], [2, 3])!
+	b := vtl.from_array([f32(7), 8, 9, 10, 11, 12], [3, 2])!
+	result := matmul(a, b)!
+	assert result.shape == [2, 2]
+	assert result.to_array() == [f32(58), 64, 139, 154]
+}
+
+fn test_matmul_broadcasts_f32_batch() {
 	a := vtl.from_array([f32(1), 2, 3, 4, 5, 6, 7, 8], [2, 2, 2])!
 	b := vtl.from_array([f32(1), 0, 0, 1], [2, 2])!
 	result := matmul(a, b)!
