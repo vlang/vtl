@@ -3,7 +3,7 @@
 Run examples from `~/.vmodules` unless a README says otherwise:
 
 ```bash
-v run vtl/examples/nn_xor/main.v
+v run ./vtl/examples/nn_xor/main.v
 ```
 
 Some examples download datasets or require GPU build flags. Use the synthetic
@@ -13,20 +13,20 @@ CIFAR examples for CI-safe checks.
 
 | Example | What it shows | Command |
 |---------|---------------|---------|
-| [tensor_axis_manipulation](./tensor_axis_manipulation) | NumPy-style `moveaxis` and `rollaxis` views | `v run vtl/examples/tensor_axis_manipulation/main.v` |
-| [vtl_basic_usage](./vtl_basic_usage) | Tensor creation and basic operations | `v run vtl/examples/vtl_basic_usage/main.v` |
-| [vtl_vandermont](./vtl_vandermont) | Matrix construction and LA utilities | `v run vtl/examples/vtl_vandermont/main.v` |
-| [autograd_backprop](./autograd_backprop) | Manual autograd/backprop flow | `v run vtl/examples/autograd_backprop/main.v` |
-| [npy_round_trip](./npy_round_trip) | Read and write NumPy `.npy` arrays | `v run vtl/examples/npy_round_trip/main.v` |
-| [stats_variance](./stats_variance) | Stable population/sample variance and standard deviation | `v run vtl/examples/stats_variance/main.v` |
-| [random_seed](./random_seed) | Repeat a random tensor sequence with an explicit seed | `v run vtl/examples/random_seed/main.v` |
-| [scatter](./scatter) | Add or assign values at indexed tensor positions | `v run vtl/examples/scatter/main.v` |
-| [broadcast_mask](./broadcast_mask) | Select and fill values with broadcastable boolean masks | `v run vtl/examples/broadcast_mask/main.v` |
-| [vector_norm](./vector_norm) | Compute stable p-norms globally and along an axis | `v run vtl/examples/vector_norm/main.v` |
-| [fft_frequency](./fft_frequency) | Create FFT frequency bins and center a spectrum | `v run vtl/examples/fft_frequency/main.v` |
-| [covariance_correlation](./covariance_correlation) | Compute sample covariance and Pearson correlation matrices | `v run vtl/examples/covariance_correlation/main.v` |
-| [histogram](./histogram) | Count values in NumPy-style evenly spaced bins | `v run vtl/examples/histogram/main.v` |
-| [bincount](./bincount) | Count integer labels and sum per-label weights | `v run vtl/examples/bincount/main.v` |
+| [tensor_axis_manipulation](./tensor_axis_manipulation) | NumPy-style `moveaxis` and `rollaxis` views | `v run ./vtl/examples/tensor_axis_manipulation/main.v` |
+| [vtl_basic_usage](./vtl_basic_usage) | Tensor creation and basic operations | `v run ./vtl/examples/vtl_basic_usage/main.v` |
+| [vtl_vandermont](./vtl_vandermont) | Matrix construction and LA utilities | `v run ./vtl/examples/vtl_vandermont/main.v` |
+| [autograd_backprop](./autograd_backprop) | Manual autograd/backprop flow | `v run ./vtl/examples/autograd_backprop/main.v` |
+| [npy_round_trip](./npy_round_trip) | Read and write NumPy `.npy` arrays | `v run ./vtl/examples/npy_round_trip/main.v` |
+| [stats_variance](./stats_variance) | Stable population/sample variance and standard deviation | `v run ./vtl/examples/stats_variance/main.v` |
+| [random_seed](./random_seed) | Repeat a random tensor sequence with an explicit seed | `v run ./vtl/examples/random_seed/main.v` |
+| [scatter](./scatter) | Add or assign values at indexed tensor positions | `v run ./vtl/examples/scatter/main.v` |
+| [broadcast_mask](./broadcast_mask) | Select and fill values with broadcastable boolean masks | `v run ./vtl/examples/broadcast_mask/main.v` |
+| [vector_norm](./vector_norm) | Compute stable p-norms globally and along an axis | `v run ./vtl/examples/vector_norm/main.v` |
+| [fft_frequency](./fft_frequency) | Create FFT frequency bins and center a spectrum | `v run ./vtl/examples/fft_frequency/main.v` |
+| [covariance_correlation](./covariance_correlation) | Compute sample covariance and Pearson correlation matrices | `v run ./vtl/examples/covariance_correlation/main.v` |
+| [histogram](./histogram) | Count values in NumPy-style evenly spaced bins | `v run ./vtl/examples/histogram/main.v` |
+| [bincount](./bincount) | Count integer labels and sum per-label weights | `v run ./vtl/examples/bincount/main.v` |
 
 ## Neural networks
 
@@ -74,7 +74,7 @@ CIFAR examples for CI-safe checks.
 Prefer scoped commands:
 
 ```bash
-VJOBS=1 v test vtl/nn/f32_training_smoke_test.v
+VJOBS=1 v test ./vtl/nn/f32_training_smoke_test.v
 VTL_USE_VULKAN=1 VJOBS=1 v -prod -d vulkan test vtl/nn/f32_vulkan_training_smoke_d_vulkan_test.v
 ```
 

@@ -5,7 +5,7 @@ Synthetic CIFAR-shaped batches (no dataset download). **Default CI smoke.**
 ## Run
 
 ```sh
-v run vtl/examples/nn_cifar10_tiny_synth/main.v
+v run ./vtl/examples/nn_cifar10_tiny_synth/main.v
 ```
 
 With CUDA Linear forward (local GPU, `-d cuda` build):

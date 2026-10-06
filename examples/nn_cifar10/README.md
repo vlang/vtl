@@ -46,15 +46,9 @@ The dataset is automatically downloaded from the University of Toronto repositor
 ## Running the Example
 
 ```bash
-cd examples/nn_cifar10
-v run .
+v run ./vtl/examples/nn_cifar10
 ```
 
-Or from the vtl root:
-
-```bash
-v run examples/nn_cifar10
-```
 
 ## Configuration
 

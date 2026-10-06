@@ -26,7 +26,7 @@ Samples are interleaved (`class = i % 3`) so every mini-batch sees all 3 classes
 ## How to run
 
 ```sh
-v run main.v
+v run vtl/examples/nn_multiclass_iris/main.v
 ```
 
 ## Expected output

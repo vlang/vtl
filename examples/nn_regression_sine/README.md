@@ -18,7 +18,7 @@ Input(1) → Linear(16) → ReLU → Linear(1) → MSE Loss
 ## How to run
 
 ```sh
-v run main.v
+v run vtl/examples/nn_regression_sine/main.v
 ```
 
 ## Expected output

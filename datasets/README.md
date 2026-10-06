@@ -37,7 +37,7 @@ Run from `~/.vmodules`:
 ```bash
 v run vtl/examples/datasets_mnist/main.v
 v run vtl/examples/datasets_imdb/main.v
-v run vtl/examples/nn_cifar10_tiny_synth/main.v
+v run ./vtl/examples/nn_cifar10_tiny_synth/main.v
 ```
 
 Use synthetic examples (`nn_cifar10_tiny_synth`,

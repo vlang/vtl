@@ -8,7 +8,7 @@ Vulkan Linear forward: `examples/nn_cifar10_f32_vulkan_tiny_synth/`.
 ## Run
 
 ```sh
-v run vtl/examples/nn_cifar10_f32_tiny_synth/main.v
+v run ./vtl/examples/nn_cifar10_f32_tiny_synth/main.v
 ```
 
 ## Notes

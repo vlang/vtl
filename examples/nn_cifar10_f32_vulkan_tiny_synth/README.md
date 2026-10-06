@@ -7,7 +7,7 @@ VSL GEMM and fused Adam where eligible.
 
 ```bash
 # CPU Linear (default)
-v run vtl/examples/nn_cifar10_f32_vulkan_tiny_synth/main.v
+v run ./vtl/examples/nn_cifar10_f32_vulkan_tiny_synth/main.v
 
 # Vulkan GPU (requires SDK; use -prod — debug Vulkan instance crashes on V 0.5.1)
 VTL_USE_VULKAN=1 v -prod -d vulkan run vtl/examples/nn_cifar10_f32_vulkan_tiny_synth/main.v

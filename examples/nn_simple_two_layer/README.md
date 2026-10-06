@@ -23,7 +23,7 @@ There is no true structure — the model is simply fitting random noise.
 ## How to run
 
 ```sh
-v run main.v
+v run vtl/examples/nn_simple_two_layer/main.v
 ```
 
 ## Expected output

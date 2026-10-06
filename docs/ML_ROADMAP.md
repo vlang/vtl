@@ -57,9 +57,9 @@ the autograd `Gate[T]` interface compiles without mixed `Payload[f32]` and
 ```bash
 v up
 cd ~/.vmodules
-v test vtl/nn vtl/datasets
-v run vtl/examples/nn_cifar10_tiny_synth/main.v
-v run vtl/examples/nn_cifar10_f32_tiny_synth/main.v
+v test ./vtl/nn ./vtl/datasets
+v run ./vtl/examples/nn_cifar10_tiny_synth/main.v
+v run ./vtl/examples/nn_cifar10_f32_tiny_synth/main.v
 # Vulkan f32 full stack (use -prod for GPU)
 # VTL_USE_VULKAN=1 v -prod -d vulkan run vtl/examples/nn_cifar10_vulkan/main.v
 # VTL_USE_VULKAN=1 VTL_TEST_VULKAN=1 VJOBS=1 v -prod -d vulkan test vtl/nn/f32_vulkan_training_smoke_d_vulkan_test.v
