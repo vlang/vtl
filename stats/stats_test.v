@@ -84,6 +84,14 @@ fn test_quantile_linear_supports_integer_tensors() {
 	assert quantile_linear(data, 0.5)! == 2.5
 }
 
+fn test_quantile_linear_handles_duplicate_values_and_unsorted_extremes() {
+	data := vtl.from_1d([9.0, 3.0, 3.0, -4.0, 12.0])!
+	assert quantile_linear(data, 0.0)! == -4.0
+	assert quantile_linear(data, 0.5)! == 3.0
+	assert quantile_linear(data, 0.625)! == 6.0
+	assert quantile_linear(data, 1.0)! == 12.0
+}
+
 fn test_quantile_linear_propagates_nan() {
 	data := vtl.from_1d([1.0, math.nan(), 2.0])!
 	assert math.is_nan(quantile_linear(data, 0.5)!)

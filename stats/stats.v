@@ -809,8 +809,64 @@ fn interpolate_quantile(mut values []f64, q f64) f64 {
 			return math.nan()
 		}
 	}
-	values.sort()
-	return interpolate_sorted_quantile(values, q)
+	position := q * f64(values.len - 1)
+	lo := int(math.floor(position))
+	hi := math.min(lo + 1, values.len - 1)
+	lower := select_order_statistic(mut values, lo)
+	if lo == hi {
+		return lower
+	}
+	upper := select_order_statistic(mut values, hi)
+	weight := position - f64(lo)
+	return lower * (1 - weight) + upper * weight
+}
+
+// select_order_statistic partitions values in place and returns its kth value.
+// Median-of-three pivots and three-way partitioning handle sorted and
+// duplicate-heavy input without sorting the entire buffer.
+fn select_order_statistic(mut values []f64, k int) f64 {
+	mut low := 0
+	mut high := values.len
+	for high - low > 1 {
+		middle := low + (high - low) / 2
+		pivot := median_of_three(values[low], values[middle], values[high - 1])
+		mut less := low
+		mut current := low
+		mut greater := high
+		for current < greater {
+			if values[current] < pivot {
+				values[less], values[current] = values[current], values[less]
+				less++
+				current++
+			} else if values[current] > pivot {
+				greater--
+				values[current], values[greater] = values[greater], values[current]
+			} else {
+				current++
+			}
+		}
+		if k < less {
+			high = less
+		} else if k >= greater {
+			low = greater
+		} else {
+			return values[k]
+		}
+	}
+	return values[k]
+}
+
+fn median_of_three(a f64, b f64, c f64) f64 {
+	if a > b {
+		if b > c {
+			return b
+		}
+		return if a > c { c } else { a }
+	}
+	if a > c {
+		return a
+	}
+	return if b > c { c } else { b }
 }
 
 fn tensor_float64_values[T](t &vtl.Tensor[T], ignore_nan bool) []f64 {
