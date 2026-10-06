@@ -2,6 +2,44 @@ module vtl
 
 import math
 
+// sign returns the elementwise sign of each value: -1, 0, or 1. Floating-point
+// NaNs remain NaN, matching NumPy's sign behavior.
+pub fn (t &Tensor[T]) sign[T]() &Tensor[T] {
+	return t.map(fn [T](value T, _ []int) T {
+		$if T is f32 || T is f64 {
+			if math.is_nan(f64(value)) {
+				return value
+			}
+		}
+		if value < cast[T](0) {
+			return cast[T](-1)
+		}
+		if value > cast[T](0) {
+			return cast[T](1)
+		}
+		return cast[T](0)
+	})
+}
+
+// heaviside returns 0 for negative values, 1 for positive values, and x1 for
+// zero values. Floating-point NaNs remain NaN.
+pub fn (t &Tensor[T]) heaviside[T](x1 T) &Tensor[T] {
+	return t.map(fn [x1] [T](value T, _ []int) T {
+		$if T is f32 || T is f64 {
+			if math.is_nan(f64(value)) {
+				return value
+			}
+		}
+		if value < cast[T](0) {
+			return cast[T](0)
+		}
+		if value > cast[T](0) {
+			return cast[T](1)
+		}
+		return x1
+	})
+}
+
 // clip limits tensor values to the inclusive scalar interval [min_value, max_value].
 // The tensor element type is preserved; NaN values remain NaN.
 pub fn (t &Tensor[T]) clip[T](min_value T, max_value T) !&Tensor[T] {

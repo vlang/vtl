@@ -18,3 +18,7 @@ d := c.map(fn (x int, i []int) int {
 })
 
 println(d)
+
+values := vtl.from_1d([-2.0, 0.0, 3.0])!
+println(values.sign())
+println(values.heaviside(0.5))
