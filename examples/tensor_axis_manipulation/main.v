@@ -20,4 +20,7 @@ fn main() {
 
 	duplicated_time := vtl.repeat_axis(video, 2, 1)!
 	println('Repeated time steps [batch, time, channel]: ${duplicated_time.shape}')
+
+	tiled_batch := vtl.tile(video, [2, 1, 1])!
+	println('Tiled batch [batch, time, channel]: ${tiled_batch.shape}')
 }

@@ -32,3 +32,22 @@ fn test_repeat_zero_and_invalid_repeats_or_axis() {
 		assert true
 	}
 }
+
+fn test_tile_repeats_blocks_and_aligns_repetitions_from_the_right() {
+	t := vtl.from_array([1, 2, 3, 4], [2, 2])!
+	assert vtl.tile(t, [2, 1])!.to_array() == [1, 2, 3, 4, 1, 2, 3, 4]
+	assert vtl.tile(t, [2])!.shape == [2, 4]
+	assert vtl.tile(t, [2])!.to_array() == [1, 2, 1, 2, 3, 4, 3, 4]
+	assert vtl.tile(vtl.from_1d([5, 6])!, [2, 1])!.shape == [2, 2]
+	assert vtl.tile(vtl.from_1d([5, 6])!, [2, 1])!.to_array() == [5, 6, 5, 6]
+}
+
+fn test_tile_zero_repetitions_and_rejects_negative_repetitions() {
+	t := vtl.from_1d([1, 2])!
+	assert vtl.tile(t, [0])!.shape == [0]
+	if _ := vtl.tile(t, [-1]) {
+		assert false, 'tile must reject negative repetitions'
+	} else {
+		assert true
+	}
+}
