@@ -7,12 +7,12 @@ result allocation. NumPy uses identical matrix values and sizes.
 ## Matmul
 
 ```bash
-systemd-run --user --scope --quiet -p MemoryMax=768M -- env VJOBS=2 \
+systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
 	v -prod run ./vtl/benchmarks/vs_numpy/matmul_bench.v
 ```
 
 ```bash
-systemd-run --user --scope --quiet -p MemoryMax=768M -- env VJOBS=2 \
+systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
 	OPENBLAS_NUM_THREADS=2 uv run --with numpy python \
 	./vtl/benchmarks/vs_numpy/numpy_matmul_baseline.py
 ```
@@ -25,12 +25,14 @@ in the report; results depend on both the V backend and NumPy's BLAS build.
 ## Local CPU sample
 
 Matched-input local runs on a Ryzen 9 5900X with V `-prod` and the pure-V BLAS
-backend measured dense 512×512 `f64` GEMM at about 37.0 ms (7.3 GFLOPS).
-NumPy 2.5.3 with OpenBLAS 0.3.34 and two BLAS threads measured about 2.3 ms
-(115 GFLOPS). VTL is currently about 16× slower for this operation on this
-setup. Each benchmark uses 3 warmups and 10 timed calls; rerun on the target
-host before using these numbers for a release comparison. This gap is an
-optimization target, not evidence of NumPy performance parity.
+backend measured dense 512×512 `f64` GEMM at 36.5 ms (7.35 GFLOPS). NumPy
+2.5.3 with scipy-openblas 0.3.34.106.0 and two BLAS threads measured 2.17 ms
+(123.7 GFLOPS), making the current pure-V path about 16.8× slower on this host.
+The system CBLAS path backed by the host’s generic `libblas` measured 36.2 ms;
+this machine does not have OpenBLAS installed for VSL’s optimized
+`-d vsl_blas_cblas` backend. Each benchmark uses 3 warmups and 10 timed calls;
+rerun on the target host before using these numbers for a release comparison.
+This gap is an optimization target, not evidence of NumPy performance parity.
 
 ## Resident-buffer Vulkan f32 GEMM
 
@@ -39,10 +41,10 @@ the VTL Vulkan GEMM operation without host readback in the timed section. Run
 the NumPy reference with the same f32 inputs and a preallocated output:
 
 ```bash
-systemd-run --user --scope --quiet -p MemoryMax=768M -- env VJOBS=2 \
+systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
 	VTL_USE_VULKAN=1 v -prod -d vulkan run \
 	./vtl/benchmarks/vs_numpy/vulkan_matmul_bench.v
-systemd-run --user --scope --quiet -p MemoryMax=768M -- env VJOBS=2 \
+systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
 	OPENBLAS_NUM_THREADS=2 uv run --with numpy python \
 	./vtl/benchmarks/vs_numpy/numpy_matmul_f32_baseline.py
 ```
@@ -59,25 +61,25 @@ GEMM kernel is slower in this comparison and needs more work.
 ## Conv2D (CPU path)
 
 ```bash
-systemd-run --user --scope --quiet -p MemoryMax=768M -- env VJOBS=2 \
+systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
 	v -prod run ./vtl/benchmarks/vs_numpy/conv2d_bench.v
 ```
 
 ## Autograd (3-layer MLP backprop)
 
 ```bash
-systemd-run --user --scope --quiet -p MemoryMax=768M -- env VJOBS=2 \
+systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
 	v -prod run ./vtl/benchmarks/vs_numpy/autograd_bench.v
-systemd-run --user --scope --quiet -p MemoryMax=768M -- env VJOBS=2 \
+systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
 	python3 ./vtl/benchmarks/vs_numpy/pytorch_baseline.py autograd
 ```
 
 ## Real FFT
 
 ```bash
-systemd-run --user --scope --quiet -p MemoryMax=768M -- env VJOBS=2 \
+systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
 	v -prod run ./vtl/benchmarks/vs_numpy/fft_bench.v
-systemd-run --user --scope --quiet -p MemoryMax=768M -- env VJOBS=2 \
+systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
 	uv run --with numpy python ./vsl/benchmarks/fft_numpy_baseline.py
 ```
 
