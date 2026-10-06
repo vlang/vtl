@@ -22,7 +22,7 @@ tests, documentation, and examples where users need them.
 | Domain | Current VTL coverage | Work needed before calling it complete |
 |---|---|---|
 | Array creation | zeros/ones/full/eye/range/sequence, `arange` with start/stop/step, endpoint-aware `linspace`, configurable `logspace`, from arrays, two-vector 2-D `meshgrid` with `xy` indexing | Validate edge cases; add N-D mesh grids and consistent dtype/device options |
-| Shape and manipulation | reshape, transpose, squeeze/expand, move/roll axes, concatenate/stack/split, `ravel`, and copying `flatten` | Add repeat/tile, flip/rotations, broadcasting helper tests, and a broader copy-vs-view audit |
+| Shape and manipulation | reshape, transpose, squeeze/expand, move/roll axes, concatenate/stack/split, `ravel`, copying `flatten`, and copying `flip` with all/selected/negative axes | Add repeat/tile, rotations, broadcasting helper tests, and a broader copy-vs-view audit |
 | Indexing | Integer indexing, slices, `take`/`take_along_axis` gathers, lookup helpers, DataLoader gathers, exact-shape boolean `masked_select`/`masked_fill` | Add general fancy indexing, broadcast masks, scatter/put, and document all bounds semantics |
 | Math and ufuncs | Broad elementwise math and broadcasting; scalar-bound `clip`, broadcast-aware `where`, `isclose`, and `allclose` | Audit the full unary/binary function families, `heaviside`, `sign`, and dtype promotion |
 | Reductions | Scalar population/sample variance and standard deviation; linearly interpolated `quantile_linear`; axis arg reductions | Add/verify `keepdims`, NaN-aware variants, accumulator dtype, per-axis statistical reductions, and percentile aliases |

@@ -1,4 +1,4 @@
-module main
+module core
 
 import vtl
 import math
