@@ -177,9 +177,9 @@ fn max_str_len[T](t &Tensor[T]) int {
 // adjusts a string to be aligned with one side
 // of the output
 fn rjust(s string, n int) string {
-	diff := n - s.len
-	if diff > 0 {
-		return ' '.repeat(diff) + s
+	space_count := n - s.len
+	if space_count > 0 {
+		return ' '.repeat(space_count) + s
 	} else {
 		return s
 	}

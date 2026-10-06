@@ -2,6 +2,21 @@
 
 VTL provides several reduction operations that summarise a tensor along one or more axes.
 
+## Discrete differences
+
+`vtl.diff` computes adjacent differences along an axis. Increase `n` to apply
+the operation repeatedly, and use a negative axis to count from the end:
+
+```v
+import vtl
+
+series := vtl.from_1d([1.0, 2.0, 4.0, 7.0])!
+first_difference := vtl.diff[f64](series, 1, -1)!
+second_difference := vtl.diff[f64](series, 2, -1)!
+assert first_difference.to_array() == [1.0, 2.0, 3.0]
+assert second_difference.to_array() == [1.0, 1.0]
+```
+
 ## argmax / argmin
 
 `argmax_axis(axis)` returns the index of the maximum value along `axis`.
