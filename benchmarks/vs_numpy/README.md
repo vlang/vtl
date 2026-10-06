@@ -57,6 +57,24 @@ than a claim of parity or superiority.
 
 ## Matmul
 
+For the 768 MiB workstation cap, run the f64 and f32 cases as separate
+programs. Copy each source to `/tmp` so V compiles only that benchmark module;
+all V commands still run from `~/.vmodules`:
+
+```bash
+cd ~/.vmodules
+cp ./vtl/benchmarks/vs_numpy/f64/main/main.v /tmp/vtl_f64_bench.v
+systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -prod run /tmp/vtl_f64_bench.v
+cp ./vtl/benchmarks/vs_numpy/f32/main/main.v /tmp/vtl_f32_bench.v
+systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -prod run /tmp/vtl_f32_bench.v
+```
+
+Both programs use the same deterministic inputs as the NumPy baselines, three
+warmups, ten timed calls, and an output sanity check. The combined benchmark
+below remains useful on machines with more compiler memory.
+
 ```bash
 systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
 	v -prod run ./vtl/benchmarks/vs_numpy/matmul_bench.v
@@ -95,15 +113,17 @@ both `f64` and `f32` results for either backend.
 
 ## Local CPU sample
 
-Matched-input local runs on a Ryzen 9 5900X with V `-prod` and the pure-V BLAS
-backend measured dense 512×512 `f64` GEMM at 36.5 ms (7.35 GFLOPS). NumPy
-2.5.3 with scipy-openblas 0.3.34.106.0 and two BLAS threads measured 2.17 ms
-(123.7 GFLOPS), making the current pure-V path about 16.8× slower on this host.
-The system CBLAS path backed by the host’s generic `libblas` measured 36.2 ms;
-this machine does not have OpenBLAS installed for VSL’s optimized
-`-d vsl_blas_cblas` backend. Each benchmark uses 3 warmups and 10 timed calls;
-rerun on the target host before using these numbers for a release comparison.
-This gap is an optimization target, not evidence of NumPy performance parity.
+Matched-input local runs on a Ryzen 9 5900X with V 0.5.2 `-prod` and the
+pure-V BLAS backend measured dense 512×512 `f64` GEMM at 16.84 ms (15.9
+GFLOPS). NumPy 2.5.3 with scipy-openblas 0.3.34.106.0 and two BLAS threads
+measured 2.12 ms (126.5 GFLOPS), making the current pure-V path about 7.9×
+slower on this host. The VTL `f32` pure-V benchmark measured 6.02 ms at the
+same size; its NumPy baseline measured 1.16 ms. The system CBLAS path backed by
+the host's generic `libblas` previously measured 36.2 ms; this machine does
+not have OpenBLAS installed for VSL's optimized `-d vsl_blas_cblas` backend.
+Each matched benchmark uses 3 warmups and 10 timed calls. Rerun on the target
+host before using these numbers for a release comparison. The remaining gaps
+are optimization targets, not evidence of NumPy performance parity.
 
 ## Resident-buffer Vulkan f32 GEMM
 
