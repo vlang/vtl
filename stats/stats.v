@@ -235,10 +235,7 @@ pub fn rms[T](t &vtl.Tensor[T]) T {
 	if t.size == 0 {
 		return vtl.cast[T](0)
 	}
-
-	return math.sqrt(t.reduce(vtl.cast[T](0), fn [T](acc T, val T, i []int) T {
-		return acc + math.pow(val, vtl.cast[T](2))
-	}) / vtl.cast[T](t.size))
+	return math.sqrt(sum_squared_deviations[T](t, vtl.cast[T](0)) / vtl.cast[T](t.size))
 }
 
 // Measure of Dispersion / Spread

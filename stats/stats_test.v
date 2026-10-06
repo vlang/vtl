@@ -215,6 +215,12 @@ fn test_rms() {
 	assert tst_res(o.str(), '47.452561')
 }
 
+fn test_rms_matches_for_transposed_views() ! {
+	values := vtl.from_2d([[3.0, 4.0], [0.0, 0.0]])!
+	transposed := values.transpose([1, 0])!
+	assert math.abs(rms(values) - rms(transposed)) < 1e-12
+}
+
 fn test_population_variance() {
 	// Tests were also verified on Wolfram Alpha
 	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)])!
