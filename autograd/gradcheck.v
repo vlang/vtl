@@ -31,16 +31,18 @@ pub fn grad_check[T](mut input &Variable[T], forward fn (&Variable[T]) !&Variabl
 	}
 	input.grad = vtl.zeros_like[T](input.value)
 
+	// Clear in place throughout this generic function instead of constructing
+	// new arrays of Node[T] for each graph reset.
 	mut analytical_output := forward(input) or {
-		input.context.nodes = []&Node[T]{}
+		input.context.nodes.clear()
 		return error('grad_check: forward evaluation failed: ${err}')
 	}
 	if analytical_output.context != input.context || analytical_output.value.size == 0 {
-		input.context.nodes = []&Node[T]{}
+		input.context.nodes.clear()
 		return error('grad_check: forward function must return a non-empty value from the input context')
 	}
 	analytical_output.backprop() or {
-		input.context.nodes = []&Node[T]{}
+		input.context.nodes.clear()
 		return error('grad_check: backpropagation failed: ${err}')
 	}
 
@@ -51,36 +53,36 @@ pub fn grad_check[T](mut input &Variable[T], forward fn (&Variable[T]) !&Variabl
 			for index, value in original_values {
 				input_value.set_nth(index, value)
 			}
-			input.context.nodes = []&Node[T]{}
+			input.context.nodes.clear()
 			return error('grad_check: positive perturbation failed: ${err}')
 		}
 		if plus_output.context != input.context || plus_output.value.size == 0 {
 			for index, value in original_values {
 				input_value.set_nth(index, value)
 			}
-			input.context.nodes = []&Node[T]{}
+			input.context.nodes.clear()
 			return error('grad_check: forward function must return a non-empty value from the input context')
 		}
 		plus := tensor_sum_f64[T](plus_output.value)
-		input.context.nodes = []&Node[T]{}
+		input.context.nodes.clear()
 
 		input_value.set_nth(i, vtl.cast[T](original - eps))
 		minus_output := forward(input) or {
 			for index, value in original_values {
 				input_value.set_nth(index, value)
 			}
-			input.context.nodes = []&Node[T]{}
+			input.context.nodes.clear()
 			return error('grad_check: negative perturbation failed: ${err}')
 		}
 		if minus_output.context != input.context || minus_output.value.size == 0 {
 			for index, value in original_values {
 				input_value.set_nth(index, value)
 			}
-			input.context.nodes = []&Node[T]{}
+			input.context.nodes.clear()
 			return error('grad_check: forward function must return a non-empty value from the input context')
 		}
 		minus := tensor_sum_f64[T](minus_output.value)
-		input.context.nodes = []&Node[T]{}
+		input.context.nodes.clear()
 		numerical := (plus - minus) / (2.0 * eps)
 		analytic := f64(input.grad.get_nth(i))
 		if math.abs(analytic - numerical) > tolerance * max_f64(1.0, math.abs(analytic),
