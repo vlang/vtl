@@ -89,6 +89,22 @@ fn test_random_generator_gamma_is_seeded_and_positive() ! {
 	replay.free()
 }
 
+fn test_random_generator_beta_is_seeded_and_bounded() ! {
+	mut generator := new_random_generator(321)
+	values := generator.beta(2.0, 5.0, [64])!
+	assert values.shape == [64]
+	for i in 0 .. values.size {
+		assert values.get_nth(i) >= 0 && values.get_nth(i) <= 1
+	}
+	mut replay := new_random_generator(321)
+	assert values.array_equal(replay.beta(2.0, 5.0, [64])!)
+	if _ := generator.beta(0.0, 1.0, [2]) {
+		assert false, 'beta must reject a non-positive shape parameter'
+	}
+	generator.free()
+	replay.free()
+}
+
 fn test_random_generator_rejects_invalid_distribution_parameters() {
 	mut generator := new_random_generator(1)
 	if _ := generator.uniform(1.0, 0.0, [2]) {

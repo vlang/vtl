@@ -41,6 +41,7 @@ waiting_times := validation_rng.geometric(0.1, [128])!
 training_indices := vtl.from_1d([0, 1, 2, 3, 4, 5, 6, 7])!
 batch_indices := training_rng.choice[int](training_indices, 4, false)!
 positive_noise := training_rng.gamma(2.0, 0.5, [128])!
+beta_samples := training_rng.beta(2.0, 5.0, [128])!
 ```
 
 `uniform(minimum, maximum, shape)` produces `f64` samples in the half-open
@@ -50,7 +51,8 @@ shape)` returns the positive number of Bernoulli trials up to the first success.
 `choice(population, size, replace)` samples from the population in flattened
 logical order and can enforce unique sampled positions.
 `gamma(alpha, scale, shape)` samples positive values from a Gamma distribution
-on the same independent stream.
+on the same independent stream. `beta(alpha, beta, shape)` samples values in
+`[0, 1]` using the same seeded stream.
 These methods return errors for invalid distribution parameters. Streams are
 reproducible with the same V/VTL versions, seed, and sequence of calls;
 cross-version compatibility is not guaranteed. See the complete data-pipeline

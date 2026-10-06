@@ -154,6 +154,24 @@ fn sample_gamma(alpha f64, scale f64, mut rng &rand.PRNG) !f64 {
 	return error('gamma: rejection sampler did not converge')
 }
 
+// beta returns samples from a Beta distribution using this generator's
+// independent stream. `alpha` and `beta` are the two positive shape parameters.
+pub fn (mut generator RandomGenerator) beta(alpha f64, beta f64, shape []int) !&Tensor[f64] {
+	validate_gamma_parameters(alpha, 1)!
+	validate_gamma_parameters(beta, 1)!
+	mut rng := generator.rng
+	mut values := []f64{len: size_from_shape(shape)}
+	for i in 0 .. values.len {
+		x := sample_gamma(alpha, 1, mut rng)!
+		y := sample_gamma(beta, 1, mut rng)!
+		if x + y == 0 {
+			return error('beta: sampled gamma values underflowed to zero')
+		}
+		values[i] = x / (x + y)
+	}
+	return from_array[f64](values, shape)
+}
+
 // bernoulli returns a tensor of bernoulli random variables.
 pub fn bernoulli[T](prob f64, shape []int, params TensorData) &Tensor[T] {
 	mut t := zeros[T](shape, params)
