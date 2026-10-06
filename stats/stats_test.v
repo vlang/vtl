@@ -101,6 +101,20 @@ fn test_quantile_linear_rejects_invalid_input() {
 	}
 }
 
+fn test_percentile_linear_aliases_quantile_and_axis_quantile_retains_axis() ! {
+	values := vtl.from_array([1.0, 10.0, 3.0, 20.0, 5.0, 30.0], [3, 2])!
+	assert percentile_linear(values, 50)! == quantile_linear(values, 0.5)!
+	assert percentile_linear(values, 50)! == 7.5
+	columns := quantile_axis(values, 0.5, 0)!
+	assert columns.shape == [1, 2]
+	assert columns.get([0, 0]) == 3.0
+	assert columns.get([0, 1]) == 20.0
+	rows := quantile_axis(values, 0.5, -1)!
+	assert rows.shape == [3, 1]
+	assert rows.get([0, 0]) == 5.5
+	assert rows.get([2, 0]) == 17.5
+}
+
 fn expect_quantile_error(data &vtl.Tensor[f64], q f64) {
 	quantile_linear(data, q) or { return }
 	panic('expected invalid quantile to return an error')

@@ -670,6 +670,10 @@ pub fn quantile_linear[T](t &vtl.Tensor[T], q f64) !f64 {
 		return error('quantile is undefined for an empty tensor')
 	}
 	mut values := t.to_array().map(vtl.cast[f64](it))
+	return interpolate_quantile(mut values, q)
+}
+
+fn interpolate_quantile(mut values []f64, q f64) f64 {
 	for value in values {
 		if math.is_nan(value) {
 			return math.nan()
@@ -684,4 +688,54 @@ pub fn quantile_linear[T](t &vtl.Tensor[T], q f64) !f64 {
 	}
 	weight := position - f64(lo)
 	return values[lo] * (1 - weight) + values[hi] * weight
+}
+
+// percentile_linear computes NumPy's default linearly interpolated percentile.
+// The percentile is expressed on the 0..100 scale.
+pub fn percentile_linear[T](t &vtl.Tensor[T], percentile f64) !f64 {
+	if math.is_nan(percentile) || math.is_inf(percentile, 0) || percentile < 0 || percentile > 100 {
+		return error('percentile must be between 0 and 100')
+	}
+	return quantile_linear[T](t, percentile / 100)
+}
+
+// quantile_axis computes linearly interpolated quantiles along axis and keeps
+// the reduced axis with length one. NaN values propagate within their slice.
+pub fn quantile_axis[T](t &vtl.Tensor[T], q f64, axis int) !&vtl.Tensor[f64] {
+	if math.is_nan(q) || math.is_inf(q, 0) || q < 0 || q > 1 {
+		return error('quantile must be between 0 and 1')
+	}
+	rank := t.rank()
+	if rank == 0 {
+		return error('quantile axis requires a tensor with at least one dimension')
+	}
+	axis_index := if axis < 0 { axis + rank } else { axis }
+	if axis_index < 0 || axis_index >= rank {
+		return error('quantile axis ${axis} out of bounds for rank ${rank}')
+	}
+	axis_size := t.shape[axis_index]
+	if axis_size == 0 {
+		return error('quantile is undefined for an empty axis')
+	}
+	mut out_shape := t.shape.clone()
+	out_shape[axis_index] = 1
+	mut result := vtl.empty[f64](out_shape, memory: .row_major)
+	mut slice_count := 1
+	for dim, dimension in t.shape {
+		if dim != axis_index {
+			slice_count *= dimension
+		}
+	}
+	mut index := []int{len: rank}
+	mut values := []f64{len: axis_size}
+	for slice in 0 .. slice_count {
+		decode_nan_slice(slice, t.shape, axis_index, mut index)
+		for position in 0 .. axis_size {
+			index[axis_index] = position
+			values[position] = f64(t.get(index))
+		}
+		index[axis_index] = 0
+		result.set(index, interpolate_quantile(mut values, q))
+	}
+	return result
 }

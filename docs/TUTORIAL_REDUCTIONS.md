@@ -93,6 +93,10 @@ information about automatic differentiation in VTL.
 NumPy's default linearly interpolated quantile. The quantile must be between
 0 and 1, and the result is `f64` even for integer input tensors.
 
+`vtl.stats.percentile_linear` accepts the equivalent 0..100 percentile scale.
+`vtl.stats.quantile_axis` computes one quantile per axis slice and retains the
+reduced axis with length one.
+
 ## Stable variance and standard deviation
 
 `stats.variance` uses Welford's online algorithm and returns `f64`, including
@@ -106,6 +110,9 @@ import vtl.stats
 
 values := vtl.from_1d([30.0, 0.0, 20.0, 10.0])!
 median := stats.quantile_linear(values, 0.5)! // 15.0
+median_percentile := stats.percentile_linear(values, 50)! // 15.0
+rows := vtl.from_array([1.0, 3.0, 5.0, 7.0], [2, 2])!
+row_medians := stats.quantile_axis(rows, 0.5, 1)! // shape [2, 1]
 ```
 
 Empty tensors and out-of-range quantiles return errors. NaNs propagate to the

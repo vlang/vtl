@@ -1,7 +1,7 @@
 # Quantiles and NaN-aware statistics
 
-This example calculates linearly interpolated quantiles and demonstrates
-NaN-aware mean and standard deviation, including a per-axis mean.
+This example calculates linearly interpolated quantiles and percentiles,
+per-axis quantiles, and NaN-aware mean and standard deviation.
 
 Run from `~/.vmodules`:
 
