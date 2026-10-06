@@ -132,12 +132,25 @@ quartiles := stats.quantiles_linear(values, [0.0, 0.25, 0.5, 0.75, 1.0])!
 assert quartiles.to_array() == [0.0, 7.5, 15.0, 22.5, 30.0]
 ```
 
+Use `quantiles_axis` to compute several quantiles for each axis slice. Its
+result puts the quantile dimension first and removes the reduced axis, matching
+NumPy's default `quantile` shape. Each slice is sorted once for all requested
+quantiles:
+
+```v
+grid := vtl.from_array([9.0, 1.0, 8.0, 2.0, 7.0, 3.0], [2, 3])!
+quartiles_by_row := stats.quantiles_axis(grid, [0.25, 0.5, 0.75], 1)!
+assert quartiles_by_row.shape == [3, 2]
+```
+
 `vtl.stats.percentile_linear` accepts the equivalent 0..100 percentile scale.
 `vtl.stats.quantile_axis` computes one quantile per axis slice and retains the
 reduced axis with length one. Ordinary quantiles propagate NaNs.
 The `nanquantile_linear`, `nanquantiles_linear`, `nanpercentile_linear`, and
-`nanquantile_axis` variants ignore NaN values; a slice containing only NaNs
-returns NaN.
+`nanquantile_axis` variants ignore NaN values; `nanquantiles_axis` returns
+multiple NaN-aware values per slice. A slice containing only NaNs returns NaN
+for each requested quantile. Ordinary axis quantiles propagate NaNs within
+their slice.
 
 ## Stable variance and standard deviation
 

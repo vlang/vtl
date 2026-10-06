@@ -13,6 +13,7 @@ fn main() {
 	println('50th percentile: ${stats.percentile_linear(values, 50)!}')
 	grid := vtl.from_array([1.0, 10.0, 3.0, 20.0, 5.0, 30.0], [3, 2])!
 	println('Median by column: ${stats.quantile_axis(grid, 0.5, 0)!.to_array()}')
+	println('Quartiles by row: ${stats.quantiles_axis(grid, [0.25, 0.5, 0.75], 1)!.to_array()}')
 	println('Mean by column: ${stats.mean_axis(grid, 0)!.to_array()}')
 
 	measurements := vtl.from_array([1.0, math.nan(), 3.0, 5.0, math.nan(), 7.0], [3, 2])!
@@ -20,4 +21,9 @@ fn main() {
 	println('NaN-aware mean by column: ${stats.nanmean_axis(measurements, 0)!.to_array()}')
 	println('NaN-aware sample standard deviation: ${stats.nanstd(measurements, 1)!}')
 	println('NaN-aware median by column: ${stats.nanquantile_axis(measurements, 0.5, 0)!.to_array()}')
+	println('NaN-aware quartiles by column: ${stats.nanquantiles_axis(measurements, [
+		0.25,
+		0.5,
+		0.75,
+	], 0)!.to_array()}')
 }
