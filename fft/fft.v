@@ -6,6 +6,13 @@ import vsl.fft as vsl_fft
 import vtl
 import vtl.storage
 
+// Complex32 stores a single-precision complex value for FFT operations.
+pub struct Complex32 {
+pub:
+	re f32
+	im f32
+}
+
 // fftfreq returns the discrete Fourier Transform sample frequencies for a
 // transform of length n and sample spacing d, in NumPy's native FFT order.
 pub fn fftfreq(n int, d f64) !&vtl.Tensor[f64] {
@@ -294,6 +301,52 @@ pub fn ifft2(input &vtl.Tensor[complex.Complex]) !&vtl.Tensor[complex.Complex] {
 	return multidimensional_fft(input, true)
 }
 
+// fft_f32 computes a one-dimensional DFT of single-precision complex values.
+pub fn fft_f32(input &vtl.Tensor[Complex32]) !&vtl.Tensor[Complex32] {
+	return complex_fft_f32(input, false)
+}
+
+// ifft_f32 computes a normalized one-dimensional inverse complex f32 transform.
+pub fn ifft_f32(input &vtl.Tensor[Complex32]) !&vtl.Tensor[Complex32] {
+	return complex_fft_f32(input, true)
+}
+
+// fft_axis_f32 transforms one axis of a complex f32 tensor.
+pub fn fft_axis_f32(input &vtl.Tensor[Complex32], axis int) !&vtl.Tensor[Complex32] {
+	return transform_complex_axis_f32(input, normalize_fft_axis(input.rank(), axis)!, false)
+}
+
+// ifft_axis_f32 computes a normalized inverse complex f32 transform on one axis.
+pub fn ifft_axis_f32(input &vtl.Tensor[Complex32], axis int) !&vtl.Tensor[Complex32] {
+	return transform_complex_axis_f32(input, normalize_fft_axis(input.rank(), axis)!, true)
+}
+
+// fftn_f32 transforms every axis of a complex f32 tensor.
+pub fn fftn_f32(input &vtl.Tensor[Complex32]) !&vtl.Tensor[Complex32] {
+	return multidimensional_fft_f32(input, false)
+}
+
+// ifftn_f32 computes a normalized inverse complex f32 transform over every axis.
+pub fn ifftn_f32(input &vtl.Tensor[Complex32]) !&vtl.Tensor[Complex32] {
+	return multidimensional_fft_f32(input, true)
+}
+
+// fft2_f32 computes a two-dimensional complex f32 DFT.
+pub fn fft2_f32(input &vtl.Tensor[Complex32]) !&vtl.Tensor[Complex32] {
+	if input.rank() != 2 {
+		return error('fft2_f32 expects a two-dimensional tensor')
+	}
+	return multidimensional_fft_f32(input, false)
+}
+
+// ifft2_f32 computes a normalized two-dimensional complex f32 inverse DFT.
+pub fn ifft2_f32(input &vtl.Tensor[Complex32]) !&vtl.Tensor[Complex32] {
+	if input.rank() != 2 {
+		return error('ifft2_f32 expects a two-dimensional tensor')
+	}
+	return multidimensional_fft_f32(input, true)
+}
+
 // rfftn computes a real-input Fourier transform across every tensor axis.
 // The final axis is stored compactly, with length floor(n/2)+1.
 pub fn rfftn[T](input &vtl.Tensor[T]) !&vtl.Tensor[complex.Complex] {
@@ -544,6 +597,16 @@ fn complex_fft(input &vtl.Tensor[complex.Complex], inverse bool) !&vtl.Tensor[co
 	return transform_complex_axis(input, 0, inverse)
 }
 
+fn complex_fft_f32(input &vtl.Tensor[Complex32], inverse bool) !&vtl.Tensor[Complex32] {
+	if input.rank() != 1 {
+		return error('fft_f32 expects a one-dimensional tensor')
+	}
+	if input.size == 0 {
+		return error('fft_f32 requires at least one input value')
+	}
+	return transform_complex_axis_f32(input, 0, inverse)
+}
+
 fn normalize_fft_axis(rank int, axis int) !int {
 	if rank == 0 {
 		return error('FFT axis requires a tensor with at least one dimension')
@@ -576,6 +639,17 @@ fn multidimensional_fft(input &vtl.Tensor[complex.Complex], inverse bool) !&vtl.
 	mut result := transform_complex_axis(input, 0, inverse)!
 	for axis in 1 .. input.rank() {
 		result = transform_complex_axis(result, axis, inverse)!
+	}
+	return result
+}
+
+fn multidimensional_fft_f32(input &vtl.Tensor[Complex32], inverse bool) !&vtl.Tensor[Complex32] {
+	if input.rank() == 0 || input.size == 0 {
+		return error('fftn_f32 expects a non-empty tensor with at least one dimension')
+	}
+	mut result := transform_complex_axis_f32(input, 0, inverse)!
+	for axis in 1 .. input.rank() {
+		result = transform_complex_axis_f32(result, axis, inverse)!
 	}
 	return result
 }
@@ -625,6 +699,48 @@ fn transform_complex_axis(input &vtl.Tensor[complex.Complex], axis int, inverse 
 		}
 	}
 	return tensor_from_owned[complex.Complex](output, input.shape)
+}
+
+fn transform_complex_axis_f32(input &vtl.Tensor[Complex32], axis int, inverse bool) !&vtl.Tensor[Complex32] {
+	axis_length := input.shape[axis]
+	if axis_length <= 0 {
+		return error('fft axis length must be positive')
+	}
+	plan := vsl_fft.create_complex_plan_f32(axis_length)!
+	defer {
+		vsl_fft.destroy_plan(plan)
+	}
+	mut output := []Complex32{len: input.size}
+	mut line := []f32{len: axis_length * 2}
+	mut index := []int{len: input.rank()}
+	line_count := input.size / axis_length
+	for line_index in 0 .. line_count {
+		decode_fft_axis_line(line_index, input.shape, axis, mut index)
+		for position in 0 .. axis_length {
+			index[axis] = position
+			value := input.get(index)
+			line[2 * position] = value.re
+			line[2 * position + 1] = value.im
+		}
+		status := if inverse {
+			vsl_fft.backward_complex_f32(plan, mut line)
+		} else {
+			vsl_fft.forward_complex_f32(plan, mut line)
+		}
+		if status != 0 {
+			return error('fft f32 backend failed to compute the transform')
+		}
+		for position in 0 .. axis_length {
+			index[axis] = position
+			output_index := row_major_index(index, input.shape)
+			factor := if inverse { f32(axis_length) } else { 1.0 }
+			output[output_index] = Complex32{
+				re: line[2 * position] / factor
+				im: line[2 * position + 1] / factor
+			}
+		}
+	}
+	return tensor_from_owned[Complex32](output, input.shape)
 }
 
 fn tensor_from_owned[T](values []T, shape []int) !&vtl.Tensor[T] {

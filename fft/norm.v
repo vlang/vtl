@@ -61,6 +61,56 @@ pub fn ifft2_norm(input &vtl.Tensor[complex.Complex], norm FftNorm) !&vtl.Tensor
 	return scale_complex_fft(mut result, fft_norm_factor(norm, true, input.size))
 }
 
+// fft_norm_f32 computes a one-dimensional complex f32 FFT with explicit normalization.
+pub fn fft_norm_f32(input &vtl.Tensor[Complex32], norm FftNorm) !&vtl.Tensor[Complex32] {
+	mut result := fft_f32(input)!
+	return scale_complex_fft_f32(mut result, fft_norm_factor(norm, false, input.size))
+}
+
+// ifft_norm_f32 computes a normalized one-dimensional inverse complex f32 FFT.
+pub fn ifft_norm_f32(input &vtl.Tensor[Complex32], norm FftNorm) !&vtl.Tensor[Complex32] {
+	mut result := ifft_f32(input)!
+	return scale_complex_fft_f32(mut result, fft_norm_factor(norm, true, input.size))
+}
+
+// fft_axis_norm_f32 transforms one complex f32 tensor axis with explicit normalization.
+pub fn fft_axis_norm_f32(input &vtl.Tensor[Complex32], axis int, norm FftNorm) !&vtl.Tensor[Complex32] {
+	axis_index := normalize_fft_axis(input.rank(), axis)!
+	mut result := fft_axis_f32(input, axis_index)!
+	return scale_complex_fft_f32(mut result, fft_norm_factor(norm, false, input.shape[axis_index]))
+}
+
+// ifft_axis_norm_f32 applies explicit inverse normalization on one complex f32 axis.
+pub fn ifft_axis_norm_f32(input &vtl.Tensor[Complex32], axis int, norm FftNorm) !&vtl.Tensor[Complex32] {
+	axis_index := normalize_fft_axis(input.rank(), axis)!
+	mut result := ifft_axis_f32(input, axis_index)!
+	return scale_complex_fft_f32(mut result, fft_norm_factor(norm, true, input.shape[axis_index]))
+}
+
+// fftn_norm_f32 transforms all complex f32 axes with explicit normalization.
+pub fn fftn_norm_f32(input &vtl.Tensor[Complex32], norm FftNorm) !&vtl.Tensor[Complex32] {
+	mut result := fftn_f32(input)!
+	return scale_complex_fft_f32(mut result, fft_norm_factor(norm, false, input.size))
+}
+
+// ifftn_norm_f32 applies explicit inverse normalization across all complex f32 axes.
+pub fn ifftn_norm_f32(input &vtl.Tensor[Complex32], norm FftNorm) !&vtl.Tensor[Complex32] {
+	mut result := ifftn_f32(input)!
+	return scale_complex_fft_f32(mut result, fft_norm_factor(norm, true, input.size))
+}
+
+// fft2_norm_f32 computes a 2-D complex f32 FFT with explicit normalization.
+pub fn fft2_norm_f32(input &vtl.Tensor[Complex32], norm FftNorm) !&vtl.Tensor[Complex32] {
+	mut result := fft2_f32(input)!
+	return scale_complex_fft_f32(mut result, fft_norm_factor(norm, false, input.size))
+}
+
+// ifft2_norm_f32 computes a 2-D complex f32 inverse FFT with explicit normalization.
+pub fn ifft2_norm_f32(input &vtl.Tensor[Complex32], norm FftNorm) !&vtl.Tensor[Complex32] {
+	mut result := ifft2_f32(input)!
+	return scale_complex_fft_f32(mut result, fft_norm_factor(norm, true, input.size))
+}
+
 // rfft_norm computes a one-dimensional real FFT with an explicit normalization mode.
 pub fn rfft_norm[T](input &vtl.Tensor[T], norm FftNorm) !&vtl.Tensor[complex.Complex] {
 	mut result := rfft[T](input)!
@@ -134,6 +184,21 @@ fn scale_complex_fft(mut input &vtl.Tensor[complex.Complex], factor f64) !&vtl.T
 	for i in 0 .. input.size {
 		value := input.data.data[i]
 		input.data.data[i] = complex.complex(value.re * factor, value.im * factor)
+	}
+	return input
+}
+
+fn scale_complex_fft_f32(mut input &vtl.Tensor[Complex32], factor f64) !&vtl.Tensor[Complex32] {
+	if factor == 1 {
+		return input
+	}
+	factor_f32 := f32(factor)
+	for i in 0 .. input.size {
+		value := input.data.data[i]
+		input.data.data[i] = Complex32{
+			re: value.re * factor_f32
+			im: value.im * factor_f32
+		}
 	}
 	return input
 }
