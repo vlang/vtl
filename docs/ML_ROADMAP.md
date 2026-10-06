@@ -23,7 +23,7 @@ GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 | — | CUDA training smoke: `nn_cifar10_cuda` + `nn/cuda_training_smoke_test` |
 | — | f32 Vulkan training: `nn_cifar10_vulkan` + `f32_vulkan_training_smoke_d_vulkan_test` |
 | — | Vulkan Conv2D f32 forward/backward (same-padding, im2col+GEMM) |
-| — | Vulkan ReLU/Sigmoid f32 (`relu_vulkan_f32` / `sigmoid_vulkan_f32`) |
+| — | Vulkan ReLU/Sigmoid/Softplus/SELU/HardSwish f32; experimental per-layer dispatch with CPU fallback |
 | — | Vulkan Adam f32 fused shader (`VTL_USE_VULKAN=1`, VSL `adam_step`) |
 | — | Conv2D autograd: register weight/bias parents (`conv2d_autograd_smoke_test`) |
 | [#86](https://github.com/vlang/vtl/issues/86) | `DataLoader` |

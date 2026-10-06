@@ -52,16 +52,16 @@ pub fn (cpu &CpuStorage[T]) vulkan(params VulkanParams) !&VulkanStorage[T] {
 
 // vulkan exposes this operation as part of the public API.
 @[inline]
-pub fn (storage &VulkanStorage[T]) vulkan(params VulkanParams) !&VulkanStorage[T] {
-	return storage
+pub fn (vstorage &VulkanStorage[T]) vulkan(params VulkanParams) !&VulkanStorage[T] {
+	return vstorage
 }
 
 // cpu exposes this operation as part of the public API.
-pub fn (storage &VulkanStorage[T]) cpu() !&CpuStorage[T] {
-	size := u64(storage.length) * u64(sizeof(T))
+pub fn (vstorage &VulkanStorage[T]) cpu() !&CpuStorage[T] {
+	size := u64(vstorage.length) * u64(sizeof(T))
 	mut raw := []u8{len: int(size)}
-	storage.data.store(mut raw)!
-	mut arr := []T{len: storage.length}
+	vstorage.data.store(mut raw)!
+	mut arr := []T{len: vstorage.length}
 	unsafe { C.memcpy(arr.data, raw.data, size) }
 	return &CpuStorage[T]{
 		data: arr
@@ -69,16 +69,16 @@ pub fn (storage &VulkanStorage[T]) cpu() !&CpuStorage[T] {
 }
 
 // to_array exposes this operation as part of the public API.
-pub fn (storage &VulkanStorage[T]) to_array() ![]T {
-	size := u64(storage.length) * u64(sizeof(T))
+pub fn (vstorage &VulkanStorage[T]) to_array() ![]T {
+	size := u64(vstorage.length) * u64(sizeof(T))
 	mut raw := []u8{len: int(size)}
-	storage.data.store(mut raw)!
-	mut arr := []T{len: storage.length}
+	vstorage.data.store(mut raw)!
+	mut arr := []T{len: vstorage.length}
 	unsafe { C.memcpy(arr.data, raw.data, size) }
 	return arr
 }
 
 // release exposes this operation as part of the public API.
-pub fn (storage &VulkanStorage[T]) release() {
-	storage.data.release()
+pub fn (vstorage &VulkanStorage[T]) release() {
+	vstorage.data.release()
 }

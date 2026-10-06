@@ -7,5 +7,5 @@ pub fn linear_gate_backward_f32_try(gate voidptr, payload voidptr) ?[]&vtl.Tenso
 	if !linear_gate_use_vulkan_backward() {
 		return none
 	}
-	return linear_gate_backward_f32_vulkan(gate, payload)!
+	return linear_gate_backward_f32_vulkan(gate, payload) or { return none }
 }
