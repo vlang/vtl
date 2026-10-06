@@ -52,8 +52,9 @@ Track these capabilities in addition to the NumPy table:
 
 - Multidimensional tensor math, slicing, broadcasting, reshape, concatenation,
   permutation, and matrix algebra.
-- CSV/NPY/HDF5 data interchange and CPU/GPU backends. VTL supports a primitive
-  `.npy` subset; `.npz` and HDF5 are not yet provided by VTL itself.
+- CSV/NPY/HDF5 data interchange and CPU/GPU backends. VTL supports typed
+  `.npy` arrays and named `.npz` members (the current `.npz` writer accepts one
+  element type per archive); CSV and HDF5 are not yet provided by VTL itself.
 - Statistics, covariance, eigen/least-squares operations, PCA, and K-means.
 - Neural-network layers and recurrent models, with training examples.
 
