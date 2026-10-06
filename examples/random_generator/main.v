@@ -12,6 +12,7 @@ fn main() {
 	training_indices := vtl.from_1d([0, 1, 2, 3, 4, 5, 6, 7])!
 	batch_indices := training_rng.choice[int](training_indices, 4, false)!
 	positive_noise := training_rng.gamma(2.0, 0.5, [4])!
+	probability_samples := training_rng.beta(2.0, 5.0, [4])!
 	noise := training_rng.uniform(-0.01, 0.01, [4])!
 
 	println('Training batch shape: ${training_features.shape}')
@@ -20,6 +21,7 @@ fn main() {
 	println('Validation waiting times: ${waiting_times.to_array()}')
 	println('Sampled training indices: ${batch_indices.to_array()}')
 	println('Positive gamma samples: ${positive_noise.to_array()}')
+	println('Beta probability samples: ${probability_samples.to_array()}')
 	println('Independent augmentation noise: ${noise.to_array()}')
 
 	training_rng.free()
