@@ -71,6 +71,15 @@ pub fn vector_norm_axes[T](t &vtl.Tensor[T], ord f64, axes []int, keepdims bool)
 		return error('vector_norm_axes is undefined for an empty reduction and this order')
 	}
 	reduction_shape := normalized.map(t.shape[it])
+	if ord == 2 && normalized.len == t.rank() && t.is_row_major_contiguous() {
+		$if T is f64 {
+			value := vector_norm2_f64(t.data.data[..t.size])
+			mut result := vtl.empty[f64](output_shape, memory: .row_major)
+			mut output_index := []int{len: output_shape.len}
+			result.set(output_index, value)
+			return result
+		}
+	}
 	mut result := vtl.empty[f64](output_shape, memory: .row_major)
 	mut output_index := []int{len: output_shape.len}
 	mut input_index := []int{len: t.rank()}
@@ -95,6 +104,34 @@ pub fn vector_norm_axes[T](t &vtl.Tensor[T], ord f64, axes []int, keepdims bool)
 }
 
 fn vector_norm_axes_slice[T](t &vtl.Tensor[T], mut index []int, axes []int, reduction_shape []int, reduction_size int, ord f64) f64 {
+	if ord == 2 {
+		mut scale := 0.0
+		mut sum_squares := 1.0
+		mut has_nan := false
+		mut has_infinity := false
+		mut reduction_index := []int{len: axes.len}
+		for item in 0 .. reduction_size {
+			decode_flat_index(item, reduction_shape, mut reduction_index)
+			for i, axis in axes {
+				index[axis] = reduction_index[i]
+			}
+			value := math.abs(f64(t.get[T](index)))
+			if math.is_nan(value) {
+				has_nan = true
+			} else if math.is_inf(value, 1) {
+				has_infinity = true
+			} else if value > 0 {
+				scale, sum_squares = accumulate_norm2(value, scale, sum_squares)
+			}
+		}
+		if has_nan {
+			return math.nan()
+		}
+		if has_infinity {
+			return math.inf(1)
+		}
+		return scale * math.sqrt(sum_squares)
+	}
 	mut count_nonzero := 0
 	mut has_zero := false
 	mut has_nan := false
@@ -154,6 +191,41 @@ fn decode_flat_index(line int, shape []int, mut index []int) {
 	}
 }
 
+fn accumulate_norm2(value f64, scale f64, sum_squares f64) (f64, f64) {
+	if value > scale {
+		ratio := if scale == 0 { 0.0 } else { scale / value }
+		return value, 1 + sum_squares * ratio * ratio
+	}
+	ratio := value / scale
+	return scale, sum_squares + ratio * ratio
+}
+
+fn vector_norm2_f64(values []f64) f64 {
+	mut scale := 0.0
+	mut sum_squares := 1.0
+	for value in values {
+		if value == 0 {
+			continue
+		}
+		abs_value := math.abs(value)
+		if math.is_nan(abs_value) {
+			return math.nan()
+		}
+		if scale < abs_value {
+			ratio := scale / abs_value
+			sum_squares = 1 + sum_squares * ratio * ratio
+			scale = abs_value
+		} else {
+			ratio := abs_value / scale
+			sum_squares += ratio * ratio
+		}
+	}
+	if math.is_inf(scale, 1) {
+		return math.inf(1)
+	}
+	return scale * math.sqrt(sum_squares)
+}
+
 fn vector_norm_axis_impl[T](t &vtl.Tensor[T], ord f64, axis int, keepdims bool) !&vtl.Tensor[f64] {
 	if math.is_nan(ord) {
 		return error('vector_norm_axis order must not be NaN')
@@ -203,6 +275,34 @@ fn vector_norm_axis_impl[T](t &vtl.Tensor[T], ord f64, axis int, keepdims bool) 
 
 fn vector_norm_slice[T](t &vtl.Tensor[T], mut index []int, axis int, ord f64) f64 {
 	length := if axis < 0 { t.size } else { t.shape[axis] }
+	if ord == 2 && axis < 0 && t.is_row_major_contiguous() {
+		$if T is f64 {
+			return vector_norm2_f64(t.data.data[..t.size])
+		}
+	}
+	if ord == 2 {
+		mut scale := 0.0
+		mut sum_squares := 1.0
+		mut has_nan := false
+		mut has_infinity := false
+		for position in 0 .. length {
+			value := math.abs(f64(norm_value[T](t, mut index, axis, position)))
+			if math.is_nan(value) {
+				has_nan = true
+			} else if math.is_inf(value, 1) {
+				has_infinity = true
+			} else if value > 0 {
+				scale, sum_squares = accumulate_norm2(value, scale, sum_squares)
+			}
+		}
+		if has_nan {
+			return math.nan()
+		}
+		if has_infinity {
+			return math.inf(1)
+		}
+		return scale * math.sqrt(sum_squares)
+	}
 	mut count_nonzero := 0
 	mut has_zero := false
 	mut has_nan := false
