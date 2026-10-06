@@ -64,9 +64,7 @@ pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
 		return result.reshape(result_shape)
 	}
 	$if T is f32 {
-		$if vsl_blas_cblas || vsl_blas_generic_cblas {
-			return matmul_f32(a, b)
-		}
+		return matmul_f32(a, b)
 	}
 	if a.rank() > 2 || b.rank() > 2 {
 		if a.rank() < 2 || b.rank() < 2 || a.shape[a.rank() - 1] != b.shape[b.rank() - 2] {
