@@ -3,6 +3,35 @@ module core
 import vtl
 import math
 
+fn test_isin_returns_mask_for_numeric_and_duplicate_values() {
+	elements := vtl.from_2d([[3, 1, 3], [2, 4, 1]])!
+	test_elements := vtl.from_1d([1, 3, 3])!
+	got := vtl.isin(elements, test_elements)
+	assert got.shape == elements.shape
+	assert got.to_array() == [true, true, true, false, false, true]
+}
+
+fn test_isin_supports_strings_and_empty_search_sets() {
+	elements := vtl.from_1d(['v', 'numpy', 'vsl'])!
+	choices := vtl.from_1d(['v', 'vtl'])!
+	assert vtl.isin(elements, choices).to_array() == [true, false, false]
+	empty := vtl.from_1d([]int{})!
+	integers := vtl.from_1d([1, 2])!
+	assert vtl.isin(integers, empty).to_array() == [false, false]
+}
+
+fn test_isin_supports_boolean_tensors() {
+	elements := vtl.from_1d([true, false, true])!
+	choices := vtl.from_1d([false])!
+	assert vtl.isin(elements, choices).to_array() == [false, true, false]
+}
+
+fn test_isin_nan_does_not_match_and_views_keep_logical_order() {
+	elements := vtl.from_2d([[math.nan(), 2.0], [3.0, 2.0]])!.transpose([1, 0])!
+	choices := vtl.from_1d([math.nan(), 2.0])!
+	assert vtl.isin(elements, choices).to_array() == [false, true, true, false]
+}
+
 fn test_count_nonzero_globally_and_by_axis_with_keepdims() ! {
 	tensor := vtl.from_2d([[0, 2, 0], [3, 0, 4]])!
 	assert vtl.count_nonzero[int](tensor) == 3

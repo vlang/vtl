@@ -38,6 +38,7 @@ CIFAR examples for CI-safe checks.
 | [bincount](./bincount) | Count integer labels and sum per-label weights | `v run ./vtl/examples/bincount/main.v` |
 | [weighted_average](./weighted_average) | Compute weighted means globally and along an axis | `v run ./vtl/examples/weighted_average/main.v` |
 | [unique](./unique) | Find sorted unique values and count occurrences | `v run ./vtl/examples/unique/main.v` |
+| [set_membership](./set_membership) | Build a boolean mask for values contained in a set | `v run ./vtl/examples/set_membership/main.v` |
 | [digitize](./digitize) | Assign values to monotonic bins and find insertion positions | `v run ./vtl/examples/digitize/main.v` |
 
 ## Neural networks
