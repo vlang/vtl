@@ -1,5 +1,6 @@
 module layers
 
+import vtl
 import vtl.autograd
 import vtl.nn.internal
 import vtl.nn.gates.activation
@@ -26,7 +27,13 @@ pub fn (_ &SoftplusLayer[T]) variables() []&autograd.Variable[T] {
 }
 
 pub fn (layer &SoftplusLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
-	output := internal.softplus[T](input.value)
+	mut output := &vtl.Tensor[T](unsafe { nil })
+	$if T is f32 {
+		out_f32 := softplus_forward_f32(unsafe { &vtl.Tensor[f32](input.value) })!
+		output = unsafe { &vtl.Tensor[T](out_f32) }
+	} $else {
+		output = internal.softplus[T](input.value)
+	}
 	mut result := input.context.variable(output)
 	if input.requires_grad {
 		gate := activation.softplus_gate[T](input.value)

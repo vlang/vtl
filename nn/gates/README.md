@@ -6,7 +6,7 @@ and preserve each parent's shape.
 
 | Submodule | Rules |
 | --- | --- |
-| [`activation`](activation/) | ReLU, sigmoid, tanh, softmax, Leaky ReLU, ELU, GELU, Swish, Mish |
+| [`activation`](activation/) | ReLU, sigmoid, tanh, softmax, Leaky ReLU, ELU, GELU, Swish, Mish, Softplus, SELU, HardSwish |
 | [`layers`](layers/) | Linear, flatten, input, max-pooling, dropout, and LSTM gates |
 | [`loss`](loss/) | MSE, extra losses, sigmoid cross entropy, and softmax cross entropy |
 
