@@ -207,6 +207,19 @@ pub fn ifft(input &vtl.Tensor[complex.Complex]) !&vtl.Tensor[complex.Complex] {
 	return complex_fft(input, true)
 }
 
+// fft_axis transforms one axis of a complex tensor and preserves its shape.
+// Negative axis values count backward from the final dimension.
+pub fn fft_axis(input &vtl.Tensor[complex.Complex], axis int) !&vtl.Tensor[complex.Complex] {
+	normalized_axis := normalize_fft_axis(input.rank(), axis)!
+	return transform_complex_axis(input, normalized_axis, false)
+}
+
+// ifft_axis computes a normalized inverse complex transform along one axis.
+pub fn ifft_axis(input &vtl.Tensor[complex.Complex], axis int) !&vtl.Tensor[complex.Complex] {
+	normalized_axis := normalize_fft_axis(input.rank(), axis)!
+	return transform_complex_axis(input, normalized_axis, true)
+}
+
 // fftn computes the complex discrete Fourier transform across every axis.
 pub fn fftn(input &vtl.Tensor[complex.Complex]) !&vtl.Tensor[complex.Complex] {
 	return multidimensional_fft(input, false)
@@ -432,6 +445,17 @@ fn complex_fft(input &vtl.Tensor[complex.Complex], inverse bool) !&vtl.Tensor[co
 		return error('fft requires at least one input value')
 	}
 	return transform_complex_axis(input, 0, inverse)
+}
+
+fn normalize_fft_axis(rank int, axis int) !int {
+	if rank == 0 {
+		return error('FFT axis requires a tensor with at least one dimension')
+	}
+	normalized_axis := if axis < 0 { axis + rank } else { axis }
+	if normalized_axis < 0 || normalized_axis >= rank {
+		return error('FFT axis ${axis} out of bounds for rank ${rank}')
+	}
+	return normalized_axis
 }
 
 fn multidimensional_fft(input &vtl.Tensor[complex.Complex], inverse bool) !&vtl.Tensor[complex.Complex] {
