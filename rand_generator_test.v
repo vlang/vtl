@@ -51,6 +51,28 @@ fn test_random_generator_supports_geometric_sampling() ! {
 	replay.free()
 }
 
+fn test_random_generator_choice_supports_replacement_modes() ! {
+	population := from_1d([10, 20, 30, 40, 50])!
+	mut generator := new_random_generator(456)
+	without_replacement := generator.choice[int](population, 5, false)!
+	assert without_replacement.shape == [5]
+	for i in 0 .. without_replacement.size {
+		for j in i + 1 .. without_replacement.size {
+			assert without_replacement.get_nth(i) != without_replacement.get_nth(j)
+		}
+	}
+	single_value := from_1d([7])!
+	with_replacement := generator.choice[int](single_value, 8, true)!
+	for i in 0 .. with_replacement.size {
+		assert with_replacement.get_nth(i) == 7
+	}
+	mut replay := new_random_generator(456)
+	replayed := replay.choice[int](population, 5, false)!
+	assert without_replacement.array_equal(replayed)
+	generator.free()
+	replay.free()
+}
+
 fn test_random_generator_rejects_invalid_distribution_parameters() {
 	mut generator := new_random_generator(1)
 	if _ := generator.uniform(1.0, 0.0, [2]) {
@@ -64,6 +86,9 @@ fn test_random_generator_rejects_invalid_distribution_parameters() {
 	}
 	if _ := generator.geometric(0.0, [2]) {
 		assert false, 'geometric must reject a zero probability'
+	}
+	if _ := generator.choice[int](from_1d([1, 2])!, 3, false) {
+		assert false, 'choice must reject oversampling without replacement'
 	}
 	generator.free()
 }

@@ -71,10 +71,44 @@ pub fn (mut generator RandomGenerator) geometric(probability f64, shape []int) !
 	validate_geometric_probability(probability)!
 	mut result := zeros[int](shape, TensorData{})
 	for i in 0 .. result.size {
-		u := generator.rng.f64_in_range(0, 1)!
+		u := generator.rng.f64_in_range(0.0, 1.0)!
 		result.set_nth(i, geometric_sample(probability, u))
 	}
 	return result
+}
+
+// choice samples values from a tensor's flattened logical order. Without
+// replacement, selected positions are unique; the same value may still occur
+// more than once in the population.
+pub fn (mut generator RandomGenerator) choice[T](population &Tensor[T], size int, replace bool) !&Tensor[T] {
+	if population.size == 0 {
+		return error('choice: population must not be empty')
+	}
+	if size < 0 {
+		return error('choice: sample size must be non-negative')
+	}
+	if !replace && size > population.size {
+		return error('choice: cannot sample more positions than the population without replacement')
+	}
+	mut selected := []T{len: size}
+	if replace {
+		for i in 0 .. size {
+			index := int(generator.rng.f64_in_range(0.0, f64(population.size))!)
+			selected[i] = population.get_nth(index)
+		}
+	} else {
+		mut positions := []int{len: population.size}
+		for index in 0 .. population.size {
+			positions[index] = index
+		}
+		for i in 0 .. size {
+			offset := int(generator.rng.f64_in_range(0.0, f64(population.size - i))!)
+			selected_position := i + offset
+			positions[i], positions[selected_position] = positions[selected_position], positions[i]
+			selected[i] = population.get_nth(positions[i])
+		}
+	}
+	return from_1d[T](selected)
 }
 
 // bernoulli returns a tensor of bernoulli random variables.
@@ -119,7 +153,7 @@ pub fn geometric(probability f64, shape []int, params TensorData) !&Tensor[int] 
 	validate_geometric_probability(probability)!
 	mut result := zeros[int](shape, params)
 	for i in 0 .. result.size {
-		u := rand.f64_in_range(0, 1)!
+		u := rand.f64_in_range(0.0, 1.0)!
 		result.set_nth(i, geometric_sample(probability, u))
 	}
 	return result
