@@ -104,6 +104,11 @@ for integer tensors. Its `ddof` parameter selects population variance (`0`, the
 default) or sample variance (`1`). The function returns an error when the
 effective denominator is not positive.
 
+`mean_axis`, `variance_axis`, and `std_axis` apply the same reductions per
+axis slice and retain the reduced dimension with length one. `variance_axis`
+and `std_axis` accept the same `ddof` convention. NaNs propagate in the
+ordinary reductions; use the `nan*` variants to ignore them.
+
 ```v
 import vtl
 import vtl.stats

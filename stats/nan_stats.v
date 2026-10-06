@@ -50,7 +50,13 @@ pub fn nanstd[T](t &vtl.Tensor[T], ddof int) !f64 {
 // nanmean_axis computes means along axis and retains the reduced dimension as
 // length one. NaN-only slices produce NaN.
 pub fn nanmean_axis[T](t &vtl.Tensor[T], axis int) !&vtl.Tensor[f64] {
-	return nan_moments_axis[T](t, axis, 0, .mean)
+	return nan_moments_axis[T](t, axis, 0, .mean, true)
+}
+
+// mean_axis computes the arithmetic mean along axis and retains that axis with
+// length one. NaNs propagate to the corresponding output slice.
+pub fn mean_axis[T](t &vtl.Tensor[T], axis int) !&vtl.Tensor[f64] {
+	return nan_moments_axis[T](t, axis, 0, .mean, false)
 }
 
 // nanvar_axis computes variance along axis and retains the reduced dimension as
@@ -59,7 +65,16 @@ pub fn nanvar_axis[T](t &vtl.Tensor[T], axis int, ddof int) !&vtl.Tensor[f64] {
 	if ddof < 0 {
 		return error('nanvar_axis: ddof must be non-negative')
 	}
-	return nan_moments_axis[T](t, axis, ddof, .variance)
+	return nan_moments_axis[T](t, axis, ddof, .variance, true)
+}
+
+// variance_axis computes population or sample variance along axis. The
+// reduced axis is retained with length one and NaNs propagate per slice.
+pub fn variance_axis[T](t &vtl.Tensor[T], axis int, ddof int) !&vtl.Tensor[f64] {
+	if ddof < 0 {
+		return error('variance_axis: ddof must be non-negative')
+	}
+	return nan_moments_axis[T](t, axis, ddof, .variance, false)
 }
 
 // nanstd_axis computes standard deviation along axis and retains the reduced
@@ -69,12 +84,19 @@ pub fn nanstd_axis[T](t &vtl.Tensor[T], axis int, ddof int) !&vtl.Tensor[f64] {
 	return variances.map[T](fn (value f64, _ []int) f64 { return math.sqrt(value) })
 }
 
+// std_axis computes standard deviation along axis and retains the reduced
+// dimension with length one.
+pub fn std_axis[T](t &vtl.Tensor[T], axis int, ddof int) !&vtl.Tensor[f64] {
+	variances := variance_axis[T](t, axis, ddof)!
+	return variances.map[T](fn (value f64, _ []int) f64 { return math.sqrt(value) })
+}
+
 enum NanMomentOutput {
 	mean
 	variance
 }
 
-fn nan_moments_axis[T](t &vtl.Tensor[T], axis int, ddof int, output NanMomentOutput) !&vtl.Tensor[f64] {
+fn nan_moments_axis[T](t &vtl.Tensor[T], axis int, ddof int, output NanMomentOutput, ignore_nan bool) !&vtl.Tensor[f64] {
 	rank := t.rank()
 	if rank == 0 {
 		return error('nan reduction axis requires a tensor with at least one dimension')
@@ -100,7 +122,7 @@ fn nan_moments_axis[T](t &vtl.Tensor[T], axis int, ddof int, output NanMomentOut
 		for position in 0 .. axis_size {
 			index[axis_index] = position
 			value := f64(t.get(index))
-			if !math.is_nan(value) {
+			if !ignore_nan || !math.is_nan(value) {
 				moments.add(value)
 			}
 		}

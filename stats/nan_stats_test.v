@@ -48,3 +48,24 @@ fn test_nan_reductions_all_nan_and_invalid_ddof_or_axis() ! {
 		assert true
 	}
 }
+
+fn test_standard_statistical_reductions_along_axis_propagate_nan() ! {
+	values := vtl.from_array([1.0, 10.0, 3.0, 20.0, 5.0, math.nan()], [3, 2])!
+	means := mean_axis(values, 0)!
+	assert means.shape == [1, 2]
+	assert means.get([0, 0]) == 3.0
+	assert math.is_nan(means.get([0, 1]))
+	population := variance_axis(values, 1, 0)!
+	assert population.shape == [3, 1]
+	assert population.get([0, 0]) == 20.25
+	assert population.get([1, 0]) == 72.25
+	assert math.is_nan(population.get([2, 0]))
+	sample_std := std_axis(values, 1, 1)!
+	assert sample_std.get([0, 0]) == math.sqrt(40.5)
+	assert math.is_nan(sample_std.get([2, 0]))
+	if _ := variance_axis(values, 0, -1) {
+		assert false, 'variance_axis must reject negative ddof'
+	} else {
+		assert true
+	}
+}
