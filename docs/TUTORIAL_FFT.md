@@ -31,10 +31,16 @@ image := vtl.from_array[complex.Complex]([
 ], [2, 2])!
 image_spectrum := fft.fft2(image)!
 image_restored := fft.ifft2(image_spectrum)!
+
+real_image := vtl.from_array([f64(1), 0, 0, 0], [2, 2])!
+real_spectrum := fft.rfft2[f64](real_image)!
+real_restored := fft.irfft2(real_spectrum, real_image.shape)!
 ```
 
 `irfft` takes the original real length because an even and an odd signal can
 have the same number of non-negative bins. It applies the NumPy-style inverse
 normalization. `fft2` and `ifft2` operate on two-dimensional complex tensors;
-`fftn` and `ifftn` apply complex transforms across every tensor axis. Real
-multidimensional transforms are not exposed yet.
+`fftn` and `ifftn` apply complex transforms across every tensor axis. `rfft2`
+and `irfft2` cover two-dimensional real transforms, while `rfftn` and `irfftn`
+support real transforms over all axes. The original shape is required by the
+inverse real operations to disambiguate odd and even final dimensions.
