@@ -68,21 +68,46 @@ pub fn rfftn[T](input &vtl.Tensor[T]) !&vtl.Tensor[complex.Complex] {
 		return error('rfftn expects a non-empty tensor with at least one dimension')
 	}
 	$if T is f32 || T is f64 {
-		mut values := []complex.Complex{len: input.size}
-		for i in 0 .. input.size {
-			values[i] = complex.complex(f64(input.get_nth(i)), 0)
-		}
-		full := vtl.from_array[complex.Complex](values, input.shape)!
-		transformed := multidimensional_fft(full, false)!
+		last_axis := input.rank() - 1
+		last_length := input.shape[last_axis]
+		frequency_count := last_length / 2 + 1
 		mut output_shape := input.shape.clone()
-		output_shape[output_shape.len - 1] = output_shape[output_shape.len - 1] / 2 + 1
+		output_shape[last_axis] = frequency_count
 		mut compact := []complex.Complex{len: product(output_shape)}
-		mut index := []int{len: output_shape.len}
-		for flat_index in 0 .. compact.len {
-			decode_row_major_index(flat_index, output_shape, mut index)
-			compact[flat_index] = transformed.get(index)
+		mut index := []int{len: input.rank()}
+		mut line := []T{len: last_length}
+		plan := vsl_fft.create_plan(line) or { return error('rfftn could not create an FFT plan') }
+		defer {
+			vsl_fft.destroy_plan(plan)
 		}
-		return vtl.from_array[complex.Complex](compact, output_shape)
+		line_count := input.size / last_length
+		for line_index in 0 .. line_count {
+			decode_row_major_index(line_index, input.shape[..last_axis], mut index)
+			for position in 0 .. last_length {
+				index[last_axis] = position
+				line[position] = T(input.get(index))
+			}
+			if vsl_fft.forward_fft(plan, mut line) != 0 {
+				return error('rfftn backend failed to compute the forward transform')
+			}
+			for frequency in 0 .. frequency_count {
+				index[last_axis] = frequency
+				output_index := row_major_index(index, output_shape)
+				if frequency == 0 {
+					compact[output_index] = complex.complex(f64(line[0]), 0)
+				} else if last_length % 2 == 0 && frequency == last_length / 2 {
+					compact[output_index] = complex.complex(f64(line[last_length - 1]), 0)
+				} else {
+					compact[output_index] = complex.complex(f64(line[2 * frequency - 1]),
+						f64(line[2 * frequency]))
+				}
+			}
+		}
+		mut result := vtl.from_array[complex.Complex](compact, output_shape)!
+		for axis in 0 .. last_axis {
+			result = transform_complex_axis(result, axis, false)!
+		}
+		return result
 	} $else {
 		return error('rfftn supports f32 and f64 input tensors')
 	}
@@ -111,30 +136,46 @@ pub fn irfftn(input &vtl.Tensor[complex.Complex], shape []int) !&vtl.Tensor[f64]
 			return error('irfftn spectrum shape does not match requested output shape')
 		}
 	}
-	mut full_values := []complex.Complex{len: product(shape)}
-	mut index := []int{len: shape.len}
-	mut reflected := []int{len: shape.len}
-	for flat_index in 0 .. full_values.len {
-		decode_row_major_index(flat_index, shape, mut index)
-		mut conjugate := false
-		for axis, coordinate in index {
-			reflected[axis] = if coordinate == 0 { 0 } else { shape[axis] - coordinate }
-			if axis == shape.len - 1 && coordinate > shape[axis] / 2 {
-				conjugate = true
-			}
-		}
-		value := if conjugate { input.get(reflected) } else { input.get(index) }
-		full_values[flat_index] = if conjugate {
-			complex.complex(value.re, -value.im)
-		} else {
-			value
+	last_axis := shape.len - 1
+	last_length := shape[last_axis]
+	mut transformed := &vtl.Tensor[complex.Complex](unsafe { nil })
+	if last_axis == 0 {
+		transformed = input
+	} else {
+		transformed = transform_complex_axis(input, 0, true)!
+		for axis in 1 .. last_axis {
+			transformed = transform_complex_axis(transformed, axis, true)!
 		}
 	}
-	full := vtl.from_array[complex.Complex](full_values, shape)!
-	transformed := multidimensional_fft(full, true)!
-	mut output := []f64{len: transformed.size}
-	for i in 0 .. output.len {
-		output[i] = transformed.get_nth(i).re
+	mut output := []f64{len: product(shape)}
+	mut line := []f64{len: last_length}
+	mut index := []int{len: shape.len}
+	plan := vsl_fft.create_plan(line) or { return error('irfftn could not create an FFT plan') }
+	defer {
+		vsl_fft.destroy_plan(plan)
+	}
+	line_count := output.len / last_length
+	for line_index in 0 .. line_count {
+		decode_row_major_index(line_index, shape[..last_axis], mut index)
+		index[last_axis] = 0
+		line[0] = transformed.get(index).re
+		for frequency in 1 .. (last_length + 1) / 2 {
+			index[last_axis] = frequency
+			value := transformed.get(index)
+			line[2 * frequency - 1] = value.re
+			line[2 * frequency] = value.im
+		}
+		if last_length % 2 == 0 && last_length > 1 {
+			index[last_axis] = last_length / 2
+			line[last_length - 1] = transformed.get(index).re
+		}
+		if vsl_fft.backward_fft(plan, mut line) != 0 {
+			return error('irfftn backend failed to compute the inverse transform')
+		}
+		for position in 0 .. last_length {
+			index[last_axis] = position
+			output[row_major_index(index, shape)] = line[position] / f64(last_length)
+		}
 	}
 	return vtl.from_array[f64](output, shape)
 }
