@@ -1,8 +1,8 @@
 # Fourier transforms
 
 The optional `vtl.fft` module wraps VSL's PocketFFT backend for one-dimensional,
-axis, and N-D real and complex transforms. Real input accepts `f32` and `f64` tensors and
-returns the non-negative frequency bins as complex values. Full complex
+axis, and N-D real and complex transforms. Real input accepts `f32` and `f64`
+tensors and returns the non-negative frequency bins as complex values. Full complex
 double-precision complex transforms use `math.complex.Complex` values, and
 single-precision complex transforms use `fft.Complex32`.
 
@@ -16,6 +16,17 @@ spectrum := fft.rfft[f64](signal)!
 restored := fft.irfft(spectrum, signal.size)!
 println(spectrum.shape) // [3], including DC and Nyquist bins
 println(restored) // [0.5, 0.5, 1, 2]
+
+signal32 := vtl.from_1d[f32]([1, 0, 0, 0])!
+spectrum32 := fft.rfft_f32(signal32)!
+restored32 := fft.irfft_f32(spectrum32, signal32.size)!
+mut plan32 := fft.create_rfft_f32_plan(signal32.size)!
+defer {
+	plan32.destroy()
+}
+reused_spectrum32 := plan32.forward(signal32)!
+println(restored32)
+println(reused_spectrum32.shape)
 
 mut plan := fft.create_rfft_plan[f64](signal.size)!
 defer {
@@ -84,7 +95,11 @@ preserve its shape. Negative axis indices count backward from the final axis.
 complex spectrum. Pass the original real axis length to `irfft_axis` so odd
 and even inputs can be distinguished.
 
-The `*_norm` variants, including the complex f32 forms, accept `.backward`
+The dedicated `rfft_f32`/`irfft_f32`, axis, 2-D, and N-D APIs preserve f32
+real values and return `fft.Complex32`; the generic `rfft[f32]` family remains
+available and returns f64 complex values for compatibility. The reusable
+`create_rfft_f32_plan` avoids rebuilding a native plan for repeated vector
+transforms. The `*_norm` variants, including complex and real f32 forms, accept `.backward`
 (NumPy default: scale the inverse),
 `.forward` (scale the forward transform), or `.ortho` (scale both directions
 unitarily). The same convention is available for axis, 2-D, N-D, real, and

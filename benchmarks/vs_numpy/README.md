@@ -177,9 +177,11 @@ systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env V
 	uv run --with numpy python ./vsl/benchmarks/fft_numpy_baseline.py
 ```
 
-The FFT benchmark uses the same input sizes and iteration counts in VTL and
-NumPy. Install NumPy in an isolated environment if needed, for example with
-`uv run --with numpy python3 vsl/benchmarks/fft_numpy_baseline.py`.
+The FFT benchmark covers real f64 and real f32 inputs with the same sizes and
+iteration counts in VTL and NumPy. For real f32, VTL's dedicated API returns
+complex f32 output while NumPy's `np.fft.rfft` promotes to complex128. Install
+NumPy in an isolated environment if needed, for example with
+`uv run --with numpy python3 ./vsl/benchmarks/fft_numpy_baseline.py`.
 
 ## Complex f32 FFT
 

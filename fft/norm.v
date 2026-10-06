@@ -160,6 +160,55 @@ pub fn irfft2_norm(input &vtl.Tensor[complex.Complex], shape []int, norm FftNorm
 	return scale_real_fft(mut result, fft_norm_factor(norm, true, product(shape)))
 }
 
+// rfft_norm_f32 computes a one-dimensional real f32 transform with normalization.
+pub fn rfft_norm_f32(input &vtl.Tensor[f32], norm FftNorm) !&vtl.Tensor[Complex32] {
+	mut result := rfft_f32(input)!
+	return scale_complex_fft_f32(mut result, fft_norm_factor(norm, false, input.size))
+}
+
+// irfft_norm_f32 reconstructs a real f32 signal with explicit inverse normalization.
+pub fn irfft_norm_f32(input &vtl.Tensor[Complex32], length int, norm FftNorm) !&vtl.Tensor[f32] {
+	mut result := irfft_f32(input, length)!
+	return scale_real_fft_f32(mut result, fft_norm_factor(norm, true, length))
+}
+
+// rfft_axis_norm_f32 computes a selected-axis real f32 FFT with normalization.
+pub fn rfft_axis_norm_f32(input &vtl.Tensor[f32], axis int, norm FftNorm) !&vtl.Tensor[Complex32] {
+	axis_index := normalize_fft_axis(input.rank(), axis)!
+	mut result := rfft_axis_f32(input, axis_index)!
+	return scale_complex_fft_f32(mut result, fft_norm_factor(norm, false, input.shape[axis_index]))
+}
+
+// irfft_axis_norm_f32 applies inverse normalization when reconstructing one f32 axis.
+pub fn irfft_axis_norm_f32(input &vtl.Tensor[Complex32], axis int, length int, norm FftNorm) !&vtl.Tensor[f32] {
+	mut result := irfft_axis_f32(input, axis, length)!
+	return scale_real_fft_f32(mut result, fft_norm_factor(norm, true, length))
+}
+
+// rfftn_norm_f32 computes a normalized real f32 transform over all axes.
+pub fn rfftn_norm_f32(input &vtl.Tensor[f32], norm FftNorm) !&vtl.Tensor[Complex32] {
+	mut result := rfftn_f32(input)!
+	return scale_complex_fft_f32(mut result, fft_norm_factor(norm, false, input.size))
+}
+
+// irfftn_norm_f32 reconstructs a real f32 tensor with explicit N-D normalization.
+pub fn irfftn_norm_f32(input &vtl.Tensor[Complex32], shape []int, norm FftNorm) !&vtl.Tensor[f32] {
+	mut result := irfftn_f32(input, shape)!
+	return scale_real_fft_f32(mut result, fft_norm_factor(norm, true, product(shape)))
+}
+
+// rfft2_norm_f32 computes a normalized two-dimensional real f32 transform.
+pub fn rfft2_norm_f32(input &vtl.Tensor[f32], norm FftNorm) !&vtl.Tensor[Complex32] {
+	mut result := rfft2_f32(input)!
+	return scale_complex_fft_f32(mut result, fft_norm_factor(norm, false, input.size))
+}
+
+// irfft2_norm_f32 reconstructs a real f32 tensor with explicit 2-D normalization.
+pub fn irfft2_norm_f32(input &vtl.Tensor[Complex32], shape []int, norm FftNorm) !&vtl.Tensor[f32] {
+	mut result := irfft2_f32(input, shape)!
+	return scale_real_fft_f32(mut result, fft_norm_factor(norm, true, product(shape)))
+}
+
 fn fft_norm_factor(norm FftNorm, inverse bool, length int) f64 {
 	match norm {
 		.backward {
@@ -210,6 +259,17 @@ fn scale_real_fft(mut input &vtl.Tensor[f64], factor f64) !&vtl.Tensor[f64] {
 	// Inverse FFT helpers also return fresh, contiguous CPU output storage.
 	for i in 0 .. input.size {
 		input.data.data[i] *= factor
+	}
+	return input
+}
+
+fn scale_real_fft_f32(mut input &vtl.Tensor[f32], factor f64) !&vtl.Tensor[f32] {
+	if factor == 1 {
+		return input
+	}
+	factor_f32 := f32(factor)
+	for i in 0 .. input.size {
+		input.data.data[i] *= factor_f32
 	}
 	return input
 }
