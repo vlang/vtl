@@ -2,6 +2,34 @@ module core
 
 import vtl
 
+fn test_argwhere_groups_nonzero_coordinates_by_element() ! {
+	tensor := vtl.from_2d([[0, 2, 0], [3, 4, 0]])!
+	coordinates := vtl.argwhere[int](tensor)!
+	assert coordinates.shape == [3, 2]
+	assert coordinates.to_array() == [0, 1, 1, 0, 1, 1]
+}
+
+fn test_argwhere_handles_views_empty_and_scalar_inputs() ! {
+	base := vtl.from_2d([[0, 2, 0], [3, 0, 4]])!
+	transposed := vtl.argwhere[int](base.t()!)!
+	assert transposed.shape == [3, 2]
+	assert transposed.to_array() == [0, 1, 1, 0, 2, 1]
+
+	empty := vtl.from_array([]int{}, [0, 3])!
+	empty_coordinates := vtl.argwhere[int](empty)!
+	assert empty_coordinates.shape == [0, 2]
+	assert empty_coordinates.size == 0
+
+	scalar := vtl.from_array([7], [])!
+	scalar_coordinates := vtl.argwhere[int](scalar)!
+	assert scalar_coordinates.shape == [1, 0]
+	assert scalar_coordinates.size == 0
+
+	zero_scalar := vtl.from_array([0], [])!
+	zero_coordinates := vtl.argwhere[int](zero_scalar)!
+	assert zero_coordinates.shape == [0, 0]
+}
+
 fn test_take_axis() {
 	t := vtl.from_array([0, 1, 2, 3, 4, 5], [2, 3])!
 	taken := t.take([2, 0, -1], 1)!

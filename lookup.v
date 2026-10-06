@@ -1,5 +1,22 @@
 module vtl
 
+// argwhere returns the coordinates of non-zero elements as a row-major tensor
+// with shape [number of matches, input rank].
+pub fn argwhere[T](t &Tensor[T]) !&Tensor[int] {
+	condition := t.as_bool()
+	mut coordinates := []int{cap: t.size * t.rank()}
+	mut matches := 0
+	for flat_index in 0 .. t.size {
+		if condition.get_nth(flat_index) {
+			for coordinate in t.nth_index(flat_index) {
+				coordinates << coordinate
+			}
+			matches++
+		}
+	}
+	return from_array[int](coordinates, [matches, t.rank()])
+}
+
 // take returns a copy of the tensor with the values at `indices` selected
 // along `axis`. Negative axes and negative indices count from the end.
 // The indices are a one-dimensional list; use slice for range-based views.
