@@ -73,6 +73,22 @@ fn test_random_generator_choice_supports_replacement_modes() ! {
 	replay.free()
 }
 
+fn test_random_generator_gamma_is_seeded_and_positive() ! {
+	mut generator := new_random_generator(789)
+	values := generator.gamma(2.0, 3.0, [64])!
+	assert values.shape == [64]
+	for i in 0 .. values.size {
+		assert values.get_nth(i) > 0
+	}
+	mut replay := new_random_generator(789)
+	assert values.array_equal(replay.gamma(2.0, 3.0, [64])!)
+	if _ := generator.gamma(0.0, 1.0, [2]) {
+		assert false, 'gamma must reject a non-positive shape parameter'
+	}
+	generator.free()
+	replay.free()
+}
+
 fn test_random_generator_rejects_invalid_distribution_parameters() {
 	mut generator := new_random_generator(1)
 	if _ := generator.uniform(1.0, 0.0, [2]) {

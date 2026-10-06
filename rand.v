@@ -111,6 +111,49 @@ pub fn (mut generator RandomGenerator) choice[T](population &Tensor[T], size int
 	return from_1d[T](selected)
 }
 
+// gamma returns samples from a Gamma distribution using this generator's
+// independent stream. `alpha` is the shape and `scale` is the scale parameter.
+pub fn (mut generator RandomGenerator) gamma(alpha f64, scale f64, shape []int) !&Tensor[f64] {
+	validate_gamma_parameters(alpha, scale)!
+	mut rng := generator.rng
+	mut values := []f64{len: size_from_shape(shape)}
+	for i in 0 .. values.len {
+		values[i] = sample_gamma(alpha, scale, mut rng)!
+	}
+	return from_array[f64](values, shape)
+}
+
+fn validate_gamma_parameters(alpha f64, scale f64) ! {
+	if alpha <= 0 || scale <= 0 || math.is_nan(alpha) || math.is_inf(alpha, 0)
+		|| math.is_nan(scale) || math.is_inf(scale, 0) {
+		return error('gamma: alpha and scale must be finite and positive')
+	}
+}
+
+fn sample_gamma(alpha f64, scale f64, mut rng &rand.PRNG) !f64 {
+	shape := if alpha < 1 { alpha + 1 } else { alpha }
+	d := shape - 1.0 / 3.0
+	c := 1.0 / math.sqrt(9 * d)
+	for _ in 0 .. 10000 {
+		x := rng.normal(config.NormalConfigStruct{})!
+		base := 1 + c * x
+		if base <= 0 {
+			continue
+		}
+		v := base * base * base
+		u := rng.f64_in_range(0.0, 1.0)!
+		if u < 1 - 0.0331 * x * x * x * x
+			|| math.log(u) < 0.5 * x * x + d * (1 - v + math.log(v)) {
+			mut sample := d * v
+			if alpha < 1 {
+				sample *= math.pow(rng.f64_in_range(0.0, 1.0)!, 1 / alpha)
+			}
+			return sample * scale
+		}
+	}
+	return error('gamma: rejection sampler did not converge')
+}
+
 // bernoulli returns a tensor of bernoulli random variables.
 pub fn bernoulli[T](prob f64, shape []int, params TensorData) &Tensor[T] {
 	mut t := zeros[T](shape, params)
