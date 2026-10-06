@@ -33,9 +33,17 @@ fn main() {
 	complex32_restored := fft.ifft_f32(complex32_spectrum)!
 	assert math.abs(complex32_restored.get_nth(0).re - 1) < 1e-5
 	assert math.abs(complex32_restored.get_nth(1).re) < 1e-5
+	real32 := vtl.from_1d[f32]([1, 0, 0, 0])!
+	real32_spectrum := fft.rfft_f32(real32)!
+	real32_restored := fft.irfft_f32(real32_spectrum, real32.size)!
+	assert real32_spectrum.size == 3
+	for flat_index in 0 .. real32.size {
+		assert math.abs(real32_restored.get_nth(flat_index) - real32.get_nth(flat_index)) < 1e-5
+	}
 	println('Input shape: ${image.shape}')
 	println('FFT along the final axis: ${column_spectrum.to_array()}')
 	println('Inverse along axis 1: ${reconstructed.to_array()}')
 	println('Real FFT shape along axis 1: ${real_spectrum.shape}')
 	println('Complex f32 round trip: ${complex32_restored.to_array()}')
+	println('Real f32 FFT shape: ${real32_spectrum.shape}')
 }
