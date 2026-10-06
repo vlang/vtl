@@ -22,6 +22,12 @@ struct NpyDescriptor {
 // write writes a CPU tensor as an uncompressed NumPy .npy v1.0 file.
 // Numeric primitive types and row-major logical tensor order are supported.
 pub fn write[T](path string, tensor &vtl.Tensor[T]) ! {
+	bytes := to_bytes[T](tensor)!
+	os.write_file_array(path, bytes)!
+}
+
+// to_bytes encodes a CPU tensor as an uncompressed NumPy .npy v1.0 payload.
+pub fn to_bytes[T](tensor &vtl.Tensor[T]) ![]u8 {
 	npy_dtype := npy_type[T]() or { return err }
 	byte_order := if npy_dtype.width == 1 { '|' } else { '<' }
 	descriptor := '${byte_order}${rune(npy_dtype.kind)}${npy_dtype.width}'
@@ -49,7 +55,7 @@ pub fn write[T](path string, tensor &vtl.Tensor[T]) ! {
 		value, _ := iter.next() or { break }
 		append_value[T](mut bytes, value, npy_dtype.width)
 	}
-	os.write_file_array(path, bytes)!
+	return bytes
 }
 
 // read reads a NumPy .npy v1.0, v2.0, or v3.0 array into T.
@@ -57,6 +63,12 @@ pub fn write[T](path string, tensor &vtl.Tensor[T]) ! {
 // Fortran-order files are converted to VTL's row-major logical tensor layout.
 pub fn read[T](path string) !&vtl.Tensor[T] {
 	bytes := os.read_bytes(path)!
+	return read_bytes[T](bytes)
+}
+
+// read_bytes decodes a NumPy .npy v1.0, v2.0, or v3.0 payload into T.
+// The payload's dtype must have the same kind and width as T.
+pub fn read_bytes[T](bytes []u8) !&vtl.Tensor[T] {
 	if bytes.len < 10 || bytes[..6] != magic {
 		return error('npy.read: invalid NumPy magic prefix')
 	}

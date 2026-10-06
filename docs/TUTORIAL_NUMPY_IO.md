@@ -1,4 +1,4 @@
-# NumPy `.npy` input and output
+# NumPy `.npy` and `.npz` input and output
 
 `vtl.npy` reads and writes uncompressed NumPy `.npy` arrays. Files can use
 versions 1.0, 2.0, or 3.0. The reader handles C and Fortran order and converts
@@ -27,4 +27,29 @@ assert loaded.to_array() == [1.0, 2.0, 3.0, 4.0]
 
 The `write` function emits `.npy` v1.0 with little-endian numeric data.
 See [the runnable example](../examples/npy_round_trip) for a complete program.
-Compressed `.npz` archives and memory mapping are not implemented yet.
+
+## Compressed `.npz` archives
+
+`vtl.npz` reads compressed and uncompressed ZIP archives and loads a named
+`.npy` member without extracting archive paths to disk. Members can have
+different supported dtypes; select the matching V type when reading each
+member. The current writer stores multiple tensors of one element type per
+archive, so writing mixed-dtype archives remains future work.
+
+```v
+import vtl
+import vtl.npz
+
+arrays := {
+	'features': vtl.from_array[f64]([1.0, 2.0, 3.0, 4.0], [2, 2])!
+	'targets':  vtl.from_1d[f64]([0.0, 1.0])!
+}
+npz.write('training.npz', arrays)!
+features := npz.read[f64]('training.npz', 'features')!
+println(npz.members('training.npz')!)
+```
+
+See [the runnable `.npz` example](../examples/npz_round_trip) for a complete
+round trip. [A second example](../examples/npz_read_compressed) reads a
+NumPy-generated compressed archive. The reader supports mixed dtypes by
+selecting the matching V type for each member.
