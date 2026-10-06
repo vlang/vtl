@@ -174,3 +174,22 @@ assert population > 0.66 && population < 0.67
 assert sample == 1.0
 assert deviation > 0.81 && deviation < 0.82
 ```
+
+## NaN-aware sums and extrema
+
+`nansum`, `nanprod`, `nanmin`, and `nanmax` skip NaN values. Their axis
+variants return promoted `f64` tensors. Use `_axis_keepdims` to retain the
+reduced axis with length one. Empty or all-NaN slices reduce to `0` for sums,
+`1` for products, and NaN for minima or maxima.
+
+```v
+import vtl
+import vtl.stats
+import math
+
+samples := vtl.from_array([1.0, math.nan(), 3.0, 4.0, math.nan(), 6.0], [2, 3])!
+assert stats.nansum(samples) == 14.0
+assert stats.nanprod(samples) == 72.0
+assert stats.nanmin_axis(samples, 1)!.to_array() == [1.0, 4.0]
+assert stats.nanmax_axis_keepdims(samples, 1)!.to_array() == [3.0, 6.0]
+```
