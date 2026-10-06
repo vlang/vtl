@@ -77,6 +77,12 @@ are broadcast to a common output shape.
 
 ## Approximate comparisons
 
+`array_equal` checks that two tensors have identical shapes and exactly equal
+elements. Floating-point values are compared with the language's exact `==`
+semantics: NaNs are unequal (including to themselves), infinities of the same
+sign are equal, and positive and negative zero are equal. Use it when exact
+identity is intended.
+
 `isclose` applies the NumPy tolerance rule elementwise and returns a boolean
 tensor. `allclose` returns whether every broadcasted pair is close. Both take
 explicit relative and absolute tolerances; NaNs compare false unless
