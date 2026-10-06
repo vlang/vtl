@@ -28,6 +28,30 @@ assert loaded.to_array() == [1.0, 2.0, 3.0, 4.0]
 The `write` function emits `.npy` v1.0 with little-endian numeric data.
 See [the runnable example](../examples/npy_round_trip) for a complete program.
 
+## Numeric CSV tensors
+
+`vtl.csv` reads numeric fields into a rank-two tensor and writes rank-two
+tensors as CSV. It supports quoted fields through V's standard CSV parser,
+configurable delimiters and comments, headers, skipped rows, selected columns,
+and a row limit. Read each tensor with its expected V element type; CSV itself
+does not store dtype or shape metadata.
+
+```v
+import vtl.csv
+
+features := csv.read[f64]('training.csv', csv.CsvReadConfig{
+	skip_header: true
+	use_cols:    [0, 2]
+	max_rows:    1000
+})!
+csv.write('features.csv', features, csv.CsvWriteConfig{
+	header: ['height', 'weight']
+})!
+```
+
+See [the CSV round-trip example](../examples/csv_round_trip) for a runnable
+program.
+
 ## Compressed `.npz` archives
 
 `vtl.npz` reads compressed and uncompressed ZIP archives and loads a named
