@@ -42,6 +42,7 @@ CIFAR examples for CI-safe checks.
 | [unique](./unique) | Find sorted unique values and count occurrences | `v run ./vtl/examples/unique/main.v` |
 | [set_membership](./set_membership) | Build a boolean mask for values contained in a set | `v run ./vtl/examples/set_membership/main.v` |
 | [digitize](./digitize) | Assign values to monotonic bins and find insertion positions | `v run ./vtl/examples/digitize/main.v` |
+| [clip](./clip) | Clamp a tensor with broadcastable per-element bounds in one pass | `v run ./vtl/examples/clip/main.v` |
 
 ## Neural networks
 

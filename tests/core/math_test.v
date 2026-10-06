@@ -51,6 +51,28 @@ fn expect_clip_error(values &vtl.Tensor[f64], min_value f64, max_value f64) {
 	panic('expected invalid clip bounds to return an error')
 }
 
+fn test_clip_tensor_broadcasts_bounds_in_one_result() {
+	values := vtl.from_array([1, 2, 3, 4, 5, 6], [2, 3])!
+	lower := vtl.from_1d([2, 2, 2])!
+	upper := vtl.from_array([3, 5], [2, 1])!
+	got := vtl.clip_tensor(values, lower, upper)!
+	expected := vtl.from_array([2, 2, 3, 4, 5, 5], [2, 3])!
+	assert got.array_equal(expected)
+}
+
+fn test_clip_tensor_handles_float_nans_and_invalid_bounds() {
+	values := vtl.from_1d([math.nan(), -2.0, 3.0])!
+	lower := vtl.from_1d([0.0])!
+	upper := vtl.from_1d([1.0])!
+	got := vtl.clip_tensor(values, lower, upper)!
+	assert math.is_nan(got.get_nth(0))
+	assert got.to_array()[1..] == [0.0, 1.0]
+	bad_lower := vtl.from_1d([2.0])!
+	if _ := vtl.clip_tensor(values, bad_lower, upper) {
+		assert false, 'clip_tensor must reject reversed bounds'
+	}
+}
+
 fn test_isclose_numpy_rule_and_broadcast() {
 	a := vtl.from_array([100.0, 1.0, 3.0, 4.0], [2, 2])!
 	b := vtl.from_1d([100.0005, 2.0])!
