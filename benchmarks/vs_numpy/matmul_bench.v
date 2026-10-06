@@ -25,8 +25,8 @@ fn bench_matmul(n int, config bu.BenchConfig) ! {
 	mut b_values := []f64{len: n * n}
 	for i in 0 .. n {
 		for j in 0 .. n {
-			a_values[i * n + j] = f64((i + j) % 7) * 0.01
-			b_values[i * n + j] = f64((i * j) % 5) * 0.02
+			a_values[i * n + j] = f64((i * 17 + j * 13) % 997 + 1) / 997.0
+			b_values[i * n + j] = f64((i * 7 + j * 19) % 991 + 1) / 991.0
 		}
 	}
 	a := vtl.from_array(a_values, [n, n])!

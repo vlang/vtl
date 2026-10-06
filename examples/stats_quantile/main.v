@@ -18,4 +18,5 @@ fn main() {
 	println('NaN-aware mean: ${stats.nanmean(measurements)}')
 	println('NaN-aware mean by column: ${stats.nanmean_axis(measurements, 0)!.to_array()}')
 	println('NaN-aware sample standard deviation: ${stats.nanstd(measurements, 1)!}')
+	println('NaN-aware median by column: ${stats.nanquantile_axis(measurements, 0.5, 0)!.to_array()}')
 }

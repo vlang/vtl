@@ -69,3 +69,35 @@ fn test_standard_statistical_reductions_along_axis_propagate_nan() ! {
 		assert true
 	}
 }
+
+fn test_nan_quantiles_ignore_nan_globally_and_by_axis() ! {
+	values := vtl.from_array([1.0, math.nan(), 3.0, 5.0, math.nan(), math.nan()], [3, 2])!
+	assert nanquantile_linear(values, 0.5)! == 3.0
+	assert nanpercentile_linear(values, 50)! == 3.0
+	columns := nanquantile_axis(values, 0.5, 0)!
+	assert columns.shape == [1, 2]
+	assert columns.get([0, 0]) == 2.0
+	assert columns.get([0, 1]) == 5.0
+	rows := nanquantile_axis(values, 0.5, -1)!
+	assert rows.shape == [3, 1]
+	assert rows.get([0, 0]) == 1.0
+	assert rows.get([1, 0]) == 4.0
+	assert math.is_nan(rows.get([2, 0]))
+}
+
+fn test_nan_quantiles_validate_quantile_and_empty_input() ! {
+	values := vtl.from_1d([math.nan(), math.nan()])!
+	assert math.is_nan(nanquantile_linear(values, 0.5)!)
+	assert math.is_nan(nanquantile_axis(values, 0.5, 0)!.get([0]))
+	if _ := nanquantile_linear(values, 1.1) {
+		assert false, 'out-of-range quantile must return an error'
+	} else {
+		assert true
+	}
+	empty := vtl.from_1d([]f64{})!
+	if _ := nanquantile_linear(empty, 0.5) {
+		assert false, 'empty input must return an error'
+	} else {
+		assert true
+	}
+}
