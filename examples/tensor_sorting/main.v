@@ -9,4 +9,6 @@ fn main() {
 	println('Sorted by row: ${vtl.sort(values)!.to_array()}')
 	println('Sort indices: ${vtl.argsort(values)!.to_array()}')
 	println('Sorted by column: ${vtl.sort_axis(values, 0)!.to_array()}')
+	println('Partition around kth=1: ${vtl.partition(values, 1)!.to_array()}')
+	println('Partition indices: ${vtl.argpartition(values, 1)!.to_array()}')
 }

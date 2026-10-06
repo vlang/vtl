@@ -14,6 +14,7 @@ CIFAR examples for CI-safe checks.
 | Example | What it shows | Command |
 |---------|---------------|---------|
 | [tensor_axis_manipulation](./tensor_axis_manipulation) | NumPy-style `moveaxis` and `rollaxis` views | `v run ./vtl/examples/tensor_axis_manipulation/main.v` |
+| [tensor_sorting](./tensor_sorting) | Sort, partially partition, and return local indices along tensor axes | `v run ./vtl/examples/tensor_sorting/main.v` |
 | [vtl_basic_usage](./vtl_basic_usage) | Tensor creation and basic operations | `v run ./vtl/examples/vtl_basic_usage/main.v` |
 | [vtl_vandermont](./vtl_vandermont) | Matrix construction and LA utilities | `v run ./vtl/examples/vtl_vandermont/main.v` |
 | [autograd_backprop](./autograd_backprop) | Manual autograd/backprop flow | `v run ./vtl/examples/autograd_backprop/main.v` |
