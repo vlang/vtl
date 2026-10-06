@@ -28,6 +28,8 @@ complex_signal := vtl.from_1d[complex.Complex]([
 ])!
 complex_spectrum := fft.fft(complex_signal)!
 complex_restored := fft.ifft(complex_spectrum)!
+frequencies := fft.fftfreq(complex_signal.size, 1.0)!
+centered_spectrum := fft.fftshift(complex_spectrum)!
 
 image := vtl.from_array[complex.Complex]([
 	complex.complex(1, 0),
@@ -54,3 +56,10 @@ normalization. `fft2` and `ifft2` operate on two-dimensional complex tensors;
 and `irfft2` cover two-dimensional real transforms, while `rfftn` and `irfftn`
 support real transforms over all axes. The original shape is required by the
 inverse real operations to disambiguate odd and even final dimensions.
+
+`fftfreq(n, d)` returns the full transform's frequency bins in FFT order;
+`rfftfreq(n, d)` returns the non-negative bins for a real transform. `fftshift`
+moves the zero-frequency component to the center of every axis, and
+`ifftshift` reverses it. The `_axis` variants shift only one selected axis and
+accept negative axis indices. Frequency helpers require a positive transform
+length and finite, non-zero sample spacing.

@@ -1,9 +1,104 @@
 module fft
 
 import math.complex
+import math
 import vsl.fft as vsl_fft
 import vtl
 import vtl.storage
+
+// fftfreq returns the discrete Fourier Transform sample frequencies for a
+// transform of length n and sample spacing d, in NumPy's native FFT order.
+pub fn fftfreq(n int, d f64) !&vtl.Tensor[f64] {
+	validate_frequency_args(n, d, 'fftfreq')!
+	step := 1.0 / (f64(n) * d)
+	mut frequencies := []f64{len: n}
+	positive_end := (n + 1) / 2
+	for index in 0 .. positive_end {
+		frequencies[index] = f64(index) * step
+	}
+	for index in positive_end .. n {
+		frequencies[index] = f64(index - n) * step
+	}
+	return vtl.from_1d(frequencies)
+}
+
+// rfftfreq returns the non-negative discrete Fourier Transform sample
+// frequencies for a real-input transform of length n and sample spacing d.
+pub fn rfftfreq(n int, d f64) !&vtl.Tensor[f64] {
+	validate_frequency_args(n, d, 'rfftfreq')!
+	step := 1.0 / (f64(n) * d)
+	mut frequencies := []f64{len: n / 2 + 1}
+	for index in 0 .. frequencies.len {
+		frequencies[index] = f64(index) * step
+	}
+	return vtl.from_1d(frequencies)
+}
+
+fn validate_frequency_args(n int, d f64, operation string) ! {
+	if n <= 0 {
+		return error('${operation} requires a positive transform length')
+	}
+	if d == 0 || math.is_nan(d) || math.is_inf(d, 0) {
+		return error('${operation} requires a finite non-zero sample spacing')
+	}
+}
+
+// fftshift moves the zero-frequency component to the center of every axis.
+pub fn fftshift[T](input &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	mut axes := []int{cap: input.rank()}
+	for axis in 0 .. input.rank() {
+		axes << axis
+	}
+	return shift_axes[T](input, axes, false)
+}
+
+// ifftshift moves the zero-frequency component back to the start of every
+// axis. It is the inverse of fftshift for odd and even dimensions.
+pub fn ifftshift[T](input &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	mut axes := []int{cap: input.rank()}
+	for axis in 0 .. input.rank() {
+		axes << axis
+	}
+	return shift_axes[T](input, axes, true)
+}
+
+// fftshift_axis shifts one axis so its zero-frequency component is centered.
+pub fn fftshift_axis[T](input &vtl.Tensor[T], axis int) !&vtl.Tensor[T] {
+	axis_index := normalize_shift_axis(input, axis, 'fftshift_axis')!
+	return shift_axes[T](input, [axis_index], false)
+}
+
+// ifftshift_axis reverses fftshift_axis for one axis.
+pub fn ifftshift_axis[T](input &vtl.Tensor[T], axis int) !&vtl.Tensor[T] {
+	axis_index := normalize_shift_axis(input, axis, 'ifftshift_axis')!
+	return shift_axes[T](input, [axis_index], true)
+}
+
+fn normalize_shift_axis[T](input &vtl.Tensor[T], axis int, operation string) !int {
+	rank := input.rank()
+	axis_index := if axis < 0 { axis + rank } else { axis }
+	if axis_index < 0 || axis_index >= rank {
+		return error('${operation} axis ${axis} is out of bounds for rank ${rank}')
+	}
+	return axis_index
+}
+
+fn shift_axes[T](input &vtl.Tensor[T], axes []int, inverse bool) !&vtl.Tensor[T] {
+	mut result := vtl.empty[T](input.shape, memory: .row_major)
+	for flat_index in 0 .. input.size {
+		output_index := result.nth_index(flat_index)
+		mut input_index := output_index.clone()
+		for axis in axes {
+			length := input.shape[axis]
+			if length > 0 {
+				shift := if inverse { length / 2 } else { (length + 1) / 2 }
+				input_index[axis] = (output_index[axis] + shift) % length
+			}
+		}
+		result.set(output_index, input.get(input_index))
+	}
+	return result
+}
 
 // RealFftPlan stores a reusable PocketFFT plan for one real input length.
 // Call destroy when finished to release the native backend plan.
