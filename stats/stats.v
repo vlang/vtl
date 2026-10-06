@@ -95,7 +95,7 @@ pub fn prod[T](t &vtl.Tensor[T]) T {
 // axis with the reduced dimension intact
 pub fn prod_axis[T](t &vtl.Tensor[T], data AxisData) T {
 	mut iter := t.axis_iterator(data.axis)
-	mut acc := vtl.cast[T](0)
+	mut acc := vtl.cast[T](1)
 	for {
 		val, _ := iter.next() or { break }
 		acc *= val
@@ -107,7 +107,7 @@ pub fn prod_axis[T](t &vtl.Tensor[T], data AxisData) T {
 // axis with the reduced dimension intact
 pub fn prod_axis_with_dims[T](t &vtl.Tensor[T], data AxisData) T {
 	mut iter := t.axis_with_dims_iterator(data.axis)
-	mut acc := vtl.cast[T](0)
+	mut acc := vtl.cast[T](1)
 	for {
 		val, _ := iter.next() or { break }
 		acc *= val
