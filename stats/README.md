@@ -6,6 +6,12 @@ standard deviation, extrema and indices, covariance, quantiles, skewness,
 kurtosis, and lag-one autocorrelation. Axis helpers are also available for
 selected reductions.
 
+`histogram(data, bins)` infers a finite range from any numeric tensor and
+returns a `Histogram` with `counts` and `bin_edges`. Empty input uses `[0, 1]`;
+constant input expands by `0.5` at each end. `histogram_range(data, bins,
+minimum, maximum)` uses explicit finite increasing bounds, ignores values
+outside them, and includes the final right edge, matching NumPy's convention.
+
 ```v
 import vtl
 import vtl.stats
