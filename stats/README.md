@@ -13,6 +13,12 @@ to `1`, while an empty sum reduces to `0`.
 with the composite trapezoidal rule and return `f64` tensors with the reduced
 axis removed. Explicit sample coordinates remain in their given order.
 
+NaN-aware reductions `nansum`, `nanprod`, `nanmin`, and `nanmax` ignore NaN
+values and promote results to `f64`. Their `_axis` variants reduce one axis
+and remove it; `_axis_keepdims` variants retain it with length one. Empty or
+all-NaN sums and products use identities `0` and `1`. Empty or all-NaN minima
+and maxima return NaN.
+
 `histogram(data, bins)` infers a finite range from any numeric tensor and
 returns a `Histogram` with `counts` and `bin_edges`. Empty input uses `[0, 1]`;
 constant input expands by `0.5` at each end. `histogram_range(data, bins,
