@@ -4,6 +4,24 @@ Run both sides from `~/.vmodules` under a memory-limited systemd scope. The VTL
 benchmark calls `vtl.la.matmul` end to end, including tensor conversion and
 result allocation. NumPy uses identical matrix values and sizes.
 
+## Contiguous sum and mean
+
+The VTL benchmark reports the contiguous fast path and the generic iterator
+reduction, which provides a before/after comparison. The NumPy baseline uses
+the same `f64` values. Run both from `~/.vmodules`:
+
+```bash
+systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -prod run ./vtl/benchmarks/vs_numpy/stats_bench.v
+systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
+	OPENBLAS_NUM_THREADS=2 uv run --with numpy python \
+	./vtl/benchmarks/vs_numpy/numpy_stats_baseline.py
+```
+
+These timings cover reductions on already allocated tensors/arrays. They do not
+include input construction; record the compiler, NumPy build, CPU, and thread
+settings when comparing results.
+
 ## Matmul
 
 ```bash

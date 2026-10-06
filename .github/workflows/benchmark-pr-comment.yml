@@ -51,6 +51,9 @@ jobs:
             OPENBLAS_NUM_THREADS=2 python3 vtl/benchmarks/vs_numpy/numpy_matmul_baseline.py
             OPENBLAS_NUM_THREADS=2 python3 vtl/benchmarks/vs_numpy/numpy_matmul_f32_end_to_end.py
             v -prod run vtl/benchmarks/vs_numpy/conv2d_bench.v
+            echo '## Contiguous sum and mean'
+            v -prod run vtl/benchmarks/vs_numpy/stats_bench.v
+            python3 vtl/benchmarks/vs_numpy/numpy_stats_baseline.py
           } 2>&1 | tee vs_numpy_pr.md
 
       - name: Post sticky PR comment
