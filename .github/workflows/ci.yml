@@ -57,7 +57,13 @@ jobs:
       - name: V doctor
         run: |
           cd ~/.vmodules
-          v doctor
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            sudo systemd-run --scope --wait --property=MemoryMax=4G \
+              --property=MemorySwapMax=0 --setenv=HOME="$HOME" \
+              --setenv=PATH="$PATH" --setenv=VJOBS=2 -- v doctor
+          else
+            v doctor
+          fi
 
       - name: Install dependencies
         run: |
@@ -79,7 +85,13 @@ jobs:
       - name: Verify Fmt
         run: |
           cd ~/.vmodules
-          v fmt -verify vtl
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            sudo systemd-run --scope --wait --property=MemoryMax=4G \
+              --property=MemorySwapMax=0 --setenv=HOME="$HOME" \
+              --setenv=PATH="$PATH" --setenv=VJOBS=2 -- v fmt -verify vtl
+          else
+            v fmt -verify vtl
+          fi
 
   run-tests:
     runs-on: ${{ matrix.os }}
@@ -138,7 +150,13 @@ jobs:
       - name: V doctor
         run: |
           cd ~/.vmodules
-          v doctor
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            sudo systemd-run --scope --wait --property=MemoryMax=4G \
+              --property=MemorySwapMax=0 --setenv=HOME="$HOME" \
+              --setenv=PATH="$PATH" --setenv=VJOBS=2 -- v doctor
+          else
+            v doctor
+          fi
 
       - name: Install dependencies
         run: |
@@ -170,7 +188,14 @@ jobs:
             backend_flag=--use-cblas
           fi
           # Default: scoped tests + tiny_synth smoke (see bin/test, issue #109)
-          ~/.vmodules/vtl/bin/test ${{ matrix.flags }} $backend_flag
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            sudo systemd-run --scope --wait --property=MemoryMax=4G \
+              --property=MemorySwapMax=0 --setenv=HOME="$HOME" \
+              --setenv=PATH="$PATH" --setenv=VJOBS=2 --setenv=TERM="$TERM" -- \
+              "$HOME/.vmodules/vtl/bin/test" ${{ matrix.flags }} $backend_flag
+          else
+            ~/.vmodules/vtl/bin/test ${{ matrix.flags }} $backend_flag
+          fi
 
   opencl-vcl-smoke:
     name: OpenCL/VCL tensor smoke
@@ -204,7 +229,9 @@ jobs:
       - name: V doctor
         run: |
           cd ~/.vmodules
-          v doctor
+          sudo systemd-run --scope --wait --property=MemoryMax=4G \
+            --property=MemorySwapMax=0 --setenv=HOME="$HOME" \
+            --setenv=PATH="$PATH" --setenv=VJOBS=2 -- v doctor
 
       - name: Install OpenCL CPU runtime
         run: |
@@ -216,7 +243,10 @@ jobs:
           VJOBS: '2'
         run: |
           cd ~/.vmodules
-          v -d vcl run vtl/examples/vtl_opencl_vcl_support/main.v
+          sudo systemd-run --scope --wait --property=MemoryMax=4G \
+            --property=MemorySwapMax=0 --setenv=HOME="$HOME" \
+            --setenv=PATH="$PATH" --setenv=VJOBS=2 -- \
+            v -d vcl run vtl/examples/vtl_opencl_vcl_support/main.v
 
   vulkan-activation-smoke:
     name: Vulkan activation kernels
@@ -256,9 +286,11 @@ jobs:
         run: |
           cd ~/.vmodules
           sudo systemd-run --scope --wait --property=MemoryMax=4G \
+            --property=MemorySwapMax=0 \
             --setenv=HOME="$HOME" --setenv=PATH="$PATH" -- \
             env VJOBS=2 vulkaninfo --summary
           sudo systemd-run --scope --wait --property=MemoryMax=4G \
+            --property=MemorySwapMax=0 \
             --setenv=HOME="$HOME" --setenv=PATH="$PATH" \
             --setenv=VTL_USE_VULKAN=1 -- \
             env VJOBS=2 VTL_USE_VULKAN=1 v -d vulkan test \
