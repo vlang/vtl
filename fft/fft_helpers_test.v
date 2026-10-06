@@ -1,6 +1,7 @@
 module fft
 
 import math
+import math.complex
 import vtl
 
 fn test_fftfreq_and_rfftfreq_match_numpy_frequency_order() ! {
@@ -39,6 +40,22 @@ fn test_fftshift_and_ifftshift_handle_odd_and_even_lengths() ! {
 	even := vtl.from_1d([0, 1, 2, 3])!
 	assert fftshift(even)!.to_array() == [2, 3, 0, 1]
 	assert ifftshift(even)!.to_array() == [2, 3, 0, 1]
+}
+
+fn test_fftshift_supports_complex_fft_output() ! {
+	input := vtl.from_1d[complex.Complex]([
+		complex.complex(1, 0),
+		complex.complex(0, 0),
+		complex.complex(0, 0),
+		complex.complex(0, 0),
+	])!
+	shifted := fftshift(fft(input)!)!
+	assert shifted.shape == [4]
+	for index in 0 .. shifted.size {
+		assert shifted.get_nth(index).re == 1
+		assert shifted.get_nth(index).im == 0
+	}
+	assert ifftshift(shifted)!.array_equal(fft(input)!)
 }
 
 fn test_fftshift_axis_handles_negative_axis_and_strided_input() ! {
