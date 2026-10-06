@@ -5,7 +5,7 @@ import math
 // sign returns the elementwise sign of each value: -1, 0, or 1. Floating-point
 // NaNs remain NaN, matching NumPy's sign behavior.
 pub fn (t &Tensor[T]) sign[T]() &Tensor[T] {
-	return t.map(fn [T](value T, _ []int) T {
+	return t.map_values(fn [T](value T) T {
 		$if T is f32 || T is f64 {
 			if math.is_nan(f64(value)) {
 				return value
@@ -24,7 +24,7 @@ pub fn (t &Tensor[T]) sign[T]() &Tensor[T] {
 // heaviside returns 0 for negative values, 1 for positive values, and x1 for
 // zero values. Floating-point NaNs remain NaN.
 pub fn (t &Tensor[T]) heaviside[T](x1 T) &Tensor[T] {
-	return t.map(fn [x1] [T](value T, _ []int) T {
+	return t.map_values(fn [x1] [T](value T) T {
 		$if T is f32 || T is f64 {
 			if math.is_nan(f64(value)) {
 				return value
@@ -51,7 +51,7 @@ pub fn (t &Tensor[T]) clip[T](min_value T, max_value T) !&Tensor[T] {
 			return error('clip bounds must be ordered and not NaN')
 		}
 	}
-	return t.map(fn [min_value, max_value] [T](value T, _ []int) T {
+	return t.map_values(fn [min_value, max_value] [T](value T) T {
 		$if T is f64 || T is f32 {
 			if math.is_nan(f64(value)) {
 				return value
@@ -130,7 +130,7 @@ fn broadcast_tensor_offset(index int, shape []int, strides []int) int {
 // abs exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) abs[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		// TODO: Figure out a way to do this without casting to f64
 		return cast[T](math.abs(td(x).f64()))
 	})
@@ -143,7 +143,7 @@ pub fn (t &Tensor[T]) abs[T]() &Tensor[T] {
 // acos exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) acos[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.acos(td(x).f64()))
 	})
 }
@@ -155,7 +155,7 @@ pub fn (t &Tensor[T]) acos[T]() &Tensor[T] {
 // acosh exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) acosh[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.acosh(td(x).f64()))
 	})
 }
@@ -167,7 +167,7 @@ pub fn (t &Tensor[T]) acosh[T]() &Tensor[T] {
 // asin exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) asin[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.asin(td(x).f64()))
 	})
 }
@@ -179,7 +179,7 @@ pub fn (t &Tensor[T]) asin[T]() &Tensor[T] {
 // asinh exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) asinh[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.asinh(td(x).f64()))
 	})
 }
@@ -191,7 +191,7 @@ pub fn (t &Tensor[T]) asinh[T]() &Tensor[T] {
 // atan exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) atan[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.atan(td(x).f64()))
 	})
 }
@@ -217,7 +217,7 @@ pub fn (a &Tensor[T]) atan2[T](b &Tensor[T]) !&Tensor[T] {
 // atanh exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) atanh[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.atanh(td(x).f64()))
 	})
 }
@@ -229,7 +229,7 @@ pub fn (t &Tensor[T]) atanh[T]() &Tensor[T] {
 // cbrt exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) cbrt[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.cbrt(td(x).f64()))
 	})
 }
@@ -241,7 +241,7 @@ pub fn (t &Tensor[T]) cbrt[T]() &Tensor[T] {
 // ceil exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) ceil[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.ceil(td(x).f64()))
 	})
 }
@@ -253,7 +253,7 @@ pub fn (t &Tensor[T]) ceil[T]() &Tensor[T] {
 // cos exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) cos[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.cos(td(x).f64()))
 	})
 }
@@ -265,7 +265,7 @@ pub fn (t &Tensor[T]) cos[T]() &Tensor[T] {
 // cosh exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) cosh[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.cosh(td(x).f64()))
 	})
 }
@@ -277,7 +277,7 @@ pub fn (t &Tensor[T]) cosh[T]() &Tensor[T] {
 // cot exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) cot[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.cot(td(x).f64()))
 	})
 }
@@ -289,7 +289,7 @@ pub fn (t &Tensor[T]) cot[T]() &Tensor[T] {
 // degrees exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) degrees[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.degrees(td(x).f64()))
 	})
 }
@@ -301,7 +301,7 @@ pub fn (t &Tensor[T]) degrees[T]() &Tensor[T] {
 // erf exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) erf[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.erf(td(x).f64()))
 	})
 }
@@ -313,7 +313,7 @@ pub fn (t &Tensor[T]) erf[T]() &Tensor[T] {
 // erfc exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) erfc[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.erfc(td(x).f64()))
 	})
 }
@@ -325,7 +325,7 @@ pub fn (t &Tensor[T]) erfc[T]() &Tensor[T] {
 // exp exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) exp[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.exp(td(x).f64()))
 	})
 }
@@ -337,7 +337,7 @@ pub fn (t &Tensor[T]) exp[T]() &Tensor[T] {
 // exp2 exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) exp2[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.exp2(td(x).f64()))
 	})
 }
@@ -349,7 +349,7 @@ pub fn (t &Tensor[T]) exp2[T]() &Tensor[T] {
 // expm1 exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) expm1[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.expm1(td(x).f64()))
 	})
 }
@@ -361,7 +361,7 @@ pub fn (t &Tensor[T]) expm1[T]() &Tensor[T] {
 // f32_bits exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) f32_bits[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.f32_bits(td(x).f32()))
 	})
 }
@@ -373,7 +373,7 @@ pub fn (t &Tensor[T]) f32_bits[T]() &Tensor[T] {
 // f32_from_bits exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) f32_from_bits[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.f32_from_bits(td(x).u32()))
 	})
 }
@@ -385,7 +385,7 @@ pub fn (t &Tensor[T]) f32_from_bits[T]() &Tensor[T] {
 // f64_bits exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) f64_bits[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.f64_bits(td(x).f64()))
 	})
 }
@@ -397,7 +397,7 @@ pub fn (t &Tensor[T]) f64_bits[T]() &Tensor[T] {
 // f64_from_bits exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) f64_from_bits[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.f64_from_bits(td(x).u64()))
 	})
 }
@@ -409,7 +409,7 @@ pub fn (t &Tensor[T]) f64_from_bits[T]() &Tensor[T] {
 // factorial exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) factorial[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.factorial(td(x).f64()))
 	})
 }
@@ -421,7 +421,7 @@ pub fn (t &Tensor[T]) factorial[T]() &Tensor[T] {
 // floor exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) floor[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.floor(td(x).f64()))
 	})
 }
@@ -447,7 +447,7 @@ pub fn (a &Tensor[T]) fmod[T](b &Tensor[T]) !&Tensor[T] {
 // gamma exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) gamma[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.gamma(td(x).f64()))
 	})
 }
@@ -501,7 +501,7 @@ pub fn (a &Tensor[T]) lcm[T](b &Tensor[T]) !&Tensor[T] {
 // log exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) log[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.log(td(x).f64()))
 	})
 }
@@ -513,7 +513,7 @@ pub fn (t &Tensor[T]) log[T]() &Tensor[T] {
 // log10 exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) log10[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.log10(td(x).f64()))
 	})
 }
@@ -525,7 +525,7 @@ pub fn (t &Tensor[T]) log10[T]() &Tensor[T] {
 // log1p exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) log1p[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.log1p(td(x).f64()))
 	})
 }
@@ -537,7 +537,7 @@ pub fn (t &Tensor[T]) log1p[T]() &Tensor[T] {
 // log2 exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) log2[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.log2(td(x).f64()))
 	})
 }
@@ -549,7 +549,7 @@ pub fn (t &Tensor[T]) log2[T]() &Tensor[T] {
 // log_factorial exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) log_factorial[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.log_factorial(td(x).f64()))
 	})
 }
@@ -561,7 +561,7 @@ pub fn (t &Tensor[T]) log_factorial[T]() &Tensor[T] {
 // log_gamma exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) log_gamma[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.log_gamma(td(x).f64()))
 	})
 }
@@ -653,7 +653,7 @@ pub fn (a &Tensor[T]) pow[T](b &Tensor[T]) !&Tensor[T] {
 // pow10 exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) pow10[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.pow10(td(x).int()))
 	})
 }
@@ -665,7 +665,7 @@ pub fn (t &Tensor[T]) pow10[T]() &Tensor[T] {
 // radians exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) radians[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.radians(td(x).f64()))
 	})
 }
@@ -677,7 +677,7 @@ pub fn (t &Tensor[T]) radians[T]() &Tensor[T] {
 // round exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) round[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.round(td(x).f64()))
 	})
 }
@@ -689,7 +689,7 @@ pub fn (t &Tensor[T]) round[T]() &Tensor[T] {
 // round_to_even exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) round_to_even[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.round_to_even(td(x).f64()))
 	})
 }
@@ -701,7 +701,7 @@ pub fn (t &Tensor[T]) round_to_even[T]() &Tensor[T] {
 // sin exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) sin[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.sin(td(x).f64()))
 	})
 }
@@ -713,7 +713,7 @@ pub fn (t &Tensor[T]) sin[T]() &Tensor[T] {
 // sinh exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) sinh[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.sinh(td(x).f64()))
 	})
 }
@@ -725,7 +725,7 @@ pub fn (t &Tensor[T]) sinh[T]() &Tensor[T] {
 // sqrt exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) sqrt[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.sqrt(td(x).f64()))
 	})
 }
@@ -737,7 +737,7 @@ pub fn (t &Tensor[T]) sqrt[T]() &Tensor[T] {
 // tan exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) tan[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.tan(td(x).f64()))
 	})
 }
@@ -749,7 +749,7 @@ pub fn (t &Tensor[T]) tan[T]() &Tensor[T] {
 // tanh exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) tanh[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.tanh(td(x).f64()))
 	})
 }
@@ -761,7 +761,7 @@ pub fn (t &Tensor[T]) tanh[T]() &Tensor[T] {
 // trunc exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) trunc[T]() &Tensor[T] {
-	return t.map(fn [T](x T, _ []int) T {
+	return t.map_values(fn [T](x T) T {
 		return cast[T](math.trunc(td(x).f64()))
 	})
 }
