@@ -51,3 +51,22 @@ fn test_tile_zero_repetitions_and_rejects_negative_repetitions() {
 		assert true
 	}
 }
+
+fn test_rot90_and_custom_axes() {
+	t := vtl.from_array([1, 2, 3, 4, 5, 6], [2, 3])!
+	assert vtl.rot90(t)!.shape == [3, 2]
+	assert vtl.rot90(t)!.to_array() == [3, 6, 2, 5, 1, 4]
+	assert vtl.rot90_k(t, -1)!.to_array() == [4, 1, 5, 2, 6, 3]
+	assert vtl.rot90_k(t, 2)!.to_array() == [6, 5, 4, 3, 2, 1]
+	assert vtl.rot90_axes(vtl.from_array([1, 2, 3, 4, 5, 6], [2, 1, 3])!, 1,
+		[0, 2])!.shape == [3, 1, 2]
+}
+
+fn test_rot90_rejects_invalid_axes() {
+	t := vtl.from_1d([1, 2])!
+	if _ := vtl.rot90(t) {
+		assert false, 'rot90 must reject tensors with fewer than two dimensions'
+	} else {
+		assert true
+	}
+}

@@ -23,4 +23,7 @@ fn main() {
 
 	tiled_batch := vtl.tile(video, [2, 1, 1])!
 	println('Tiled batch [batch, time, channel]: ${tiled_batch.shape}')
+
+	rotated_batch_time := vtl.rot90(video)!
+	println('Rotated batch/time plane: ${rotated_batch_time.shape}')
 }
