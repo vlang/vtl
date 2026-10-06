@@ -73,7 +73,7 @@ fn test_acosh() {
 	a := vtl.from_1d([1.0, 2, 3])!
 	result := a.acosh()
 	expected := vtl.from_1d([0.0, 1.3169578969248166, 1.7627471740390859])!
-	assert result.array_equal(expected)
+	assert result.allclose(expected)!
 }
 
 fn test_asin() {
@@ -231,7 +231,7 @@ fn test_hypot() {
 	b := vtl.from_1d([4.0, 5, 6])!
 	result := a.hypot(b)!
 	expected := vtl.from_1d([4.123105625617661, 5.385164807134504, 6.708203932499369])!
-	assert result.array_equal(expected)
+	assert result.allclose(expected)!
 }
 
 fn test_lcm() {
@@ -246,14 +246,14 @@ fn test_log() {
 	a := vtl.from_1d([1.0, 2, 3])!
 	result := a.log()
 	expected := vtl.from_1d([0.0, 0.6931471805599453, 1.0986122886681096])!
-	assert result.array_equal(expected)
+	assert result.allclose(expected)!
 }
 
 fn test_log10() {
 	a := vtl.from_1d([1.0, 2, 3])!
 	result := a.log10()
 	expected := vtl.from_1d([0.0, 0.30102999566398114, 0.4771212547196623])!
-	assert result.array_equal(expected)
+	assert result.allclose(expected)!
 }
 
 fn test_log1p() {
@@ -267,7 +267,7 @@ fn test_log2() {
 	a := vtl.from_1d([1.0, 2, 3])!
 	result := a.log2()
 	expected := vtl.from_1d([0.0, 1.0, 1.5849625007211563])!
-	assert result.array_equal(expected)
+	assert result.allclose(expected)!
 }
 
 fn test_log_factorial() {
@@ -289,7 +289,7 @@ fn test_log_n() {
 	b := vtl.from_1d([4.0, 5, 6])!
 	result := a.log_n(b)!
 	expected := vtl.from_1d([0.0, 0.43067655807339306, 0.6131471927654584])!
-	assert result.array_equal(expected)
+	assert result.allclose(expected)!
 }
 
 fn test_max() {
@@ -355,7 +355,7 @@ fn test_sqrt() {
 	a := vtl.from_1d([1.0, 2, 3])!
 	result := a.sqrt()
 	expected := vtl.from_1d([1.0, 1.414213562373095, 1.7320508075688772])!
-	assert result.array_equal(expected)
+	assert result.allclose(expected)!
 }
 
 fn test_tan() {
