@@ -44,6 +44,17 @@ GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 | P2 | [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support |
 | P2 | — | Vulkan: persistent GPU activation chain between layers (CUDA has `VTL_GPU_ACTIVATIONS`) |
 
+## Performance engineering backlog
+
+The historical [#64 performance engineering proposal](https://github.com/vlang/vtl/issues/64)
+is closed, but its acceptance checklist is not complete in the current tree.
+VTL has specific optimized paths, including fused Vulkan Adam, while the
+broader work remains: general fused operation chains, FP16/BF16 and automatic
+mixed precision, reusable GPU memory pools, asynchronous Vulkan execution,
+backend profiling, and checkpointing. Treat these as future work until each
+has an implementation, correctness coverage, and benchmark evidence; issue
+closure alone is not completion evidence.
+
 The beta contract is tensors, autograd, high-level layers/losses/optimizers,
 datasets, and f32 CPU training. CUDA and Vulkan remain opt-in experimental
 backend paths during beta. Generic f64 training is tracked as post-beta until
