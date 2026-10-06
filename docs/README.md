@@ -22,6 +22,7 @@ neural network module.
 | Gather and indexed updates | [Indexing and scatter](./TUTORIAL_INDEXING.md) |
 | Broadcasting, maps, reductions | [Broadcasting](./TUTORIAL_BROADCASTING.md), [Map/reduce](./TUTORIAL_MAP_REDUCE.md), [Reductions](./TUTORIAL_REDUCTIONS.md) |
 | Random tensors and reproducibility | [Random numbers](./TUTORIAL_RANDOM.md) |
+| Fourier transforms | [FFT and normalization modes](./TUTORIAL_FFT.md) |
 | NumPy file interchange | [`.npy` input/output](./TUTORIAL_NUMPY_IO.md) |
 | Linear algebra and norms | [Linear algebra](./TUTORIAL_LINEAR_ALGEBRA.md), [Advanced LA](./TUTORIAL_ADVANCED_LA.md) |
 | Autograd | [Autograd](./TUTORIAL_AUTOGRAD.md) |
@@ -37,11 +38,12 @@ neural network module.
 3. [Broadcasting](./TUTORIAL_BROADCASTING.md)
 4. [Map and Reduce](./TUTORIAL_MAP_REDUCE.md)
 5. [Reductions](./TUTORIAL_REDUCTIONS.md)
-6. [Matrix and Vector Operations](./TUTORIAL_LINEAR_ALGEBRA.md)
-7. [Advanced Linear Algebra](./TUTORIAL_ADVANCED_LA.md)
-8. [Automatic Differentiation](./TUTORIAL_AUTOGRAD.md)
-9. [Neural Networks](./TUTORIAL_NEURAL_NETWORKS.md)
-10. [Optimizers](./TUTORIAL_OPTIMIZERS.md)
+6. [Fourier Transforms](./TUTORIAL_FFT.md)
+7. [Matrix and Vector Operations](./TUTORIAL_LINEAR_ALGEBRA.md)
+8. [Advanced Linear Algebra](./TUTORIAL_ADVANCED_LA.md)
+9. [Automatic Differentiation](./TUTORIAL_AUTOGRAD.md)
+10. [Neural Networks](./TUTORIAL_NEURAL_NETWORKS.md)
+11. [Optimizers](./TUTORIAL_OPTIMIZERS.md)
 
 ## ML Release Docs
 
