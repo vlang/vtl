@@ -85,6 +85,15 @@ fn test_get_nth() {
 	assert t.get_nth(9) == 10
 }
 
+fn test_get_nth_and_to_array_preserve_gapped_row_strides() ! {
+	base := vtl.from_array([1, 2, 3, 4, 5, 6, 7, 8], [4, 2])!
+	view := base.slice([0, 2], []int{})!
+	gapped := view.as_strided([2, 2], [3, 1])!
+	assert !gapped.is_row_major_contiguous()
+	assert gapped.get_nth(2) == 4
+	assert gapped.to_array() == [1, 2, 4, 5]
+}
+
 fn test_offset_index() {
 	t := vtl.from_array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [5, 2])!
 	assert t.size() == 10

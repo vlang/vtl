@@ -80,6 +80,9 @@ pub fn (t &Tensor[T]) get[T](index []int) T {
 // get_nth exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) get_nth[T](n int) T {
+	if t.is_row_major_contiguous() && n >= 0 && n < t.size {
+		return t.data.get[T](n)
+	}
 	index := t.nth_index(n)
 	return t.get[T](index)
 }

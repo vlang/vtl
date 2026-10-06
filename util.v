@@ -133,21 +133,16 @@ fn is_row_major_contiguous(shape []int, strides []int, ndims int) bool {
 	if ndims == 0 {
 		return true
 	}
-	if ndims == 1 {
-		return shape[0] == 1 || strides[0] == 1
-	}
 	mut sd := 1
-	mut i := ndims - 1
-	for i > 0 {
+	for i := ndims - 1; i >= 0; i-- {
 		dim := shape[i]
 		if dim == 0 {
 			return true
 		}
-		if strides[i] != sd {
+		if dim > 1 && strides[i] != sd {
 			return false
 		}
 		sd *= dim
-		i--
 	}
 	return true
 }

@@ -3,6 +3,69 @@ module fft
 import math.complex
 import vsl.fft as vsl_fft
 import vtl
+import vtl.storage
+
+// RealFftPlan stores a reusable PocketFFT plan for one real input length.
+// Call destroy when finished to release the native backend plan.
+pub struct RealFftPlan[T] {
+pub:
+	length int
+mut:
+	plan      vsl_fft.Fftplan
+	destroyed bool
+}
+
+// create_rfft_plan creates a reusable one-dimensional real FFT plan.
+pub fn create_rfft_plan[T](length int) !RealFftPlan[T] {
+	if length <= 0 {
+		return error('FFT plan length must be positive')
+	}
+	$if T is f32 {
+		plan := vsl_fft.create_plan([]f32{len: length}) or {
+			return error('could not create an f32 FFT plan')
+		}
+		return RealFftPlan[T]{
+			length: length
+			plan:   plan
+		}
+	} $else $if T is f64 {
+		plan := vsl_fft.create_plan([]f64{len: length}) or {
+			return error('could not create an f64 FFT plan')
+		}
+		return RealFftPlan[T]{
+			length: length
+			plan:   plan
+		}
+	} $else {
+		return error('rfft supports f32 and f64 input tensors')
+	}
+}
+
+// forward computes a compact real FFT using the plan. The input length must
+// match the plan length; a new output tensor is allocated for each call.
+pub fn (plan &RealFftPlan[T]) forward(input &vtl.Tensor[T]) !&vtl.Tensor[complex.Complex] {
+	if plan.destroyed {
+		return error('FFT plan has been destroyed')
+	}
+	if input.rank() != 1 || input.size != plan.length {
+		return error('FFT input must be a vector of length ${plan.length}')
+	}
+	$if T is f32 {
+		return rfft_f32_with_plan(unsafe { &vtl.Tensor[f32](input) }, plan.plan)
+	} $else $if T is f64 {
+		return rfft_f64_with_plan(unsafe { &vtl.Tensor[f64](input) }, plan.plan)
+	} $else {
+		return error('rfft supports f32 and f64 input tensors')
+	}
+}
+
+// destroy releases the native PocketFFT plan. Repeated calls are safe.
+pub fn (mut plan RealFftPlan[T]) destroy() {
+	if !plan.destroyed {
+		vsl_fft.destroy_plan(plan.plan)
+		plan.destroyed = true
+	}
+}
 
 // rfft computes the one-dimensional real-input discrete Fourier transform.
 // It returns the non-negative frequencies as complex f64 values, matching the
@@ -15,9 +78,17 @@ pub fn rfft[T](input &vtl.Tensor[T]) !&vtl.Tensor[complex.Complex] {
 		return error('rfft requires at least one input value')
 	}
 	$if T is f32 {
-		return rfft_f32(unsafe { &vtl.Tensor[f32](input) })
+		mut plan := create_rfft_plan[f32](input.size)!
+		defer {
+			plan.destroy()
+		}
+		return plan.forward(unsafe { &vtl.Tensor[f32](input) })
 	} $else $if T is f64 {
-		return rfft_f64(unsafe { &vtl.Tensor[f64](input) })
+		mut plan := create_rfft_plan[f64](input.size)!
+		defer {
+			plan.destroy()
+		}
+		return plan.forward(unsafe { &vtl.Tensor[f64](input) })
 	} $else {
 		return error('rfft supports f32 and f64 input tensors')
 	}
@@ -103,7 +174,7 @@ pub fn rfftn[T](input &vtl.Tensor[T]) !&vtl.Tensor[complex.Complex] {
 				}
 			}
 		}
-		mut result := vtl.from_array[complex.Complex](compact, output_shape)!
+		mut result := tensor_from_owned[complex.Complex](compact, output_shape)!
 		for axis in 0 .. last_axis {
 			result = transform_complex_axis(result, axis, false)!
 		}
@@ -177,7 +248,7 @@ pub fn irfftn(input &vtl.Tensor[complex.Complex], shape []int) !&vtl.Tensor[f64]
 			output[row_major_index(index, shape)] = line[position] / f64(last_length)
 		}
 	}
-	return vtl.from_array[f64](output, shape)
+	return tensor_from_owned[f64](output, shape)
 }
 
 // irfft2 reconstructs a two-dimensional real tensor from rfft2 output.
@@ -221,27 +292,19 @@ pub fn irfft(input &vtl.Tensor[complex.Complex], length int) !&vtl.Tensor[f64] {
 	for i in 0 .. packed.len {
 		packed[i] /= f64(length)
 	}
-	return vtl.from_1d[f64](packed)
+	return tensor_from_owned[f64](packed, [packed.len])
 }
 
-fn rfft_f32(input &vtl.Tensor[f32]) !&vtl.Tensor[complex.Complex] {
+fn rfft_f32_with_plan(input &vtl.Tensor[f32], plan vsl_fft.Fftplan) !&vtl.Tensor[complex.Complex] {
 	mut packed := input.to_array()
-	plan := vsl_fft.create_plan(packed) or { return error('rfft could not create an FFT plan') }
-	defer {
-		vsl_fft.destroy_plan(plan)
-	}
 	if vsl_fft.forward_fft(plan, mut packed) != 0 {
 		return error('rfft backend failed to compute the forward transform')
 	}
 	return unpack_rfft_f32(packed)
 }
 
-fn rfft_f64(input &vtl.Tensor[f64]) !&vtl.Tensor[complex.Complex] {
+fn rfft_f64_with_plan(input &vtl.Tensor[f64], plan vsl_fft.Fftplan) !&vtl.Tensor[complex.Complex] {
 	mut packed := input.to_array()
-	plan := vsl_fft.create_plan(packed) or { return error('rfft could not create an FFT plan') }
-	defer {
-		vsl_fft.destroy_plan(plan)
-	}
 	if vsl_fft.forward_fft(plan, mut packed) != 0 {
 		return error('rfft backend failed to compute the forward transform')
 	}
@@ -316,7 +379,28 @@ fn transform_complex_axis(input &vtl.Tensor[complex.Complex], axis int, inverse 
 				line[2 * position + 1] / factor)
 		}
 	}
-	return vtl.from_array[complex.Complex](output, input.shape, memory: .row_major)
+	return tensor_from_owned[complex.Complex](output, input.shape)
+}
+
+fn tensor_from_owned[T](values []T, shape []int) !&vtl.Tensor[T] {
+	if product(shape) != values.len {
+		return error('FFT output data length does not match its shape')
+	}
+	mut strides := []int{len: shape.len}
+	mut stride := 1
+	for axis := shape.len - 1; axis >= 0; axis-- {
+		strides[axis] = stride
+		stride *= shape[axis]
+	}
+	return &vtl.Tensor[T]{
+		data:    &storage.CpuStorage[T]{
+			data: values
+		}
+		memory:  .row_major
+		size:    values.len
+		shape:   shape.clone()
+		strides: strides
+	}
 }
 
 fn row_major_index(index []int, shape []int) int {
@@ -353,7 +437,7 @@ fn unpack_rfft_f32(packed []f32) !&vtl.Tensor[complex.Complex] {
 	if packed.len % 2 == 0 && packed.len > 1 {
 		frequencies[packed.len / 2] = complex.complex(f64(packed[packed.len - 1]), 0)
 	}
-	return vtl.from_1d[complex.Complex](frequencies)
+	return tensor_from_owned[complex.Complex](frequencies, [frequencies.len])
 }
 
 fn unpack_rfft_f64(packed []f64) !&vtl.Tensor[complex.Complex] {
@@ -365,5 +449,5 @@ fn unpack_rfft_f64(packed []f64) !&vtl.Tensor[complex.Complex] {
 	if packed.len % 2 == 0 && packed.len > 1 {
 		frequencies[packed.len / 2] = complex.complex(packed[packed.len - 1], 0)
 	}
-	return vtl.from_1d[complex.Complex](frequencies)
+	return tensor_from_owned[complex.Complex](frequencies, [frequencies.len])
 }

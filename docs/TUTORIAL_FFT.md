@@ -16,6 +16,12 @@ restored := fft.irfft(spectrum, signal.size)!
 println(spectrum.shape) // [3], including DC and Nyquist bins
 println(restored) // [0.5, 0.5, 1, 2]
 
+mut plan := fft.create_rfft_plan[f64](signal.size)!
+defer {
+	plan.destroy()
+}
+repeated_spectrum := plan.forward(signal)!
+
 complex_signal := vtl.from_1d[complex.Complex]([
 	complex.complex(1, 0),
 	complex.complex(0, 0),

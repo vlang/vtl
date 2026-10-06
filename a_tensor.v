@@ -143,6 +143,9 @@ pub fn (t &Tensor[T]) is_contiguous() bool {
 // to_array returns the flatten representation of a tensor in a v array storing
 // elements of type T
 pub fn (t &Tensor[T]) to_array() []T {
+	if t.is_row_major_contiguous() {
+		return t.data.data[..t.size].clone()
+	}
 	mut arr := []T{cap: t.size}
 	mut iter := t.iterator()
 	for {

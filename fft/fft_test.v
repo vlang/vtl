@@ -47,6 +47,34 @@ fn test_rfft_accepts_f32_and_returns_f64_complex_values() ! {
 	assert math.abs(frequencies.get_nth(2).re) < 1e-6
 }
 
+fn test_rfft_plan_reuses_backend_and_validates_input_length() ! {
+	input := vtl.from_1d([f64(1), 0, -1, 0])!
+	mut plan := create_rfft_plan[f64](4)!
+	first := plan.forward(input)!
+	second := plan.forward(input)!
+	assert first.array_equal(second)
+
+	wrong_length := vtl.from_1d([f64(1), 2])!
+	_ := plan.forward(wrong_length) or {
+		assert err.msg().contains('length 4')
+		plan.destroy()
+		return
+	}
+	assert false, 'expected reusable plan to reject a different input length'
+}
+
+fn test_rfft_plan_rejects_use_after_destroy() ! {
+	input := vtl.from_1d([f64(1), 0])!
+	mut plan := create_rfft_plan[f64](2)!
+	plan.destroy()
+	plan.destroy()
+	_ := plan.forward(input) or {
+		assert err.msg().contains('destroyed')
+		return
+	}
+	assert false, 'expected a destroyed plan to reject transforms'
+}
+
 fn test_complex_fft_and_ifft_roundtrip() ! {
 	input := vtl.from_1d[complex.Complex]([
 		complex.complex(1, 0),

@@ -30,6 +30,17 @@ v run vtl/benchmarks/vs_numpy/autograd_bench.v
 python3 vtl/benchmarks/vs_numpy/pytorch_baseline.py autograd
 ```
 
+## Real FFT
+
+```bash
+v -prod run vtl/benchmarks/vs_numpy/fft_bench.v
+python3 vsl/benchmarks/fft_numpy_baseline.py
+```
+
+The FFT benchmark uses the same input sizes and iteration counts in VTL and
+NumPy. Install NumPy in an isolated environment if needed, for example with
+`uv run --with numpy python3 vsl/benchmarks/fft_numpy_baseline.py`.
+
 ## Notes
 
 - Use the same matrix sizes when comparing manually.
