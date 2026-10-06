@@ -46,6 +46,7 @@ pub:
 }
 
 // sum returns the sum of all elements of the given tensor
+@[direct_array_access]
 pub fn sum[T](t &vtl.Tensor[T]) T {
 	if is_flat_tensor_storage(t) {
 		mut total := vtl.cast[T](0)
@@ -88,6 +89,7 @@ pub fn sum_axis_with_dims[T](t &vtl.Tensor[T], data AxisData) T {
 }
 
 // prod returns the product of all elements of the given tensor
+@[direct_array_access]
 pub fn prod[T](t &vtl.Tensor[T]) T {
 	if is_flat_tensor_storage(t) {
 		mut product := vtl.cast[T](1)
