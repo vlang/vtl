@@ -18,8 +18,6 @@ fn main() {
 		tensor := vtl.from_array(values, [n])!
 		bench_stat('vtl_sum', tensor, false)
 		bench_stat('vtl_mean', tensor, true)
-		bench_iterator('iterator_sum', tensor, false)
-		bench_iterator('iterator_mean', tensor, true)
 	}
 	println('\nNumPy reference: numpy_stats_baseline.py')
 }
@@ -41,26 +39,4 @@ fn bench_stat(name string, tensor &vtl.Tensor[f64], use_mean bool) {
 		checksum += result
 	}
 	println('${name} | ${tensor.size} | ${bu.mean_time_ms(mut samples):.4f} | checksum=${checksum:.4f}')
-}
-
-fn bench_iterator(name string, tensor &vtl.Tensor[f64], use_mean bool) {
-	for _ in 0 .. 3 {
-		_ = iterator_reduction(tensor, use_mean)
-	}
-	mut samples := []f64{len: 10}
-	mut checksum := 0.0
-	for i in 0 .. samples.len {
-		started := time.sys_mono_now()
-		result := iterator_reduction(tensor, use_mean)
-		samples[i] = f64(time.sys_mono_now() - started) / 1_000_000.0
-		checksum += result
-	}
-	println('${name} | ${tensor.size} | ${bu.mean_time_ms(mut samples):.4f} | checksum=${checksum:.4f}')
-}
-
-fn iterator_reduction(tensor &vtl.Tensor[f64], use_mean bool) f64 {
-	value := tensor.reduce(0.0, fn (acc f64, item f64, _ []int) f64 {
-		return acc + item
-	})
-	return if use_mean { value / f64(tensor.size) } else { value }
 }
