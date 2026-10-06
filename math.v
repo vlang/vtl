@@ -67,6 +67,45 @@ pub fn (t &Tensor[T]) clip[T](min_value T, max_value T) !&Tensor[T] {
 	})
 }
 
+// clip_tensor clamps values using broadcastable lower and upper bounds. It
+// computes the result in one pass so callers do not need separate maximum and
+// minimum tensors or intermediate results.
+pub fn clip_tensor[T](t &Tensor[T], lower &Tensor[T], upper &Tensor[T]) !&Tensor[T] {
+	shape := broadcast_shapes(t.shape, lower.shape, upper.shape)
+	values := t.broadcast_to(shape)!
+	lower_values := lower.broadcast_to(shape)!
+	upper_values := upper.broadcast_to(shape)!
+	mut value_iter := values.iterator[T]()
+	mut lower_iter := lower_values.iterator[T]()
+	mut upper_iter := upper_values.iterator[T]()
+	mut result := empty[T](shape, memory: .row_major)
+	for {
+		value, index := value_iter.next() or { break }
+		min_value, _ := lower_iter.next() or { break }
+		max_value, _ := upper_iter.next() or { break }
+		if min_value > max_value {
+			return error('clip_tensor lower bound exceeds upper bound at ${index}')
+		}
+		$if T is f32 || T is f64 {
+			if math.is_nan(f64(min_value)) || math.is_nan(f64(max_value)) {
+				return error('clip_tensor bounds must not be NaN at ${index}')
+			}
+			if math.is_nan(f64(value)) {
+				result.set(index, value)
+				continue
+			}
+		}
+		result.set(index, if value < min_value {
+			min_value
+		} else if value > max_value {
+			max_value
+		} else {
+			value
+		})
+	}
+	return result
+}
+
 // abs returns the elementwise abs of an tensor
 
 // abs exposes this operation as part of the public API.
