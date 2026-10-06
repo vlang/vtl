@@ -125,3 +125,72 @@ pub fn tile[T](t &Tensor[T], reps []int) !&Tensor[T] {
 	}
 	return result
 }
+
+// rot90 rotates a tensor counterclockwise by k quarter-turns in its first two
+// dimensions, matching NumPy's default axes=(0, 1).
+pub fn rot90[T](t &Tensor[T]) !&Tensor[T] {
+	return rot90_axes[T](t, 1, [0, 1])
+}
+
+// rot90_k rotates in the first two dimensions by k counterclockwise quarter-turns.
+pub fn rot90_k[T](t &Tensor[T], k int) !&Tensor[T] {
+	return rot90_axes[T](t, k, [0, 1])
+}
+
+// rot90_axes rotates counterclockwise in the plane defined by two distinct axes.
+pub fn rot90_axes[T](t &Tensor[T], k int, axes []int) !&Tensor[T] {
+	if t.rank() < 2 {
+		return error('rot90: tensor must have at least two dimensions')
+	}
+	if axes.len != 2 {
+		return error('rot90: exactly two axes are required')
+	}
+	mut axis0 := axes[0]
+	mut axis1 := axes[1]
+	if axis0 < 0 {
+		axis0 += t.rank()
+	}
+	if axis1 < 0 {
+		axis1 += t.rank()
+	}
+	if axis0 < 0 || axis0 >= t.rank() || axis1 < 0 || axis1 >= t.rank() {
+		return error('rot90: axes ${axes} out of bounds for tensor with ${t.rank()} dimensions')
+	}
+	if axis0 == axis1 {
+		return error('rot90: axes must be different')
+	}
+	turns := ((k % 4) + 4) % 4
+	mut out_shape := t.shape.clone()
+	if turns % 2 == 1 {
+		out_shape[axis0] = t.shape[axis1]
+		out_shape[axis1] = t.shape[axis0]
+	}
+	mut result := empty[T](out_shape, memory: t.memory)
+	mut output_index := []int{len: t.rank()}
+	mut source_index := []int{len: t.rank()}
+	for linear in 0 .. result.size {
+		mut remainder := linear
+		for dim := t.rank() - 1; dim >= 0; dim-- {
+			output_index[dim] = remainder % out_shape[dim]
+			remainder /= out_shape[dim]
+			source_index[dim] = output_index[dim]
+		}
+		match turns {
+			1 {
+				source_index[axis0] = output_index[axis1]
+				source_index[axis1] = t.shape[axis1] - 1 - output_index[axis0]
+			}
+			2 {
+				source_index[axis0] = t.shape[axis0] - 1 - output_index[axis0]
+				source_index[axis1] = t.shape[axis1] - 1 - output_index[axis1]
+			}
+			3 {
+				source_index[axis0] = t.shape[axis0] - 1 - output_index[axis1]
+				source_index[axis1] = output_index[axis0]
+			}
+			else {}
+		}
+		result.set_nth(linear, t.get(source_index))
+	}
+	return result
+}

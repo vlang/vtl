@@ -16,3 +16,5 @@ to reverse every dimension, or pass one or more positive or negative axes.
 `vtl.repeat` repeats values in flattened order, while `vtl.repeat_axis` preserves
 the tensor rank and repeats each value along the requested axis.
 `vtl.tile` repeats whole blocks and aligns repetition dimensions from the right.
+`vtl.rot90` rotates the first two dimensions; use `vtl.rot90_k` for a chosen
+number of quarter turns or `vtl.rot90_axes` to select another plane.
