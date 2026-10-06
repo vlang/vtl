@@ -60,8 +60,7 @@ pub fn sum[T](t &vtl.Tensor[T]) T {
 }
 
 fn is_flat_tensor_storage[T](t &vtl.Tensor[T]) bool {
-	return t.data.data.len == t.size
-		&& (t.is_row_major_contiguous() || t.is_col_major_contiguous())
+	return t.data.data.len == t.size && t.is_row_major_contiguous()
 }
 
 // sum_axis returns the sum of a given Tensor along a provided

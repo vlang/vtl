@@ -362,6 +362,11 @@ fn test_sum() {
 	assert tst_res(o.str(), '150.832')
 }
 
+fn test_sum_preserves_logical_order_for_column_major_views() {
+	values := vtl.from_2d([[1e16, 1.0], [-1e16, 1.0]])!.transpose([1, 0])!
+	assert sum(values) == 2.0
+}
+
 fn test_prod() {
 	// Tests were also verified on Wolfram Alpha
 	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)])!
