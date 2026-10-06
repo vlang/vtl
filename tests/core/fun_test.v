@@ -24,6 +24,23 @@ fn test_map() {
 	assert d.array_equal(expected)
 }
 
+fn test_map_values_and_map_pair_values() ! {
+	a := vtl.from_2d([[1, 2], [3, 4]])!
+	doubled := a.map_values(fn (value int) int { return value * 2 })
+	expected_doubled := vtl.from_2d([[2, 4], [6, 8]])!
+	assert doubled.array_equal(expected_doubled)
+
+	b := vtl.from_1d([10, 20])!
+	summed := a.map_pair_values(b, fn (x int, y int) int { return x + y })!
+	expected_sum := vtl.from_2d([[11, 22], [13, 24]])!
+	assert summed.array_equal(expected_sum)
+
+	transposed := a.transpose([1, 0])!
+	incremented := transposed.map_values(fn (value int) int { return value + 1 })
+	expected_transposed := vtl.from_2d([[2, 4], [3, 5]])!
+	assert incremented.array_equal(expected_transposed)
+}
+
 fn test_reduce() {
 	a := vtl.from_1d([1, 2, 3, 4])!
 	b := a.reduce(0, fn (acc int, x int, i []int) int {
