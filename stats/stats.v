@@ -78,14 +78,6 @@ pub fn sum_axis_with_dims[T](t &vtl.Tensor[T], data AxisData) T {
 
 // prod returns the product of all elements of the given tensor
 pub fn prod[T](t &vtl.Tensor[T]) T {
-	/*
-	If the tensor is empty, his product is zero
-	We are returning it right way otherwise it will be set to 1
-	*/
-	if t.size == 0 {
-		return vtl.cast[T](0)
-	}
-
 	return t.reduce(vtl.cast[T](1), fn [T](acc T, val T, i []int) T {
 		return acc * val
 	})

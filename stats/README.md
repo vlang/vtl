@@ -6,6 +6,9 @@ standard deviation, extrema and indices, covariance, quantiles, skewness,
 kurtosis, and lag-one autocorrelation. Axis helpers are also available for
 selected reductions.
 
+`prod` follows the multiplicative identity convention: an empty input reduces
+to `1`, while an empty sum reduces to `0`.
+
 `histogram(data, bins)` infers a finite range from any numeric tensor and
 returns a `Histogram` with `counts` and `bin_edges`. Empty input uses `[0, 1]`;
 constant input expands by `0.5` at each end. `histogram_range(data, bins,

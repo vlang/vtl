@@ -396,5 +396,5 @@ fn test_passing_empty() {
 	assert max(data) == f64(0)
 	assert range(data) == f64(0)
 	assert sum(data) == f64(0)
-	assert prod(data) == f64(0)
+	assert prod(data) == f64(1)
 }
