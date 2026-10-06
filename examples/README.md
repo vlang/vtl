@@ -25,6 +25,7 @@ CIFAR examples for CI-safe checks.
 | [vector_norm](./vector_norm) | Compute stable p-norms globally and along an axis | `v run vtl/examples/vector_norm/main.v` |
 | [fft_frequency](./fft_frequency) | Create FFT frequency bins and center a spectrum | `v run vtl/examples/fft_frequency/main.v` |
 | [covariance_correlation](./covariance_correlation) | Compute sample covariance and Pearson correlation matrices | `v run vtl/examples/covariance_correlation/main.v` |
+| [histogram](./histogram) | Count values in NumPy-style evenly spaced bins | `v run vtl/examples/histogram/main.v` |
 
 ## Neural networks
 
