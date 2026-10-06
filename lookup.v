@@ -67,11 +67,7 @@ pub fn argwhere[T](t &Tensor[T]) !&Tensor[int] {
 		if !td[T](t.get_nth(flat_index)).bool() {
 			continue
 		}
-		mut remaining := flat_index
-		for dim := t.rank() - 1; dim >= 0; dim-- {
-			index[dim] = remaining % t.shape[dim]
-			remaining /= t.shape[dim]
-		}
+		decode_flat_coordinate(flat_index, t.shape, mut index)
 		coordinates << index
 		matches++
 	}
@@ -82,22 +78,36 @@ pub fn argwhere[T](t &Tensor[T]) !&Tensor[int] {
 // coordinate arrays. A nonzero scalar is treated as a one-dimensional value
 // with index zero, following NumPy's scalar promotion behavior.
 pub fn nonzero[T](t &Tensor[T]) ![]&Tensor[int] {
-	coordinates := argwhere[T](t)!
 	if t.rank() == 0 {
-		if coordinates.shape[0] == 0 {
+		if !td[T](t.get_nth(0)).bool() {
 			return [from_1d[int]([]int{})!]
 		}
 		return [from_1d[int]([0])!]
 	}
+	mut axis_values := [][]int{len: t.rank()}
+	mut coordinate := []int{len: t.rank()}
+	for flat_index in 0 .. t.size {
+		if !td[T](t.get_nth(flat_index)).bool() {
+			continue
+		}
+		decode_flat_coordinate(flat_index, t.shape, mut coordinate)
+		for axis, value in coordinate {
+			axis_values[axis] << value
+		}
+	}
 	mut indices := []&Tensor[int]{cap: t.rank()}
 	for axis in 0 .. t.rank() {
-		mut axis_indices := []int{len: coordinates.shape[0]}
-		for match_index in 0 .. coordinates.shape[0] {
-			axis_indices[match_index] = coordinates.get[int]([match_index, axis])
-		}
-		indices << from_1d[int](axis_indices)!
+		indices << from_1d[int](axis_values[axis])!
 	}
 	return indices
+}
+
+fn decode_flat_coordinate(flat_index int, shape []int, mut coordinate []int) {
+	mut remaining := flat_index
+	for dim := shape.len - 1; dim >= 0; dim-- {
+		coordinate[dim] = remaining % shape[dim]
+		remaining /= shape[dim]
+	}
 }
 
 // UniqueCounts contains sorted unique values and their occurrence counts.
