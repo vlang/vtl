@@ -18,8 +18,13 @@ fn main() {
 		bench_matmul(n, config)!
 	}
 	$if vsl_blas_cblas || vsl_blas_generic_cblas {
-		println('\nVTL f32 matmul (single-precision CBLAS sgemm)')
+		println('\nVTL f32 matmul (CBLAS sgemm)')
 		for n in [128, 256, 512, 1024, 2048] {
+			bench_matmul_f32(n, config)!
+		}
+	} $else {
+		println('\nVTL f32 matmul (pure-V sgemm)')
+		for n in [128, 256, 512] {
 			bench_matmul_f32(n, config)!
 		}
 	}
