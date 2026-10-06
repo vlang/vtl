@@ -28,3 +28,20 @@ assert values.to_array() == [1, 20, 3, 40, 5, 6]
 for a repeated index wins. Both update operations validate all indices before
 mutating the target. Indexed writes currently operate on tensors directly and
 are not autograd operations.
+
+Boolean masks passed to `masked_select` and `masked_fill` may broadcast to the
+tensor shape. `masked_select` returns selected elements as a one-dimensional
+copy; `masked_fill` returns a new tensor and leaves the input unchanged.
+
+```v
+import vtl
+
+values := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
+column_mask := vtl.from_1d([false, true, true])!
+selected := values.masked_select(column_mask)!
+assert selected.to_array() == [2, 3, 5, 6]
+
+row_mask := vtl.from_array([true, false], [2, 1])!
+filled := values.masked_fill(row_mask, -1)!
+assert filled.to_array() == [-1, -1, -1, 4, 5, 6]
+```
