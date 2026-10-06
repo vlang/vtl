@@ -65,6 +65,18 @@ pub fn (mut generator RandomGenerator) bernoulli(probability f64, shape []int) !
 	return result
 }
 
+// geometric returns the number of Bernoulli trials needed for the first
+// success, independently sampled from this generator. Results start at 1.
+pub fn (mut generator RandomGenerator) geometric(probability f64, shape []int) !&Tensor[int] {
+	validate_geometric_probability(probability)!
+	mut result := zeros[int](shape, TensorData{})
+	for i in 0 .. result.size {
+		u := generator.rng.f64_in_range(0, 1)!
+		result.set_nth(i, geometric_sample(probability, u))
+	}
+	return result
+}
+
 // bernoulli returns a tensor of bernoulli random variables.
 pub fn bernoulli[T](prob f64, shape []int, params TensorData) &Tensor[T] {
 	mut t := zeros[T](shape, params)
@@ -99,6 +111,32 @@ pub fn exponential[T](lambda f64, shape []int, params TensorData) &Tensor[T] {
 		t.set(i, rand_value)
 	}
 	return t
+}
+
+// geometric returns the number of Bernoulli trials needed for the first
+// success, sampled from V's global random stream. Results start at 1.
+pub fn geometric(probability f64, shape []int, params TensorData) !&Tensor[int] {
+	validate_geometric_probability(probability)!
+	mut result := zeros[int](shape, params)
+	for i in 0 .. result.size {
+		u := rand.f64_in_range(0, 1)!
+		result.set_nth(i, geometric_sample(probability, u))
+	}
+	return result
+}
+
+fn validate_geometric_probability(probability f64) ! {
+	if probability <= 0 || probability > 1 || math.is_nan(probability) || math.is_inf(probability,
+		0) {
+		return error('geometric: probability must be finite and in (0, 1]')
+	}
+}
+
+fn geometric_sample(probability f64, uniform_value f64) int {
+	if probability == 1 {
+		return 1
+	}
+	return int(math.floor(math.log(1 - uniform_value) / math.log(1 - probability))) + 1
 }
 
 // NormalTensorData is the data for a normal distribution.

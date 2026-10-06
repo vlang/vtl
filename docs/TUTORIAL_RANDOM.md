@@ -37,15 +37,17 @@ mut training_rng := vtl.new_random_generator(42)
 mut validation_rng := vtl.new_random_generator(2026)
 training_noise := training_rng.normal([128, 32], vtl.NormalTensorData{sigma: 0.1})!
 validation_mask := validation_rng.bernoulli(0.8, [128])!
+waiting_times := validation_rng.geometric(0.1, [128])!
 ```
 
 `uniform(minimum, maximum, shape)` produces `f64` samples in the half-open
 range `[minimum, maximum)`. `normal(shape, params)` produces `f64` samples, and
-`bernoulli(probability, shape)` produces boolean samples. These methods return
-errors for invalid distribution parameters. Streams are reproducible with the
-same V/VTL versions, seed, and sequence of calls; cross-version compatibility
-is not guaranteed. A complete data-pipeline example is available at
-[`examples/random_generator/main.v`](../examples/random_generator/main.v).
+`bernoulli(probability, shape)` produces boolean samples. `geometric(probability,
+shape)` returns the positive number of Bernoulli trials up to the first success.
+These methods return errors for invalid distribution parameters. Streams are
+reproducible with the same V/VTL versions, seed, and sequence of calls;
+cross-version compatibility is not guaranteed. See the complete data-pipeline
+example in [`examples/random_generator/main.v`](../examples/random_generator/main.v).
 
-VTL currently provides uniform range, normal, Bernoulli, binomial, and
-exponential tensor constructors. See [`rand.v`](../rand.v) for their API.
+VTL currently provides uniform range, normal, Bernoulli, binomial, geometric,
+and exponential tensor constructors. See [`rand.v`](../rand.v) for their API.

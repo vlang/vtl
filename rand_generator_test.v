@@ -33,6 +33,24 @@ fn test_random_generator_supports_normal_and_bernoulli_distributions() ! {
 	generator.free()
 }
 
+fn test_random_generator_supports_geometric_sampling() ! {
+	mut generator := new_random_generator(987)
+	values := generator.geometric(0.25, [64])!
+	assert values.shape == [64]
+	for i in 0 .. values.size {
+		assert values.get_nth(i) > 0
+	}
+	one_trial := generator.geometric(1.0, [4])!
+	for i in 0 .. one_trial.size {
+		assert one_trial.get_nth(i) == 1
+	}
+	mut replay := new_random_generator(987)
+	replayed := replay.geometric(0.25, [64])!
+	assert values.array_equal(replayed)
+	generator.free()
+	replay.free()
+}
+
 fn test_random_generator_rejects_invalid_distribution_parameters() {
 	mut generator := new_random_generator(1)
 	if _ := generator.uniform(1.0, 0.0, [2]) {
@@ -43,6 +61,9 @@ fn test_random_generator_rejects_invalid_distribution_parameters() {
 	}
 	if _ := generator.bernoulli(1.1, [2]) {
 		assert false, 'bernoulli must reject probabilities above one'
+	}
+	if _ := generator.geometric(0.0, [2]) {
+		assert false, 'geometric must reject a zero probability'
 	}
 	generator.free()
 }
