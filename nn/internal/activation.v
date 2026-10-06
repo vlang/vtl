@@ -33,7 +33,7 @@ pub fn deriv_tanh[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tenso
 // sigmoid exposes this operation as part of the public API.
 @[inline]
 pub fn sigmoid[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
-	return x.map(fn [T](val T, i []int) T {
+	return x.map_values(fn [T](val T) T {
 		// correct sigmoid: 1 / (1 + exp(-x))
 		return vtl.cast[T](1) / (vtl.cast[T](1) + vtl.cast[T](math.exp(-vtl.cast[f64](val))))
 	})
@@ -61,7 +61,7 @@ pub fn deriv_sigmoid[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Te
 // relu exposes this operation as part of the public API.
 @[inline]
 pub fn relu[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
-	return x.map(fn [T](val T, i []int) T {
+	return x.map_values(fn [T](val T) T {
 		if val < 0 {
 			return vtl.cast[T](0)
 		}
@@ -93,7 +93,7 @@ pub fn deriv_relu[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tenso
 // leaky_relu exposes this operation as part of the public API.
 @[inline]
 pub fn leaky_relu[T](x &vtl.Tensor[T], alpha T) &vtl.Tensor[T] {
-	return x.map(fn [alpha] [T](val T, i []int) T {
+	return x.map_values(fn [alpha] [T](val T) T {
 		if val < 0 {
 			return alpha * val
 		}
@@ -125,7 +125,7 @@ pub fn deriv_leaky_relu[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T], alpha
 // elu exposes this operation as part of the public API.
 @[inline]
 pub fn elu[T](x &vtl.Tensor[T], alpha T) &vtl.Tensor[T] {
-	return x.map(fn [alpha] [T](val T, i []int) T {
+	return x.map_values(fn [alpha] [T](val T) T {
 		if val < 0 {
 			return alpha * (vtl.cast[T](math.exp(vtl.cast[f64](val))) - vtl.cast[T](1))
 		}
@@ -160,7 +160,7 @@ pub fn deriv_elu[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T], alpha T) !&v
 // gelu exposes this operation as part of the public API.
 @[inline]
 pub fn gelu[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
-	return x.map(fn [T](val T, i []int) T {
+	return x.map_values(fn [T](val T) T {
 		value := vtl.cast[f64](val)
 		tanh_arg := 0.7978845608028654 * (value + 0.044715 * value * value * value)
 		return vtl.cast[T](0.5 * value * (1.0 + math.tanh(tanh_arg)))
@@ -194,7 +194,7 @@ pub fn deriv_gelu[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tenso
 // swish exposes this operation as part of the public API.
 @[inline]
 pub fn swish[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
-	return x.map(fn [T](val T, i []int) T {
+	return x.map_values(fn [T](val T) T {
 		one := vtl.cast[T](1)
 		exp_neg := vtl.cast[T](math.exp(-vtl.cast[f64](val)))
 		sig := one / (one + exp_neg)
@@ -232,7 +232,7 @@ pub fn deriv_swish[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tens
 // mish exposes this operation as part of the public API.
 @[inline]
 pub fn mish[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
-	return x.map(fn [T](val T, i []int) T {
+	return x.map_values(fn [T](val T) T {
 		value := vtl.cast[f64](val)
 		softplus_value := if value > 0 {
 			value + math.log1p(math.exp(-value))
@@ -273,7 +273,7 @@ pub fn deriv_mish[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tenso
 // softplus computes log(1 + exp(x)) using a stable formulation.
 @[inline]
 pub fn softplus[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
-	return x.map(fn [T](val T, _ []int) T {
+	return x.map_values(fn [T](val T) T {
 		v := vtl.cast[f64](val)
 		return if v > 0 {
 			vtl.cast[T](v + math.log1p(math.exp(-v)))
@@ -304,7 +304,7 @@ const selu_scale = 1.0507009873554805
 // selu applies the scaled exponential linear unit.
 @[inline]
 pub fn selu[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
-	return x.map(fn [T](val T, _ []int) T {
+	return x.map_values(fn [T](val T) T {
 		if val > vtl.cast[T](0) {
 			return vtl.cast[T](selu_scale) * val
 		}
@@ -328,7 +328,7 @@ pub fn deriv_selu[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tenso
 // hardswish applies x * clamp(x + 3, 0, 6) / 6.
 @[inline]
 pub fn hardswish[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
-	return x.map(fn [T](val T, _ []int) T {
+	return x.map_values(fn [T](val T) T {
 		v := vtl.cast[f64](val)
 		if v != v {
 			return val
