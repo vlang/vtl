@@ -37,6 +37,31 @@ fn test_rfft_and_irfft_handle_odd_lengths() ! {
 	}
 }
 
+fn test_rfft_axis_and_irfft_axis_roundtrip_even_odd_and_f32() ! {
+	input := vtl.from_array([f64(0), 1, 0, 0], [2, 2])!
+	columns := rfft_axis(input, -1)!
+	assert columns.shape == [2, 2]
+	assert math.abs(columns.get([0, 0]).re - 1) < 1e-12
+	assert math.abs(columns.get([0, 1]).re + 1) < 1e-12
+	restored := irfft_axis(columns, 1, 2)!
+	assert restored.shape == input.shape
+	for i in 0 .. input.size {
+		assert math.abs(restored.get_nth(i) - input.get_nth(i)) < 1e-12
+	}
+	odd := vtl.from_array([f64(1), 2, 3, 4, 5, 6], [2, 3])!
+	odd_spectrum := rfft_axis(odd, 1)!
+	assert odd_spectrum.shape == [2, 2]
+	odd_restored := irfft_axis(odd_spectrum, -1, 3)!
+	for i in 0 .. odd.size {
+		assert math.abs(odd_restored.get_nth(i) - odd.get_nth(i)) < 1e-12
+	}
+	f32_input := vtl.from_2d([[f32(1), 0], [0, 0]])!
+	f32_spectrum := rfft_axis(f32_input, 0)!
+	assert f32_spectrum.shape == [2, 2]
+	assert math.abs(f32_spectrum.get([0, 0]).re - 1) < 1e-6
+	assert math.abs(f32_spectrum.get([1, 0]).re - 1) < 1e-6
+}
+
 fn test_rfft_accepts_f32_and_returns_f64_complex_values() ! {
 	input := vtl.from_1d([f32(1), 0, -1, 0])!
 

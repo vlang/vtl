@@ -195,6 +195,54 @@ pub fn rfft[T](input &vtl.Tensor[T]) !&vtl.Tensor[complex.Complex] {
 	}
 }
 
+// rfft_axis computes a compact real-input Fourier transform along one axis.
+// The selected dimension becomes floor(n/2)+1; other axes are unchanged.
+pub fn rfft_axis[T](input &vtl.Tensor[T], axis int) !&vtl.Tensor[complex.Complex] {
+	axis_index := normalize_fft_axis(input.rank(), axis)!
+	if input.size == 0 {
+		return error('rfft_axis requires a non-empty tensor')
+	}
+	$if T is f32 || T is f64 {
+		axis_length := input.shape[axis_index]
+		frequency_count := axis_length / 2 + 1
+		mut output_shape := input.shape.clone()
+		output_shape[axis_index] = frequency_count
+		mut output := []complex.Complex{len: product(output_shape)}
+		mut line := []T{len: axis_length}
+		mut index := []int{len: input.rank()}
+		plan := vsl_fft.create_plan(line) or { return error('rfft_axis could not create an FFT plan') }
+		defer {
+			vsl_fft.destroy_plan(plan)
+		}
+		line_count := input.size / axis_length
+		for line_index in 0 .. line_count {
+			decode_fft_axis_line(line_index, input.shape, axis_index, mut index)
+			for position in 0 .. axis_length {
+				index[axis_index] = position
+				line[position] = T(input.get(index))
+			}
+			if vsl_fft.forward_fft(plan, mut line) != 0 {
+				return error('rfft_axis backend failed to compute the forward transform')
+			}
+			for frequency in 0 .. frequency_count {
+				index[axis_index] = frequency
+				output_index := row_major_index(index, output_shape)
+				if frequency == 0 {
+					output[output_index] = complex.complex(f64(line[0]), 0)
+				} else if axis_length % 2 == 0 && frequency == axis_length / 2 {
+					output[output_index] = complex.complex(f64(line[axis_length - 1]), 0)
+				} else {
+					output[output_index] = complex.complex(f64(line[2 * frequency - 1]),
+						f64(line[2 * frequency]))
+				}
+			}
+		}
+		return tensor_from_owned[complex.Complex](output, output_shape)
+	} $else {
+		return error('rfft_axis supports f32 and f64 input tensors')
+	}
+}
+
 // fft computes a one-dimensional discrete Fourier transform of complex f64
 // values, returning all positive and negative frequencies in native order.
 pub fn fft(input &vtl.Tensor[complex.Complex]) !&vtl.Tensor[complex.Complex] {
@@ -409,6 +457,55 @@ pub fn irfft(input &vtl.Tensor[complex.Complex], length int) !&vtl.Tensor[f64] {
 	return tensor_from_owned[f64](packed, [packed.len])
 }
 
+// irfft_axis reconstructs a real tensor from compact frequencies along one
+// axis. `length` is the original real axis length, including for odd lengths.
+pub fn irfft_axis(input &vtl.Tensor[complex.Complex], axis int, length int) !&vtl.Tensor[f64] {
+	axis_index := normalize_fft_axis(input.rank(), axis)!
+	if length <= 0 {
+		return error('irfft_axis length must be positive')
+	}
+	if input.size == 0 {
+		return error('irfft_axis requires a non-empty spectrum')
+	}
+	expected_bins := length / 2 + 1
+	if input.shape[axis_index] != expected_bins {
+		return error('irfft_axis expects ${expected_bins} frequency bins on axis ${axis_index}, got ${input.shape[axis_index]}')
+	}
+	mut output_shape := input.shape.clone()
+	output_shape[axis_index] = length
+	mut output := []f64{len: product(output_shape)}
+	mut line := []f64{len: length}
+	mut index := []int{len: input.rank()}
+	plan := vsl_fft.create_plan(line) or { return error('irfft_axis could not create an FFT plan') }
+	defer {
+		vsl_fft.destroy_plan(plan)
+	}
+	line_count := output.len / length
+	for line_index in 0 .. line_count {
+		decode_fft_axis_line(line_index, output_shape, axis_index, mut index)
+		index[axis_index] = 0
+		line[0] = input.get(index).re
+		for frequency in 1 .. (length + 1) / 2 {
+			index[axis_index] = frequency
+			value := input.get(index)
+			line[2 * frequency - 1] = value.re
+			line[2 * frequency] = value.im
+		}
+		if length % 2 == 0 && length > 1 {
+			index[axis_index] = length / 2
+			line[length - 1] = input.get(index).re
+		}
+		if vsl_fft.backward_fft(plan, mut line) != 0 {
+			return error('irfft_axis backend failed to compute the inverse transform')
+		}
+		for position in 0 .. length {
+			index[axis_index] = position
+			output[row_major_index(index, output_shape)] = line[position] / f64(length)
+		}
+	}
+	return tensor_from_owned[f64](output, output_shape)
+}
+
 fn rfft_f32_with_plan(input &vtl.Tensor[f32], plan vsl_fft.Fftplan, mut packed []f32) !&vtl.Tensor[complex.Complex] {
 	if input.is_row_major_contiguous() {
 		unsafe { C.memcpy(packed.data, input.data.data.data, input.size * sizeof(f32)) }
@@ -456,6 +553,17 @@ fn normalize_fft_axis(rank int, axis int) !int {
 		return error('FFT axis ${axis} out of bounds for rank ${rank}')
 	}
 	return normalized_axis
+}
+
+fn decode_fft_axis_line(line_index int, shape []int, axis int, mut index []int) {
+	mut remainder := line_index
+	for dimension := shape.len - 1; dimension >= 0; dimension-- {
+		if dimension == axis {
+			continue
+		}
+		index[dimension] = remainder % shape[dimension]
+		remainder /= shape[dimension]
+	}
 }
 
 fn multidimensional_fft(input &vtl.Tensor[complex.Complex], inverse bool) !&vtl.Tensor[complex.Complex] {

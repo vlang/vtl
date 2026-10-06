@@ -45,6 +45,8 @@ column_restored := fft.ifft_axis(column_spectrum, 1)!
 real_image := vtl.from_array([f64(1), 0, 0, 0], [2, 2])!
 real_spectrum := fft.rfft2[f64](real_image)!
 real_restored := fft.irfft2(real_spectrum, real_image.shape)!
+row_spectrum := fft.rfft_axis(real_image, 1)!
+row_restored := fft.irfft_axis(row_spectrum, 1, real_image.shape[1])!
 ```
 
 `RealFftPlan.forward` reuses a per-plan work buffer and therefore takes a
@@ -68,3 +70,6 @@ length and finite, non-zero sample spacing.
 
 `fft_axis` and `ifft_axis` transform just one axis of a complex tensor and
 preserve its shape. Negative axis indices count backward from the final axis.
+`rfft_axis` and `irfft_axis` do the same for a real tensor and its compact
+complex spectrum. Pass the original real axis length to `irfft_axis` so odd
+and even inputs can be distinguished.
