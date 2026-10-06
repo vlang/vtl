@@ -234,10 +234,10 @@ fn filter_shape_not_strides(shape []int, strides []int) !([]int, []int) {
 // pad_with_zeros pads a shape with zeros to support an indexing
 // operation
 fn pad_with_zeros(pad []int, ndims int) []int {
-	diff := ndims - pad.len
+	pad_delta := ndims - pad.len
 	mut newpad := pad.clone()
 	mut i := 0
-	for i < diff {
+	for i < pad_delta {
 		newpad << 0
 		i++
 	}
@@ -248,8 +248,8 @@ fn pad_with_zeros(pad []int, ndims int) []int {
 // an indexing operation
 fn pad_with_max(pad []int, shape []int, ndims int) []int {
 	mut newpad := pad.clone()
-	diff := ndims - pad.len
-	if diff > 0 {
+	pad_delta := ndims - pad.len
+	if pad_delta > 0 {
 		newpad << shape[pad.len..]
 	}
 	return newpad
