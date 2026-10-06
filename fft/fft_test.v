@@ -81,6 +81,61 @@ fn test_complex_fft_and_ifft_roundtrip() ! {
 	}
 }
 
+fn test_complex_fft2_matches_expected_bins_and_roundtrips() ! {
+	input := vtl.from_array[complex.Complex]([
+		complex.complex(0, 0),
+		complex.complex(1, 0),
+		complex.complex(0, 0),
+		complex.complex(0, 0),
+	], [2, 2])!
+
+	spectrum := fft2(input)!
+	assert spectrum.shape == [2, 2]
+	assert math.abs(spectrum.get([0, 0]).re - 1) < 1e-12
+	assert math.abs(spectrum.get([0, 1]).re + 1) < 1e-12
+	assert math.abs(spectrum.get([1, 0]).re - 1) < 1e-12
+	assert math.abs(spectrum.get([1, 1]).re + 1) < 1e-12
+	for i in 0 .. spectrum.size {
+		assert math.abs(spectrum.get_nth(i).im) < 1e-12
+	}
+
+	reconstructed := ifft2(spectrum)!
+	for i in 0 .. input.size {
+		assert math.abs(reconstructed.get_nth(i).re - input.get_nth(i).re) < 1e-12
+		assert math.abs(reconstructed.get_nth(i).im - input.get_nth(i).im) < 1e-12
+	}
+
+	general_spectrum := fftn(input)!
+	assert general_spectrum.shape == spectrum.shape
+	general_reconstructed := ifftn(general_spectrum)!
+	for i in 0 .. input.size {
+		assert math.abs(general_reconstructed.get_nth(i).re - input.get_nth(i).re) < 1e-12
+	}
+}
+
+fn test_complex_fft2_handles_rectangular_tensors() ! {
+	mut values := []complex.Complex{len: 6}
+	values[3] = complex.complex(1, 0)
+	input := vtl.from_array[complex.Complex](values, [2, 3])!
+	spectrum := fft2(input)!
+	assert spectrum.shape == [2, 3]
+	for column in 0 .. 3 {
+		assert math.abs(spectrum.get([0, column]).re - 1) < 1e-12
+		assert math.abs(spectrum.get([1, column]).re + 1) < 1e-12
+		assert math.abs(spectrum.get([0, column]).im) < 1e-12
+		assert math.abs(spectrum.get([1, column]).im) < 1e-12
+	}
+}
+
+fn test_fft2_rejects_wrong_rank() ! {
+	input := vtl.from_1d[complex.Complex]([complex.complex(1, 0)])!
+	_ := fft2(input) or {
+		assert err.msg().contains('two-dimensional')
+		return
+	}
+	assert false, 'expected fft2 to reject a vector'
+}
+
 fn test_rfft_rejects_non_vector_and_empty_input() ! {
 	matrix := vtl.ones[f64]([2, 2])
 
