@@ -62,13 +62,18 @@ pub fn count_nonzero_axis[T](t &Tensor[T], axis int, keepdims bool) !&Tensor[int
 pub fn argwhere[T](t &Tensor[T]) !&Tensor[int] {
 	mut coordinates := []int{}
 	mut matches := 0
+	mut index := []int{len: t.rank()}
 	for flat_index in 0 .. t.size {
-		if td[T](t.get_nth(flat_index)).bool() {
-			for coordinate in t.nth_index(flat_index) {
-				coordinates << coordinate
-			}
-			matches++
+		if !td[T](t.get_nth(flat_index)).bool() {
+			continue
 		}
+		mut remaining := flat_index
+		for dim := t.rank() - 1; dim >= 0; dim-- {
+			index[dim] = remaining % t.shape[dim]
+			remaining /= t.shape[dim]
+		}
+		coordinates << index
+		matches++
 	}
 	return from_array[int](coordinates, [matches, t.rank()])
 }
