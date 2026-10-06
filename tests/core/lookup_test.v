@@ -187,4 +187,5 @@ fn test_unique_counts_reports_sorted_occurrences() ! {
 	result := vtl.unique_counts(tensor)!
 	assert result.values.to_array() == [1, 2, 4]
 	assert result.counts.to_array() == [1, 2, 3]
+	assert vtl.unique_inverse(tensor)!.to_array() == [2, 1, 2, 0, 1, 2]
 }

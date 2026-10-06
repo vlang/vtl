@@ -62,6 +62,29 @@ pub fn unique_counts[T](t &Tensor[T]) !UniqueCounts[T] {
 	}
 }
 
+// unique_inverse returns the unique-value index for each flattened input
+// element. Apply it to `unique(t)` to reconstruct the input values.
+pub fn unique_inverse[T](t &Tensor[T]) !&Tensor[int] {
+	values, _ := sorted_unique_values_counts[T](t)!
+	mut inverse := []int{len: t.size}
+	for input_index in 0 .. t.size {
+		value := t.get_nth[T](input_index)
+		mut low := 0
+		mut high := values.len
+		for low < high {
+			mid := low + (high - low) / 2
+			comparison := compare_sort_values[T](values[mid], value)
+			if comparison < 0 {
+				low = mid + 1
+			} else {
+				high = mid
+			}
+		}
+		inverse[input_index] = low
+	}
+	return from_1d[int](inverse)
+}
+
 fn sorted_unique_values_counts[T](t &Tensor[T]) !([]T, []int) {
 	mut sorted := []T{len: t.size}
 	for i in 0 .. t.size {
