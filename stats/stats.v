@@ -267,10 +267,7 @@ pub fn population_variance_mean[T](t &vtl.Tensor[T], provided_mean T) T {
 	if t.size == 0 {
 		return vtl.cast[T](0)
 	}
-
-	return t.reduce(vtl.cast[T](0), fn [provided_mean] [T](acc T, val T, i []int) T {
-		return acc + math.pow(val - provided_mean, vtl.cast[T](2))
-	}) / vtl.cast[T](t.size)
+	return sum_squared_deviations[T](t, provided_mean) / vtl.cast[T](t.size)
 }
 
 // Measure of Dispersion / Spread
@@ -299,10 +296,23 @@ pub fn sample_variance_mean[T](t &vtl.Tensor[T], provided_mean T) T {
 	if t.size == 0 {
 		return vtl.cast[T](0)
 	}
+	return sum_squared_deviations[T](t, provided_mean) / vtl.cast[T](t.size - 1)
+}
 
-	return t.reduce(vtl.cast[T](0), fn [provided_mean] [T](acc T, val T, i []int) T {
-		return acc + math.pow(val - provided_mean, vtl.cast[T](2))
-	}) / vtl.cast[T](t.size - 1)
+@[direct_array_access]
+fn sum_squared_deviations[T](t &vtl.Tensor[T], provided_mean T) T {
+	if is_flat_tensor_storage(t) {
+		mut total := vtl.cast[T](0)
+		for value in t.data.data {
+			difference := value - provided_mean
+			total += difference * difference
+		}
+		return total
+	}
+	return t.reduce(vtl.cast[T](0), fn [provided_mean] [T](acc T, val T, _ []int) T {
+		difference := val - provided_mean
+		return acc + difference * difference
+	})
 }
 
 // Measure of Dispersion / Spread
@@ -427,10 +437,7 @@ pub fn tss_mean[T](t &vtl.Tensor[T], provided_mean T) T {
 	if t.size == 0 {
 		return vtl.cast[T](0)
 	}
-
-	return t.reduce(vtl.cast[T](0), fn [provided_mean] [T](acc T, val T, i []int) T {
-		return acc + math.pow(val - provided_mean, vtl.cast[T](2))
-	})
+	return sum_squared_deviations[T](t, provided_mean)
 }
 
 // Minimum of the given input array

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""NumPy reference for the VTL contiguous sum/mean benchmark."""
+"""NumPy reference for the VTL contiguous sum/mean/variance benchmark."""
 
 import time
 
@@ -9,7 +9,12 @@ import numpy as np
 def bench_stats() -> None:
     for n in (100_000, 1_000_000):
         values = (np.arange(n, dtype=np.float64) % 1000 + 1) / 1000.0
-        for name, operation in (("numpy_sum", np.sum), ("numpy_mean", np.mean)):
+        operations = (
+            ("numpy_sum", np.sum),
+            ("numpy_mean", np.mean),
+            ("numpy_variance", np.var),
+        )
+        for name, operation in operations:
             for _ in range(3):
                 operation(values)
             samples = []
