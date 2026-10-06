@@ -311,12 +311,23 @@ pub fn from_1d[T](arr []T, params TensorData) !&Tensor[T] {
 // from_2d exposes this operation as part of the public API.
 @[direct_array_access]
 pub fn from_2d[T](a [][]T, params TensorData) !&Tensor[T] {
-	mut arr := []T{cap: a.len * a[0].len}
+	if a.len == 0 {
+		return error('from_2d requires at least one row')
+	}
+	columns := a[0].len
+	mut arr := []T{cap: a.len * columns}
 	for i in 0 .. a.len {
-		for j in 0 .. a[0].len {
+		if a[i].len != columns {
+			return error('from_2d row ${i} has ${a[i].len} columns; expected ${columns}')
+		}
+		for j in 0 .. columns {
 			arr << a[i][j]
 		}
 	}
-	shape := [a.len, a[0].len]
-	return from_array[T](arr, shape, params)
+	shape := [a.len, columns]
+	row_major := from_array[T](arr, shape)!
+	if params.memory == .col_major {
+		return row_major.copy(.col_major)
+	}
+	return row_major
 }
