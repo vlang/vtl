@@ -37,6 +37,32 @@ pub fn inv[T](t &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 
 // matmul exposes this operation as part of the public API.
 pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	if a.rank() < 2 || b.rank() < 2 {
+		if a.rank() == 0 || b.rank() == 0 {
+			return error('Matrix multiplication requires tensors with rank at least one')
+		}
+		a_is_vector := a.rank() == 1
+		b_is_vector := b.rank() == 1
+		mut a_shape := a.shape.clone()
+		mut b_shape := b.shape.clone()
+		if a_is_vector {
+			a_shape = [1, a.shape[0]]
+		}
+		if b_is_vector {
+			b_shape = [b.shape[0], 1]
+		}
+		promoted_a := a.reshape(a_shape)!
+		promoted_b := b.reshape(b_shape)!
+		result := matmul[T](promoted_a, promoted_b)!
+		mut result_shape := result.shape.clone()
+		if a_is_vector {
+			result_shape.delete(result_shape.len - 2)
+		}
+		if b_is_vector {
+			result_shape.delete(result_shape.len - 1)
+		}
+		return result.reshape(result_shape)
+	}
 	if a.rank() > 2 || b.rank() > 2 {
 		if a.rank() < 2 || b.rank() < 2 || a.shape[a.rank() - 1] != b.shape[b.rank() - 2] {
 			return error('Invalid shapes for matrix multiplication ${a.shape} and ${b.shape}')

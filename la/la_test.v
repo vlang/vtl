@@ -81,8 +81,40 @@ fn test_matmul_rejects_incompatible_batch_dimensions() {
 	}
 }
 
-fn test_matmul_3() {
-	a := vtl.from_2d([[1.0, 0], [0.0, 1]])!
+fn test_matmul_vector_vector_returns_scalar() {
+	a := vtl.from_1d([1.0, 2, 3])!
+	b := vtl.from_1d([4.0, 5, 6])!
+	result := matmul(a, b)!
+	assert result.rank() == 0
+	assert result.get_nth[f64](0) == 32.0
+}
+
+fn test_matmul_matrix_vector_returns_vector() {
+	a := vtl.from_2d([[1.0, 2.0], [3.0, 4.0]])!
+	b := vtl.from_1d([5.0, 6.0])!
+	result := matmul(a, b)!
+	assert result.shape == [2]
+	assert result.to_array() == [17.0, 39.0]
+}
+
+fn test_matmul_vector_matrix_returns_vector() {
+	a := vtl.from_1d([1.0, 2.0])!
+	b := vtl.from_2d([[3.0, 4.0], [5.0, 6.0]])!
+	result := matmul(a, b)!
+	assert result.shape == [2]
+	assert result.to_array() == [13.0, 16.0]
+}
+
+fn test_matmul_batched_matrix_vector_returns_batched_vectors() {
+	a := vtl.seq[f64](12).reshape([2, 2, 3])!
+	b := vtl.from_1d([1.0, 0, -1])!
+	result := matmul(a, b)!
+	assert result.shape == [2, 2]
+	assert result.to_array() == [-2.0, -2.0, -2.0, -2.0]
+}
+
+fn test_matmul_rejects_scalar_operands() {
+	a := vtl.from_array([2.0], [])!
 	b := vtl.from_1d([1.0, 2])!
 	if _ := matmul(a, b) {
 		assert false
