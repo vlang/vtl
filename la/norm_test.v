@@ -45,9 +45,6 @@ fn test_vector_norm_axes_reduces_axis_tuples_and_keeps_dimensions() ! {
 	assert kept.shape == [1, 2, 1]
 	assert math.abs(kept.get([0, 0, 0]) - math.sqrt(66.0)) < 1e-12
 	assert math.abs(kept.get([0, 1, 0]) - math.sqrt(138.0)) < 1e-12
-	absolute := vector_norm_axes(values, 2, [], false)!
-	assert absolute.shape == values.shape
-	assert absolute.get([1, 1, 1]) == 8.0
 	transposed := values.transpose([2, 1, 0])!
 	strided := vector_norm_axes(transposed, 2, [0, 2], false)!
 	assert strided.shape == [2]
@@ -62,6 +59,9 @@ fn test_vector_norm_axes_rejects_invalid_and_duplicate_axes() ! {
 	}
 	if _ := vector_norm_axes(values, 2, [2], false) {
 		assert false, 'out-of-range axes must be rejected'
+	}
+	if _ := vector_norm_axes(values, 2, [], false) {
+		assert false, 'empty axes must be rejected'
 	}
 }
 
