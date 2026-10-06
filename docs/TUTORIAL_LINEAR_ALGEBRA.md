@@ -7,6 +7,7 @@ tensors of rank 1 (vectors) and 2 (matrices):
 - addition and subtraction (any rank) using `vtl.add` and `vtl.subtract`
 - multiplication or division by a scalar using `vtl.multiply` and `vtl.divide`
 - matrix-matrix multiplication using `vtl.la.matmul`
+- generalized tensor contraction using `vtl.la.tensordot`
 - . . .
 
 *Note*: Matrix operations for floats are accelerated using
@@ -83,6 +84,30 @@ println(c)
 // [[19, 22],
 //  [43, 50]]
 ```
+
+## Tensor contraction
+
+`tensordot` generalizes dot products and matrix multiplication by summing over
+one or more matching dimensions. With an integer `axes`, it contracts the last
+axes of the first tensor with the first axes of the second tensor. Use
+`tensordot_axes` when the contracted axes are elsewhere:
+
+```v
+import vtl
+import vtl.la
+
+a := vtl.from_2d([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])!
+b := vtl.from_2d([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]])!
+product := la.tensordot(a, b, 1)! // shape [2, 2], same contraction as matmul
+
+// Contract axis 0 of a with axis 0 of b instead.
+contracted := la.tensordot_axes(a, b, [0], [0])!
+```
+
+The result shape lists the uncontracted axes of `a`, followed by the
+uncontracted axes of `b`. Axis lists must have equal lengths, contain no
+repeated axes, and pair dimensions with equal sizes. Negative axes count from
+the end of their tensor.
 
 ## Transpose
 
