@@ -69,20 +69,24 @@ pub fn unique_inverse[T](t &Tensor[T]) !&Tensor[int] {
 	mut inverse := []int{len: t.size}
 	for input_index in 0 .. t.size {
 		value := t.get_nth[T](input_index)
-		mut low := 0
-		mut high := values.len
-		for low < high {
-			mid := low + (high - low) / 2
-			comparison := compare_sort_values[T](values[mid], value)
-			if comparison < 0 {
-				low = mid + 1
-			} else {
-				high = mid
-			}
-		}
-		inverse[input_index] = low
+		inverse[input_index] = find_unique_value_index[T](values, value)
 	}
 	return from_1d[int](inverse)
+}
+
+// unique_first_indices returns the first flattened input index for each
+// sorted unique value.
+pub fn unique_first_indices[T](t &Tensor[T]) !&Tensor[int] {
+	values, _ := sorted_unique_values_counts[T](t)!
+	mut first_indices := []int{len: values.len, init: -1}
+	for input_index in 0 .. t.size {
+		value := t.get_nth[T](input_index)
+		unique_index := find_unique_value_index[T](values, value)
+		if first_indices[unique_index] < 0 {
+			first_indices[unique_index] = input_index
+		}
+	}
+	return from_1d[int](first_indices)
 }
 
 fn sorted_unique_values_counts[T](t &Tensor[T]) !([]T, []int) {
@@ -104,6 +108,20 @@ fn sorted_unique_values_counts[T](t &Tensor[T]) !([]T, []int) {
 		}
 	}
 	return values, counts
+}
+
+fn find_unique_value_index[T](values []T, target T) int {
+	mut low := 0
+	mut high := values.len
+	for low < high {
+		mid := low + (high - low) / 2
+		if compare_sort_values[T](values[mid], target) < 0 {
+			low = mid + 1
+		} else {
+			high = mid
+		}
+	}
+	return low
 }
 
 // take returns a copy of the tensor with the values at `indices` selected

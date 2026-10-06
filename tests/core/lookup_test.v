@@ -189,6 +189,7 @@ fn test_unique_counts_reports_sorted_occurrences() ! {
 	assert result.values.to_array() == [1, 2, 4]
 	assert result.counts.to_array() == [1, 2, 3]
 	assert vtl.unique_inverse(tensor)!.to_array() == [2, 1, 2, 0, 1, 2]
+	assert vtl.unique_first_indices(tensor)!.to_array() == [3, 1, 0]
 }
 
 fn test_unique_counts_groups_nan_values() ! {
@@ -199,4 +200,5 @@ fn test_unique_counts_groups_nan_values() ! {
 	assert math.is_nan(result.values.get_nth[f64](2))
 	assert result.counts.to_array() == [1, 2, 2]
 	assert vtl.unique_inverse(tensor)!.to_array() == [2, 1, 2, 0, 1]
+	assert vtl.unique_first_indices(tensor)!.to_array() == [3, 1, 0]
 }
