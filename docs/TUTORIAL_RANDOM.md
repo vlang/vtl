@@ -38,12 +38,16 @@ mut validation_rng := vtl.new_random_generator(2026)
 training_noise := training_rng.normal([128, 32], vtl.NormalTensorData{sigma: 0.1})!
 validation_mask := validation_rng.bernoulli(0.8, [128])!
 waiting_times := validation_rng.geometric(0.1, [128])!
+training_indices := vtl.from_1d([0, 1, 2, 3, 4, 5, 6, 7])!
+batch_indices := training_rng.choice[int](training_indices, 4, false)!
 ```
 
 `uniform(minimum, maximum, shape)` produces `f64` samples in the half-open
 range `[minimum, maximum)`. `normal(shape, params)` produces `f64` samples, and
 `bernoulli(probability, shape)` produces boolean samples. `geometric(probability,
 shape)` returns the positive number of Bernoulli trials up to the first success.
+`choice(population, size, replace)` samples from the population in flattened
+logical order and can enforce unique sampled positions.
 These methods return errors for invalid distribution parameters. Streams are
 reproducible with the same V/VTL versions, seed, and sequence of calls;
 cross-version compatibility is not guaranteed. See the complete data-pipeline
