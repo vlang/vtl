@@ -231,6 +231,13 @@ fn test_population_variance() {
 	assert tst_res(o.str(), '829.852282')
 }
 
+fn test_population_variance_matches_for_transposed_views() ! {
+	values := vtl.from_2d([[1.0, 10.0], [3.0, 20.0], [5.0, 30.0]])!
+	transposed := values.transpose([1, 0])!
+	assert math.abs(population_variance(values) - population_variance(transposed)) < 1e-12
+	assert math.abs(tss(values) - tss(transposed)) < 1e-12
+}
+
 fn test_sample_variance() {
 	// Tests were also verified on Wolfram Alpha
 	mut data := vtl.from_1d([f64(10.0), f64(4.45), f64(5.9), f64(2.7)])!
