@@ -28,6 +28,8 @@ complex_signal := vtl.from_1d[complex.Complex]([
 ])!
 complex_spectrum := fft.fft(complex_signal)!
 complex_restored := fft.ifft(complex_spectrum)!
+unitary_spectrum := fft.fft_norm(complex_signal, .ortho)!
+unitary_restored := fft.ifft_norm(unitary_spectrum, .ortho)!
 frequencies := fft.fftfreq(complex_signal.size, 1.0)!
 centered_spectrum := fft.fftshift(complex_spectrum)!
 
@@ -73,3 +75,9 @@ preserve its shape. Negative axis indices count backward from the final axis.
 `rfft_axis` and `irfft_axis` do the same for a real tensor and its compact
 complex spectrum. Pass the original real axis length to `irfft_axis` so odd
 and even inputs can be distinguished.
+
+The `*_norm` variants accept `.backward` (NumPy default: scale the inverse),
+`.forward` (scale the forward transform), or `.ortho` (scale both directions
+unitarily). The same convention is available for axis, 2-D, N-D, real, and
+inverse real transforms, for example `rfft_norm[f64](signal, .ortho)` and
+`irfftn_norm(spectrum, original_shape, .ortho)`.
