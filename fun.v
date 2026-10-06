@@ -25,6 +25,7 @@ pub fn (t &Tensor[T]) map[T](f fn (x T, i []int) T) &Tensor[T] {
 // map_values maps each value without constructing multidimensional indices.
 // It uses direct linear access only for contiguous row-major storage and falls
 // back to map for views and non-contiguous tensors.
+@[direct_array_access]
 fn (t &Tensor[T]) map_values[T](f fn (x T) T) &Tensor[T] {
 	if t.is_row_major_contiguous() && t.data.data.len == t.size {
 		mut ret := tensor_like[T](t)
@@ -40,6 +41,7 @@ fn (t &Tensor[T]) map_values[T](f fn (x T) T) &Tensor[T] {
 
 // map_pair_values maps equal-shaped contiguous tensors without creating
 // coordinate arrays. Broadcasting and non-contiguous inputs use nmap.
+@[direct_array_access]
 fn (a &Tensor[T]) map_pair_values[T](b &Tensor[T], f fn (x T, y T) T) !&Tensor[T] {
 	if a.shape == b.shape && a.is_row_major_contiguous() && b.is_row_major_contiguous()
 		&& a.data.data.len == a.size && b.data.data.len == b.size {
