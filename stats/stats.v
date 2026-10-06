@@ -47,9 +47,21 @@ pub:
 
 // sum returns the sum of all elements of the given tensor
 pub fn sum[T](t &vtl.Tensor[T]) T {
+	if is_flat_tensor_storage(t) {
+		mut total := vtl.cast[T](0)
+		for value in t.data.data {
+			total += value
+		}
+		return total
+	}
 	return t.reduce(vtl.cast[T](0), fn [T](acc T, val T, i []int) T {
 		return acc + val
 	})
+}
+
+fn is_flat_tensor_storage[T](t &vtl.Tensor[T]) bool {
+	return t.data.data.len == t.size
+		&& (t.is_row_major_contiguous() || t.is_col_major_contiguous())
 }
 
 // sum_axis returns the sum of a given Tensor along a provided
@@ -78,6 +90,13 @@ pub fn sum_axis_with_dims[T](t &vtl.Tensor[T], data AxisData) T {
 
 // prod returns the product of all elements of the given tensor
 pub fn prod[T](t &vtl.Tensor[T]) T {
+	if is_flat_tensor_storage(t) {
+		mut product := vtl.cast[T](1)
+		for value in t.data.data {
+			product *= value
+		}
+		return product
+	}
 	return t.reduce(vtl.cast[T](1), fn [T](acc T, val T, i []int) T {
 		return acc * val
 	})
@@ -136,9 +155,7 @@ pub fn mean[T](t &vtl.Tensor[T]) T {
 		return vtl.cast[T](0)
 	}
 
-	return t.reduce(vtl.cast[T](0), fn [T](acc T, val T, i []int) T {
-		return acc + val
-	}) / vtl.cast[T](t.size)
+	return sum(t) / vtl.cast[T](t.size)
 }
 
 // Measure of Central Tendency
