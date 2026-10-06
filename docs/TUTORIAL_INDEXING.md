@@ -4,6 +4,21 @@
 indices count from the end. See [slicing](./TUTORIAL_SLICING.md) when a view of
 a range is more appropriate.
 
+## Count non-zero values
+
+`count_nonzero` counts all non-zero tensor values. `count_nonzero_axis` counts
+along one axis and removes it; pass `keepdims: true` to retain that axis with
+length one.
+
+```v
+import vtl
+
+values := vtl.from_2d([[0, 2, 0], [3, 0, 4]])!
+assert vtl.count_nonzero[int](values) == 3
+assert vtl.count_nonzero_axis[int](values, 1, false)!.to_array() == [1, 2]
+assert vtl.count_nonzero_axis[int](values, 1, true)!.shape == [2, 1]
+```
+
 ## Search and digitize
 
 `searchsorted` returns insertion positions in an ascending one-dimensional

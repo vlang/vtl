@@ -1,5 +1,62 @@
 module vtl
 
+// count_nonzero counts non-zero values across every tensor dimension.
+pub fn count_nonzero[T](t &Tensor[T]) int {
+	mut count := 0
+	for flat_index in 0 .. t.size {
+		if td[T](t.get_nth[T](flat_index)).bool() {
+			count++
+		}
+	}
+	return count
+}
+
+// count_nonzero_axis counts non-zero values along one axis. By default the
+// reduced axis is removed; set keepdims to retain it with length one.
+pub fn count_nonzero_axis[T](t &Tensor[T], axis int, keepdims bool) !&Tensor[int] {
+	rank := t.rank()
+	if rank == 0 {
+		return error('count_nonzero_axis: axis requires a tensor with at least one dimension')
+	}
+	axis_index := if axis < 0 { axis + rank } else { axis }
+	if axis_index < 0 || axis_index >= rank {
+		return error('count_nonzero_axis: axis ${axis} out of bounds for rank ${rank}')
+	}
+	mut output_shape := []int{cap: if keepdims { rank } else { rank - 1 }}
+	for dim, dimension in t.shape {
+		if dim == axis_index {
+			if keepdims {
+				output_shape << 1
+			}
+		} else {
+			output_shape << dimension
+		}
+	}
+	mut counts := []int{len: size_from_shape(output_shape)}
+	for flat_index in 0 .. t.size {
+		if !td[T](t.get_nth[T](flat_index)).bool() {
+			continue
+		}
+		coordinates := t.nth_index(flat_index)
+		mut output_flat_index := 0
+		mut output_stride := 1
+		mut output_dim := output_shape.len - 1
+		for dim := rank - 1; dim >= 0; dim-- {
+			if dim == axis_index {
+				if keepdims {
+					output_dim--
+				}
+				continue
+			}
+			output_flat_index += coordinates[dim] * output_stride
+			output_stride *= output_shape[output_dim]
+			output_dim--
+		}
+		counts[output_flat_index]++
+	}
+	return from_array[int](counts, output_shape)
+}
+
 // argwhere returns the coordinates of non-zero elements as a row-major tensor
 // with shape [number of matches, input rank].
 pub fn argwhere[T](t &Tensor[T]) !&Tensor[int] {
