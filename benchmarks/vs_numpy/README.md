@@ -181,6 +181,25 @@ The FFT benchmark uses the same input sizes and iteration counts in VTL and
 NumPy. Install NumPy in an isolated environment if needed, for example with
 `uv run --with numpy python3 vsl/benchmarks/fft_numpy_baseline.py`.
 
+## Complex f32 FFT
+
+The complex f32 benchmark uses deterministic complex64 input, matching sizes,
+three warmups, and identical iteration counts. It measures the public VTL FFT
+path, including plan creation and output allocation, against NumPy's public
+`fft` call. NumPy currently promotes complex64 inputs to complex128 output, so
+the timings compare user-facing behavior rather than identical internal
+precision. Run both commands from `~/.vmodules`:
+
+```bash
+systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -prod run ./vtl/benchmarks/vs_numpy/fft_complex_f32_bench.v
+systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
+	uv run --with numpy python ./vtl/benchmarks/vs_numpy/numpy_fft_complex_f32_baseline.py
+```
+
+This benchmark reports measurements but does not claim a speedup before a
+matched run on the target machine.
+
 ## Notes
 
 - Use the same matrix sizes when comparing manually.

@@ -1,9 +1,10 @@
 # Fourier transforms
 
-The optional `vtl.fft` module wraps VSL's PocketFFT backend for one-dimensional
-real and complex transforms. Real input accepts `f32` and `f64` tensors and
+The optional `vtl.fft` module wraps VSL's PocketFFT backend for one-dimensional,
+axis, and N-D real and complex transforms. Real input accepts `f32` and `f64` tensors and
 returns the non-negative frequency bins as complex values. Full complex
-transforms use `math.complex.Complex` values.
+double-precision complex transforms use `math.complex.Complex` values, and
+single-precision complex transforms use `fft.Complex32`.
 
 ```v
 import vtl
@@ -30,6 +31,13 @@ complex_spectrum := fft.fft(complex_signal)!
 complex_restored := fft.ifft(complex_spectrum)!
 unitary_spectrum := fft.fft_norm(complex_signal, .ortho)!
 unitary_restored := fft.ifft_norm(unitary_spectrum, .ortho)!
+
+complex32_signal := vtl.from_1d[fft.Complex32]([
+	fft.Complex32{re: 1, im: 0},
+	fft.Complex32{re: 0, im: 0},
+])!
+complex32_spectrum := fft.fft_f32(complex32_signal)!
+complex32_restored := fft.ifft_norm_f32(complex32_spectrum, .ortho)!
 frequencies := fft.fftfreq(complex_signal.size, 1.0)!
 centered_spectrum := fft.fftshift(complex_spectrum)!
 
@@ -76,7 +84,8 @@ preserve its shape. Negative axis indices count backward from the final axis.
 complex spectrum. Pass the original real axis length to `irfft_axis` so odd
 and even inputs can be distinguished.
 
-The `*_norm` variants accept `.backward` (NumPy default: scale the inverse),
+The `*_norm` variants, including the complex f32 forms, accept `.backward`
+(NumPy default: scale the inverse),
 `.forward` (scale the forward transform), or `.ortho` (scale both directions
 unitarily). The same convention is available for axis, 2-D, N-D, real, and
 inverse real transforms, for example `rfft_norm[f64](signal, .ortho)` and
