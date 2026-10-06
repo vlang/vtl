@@ -35,7 +35,7 @@ CIFAR examples for CI-safe checks.
 | [array_choose](./array_choose) | Select and broadcast tensor values by integer choice indices | `v run ./vtl/examples/array_choose/main.v` |
 | [vector_norm](./vector_norm) | Compute stable p-norms globally and along an axis | `v run ./vtl/examples/vector_norm/main.v` |
 | [fft_frequency](./fft_frequency) | Create FFT frequency bins and center a spectrum | `v run ./vtl/examples/fft_frequency/main.v` |
-| [fft_axis](./fft_axis) | Transform a complex tensor along one selected axis | `v run ./vtl/examples/fft_axis/main.v` |
+| [fft_axis](./fft_axis) | Transform real or complex tensors along one selected axis | `v run ./vtl/examples/fft_axis/main.v` |
 | [covariance_correlation](./covariance_correlation) | Compute sample covariance and Pearson correlation matrices | `v run ./vtl/examples/covariance_correlation/main.v` |
 | [histogram](./histogram) | Count samples and compute weighted density with custom bin edges | `v run ./vtl/examples/histogram/main.v` |
 | [bincount](./bincount) | Count integer labels and sum per-label weights | `v run ./vtl/examples/bincount/main.v` |
