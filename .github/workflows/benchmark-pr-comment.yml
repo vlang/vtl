@@ -13,10 +13,18 @@ permissions:
 jobs:
   comment:
     runs-on: ubuntu-24.04
+    env:
+      VJOBS: '2'
     steps:
       - uses: actions/checkout@v4
         with:
           path: vtl
+
+      - name: Checkout VSL
+        uses: actions/checkout@v4
+        with:
+          repository: vlang/vsl
+          path: vsl
 
       - uses: vlang/setup-v@v1.6
         with:
@@ -24,20 +32,25 @@ jobs:
 
       - name: Install deps
         run: |
-          v install vsl@v0.2.0-beta.1
           sudo apt-get update -qq
           sudo apt-get install -qq -y libopenblas-dev liblapacke-dev gfortran python3 python3-numpy
 
       - name: Install module
-        run: cp -rf ./vtl ~/.vmodules/vtl
+        run: |
+          mkdir -p ~/.vmodules
+          cp -rf ./vsl ~/.vmodules/vsl
+          cp -rf ./vtl ~/.vmodules/vtl
 
       - name: Run vs NumPy harness
         run: |
+          set -euo pipefail
           cd ~/.vmodules
           {
-            echo '## VTL vs NumPy (CPU matmul via vsl.la)'
-            v -d vsl_blas_cblas run vtl/benchmarks/vs_numpy/matmul_bench.v
-            v run vtl/benchmarks/vs_numpy/conv2d_bench.v
+            echo '## VTL vs NumPy (CPU matmul via VSL CBLAS)'
+            OPENBLAS_NUM_THREADS=2 v -d vsl_blas_cblas -prod run vtl/benchmarks/vs_numpy/matmul_bench.v
+            OPENBLAS_NUM_THREADS=2 python3 vtl/benchmarks/vs_numpy/numpy_matmul_baseline.py
+            OPENBLAS_NUM_THREADS=2 python3 vtl/benchmarks/vs_numpy/numpy_matmul_f32_end_to_end.py
+            v -prod run vtl/benchmarks/vs_numpy/conv2d_bench.v
           } 2>&1 | tee vs_numpy_pr.md
 
       - name: Post sticky PR comment
