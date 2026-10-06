@@ -6,15 +6,15 @@ Lightweight performance harness comparing VTL to external baselines (NumPy / PyT
 
 ```bash
 cd ~/.vmodules
-v run ./vtl/benchmarks/vs_numpy/matmul_bench.v
-v run ./vtl/benchmarks/vs_numpy/conv2d_bench.v
+systemd-run --user --scope -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 v -prod run ./vtl/benchmarks/vs_numpy/matmul_bench.v
+systemd-run --user --scope -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 v -prod run ./vtl/benchmarks/vs_numpy/conv2d_bench.v
 ```
 
 CUDA/Vulkan paths are opt-in:
 
 ```bash
-VTL_USE_CUDA=1 v -d cuda run vtl/benchmarks/vs_numpy/matmul_bench.v
-VTL_USE_VULKAN=1 v -prod -d vulkan run vtl/benchmarks/vs_numpy/matmul_bench.v
+systemd-run --user --scope -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 VTL_USE_CUDA=1 v -d cuda run ./vtl/benchmarks/vs_numpy/matmul_bench.v
+systemd-run --user --scope -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 VTL_USE_VULKAN=1 v -prod -d vulkan run ./vtl/benchmarks/vs_numpy/matmul_bench.v
 ```
 
 ## NumPy / PyTorch reference
