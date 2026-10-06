@@ -18,6 +18,7 @@ neural network module.
 |------|------|
 | New to VTL | [Tutorial overview](./TUTORIAL.md) |
 | Tensor creation, indexing, slicing | [First steps](./TUTORIAL_FIRST_STEPS.md), [Slicing](./TUTORIAL_SLICING.md) |
+| Unique values and occurrence counts | [Unique values](./TUTORIAL_UNIQUE.md) |
 | Gather and indexed updates | [Indexing and scatter](./TUTORIAL_INDEXING.md) |
 | Broadcasting, maps, reductions | [Broadcasting](./TUTORIAL_BROADCASTING.md), [Map/reduce](./TUTORIAL_MAP_REDUCE.md), [Reductions](./TUTORIAL_REDUCTIONS.md) |
 | Random tensors and reproducibility | [Random numbers](./TUTORIAL_RANDOM.md) |

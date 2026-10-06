@@ -38,6 +38,51 @@ pub fn nonzero[T](t &Tensor[T]) ![]&Tensor[int] {
 	return indices
 }
 
+// UniqueCounts contains sorted unique values and their occurrence counts.
+pub struct UniqueCounts[T] {
+pub:
+	values &Tensor[T]
+	counts &Tensor[int]
+}
+
+// unique returns the sorted unique values in a flattened copy of the tensor.
+// Floating-point NaNs are treated as one value and sort after other values.
+pub fn unique[T](t &Tensor[T]) !&Tensor[T] {
+	values, _ := sorted_unique_values_counts[T](t)!
+	return from_1d[T](values)
+}
+
+// unique_counts returns sorted unique values and the number of occurrences of
+// each value in the flattened input tensor.
+pub fn unique_counts[T](t &Tensor[T]) !UniqueCounts[T] {
+	values, counts := sorted_unique_values_counts[T](t)!
+	return UniqueCounts[T]{
+		values: from_1d[T](values)!
+		counts: from_1d[int](counts)!
+	}
+}
+
+fn sorted_unique_values_counts[T](t &Tensor[T]) !([]T, []int) {
+	mut sorted := []T{len: t.size}
+	for i in 0 .. t.size {
+		sorted[i] = t.get_nth[T](i)
+	}
+	sorted.sort_with_compare(fn [T](a &T, b &T) int {
+		return compare_sort_values[T](*a, *b)
+	})
+	mut values := []T{cap: sorted.len}
+	mut counts := []int{cap: sorted.len}
+	for value in sorted {
+		if values.len == 0 || compare_sort_values[T](values[values.len - 1], value) != 0 {
+			values << value
+			counts << 1
+		} else {
+			counts[counts.len - 1]++
+		}
+	}
+	return values, counts
+}
+
 // take returns a copy of the tensor with the values at `indices` selected
 // along `axis`. Negative axes and negative indices count from the end.
 // The indices are a one-dimensional list; use slice for range-based views.

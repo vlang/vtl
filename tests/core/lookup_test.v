@@ -175,3 +175,16 @@ fn test_nth_index() {
 	assert t.nth_index(8) == [4, 0]
 	assert t.nth_index(9) == [4, 1]
 }
+
+fn test_unique_flattens_and_sorts_values() ! {
+	tensor := vtl.from_2d([[3, 1, 3], [2, 1, 2]])!
+	assert vtl.unique(tensor)!.to_array() == [1, 2, 3]
+	assert vtl.unique(vtl.from_1d[int]([]int{})!)!.to_array() == []int{}
+}
+
+fn test_unique_counts_reports_sorted_occurrences() ! {
+	tensor := vtl.from_1d([4, 2, 4, 1, 2, 4])!
+	result := vtl.unique_counts(tensor)!
+	assert result.values.to_array() == [1, 2, 4]
+	assert result.counts.to_array() == [1, 2, 3]
+}
