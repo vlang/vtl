@@ -18,6 +18,16 @@ pub:
 	bin_edges &vtl.Tensor[f64]
 }
 
+// HistogramBinRule selects a standard data-driven bin-width heuristic.
+pub enum HistogramBinRule {
+	automatic
+	freedman_diaconis
+	rice
+	scott
+	square_root
+	sturges
+}
+
 // histogram computes a NumPy-style histogram with evenly spaced bins. The
 // range is inferred from finite data; empty input uses [0, 1], and a constant
 // input expands its range by 0.5 on each side.
@@ -40,6 +50,98 @@ pub fn histogram[T](data &vtl.Tensor[T], bins int) !Histogram {
 		maximum += 0.5
 	}
 	return histogram_range[T](data, bins, minimum, maximum)
+}
+
+// histogram_auto chooses an evenly spaced bin count from the data. The
+// automatic rule uses the larger of Sturges and Freedman-Diaconis estimates,
+// falling back to Sturges when the interquartile range is zero.
+pub fn histogram_auto[T](data &vtl.Tensor[T], rule HistogramBinRule) !Histogram {
+	if data.size == 0 {
+		return histogram_range[T](data, 1, 0, 1)
+	}
+	mut values := []f64{len: data.size}
+	mut minimum := math.inf(1)
+	mut maximum := math.inf(-1)
+	for index in 0 .. data.size {
+		value := histogram_value[T](data, index)!
+		if math.is_nan(value) || math.is_inf(value, 0) {
+			return error('histogram_auto requires finite input values')
+		}
+		values[index] = value
+		minimum = math.min(minimum, value)
+		maximum = math.max(maximum, value)
+	}
+	if minimum == maximum {
+		minimum -= 0.5
+		maximum += 0.5
+	}
+	sturges_bins := math.max(1, int(math.ceil(math.log2(f64(values.len)))) + 1)
+	mut bins := sturges_bins
+	match rule {
+		.automatic {
+			values.sort()
+			fd_bins := histogram_freedman_diaconis_bins(values, maximum - minimum)
+			bins = math.max(sturges_bins, fd_bins)
+		}
+		.freedman_diaconis {
+			values.sort()
+			bins = histogram_freedman_diaconis_bins(values, maximum - minimum)
+		}
+		.rice {
+			bins = math.max(1, int(math.ceil(2 * math.pow(f64(values.len), 1.0 / 3.0))))
+		}
+		.scott {
+			bins = histogram_scott_bins(values, maximum - minimum, sturges_bins)
+		}
+		.square_root {
+			bins = math.max(1, int(math.ceil(math.sqrt(f64(values.len)))))
+		}
+		.sturges {}
+	}
+	return histogram_range[T](data, bins, minimum, maximum)
+}
+
+fn histogram_freedman_diaconis_bins(sorted []f64, data_range f64) int {
+	if sorted.len < 2 {
+		return 1
+	}
+	interquartile_range := histogram_sample_quantile(sorted, 0.75) - histogram_sample_quantile(sorted,
+		0.25)
+	if interquartile_range <= 0 {
+		return math.max(1, int(math.ceil(math.log2(f64(sorted.len)))) + 1)
+	}
+	width := 2 * interquartile_range / math.pow(f64(sorted.len), 1.0 / 3.0)
+	return math.max(1, int(math.ceil(data_range / width)))
+}
+
+fn histogram_scott_bins(values []f64, data_range f64, fallback int) int {
+	if values.len < 2 {
+		return 1
+	}
+	mut mean := 0.0
+	for value in values {
+		mean += value
+	}
+	mean /= f64(values.len)
+	mut sum_squared_deviations := 0.0
+	for value in values {
+		difference := value - mean
+		sum_squared_deviations += difference * difference
+	}
+	standard_deviation := math.sqrt(sum_squared_deviations / f64(values.len))
+	if standard_deviation == 0 {
+		return fallback
+	}
+	width := 3.5 * standard_deviation / math.pow(f64(values.len), 1.0 / 3.0)
+	return math.max(1, int(math.ceil(data_range / width)))
+}
+
+fn histogram_sample_quantile(sorted []f64, q f64) f64 {
+	position := q * f64(sorted.len - 1)
+	lower := int(math.floor(position))
+	upper := math.min(lower + 1, sorted.len - 1)
+	weight := position - f64(lower)
+	return sorted[lower] * (1 - weight) + sorted[upper] * weight
 }
 
 // histogram_range computes evenly spaced bins over [minimum, maximum]. Values

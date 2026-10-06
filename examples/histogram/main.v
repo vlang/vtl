@@ -8,6 +8,8 @@ fn main() {
 	result := stats.histogram[int](measurements, 3)!
 	println('Counts: ${result.counts.to_array()}')
 	println('Bin edges: ${result.bin_edges.to_array()}')
+	automatic := stats.histogram_auto[int](measurements, .automatic)!
+	println('Automatic bin count: ${automatic.counts.size}')
 
 	weighted := stats.histogram_weighted_edges[int, f64](measurements,
 		vtl.from_1d([1.0, 1, 2, 1, 3, 2, 1, 4])!, [150.0, 160.0, 175.0, 180.0], true)!

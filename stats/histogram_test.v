@@ -26,6 +26,27 @@ fn test_histogram_constant_and_empty_inputs() ! {
 	assert empty.bin_edges.to_array() == [0.0, 0.5, 1.0]
 }
 
+fn test_histogram_auto_supports_data_driven_bin_rules() ! {
+	data := vtl.from_1d([0, 1, 2, 3, 4, 5, 6, 7])!
+	sqrt_bins := histogram_auto[int](data, .square_root)!
+	assert sqrt_bins.counts.shape == [3]
+	assert sqrt_bins.counts.to_array() == [3, 2, 3]
+	sturges_bins := histogram_auto[int](data, .sturges)!
+	assert sturges_bins.counts.shape == [4]
+	rice_bins := histogram_auto[int](data, .rice)!
+	assert rice_bins.counts.shape == [4]
+	scott_bins := histogram_auto[int](data, .scott)!
+	assert scott_bins.counts.shape == [2]
+	fd_bins := histogram_auto[int](data, .freedman_diaconis)!
+	assert fd_bins.counts.shape == [2]
+	automatic_bins := histogram_auto[int](data, .automatic)!
+	assert automatic_bins.counts.shape == [4]
+	constant := histogram_auto[int](vtl.from_1d([2, 2, 2, 2])!, .automatic)!
+	assert constant.counts.shape[0] > 0
+	empty := histogram_auto[int](vtl.from_array([]int{}, [0])!, .automatic)!
+	assert empty.counts.to_array() == [0]
+}
+
 fn test_histogram_rejects_invalid_bins_and_ranges() {
 	data := vtl.from_1d([1.0, 2.0])!
 	if _ := histogram[f64](data, 0) {
