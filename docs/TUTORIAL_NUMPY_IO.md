@@ -33,8 +33,8 @@ See [the runnable example](../examples/npy_round_trip) for a complete program.
 `vtl.npz` reads compressed and uncompressed ZIP archives and loads a named
 `.npy` member without extracting archive paths to disk. Members can have
 different supported dtypes; select the matching V type when reading each
-member. The current writer stores multiple tensors of one element type per
-archive, so writing mixed-dtype archives remains future work.
+member. `write` stores same-type tensors efficiently, while `write_arrays`
+accepts tensors wrapped with `npz.array` for mixed-dtype archives.
 
 ```v
 import vtl
@@ -47,9 +47,15 @@ arrays := {
 npz.write('training.npz', arrays)!
 features := npz.read[f64]('training.npz', 'features')!
 println(npz.members('training.npz')!)
+
+mixed := {
+	'features': npz.array[f64](vtl.from_1d[f64]([1.0, 2.0])!)
+	'labels':   npz.array[i32](vtl.from_1d[i32]([0, 1])!)
+}
+npz.write_arrays('mixed_training.npz', mixed)!
 ```
 
 See [the runnable `.npz` example](../examples/npz_round_trip) for a complete
 round trip. [A second example](../examples/npz_read_compressed) reads a
-NumPy-generated compressed archive. The reader supports mixed dtypes by
-selecting the matching V type for each member.
+NumPy-generated compressed archive. The reader and writer support mixed dtypes
+by selecting a matching V type for each member.

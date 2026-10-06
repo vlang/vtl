@@ -21,13 +21,16 @@ fn main() {
 		os.rm(path) or {}
 	}
 	arrays := {
-		'features': vtl.from_array[f64]([1.0, 2.0, 3.0, 4.0], [2, 2])!
-		'targets':  vtl.from_1d[f64]([0.0, 1.0])!
+		'features': npz.array[f64](vtl.from_array[f64]([1.0, 2.0, 3.0, 4.0], [2, 2])!)
+		'labels':   npz.array[i32](vtl.from_1d[i32]([0, 1])!)
+		'mask':     npz.array[bool](vtl.from_1d[bool]([true, false])!)
 	}
-	npz.write(path, arrays)!
+	npz.write_arrays(path, arrays)!
 	features := npz.read[f64](path, 'features')!
-	targets := npz.read[f64](path, 'targets')!
+	labels := npz.read[i32](path, 'labels')!
+	mask := npz.read[bool](path, 'mask')!
 	println('Arrays: ${npz.members(path)!}')
 	println('Features (${features.shape}): ${features.to_array()}')
-	println('Targets (${targets.shape}): ${targets.to_array()}')
+	println('Labels: ${labels.to_array()}')
+	println('Mask: ${mask.to_array()}')
 }
