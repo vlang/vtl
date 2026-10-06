@@ -23,6 +23,7 @@ CIFAR examples for CI-safe checks.
 | [scatter](./scatter) | Add or assign values at indexed tensor positions | `v run vtl/examples/scatter/main.v` |
 | [broadcast_mask](./broadcast_mask) | Select and fill values with broadcastable boolean masks | `v run vtl/examples/broadcast_mask/main.v` |
 | [vector_norm](./vector_norm) | Compute stable p-norms globally and along an axis | `v run vtl/examples/vector_norm/main.v` |
+| [fft_frequency](./fft_frequency) | Create FFT frequency bins and center a spectrum | `v run vtl/examples/fft_frequency/main.v` |
 
 ## Neural networks
 
