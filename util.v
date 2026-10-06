@@ -63,11 +63,6 @@ pub fn (mut t Tensor[T]) ensure_memory[T]() {
 			t.memory = .row_major
 		}
 	}
-	if t.is_contiguous() {
-		if t.rank() > 1 {
-			t.memory = .row_major
-		}
-	}
 }
 
 // assert_shape_off_axis ensures that the shapes of Tensors match

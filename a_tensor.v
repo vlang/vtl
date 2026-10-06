@@ -163,16 +163,15 @@ pub fn (t &Tensor[T]) to_array() []T {
 // copy exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) copy(memory MemoryFormat) &Tensor[T] {
-	strides := strides_from_shape(t.shape, memory)
-	size := size_from_shape(t.shape)
-	mut ret := &Tensor[T]{
-		data:    t.data.clone()
-		memory:  memory
-		shape:   t.shape
-		strides: strides
-		size:    size
+	mut ret := tensor[T](cast[T](0), t.shape, memory: memory)
+	if memory == .row_major && t.is_row_major_contiguous()
+		|| memory == .col_major && t.is_col_major_contiguous() {
+		ret.data = t.data.clone()
+		return ret
 	}
-	ret.ensure_memory()
+	for i in 0 .. t.size {
+		ret.set_nth(i, t.get_nth(i))
+	}
 	return ret
 }
 
