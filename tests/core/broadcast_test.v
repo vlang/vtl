@@ -1,5 +1,5 @@
 // vtest flaky: true
-module main
+module core
 
 import vtl
 
