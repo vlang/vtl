@@ -73,6 +73,14 @@ fn test_clip_tensor_handles_float_nans_and_invalid_bounds() {
 	}
 }
 
+fn test_clip_tensor_reads_reversed_tensor_views_by_stride() {
+	values := vtl.from_1d([1, 2, 3])!.flip()!
+	lower := vtl.from_1d([0])!
+	upper := vtl.from_1d([2])!
+	got := vtl.clip_tensor(values, lower, upper)!
+	assert got.to_array() == [2, 2, 1]
+}
+
 fn test_isclose_numpy_rule_and_broadcast() {
 	a := vtl.from_array([100.0, 1.0, 3.0, 4.0], [2, 2])!
 	b := vtl.from_1d([100.0005, 2.0])!

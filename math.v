@@ -69,41 +69,58 @@ pub fn (t &Tensor[T]) clip[T](min_value T, max_value T) !&Tensor[T] {
 
 // clip_tensor clamps values using broadcastable lower and upper bounds. It
 // computes the result in one pass so callers do not need separate maximum and
-// minimum tensors or intermediate results.
+// minimum tensors or intermediate results. Stride-based offsets avoid creating
+// per-element coordinate arrays, including when an input is a view.
 pub fn clip_tensor[T](t &Tensor[T], lower &Tensor[T], upper &Tensor[T]) !&Tensor[T] {
 	shape := broadcast_shapes(t.shape, lower.shape, upper.shape)
 	values := t.broadcast_to(shape)!
 	lower_values := lower.broadcast_to(shape)!
 	upper_values := upper.broadcast_to(shape)!
-	mut value_iter := values.iterator[T]()
-	mut lower_iter := lower_values.iterator[T]()
-	mut upper_iter := upper_values.iterator[T]()
 	mut result := empty[T](shape, memory: .row_major)
-	for {
-		value, index := value_iter.next() or { break }
-		min_value, _ := lower_iter.next() or { break }
-		max_value, _ := upper_iter.next() or { break }
+	for index in 0 .. result.size {
+		value_offset := broadcast_tensor_offset(index, shape, values.strides)
+		lower_offset := broadcast_tensor_offset(index, shape, lower_values.strides)
+		upper_offset := broadcast_tensor_offset(index, shape, upper_values.strides)
+		value := values.data.data[value_offset]
+		min_value := lower_values.data.data[lower_offset]
+		max_value := upper_values.data.data[upper_offset]
 		if min_value > max_value {
-			return error('clip_tensor lower bound exceeds upper bound at ${index}')
+			return error('clip_tensor lower bound exceeds upper bound at flat index ${index}')
 		}
 		$if T is f32 || T is f64 {
 			if math.is_nan(f64(min_value)) || math.is_nan(f64(max_value)) {
-				return error('clip_tensor bounds must not be NaN at ${index}')
+				return error('clip_tensor bounds must not be NaN at flat index ${index}')
 			}
 			if math.is_nan(f64(value)) {
-				result.set(index, value)
+				result.data.data[index] = value
 				continue
 			}
 		}
-		result.set(index, if value < min_value {
+		result.data.data[index] = if value < min_value {
 			min_value
 		} else if value > max_value {
 			max_value
 		} else {
 			value
-		})
+		}
 	}
 	return result
+}
+
+@[direct_array_access; inline]
+fn broadcast_tensor_offset(index int, shape []int, strides []int) int {
+	mut offset := 0
+	mut remaining := index
+	for axis := shape.len - 1; axis >= 0; axis-- {
+		coordinate := remaining % shape[axis]
+		remaining /= shape[axis]
+		stride := strides[axis]
+		offset += coordinate * stride
+		if stride < 0 {
+			offset += shape[axis] - 1
+		}
+	}
+	return offset
 }
 
 // abs returns the elementwise abs of an tensor
