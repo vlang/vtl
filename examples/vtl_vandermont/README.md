@@ -13,7 +13,7 @@ assignment.
 ## How to run
 
 ```sh
-v run main.v
+v run vtl/examples/vtl_vandermont/main.v
 ```
 
 ## Expected output

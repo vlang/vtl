@@ -23,7 +23,7 @@ Target: `a XOR b` — outputs 1 when exactly one input is 1.
 ## How to run
 
 ```sh
-v run main.v
+v run vtl/examples/nn_xor/main.v
 ```
 
 ## Expected output

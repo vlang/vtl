@@ -12,7 +12,7 @@ compatibility.
 
 ```bash
 # CPU Linear (no Vulkan SDK required)
-v run vtl/examples/nn_cifar10_vulkan/main.v
+v run ./vtl/examples/nn_cifar10_vulkan/main.v
 
 # GPU f32 stack via Vulkan (use -prod on V 0.5.1+ to avoid debug-instance crash)
 VTL_USE_VULKAN=1 v -prod -d vulkan run vtl/examples/nn_cifar10_vulkan/main.v

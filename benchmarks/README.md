@@ -6,8 +6,8 @@ Lightweight performance harness comparing VTL to external baselines (NumPy / PyT
 
 ```bash
 cd ~/.vmodules
-v run vtl/benchmarks/vs_numpy/matmul_bench.v
-v run vtl/benchmarks/vs_numpy/conv2d_bench.v
+v run ./vtl/benchmarks/vs_numpy/matmul_bench.v
+v run ./vtl/benchmarks/vs_numpy/conv2d_bench.v
 ```
 
 CUDA/Vulkan paths are opt-in:

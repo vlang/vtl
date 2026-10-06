@@ -20,14 +20,9 @@ per sequence, eight features per token, and two attention heads.
 From the repository root:
 
 ```sh
-v run examples/nn_transformer_attention/main.v
+v run vtl/examples/nn_transformer_attention/main.v
 ```
 
-Or from this directory:
-
-```sh
-v run main.v
-```
 
 The example prints the input and output shapes and the first output token. The
 attention weights are initialized randomly, so the token values vary between

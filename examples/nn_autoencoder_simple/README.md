@@ -30,7 +30,7 @@ a random amplitude in [0.5, 1.0]. These patterns lie in a 2-D subspace of
 ## How to run
 
 ```sh
-v run main.v
+v run vtl/examples/nn_autoencoder_simple/main.v
 ```
 
 ## Expected output

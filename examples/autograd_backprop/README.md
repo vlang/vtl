@@ -22,7 +22,7 @@ f'(x) = y * x^(y-1)  →  f'(3) = 2 * 3^1 = 6
 ## How to run
 
 ```sh
-v run main.v
+v run vtl/examples/autograd_backprop/main.v
 ```
 
 ## Expected output

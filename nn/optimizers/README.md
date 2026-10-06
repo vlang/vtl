@@ -66,8 +66,8 @@ Run commands from the V module workspace, outside this repository:
 
 ```sh
 cd ~/.vmodules
-systemd-run --user --scope --quiet --property=MemoryMax=1000M --setenv=VJOBS=2 -- v test ./vtl/nn/optimizers
-systemd-run --user --scope --quiet --property=MemoryMax=1000M --setenv=VJOBS=2 -- v -prod test ./vtl/nn/optimizers
+systemd-run --user --scope --quiet --property=MemoryMax=768M --property=MemorySwapMax=0 --setenv=VJOBS=2 -- v test ./vtl/nn/optimizers
+systemd-run --user --scope --quiet --property=MemoryMax=768M --property=MemorySwapMax=0 --setenv=VJOBS=2 -- v -prod test ./vtl/nn/optimizers
 ```
 
 In constrained environments, run each command under a systemd scope with an

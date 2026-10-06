@@ -137,7 +137,7 @@ v install vtl
 ## Testing
 
 ```sh
-systemd-run --user --scope --quiet --property=MemoryMax=1000M --setenv=VJOBS=2 -- v test ./vtl
+systemd-run --user --scope --quiet --property=MemoryMax=768M --property=MemorySwapMax=0 --setenv=VJOBS=2 -- v test ./vtl
 ```
 
 See [DEV_LIGHTWEIGHT.md](docs/DEV_LIGHTWEIGHT.md) for memory-safe subsets in CI.

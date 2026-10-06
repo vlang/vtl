@@ -46,7 +46,7 @@ restored after checking; its gradient is replaced by the analytical gradient.
 Call the V compiler from the parent of the `vtl` clone:
 
 ```sh
-systemd-run --user --scope --quiet --property=MemoryMax=1G --setenv=VJOBS=2 \
+systemd-run --user --scope --quiet --property=MemoryMax=768M --property=MemorySwapMax=0 --setenv=VJOBS=2 \
 	--working-directory="$HOME/.vmodules" -- v test ./vtl/autograd_tests
 ```
 
