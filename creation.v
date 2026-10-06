@@ -2,6 +2,12 @@ module vtl
 
 import math
 
+// MeshgridIndexing controls the dimension order used by meshgrid_n.
+pub enum MeshgridIndexing {
+	xy
+	ij
+}
+
 // meshgrid builds dense two-dimensional XY coordinate grids from two vectors.
 // The output shape is [len(y), len(x)], matching NumPy's default indexing="xy".
 pub fn meshgrid[T](x &Tensor[T], y &Tensor[T]) !(&Tensor[T], &Tensor[T]) {
@@ -18,6 +24,58 @@ pub fn meshgrid[T](x &Tensor[T], y &Tensor[T]) !(&Tensor[T], &Tensor[T]) {
 		}
 	}
 	return x_grid, y_grid
+}
+
+// meshgrid_n builds one dense coordinate tensor for each one-dimensional
+// input. With `xy`, the first two dimensions are swapped, matching NumPy's
+// default indexing convention. `ij` preserves the input axis order.
+pub fn meshgrid_n[T](vectors []&Tensor[T], indexing MeshgridIndexing) ![]&Tensor[T] {
+	if vectors.len == 0 {
+		return error('meshgrid_n expects at least one vector')
+	}
+	mut shape := []int{cap: vectors.len}
+	for vector in vectors {
+		if vector.rank() != 1 {
+			return error('meshgrid_n expects one-dimensional tensors')
+		}
+		shape << vector.size()
+	}
+	if indexing == .xy && shape.len > 1 {
+		first_dimension := shape[0]
+		shape[0] = shape[1]
+		shape[1] = first_dimension
+	}
+	mut grids := []&Tensor[T]{cap: vectors.len}
+	for _ in vectors {
+		grids << empty[T](shape, memory: .row_major)
+	}
+	mut total_size := 1
+	for dimension in shape {
+		total_size *= dimension
+	}
+	for flat_index in 0 .. total_size {
+		mut output_index := []int{len: shape.len}
+		mut remainder := flat_index
+		for axis := shape.len - 1; axis >= 0; axis-- {
+			output_index[axis] = remainder % shape[axis]
+			remainder /= shape[axis]
+		}
+		for axis, vector in vectors {
+			input_axis := if indexing == .xy && vectors.len > 1 {
+				if axis == 0 {
+					1
+				} else if axis == 1 {
+					0
+				} else {
+					axis
+				}
+			} else {
+				axis
+			}
+			grids[axis].set(output_index, vector.get_nth(output_index[input_axis]))
+		}
+	}
+	return grids
 }
 
 // empty returns a new Tensor of given shape and type, without initializing entries

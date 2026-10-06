@@ -21,7 +21,7 @@ tests, documentation, and examples where users need them.
 
 | Domain | Current VTL coverage | Work needed before calling it complete |
 |---|---|---|
-| Array creation | zeros/ones/full/eye/range/sequence, `arange` with start/stop/step, endpoint-aware `linspace`, configurable `logspace`, from arrays, two-vector 2-D `meshgrid` with `xy` indexing | Validate edge cases; add N-D mesh grids and consistent dtype/device options |
+| Array creation | zeros/ones/full/eye/range/sequence, `arange` with start/stop/step, endpoint-aware `linspace`, configurable `logspace`, from arrays, two-vector 2-D `meshgrid`, N-D `meshgrid_n` with `xy` and `ij` indexing | Validate edge cases and consistent dtype/device options |
 | Shape and manipulation | reshape, transpose, squeeze/expand, move/roll axes, concatenate/stack/split, `ravel`, copying `flatten`, `flip`, `repeat`, `repeat_axis`, block `tile`, `rot90`, stable `sort` and `argsort` over selected axes | Add broadcasting helper tests and a broader copy-vs-view audit |
 | Indexing | Integer indexing, slices, `argwhere`, per-axis `nonzero` coordinate arrays, `take`/`take_along_axis` gathers, `put_along_axis`, additive `scatter_add`, lookup helpers, DataLoader gathers, broadcastable boolean `masked_select`/`masked_fill` | Add general fancy indexing, autograd support for indexed updates, and document all bounds semantics |
 | Math and ufuncs | Broad elementwise math and broadcasting; scalar-bound `clip`, broadcast-aware `where`, `isclose`, `allclose`, `heaviside`, and `sign` | Audit the full unary/binary function families and dtype promotion |
