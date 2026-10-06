@@ -27,6 +27,14 @@ shape, and tolerances) are checked by the individual functions.
 first `axes` dimensions of `b`. Use `tensordot_axes(a, b, axes_a, axes_b)` to
 choose arbitrary axis pairs.
 
+`covariance_matrix(data, rowvar, ddof)` and `correlation_matrix(data, rowvar)`
+accept rank-2 tensors. With `rowvar: true`, each row is a variable and columns
+are observations, matching NumPy's default. Set `rowvar: false` when variables
+are columns. Covariance uses `ddof: 0` for population values and `ddof: 1` for
+sample values. Non-positive degrees of freedom follow NumPy's divisor
+semantics, including NaN when the divisor is zero. Correlation returns NaN for
+constant variables.
+
 More examples:
 [linear algebra tutorial](../docs/TUTORIAL_LINEAR_ALGEBRA.md) and
 [advanced tutorial](../docs/TUTORIAL_ADVANCED_LA.md).
