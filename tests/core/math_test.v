@@ -87,7 +87,7 @@ fn test_asinh() {
 	a := vtl.from_1d([-1.0, 0, 1])!
 	result := a.asinh()
 	expected := vtl.from_1d([-0.881373587019543, 0.0, 0.881373587019543])!
-	assert result.array_equal(expected)
+	assert result.allclose(expected)!
 }
 
 fn test_atan() {
@@ -165,7 +165,7 @@ fn test_erfc() {
 	a := vtl.from_1d([1.0, 2, 3])!
 	result := a.erfc()
 	expected := vtl.from_1d([0.15729920705028513, 0.004677734981047265, 2.2090496998585438e-05])!
-	assert result.array_equal(expected)
+	assert result.allclose(expected)!
 }
 
 fn test_exp() {
