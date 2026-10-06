@@ -123,6 +123,24 @@ fn test_percentile_linear_aliases_quantile_and_axis_quantile_retains_axis() ! {
 	assert rows.get([2, 0]) == 17.5
 }
 
+fn test_quantile_axis_squeeze_matches_numpy_output_shape() ! {
+	values := vtl.from_array([1.0, 10.0, 3.0, 20.0, 5.0, 30.0], [3, 2])!
+	rows := quantile_axis_squeeze(values, 0.5, 1)!
+	assert rows.shape == [3]
+	assert rows.to_array() == [5.5, 11.5, 17.5]
+	columns := quantile_axis_squeeze(values, 0.5, 0)!
+	assert columns.shape == [2]
+	assert columns.to_array() == [3.0, 20.0]
+	nan_values := vtl.from_array([1.0, math.nan(), 3.0, 5.0], [2, 2])!
+	nan_rows := nanquantile_axis_squeeze(nan_values, 0.5, 1)!
+	assert nan_rows.shape == [2]
+	assert nan_rows.to_array() == [1.0, 4.0]
+	vector := vtl.from_1d([1.0, 3.0, 5.0])!
+	scalar := quantile_axis_squeeze(vector, 0.5, 0)!
+	assert scalar.shape.len == 0
+	assert scalar.get([]) == 3.0
+}
+
 fn expect_quantile_error(data &vtl.Tensor[f64], q f64) {
 	quantile_linear(data, q) or { return }
 	panic('expected invalid quantile to return an error')

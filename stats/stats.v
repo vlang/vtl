@@ -915,14 +915,26 @@ pub fn nanpercentile_linear[T](t &vtl.Tensor[T], percentile f64) !f64 {
 // quantile_axis computes linearly interpolated quantiles along axis and keeps
 // the reduced axis with length one. NaN values propagate within their slice.
 pub fn quantile_axis[T](t &vtl.Tensor[T], q f64, axis int) !&vtl.Tensor[f64] {
-	return quantile_axis_impl[T](t, q, axis, false)
+	return quantile_axis_impl[T](t, q, axis, false, true)
+}
+
+// quantile_axis_squeeze computes one quantile per axis slice and removes the
+// reduced axis from the result shape, matching NumPy's default quantile shape.
+pub fn quantile_axis_squeeze[T](t &vtl.Tensor[T], q f64, axis int) !&vtl.Tensor[f64] {
+	return quantile_axis_impl[T](t, q, axis, false, false)
 }
 
 // nanquantile_axis computes one linearly interpolated quantile per axis slice,
 // ignoring NaN values and retaining the reduced axis with length one. Slices
 // containing only NaNs produce NaN.
 pub fn nanquantile_axis[T](t &vtl.Tensor[T], q f64, axis int) !&vtl.Tensor[f64] {
-	return quantile_axis_impl[T](t, q, axis, true)
+	return quantile_axis_impl[T](t, q, axis, true, true)
+}
+
+// nanquantile_axis_squeeze ignores NaNs and removes the reduced axis from the
+// result shape. Slices containing only NaNs produce NaN.
+pub fn nanquantile_axis_squeeze[T](t &vtl.Tensor[T], q f64, axis int) !&vtl.Tensor[f64] {
+	return quantile_axis_impl[T](t, q, axis, true, false)
 }
 
 // quantiles_axis computes several linearly interpolated quantiles for each
@@ -1013,7 +1025,7 @@ fn quantiles_axis_impl[T](t &vtl.Tensor[T], quantiles []f64, axis int, ignore_na
 	return result
 }
 
-fn quantile_axis_impl[T](t &vtl.Tensor[T], q f64, axis int, ignore_nan bool) !&vtl.Tensor[f64] {
+fn quantile_axis_impl[T](t &vtl.Tensor[T], q f64, axis int, ignore_nan bool, keepdims bool) !&vtl.Tensor[f64] {
 	if math.is_nan(q) || math.is_inf(q, 0) || q < 0 || q > 1 {
 		return error('quantile must be between 0 and 1')
 	}
@@ -1030,7 +1042,11 @@ fn quantile_axis_impl[T](t &vtl.Tensor[T], q f64, axis int, ignore_nan bool) !&v
 		return error('quantile is undefined for an empty axis')
 	}
 	mut out_shape := t.shape.clone()
-	out_shape[axis_index] = 1
+	if keepdims {
+		out_shape[axis_index] = 1
+	} else {
+		out_shape.delete(axis_index)
+	}
 	mut result := vtl.empty[f64](out_shape, memory: .row_major)
 	mut slice_count := 1
 	for dim, dimension in t.shape {
@@ -1050,8 +1066,17 @@ fn quantile_axis_impl[T](t &vtl.Tensor[T], q f64, axis int, ignore_nan bool) !&v
 				values << value
 			}
 		}
-		index[axis_index] = 0
-		result.set(index, if values.len == 0 {
+		if keepdims {
+			index[axis_index] = 0
+		}
+		output_index := if keepdims {
+			index
+		} else {
+			mut reduced_index := index[..axis_index].clone()
+			reduced_index << index[axis_index + 1..]
+			reduced_index
+		}
+		result.set(output_index, if values.len == 0 {
 			math.nan()
 		} else {
 			interpolate_quantile(mut values, q)

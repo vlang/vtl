@@ -172,6 +172,8 @@ assert quartiles_by_row.shape == [3, 2]
 `vtl.stats.percentile_linear` accepts the equivalent 0..100 percentile scale.
 `vtl.stats.quantile_axis` computes one quantile per axis slice and retains the
 reduced axis with length one. Ordinary quantiles propagate NaNs.
+Use `quantile_axis_squeeze` or `nanquantile_axis_squeeze` to remove the axis
+instead, matching NumPy's output shape for a single quantile.
 The `nanquantile_linear`, `nanquantiles_linear`, `nanpercentile_linear`, and
 `nanquantile_axis` variants ignore NaN values; `nanquantiles_axis` returns
 multiple NaN-aware values per slice. A slice containing only NaNs returns NaN
