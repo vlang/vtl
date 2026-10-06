@@ -2,6 +2,51 @@ module core
 
 import vtl
 
+fn test_compress_flattens_and_ignores_extra_condition_values() {
+	values := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
+	condition := vtl.from_1d([false, true, true, false, true, false, true])!
+	got := vtl.compress(condition, values)!
+	assert got.shape == [3]
+	assert got.to_array() == [2, 3, 5]
+}
+
+fn test_compress_stops_at_short_condition() {
+	values := vtl.from_1d([10, 20, 30, 40])!
+	condition := vtl.from_1d([true, false])!
+	assert vtl.compress(condition, values)!.to_array() == [10]
+}
+
+fn test_compress_axis_selects_rows_and_supports_negative_axes() {
+	values := vtl.from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
+	condition := vtl.from_1d([false, true, true])!
+	rows := vtl.compress_axis(condition, values, 0)!
+	assert rows.shape == [2, 3]
+	assert rows.to_array() == [4, 5, 6, 7, 8, 9]
+	columns := vtl.compress_axis(condition, values, -1)!
+	assert columns.shape == [3, 2]
+	assert columns.to_array() == [2, 3, 5, 6, 8, 9]
+}
+
+fn test_compress_axis_handles_transposed_views_and_short_conditions() {
+	values := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!.transpose([1, 0])!
+	condition := vtl.from_1d([true, false])!
+	got := vtl.compress_axis(condition, values, 0)!
+	assert got.shape == [1, 2]
+	assert got.to_array() == [1, 4]
+}
+
+fn test_compress_rejects_non_vector_conditions_and_invalid_axes() {
+	values := vtl.from_2d([[1, 2], [3, 4]])!
+	bad_condition := vtl.from_2d([[true, false]])!
+	if _ := vtl.compress(bad_condition, values) {
+		assert false, 'compress must reject a non-vector condition'
+	}
+	condition := vtl.from_1d([true, false])!
+	if _ := vtl.compress_axis(condition, values, 2) {
+		assert false, 'compress_axis must reject an out-of-range axis'
+	}
+}
+
 fn test_masked_select_returns_row_major_selected_values() {
 	values := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
 	mask := vtl.from_2d([[true, false, true], [false, true, false]])!

@@ -30,6 +30,7 @@ CIFAR examples for CI-safe checks.
 | [diff](./diff) | Compute discrete differences in one-dimensional and multidimensional data | `v run ./vtl/examples/diff/main.v` |
 | [trapezoid](./trapezoid) | Integrate sampled data with the composite trapezoidal rule | `v run ./vtl/examples/trapezoid/main.v` |
 | [broadcast_mask](./broadcast_mask) | Select and fill values with broadcastable boolean masks | `v run ./vtl/examples/broadcast_mask/main.v` |
+| [compress](./compress) | Select flattened values or tensor slices with a one-dimensional condition | `v run ./vtl/examples/compress/main.v` |
 | [vector_norm](./vector_norm) | Compute stable p-norms globally and along an axis | `v run ./vtl/examples/vector_norm/main.v` |
 | [fft_frequency](./fft_frequency) | Create FFT frequency bins and center a spectrum | `v run ./vtl/examples/fft_frequency/main.v` |
 | [covariance_correlation](./covariance_correlation) | Compute sample covariance and Pearson correlation matrices | `v run ./vtl/examples/covariance_correlation/main.v` |
