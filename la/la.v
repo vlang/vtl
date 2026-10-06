@@ -63,6 +63,11 @@ pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
 		}
 		return result.reshape(result_shape)
 	}
+	$if T is f32 {
+		$if vsl_blas_cblas || vsl_blas_generic_cblas {
+			return matmul_f32(a, b)
+		}
+	}
 	if a.rank() > 2 || b.rank() > 2 {
 		if a.rank() < 2 || b.rank() < 2 || a.shape[a.rank() - 1] != b.shape[b.rank() - 2] {
 			return error('Invalid shapes for matrix multiplication ${a.shape} and ${b.shape}')
@@ -128,6 +133,42 @@ pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	}
 }
 
+fn matmul_f32(a &vtl.Tensor[f32], b &vtl.Tensor[f32]) !&vtl.Tensor[f32] {
+	if a.rank() < 2 || b.rank() < 2 || a.shape[a.rank() - 1] != b.shape[b.rank() - 2] {
+		return error('Invalid shapes for matrix multiplication ${a.shape} and ${b.shape}')
+	}
+	a_batch_shape := a.shape[..a.rank() - 2]
+	b_batch_shape := b.shape[..b.rank() - 2]
+	batch_shape := matmul_broadcast_shape(a_batch_shape, b_batch_shape) or {
+		return error('Batch shapes ${a_batch_shape} and ${b_batch_shape} cannot be broadcast for matrix multiplication ${a.shape} and ${b.shape}')
+	}
+	mut batch_size := 1
+	for dimension in batch_shape {
+		batch_size *= dimension
+	}
+	rows := a.shape[a.rank() - 2]
+	inner := a.shape[a.rank() - 1]
+	columns := b.shape[b.rank() - 1]
+	mut result_shape := batch_shape.clone()
+	result_shape << rows
+	result_shape << columns
+	a_data := tensor_to_f32_array(a)
+	b_data := tensor_to_f32_array(b)
+	mut result_data := []f32{len: batch_size * rows * columns}
+	for batch in 0 .. batch_size {
+		a_batch := matmul_broadcast_offset(batch, batch_shape, a_batch_shape)
+		b_batch := matmul_broadcast_offset(batch, batch_shape, b_batch_shape)
+		a_start := a_batch * rows * inner
+		b_start := b_batch * inner * columns
+		result_start := batch * rows * columns
+		result_end := result_start + rows * columns
+		vsl_la.matrix_matrix_mul_f32(mut result_data[result_start..result_end], rows, columns, inner, 1,
+			a_data[a_start..a_start + rows * inner],
+			b_data[b_start..b_start + inner * columns])
+	}
+	return vtl.from_array[f32](result_data, result_shape)
+}
+
 fn matmul_broadcast_shape(a []int, b []int) ![]int {
 	rank := if a.len > b.len { a.len } else { b.len }
 	mut result := []int{len: rank, init: 1}
@@ -174,4 +215,11 @@ fn tensor_to_f64_array[T](t &vtl.Tensor[T]) []f64 {
 		}
 	}
 	return t.as_f64().to_array()
+}
+
+fn tensor_to_f32_array(t &vtl.Tensor[f32]) []f32 {
+	if t.is_row_major_contiguous() {
+		return t.data.data[..t.size]
+	}
+	return t.to_array()
 }

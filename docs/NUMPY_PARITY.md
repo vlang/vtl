@@ -33,7 +33,7 @@ tests, documentation, and examples where users need them.
 | Data types | V generic element types | Define promotion/casting rules, complex types, booleans, integer overflow, and structured data limits |
 | Masked and missing data | Not established as a general tensor feature | Define a mask representation and NaN/missing-value reduction behavior |
 | Structured/record arrays | Not supported as a general tensor feature | Decide whether this belongs in VTL or a companion table/dataframe package |
-| Performance and devices | CPU plus optional GPU backends | Publish reproducible benchmarks for each backend; optimize without changing numerical semantics |
+| Performance and devices | Pure-V CPU and optional CBLAS CPU paths; `f32` matmul uses single-precision GEMM with CBLAS flags, alongside optional GPU backends | Publish reproducible benchmarks for each backend; optimize without changing numerical semantics |
 | Learning and examples | Autograd, NN, optimizers, datasets, tutorials | Add end-to-end examples for classical ML, transforms, batching, checkpointing, and deployment |
 
 The NumPy `.npy` format stores dtype, shape, and memory order alongside binary
