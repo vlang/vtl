@@ -1,48 +1,50 @@
-// VTL matmul benchmark — reports avg ms and GFLOPS per matrix size.
-// Times vsl.la GEMM only (matrices pre-built; no per-iter tensor copies).
-// Run: v run vtl/benchmarks/vs_numpy/matmul_bench.v
+// End-to-end VTL matmul benchmark. Run from ~/.vmodules with `v -prod run`.
 module main
 
 import time
-import vsl.la as vsl_la
+import vtl
+import vtl.la as vtl_la
 import vtl.benchmarks.util as bu
 
 fn main() {
-	bu.print_header('VTL matmul benchmark (vsl.la GEMM, f64)')
+	bu.print_header('VTL matmul benchmark (vtl.la API, f64)')
 	config := bu.BenchConfig{
 		sizes:       [128, 256, 512]
-		iterations:  5
-		warmup_runs: 2
+		iterations:  10
+		warmup_runs: 3
 	}
 	bu.print_table_header()
 	for n in config.sizes {
-		bench_matmul(n, config)
+		bench_matmul(n, config)!
 	}
-	println('\nCompare with NumPy: see benchmarks/vs_numpy/README.md')
+	println('\nNumPy baseline: run numpy_matmul_baseline.py with the same BLAS thread count')
 }
 
-fn bench_matmul(n int, config bu.BenchConfig) {
-	mut a := vsl_la.Matrix.new[f64](n, n)
-	mut b := vsl_la.Matrix.new[f64](n, n)
-	mut c := vsl_la.Matrix.new[f64](n, n)
+fn bench_matmul(n int, config bu.BenchConfig) ! {
+	mut a_values := []f64{len: n * n}
+	mut b_values := []f64{len: n * n}
 	for i in 0 .. n {
 		for j in 0 .. n {
-			a.set(i, j, f64((i + j) % 7) * 0.01)
-			b.set(i, j, f64((i * j) % 5) * 0.02)
+			a_values[i * n + j] = f64((i + j) % 7) * 0.01
+			b_values[i * n + j] = f64((i * j) % 5) * 0.02
 		}
 	}
-
+	a := vtl.from_array(a_values, [n, n])!
+	b := vtl.from_array(b_values, [n, n])!
 	for _ in 0 .. config.warmup_runs {
-		vsl_la.matrix_matrix_mul(mut c, 1.0, a, b)
+		_ := vtl_la.matmul[f64](a, b)!
 	}
-
 	mut samples := []f64{len: config.iterations}
+	mut checksum := 0.0
 	for i in 0 .. config.iterations {
-		t0 := time.ticks()
-		vsl_la.matrix_matrix_mul(mut c, 1.0, a, b)
-		samples[i] = f64(time.ticks() - t0)
+		started := time.sys_mono_now()
+		result := vtl_la.matmul[f64](a, b)!
+		elapsed_ns := time.sys_mono_now() - started
+		samples[i] = f64(elapsed_ns) / 1_000_000.0
+		checksum += result.get_nth[f64](n * n / 2 + n / 2)
 	}
 	avg := bu.mean_time_ms(mut samples)
 	gflops := bu.gflops_gemm(n, n, n, avg)
 	bu.print_row('gemm', '${n}x${n}', avg, '${gflops}')
+	println('checksum: ${checksum}')
 }
