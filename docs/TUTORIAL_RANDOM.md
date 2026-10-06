@@ -40,6 +40,7 @@ validation_mask := validation_rng.bernoulli(0.8, [128])!
 waiting_times := validation_rng.geometric(0.1, [128])!
 training_indices := vtl.from_1d([0, 1, 2, 3, 4, 5, 6, 7])!
 batch_indices := training_rng.choice[int](training_indices, 4, false)!
+positive_noise := training_rng.gamma(2.0, 0.5, [128])!
 ```
 
 `uniform(minimum, maximum, shape)` produces `f64` samples in the half-open
@@ -48,10 +49,13 @@ range `[minimum, maximum)`. `normal(shape, params)` produces `f64` samples, and
 shape)` returns the positive number of Bernoulli trials up to the first success.
 `choice(population, size, replace)` samples from the population in flattened
 logical order and can enforce unique sampled positions.
+`gamma(alpha, scale, shape)` samples positive values from a Gamma distribution
+on the same independent stream.
 These methods return errors for invalid distribution parameters. Streams are
 reproducible with the same V/VTL versions, seed, and sequence of calls;
 cross-version compatibility is not guaranteed. See the complete data-pipeline
 example in [`examples/random_generator/main.v`](../examples/random_generator/main.v).
 
-VTL currently provides uniform range, normal, Bernoulli, binomial, geometric,
-and exponential tensor constructors. See [`rand.v`](../rand.v) for their API.
+VTL also provides global tensor constructors for uniform range, normal,
+Bernoulli, binomial, geometric, and exponential distributions. See
+[`rand.v`](../rand.v) for the complete API.
