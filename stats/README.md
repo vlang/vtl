@@ -12,6 +12,10 @@ constant input expands by `0.5` at each end. `histogram_range(data, bins,
 minimum, maximum)` uses explicit finite increasing bounds, ignores values
 outside them, and includes the final right edge, matching NumPy's convention.
 
+`bincount(input, minlength)` counts non-negative integer labels in a vector;
+`bincount_weighted(input, weights, minlength)` sums numeric weights for each
+label. Both return vectors sized to at least `minlength`.
+
 ```v
 import vtl
 import vtl.stats
