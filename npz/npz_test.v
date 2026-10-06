@@ -32,6 +32,23 @@ fn test_npz_reads_numpy_compressed_archive_with_mixed_dtypes() ! {
 	assert mask.to_array() == [true, false]
 }
 
+fn test_npz_writes_and_reads_mixed_dtypes() ! {
+	path := os.join_path(os.temp_dir(), 'vtl_npz_mixed_round_trip.npz')
+	defer {
+		os.rm(path) or {}
+	}
+	arrays := {
+		'weights': array[f64](vtl.from_array[f64]([1.5, -2.0], [2])!)
+		'labels':  array[i32](vtl.from_1d[i32]([2, 0, 1])!)
+		'mask':    array[bool](vtl.from_1d[bool]([true, false])!)
+	}
+	write_arrays(path, arrays)!
+	assert members(path)! == ['labels', 'mask', 'weights']
+	assert read[f64](path, 'weights')!.to_array() == [1.5, -2.0]
+	assert read[i32](path, 'labels')!.to_array() == [i32(2), 0, 1]
+	assert read[bool](path, 'mask')!.to_array() == [true, false]
+}
+
 fn test_npz_rejects_missing_members_and_path_names() {
 	path := os.join_path(os.temp_dir(), 'vtl_npz_reject_names.npz')
 	defer {
@@ -50,5 +67,11 @@ fn test_npz_rejects_missing_members_and_path_names() {
 		'folder/array': vtl.from_1d[f64]([3.0])!
 	}) {
 		assert false, 'write must reject member paths'
+	}
+	if _ := write_arrays(path, {
+		'values':     array[f64](vtl.from_1d[f64]([3.0])!)
+		'values.npy': array[i32](vtl.from_1d[i32]([4])!)
+	}) {
+		assert false, 'write_arrays must reject duplicate normalized names'
 	}
 }
