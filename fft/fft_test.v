@@ -136,6 +136,46 @@ fn test_fft2_rejects_wrong_rank() ! {
 	assert false, 'expected fft2 to reject a vector'
 }
 
+fn test_rfft2_and_irfft2_roundtrip_even_and_odd_shapes() ! {
+	input_even := vtl.from_array([f64(1), 0, 0, 0], [2, 2])!
+	spectrum_even := rfft2[f64](input_even)!
+	assert spectrum_even.shape == [2, 2]
+	for i in 0 .. spectrum_even.size {
+		assert math.abs(spectrum_even.get_nth(i).re - 1) < 1e-12
+		assert math.abs(spectrum_even.get_nth(i).im) < 1e-12
+	}
+	reconstructed_even := irfft2(spectrum_even, [2, 2])!
+	for i in 0 .. input_even.size {
+		assert math.abs(reconstructed_even.get_nth(i) - input_even.get_nth(i)) < 1e-12
+	}
+
+	input_odd := vtl.from_array([f64(1), 2, 3, 4, 5, 6], [2, 3])!
+	spectrum_odd := rfft2[f64](input_odd)!
+	assert spectrum_odd.shape == [2, 2]
+	reconstructed_odd := irfft2(spectrum_odd, [2, 3])!
+	for i in 0 .. input_odd.size {
+		assert math.abs(reconstructed_odd.get_nth(i) - input_odd.get_nth(i)) < 1e-12
+	}
+
+	impulse := vtl.from_array([f64(1), 0, 0, 0, 0, 0], [2, 3])!
+	impulse_spectrum := rfft2[f64](impulse)!
+	for i in 0 .. impulse_spectrum.size {
+		assert math.abs(impulse_spectrum.get_nth(i).re - 1) < 1e-12
+		assert math.abs(impulse_spectrum.get_nth(i).im) < 1e-12
+	}
+}
+
+fn test_rfftn_and_irfftn_handle_three_dimensions() ! {
+	input := vtl.from_array([f64(1), 2, 3, 4, 5, 6], [2, 1, 3])!
+	spectrum := rfftn[f64](input)!
+	assert spectrum.shape == [2, 1, 2]
+	reconstructed := irfftn(spectrum, [2, 1, 3])!
+	assert reconstructed.shape == input.shape
+	for i in 0 .. input.size {
+		assert math.abs(reconstructed.get_nth(i) - input.get_nth(i)) < 1e-12
+	}
+}
+
 fn test_rfft_rejects_non_vector_and_empty_input() ! {
 	matrix := vtl.ones[f64]([2, 2])
 

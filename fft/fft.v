@@ -61,6 +61,92 @@ pub fn ifft2(input &vtl.Tensor[complex.Complex]) !&vtl.Tensor[complex.Complex] {
 	return multidimensional_fft(input, true)
 }
 
+// rfftn computes a real-input Fourier transform across every tensor axis.
+// The final axis is stored compactly, with length floor(n/2)+1.
+pub fn rfftn[T](input &vtl.Tensor[T]) !&vtl.Tensor[complex.Complex] {
+	if input.rank() == 0 || input.size == 0 {
+		return error('rfftn expects a non-empty tensor with at least one dimension')
+	}
+	$if T is f32 || T is f64 {
+		mut values := []complex.Complex{len: input.size}
+		for i in 0 .. input.size {
+			values[i] = complex.complex(f64(input.get_nth(i)), 0)
+		}
+		full := vtl.from_array[complex.Complex](values, input.shape)!
+		transformed := multidimensional_fft(full, false)!
+		mut output_shape := input.shape.clone()
+		output_shape[output_shape.len - 1] = output_shape[output_shape.len - 1] / 2 + 1
+		mut compact := []complex.Complex{len: product(output_shape)}
+		mut index := []int{len: output_shape.len}
+		for flat_index in 0 .. compact.len {
+			decode_row_major_index(flat_index, output_shape, mut index)
+			compact[flat_index] = transformed.get(index)
+		}
+		return vtl.from_array[complex.Complex](compact, output_shape)
+	} $else {
+		return error('rfftn supports f32 and f64 input tensors')
+	}
+}
+
+// rfft2 computes a real-input two-dimensional Fourier transform.
+pub fn rfft2[T](input &vtl.Tensor[T]) !&vtl.Tensor[complex.Complex] {
+	if input.rank() != 2 {
+		return error('rfft2 expects a two-dimensional tensor')
+	}
+	return rfftn[T](input)
+}
+
+// irfftn reconstructs a real tensor from a compact multidimensional spectrum.
+// The original shape is required to disambiguate odd and even final axes.
+pub fn irfftn(input &vtl.Tensor[complex.Complex], shape []int) !&vtl.Tensor[f64] {
+	if shape.len == 0 || input.rank() != shape.len || input.size == 0 {
+		return error('irfftn expects a non-empty spectrum and a matching non-empty shape')
+	}
+	for axis, dimension in shape {
+		if dimension <= 0 {
+			return error('irfftn dimensions must be positive')
+		}
+		expected := if axis == shape.len - 1 { dimension / 2 + 1 } else { dimension }
+		if input.shape[axis] != expected {
+			return error('irfftn spectrum shape does not match requested output shape')
+		}
+	}
+	mut full_values := []complex.Complex{len: product(shape)}
+	mut index := []int{len: shape.len}
+	mut reflected := []int{len: shape.len}
+	for flat_index in 0 .. full_values.len {
+		decode_row_major_index(flat_index, shape, mut index)
+		mut conjugate := false
+		for axis, coordinate in index {
+			reflected[axis] = if coordinate == 0 { 0 } else { shape[axis] - coordinate }
+			if axis == shape.len - 1 && coordinate > shape[axis] / 2 {
+				conjugate = true
+			}
+		}
+		value := if conjugate { input.get(reflected) } else { input.get(index) }
+		full_values[flat_index] = if conjugate {
+			complex.complex(value.re, -value.im)
+		} else {
+			value
+		}
+	}
+	full := vtl.from_array[complex.Complex](full_values, shape)!
+	transformed := multidimensional_fft(full, true)!
+	mut output := []f64{len: transformed.size}
+	for i in 0 .. output.len {
+		output[i] = transformed.get_nth(i).re
+	}
+	return vtl.from_array[f64](output, shape)
+}
+
+// irfft2 reconstructs a two-dimensional real tensor from rfft2 output.
+pub fn irfft2(input &vtl.Tensor[complex.Complex], shape []int) !&vtl.Tensor[f64] {
+	if shape.len != 2 {
+		return error('irfft2 expects a two-dimensional output shape')
+	}
+	return irfftn(input, shape)
+}
+
 // irfft reconstructs a real signal of `length` samples from its non-negative
 // frequency components. The inverse transform is normalized by `length`.
 pub fn irfft(input &vtl.Tensor[complex.Complex], length int) !&vtl.Tensor[f64] {
@@ -198,6 +284,22 @@ fn row_major_index(index []int, shape []int) int {
 		flat_index = flat_index * shape[axis] + index[axis]
 	}
 	return flat_index
+}
+
+fn decode_row_major_index(flat_index int, shape []int, mut index []int) {
+	mut remainder := flat_index
+	for axis := shape.len - 1; axis >= 0; axis-- {
+		index[axis] = remainder % shape[axis]
+		remainder /= shape[axis]
+	}
+}
+
+fn product(shape []int) int {
+	mut result := 1
+	for dimension in shape {
+		result *= dimension
+	}
+	return result
 }
 
 fn unpack_rfft_f32(packed []f32) !&vtl.Tensor[complex.Complex] {
