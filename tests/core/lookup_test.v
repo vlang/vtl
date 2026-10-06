@@ -1,6 +1,7 @@
 module core
 
 import vtl
+import math
 
 fn test_argwhere_groups_nonzero_coordinates_by_element() ! {
 	tensor := vtl.from_2d([[0, 2, 0], [3, 4, 0]])!
@@ -188,4 +189,14 @@ fn test_unique_counts_reports_sorted_occurrences() ! {
 	assert result.values.to_array() == [1, 2, 4]
 	assert result.counts.to_array() == [1, 2, 3]
 	assert vtl.unique_inverse(tensor)!.to_array() == [2, 1, 2, 0, 1, 2]
+}
+
+fn test_unique_counts_groups_nan_values() ! {
+	tensor := vtl.from_1d([math.nan(), 3.0, math.nan(), -2.0, 3.0])!
+	result := vtl.unique_counts(tensor)!
+	assert result.values.get_nth[f64](0) == -2.0
+	assert result.values.get_nth[f64](1) == 3.0
+	assert math.is_nan(result.values.get_nth[f64](2))
+	assert result.counts.to_array() == [1, 2, 2]
+	assert vtl.unique_inverse(tensor)!.to_array() == [2, 1, 2, 0, 1]
 }
