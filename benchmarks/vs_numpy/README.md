@@ -22,6 +22,26 @@ These timings cover reductions on already allocated tensors/arrays. They do not
 include input construction; record the compiler, NumPy build, CPU, and thread
 settings when comparing results.
 
+## Vector p=2 norm
+
+The VTL and NumPy cases use the same 500,000-element `f64` input, warm up
+three times, then report the mean of seven timed reductions. Input allocation
+is outside the timed region. Run both from `~/.vmodules`:
+
+```bash
+systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -prod run ./vtl/benchmarks/vs_numpy/vector_norm_bench.v
+systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
+	OPENBLAS_NUM_THREADS=2 uv run --with numpy python \
+	./vtl/benchmarks/vs_numpy/numpy_vector_norm_baseline.py
+```
+
+Record V version, NumPy version, CPU, and BLAS build when comparing results.
+On an AMD Ryzen 9 5900X with V 0.5.2 `-prod`, this VTL path measured 0.545 ms;
+NumPy 2.5.3 measured 0.172 ms with `OPENBLAS_NUM_THREADS=2`. VTL is still
+about 3.2x slower for this case, so this is a tracked optimization target rather
+than a claim of parity or superiority.
+
 ## Matmul
 
 ```bash

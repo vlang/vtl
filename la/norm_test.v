@@ -36,7 +36,7 @@ fn test_vector_norm_axis_retains_dimensions_for_strided_views() ! {
 }
 
 fn test_vector_norm_axes_reduces_axis_tuples_and_keeps_dimensions() ! {
-	values := vtl.from_3d([[[1.0, 2.0], [3.0, 4.0]], [[5.0, 6.0], [7.0, 8.0]]])!
+	values := vtl.from_array([f64(1), 2, 3, 4, 5, 6, 7, 8], [2, 2, 2])!
 	got := vector_norm_axes(values, 2, [0, 2], false)!
 	assert got.shape == [2]
 	assert math.abs(got.get([0]) - math.sqrt(66.0)) < 1e-12
@@ -63,6 +63,19 @@ fn test_vector_norm_axes_rejects_invalid_and_duplicate_axes() ! {
 	if _ := vector_norm_axes(values, 2, [], false) {
 		assert false, 'empty axes must be rejected'
 	}
+}
+
+fn test_vector_norm_axes_two_norm_scales_extreme_values_and_propagates_nan() ! {
+	large := vtl.from_1d([1e308, 1e308])!
+	large_norm := vector_norm_axes(large, 2, [0], false)!
+	assert math.abs(large_norm.get([]) / 1e308 - math.sqrt(2.0)) < 1e-12
+	small := vtl.from_1d([1e-308, 1e-308])!
+	small_norm := vector_norm_axes(small, 2, [0], false)!
+	assert math.abs(small_norm.get([]) / 1e-308 - math.sqrt(2.0)) < 1e-12
+	infinite := vtl.from_1d([math.inf(1), 1.0])!
+	assert math.is_inf(vector_norm_axes(infinite, 2, [0], false)!.get([]), 1)
+	nan_and_infinite := vtl.from_1d([math.inf(1), math.nan()])!
+	assert math.is_nan(vector_norm_axes(nan_and_infinite, 2, [0], false)!.get([]))
 }
 
 fn test_vector_norm_scales_large_finite_values() ! {
