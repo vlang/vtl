@@ -3,8 +3,6 @@ module vtl
 import math
 import rand
 import rand.config
-import rand.seed
-import time
 
 // bernoulli returns a tensor of bernoulli random variables.
 pub fn bernoulli[T](prob f64, shape []int, params TensorData) &Tensor[T] {
@@ -78,14 +76,11 @@ pub fn random[T](min T, max T, shape []int, params TensorData) &Tensor[T] {
 	return t
 }
 
-// random_seed exposes this operation as part of the public API.
+// random_seed resets VTL's global random generator for reproducible results.
+// The seed affects random tensor constructors and model parameter
+// initialization that use V's default random generator.
 pub fn random_seed(i int) {
-	rand.seed(seed.time_seed_array(2))
-}
-
-fn init() {
-	unix_time := u32(time.now().unix())
-	rand.seed([unix_time, 0])
+	rand.seed([u32(i), 0])
 }
 
 fn random_in_range[T](min T, max T) T {

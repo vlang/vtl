@@ -222,14 +222,14 @@ for b in 0 .. n_batches {
 
 ## Reproducibility
 
-VTL initialises weights using the global random seed.  Call `rand.seed` before
-creating the autograd context to get reproducible results:
+VTL initialises weights using V's global random generator. Call
+`vtl.random_seed` before creating the model to get reproducible results:
 
 ```v
-import rand
+import vtl
 import vtl.autograd
 
-rand.seed([u32(42), u32(0)])
+vtl.random_seed(42)
 ctx := autograd.ctx[f64]()
 _ = ctx
 ```
