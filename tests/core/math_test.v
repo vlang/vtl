@@ -10,6 +10,26 @@ fn test_abs() {
 	assert result.array_equal(expected)
 }
 
+fn test_sign_and_heaviside() {
+	values := vtl.from_1d([-2.0, -0.0, 0.0, 3.0])!
+	assert values.sign().array_equal(vtl.from_1d([-1.0, 0.0, 0.0, 1.0])!)
+	assert values.heaviside(0.25).array_equal(vtl.from_1d([0.0, 0.25, 0.25, 1.0])!)
+	assert vtl.from_1d([-2, 0, 4])!.sign().array_equal(vtl.from_1d([-1, 0, 1])!)
+}
+
+fn test_sign_and_heaviside_preserve_nan() {
+	nan := math.nan()
+	values := vtl.from_1d([-1.0, nan, 1.0])!
+	signs := values.sign()
+	heavisides := values.heaviside(0.5)
+	assert signs.get_nth(0) == -1.0
+	assert math.is_nan(signs.get_nth(1))
+	assert signs.get_nth(2) == 1.0
+	assert heavisides.get_nth(0) == 0.0
+	assert math.is_nan(heavisides.get_nth(1))
+	assert heavisides.get_nth(2) == 1.0
+}
+
 fn test_clip_limits_values_and_preserves_type() {
 	ints := vtl.from_1d([-4, 2, 9])!
 	assert ints.clip(-1, 5)!.array_equal[int](vtl.from_1d([-1, 2, 5])!)
