@@ -16,6 +16,28 @@ pub fn argwhere[T](t &Tensor[T]) !&Tensor[int] {
 	return from_array[int](coordinates, [matches, t.rank()])
 }
 
+// nonzero returns one index tensor per input axis, matching NumPy's tuple of
+// coordinate arrays. A nonzero scalar is treated as a one-dimensional value
+// with index zero, following NumPy's scalar promotion behavior.
+pub fn nonzero[T](t &Tensor[T]) ![]&Tensor[int] {
+	coordinates := argwhere[T](t)!
+	if t.rank() == 0 {
+		if coordinates.shape[0] == 0 {
+			return [from_1d[int]([]int{})!]
+		}
+		return [from_1d[int]([0])!]
+	}
+	mut indices := []&Tensor[int]{cap: t.rank()}
+	for axis in 0 .. t.rank() {
+		mut axis_indices := []int{len: coordinates.shape[0]}
+		for match_index in 0 .. coordinates.shape[0] {
+			axis_indices[match_index] = coordinates.get[int]([match_index, axis])
+		}
+		indices << from_1d[int](axis_indices)!
+	}
+	return indices
+}
+
 // take returns a copy of the tensor with the values at `indices` selected
 // along `axis`. Negative axes and negative indices count from the end.
 // The indices are a one-dimensional list; use slice for range-based views.
