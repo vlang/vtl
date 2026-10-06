@@ -9,6 +9,10 @@ selected reductions.
 `prod` follows the multiplicative identity convention: an empty input reduces
 to `1`, while an empty sum reduces to `0`.
 
+`trapezoid`, `trapezoid_axis`, and `trapezoid_x_axis` integrate numeric tensors
+with the composite trapezoidal rule and return `f64` tensors with the reduced
+axis removed. Explicit sample coordinates remain in their given order.
+
 `histogram(data, bins)` infers a finite range from any numeric tensor and
 returns a `Histogram` with `counts` and `bin_edges`. Empty input uses `[0, 1]`;
 constant input expands by `0.5` at each end. `histogram_range(data, bins,

@@ -17,6 +17,22 @@ assert first_difference.to_array() == [1.0, 2.0, 3.0]
 assert second_difference.to_array() == [1.0, 1.0]
 ```
 
+## Trapezoidal integration
+
+`vtl.stats.trapezoid` integrates over the last axis with uniform spacing.
+Use `trapezoid_axis` for another axis, or `trapezoid_x_axis` for explicit
+coordinates. The order of explicit coordinates is preserved, so decreasing
+coordinates produce a negative integral, matching
+[NumPy's `trapezoid`](https://numpy.org/doc/stable/reference/generated/numpy.trapezoid.html).
+
+```v
+import vtl
+import vtl.stats
+
+series := vtl.from_1d([1.0, 2.0, 3.0])!
+assert stats.trapezoid[f64](series, 1.0)!.get_nth(0) == 4.0
+```
+
 ## argmax / argmin
 
 `argmax_axis(axis)` returns the index of the maximum value along `axis`.
