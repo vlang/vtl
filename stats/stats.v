@@ -799,6 +799,94 @@ pub fn nanquantile_axis[T](t &vtl.Tensor[T], q f64, axis int) !&vtl.Tensor[f64] 
 	return quantile_axis_impl[T](t, q, axis, true)
 }
 
+// quantiles_axis computes several linearly interpolated quantiles for each
+// axis slice. The quantile dimension is prepended to the output shape, matching
+// NumPy's quantile(..., axis=axis) layout. Each slice is sorted only once.
+// NaN values propagate to every requested quantile in their slice.
+pub fn quantiles_axis[T](t &vtl.Tensor[T], quantiles []f64, axis int) !&vtl.Tensor[f64] {
+	return quantiles_axis_impl[T](t, quantiles, axis, false)
+}
+
+// nanquantiles_axis computes several quantiles per axis slice while ignoring
+// NaN values. Slices containing only NaNs produce NaN for each quantile.
+pub fn nanquantiles_axis[T](t &vtl.Tensor[T], quantiles []f64, axis int) !&vtl.Tensor[f64] {
+	return quantiles_axis_impl[T](t, quantiles, axis, true)
+}
+
+fn quantiles_axis_impl[T](t &vtl.Tensor[T], quantiles []f64, axis int, ignore_nan bool) !&vtl.Tensor[f64] {
+	for q in quantiles {
+		if math.is_nan(q) || math.is_inf(q, 0) || q < 0 || q > 1 {
+			return error('quantiles must be between 0 and 1')
+		}
+	}
+	rank := t.rank()
+	if rank == 0 {
+		return error('quantile axis requires a tensor with at least one dimension')
+	}
+	axis_index := if axis < 0 { axis + rank } else { axis }
+	if axis_index < 0 || axis_index >= rank {
+		return error('quantile axis ${axis} out of bounds for rank ${rank}')
+	}
+	axis_size := t.shape[axis_index]
+	if axis_size == 0 {
+		return error('quantiles are undefined for an empty axis')
+	}
+	mut out_shape := [quantiles.len]
+	for dim, dimension in t.shape {
+		if dim != axis_index {
+			out_shape << dimension
+		}
+	}
+	mut result := vtl.empty[f64](out_shape, memory: .row_major)
+	mut slice_count := 1
+	for dim, dimension in t.shape {
+		if dim != axis_index {
+			slice_count *= dimension
+		}
+	}
+	mut index := []int{len: rank}
+	mut out_index := []int{len: rank}
+	mut values := []f64{len: axis_size}
+	for slice in 0 .. slice_count {
+		decode_nan_slice(slice, t.shape, axis_index, mut index)
+		values.clear()
+		mut has_nan := false
+		for position in 0 .. axis_size {
+			index[axis_index] = position
+			value := f64(t.get(index))
+			if math.is_nan(value) {
+				has_nan = true
+			} else {
+				values << value
+			}
+		}
+		index[axis_index] = 0
+		if !ignore_nan && has_nan {
+			values.clear()
+		} else {
+			values.sort()
+		}
+		out_index[0] = 0
+		mut source_dim := 0
+		for dim in 0 .. rank {
+			if dim != axis_index {
+				out_index[source_dim + 1] = index[dim]
+				source_dim++
+			}
+		}
+		for quantile_index, q in quantiles {
+			out_index[0] = quantile_index
+			value := if values.len == 0 {
+				math.nan()
+			} else {
+				interpolate_sorted_quantile(values, q)
+			}
+			result.set(out_index, value)
+		}
+	}
+	return result
+}
+
 fn quantile_axis_impl[T](t &vtl.Tensor[T], q f64, axis int, ignore_nan bool) !&vtl.Tensor[f64] {
 	if math.is_nan(q) || math.is_inf(q, 0) || q < 0 || q > 1 {
 		return error('quantile must be between 0 and 1')
