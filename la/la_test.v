@@ -36,6 +36,22 @@ fn test_matmul_1() {
 	assert result.array_equal(expected)
 }
 
+fn test_matmul_preserves_integer_dtype_and_values() {
+	a := vtl.from_array([1, 2, 3, 4], [2, 2])!
+	b := vtl.from_array([5, 6, 7, 8], [2, 2])!
+	result := matmul(a, b)!
+	assert result.shape == [2, 2]
+	assert result.to_array() == [19, 22, 43, 50]
+}
+
+fn test_matmul_preserves_f32_dtype() {
+	a := vtl.from_array([f32(1), 2, 3, 4], [2, 2])!
+	b := vtl.from_array([f32(5), 6, 7, 8], [2, 2])!
+	result := matmul(a, b)!
+	assert result.shape == [2, 2]
+	assert result.to_array() == [f32(19), 22, 43, 50]
+}
+
 fn test_matmul_2() {
 	a := vtl.seq[f64](2 * 2 * 4).reshape([2, 2, 4])!
 	b := vtl.seq[f64](2 * 2 * 4).reshape([2, 4, 2])!
@@ -96,4 +112,12 @@ fn test_matmul_column_major_operand() {
 	result := matmul(a, b)!
 	expected := vtl.from_array([1.0, 2, 3, 4], [1, 2, 2], memory: .col_major)!
 	assert result.array_equal(expected)
+}
+
+fn test_matmul_non_contiguous_rank_two_operands() {
+	a := vtl.from_2d([[1.0, 2.0], [3.0, 4.0]])!.transpose([1, 0])!
+	b := vtl.from_2d([[1.0, 0.0], [0.0, 1.0]])!
+	result := matmul(a, b)!
+	assert result.shape == [2, 2]
+	assert result.to_array() == [1.0, 3.0, 2.0, 4.0]
 }

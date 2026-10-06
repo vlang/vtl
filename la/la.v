@@ -2,6 +2,7 @@ module la
 
 import vsl.la as vsl_la
 import vtl
+import vtl.storage
 
 // dot exposes this operation as part of the public API.
 pub fn dot[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[f64] {
@@ -55,22 +56,20 @@ pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
 		rows := a.shape[a.rank() - 2]
 		inner := a.shape[a.rank() - 1]
 		columns := b.shape[b.rank() - 1]
-		a_data := a.to_array()
-		b_data := b.to_array()
+		a_data := tensor_to_f64_array[T](a)
+		b_data := tensor_to_f64_array[T](b)
 		mut result_data := []T{len: batch_size * rows * columns}
 		for batch in 0 .. batch_size {
 			a_batch := matmul_broadcast_offset(batch, batch_shape, a_batch_shape)
 			b_batch := matmul_broadcast_offset(batch, batch_shape, b_batch_shape)
-			for row in 0 .. rows {
-				for column in 0 .. columns {
-					mut value := T(0)
-					for index in 0 .. inner {
-						a_offset := a_batch * rows * inner + row * inner + index
-						b_offset := b_batch * inner * columns + index * columns + column
-						value += a_data[a_offset] * b_data[b_offset]
-					}
-					result_data[batch * rows * columns + row * columns + column] = value
-				}
+			a_start := a_batch * rows * inner
+			b_start := b_batch * inner * columns
+			mam := vsl_la.Matrix.raw(rows, inner, a_data[a_start..a_start + rows * inner])
+			mbm := vsl_la.Matrix.raw(inner, columns, b_data[b_start..b_start + inner * columns])
+			mut dm := vsl_la.Matrix.new[f64](rows, columns)
+			vsl_la.matrix_matrix_mul(mut dm, 1.0, mam, mbm)
+			for i, value in dm.data {
+				result_data[batch * rows * columns + i] = vtl.cast[T](value)
 			}
 		}
 		return vtl.from_array(result_data, result_shape)
@@ -80,17 +79,27 @@ pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	if a.shape[1] != b.shape[0] {
 		return error('Invalid shapes for matrix multiplication ${a.shape} and ${b.shape}')
 	}
-	ma := a.copy(.row_major)
-	mb := b.copy(.row_major)
 	mut dm := vsl_la.Matrix.new[f64](a.shape[0], b.shape[1])
-	mam := vsl_la.Matrix.raw(a.shape[0], a.shape[1], tensor_to_f64_array[T](ma))
-	mbm := vsl_la.Matrix.raw(b.shape[0], b.shape[1], tensor_to_f64_array[T](mb))
+	mam := vsl_la.Matrix.raw(a.shape[0], a.shape[1], tensor_to_f64_array[T](a))
+	mbm := vsl_la.Matrix.raw(b.shape[0], b.shape[1], tensor_to_f64_array[T](b))
 	vsl_la.matrix_matrix_mul(mut dm, 1.0, mam, mbm)
-	res := vtl.from_2d[f64](dm.get_deep2())!
-	if sizeof(T) == 4 {
-		return unsafe { &vtl.Tensor[T](res.as_f32()) }
+	res := &vtl.Tensor[f64]{
+		data:    &storage.CpuStorage[f64]{
+			data: dm.data
+		}
+		memory:  .row_major
+		size:    a.shape[0] * b.shape[1]
+		shape:   [a.shape[0], b.shape[1]]
+		strides: [b.shape[1], 1]
 	}
-	return unsafe { &vtl.Tensor[T](res) }
+	$if T is f32 {
+		return unsafe { &vtl.Tensor[T](res.as_f32()) }
+	} $else $if T is f64 {
+		return unsafe { &vtl.Tensor[T](res) }
+	} $else {
+		result_data := res.to_array().map(vtl.cast[T](it))
+		return vtl.from_array[T](result_data, [a.shape[0], b.shape[1]])
+	}
 }
 
 fn matmul_broadcast_shape(a []int, b []int) ![]int {
@@ -133,5 +142,10 @@ fn matmul_broadcast_offset(output_batch int, output_shape []int, input_shape []i
 }
 
 fn tensor_to_f64_array[T](t &vtl.Tensor[T]) []f64 {
+	$if T is f64 {
+		if t.is_row_major_contiguous() {
+			return t.data.data[..t.size]
+		}
+	}
 	return t.as_f64().to_array()
 }
