@@ -25,6 +25,19 @@ println(t.shape) // [2, 3]
 println(t.strides) // [3, 1] => next row is 3 elements away in memory while the next column is 1 element away in memory
 ```
 
+The optional memory format changes the storage layout, not the logical matrix
+values. A column-major tensor created from nested rows keeps the same row and
+column indices:
+
+```v
+import vtl
+
+column_major := vtl.from_2d([[1, 2, 3], [4, 5, 6]], memory: .col_major)!
+assert column_major.is_col_major_contiguous()
+assert column_major.to_array() == [1, 2, 3, 4, 5, 6]
+assert column_major.get([0, 1]) == 2
+```
+
 ## Tensor Creation
 
 The canonical way to create a tensor is to use the `vtl.from_*` functions.
@@ -144,6 +157,8 @@ For three or more axes, `meshgrid_n` returns one grid per input. Use `.ij` to
 preserve axis order or `.xy` to swap the first two axes like NumPy:
 
 ```v
+import vtl
+
 x := vtl.from_1d([1, 2])!
 y := vtl.from_1d([10, 20, 30])!
 z := vtl.from_1d([4, 5])!
