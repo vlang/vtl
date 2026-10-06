@@ -106,6 +106,7 @@ opt.update()!
 |--------|---------|---------------------|
 | `vtl` | Core `Tensor[T]`; creation, slicing, broadcasting, and reductions | [First steps](docs/TUTORIAL_FIRST_STEPS.md) · [API docs](https://vlang.github.io/vtl/vtl.html) |
 | `vtl.fft` | 1D/N-D real and complex FFTs via VSL PocketFFT | [FFT tutorial](docs/TUTORIAL_FFT.md) |
+| `vtl.npy` / `vtl.npz` | Typed NumPy `.npy` input/output and named `.npz` member reads | [NumPy I/O tutorial](docs/TUTORIAL_NUMPY_IO.md) |
 | `vtl.autograd` | `Context`, `Variable`, differentiable operations, and `backprop()` | [Autograd tutorial](docs/TUTORIAL_AUTOGRAD.md) · [API docs](https://vlang.github.io/vtl/vtl.autograd.html) |
 | `vtl.autograd_cuda` | Optional CUDA device sessions and GPU-backed autograd | [Device memory guide](docs/DEVICE_MEMORY.md) · [CUDA example](examples/nn_cifar10_cuda/README.md) · [Source](autograd_cuda/) |
 | `vtl.la` | Linear algebra operations backed by VSL | [Linear algebra tutorial](docs/TUTORIAL_LINEAR_ALGEBRA.md) · [Advanced LA](docs/TUTORIAL_ADVANCED_LA.md) · [API docs](https://vlang.github.io/vtl/vtl.la.html) |
