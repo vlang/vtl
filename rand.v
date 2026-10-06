@@ -4,6 +4,67 @@ import math
 import rand
 import rand.config
 
+// RandomGenerator owns an independent pseudorandom stream for reproducible
+// experiments that must not modify or depend on V's global random state.
+pub struct RandomGenerator {
+mut:
+	rng &rand.PRNG
+}
+
+// new_random_generator creates an independent generator initialized from seed.
+pub fn new_random_generator(seed int) RandomGenerator {
+	mut rng := rand.new_default(config.PRNGConfigStruct{
+		seed_: [u32(seed), 0]
+	})
+	return RandomGenerator{
+		rng: rng
+	}
+}
+
+// free releases the generator's underlying pseudorandom engine.
+pub fn (mut generator RandomGenerator) free() {
+	generator.rng.free()
+}
+
+// uniform returns f64 values in the [minimum, maximum) range.
+pub fn (mut generator RandomGenerator) uniform(minimum f64, maximum f64, shape []int) !&Tensor[f64] {
+	if maximum < minimum {
+		return error('uniform: maximum must be greater than or equal to minimum')
+	}
+	mut result := zeros[f64](shape, TensorData{})
+	for i in 0 .. result.size {
+		result.set_nth(i, generator.rng.f64_in_range(minimum, maximum)!)
+	}
+	return result
+}
+
+// normal returns f64 values from a normal distribution with the given parameters.
+pub fn (mut generator RandomGenerator) normal(shape []int, params NormalTensorData) !&Tensor[f64] {
+	if params.sigma <= 0 {
+		return error('normal: sigma must be positive')
+	}
+	mut result := zeros[f64](shape, TensorData{})
+	for i in 0 .. result.size {
+		result.set_nth(i, generator.rng.normal(config.NormalConfigStruct{
+			mu:    params.mu
+			sigma: params.sigma
+		})!)
+	}
+	return result
+}
+
+// bernoulli returns bool values sampled with the given probability of true.
+pub fn (mut generator RandomGenerator) bernoulli(probability f64, shape []int) !&Tensor[bool] {
+	if probability < 0 || probability > 1 {
+		return error('bernoulli: probability must be in [0, 1]')
+	}
+	mut result := zeros[bool](shape, TensorData{})
+	for i in 0 .. result.size {
+		result.set_nth(i, generator.rng.bernoulli(probability)!)
+	}
+	return result
+}
+
 // bernoulli returns a tensor of bernoulli random variables.
 pub fn bernoulli[T](prob f64, shape []int, params TensorData) &Tensor[T] {
 	mut t := zeros[T](shape, params)
