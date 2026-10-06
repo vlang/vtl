@@ -140,6 +140,20 @@ println(x_grid) // [[1, 2, 3], [1, 2, 3]]
 println(y_grid) // [[10, 10, 10], [20, 20, 20]]
 ```
 
+For three or more axes, `meshgrid_n` returns one grid per input. Use `.ij` to
+preserve axis order or `.xy` to swap the first two axes like NumPy:
+
+```v
+x := vtl.from_1d([1, 2])!
+y := vtl.from_1d([10, 20, 30])!
+z := vtl.from_1d([4, 5])!
+grids := vtl.meshgrid_n[int]([x, y, z], .xy)!
+assert grids[0].shape == [3, 2, 2]
+assert grids[0].get([2, 1, 1]) == 2
+assert grids[1].get([2, 1, 1]) == 30
+assert grids[2].get([2, 1, 1]) == 5
+```
+
 ## Accessing and modifying a value
 
 ```v
