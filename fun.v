@@ -22,6 +22,22 @@ pub fn (t &Tensor[T]) map[T](f fn (x T, i []int) T) &Tensor[T] {
 	return ret
 }
 
+// map_values maps each value without constructing multidimensional indices.
+// It uses direct linear access only for contiguous row-major storage and falls
+// back to map for views and non-contiguous tensors.
+fn (t &Tensor[T]) map_values[T](f fn (x T) T) &Tensor[T] {
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		mut ret := tensor_like[T](t)
+		for i in 0 .. t.size {
+			ret.data.data[i] = f(t.data.data[i])
+		}
+		return ret
+	}
+	return t.map(fn [f] [T](x T, _ []int) T {
+		return f(x)
+	})
+}
+
 // reduce reduces a function to a given Tensor retuning a new aggregated value
 pub fn (t &Tensor[T]) reduce[T](init T, f fn (acc T, x T, i []int) T) T {
 	mut ret := init

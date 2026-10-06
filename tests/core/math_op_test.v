@@ -121,3 +121,11 @@ fn test_divide_2d_scalar() {
 	expected := vtl.from_2d([[0.5, 1, 1.5, 2], [2.5, 3, 3.5, 4]])!
 	assert result.array_equal(expected)
 }
+
+fn test_scalar_elementwise_operations_on_noncontiguous_views() {
+	a := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
+	transposed := a.transpose([1, 0])!
+	result := transposed.add_scalar(10)!
+	expected := vtl.from_2d([[11, 14], [12, 15], [13, 16]])!
+	assert result.array_equal(expected)
+}

@@ -27,7 +27,7 @@ pub fn (a &Tensor[T]) add[T](b &Tensor[T]) !&Tensor[T] {
 // add_scalar exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) add_scalar[T](scalar T) !&Tensor[T] {
-	return a.map(fn [scalar] [T](x T, _ []int) T {
+	return a.map_values(fn [scalar] [T](x T) T {
 		$if T is bool {
 			return td[T](x).bool() || td[T](scalar).bool()
 		} $else $if T is string {
@@ -65,7 +65,7 @@ pub fn (a &Tensor[T]) subtract[T](b &Tensor[T]) !&Tensor[T] {
 // subtract_scalar exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) subtract_scalar[T](scalar T) !&Tensor[T] {
-	return a.map(fn [scalar] [T](x T, _ []int) T {
+	return a.map_values(fn [scalar] [T](x T) T {
 		$if T is bool {
 			return td[T](x).bool() && !td[T](scalar).bool()
 		} $else $if T is string {
@@ -101,7 +101,7 @@ pub fn (a &Tensor[T]) divide[T](b &Tensor[T]) !&Tensor[T] {
 // divide_scalar exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) divide_scalar[T](scalar T) !&Tensor[T] {
-	return a.map(fn [scalar] [T](x T, _ []int) T {
+	return a.map_values(fn [scalar] [T](x T) T {
 		$if T is bool || T is string {
 			panic(@FN + ' is not supported for type ${typeof(x).name}')
 		} $else {
@@ -135,7 +135,7 @@ pub fn (a &Tensor[T]) multiply[T](b &Tensor[T]) !&Tensor[T] {
 // multiply_scalar exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) multiply_scalar[T](scalar T) !&Tensor[T] {
-	return a.map(fn [scalar] [T](x T, _ []int) T {
+	return a.map_values(fn [scalar] [T](x T) T {
 		$if T is bool || T is string {
 			panic(@FN + ' is not supported for type ${typeof(x).name}')
 		} $else {
