@@ -683,6 +683,54 @@ pub fn quantile_linear[T](t &vtl.Tensor[T], q f64) !f64 {
 	return interpolate_quantile(mut values, q)
 }
 
+// quantiles_linear computes several NumPy-style quantiles from one sorted
+// copy of the flattened tensor values.
+pub fn quantiles_linear[T](t &vtl.Tensor[T], quantiles []f64) !&vtl.Tensor[f64] {
+	for q in quantiles {
+		if math.is_nan(q) || math.is_inf(q, 0) || q < 0 || q > 1 {
+			return error('quantiles must be between 0 and 1')
+		}
+	}
+	if t.size == 0 {
+		return error('quantiles are undefined for an empty tensor')
+	}
+	mut values := t.to_array().map(vtl.cast[f64](it))
+	for value in values {
+		if math.is_nan(value) {
+			return vtl.from_1d[f64]([]f64{len: quantiles.len, init: math.nan()})
+		}
+	}
+	values.sort()
+	mut results := []f64{len: quantiles.len}
+	for i, q in quantiles {
+		results[i] = interpolate_sorted_quantile(values, q)
+	}
+	return vtl.from_1d[f64](results)
+}
+
+// nanquantiles_linear computes several quantiles while ignoring NaN values.
+// If every input value is NaN, every result is NaN.
+pub fn nanquantiles_linear[T](t &vtl.Tensor[T], quantiles []f64) !&vtl.Tensor[f64] {
+	for q in quantiles {
+		if math.is_nan(q) || math.is_inf(q, 0) || q < 0 || q > 1 {
+			return error('quantiles must be between 0 and 1')
+		}
+	}
+	if t.size == 0 {
+		return error('quantiles are undefined for an empty tensor')
+	}
+	mut values := t.to_array().map(vtl.cast[f64](it)).filter(!math.is_nan(it))
+	if values.len == 0 {
+		return vtl.from_1d[f64]([]f64{len: quantiles.len, init: math.nan()})
+	}
+	values.sort()
+	mut results := []f64{len: quantiles.len}
+	for i, q in quantiles {
+		results[i] = interpolate_sorted_quantile(values, q)
+	}
+	return vtl.from_1d[f64](results)
+}
+
 // nanquantile_linear computes a linearly interpolated quantile while ignoring
 // NaN values. It returns NaN when the tensor has no non-NaN values.
 pub fn nanquantile_linear[T](t &vtl.Tensor[T], q f64) !f64 {
@@ -706,6 +754,10 @@ fn interpolate_quantile(mut values []f64, q f64) f64 {
 		}
 	}
 	values.sort()
+	return interpolate_sorted_quantile(values, q)
+}
+
+fn interpolate_sorted_quantile(values []f64, q f64) f64 {
 	position := q * f64(values.len - 1)
 	lo := int(math.floor(position))
 	hi := math.min(lo + 1, values.len - 1)

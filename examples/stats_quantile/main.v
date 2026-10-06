@@ -9,6 +9,7 @@ fn main() {
 	for q in [0.0, 0.25, 0.5, 0.75, 1.0] {
 		println('q=${q}: ${stats.quantile_linear(values, q)!}')
 	}
+	println('All quantiles: ${stats.quantiles_linear(values, [0.0, 0.25, 0.5, 0.75, 1.0])!.to_array()}')
 	println('50th percentile: ${stats.percentile_linear(values, 50)!}')
 	grid := vtl.from_array([1.0, 10.0, 3.0, 20.0, 5.0, 30.0], [3, 2])!
 	println('Median by column: ${stats.quantile_axis(grid, 0.5, 0)!.to_array()}')
