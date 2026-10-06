@@ -35,6 +35,7 @@ CIFAR examples for CI-safe checks.
 | [covariance_correlation](./covariance_correlation) | Compute sample covariance and Pearson correlation matrices | `v run ./vtl/examples/covariance_correlation/main.v` |
 | [histogram](./histogram) | Count samples and compute weighted density with custom bin edges | `v run ./vtl/examples/histogram/main.v` |
 | [bincount](./bincount) | Count integer labels and sum per-label weights | `v run ./vtl/examples/bincount/main.v` |
+| [unique](./unique) | Find sorted unique values and count occurrences | `v run ./vtl/examples/unique/main.v` |
 
 ## Neural networks
 

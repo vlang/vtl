@@ -1,0 +1,27 @@
+# Tutorial: Unique Values
+
+`vtl.unique` flattens a tensor and returns its distinct values in ascending
+order. `vtl.unique_counts` also returns the number of input occurrences for
+each sorted value.
+
+```v
+import vtl
+
+samples := vtl.from_2d([[4, 2, 4], [1, 2, 4]])!
+values := vtl.unique(samples)!
+summary := vtl.unique_counts(samples)!
+
+assert values.to_array() == [1, 2, 4]
+assert summary.values.to_array() == [1, 2, 4]
+assert summary.counts.to_array() == [1, 2, 3]
+```
+
+The returned values are sorted regardless of input order. For `f32` and `f64`,
+all NaN values are grouped into one unique value and placed after finite values,
+matching VTL's sort ordering. Empty tensors return empty values and counts.
+
+Run the complete example from `~/.vmodules`:
+
+```bash
+v run ./vtl/examples/unique/main.v
+```
