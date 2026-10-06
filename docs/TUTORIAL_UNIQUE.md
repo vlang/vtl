@@ -14,7 +14,12 @@ summary := vtl.unique_counts(samples)!
 assert values.to_array() == [1, 2, 4]
 assert summary.values.to_array() == [1, 2, 4]
 assert summary.counts.to_array() == [1, 2, 3]
+inverse := vtl.unique_inverse(samples)!
+assert inverse.to_array() == [2, 1, 2, 0, 1, 2]
 ```
+
+`unique_inverse` returns one index per flattened input value. Use those indices
+to map each source value back into the sorted unique-value array.
 
 The returned values are sorted regardless of input order. For `f32` and `f64`,
 all NaN values are grouped into one unique value and placed after finite values,
