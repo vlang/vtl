@@ -17,4 +17,7 @@ fn main() {
 	last_frames_reversed := video.flip(1)!
 	println('Time reversed [batch, time, channel]: ${last_frames_reversed.shape}')
 	println('First reversed frame value: ${last_frames_reversed.get([0, 0, 0])}')
+
+	duplicated_time := vtl.repeat_axis(video, 2, 1)!
+	println('Repeated time steps [batch, time, channel]: ${duplicated_time.shape}')
 }
