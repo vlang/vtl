@@ -55,4 +55,7 @@ jobs:
       - name: Full test tree and examples
         run: |
           cd ~/.vmodules
-          vtl/bin/test --full
+          sudo systemd-run --scope --wait --property=MemoryMax=4G \
+            --property=MemorySwapMax=0 --setenv=HOME="$HOME" \
+            --setenv=PATH="$PATH" --setenv=VJOBS=2 --setenv=TERM="$TERM" -- \
+            "$HOME/.vmodules/vtl/bin/test" --full
