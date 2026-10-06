@@ -23,6 +23,18 @@ pub fn rfft[T](input &vtl.Tensor[T]) !&vtl.Tensor[complex.Complex] {
 	}
 }
 
+// fft computes a one-dimensional discrete Fourier transform of complex f64
+// values, returning all positive and negative frequencies in native order.
+pub fn fft(input &vtl.Tensor[complex.Complex]) !&vtl.Tensor[complex.Complex] {
+	return complex_fft(input, false)
+}
+
+// ifft computes the normalized one-dimensional inverse transform of complex
+// f64 values.
+pub fn ifft(input &vtl.Tensor[complex.Complex]) !&vtl.Tensor[complex.Complex] {
+	return complex_fft(input, true)
+}
+
 // irfft reconstructs a real signal of `length` samples from its non-negative
 // frequency components. The inverse transform is normalized by `length`.
 pub fn irfft(input &vtl.Tensor[complex.Complex], length int) !&vtl.Tensor[f64] {
@@ -81,6 +93,40 @@ fn rfft_f64(input &vtl.Tensor[f64]) !&vtl.Tensor[complex.Complex] {
 		return error('rfft backend failed to compute the forward transform')
 	}
 	return unpack_rfft_f64(packed)
+}
+
+fn complex_fft(input &vtl.Tensor[complex.Complex], inverse bool) !&vtl.Tensor[complex.Complex] {
+	if input.rank() != 1 {
+		return error('fft expects a one-dimensional tensor')
+	}
+	if input.size == 0 {
+		return error('fft requires at least one input value')
+	}
+	mut interleaved := []f64{len: input.size * 2}
+	for i in 0 .. input.size {
+		value := input.get_nth(i)
+		interleaved[2 * i] = value.re
+		interleaved[2 * i + 1] = value.im
+	}
+	plan := vsl_fft.create_complex_plan_f64(input.size)!
+	defer {
+		vsl_fft.destroy_plan(plan)
+	}
+	status := if inverse {
+		vsl_fft.backward_complex_f64(plan, mut interleaved)
+	} else {
+		vsl_fft.forward_complex_f64(plan, mut interleaved)
+	}
+	if status != 0 {
+		return error('fft backend failed to compute the transform')
+	}
+	mut result := []complex.Complex{len: input.size}
+	for i in 0 .. input.size {
+		factor := if inverse { f64(input.size) } else { 1.0 }
+		result[i] = complex.complex(interleaved[2 * i] / factor,
+			interleaved[2 * i + 1] / factor)
+	}
+	return vtl.from_1d[complex.Complex](result)
 }
 
 fn unpack_rfft_f32(packed []f32) !&vtl.Tensor[complex.Complex] {

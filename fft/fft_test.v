@@ -47,6 +47,40 @@ fn test_rfft_accepts_f32_and_returns_f64_complex_values() ! {
 	assert math.abs(frequencies.get_nth(2).re) < 1e-6
 }
 
+fn test_complex_fft_and_ifft_roundtrip() ! {
+	input := vtl.from_1d[complex.Complex]([
+		complex.complex(1, 0),
+		complex.complex(0, 0),
+		complex.complex(0, 0),
+		complex.complex(0, 0),
+	])!
+
+	spectrum := fft(input)!
+	assert spectrum.shape == [4]
+	for i in 0 .. input.size {
+		assert math.abs(spectrum.get_nth(i).re - 1) < 1e-12
+		assert math.abs(spectrum.get_nth(i).im) < 1e-12
+	}
+
+	phase_input := vtl.from_1d[complex.Complex]([
+		complex.complex(0, 0),
+		complex.complex(1, 0),
+		complex.complex(0, 0),
+		complex.complex(0, 0),
+	])!
+	phase_spectrum := fft(phase_input)!
+	assert math.abs(phase_spectrum.get_nth(0).re - 1) < 1e-12
+	assert math.abs(phase_spectrum.get_nth(1).im + 1) < 1e-12
+	assert math.abs(phase_spectrum.get_nth(2).re + 1) < 1e-12
+	assert math.abs(phase_spectrum.get_nth(3).im - 1) < 1e-12
+
+	reconstructed := ifft(spectrum)!
+	for i in 0 .. input.size {
+		assert math.abs(reconstructed.get_nth(i).re - input.get_nth(i).re) < 1e-12
+		assert math.abs(reconstructed.get_nth(i).im - input.get_nth(i).im) < 1e-12
+	}
+}
+
 fn test_rfft_rejects_non_vector_and_empty_input() ! {
 	matrix := vtl.ones[f64]([2, 2])
 
