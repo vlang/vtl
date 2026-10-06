@@ -735,7 +735,7 @@ pub fn quantile_linear[T](t &vtl.Tensor[T], q f64) !f64 {
 	if t.size == 0 {
 		return error('quantile is undefined for an empty tensor')
 	}
-	mut values := t.to_array().map(vtl.cast[f64](it))
+	mut values := tensor_float64_values[T](t, false)
 	return interpolate_quantile(mut values, q)
 }
 
@@ -750,7 +750,7 @@ pub fn quantiles_linear[T](t &vtl.Tensor[T], quantiles []f64) !&vtl.Tensor[f64] 
 	if t.size == 0 {
 		return error('quantiles are undefined for an empty tensor')
 	}
-	mut values := t.to_array().map(vtl.cast[f64](it))
+	mut values := tensor_float64_values[T](t, false)
 	for value in values {
 		if math.is_nan(value) {
 			return vtl.from_1d[f64]([]f64{len: quantiles.len, init: math.nan()})
@@ -775,7 +775,7 @@ pub fn nanquantiles_linear[T](t &vtl.Tensor[T], quantiles []f64) !&vtl.Tensor[f6
 	if t.size == 0 {
 		return error('quantiles are undefined for an empty tensor')
 	}
-	mut values := t.to_array().map(vtl.cast[f64](it)).filter(!math.is_nan(it))
+	mut values := tensor_float64_values[T](t, true)
 	if values.len == 0 {
 		return vtl.from_1d[f64]([]f64{len: quantiles.len, init: math.nan()})
 	}
@@ -796,7 +796,7 @@ pub fn nanquantile_linear[T](t &vtl.Tensor[T], q f64) !f64 {
 	if t.size == 0 {
 		return error('quantile is undefined for an empty tensor')
 	}
-	mut values := t.to_array().map(vtl.cast[f64](it)).filter(!math.is_nan(it))
+	mut values := tensor_float64_values[T](t, true)
 	if values.len == 0 {
 		return math.nan()
 	}
@@ -811,6 +811,20 @@ fn interpolate_quantile(mut values []f64, q f64) f64 {
 	}
 	values.sort()
 	return interpolate_sorted_quantile(values, q)
+}
+
+fn tensor_float64_values[T](t &vtl.Tensor[T], ignore_nan bool) []f64 {
+	mut values := []f64{cap: t.size}
+	mut iter := t.iterator[T]()
+	for {
+		value, _ := iter.next() or { break }
+		numeric := vtl.cast[f64](value)
+		if ignore_nan && math.is_nan(numeric) {
+			continue
+		}
+		values << numeric
+	}
+	return values
 }
 
 fn interpolate_sorted_quantile(values []f64, q f64) f64 {
