@@ -170,8 +170,9 @@ fn test_copy_4() {
 fn test_copy_5() {
 	t := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
 	result := t.copy(.col_major)
-	expected := vtl.from_2d([[1, 2, 3], [4, 5, 6]], memory: .col_major)!
-	assert result.array_equal(expected)
+	assert result.array_equal(t)
+	assert result.is_col_major_contiguous()
+	assert result.to_array() == [1, 2, 3, 4, 5, 6]
 }
 
 fn test_view_1() {
