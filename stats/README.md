@@ -22,9 +22,10 @@ axis removed. Explicit sample coordinates remain in their given order.
 uniform sample spacing. It preserves the input shape, accepts negative axes,
 uses centered differences for interior points, and uses first-order one-sided
 differences at the boundaries. `gradient_axis_with_coordinates` accepts
-strictly monotonic non-uniform sample coordinates and selects first- or
-second-order boundary differences with `edge_order`. Both functions preserve
-the input shape and support negative axes. See the
+strictly monotonic non-uniform sample coordinates and uses first-order
+boundary differences. `gradient_axis_with_coordinates_edge_order` selects
+first- or second-order boundary differences explicitly. All gradient functions
+preserve the input shape and support negative axes. See the
 [gradient example](../examples/gradient).
 
 NaN-aware reductions `nansum`, `nanprod`, `nanmin`, and `nanmax` ignore NaN

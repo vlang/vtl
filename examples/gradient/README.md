@@ -12,6 +12,7 @@ systemd-run --user --scope --quiet --property=MemoryMax=768M --property=MemorySw
 returns `f64` values. It uses centered differences inside the axis and
 first-order one-sided differences at the two boundaries.
 
-For non-uniform coordinates, use `stats.gradient_axis_with_coordinates` and
-pass `edge_order` as `1` or `2`. The example also demonstrates exact
-second-order derivatives for samples of a quadratic function.
+For non-uniform coordinates, use `stats.gradient_axis_with_coordinates` for
+first-order boundaries, or `stats.gradient_axis_with_coordinates_edge_order`
+to select `edge_order` 1 or 2. The example demonstrates exact second-order
+derivatives for samples of a quadratic function.

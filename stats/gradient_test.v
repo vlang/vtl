@@ -18,7 +18,7 @@ fn test_gradient_axis_supports_negative_axis_and_spacing() ! {
 
 fn test_gradient_axis_with_non_uniform_coordinates_and_second_order_edges() ! {
 	values := vtl.from_1d([0.0, 1.0, 9.0, 36.0])!
-	gradient := gradient_axis_with_coordinates[f64](values, [0.0, 1.0, 3.0, 6.0], 0, 2)!
+	gradient := gradient_axis_with_coordinates_edge_order[f64](values, [0.0, 1.0, 3.0, 6.0], 0, 2)!
 	expected := vtl.from_1d([0.0, 2.0, 6.0, 12.0])!
 	assert gradient.allclose(expected, vtl.IsCloseData{
 		rtol: 1e-12
@@ -28,7 +28,7 @@ fn test_gradient_axis_with_non_uniform_coordinates_and_second_order_edges() ! {
 
 fn test_gradient_axis_with_coordinates_supports_first_order_edges() ! {
 	values := vtl.from_1d([0.0, 1.0, 9.0, 36.0])!
-	gradient := gradient_axis_with_coordinates[f64](values, [0.0, 1.0, 3.0, 6.0], 0, 1)!
+	gradient := gradient_axis_with_coordinates[f64](values, [0.0, 1.0, 3.0, 6.0], 0)!
 	expected := vtl.from_1d([1.0, 2.0, 6.0, 9.0])!
 	assert gradient.allclose(expected, vtl.IsCloseData{
 		rtol: 1e-12
@@ -38,7 +38,7 @@ fn test_gradient_axis_with_coordinates_supports_first_order_edges() ! {
 
 fn test_gradient_axis_with_descending_coordinates() ! {
 	values := vtl.from_1d([36.0, 9.0, 1.0, 0.0])!
-	gradient := gradient_axis_with_coordinates[f64](values, [6.0, 3.0, 1.0, 0.0], 0, 2)!
+	gradient := gradient_axis_with_coordinates_edge_order[f64](values, [6.0, 3.0, 1.0, 0.0], 0, 2)!
 	expected := vtl.from_1d([12.0, 6.0, 2.0, 0.0])!
 	assert gradient.allclose(expected, vtl.IsCloseData{
 		rtol: 1e-12
@@ -48,20 +48,20 @@ fn test_gradient_axis_with_descending_coordinates() ! {
 
 fn test_gradient_axis_with_coordinates_rejects_invalid_coordinates() {
 	values := vtl.from_1d([1.0, 2.0, 3.0])!
-	if _ := gradient_axis_with_coordinates[f64](values, [0.0, 0.0, 2.0], 0, 1) {
+	if _ := gradient_axis_with_coordinates[f64](values, [0.0, 0.0, 2.0], 0) {
 		assert false
 	}
-	if _ := gradient_axis_with_coordinates[f64](values, [0.0, 1.0], 0, 1) {
+	if _ := gradient_axis_with_coordinates[f64](values, [0.0, 1.0], 0) {
 		assert false
 	}
-	if _ := gradient_axis_with_coordinates[f64](values, [0.0, 1.0, 2.0], 0, 3) {
+	if _ := gradient_axis_with_coordinates_edge_order[f64](values, [0.0, 1.0, 2.0], 0, 3) {
 		assert false
 	}
-	if _ := gradient_axis_with_coordinates[f64](values, [0.0, 2.0, 1.0], 0, 1) {
+	if _ := gradient_axis_with_coordinates[f64](values, [0.0, 2.0, 1.0], 0) {
 		assert false
 	}
 	short := vtl.from_1d([1.0, 2.0])!
-	if _ := gradient_axis_with_coordinates[f64](short, [0.0, 1.0], 0, 2) {
+	if _ := gradient_axis_with_coordinates_edge_order[f64](short, [0.0, 1.0], 0, 2) {
 		assert false
 	}
 }
