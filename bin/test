@@ -68,10 +68,11 @@ if [[ -n "${full}" ]]; then
     echo "Full CI mode (high RAM): v test entire tree"
     v ${flags} test ${vtl_dir_path}
 else
-    echo "Scoped CI mode (VJOBS=${VJOBS}): nn, autograd, datasets, core, la, storage, stats, ml"
+    echo "Scoped CI mode (VJOBS=${VJOBS}): nn, autograd, autograd_tests, datasets, core, la, storage, stats, ml"
     v ${flags} test \
         ${vtl_dir_path}/nn \
         ${vtl_dir_path}/autograd \
+        ${vtl_dir_path}/autograd_tests \
         ${vtl_dir_path}/datasets \
         ${vtl_dir_path}/tests/core \
         ${vtl_dir_path}/la \
