@@ -124,6 +124,29 @@ println(t)
 //  [3, 6]]
 ```
 
+## Einstein summation
+
+`einsum` expresses contractions by assigning a label to each axis. Labels that
+appear in both operands are contracted when omitted from the output. For
+example, matrix multiplication can be written explicitly or with NumPy-style
+implicit output labels:
+
+```v
+import vtl
+
+a := vtl.from_2d([[1.0, 2.0], [3.0, 4.0]])!
+b := vtl.from_2d([[5.0, 6.0], [7.0, 8.0]])!
+product := vtl.einsum[f64]('ij,jk->ik', a, b)!
+implicit_product := vtl.einsum[f64]('ij,jk', a, b)!
+println(product) // [[19, 22], [43, 50]]
+```
+
+Repeated labels select diagonals (`'ii->i'`) or reduce them to a scalar
+(`'ii->'`). Multiple operands, size-one broadcasting, integer tensors, and
+ellipsis notation for batched operations are supported. Labels are single ASCII
+letters. Two-dimensional floating-point matrix products use the VSL linear
+algebra kernel; other expressions use the general contraction evaluator.
+
 ## See also
 
 - [First Steps](./TUTORIAL_FIRST_STEPS.md) — tensor creation and shapes
