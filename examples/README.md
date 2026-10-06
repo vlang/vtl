@@ -30,6 +30,7 @@ CIFAR examples for CI-safe checks.
 | [meshgrid_n](./meshgrid_n) | Build N-dimensional coordinate grids with `xy` or `ij` indexing | `v run ./vtl/examples/meshgrid_n/main.v` |
 | [diff](./diff) | Compute discrete differences in one-dimensional and multidimensional data | `v run ./vtl/examples/diff/main.v` |
 | [trapezoid](./trapezoid) | Integrate sampled data with the composite trapezoidal rule | `v run ./vtl/examples/trapezoid/main.v` |
+| [gradient](./gradient) | Estimate numerical derivatives along a tensor axis | `v run ./vtl/examples/gradient/main.v` |
 | [broadcast_mask](./broadcast_mask) | Select and fill values with broadcastable boolean masks | `v run ./vtl/examples/broadcast_mask/main.v` |
 | [compress](./compress) | Select flattened values or tensor slices with a one-dimensional condition | `v run ./vtl/examples/compress/main.v` |
 | [array_choose](./array_choose) | Select and broadcast tensor values by integer choice indices | `v run ./vtl/examples/array_choose/main.v` |
