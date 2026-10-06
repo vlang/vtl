@@ -211,6 +211,64 @@ pub fn (t &Tensor[T]) take[T](indices []int, axis int) !&Tensor[T] {
 	return result
 }
 
+// take_nd gathers values along one axis using an index tensor. The index
+// tensor's dimensions replace the selected axis in the output shape.
+pub fn (t &Tensor[T]) take_nd[T](indices &Tensor[int], axis int) !&Tensor[T] {
+	rank := t.rank()
+	axis_index := if axis < 0 { axis + rank } else { axis }
+	if axis_index < 0 || axis_index >= rank {
+		return error('take_nd axis ${axis} is out of range for rank ${rank}')
+	}
+	mut output_shape := []int{cap: rank - 1 + indices.rank()}
+	output_shape << t.shape[..axis_index]
+	output_shape << indices.shape
+	output_shape << t.shape[axis_index + 1..]
+	mut result := empty[T](output_shape, memory: t.memory)
+	mut input_index := []int{len: rank}
+	mut indices_index := []int{len: indices.rank()}
+	mut output_index := []int{len: output_shape.len}
+	for flat_index in 0 .. result.size {
+		mut remaining := flat_index
+		for output_axis := output_shape.len - 1; output_axis >= 0; output_axis-- {
+			output_index[output_axis] = remaining % output_shape[output_axis]
+			remaining /= output_shape[output_axis]
+		}
+		for input_axis in 0 .. axis_index {
+			input_index[input_axis] = output_index[input_axis]
+		}
+		for index_axis in 0 .. indices.rank() {
+			indices_index[index_axis] = output_index[axis_index + index_axis]
+		}
+		selected := indices.get(indices_index)
+		normalized := if selected < 0 { selected + t.shape[axis_index] } else { selected }
+		if normalized < 0 || normalized >= t.shape[axis_index] {
+			return error('take_nd index ${selected} is out of range for axis size ${t.shape[axis_index]}')
+		}
+		input_index[axis_index] = normalized
+		for input_axis in axis_index + 1 .. rank {
+			input_index[input_axis] = output_index[input_axis - 1 + indices.rank()]
+		}
+		result.data.data[result.offset_index(output_index)] = t.get(input_index)
+	}
+	return result
+}
+
+// take_flat gathers from the row-major logical flattening of a tensor and
+// preserves the shape of the index tensor.
+pub fn (t &Tensor[T]) take_flat[T](indices &Tensor[int]) !&Tensor[T] {
+	flattened := t.ravel[T]()!
+	mut result := empty[T](indices.shape, memory: .row_major)
+	for flat_index in 0 .. indices.size {
+		selected := indices.get_nth[int](flat_index)
+		normalized := if selected < 0 { selected + flattened.size } else { selected }
+		if normalized < 0 || normalized >= flattened.size {
+			return error('take_flat index ${selected} is out of range for flattened size ${flattened.size}')
+		}
+		result.data.data[flat_index] = flattened.get_nth(normalized)
+	}
+	return result
+}
+
 // take_along_axis gathers values using an index tensor with the same rank as
 // the receiver. Dimensions must match except along `axis`.
 pub fn (t &Tensor[T]) take_along_axis[T](indices &Tensor[int], axis int) !&Tensor[T] {

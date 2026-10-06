@@ -158,6 +158,51 @@ fn test_take_rejects_invalid_axes_and_indices() {
 	}
 }
 
+fn test_take_nd_replaces_axis_with_multidimensional_indices() {
+	tensor := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
+	indices := vtl.from_array([0, 2, 1, 0], [2, 2])!
+	got := tensor.take_nd(indices, -1)!
+	assert got.shape == [2, 2, 2]
+	assert got.to_array() == [1, 3, 2, 1, 4, 6, 5, 4]
+	column_major := vtl.from_array([0, 3, 1, 4, 2, 5], [2, 3], memory: .col_major)!
+	columns := column_major.take_nd(vtl.from_1d([2, 0])!, 1)!
+	assert columns.is_col_major()
+	assert columns.to_array() == [2, 0, 5, 3]
+	if _ := tensor.take_nd(vtl.from_1d([3])!, 1) {
+		assert false, 'take_nd must reject out-of-range indices'
+	}
+	if _ := tensor.take_nd(indices, 2) {
+		assert false, 'take_nd must reject out-of-range axes'
+	}
+}
+
+fn test_take_nd_supports_scalar_and_empty_index_tensors() {
+	tensor := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
+	scalar_index := vtl.from_array([-1], [])!
+	taken_scalar := tensor.take_nd(scalar_index, 1)!
+	assert taken_scalar.shape == [2]
+	assert taken_scalar.to_array() == [3, 6]
+	empty_indices := vtl.from_array([]int{}, [0, 2])!
+	empty := tensor.take_nd(empty_indices, 1)!
+	assert empty.shape == [2, 0, 2]
+	assert empty.size() == 0
+}
+
+fn test_take_flat_preserves_index_shape_and_rejects_out_of_range() {
+	tensor := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
+	indices := vtl.from_array([5, 0, -2, 3], [2, 2])!
+	got := tensor.take_flat(indices)!
+	assert got.shape == [2, 2]
+	assert got.to_array() == [6, 1, 5, 4]
+	transposed := tensor.transpose([1, 0])!
+	logical_flat := transposed.take_flat(vtl.from_1d([0, 1, 4, 5])!)!
+	assert logical_flat.to_array() == [1, 4, 3, 6]
+	bad_indices := vtl.from_1d([6])!
+	if _ := tensor.take_flat(bad_indices) {
+		assert false, 'take_flat must reject indices outside the flattened tensor'
+	}
+}
+
 fn test_take_along_axis() {
 	t := vtl.from_array([0, 1, 2, 3, 4, 5], [2, 3])!
 	indices := vtl.from_array([2, 0, 1, -1], [2, 2])!
