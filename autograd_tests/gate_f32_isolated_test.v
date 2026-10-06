@@ -1,4 +1,4 @@
-module gate_iso
+module autograd_tests
 
 struct Tensor[T] {
 mut:
