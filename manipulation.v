@@ -91,3 +91,37 @@ pub fn repeat_axis[T](t &Tensor[T], repeats int, axis int) !&Tensor[T] {
 	}
 	return result
 }
+
+// tile repeats t as a block according to reps. Repetition dimensions align
+// from the right; shorter reps are padded with ones on the left, as in NumPy.
+pub fn tile[T](t &Tensor[T], reps []int) !&Tensor[T] {
+	for repeat_count in reps {
+		if repeat_count < 0 {
+			return error('tile: repetitions must be non-negative')
+		}
+	}
+	out_rank := if reps.len > t.rank() { reps.len } else { t.rank() }
+	input_padding := out_rank - t.rank()
+	repeat_padding := out_rank - reps.len
+	mut out_shape := []int{len: out_rank, init: 1}
+	for dim in 0 .. out_rank {
+		input_dim := if dim < input_padding { 1 } else { t.shape[dim - input_padding] }
+		repeat_count := if dim < repeat_padding { 1 } else { reps[dim - repeat_padding] }
+		out_shape[dim] = input_dim * repeat_count
+	}
+	mut result := empty[T](out_shape, memory: t.memory)
+	mut output_index := []int{len: out_rank}
+	mut source_index := []int{len: t.rank()}
+	for linear in 0 .. result.size {
+		mut remainder := linear
+		for dim := out_rank - 1; dim >= 0; dim-- {
+			output_index[dim] = remainder % out_shape[dim]
+			remainder /= out_shape[dim]
+		}
+		for dim in 0 .. t.rank() {
+			source_index[dim] = output_index[dim + input_padding] % t.shape[dim]
+		}
+		result.set_nth(linear, t.get(source_index))
+	}
+	return result
+}

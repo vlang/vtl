@@ -1,8 +1,8 @@
 # Tensor axis manipulation
 
 This example moves tensor axes without copying their underlying data, reverses
-values along a selected axis with `Tensor.flip`, and repeats values with
-`vtl.repeat_axis`.
+values along a selected axis with `Tensor.flip`, repeats values with
+`vtl.repeat_axis`, and repeats full blocks with `vtl.tile`.
 
 Run from `~/.vmodules`:
 
@@ -15,3 +15,4 @@ API details and negative-axis rules. `flip` returns a tensor copy; pass no axes
 to reverse every dimension, or pass one or more positive or negative axes.
 `vtl.repeat` repeats values in flattened order, while `vtl.repeat_axis` preserves
 the tensor rank and repeats each value along the requested axis.
+`vtl.tile` repeats whole blocks and aligns repetition dimensions from the right.
