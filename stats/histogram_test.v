@@ -33,6 +33,8 @@ fn test_histogram_auto_supports_data_driven_bin_rules() ! {
 	assert sqrt_bins.counts.to_array() == [3, 2, 3]
 	sturges_bins := histogram_auto[int](data, .sturges)!
 	assert sturges_bins.counts.shape == [4]
+	doane_bins := histogram_auto[int](data, .doane)!
+	assert doane_bins.counts.shape == [4]
 	rice_bins := histogram_auto[int](data, .rice)!
 	assert rice_bins.counts.shape == [4]
 	scott_bins := histogram_auto[int](data, .scott)!

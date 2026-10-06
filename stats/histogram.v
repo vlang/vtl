@@ -21,6 +21,7 @@ pub:
 // HistogramBinRule selects a standard data-driven bin-width heuristic.
 pub enum HistogramBinRule {
 	automatic
+	doane
 	freedman_diaconis
 	rice
 	scott
@@ -87,6 +88,9 @@ pub fn histogram_auto[T](data &vtl.Tensor[T], rule HistogramBinRule) !Histogram 
 			values.sort()
 			bins = histogram_freedman_diaconis_bins(values, maximum - minimum)
 		}
+		.doane {
+			bins = histogram_doane_bins(values, sturges_bins)
+		}
 		.rice {
 			bins = math.max(1, int(math.ceil(2 * math.pow(f64(values.len), 1.0 / 3.0))))
 		}
@@ -99,6 +103,37 @@ pub fn histogram_auto[T](data &vtl.Tensor[T], rule HistogramBinRule) !Histogram 
 		.sturges {}
 	}
 	return histogram_range[T](data, bins, minimum, maximum)
+}
+
+fn histogram_doane_bins(values []f64, fallback int) int {
+	if values.len <= 2 {
+		return fallback
+	}
+	mut mean := 0.0
+	for value in values {
+		mean += value
+	}
+	mean /= f64(values.len)
+	mut second_moment := 0.0
+	mut third_moment := 0.0
+	for value in values {
+		difference := value - mean
+		second_moment += difference * difference
+		third_moment += difference * difference * difference
+	}
+	second_moment /= f64(values.len)
+	if second_moment == 0 {
+		return fallback
+	}
+	third_moment /= f64(values.len)
+	skewness := third_moment / math.pow(second_moment, 1.5)
+	n := f64(values.len)
+	skewness_error := math.sqrt(6 * (n - 2) / ((n + 1) * (n + 3)))
+	if skewness_error == 0 {
+		return fallback
+	}
+	bin_count := 1 + math.log2(n) + math.log2(1 + math.abs(skewness) / skewness_error)
+	return math.max(1, int(math.ceil(bin_count)))
 }
 
 fn histogram_freedman_diaconis_bins(sorted []f64, data_range f64) int {
