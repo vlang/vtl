@@ -109,6 +109,36 @@ uncontracted axes of `b`. Axis lists must have equal lengths, contain no
 repeated axes, and pair dimensions with equal sizes. Negative axes count from
 the end of their tensor.
 
+## Vector norms
+
+`la.vector_norm` computes a p-norm over all elements of any-rank tensor.
+`la.vector_norm_axis` computes one p-norm per slice and removes the reduced
+axis, matching NumPy's default. Use `la.vector_norm_axis_keepdims` to retain
+the reduced axis with length one. All three return `f64` tensors. Any finite
+positive or negative p, `0`, and positive or negative infinity are supported.
+
+```v
+import math
+import vtl
+import vtl.la
+
+values := vtl.from_1d([3.0, -4.0, 0.0])!
+l2 := la.vector_norm(values, 2)!.get_nth(0) // 5.0
+l1 := la.vector_norm(values, 1)!.get_nth(0) // 7.0
+nonzero := la.vector_norm(values, 0)!.get_nth(0) // 2.0
+maximum := la.vector_norm(values, math.inf(1))!.get_nth(0) // 4.0
+
+matrix := vtl.from_2d([[3.0, 4.0], [0.0, 12.0]])!
+row_lengths := la.vector_norm_axis(matrix, 2, 1)! // shape [2]
+row_lengths_keepdims := la.vector_norm_axis_keepdims(matrix, 2, 1)! // shape [2, 1]
+```
+
+The implementation scales values before exponentiation to reduce overflow and
+underflow for finite norms. Empty inputs return zero for order zero and finite
+positive orders; negative orders and extrema orders that need a minimum or
+maximum return an error. `la.norm` remains the separate matrix-norm API for
+Frobenius, one, and infinity matrix norms.
+
 ## Transpose
 
 Pass the desired axis order to `transpose`.  For a 2-D matrix, swap axes `[1, 0]`:

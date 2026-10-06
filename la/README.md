@@ -17,7 +17,8 @@ determinant := la.det[f64](a)!
 ```
 
 Available operations include `dot`, `matmul`, `tensordot`, `det`, `inv`,
-`trace`, `norm`,
+`trace`, matrix `norm`, vector `vector_norm`, axis `vector_norm_axis` and
+`vector_norm_axis_keepdims`,
 `outer`, `cross`, `solve`, `lstsq`, `qr`, `lu`, `cholesky`, `pinv`, and
 `matrix_rank`. Matrix multiplication and decomposition requirements (rank,
 shape, and tolerances) are checked by the individual functions.
