@@ -30,9 +30,10 @@ constant input expands by `0.5` at each end. `histogram_range(data, bins,
 minimum, maximum)` uses explicit finite increasing bounds, ignores values
 outside them, and includes the final right edge, matching NumPy's convention.
 `histogram_auto(data, rule)` chooses a bin count using Sturges, Doane,
-square-root, Rice, Scott, Freedman-Diaconis, or the NumPy-style automatic
-maximum of Sturges and Freedman-Diaconis. Degenerate estimates fall back to
-Sturges.
+square-root, Rice, Scott, Freedman-Diaconis, Stone, or the NumPy-style
+automatic maximum of Sturges and Freedman-Diaconis. Stone minimizes the
+cross-validated integrated squared error over candidate counts up to
+`max(100, floor(sqrt(n)))`. Degenerate estimates fall back to Sturges.
 
 `bincount(input, minlength)` counts non-negative integer labels in a vector;
 `bincount_weighted(input, weights, minlength)` sums numeric weights for each

@@ -41,10 +41,14 @@ fn test_histogram_auto_supports_data_driven_bin_rules() ! {
 	assert scott_bins.counts.shape == [2]
 	fd_bins := histogram_auto[int](data, .freedman_diaconis)!
 	assert fd_bins.counts.shape == [2]
+	stone_bins := histogram_auto[int](data, .stone)!
+	assert stone_bins.counts.size == 1
 	automatic_bins := histogram_auto[int](data, .automatic)!
 	assert automatic_bins.counts.shape == [4]
 	constant := histogram_auto[int](vtl.from_1d([2, 2, 2, 2])!, .automatic)!
 	assert constant.counts.shape[0] > 0
+	constant_stone := histogram_auto[int](vtl.from_1d([2, 2, 2, 2])!, .stone)!
+	assert constant_stone.counts.shape == [1]
 	empty := histogram_auto[int](vtl.from_array([]int{}, [0])!, .automatic)!
 	assert empty.counts.to_array() == [0]
 }

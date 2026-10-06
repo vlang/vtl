@@ -26,6 +26,7 @@ pub enum HistogramBinRule {
 	rice
 	scott
 	square_root
+	stone
 	sturges
 }
 
@@ -100,9 +101,41 @@ pub fn histogram_auto[T](data &vtl.Tensor[T], rule HistogramBinRule) !Histogram 
 		.square_root {
 			bins = math.max(1, int(math.ceil(math.sqrt(f64(values.len)))))
 		}
+		.stone {
+			bins = histogram_stone_bins(values, minimum, maximum)
+		}
 		.sturges {}
 	}
 	return histogram_range[T](data, bins, minimum, maximum)
+}
+
+fn histogram_stone_bins(values []f64, minimum f64, maximum f64) int {
+	if values.len <= 1 || minimum == maximum {
+		return 1
+	}
+	n := values.len
+	upper_bound := math.max(100, int(math.sqrt(f64(n))))
+	mut best_bins := 1
+	mut best_score := math.inf(1)
+	for candidate in 1 .. upper_bound + 1 {
+		mut counts := []int{len: candidate}
+		width := (maximum - minimum) / f64(candidate)
+		for value in values {
+			bin := math.min(int((value - minimum) / width), candidate - 1)
+			counts[bin]++
+		}
+		mut squared_probability_sum := 0.0
+		for count in counts {
+			probability := f64(count) / f64(n)
+			squared_probability_sum += probability * probability
+		}
+		score := (2 - f64(n + 1) * squared_probability_sum) / width
+		if score < best_score {
+			best_score = score
+			best_bins = candidate
+		}
+	}
+	return best_bins
 }
 
 fn histogram_doane_bins(values []f64, fallback int) int {
