@@ -120,7 +120,7 @@ opt.update()!
 | `vtl.nn.internal` | Internal tensor operations, activations, losses, and weight initialization | [API docs](https://vlang.github.io/vtl/vtl.nn.internal.html) |
 | `vtl.nn.gates` | Autograd gate implementations used by neural-network layers | [Autograd tutorial](docs/TUTORIAL_AUTOGRAD.md) · [API docs](https://vlang.github.io/vtl/vtl.nn.gates.html) |
 | `vtl.datasets` | MNIST, CIFAR-10, and IMDB dataset loaders | [Datasets guide](datasets/README.md) · [Examples](examples/README.md) · [API docs](https://vlang.github.io/vtl/vtl.datasets.html) |
-| `vtl.stats` | Descriptive statistics and statistical summaries | [Source](stats/stats.v) · [Tests](stats/stats_test.v) |
+| `vtl.stats` | Weighted averages, descriptive statistics, and statistical summaries | [Reduction tutorial](docs/TUTORIAL_REDUCTIONS.md) · [Source](stats/) · [Tests](stats/) |
 | Core lookup | Sorted unique values, first/inverse indices, axis slices/counts, and coordinate-based lookup | [Unique values tutorial](docs/TUTORIAL_UNIQUE.md) · [Example](examples/unique/main.v) |
 | `vtl.ml.metrics` | Machine-learning metrics and evaluation helpers | [Source](ml/metrics/) · [Tests](ml/metrics/metrics_test.v) |
 | `vtl.storage` | CPU storage plus optional CUDA, VCL, and Vulkan storage backends | [Device memory guide](docs/DEVICE_MEMORY.md) · [Source](storage/) |

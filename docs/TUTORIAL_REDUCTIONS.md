@@ -184,6 +184,22 @@ assert sample == 1.0
 assert deviation > 0.81 && deviation < 0.82
 ```
 
+## Weighted averages
+
+`stats.average` calculates one weighted mean when values and weights have the
+same shape. `stats.average_axis` accepts either full-shaped weights or a
+one-dimensional weight vector matching the selected axis; the result keeps
+that axis with length one.
+
+```v
+measurements := vtl.from_2d([[4.0, 5.0, 4.5], [3.0, 4.0, 5.0]])!
+reliability := vtl.from_1d([1.0, 2.0, 1.0])!
+row_means := stats.average_axis(measurements, reliability, 1)!
+assert row_means.to_array() == [4.625, 4.0]
+```
+
+Empty input, incompatible shapes, or a zero sum of weights returns an error.
+
 ## NaN-aware sums and extrema
 
 `nansum`, `nanprod`, `nanmin`, and `nanmax` skip NaN values. Their axis
