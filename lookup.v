@@ -3,11 +3,10 @@ module vtl
 // argwhere returns the coordinates of non-zero elements as a row-major tensor
 // with shape [number of matches, input rank].
 pub fn argwhere[T](t &Tensor[T]) !&Tensor[int] {
-	condition := t.as_bool()
-	mut coordinates := []int{cap: t.size * t.rank()}
+	mut coordinates := []int{}
 	mut matches := 0
 	for flat_index in 0 .. t.size {
-		if condition.get_nth(flat_index) {
+		if td[T](t.get_nth(flat_index)).bool() {
 			for coordinate in t.nth_index(flat_index) {
 				coordinates << coordinate
 			}
