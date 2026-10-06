@@ -44,7 +44,8 @@ range `[minimum, maximum)`. `normal(shape, params)` produces `f64` samples, and
 `bernoulli(probability, shape)` produces boolean samples. These methods return
 errors for invalid distribution parameters. Streams are reproducible with the
 same V/VTL versions, seed, and sequence of calls; cross-version compatibility
-is not guaranteed.
+is not guaranteed. A complete data-pipeline example is available at
+[`examples/random_generator/main.v`](../examples/random_generator/main.v).
 
 VTL currently provides uniform range, normal, Bernoulli, binomial, and
 exponential tensor constructors. See [`rand.v`](../rand.v) for their API.

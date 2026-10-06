@@ -1,5 +1,7 @@
 module vtl
 
+import rand
+
 fn test_random_generators_have_independent_reproducible_state() ! {
 	mut first := new_random_generator(42)
 	mut second := new_random_generator(7)
@@ -43,4 +45,15 @@ fn test_random_generator_rejects_invalid_distribution_parameters() {
 		assert false, 'bernoulli must reject probabilities above one'
 	}
 	generator.free()
+}
+
+fn test_random_generator_does_not_change_v_global_random_stream() ! {
+	random_seed(31415)
+	expected_global_value := rand.f64()
+	random_seed(31415)
+	mut independent := new_random_generator(2718)
+	_ := independent.uniform(0.0, 1.0, [16])!
+	observed_global_value := rand.f64()
+	assert observed_global_value == expected_global_value
+	independent.free()
 }
