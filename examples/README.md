@@ -20,6 +20,7 @@ CIFAR examples for CI-safe checks.
 | [npy_round_trip](./npy_round_trip) | Read and write NumPy `.npy` arrays | `v run vtl/examples/npy_round_trip/main.v` |
 | [stats_variance](./stats_variance) | Stable population/sample variance and standard deviation | `v run vtl/examples/stats_variance/main.v` |
 | [random_seed](./random_seed) | Repeat a random tensor sequence with an explicit seed | `v run vtl/examples/random_seed/main.v` |
+| [scatter](./scatter) | Add or assign values at indexed tensor positions | `v run vtl/examples/scatter/main.v` |
 
 ## Neural networks
 
