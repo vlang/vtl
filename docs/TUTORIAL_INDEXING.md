@@ -4,6 +4,24 @@
 indices count from the end. See [slicing](./TUTORIAL_SLICING.md) when a view of
 a range is more appropriate.
 
+## Find non-zero coordinates
+
+`argwhere` groups each non-zero element's coordinates into one row. Its output
+shape is `[number of matches, input rank]`; a scalar input therefore produces
+one row with zero columns when it is non-zero.
+
+```v
+import vtl
+
+values := vtl.from_2d([[0, 2, 0], [3, 4, 0]])!
+coordinates := vtl.argwhere[int](values)!
+assert coordinates.shape == [3, 2]
+assert coordinates.to_array() == [0, 1, 1, 0, 1, 1]
+```
+
+As with NumPy's `argwhere`, these coordinate rows are useful for inspection and
+coordinate-based updates; they are not a tuple of per-axis index arrays.
+
 `put_along_axis` writes values into a mutable tensor. `scatter_add` adds values
 to the selected locations; duplicate indices accumulate in row-major order.
 Both operations require the index tensor and values tensor to have matching
