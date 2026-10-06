@@ -18,6 +18,11 @@ output slice.
 with the composite trapezoidal rule and return `f64` tensors with the reduced
 axis removed. Explicit sample coordinates remain in their given order.
 
+`gradient_axis` estimates the numerical derivative along one axis using
+uniform sample spacing. It preserves the input shape, accepts negative axes,
+uses centered differences for interior points, and uses first-order one-sided
+differences at the boundaries. See the [gradient example](../examples/gradient).
+
 NaN-aware reductions `nansum`, `nanprod`, `nanmin`, and `nanmax` ignore NaN
 values and promote results to `f64`. Their `_axis` variants reduce one axis
 and remove it; `_axis_keepdims` variants retain it with length one. Empty or
