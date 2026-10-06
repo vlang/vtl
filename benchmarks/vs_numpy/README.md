@@ -144,10 +144,13 @@ The GPU result is read back only after timing to validate a checksum. Compare
 these resident-buffer timings as accelerator kernel measurements; they exclude
 CPU↔GPU transfer costs.
 
-On the same machine, one local run measured VTL Vulkan at 1.7 ms for 512×512,
-13.1 ms for 1024×1024, and 159.2 ms for 2048×2048. NumPy with two CPU BLAS
-threads measured 1.0 ms, 8.0 ms, and 62.2 ms respectively. The current Vulkan
-GEMM kernel is slower in this comparison and needs more work.
+On the Ryzen 9 5900X with an RTX 3060, the tiled 32×32 Vulkan kernel measured
+1.34 ms for 512×512, 4.39 ms for 1024×1024, and 42.95 ms for 2048×2048.
+Earlier NumPy runs on the same host with two CPU BLAS threads measured 1.0 ms,
+8.0 ms, and 62.2 ms respectively. This Vulkan kernel is about 1.8× faster at
+1024×1024 and 1.4× faster at 2048×2048, while it remains slower at 512×512.
+These resident-buffer kernel measurements exclude CPU↔GPU transfers, so they
+do not establish end-to-end superiority over NumPy.
 
 ## Conv2D (CPU path)
 
