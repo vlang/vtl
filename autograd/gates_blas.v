@@ -9,17 +9,27 @@ fn gate_matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	if a.shape[1] != b.shape[0] {
 		return error('Invalid shapes for matrix multiplication ${a.shape} and ${b.shape}')
 	}
-	ma := a.copy(.row_major)
-	mb := b.copy(.row_major)
+	ma := gate_matmul_data[T](a)
+	mb := gate_matmul_data[T](b)
 	mut dm := vsl_la.Matrix.new[f64](a.shape[0], b.shape[1])
-	mam := vsl_la.Matrix.raw(a.shape[0], a.shape[1], ma.as_f64().to_array())
-	mbm := vsl_la.Matrix.raw(b.shape[0], b.shape[1], mb.as_f64().to_array())
+	mam := vsl_la.Matrix.raw(a.shape[0], a.shape[1], ma)
+	mbm := vsl_la.Matrix.raw(b.shape[0], b.shape[1], mb)
 	vsl_la.matrix_matrix_mul(mut dm, 1.0, mam, mbm)
-	res := vtl.from_2d[f64](dm.get_deep2())!
+	res := vtl.from_array[f64](dm.data, [a.shape[0], b.shape[1]])!
 	if sizeof(T) == 4 {
 		return unsafe { &vtl.Tensor[T](res.as_f32()) }
 	}
 	return unsafe { &vtl.Tensor[T](res) }
+}
+
+// gate_matmul_data returns the logical values of a tensor as contiguous row-major f64 data.
+// It borrows already contiguous f64 or converted f64 storage and only copies strided views.
+fn gate_matmul_data[T](t &vtl.Tensor[T]) []f64 {
+	converted := t.as_f64()
+	if converted.is_row_major_contiguous() {
+		return converted.data.data[..converted.size]
+	}
+	return converted.to_array()
 }
 
 // MatMulGate defines a public data structure for this module.
