@@ -35,6 +35,32 @@ pub fn ifft(input &vtl.Tensor[complex.Complex]) !&vtl.Tensor[complex.Complex] {
 	return complex_fft(input, true)
 }
 
+// fftn computes the complex discrete Fourier transform across every axis.
+pub fn fftn(input &vtl.Tensor[complex.Complex]) !&vtl.Tensor[complex.Complex] {
+	return multidimensional_fft(input, false)
+}
+
+// ifftn computes the normalized complex inverse transform across every axis.
+pub fn ifftn(input &vtl.Tensor[complex.Complex]) !&vtl.Tensor[complex.Complex] {
+	return multidimensional_fft(input, true)
+}
+
+// fft2 computes a two-dimensional complex discrete Fourier transform.
+pub fn fft2(input &vtl.Tensor[complex.Complex]) !&vtl.Tensor[complex.Complex] {
+	if input.rank() != 2 {
+		return error('fft2 expects a two-dimensional tensor')
+	}
+	return multidimensional_fft(input, false)
+}
+
+// ifft2 computes the normalized two-dimensional complex inverse transform.
+pub fn ifft2(input &vtl.Tensor[complex.Complex]) !&vtl.Tensor[complex.Complex] {
+	if input.rank() != 2 {
+		return error('ifft2 expects a two-dimensional tensor')
+	}
+	return multidimensional_fft(input, true)
+}
+
 // irfft reconstructs a real signal of `length` samples from its non-negative
 // frequency components. The inverse transform is normalized by `length`.
 pub fn irfft(input &vtl.Tensor[complex.Complex], length int) !&vtl.Tensor[f64] {
@@ -102,31 +128,76 @@ fn complex_fft(input &vtl.Tensor[complex.Complex], inverse bool) !&vtl.Tensor[co
 	if input.size == 0 {
 		return error('fft requires at least one input value')
 	}
-	mut interleaved := []f64{len: input.size * 2}
-	for i in 0 .. input.size {
-		value := input.get_nth(i)
-		interleaved[2 * i] = value.re
-		interleaved[2 * i + 1] = value.im
+	return transform_complex_axis(input, 0, inverse)
+}
+
+fn multidimensional_fft(input &vtl.Tensor[complex.Complex], inverse bool) !&vtl.Tensor[complex.Complex] {
+	if input.rank() == 0 {
+		return error('fftn expects a tensor with at least one dimension')
 	}
-	plan := vsl_fft.create_complex_plan_f64(input.size)!
+	if input.size == 0 {
+		return error('fftn requires at least one input value')
+	}
+	mut result := transform_complex_axis(input, 0, inverse)!
+	for axis in 1 .. input.rank() {
+		result = transform_complex_axis(result, axis, inverse)!
+	}
+	return result
+}
+
+fn transform_complex_axis(input &vtl.Tensor[complex.Complex], axis int, inverse bool) !&vtl.Tensor[complex.Complex] {
+	axis_length := input.shape[axis]
+	if axis_length <= 0 {
+		return error('fft axis length must be positive')
+	}
+	plan := vsl_fft.create_complex_plan_f64(axis_length)!
 	defer {
 		vsl_fft.destroy_plan(plan)
 	}
-	status := if inverse {
-		vsl_fft.backward_complex_f64(plan, mut interleaved)
-	} else {
-		vsl_fft.forward_complex_f64(plan, mut interleaved)
+	mut output := []complex.Complex{len: input.size}
+	mut line := []f64{len: axis_length * 2}
+	mut index := []int{len: input.rank()}
+	line_count := input.size / axis_length
+	for line_index in 0 .. line_count {
+		mut remainder := line_index
+		for dimension := input.rank() - 1; dimension >= 0; dimension-- {
+			if dimension == axis {
+				continue
+			}
+			index[dimension] = remainder % input.shape[dimension]
+			remainder /= input.shape[dimension]
+		}
+		for position in 0 .. axis_length {
+			index[axis] = position
+			value := input.get(index)
+			line[2 * position] = value.re
+			line[2 * position + 1] = value.im
+		}
+		status := if inverse {
+			vsl_fft.backward_complex_f64(plan, mut line)
+		} else {
+			vsl_fft.forward_complex_f64(plan, mut line)
+		}
+		if status != 0 {
+			return error('fft backend failed to compute the transform')
+		}
+		for position in 0 .. axis_length {
+			index[axis] = position
+			output_index := row_major_index(index, input.shape)
+			factor := if inverse { f64(axis_length) } else { 1.0 }
+			output[output_index] = complex.complex(line[2 * position] / factor,
+				line[2 * position + 1] / factor)
+		}
 	}
-	if status != 0 {
-		return error('fft backend failed to compute the transform')
+	return vtl.from_array[complex.Complex](output, input.shape, memory: .row_major)
+}
+
+fn row_major_index(index []int, shape []int) int {
+	mut flat_index := 0
+	for axis in 0 .. shape.len {
+		flat_index = flat_index * shape[axis] + index[axis]
 	}
-	mut result := []complex.Complex{len: input.size}
-	for i in 0 .. input.size {
-		factor := if inverse { f64(input.size) } else { 1.0 }
-		result[i] = complex.complex(interleaved[2 * i] / factor,
-			interleaved[2 * i + 1] / factor)
-	}
-	return vtl.from_1d[complex.Complex](result)
+	return flat_index
 }
 
 fn unpack_rfft_f32(packed []f32) !&vtl.Tensor[complex.Complex] {
