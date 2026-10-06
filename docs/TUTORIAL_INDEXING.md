@@ -7,8 +7,10 @@ a range is more appropriate.
 ## Search and digitize
 
 `searchsorted` returns insertion positions in an ascending one-dimensional
-tensor. Choose `.left` to insert before equal values or `.right` to insert
-after them. The result has the shape of the query tensor.
+tensor; `searchsorted_descending` handles descending input. Both assume that
+the input is already sorted and use binary search for each query. Choose
+`.left` to insert before equal values or `.right` to insert after them. The
+result has the shape of the query tensor.
 `digitize` assigns values to monotonic bin edges, including decreasing edges;
 `right` controls which interval owns an edge value.
 
@@ -20,13 +22,16 @@ queries := vtl.from_1d([0, 3, 4])!
 assert vtl.searchsorted(sorted, queries, .left)!.to_array() == [0, 1, 3]
 assert vtl.searchsorted(sorted, queries, .right)!.to_array() == [0, 3, 3]
 
+descending := vtl.from_1d([9, 7, 7, 4, 1])!
+assert vtl.searchsorted_descending(descending, queries, .left)!.to_array() == [5, 4, 3]
+
 measurements := vtl.from_1d([0.2, 1.5, 2.0, 3.8, 5.1])!
 bins := vtl.from_1d([0.0, 2.0, 4.0, 6.0])!
 assert vtl.digitize(measurements, bins, false)!.to_array() == [1, 1, 2, 2, 3]
 ```
 
-`searchsorted` rejects values that are not sorted in ascending order. `digitize`
-rejects non-monotonic bins.
+Passing an unsorted tensor to either search function violates its precondition.
+`digitize` checks its bins and rejects non-monotonic edges.
 
 ## Find non-zero coordinates
 
