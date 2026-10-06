@@ -17,8 +17,8 @@ determinant := la.det[f64](a)!
 ```
 
 Available operations include `dot`, `matmul`, `tensordot`, `det`, `inv`,
-`trace`, matrix `norm`, vector `vector_norm`, axis `vector_norm_axis` and
-`vector_norm_axis_keepdims`,
+`trace`, matrix `norm`, vector `vector_norm`, axis `vector_norm_axis`,
+`vector_norm_axis_keepdims`, and multi-axis `vector_norm_axes`,
 `outer`, `cross`, `solve`, `lstsq`, `qr`, `lu`, `cholesky`, `pinv`, and
 `matrix_rank`. Matrix multiplication and decomposition requirements (rank,
 shape, and tolerances) are checked by the individual functions.
@@ -26,6 +26,11 @@ shape, and tolerances) are checked by the individual functions.
 `tensordot(a, b, axes)` contracts the last `axes` dimensions of `a` with the
 first `axes` dimensions of `b`. Use `tensordot_axes(a, b, axes_a, axes_b)` to
 choose arbitrary axis pairs.
+
+`vector_norm_axes(t, ord, axes, keepdims)` reduces a tuple of axes in one
+operation. Axes may be negative but must be unique. An empty axes list returns
+elementwise absolute values. For example, `vector_norm_axes(t, 2, [0, 2], false)`
+reduces the first and last dimensions and keeps the middle dimension.
 
 `covariance_matrix(data, rowvar, ddof)` and `correlation_matrix(data, rowvar)`
 accept rank-2 tensors. With `rowvar: true`, each row is a variable and columns

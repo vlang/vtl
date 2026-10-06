@@ -35,6 +35,36 @@ fn test_vector_norm_axis_retains_dimensions_for_strided_views() ! {
 	assert scalar.get([]) == 5.0
 }
 
+fn test_vector_norm_axes_reduces_axis_tuples_and_keeps_dimensions() ! {
+	values := vtl.from_3d([[[1.0, 2.0], [3.0, 4.0]], [[5.0, 6.0], [7.0, 8.0]]])!
+	got := vector_norm_axes(values, 2, [0, 2], false)!
+	assert got.shape == [2]
+	assert math.abs(got.get([0]) - math.sqrt(66.0)) < 1e-12
+	assert math.abs(got.get([1]) - math.sqrt(138.0)) < 1e-12
+	kept := vector_norm_axes(values, 2, [-1, 0], true)!
+	assert kept.shape == [1, 2, 1]
+	assert math.abs(kept.get([0, 0, 0]) - math.sqrt(66.0)) < 1e-12
+	assert math.abs(kept.get([0, 1, 0]) - math.sqrt(138.0)) < 1e-12
+	absolute := vector_norm_axes(values, 2, [], false)!
+	assert absolute.shape == values.shape
+	assert absolute.get([1, 1, 1]) == 8.0
+	transposed := values.transpose([2, 1, 0])!
+	strided := vector_norm_axes(transposed, 2, [0, 2], false)!
+	assert strided.shape == [2]
+	assert math.abs(strided.get([0]) - math.sqrt(66.0)) < 1e-12
+	assert math.abs(strided.get([1]) - math.sqrt(138.0)) < 1e-12
+}
+
+fn test_vector_norm_axes_rejects_invalid_and_duplicate_axes() ! {
+	values := vtl.from_2d([[1.0, 2.0], [3.0, 4.0]])!
+	if _ := vector_norm_axes(values, 2, [0, -2], false) {
+		assert false, 'duplicate normalized axes must be rejected'
+	}
+	if _ := vector_norm_axes(values, 2, [2], false) {
+		assert false, 'out-of-range axes must be rejected'
+	}
+}
+
 fn test_vector_norm_scales_large_finite_values() ! {
 	values := vtl.from_1d([1e308, 1e308])!
 	got := vector_norm(values, 2)!.get_nth(0)
