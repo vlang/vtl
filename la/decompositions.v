@@ -114,12 +114,16 @@ pub fn lstsq[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !(&vtl.Tensor[f64], &vtl.Ten
 	if a.rank() != 2 {
 		return error('lstsq: A must be a 2D matrix')
 	}
-	if b.rank() > 2 {
+	if b.rank() < 1 || b.rank() > 2 {
 		return error('lstsq: B must be 1D or 2D')
 	}
 	m := a.shape[0]
 	n := a.shape[1]
-	nrhs := if b.rank() == 1 { 1 } else { b.shape[1] }
+	if b.shape[0] != m {
+		return error('lstsq: A rows (${m}) must match B rows (${b.shape[0]})')
+	}
+	b_is_vector := b.rank() == 1
+	nrhs := if b_is_vector { 1 } else { b.shape[1] }
 
 	// Build VSL matrices
 	mut a_mat := vsl_la.Matrix.new[f64](m, n)
@@ -142,7 +146,15 @@ pub fn lstsq[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !(&vtl.Tensor[f64], &vtl.Ten
 	x, residuals, rnk, s := vsl_la.lstsq(a_mat, b_mat)
 
 	// Convert x back to vtl tensor
-	x_t := vtl.from_2d[f64](x)!
+	x_t := if b_is_vector {
+		mut vector := []f64{len: n}
+		for i in 0 .. n {
+			vector[i] = x[i][0]
+		}
+		vtl.from_1d[f64](vector)!
+	} else {
+		vtl.from_2d[f64](x)!
+	}
 	res_t := vtl.from_1d(residuals)!
 	s_t := vtl.from_1d(s)!
 

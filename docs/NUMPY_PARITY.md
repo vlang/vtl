@@ -117,7 +117,7 @@ conversion, matching NumPy's `axis=()` behavior.
 
 **Current:** NumPy-style vector/matrix `matmul` promotion and batched
 broadcasting; N-D Kronecker products with NumPy rank-promotion semantics;
-offset diagonal construction and extraction; solve,
+offset diagonal construction and extraction; solve, least squares,
 QR/LU/Cholesky, pseudoinverse, trace, matrix norms,
 flattened and axis-wise p-norms, and covariance/correlation matrices.
 
@@ -144,6 +144,9 @@ it does not converge within 100 sweeps.
 `la.matrix_rank` computes one matrix's numerical rank with an explicit or
 dtype-aware NumPy-style default tolerance; `la.matrix_rank_batch` preserves
 leading batch dimensions.
+`la.lstsq` preserves vector versus matrix solution shapes, computes numerical
+rank from a relative singular-value cutoff, and returns squared residual sums
+only when NumPy does.
 
 **Remaining:** add general (non-symmetric, possibly complex) eigenproblems and
 full SVD options, and benchmark realistic shapes.

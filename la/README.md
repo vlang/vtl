@@ -30,6 +30,11 @@ batch dimensions follow NumPy broadcasting. A vector right-hand side has shape
 `[..., n, nrhs]`. The result keeps the broadcast batch shape and removes the
 last axis for vector right-hand sides. Singular systems return an error.
 
+`lstsq(a, b)` accepts a vector or matrix right-hand side. It preserves vector
+output shape, reports the effective numerical rank, returns squared residuals
+for overdetermined full-column-rank systems, and an empty residual tensor for
+rank-deficient or underdetermined systems.
+
 `tensordot(a, b, axes)` contracts the last `axes` dimensions of `a` with the
 first `axes` dimensions of `b`. Use `tensordot_axes(a, b, axes_a, axes_b)` to
 choose arbitrary axis pairs.
