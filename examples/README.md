@@ -50,6 +50,7 @@ CIFAR examples for CI-safe checks.
 | [triangular_matrices](./triangular_matrices) | Extract lower and upper triangles from batched matrices | `v run ./vtl/examples/triangular_matrices/main.v` |
 | [matrix_norm](./matrix_norm) | Compute batched Frobenius, nuclear, and spectral matrix norms | `v run ./vtl/examples/matrix_norm/main.v` |
 | [trace_axes](./trace_axes) | Sum diagonals across selected tensor axes | `v run ./vtl/examples/trace_axes/main.v` |
+| [svdvals](./svdvals) | Compute descending singular values for batched matrices | `v run ./vtl/examples/svdvals/main.v` |
 | [diff](./diff) | Compute discrete differences in one-dimensional and multidimensional data | `v run ./vtl/examples/diff/main.v` |
 | [trapezoid](./trapezoid) | Integrate sampled data with the composite trapezoidal rule | `v run ./vtl/examples/trapezoid/main.v` |
 | [gradient](./gradient) | Estimate numerical derivatives along a tensor axis | `v run ./vtl/examples/gradient/main.v` |

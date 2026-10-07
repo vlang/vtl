@@ -204,6 +204,17 @@ traces := la.trace_axes(batch, axis1: 1, axis2: 2)! // [6, 18]
 offset_traces := la.trace_axes(batch, axis1: 1, axis2: 2, offset: 1)! // [8, 20]
 ```
 
+`la.svdvals` returns descending singular values for every trailing matrix in
+a stack. Its result has shape `[..., min(M, N)]` and rejects non-finite input:
+
+```v
+import vtl
+import vtl.la
+
+batch := vtl.from_array([3, 0, 0, 0, 4, 0, 5, 0, 0, 0, 12, 0], [2, 2, 3])!
+singular_values := la.svdvals(batch)! // [[4, 3], [12, 5]]
+```
+
 ## Transpose
 
 Pass the desired axis order to `transpose`.  For a 2-D matrix, swap axes `[1, 0]`:
