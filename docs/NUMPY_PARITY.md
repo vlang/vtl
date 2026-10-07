@@ -130,6 +130,9 @@ remaining dimensions as a batch.
 including singular matrices and values whose determinants would overflow.
 `la.matrix_power` uses exponentiation by squaring for batched integer powers and
 partial-pivot inversion for negative exponents.
+`la.cond` computes spectral and induced-norm condition numbers for stacked
+square matrices, with singular spectral cases returning infinity or zero for
+orders `2` and `-2` respectively.
 
 **Remaining:** expand eigen/SVD options, specify singular/non-finite behavior,
 and benchmark realistic shapes.

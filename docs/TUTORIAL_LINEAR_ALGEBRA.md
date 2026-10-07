@@ -242,6 +242,19 @@ fourth_power := la.matrix_power(rotation, 4)! // identity matrix
 inverse := la.matrix_power(rotation, -1)!
 ```
 
+`la.cond` defaults to the 2-norm condition number and also supports the
+`-2`, `1`, `-1`, `inf`, `-inf`, and `fro` matrix orders through
+`la.CondOptions`:
+
+```v
+import vtl
+import vtl.la
+
+matrix := vtl.from_2d([[1.0, 2.0], [3.0, 4.0]])!
+spectral := la.cond(matrix, la.CondOptions{})!
+one_norm := la.cond(matrix, la.CondOptions{ ord: '1' })!
+```
+
 ## Transpose
 
 Pass the desired axis order to `transpose`.  For a 2-D matrix, swap axes `[1, 0]`:
