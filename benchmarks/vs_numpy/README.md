@@ -120,19 +120,16 @@ single-precision CBLAS `sgemm`; without those flags, it uses VSL's pure-V
 `sgemm` implementation. `f64` continues to use `dgemm`. The benchmark reports
 both `f64` and `f32` results for either backend.
 
-## Local CPU sample
+## Earlier local CPU sample
 
-Matched-input local runs on a Ryzen 9 5900X with V 0.5.2 `-prod` and the
-pure-V BLAS backend measured dense 512×512 `f64` GEMM at 16.84 ms (15.9
-GFLOPS). NumPy 2.5.3 with scipy-openblas 0.3.34.106.0 and two BLAS threads
-measured 2.12 ms (126.5 GFLOPS), making the current pure-V path about 7.9×
-slower on this host. The VTL `f32` pure-V benchmark measured 6.02 ms at the
-same size; its NumPy baseline measured 1.16 ms. The system CBLAS path backed by
-the host's generic `libblas` previously measured 36.2 ms; this machine does
-not have OpenBLAS installed for VSL's optimized `-d vsl_blas_cblas` backend.
-Each matched benchmark uses 3 warmups and 10 timed calls. Rerun on the target
-host before using these numbers for a release comparison. The remaining gaps
-are optimization targets, not evidence of NumPy performance parity.
+An earlier matched-input run on a Ryzen 9 5900X with V 0.5.2 `-prod` measured
+dense 512×512 `f64` GEMM at 16.84 ms (15.9 GFLOPS); NumPy 2.5.3 measured
+2.12 ms (126.5 GFLOPS). The VTL `f32` pure-V benchmark measured 6.02 ms at
+the same size, while its NumPy baseline measured 1.16 ms. A generic system
+CBLAS build measured 36.2 ms. These values are retained as an earlier sample;
+the newer matched run at the end of this document supersedes them for the
+current checkout. Both runs identify the CPU GEMM path as an optimization
+target, not evidence of NumPy performance parity.
 
 ## Resident-buffer Vulkan f32 GEMM
 
@@ -158,6 +155,33 @@ On the Ryzen 9 5900X with an RTX 3060, the tiled 32×32 Vulkan kernel measured
 Earlier NumPy runs on the same host with two CPU BLAS threads measured 1.0 ms,
 8.0 ms, and 62.2 ms respectively. This Vulkan kernel is about 1.8× faster at
 1024×1024 and 1.4× faster at 2048×2048, while it remains slower at 512×512.
+
+## Local matched run (2026-10-07)
+
+The following `-prod` run was collected on an AMD Ryzen 9 5900X with
+`VJOBS=2`. VTL used its pure-V backend; NumPy 2.5.3 used its bundled
+scipy-openblas 0.3.34.106.0 build with `OPENBLAS_NUM_THREADS=2`. Both sides
+used the benchmark's deterministic inputs and timed matrix multiplication
+including result allocation. Higher GFLOPS is better.
+
+| dtype | size | VTL GFLOPS | NumPy GFLOPS | NumPy / VTL |
+| --- | ---: | ---: | ---: | ---: |
+| f64 | 128×128 | 13.46 | 64.00 | 4.8× |
+| f64 | 256×256 | 18.62 | 91.95 | 4.9× |
+| f64 | 512×512 | 26.60 | 109.66 | 4.1× |
+| f32 | 128×128 | 32.64 | 83.81 | 2.6× |
+| f32 | 256×256 | 58.71 | 169.19 | 2.9× |
+| f32 | 512×512 | 59.05 | 212.88 | 3.6× |
+
+![VTL and NumPy matmul performance](../../docs/assets/matmul-ryzen-5900x.png)
+
+Regenerate the checked-in chart from these measured values with
+`uv run --with matplotlib python ./vtl/benchmarks/vs_numpy/plot_local_matmul_results.py`
+from `~/.vmodules`. These results show the current CPU GEMM optimization gap;
+they do not establish general performance across hardware or workloads. The
+machine does not have system OpenBLAS installed, so VTL's `vsl_blas_cblas`
+build could not be measured here; the generic system CBLAS path was slower
+than VTL pure V in this run.
 These resident-buffer kernel measurements exclude CPU↔GPU transfers, so they
 do not establish end-to-end superiority over NumPy.
 
