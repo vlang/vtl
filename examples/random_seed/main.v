@@ -27,15 +27,22 @@ fn main() {
 	chi_square_values := vtl.chi_square(4.0, [4], vtl.TensorData{})!
 	student_t_values := vtl.student_t(12.0, [4], vtl.TensorData{})!
 	f_values := vtl.f_distribution(5.0, 20.0, [4], vtl.TensorData{})!
+	lognormal_values := vtl.lognormal(0.5, 0.75, [4], vtl.TensorData{})!
+	concentrations := vtl.from_array[f64]([1.0, 2.0, 3.0], [3])!
+	dirichlet_values := vtl.dirichlet(concentrations, [2], vtl.TensorData{})!
 	vtl.random_seed(2027)
 	assert gamma_values.array_equal(vtl.gamma(2.0, 3.0, [4], vtl.TensorData{})!)
 	assert beta_values.array_equal(vtl.beta(2.0, 5.0, [4], vtl.TensorData{})!)
 	assert chi_square_values.array_equal(vtl.chi_square(4.0, [4], vtl.TensorData{})!)
 	assert student_t_values.array_equal(vtl.student_t(12.0, [4], vtl.TensorData{})!)
 	assert f_values.array_equal(vtl.f_distribution(5.0, 20.0, [4], vtl.TensorData{})!)
+	assert lognormal_values.array_equal(vtl.lognormal(0.5, 0.75, [4], vtl.TensorData{})!)
+	assert dirichlet_values.array_equal(vtl.dirichlet(concentrations, [2], vtl.TensorData{})!)
 	println('Gamma samples: ${gamma_values.to_array()}')
 	println('Beta samples: ${beta_values.to_array()}')
 	println('Chi-square samples: ${chi_square_values.to_array()}')
 	println('Student t samples: ${student_t_values.to_array()}')
 	println('F samples: ${f_values.to_array()}')
+	println('Lognormal samples: ${lognormal_values.to_array()}')
+	println('Dirichlet samples: ${dirichlet_values.to_array()}')
 }
