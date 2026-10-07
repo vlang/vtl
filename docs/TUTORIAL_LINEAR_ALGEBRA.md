@@ -170,8 +170,27 @@ row_lengths_keepdims := la.vector_norm_axis_keepdims(matrix, 2, 1)! // shape [2,
 The implementation scales values before exponentiation to reduce overflow and
 underflow for finite norms. Empty inputs return zero for order zero and finite
 positive orders; negative orders and extrema orders that need a minimum or
-maximum return an error. `la.norm` remains the separate matrix-norm API for
-Frobenius, one, and infinity matrix norms.
+maximum return an error.
+
+## Batched matrix norms
+
+`la.matrix_norm` computes one matrix norm for each trailing `M x N` matrix in
+an N-D tensor. It supports Frobenius (`'fro'`), nuclear (`'nuc'`), maximum and
+minimum column sums (`'1'`, `'-1'`), maximum and minimum row sums (`'inf'`,
+`'-inf'`), and spectral (`'2'`, `'-2'`) orders. The default is Frobenius.
+`keepdims: true` retains the final
+two axes as dimensions of length one. Pass matrix orders as strings; spectral
+and nuclear orders reject non-finite inputs instead of passing them to SVD.
+
+```v
+import vtl
+import vtl.la
+
+batch := vtl.from_array([3, 0, 0, 0, 4, 0, 5, 0, 0, 0, 12, 0], [2, 2, 3])!
+frobenius := la.matrix_norm(batch)! // [5, 13]
+nuclear := la.matrix_norm(batch, ord: 'nuc')! // [7, 17]
+kept := la.matrix_norm(batch, keepdims: true)! // shape [2, 1, 1]
+```
 
 ## Transpose
 

@@ -121,6 +121,9 @@ offset diagonal construction and extraction; solve,
 QR/LU/Cholesky, pseudoinverse, trace, matrix norms,
 flattened and axis-wise p-norms, and covariance/correlation matrices.
 
+`la.matrix_norm` computes NumPy's eight standard matrix norms for each trailing
+matrix in an N-D tensor, with optional retained matrix dimensions.
+
 **Remaining:** expand eigen/SVD options, specify singular/non-finite behavior,
 and benchmark realistic shapes.
 
