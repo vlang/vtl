@@ -181,9 +181,7 @@ pub fn (mut generator RandomGenerator) geometric(probability f64, shape []int) !
 // poisson returns integer event counts with the given finite, non-negative
 // expected rate using this generator's independent stream.
 pub fn (mut generator RandomGenerator) poisson(lambda f64, shape []int) !&Tensor[int] {
-	if lambda < 0 || math.is_nan(lambda) || math.is_inf(lambda, 0) || lambda >= f64(max_int) {
-		return error('poisson: lambda must be finite, non-negative, and fit in an int')
-	}
+	validate_poisson_rate(lambda)!
 	mut rng := generator.rng
 	mut values := []int{len: size_from_shape(shape)}
 	for i in 0 .. values.len {
@@ -209,29 +207,13 @@ fn sample_poisson(lambda f64, mut rng &rand.PRNG) !int {
 	}
 	// Hörmann's PTRS transformed rejection method has constant expected work
 	// for large rates, unlike the product method whose cost grows with lambda.
-	sqrt_lambda := math.sqrt(lambda)
-	b := 0.931 + 2.53 * sqrt_lambda
-	a := -0.059 + 0.02483 * b
-	inverse_alpha := 1.1239 + 1.1328 / (b - 3.4)
-	quick_acceptance := 0.9277 - 3.6224 / (b - 2)
+	ptrs := poisson_ptrs_config(lambda)
 	for _ in 0 .. 10000 {
-		u := rng.f64_in_range(0.0, 1.0)! - 0.5
+		u := rng.f64_in_range(0.0, 1.0)!
 		v := rng.f64_in_range(0.0, 1.0)!
-		window := 0.5 - math.abs(u)
-		candidate := math.floor((2 * a / window + b) * u + lambda + 0.43)
-		if candidate < 0 || candidate >= f64(max_int) {
-			continue
-		}
-		if window >= 0.07 && v <= quick_acceptance {
-			return int(candidate)
-		}
-		if window < 0.013 && v > window {
-			continue
-		}
-		left := math.log(v * inverse_alpha / (a / (window * window) + b))
-		right := -lambda + candidate * math.log(lambda) - math.log_factorial(candidate)
-		if left <= right {
-			return int(candidate)
+		candidate, accepted := sample_poisson_ptrs_candidate(ptrs, u, v)
+		if accepted {
+			return candidate
 		}
 	}
 	return error('poisson: rejection sampler did not converge')
@@ -591,6 +573,101 @@ fn geometric_sample(probability f64, uniform_value f64) int {
 		return 1
 	}
 	return int(math.floor(math.log(1 - uniform_value) / math.log(1 - probability))) + 1
+}
+
+// poisson returns integer event counts from VTL's global random stream.
+pub fn poisson(lambda f64, shape []int, params TensorData) !&Tensor[int] {
+	validate_poisson_rate(lambda)!
+	mut result := zeros[int](shape, params)
+	for i in 0 .. result.size {
+		result.set_nth(i, sample_poisson_global(lambda)!)
+	}
+	return result
+}
+
+// weibull returns samples from the unit-scale Weibull distribution using
+// VTL's global random stream.
+pub fn weibull(shape_parameter f64, shape []int, params TensorData) !&Tensor[f64] {
+	if shape_parameter <= 0 || math.is_nan(shape_parameter) || math.is_inf(shape_parameter, 0) {
+		return error('weibull: shape parameter must be finite and positive')
+	}
+	mut result := zeros[f64](shape, params)
+	for i in 0 .. result.size {
+		u := rand.f64_in_range(0.0, 1.0)!
+		result.set_nth(i, math.pow(-math.log(1.0 - u), 1.0 / shape_parameter))
+	}
+	return result
+}
+
+fn validate_poisson_rate(lambda f64) ! {
+	if lambda < 0 || math.is_nan(lambda) || math.is_inf(lambda, 0) || lambda >= f64(max_int) {
+		return error('poisson: lambda must be finite, non-negative, and fit in an int')
+	}
+}
+
+fn sample_poisson_global(lambda f64) !int {
+	if lambda == 0 {
+		return 0
+	}
+	if lambda < 10 {
+		limit := math.exp(-lambda)
+		mut product := 1.0
+		mut count := 0
+		for product > limit {
+			count++
+			product *= rand.f64_in_range(0.0, 1.0)!
+		}
+		return count - 1
+	}
+	ptrs := poisson_ptrs_config(lambda)
+	for _ in 0 .. 10000 {
+		u := rand.f64_in_range(0.0, 1.0)!
+		v := rand.f64_in_range(0.0, 1.0)!
+		candidate, accepted := sample_poisson_ptrs_candidate(ptrs, u, v)
+		if accepted {
+			return candidate
+		}
+	}
+	return error('poisson: rejection sampler did not converge')
+}
+
+struct PoissonPtrsConfig {
+	lambda           f64
+	a                f64
+	b                f64
+	inverse_alpha    f64
+	quick_acceptance f64
+}
+
+fn poisson_ptrs_config(lambda f64) PoissonPtrsConfig {
+	sqrt_lambda := math.sqrt(lambda)
+	b := 0.931 + 2.53 * sqrt_lambda
+	a := -0.059 + 0.02483 * b
+	return PoissonPtrsConfig{
+		lambda:           lambda
+		a:                a
+		b:                b
+		inverse_alpha:    1.1239 + 1.1328 / (b - 3.4)
+		quick_acceptance: 0.9277 - 3.6224 / (b - 2)
+	}
+}
+
+fn sample_poisson_ptrs_candidate(ptrs PoissonPtrsConfig, uniform_value f64, threshold f64) (int, bool) {
+	u := uniform_value - 0.5
+	window := 0.5 - math.abs(u)
+	candidate := math.floor((2 * ptrs.a / window + ptrs.b) * u + ptrs.lambda + 0.43)
+	if candidate < 0 || candidate >= f64(max_int) {
+		return 0, false
+	}
+	if window >= 0.07 && threshold <= ptrs.quick_acceptance {
+		return int(candidate), true
+	}
+	if window < 0.013 && threshold > window {
+		return 0, false
+	}
+	left := math.log(threshold * ptrs.inverse_alpha / (ptrs.a / (window * window) + ptrs.b))
+	right := -ptrs.lambda + candidate * math.log(ptrs.lambda) - math.log_factorial(candidate)
+	return int(candidate), left <= right
 }
 
 // NormalTensorData is the data for a normal distribution.
