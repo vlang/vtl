@@ -180,8 +180,9 @@ runtime versions.
 
 **Current:** model serialization and dataset loaders; numeric CSV tensors;
 typed `.npy` and named `.npz` I/O with mixed supported dtypes. `.npy` accepts
-v1/v2/v3 headers, both byte orders, Fortran order, bool, f32/f64, and signed or
-unsigned integer widths when the requested V type matches.
+v1/v2/v3 headers, both byte orders, Fortran order, bool, f32/f64, complex128,
+and signed or unsigned integer widths when the requested V type matches.
+`.npz` read/write also supports complex128 members.
 
 **Remaining:** support more text formats and dtypes, add independent NumPy
 fixtures, and continue rejecting unsupported object/structured values.
@@ -204,9 +205,8 @@ logical order, and truncate floating-point values when converting to integers.
 
 **Remaining:** connect promotion to mixed-dtype arithmetic, add weak scalar
 promotion and string conversion, extend complex support to other mathematical
-functions, linear algebra, random generation, and
-`.npy`/`.npz` I/O, add complex32, and define integer overflow and structured-data
-limits.
+functions, linear algebra, and random generation, add complex32, and define
+integer overflow and structured-data limits.
 
 ### Masked and missing data
 

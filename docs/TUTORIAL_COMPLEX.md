@@ -114,9 +114,10 @@ assert row_variances.to_array() == [2.0, 2.0]
 ```
 
 Complex tensors are an early part of VTL's complex-number support. Real-valued
-casts, complex linear algebra, random distributions, and `.npy`/`.npz` complex
-I/O do not yet support this dtype. FFT APIs have their own complex output types
-and are documented in the [FFT tutorial](./TUTORIAL_FFT.md).
+casts, complex linear algebra, and random distributions do not yet support this
+dtype. `.npy` and `.npz` round trips support NumPy `complex128` arrays. FFT APIs
+have their own complex output types and are documented in the
+[FFT tutorial](./TUTORIAL_FFT.md).
 
 Run the [complex tensor example](../examples/complex_tensors/README.md) from
 `~/.vmodules`:

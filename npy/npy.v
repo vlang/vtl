@@ -2,6 +2,7 @@ module npy
 
 import encoding.binary
 import math
+import math.complex as vcomplex
 import os
 import strconv
 import vtl
@@ -124,8 +125,17 @@ pub fn read_bytes[T](bytes []u8) !&vtl.Tensor[T] {
 	for i in 0 .. count {
 		source_index := if fortran { fortran_index(i, shape) } else { i }
 		offset := data_offset + source_index * descriptor.width
-		bits := read_bits(bytes, offset, descriptor.width, little_endian)
-		tensor.set_nth[T](i, value_from_bits[T](bits))
+		$if T is vcomplex.Complex {
+			real_bits := read_bits(bytes, offset, 8, little_endian)
+			imag_bits := read_bits(bytes, offset + 8, 8, little_endian)
+			tensor.set_nth[T](i, T(vcomplex.Complex{
+				re: math.f64_from_bits(real_bits)
+				im: math.f64_from_bits(imag_bits)
+			}))
+		} $else {
+			bits := read_bits(bytes, offset, descriptor.width, little_endian)
+			tensor.set_nth[T](i, value_from_bits[T](bits))
+		}
 	}
 	return tensor
 }
@@ -137,6 +147,8 @@ fn npy_type[T]() !NpyType {
 		return NpyType{u8(`f`), 4}
 	} $else $if T is f64 {
 		return NpyType{u8(`f`), 8}
+	} $else $if T is vcomplex.Complex {
+		return NpyType{u8(`c`), 16}
 	} $else $if T is i8 {
 		return NpyType{u8(`i`), 1}
 	} $else $if T is i16 {
@@ -161,25 +173,32 @@ fn npy_type[T]() !NpyType {
 }
 
 fn append_value[T](mut output []u8, value T, width int) {
-	mut bits := u64(0)
-	$if T is f64 {
-		bits = math.f64_bits(value)
-	} $else $if T is f32 {
-		bits = u64(math.f32_bits(value))
-	} $else $if T is bool {
-		bits = if value { 1 } else { 0 }
+	$if T is vcomplex.Complex {
+		mut encoded := []u8{len: width}
+		binary.little_endian_put_u64_at(mut encoded, math.f64_bits(value.re), 0)
+		binary.little_endian_put_u64_at(mut encoded, math.f64_bits(value.im), 8)
+		output << encoded
 	} $else {
-		bits = u64(value)
+		mut bits := u64(0)
+		$if T is f64 {
+			bits = math.f64_bits(value)
+		} $else $if T is f32 {
+			bits = u64(math.f32_bits(value))
+		} $else $if T is bool {
+			bits = if value { 1 } else { 0 }
+		} $else {
+			bits = u64(value)
+		}
+		mut encoded := []u8{len: width}
+		match width {
+			1 { encoded[0] = u8(bits) }
+			2 { binary.little_endian_put_u16(mut encoded, u16(bits)) }
+			4 { binary.little_endian_put_u32(mut encoded, u32(bits)) }
+			8 { binary.little_endian_put_u64(mut encoded, bits) }
+			else {}
+		}
+		output << encoded
 	}
-	mut encoded := []u8{len: width}
-	match width {
-		1 { encoded[0] = u8(bits) }
-		2 { binary.little_endian_put_u16(mut encoded, u16(bits)) }
-		4 { binary.little_endian_put_u32(mut encoded, u32(bits)) }
-		8 { binary.little_endian_put_u64(mut encoded, bits) }
-		else {}
-	}
-	output << encoded
 }
 
 fn value_from_bits[T](bits u64) T {
@@ -303,12 +322,12 @@ fn parse_descriptor(header string) !NpyDescriptor {
 	}
 	endian := descriptor[0]
 	kind := descriptor[1]
-	if endian !in [`<`, `>`, `=`, `|`] || kind !in [`b`, `f`, `i`, `u`] {
+	if endian !in [`<`, `>`, `=`, `|`] || kind !in [`b`, `c`, `f`, `i`, `u`] {
 		return error('npy.read: unsupported dtype descriptor ${descriptor}')
 	}
 	width := strconv.atoi(descriptor[2..]) or { return error('npy.read: invalid dtype width') }
-	if width !in [1, 2, 4, 8] || (endian == `|` && width != 1) || (kind == `b` && width != 1)
-		|| (kind == `f` && width !in [4, 8]) {
+	if width !in [1, 2, 4, 8, 16] || (endian == `|` && width != 1) || (kind == `b` && width != 1)
+		|| (kind == `f` && width !in [4, 8]) || (kind == `c` && width != 16) {
 		return error('npy.read: unsupported dtype width ${width}')
 	}
 	return NpyDescriptor{kind, width, endian}
