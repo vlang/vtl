@@ -61,9 +61,10 @@ axis-removed output shape. VTL represents scalar-shaped reductions as shape
 **Current:** broad elementwise math and broadcasting; `clip` and fused
 `clip_tensor`; broadcast-aware `where`; elementwise `is_nan`, `is_inf`, and
 `is_finite`; `isclose`, `allclose`, `heaviside`, `sign`, `diff`, and numerical
-gradients along selected axes; integer bitwise AND/OR/XOR/invert and scalar
-left/right shifts. Gradients support uniform spacing or monotonic non-uniform
-coordinates and first/second-order boundary differences.
+gradients along selected axes; elementwise logical AND/OR/XOR/NOT; integer
+bitwise AND/OR/XOR/invert and scalar left/right shifts. Gradients support
+uniform spacing or monotonic non-uniform coordinates and first/second-order
+boundary differences.
 
 **Remaining:** audit unary/binary function families and define dtype promotion.
 
