@@ -23,7 +23,8 @@ batched `det` and `inv`, `trace`, matrix `norm`, vector `vector_norm`, axis `vec
 `outer`, `cross`, `solve`, `lstsq`, `qr`, `lu`, `cholesky`, `pinv`, and
 `matrix_rank`, `slogdet`, `svdvals`, batched `matrix_norm`, and batched
 `matrix_power` and `cond`. Matrix multiplication and decomposition requirements (rank,
-shape, and tolerances) are checked by the individual functions.
+shape, and tolerances) are checked by the individual functions. Symmetric
+eigenproblems are available through batched `eigh` and `eigvalsh`.
 
 `tensordot(a, b, axes)` contracts the last `axes` dimensions of `a` with the
 first `axes` dimensions of `b`. Use `tensordot_axes(a, b, axes_a, axes_b)` to

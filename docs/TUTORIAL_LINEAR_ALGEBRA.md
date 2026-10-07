@@ -267,6 +267,22 @@ determinants := la.det(batch)!
 inverses := la.inv(batch)!
 ```
 
+`la.eigh` computes eigenvalues and eigenvectors for stacked real symmetric
+matrices; eigenvalues are ascending and eigenvectors are columns. Use
+`la.eigvalsh` when only eigenvalues are needed. `EighOptions{ uplo: 'U' }`
+selects the upper triangle instead of the default lower triangle. Inputs must
+be finite; non-convergence within 100 Jacobi sweeps returns an error:
+
+```v okfmt
+import vtl
+import vtl.la
+
+batch := vtl.from_array([1.0, 2, 2, 1, 4, 1, 1, 2], [2, 2, 2])!
+values, vectors := la.eigh(batch, la.EighOptions{})!
+println(values.to_array())
+println(vectors.to_array())
+```
+
 ## Transpose
 
 Pass the desired axis order to `transpose`.  For a 2-D matrix, swap axes `[1, 0]`:
