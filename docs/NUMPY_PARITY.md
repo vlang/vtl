@@ -133,8 +133,10 @@ partial-pivot inversion for negative exponents.
 `la.cond` computes spectral and induced-norm condition numbers for stacked
 square matrices, with singular spectral cases returning infinity or zero for
 orders `2` and `-2` respectively.
-`la.det` and `la.inv` operate on stacks of square matrices; inverse results
-are checked against their input layout and singular inputs report errors.
+`la.solve` supports vector and matrix right-hand sides, stacked systems, and
+NumPy-style broadcasting of leading dimensions. `la.det` and `la.inv` operate
+on stacks of square matrices; inverse results are checked against their input
+layout and singular inputs report errors.
 `la.eigh` and `la.eigvalsh` compute ascending eigenvalues for batches of real
 symmetric matrices, with eigenvectors in columns and selectable upper/lower
 triangle input. Inputs must be finite; the Jacobi method returns an error if

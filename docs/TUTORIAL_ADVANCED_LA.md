@@ -107,16 +107,27 @@ l, u, piv := la.lu(a)!
 
 ## Solving Linear Systems
 
-`la.solve(a, b)` solves `A · x = B` for `x` using LU decomposition.
-`a` must be square and non-singular.
+`la.solve(a, b)` solves `A · x = B` for `x`. `a` must contain square,
+non-singular matrices. Leading batch dimensions of `a` and `b` broadcast like
+NumPy. A vector right-hand side has shape `[n]` or `[..., n]`; a matrix of
+right-hand sides has shape `[..., n, nrhs]`.
 
 ```v
 import vtl.la
 import vtl
 
 a := vtl.from_array[f64]([2.0, 1.0, 1.0, 4.0, 3.0, 3.0, 8.0, 7.0, 9.0], [3, 3])!
-b := vtl.from_array[f64]([1.0, 2.0, 3.0], [3, 1])!
-la.solve(a, b)! // solution vector
+b := vtl.from_1d[f64]([1.0, 2.0, 3.0])!
+la.solve(a, b)! // shape [3]
+
+// Two systems, each with its own vector right-hand side.
+stacked_a := vtl.from_array[f64]([2.0, 0, 0, 4, 1, 0, 0, 2], [2, 2, 2])!
+stacked_b := vtl.from_array[f64]([2.0, 8, 3, 10], [2, 2])!
+la.solve(stacked_a, stacked_b)!.shape // [2, 2]
+
+// Broadcast one matrix RHS to both systems by including a size-one batch axis.
+matrix_rhs := vtl.from_array[f64]([2.0, 4, 6, 8], [1, 2, 2])!
+la.solve(stacked_a, matrix_rhs)!.shape // [2, 2, 2]
 ```
 
 ## Least Squares

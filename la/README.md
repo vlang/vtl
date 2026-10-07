@@ -24,6 +24,12 @@ variants, `outer`, `cross`, `solve`, `lstsq`, `qr`, `lu`, `cholesky`, `pinv`,
 `matrix_power`, `cond`, and symmetric `eigh`/`eigvalsh`. Shape and tolerance
 requirements are checked by each function.
 
+`solve(a, b)` accepts square matrices or stacks of square matrices. Leading
+batch dimensions follow NumPy broadcasting. A vector right-hand side has shape
+`[n]` (or `[..., n]` for vector batches); a matrix right-hand side has shape
+`[..., n, nrhs]`. The result keeps the broadcast batch shape and removes the
+last axis for vector right-hand sides. Singular systems return an error.
+
 `tensordot(a, b, axes)` contracts the last `axes` dimensions of `a` with the
 first `axes` dimensions of `b`. Use `tensordot_axes(a, b, axes_a, axes_b)` to
 choose arbitrary axis pairs.

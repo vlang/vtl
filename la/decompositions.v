@@ -1,53 +1,110 @@
 module la
 
 import vsl.la as vsl_la
+import vsl.lapack as vsl_lapack
 import vtl
 
-// solve solves the linear system A * X = B for X given A and B.
-// A must be square (m x m) and B has shape (m,) or (m, nrhs).
+// solve solves A * X = B for stacks of square A matrices. Leading dimensions
+// broadcast like NumPy; B may be a vector or a matrix of right-hand sides.
 pub fn solve[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[f64] {
-	a.assert_square_matrix()!
-	b.assert_matrix()!
-	if a.shape[0] != b.shape[0] {
-		return error('solve: A rows (${a.shape[0]}) must match B rows (${b.shape[0]})')
+	if a.rank() < 2 || b.rank() < 1 {
+		return error('solve: A must be a matrix stack and B must have at least one dimension')
 	}
-	n := a.shape[0]
-	nrhs := if b.rank() == 1 { 1 } else { b.shape[1] }
-
-	// Convert A to column-major flat array for VSL
-	mut a_col := []f64{len: n * n}
-	for i := 0; i < n; i++ {
-		for j := 0; j < n; j++ {
-			// vtl uses row-major storage
-			a_col[i + j * n] = a.get([i, j])
+	n := a.shape[a.rank() - 2]
+	if a.shape[a.rank() - 1] != n {
+		return error('solve: A matrices must be square')
+	}
+	b_is_vector := b.rank() == 1 || (a.rank() > 2 && b.rank() == a.rank() - 1)
+	b_rows := if b_is_vector { b.shape[b.rank() - 1] } else { b.shape[b.rank() - 2] }
+	nrhs := if b_is_vector { 1 } else { b.shape[b.rank() - 1] }
+	if b_rows != n {
+		return error('solve: A dimension ${n} does not match B rows ${b_rows}')
+	}
+	a_batch_shape := a.shape[..a.rank() - 2]
+	b_batch_shape := if b_is_vector && b.rank() > 1 {
+		b.shape[..b.rank() - 1]
+	} else if b_is_vector {
+		[]int{}
+	} else {
+		b.shape[..b.rank() - 2]
+	}
+	batch_shape := matmul_broadcast_shape(a_batch_shape, b_batch_shape) or {
+		return error('solve: batch shapes ${a_batch_shape} and ${b_batch_shape} cannot broadcast')
+	}
+	mut batch_count := 1
+	for dimension in batch_shape {
+		batch_count *= dimension
+	}
+	mut output_shape := batch_shape.clone()
+	output_shape << n
+	if !b_is_vector {
+		output_shape << nrhs
+	}
+	mut output := vtl.empty[f64](output_shape, memory: .row_major)
+	if n == 0 || nrhs == 0 {
+		return output
+	}
+	mut a_index := []int{len: a.rank()}
+	mut b_index := []int{len: b.rank()}
+	for batch in 0 .. batch_count {
+		batch_coordinates := decode_batch_coordinates(batch, batch_shape)
+		fill_broadcast_batch_index(a_batch_shape, batch_shape, batch_coordinates, mut a_index)
+		if !b_is_vector {
+			fill_broadcast_batch_index(b_batch_shape, batch_shape, batch_coordinates, mut b_index)
+		} else if b.rank() > 1 {
+			fill_broadcast_batch_index(b_batch_shape, batch_shape, batch_coordinates, mut b_index)
 		}
-	}
-
-	// Convert B to appropriate shape
-	mut b_mat := vsl_la.Matrix.new[f64](b.shape[0], nrhs)
-	for i := 0; i < b.shape[0]; i++ {
-		for j := 0; j < nrhs; j++ {
-			if b.rank() == 1 {
-				b_mat.set(i, j, b.get([i]))
+		mut matrix := []f64{len: n * n}
+		mut rhs := []f64{len: n * nrhs}
+		for row in 0 .. n {
+			a_index[a.rank() - 2] = row
+			for column in 0 .. n {
+				a_index[a.rank() - 1] = column
+				matrix[row * n + column] = f64(a.get[T](a_index))
+			}
+			if b_is_vector {
+				b_index[b.rank() - 1] = row
+				rhs[row * nrhs] = f64(b.get[T](b_index))
 			} else {
-				b_mat.set(i, j, b.get([i, j]))
+				b_index[b.rank() - 2] = row
+				for column in 0 .. nrhs {
+					b_index[b.rank() - 1] = column
+					rhs[row * nrhs + column] = f64(b.get[T](b_index))
+				}
+			}
+		}
+		mut pivots := []int{len: n}
+		info := vsl_lapack.dgesv(n, nrhs, mut matrix, n, mut pivots, mut rhs, nrhs)
+		if info < 0 {
+			return error('solve: LAPACK rejected argument ${-info}')
+		}
+		if info > 0 {
+			return error('solve: matrix is singular')
+		}
+		start := batch * n * nrhs
+		for row in 0 .. n {
+			for column in 0 .. nrhs {
+				output.set_nth(start + row * nrhs + column, rhs[row * nrhs + column])
 			}
 		}
 	}
+	return output
+}
 
-	// Solve using VSL den_solve (overwrites a and b)
-	mut x := []f64{len: n * nrhs}
-	vsl_la.den_solve(mut x, b_mat, b_mat.get_deep2()[0], false)
+fn decode_batch_coordinates(batch int, shape []int) []int {
+	mut coordinates := []int{len: shape.len}
+	mut remainder := batch
+	for i := shape.len - 1; i >= 0; i-- {
+		coordinates[i] = remainder % shape[i]
+		remainder /= shape[i]
+	}
+	return coordinates
+}
 
-	// Build result tensor
-	if nrhs == 1 {
-		return vtl.from_1d(x)
-	} else {
-		mut data := [][]f64{len: n}
-		for i in 0 .. n {
-			data[i] = x[i * nrhs..(i + 1) * nrhs]
-		}
-		return vtl.from_2d[f64](data)
+fn fill_broadcast_batch_index(source_shape []int, output_shape []int, output_coordinates []int, mut index []int) {
+	offset := output_shape.len - source_shape.len
+	for i, dimension in source_shape {
+		index[i] = if dimension == 1 { 0 } else { output_coordinates[offset + i] }
 	}
 }
 
