@@ -22,7 +22,7 @@ Available operations include `dot`, `matmul`, `tensordot`, `diag`, `det`, `inv`,
 `vector_norm_axis_keepdims`, and multi-axis `vector_norm_axes`,
 `outer`, `cross`, `solve`, `lstsq`, `qr`, `lu`, `cholesky`, `pinv`, and
 `matrix_rank`, `slogdet`, `svdvals`, batched `matrix_norm`, and batched
-`matrix_power`. Matrix multiplication and decomposition requirements (rank,
+`matrix_power` and `cond`. Matrix multiplication and decomposition requirements (rank,
 shape, and tolerances) are checked by the individual functions.
 
 `tensordot(a, b, axes)` contracts the last `axes` dimensions of `a` with the
