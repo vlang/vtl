@@ -4,6 +4,11 @@ Broadcasting lets VTL apply an operation between two tensors of different
 (but compatible) shapes by implicitly expanding the smaller tensor to match
 the larger one — without copying memory.
 
+Use `broadcast2`, `broadcast3`, or `broadcast_n` when an operation needs
+explicit broadcast views. Each returns views with a shared shape and shared
+storage; `broadcast_n` requires at least one tensor and reports an error when
+the input shapes cannot broadcast.
+
 ## Broadcasting rules
 
 Two shapes are compatible if, for every dimension (aligned from the right),
@@ -13,6 +18,11 @@ the sizes are equal **or** one of them is 1.
 Shape A: [3, 4]       compatible with [1, 4] and [4] and [3, 1]
 Shape A: [3, 4]  NOT  compatible with [2, 4] or [3, 3]
 ```
+
+Zero-sized dimensions follow NumPy's rules: `[0, 3]` and `[1, 3]` broadcast to
+`[0, 3]`. A dimension of zero cannot broadcast with a dimension greater than
+one. `broadcast_to` also rejects negative dimensions and target shapes with a
+lower rank than the source instead of attempting an invalid view.
 
 ## Element-wise operations with broadcasting
 

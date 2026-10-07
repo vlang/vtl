@@ -36,7 +36,12 @@ shape, concatenate/stack/split, `ravel`, copying `flatten`, `flip`, `repeat`,
 `repeat_axis`, block `tile`, `rot90`, constant/edge/wrap/reflect/symmetric
 padding, and stable axis-wise `sort`/`argsort`.
 
-**Remaining:** test broadcasting helpers and audit copy-versus-view behavior.
+**Current:** `broadcast_to`, `broadcast2`, `broadcast3`, and `broadcast_n`
+create zero-copy views, validate incompatible shapes, and follow NumPy's
+zero-dimension rules. Tests cover empty inputs, rank mismatches, and invalid
+target dimensions.
+
+**Remaining:** audit copy-versus-view behavior across other manipulation APIs.
 VTL diagonal views share writable storage; NumPy exposes its diagonal views as
 read-only by default.
 
