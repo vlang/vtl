@@ -113,7 +113,8 @@ conversion, matching NumPy's `axis=()` behavior.
 ### Linear algebra
 
 **Current:** NumPy-style vector/matrix `matmul` promotion and batched
-broadcasting; offset diagonal construction and extraction; solve,
+broadcasting; N-D Kronecker products with NumPy rank-promotion semantics;
+offset diagonal construction and extraction; solve,
 QR/LU/Cholesky, pseudoinverse, trace, matrix norms,
 flattened and axis-wise p-norms, and covariance/correlation matrices.
 
