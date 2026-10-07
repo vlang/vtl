@@ -128,6 +128,8 @@ remaining dimensions as a batch.
 `la.svdvals` returns descending singular values for batched real matrices.
 `la.slogdet` returns determinant signs and log absolute determinants for batches,
 including singular matrices and values whose determinants would overflow.
+`la.matrix_power` uses exponentiation by squaring for batched integer powers and
+partial-pivot inversion for negative exponents.
 
 **Remaining:** expand eigen/SVD options, specify singular/non-finite behavior,
 and benchmark realistic shapes.
