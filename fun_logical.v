@@ -28,6 +28,44 @@ pub fn (t &Tensor[T]) any[T]() bool {
 	return false
 }
 
+// logical_and evaluates element truth values with standard tensor broadcasting.
+pub fn (a &Tensor[T]) logical_and[T](b &Tensor[T]) !&Tensor[bool] {
+	return logical_binary[T](a, b, fn [T](left T, right T) bool {
+		return td[T](left).bool() && td[T](right).bool()
+	})
+}
+
+// logical_or evaluates element truth values with standard tensor broadcasting.
+pub fn (a &Tensor[T]) logical_or[T](b &Tensor[T]) !&Tensor[bool] {
+	return logical_binary[T](a, b, fn [T](left T, right T) bool {
+		return td[T](left).bool() || td[T](right).bool()
+	})
+}
+
+// logical_xor evaluates element truth values with standard tensor broadcasting.
+pub fn (a &Tensor[T]) logical_xor[T](b &Tensor[T]) !&Tensor[bool] {
+	return logical_binary[T](a, b, fn [T](left T, right T) bool {
+		return td[T](left).bool() != td[T](right).bool()
+	})
+}
+
+// logical_not negates the truth value of each tensor element.
+pub fn (t &Tensor[T]) logical_not[T]() &Tensor[bool] {
+	return map_predicate[T](t, fn [T](value T) bool {
+		return !td[T](value).bool()
+	})
+}
+
+fn logical_binary[T](a &Tensor[T], b &Tensor[T], operation fn (left T, right T) bool) !&Tensor[bool] {
+	mut iterators, shape := a.iterators[T]([b])!
+	mut result := empty[bool](shape)
+	for {
+		values, index := iterators.next() or { break }
+		result.set(index, operation(values[0], values[1]))
+	}
+	return result
+}
+
 // all_axis reduces one axis with logical AND. The reduced dimension is removed
 // unless keepdims is true. Empty reductions follow NumPy's identity: true.
 pub fn (t &Tensor[T]) all_axis[T](axis int, keepdims bool) !&Tensor[bool] {

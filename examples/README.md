@@ -27,6 +27,7 @@ CIFAR examples for CI-safe checks.
 | [stats_nan_reductions](./stats_nan_reductions) | NaN-aware sums, products, extrema, and axis reductions | `v run ./vtl/examples/stats_nan_reductions/main.v` |
 | [is_nan](./is_nan) | NaN, infinity, and finite-value predicates on tensors and views | `v run ./vtl/examples/is_nan/main.v` |
 | [logical_reductions](./logical_reductions) | Axis-wise logical all/any reductions with keepdims | `v run ./vtl/examples/logical_reductions/main.v` |
+| [logical_ops](./logical_ops) | Elementwise AND/OR/XOR/NOT with broadcasting | `v run ./vtl/examples/logical_ops/main.v` |
 | [multi_axis_extrema](./multi_axis_extrema) | Multi-axis min/max reductions with NumPy-style output shapes | `v run ./vtl/examples/multi_axis_extrema/main.v` |
 | [nan_multi_axis_reductions](./nan_multi_axis_reductions) | NaN-aware multi-axis reductions | `v run ./vtl/examples/nan_multi_axis_reductions/main.v` |
 | [random_seed](./random_seed) | Repeat a random tensor sequence with an explicit seed | `v run ./vtl/examples/random_seed/main.v` |
