@@ -76,8 +76,10 @@ assert sample_std.to_array() == [2.1213203435596424, 2.1213203435596424, 2.12132
 
 ## argmax / argmin
 
-`argmax_axis(axis)` returns the index of the maximum value along `axis`.
-`argmin_axis(axis)` returns the index of the minimum value.
+`argmax_axis(axis)` and `argmin_axis(axis)` retain the reduced axis with
+length one. Use `argmax_axis_squeeze(axis)` or `argmin_axis_squeeze(axis)` to
+remove it, matching NumPy's default `keepdims=false` shape behavior. VTL's
+one-dimensional tensors use shape `[1]` for scalar results.
 
 If no axis is specified, the tensor is flattened first.
 
@@ -88,11 +90,11 @@ import vtl
 t := vtl.from_array[f64]([3.0, 5.0, 1.0, 4.0], [2, 2])!
 
 // Along axis 1 (columns): which column holds the max per row?
-amax := t.argmax_axis[f64](1)!
+amax := t.argmax_axis_squeeze[f64](1)!
 assert amax.shape == [2]
 // amax = [1, 1]  → row 0: max is at col 1 (5.0), row 1: max is at col 1 (4.0)
 
-amin := t.argmin_axis[f64](0)!
+amin := t.argmin_axis_squeeze[f64](0)!
 assert amin.shape == [2]
 // amin = [1, 0]  → col 0: min is at row 1 (1.0), col 1: min is at row 0 (4.0)
 

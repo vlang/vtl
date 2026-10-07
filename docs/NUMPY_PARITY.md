@@ -50,6 +50,11 @@ axis `count_nonzero`; `argwhere` and per-axis `nonzero`; `take`, `take_nd`,
 **Remaining:** mix coordinate arrays with slices, add autograd support for
 indexed updates, and document all bounds semantics.
 
+Axis-wise `argmax` and `argmin` retain a length-one axis for compatibility;
+`argmax_axis_squeeze` and `argmin_axis_squeeze` provide NumPy's default
+axis-removed output shape. VTL represents scalar-shaped reductions as shape
+`[1]`.
+
 ### Math and ufuncs
 
 **Current:** broad elementwise math and broadcasting; `clip` and fused

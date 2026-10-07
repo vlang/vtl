@@ -34,6 +34,20 @@ fn test_argmin_axis_1() {
 	assert result.get_nth(1) == 1
 }
 
+fn test_arg_extrema_axis_squeeze_matches_numpy_shape() {
+	t := vtl.from_2d([[1.0, 5.0], [3.0, 2.0]])!
+	max_indices := t.argmax_axis_squeeze(1)!
+	assert max_indices.shape == [2]
+	assert max_indices.to_array() == [1, 0]
+	min_indices := t.argmin_axis_squeeze(-2)!
+	assert min_indices.shape == [2]
+	assert min_indices.to_array() == [0, 1]
+
+	vector := vtl.from_1d([4.0, 2.0, 6.0])!
+	assert vector.argmax_axis_squeeze(0)!.shape == [1]
+	assert vector.argmin_axis_squeeze(0)!.to_array() == [1]
+}
+
 fn test_argmax_flat() {
 	t := vtl.from_1d([1.0, 7.0, 3.0, 5.0])!
 	result := t.argmax(0)!
