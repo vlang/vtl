@@ -1,8 +1,19 @@
 # Indexing, gather, and scatter
 
 `take` and `take_along_axis` gather copies from a tensor. Negative axes and
-indices count from the end. See [slicing](./TUTORIAL_SLICING.md) when a view of
-a range is more appropriate.
+indices count from the end. `take_along_axis` broadcasts dimensions outside
+the selected axis. See [slicing](./TUTORIAL_SLICING.md) when a view of a range
+is more appropriate.
+
+```v
+import vtl
+
+matrix := vtl.from_2d([[10, 11, 12], [20, 21, 22]])!
+indices := vtl.from_array[int]([2, 0], [1, 2])!
+selected := matrix.take_along_axis(indices, 1)!
+assert selected.shape == [2, 2]
+assert selected.to_array() == [12, 10, 22, 20]
+```
 
 ## Count non-zero values
 

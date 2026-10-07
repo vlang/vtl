@@ -41,8 +41,9 @@ concatenate/stack/split, `ravel`, copying `flatten`, `flip`, `repeat`,
 `advanced_index`; sorted `unique` and its counts/inverse/first-index variants;
 `unique_axis`; `digitize`; ascending and descending `searchsorted`; global and
 axis `count_nonzero`; `argwhere` and per-axis `nonzero`; `take`, `take_nd`,
-`take_flat`, `take_along_axis`, `put_along_axis`, and `scatter_add`; lookup and
-DataLoader gathers; broadcastable `masked_select` and `masked_fill`.
+`take_flat`; `take_along_axis` with broadcasting outside the selected axis;
+`put_along_axis` and `scatter_add`; lookup and DataLoader gathers; broadcastable
+`masked_select` and `masked_fill`.
 
 **Remaining:** mix coordinate arrays with slices, add autograd support for
 indexed updates, and document all bounds semantics.
