@@ -132,8 +132,10 @@ fn matrix_svd_tall(data []f64, rows int, columns int, full bool) !SvdFactors {
 		return SvdFactors{ values: []f64{len: columns}, u: u, vt: vt }
 	}
 	mut work := []f64{len: rows * columns}
-	for i, value in data {
-		work[i] = value / scale
+	for row in 0 .. rows {
+		for column in 0 .. columns {
+			work[column * rows + row] = data[row * columns + column] / scale
+		}
 	}
 	mut right := identity_f64(columns)
 	mut converged := false
@@ -145,8 +147,8 @@ fn matrix_svd_tall(data []f64, rows int, columns int, full bool) !SvdFactors {
 				mut beta := 0.0
 				mut gamma := 0.0
 				for row in 0 .. rows {
-					x := work[row * columns + p]
-					y := work[row * columns + q]
+					x := work[p * rows + row]
+					y := work[q * rows + row]
 					alpha += x * x
 					beta += y * y
 					gamma += x * y
@@ -162,16 +164,16 @@ fn matrix_svd_tall(data []f64, rows int, columns int, full bool) !SvdFactors {
 				cosine := 1 / math.sqrt(1 + tangent * tangent)
 				sine := cosine * tangent
 				for row in 0 .. rows {
-					p_index := row * columns + p
-					q_index := row * columns + q
+					p_index := p * rows + row
+					q_index := q * rows + row
 					x := work[p_index]
 					y := work[q_index]
 					work[p_index] = cosine * x - sine * y
 					work[q_index] = sine * x + cosine * y
 				}
 				for row in 0 .. columns {
-					p_index := row * columns + p
-					q_index := row * columns + q
+					p_index := p * columns + row
+					q_index := q * columns + row
 					x := right[p_index]
 					y := right[q_index]
 					right[p_index] = cosine * x - sine * y
@@ -193,7 +195,7 @@ fn matrix_svd_tall(data []f64, rows int, columns int, full bool) !SvdFactors {
 	for column in 0 .. columns {
 		mut norm_squared := 0.0
 		for row in 0 .. rows {
-			value := work[row * columns + column]
+			value := work[column * rows + row]
 			norm_squared += value * value
 		}
 		values[column] = math.sqrt(norm_squared) * scale
@@ -216,11 +218,11 @@ fn matrix_svd_tall(data []f64, rows int, columns int, full bool) !SvdFactors {
 			sorted_u[row * columns + output_column] = if sigma == 0 {
 				0
 			} else {
-				work[row * columns + source_column] / (sigma / scale)
+				work[source_column * rows + row] / (sigma / scale)
 			}
 		}
 		for column in 0 .. columns {
-			sorted_vt[output_column * columns + column] = right[column * columns + source_column]
+			sorted_vt[output_column * columns + column] = right[source_column * columns + column]
 		}
 	}
 	sorted_u = orthogonal_completion(sorted_u, rows, columns, u_columns)
