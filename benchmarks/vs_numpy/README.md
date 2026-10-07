@@ -1,5 +1,36 @@
 # VTL vs NumPy baselines
 
+## Reduced SVD
+
+Both programs compute reduced `f64` SVDs of identical deterministic square
+matrices, with matrix construction outside the timed region. They warm up twice
+and average five calls. Run from `~/.vmodules` under a memory-limited scope:
+
+```bash
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -prod run ./vtl/benchmarks/vs_numpy/svd_bench.v
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	OPENBLAS_NUM_THREADS=2 uv run --with numpy python \
+	./vtl/benchmarks/vs_numpy/numpy_svd_baseline.py
+```
+
+The checksum sums all singular values across timed calls. Compare timings only
+when recording the V backend, NumPy/BLAS build, CPU, and thread count.
+
+On an AMD Ryzen 9 5900X with V `b69f626` `-prod`, NumPy 2.5.3 using its
+bundled OpenBLAS and `OPENBLAS_NUM_THREADS=2`, a matched run measured:
+
+| Size | VTL pure-V (ms) | NumPy (ms) | NumPy / VTL |
+| ---: | ---: | ---: | ---: |
+| 16×16 | 0.315 | 0.039 | 0.12× |
+| 32×32 | 4.524 | 0.047 | 0.01× |
+| 64×64 | 59.238 | 0.357 | 0.006× |
+| 128×128 | 875.938 | 2.296 | 0.003× |
+
+The pure-V SVD is substantially slower for these cases. This benchmark is a
+performance gap report, not evidence of parity; optimized SVD kernels remain a
+priority before making CPU performance claims.
+
 Run both sides from `~/.vmodules` under a memory-limited systemd scope. The VTL
 benchmark calls `vtl.la.matmul` end to end, including tensor conversion and
 result allocation. NumPy uses identical matrix values and sizes.
