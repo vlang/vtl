@@ -18,6 +18,7 @@ CIFAR examples for CI-safe checks.
 | [kron](./kron) | Build NumPy-style Kronecker products from tensors of any rank | `v run ./vtl/examples/kron/main.v` |
 | [vander](./vander) | Build polynomial features from powers of a vector | `v run ./vtl/examples/vander/main.v` |
 | [complex_tensors](./complex_tensors) | Create `complex128` tensors and use elementwise arithmetic | `v run ./vtl/examples/complex_tensors/main.v` |
+| [einsum_complex](./einsum_complex) | Contract complex tensors with Einstein summation | `v run ./vtl/examples/einsum_complex/main.v` |
 | [tensor_axis_manipulation](./tensor_axis_manipulation) | `moveaxis` and `rollaxis` views | `v run ./vtl/examples/tensor_axis_manipulation/main.v` |
 | [tensor_sorting](./tensor_sorting) | Sort, partially partition, and return local indices along tensor axes | `v run ./vtl/examples/tensor_sorting/main.v` |
 | [vtl_basic_usage](./vtl_basic_usage) | Tensor creation and basic operations | `v run ./vtl/examples/vtl_basic_usage/main.v` |
