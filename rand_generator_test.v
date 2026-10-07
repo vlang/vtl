@@ -1,6 +1,7 @@
 module vtl
 
 import rand
+import math
 
 fn test_random_generators_have_independent_reproducible_state() ! {
 	mut first := new_random_generator(42)
@@ -47,6 +48,34 @@ fn test_random_generator_supports_geometric_sampling() ! {
 	mut replay := new_random_generator(987)
 	replayed := replay.geometric(0.25, [64])!
 	assert values.array_equal(replayed)
+	generator.free()
+	replay.free()
+}
+
+fn test_random_generator_supports_seeded_binomial_and_exponential() ! {
+	mut generator := new_random_generator(654)
+	binomial_values := generator.binomial(12, 0.25, [64])!
+	exponential_values := generator.exponential(2.0, [64])!
+	for value in binomial_values.to_array() {
+		assert value >= 0 && value <= 12
+	}
+	for value in exponential_values.to_array() {
+		assert value >= 0 && !math.is_inf(value, 0) && !math.is_nan(value)
+	}
+	mut replay := new_random_generator(654)
+	assert binomial_values.array_equal(replay.binomial(12, 0.25, [64])!)
+	assert exponential_values.array_equal(replay.exponential(2.0, [64])!)
+	assert generator.binomial(0, 0.5, [4])!.to_array() == [0, 0, 0, 0]
+	assert generator.binomial(5, 1.0, [4])!.to_array() == [5, 5, 5, 5]
+	if _ := generator.binomial(-1, 0.5, [1]) {
+		assert false, 'binomial must reject negative trial counts'
+	}
+	if _ := generator.binomial(2, math.nan(), [1]) {
+		assert false, 'binomial must reject a NaN probability'
+	}
+	if _ := generator.exponential(0.0, [1]) {
+		assert false, 'exponential must reject a non-positive rate'
+	}
 	generator.free()
 	replay.free()
 }
