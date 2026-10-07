@@ -132,6 +132,35 @@ filled := values.masked_fill(row_mask, -1)!
 assert filled.to_array() == [-1, -1, -1, 4, 5, 6]
 ```
 
+## Mixed basic and coordinate-array indexing
+
+`mixed_index` accepts one descriptor per indexed axis; omitted trailing axes
+select the full axis. Use `integer_index` to remove one axis, `slice_index` for
+an explicit range, `slice_all` for a full or reversed range, and `array_index`
+for integer coordinate tensors. Coordinate tensors broadcast together. When
+their axes are separated by slices, the broadcast dimensions move to the front
+as in NumPy. Coordinate indexing returns an independent copy; basic indexing
+returns a view except for negative-step slices, which currently materialize a
+copy because VTL storage cannot represent negative-stride views safely.
+
+```v
+import vtl
+
+matrix := vtl.from_array[int]([]int{len: 35, init: index}, [5, 7])!
+rows := vtl.from_1d([0, 2, 4])!
+columns := vtl.slice_index(1, 3, 1)!
+selected := vtl.mixed_index[int](matrix, [vtl.array_index(rows), columns])!
+assert selected.shape == [3, 2]
+assert selected.to_array() == [1, 2, 15, 16, 29, 30]
+
+mut last_row := vtl.mixed_index[int](matrix, [vtl.integer_index(-1)])!
+last_row.set([0], 99)
+assert matrix.get([4, 0]) == 99 // basic indexing shares storage
+```
+
+`mixed_index` currently does not provide ellipsis or new-axis descriptors.
+Use `advanced_index` when each source axis has a coordinate tensor:
+
 ## Coordinate-array indexing
 
 `advanced_index` accepts one integer coordinate tensor for each input axis.
@@ -151,6 +180,5 @@ assert selected.to_array() == [11, 12, 10, 21, 22, 20]
 ```
 
 This covers coordinate-array selection such as NumPy's `matrix[rows, columns]`.
-The current API requires a coordinate tensor for every axis; combining
-coordinate arrays with slices or scalar indices is not supported yet. Use
-`take` or `take_nd` when gathering along one axis.
+Use `mixed_index` when coordinate arrays are combined with scalar or range
+indices. Use `take` or `take_nd` when gathering along one axis.
