@@ -71,11 +71,31 @@ assert stats.prod(values) == cmplx.Complex{ re: -5.0, im: 10.0 }
 assert stats.mean(values) == cmplx.Complex{ re: 2.0, im: 3.0 }
 ```
 
+Axis-wise complex means preserve complex values. Variance and standard deviation
+return real tensors using `E(|z - mean(z)|²)`, and accept one or several axes,
+negative axes, `keepdims`, and `ddof`:
+
+```v
+import math.complex as cmplx
+import vtl
+import vtl.stats
+
+values := vtl.from_array[cmplx.Complex]([
+	cmplx.complex(1.0, 2.0),
+	cmplx.complex(3.0, 4.0),
+	cmplx.complex(5.0, 6.0),
+	cmplx.complex(7.0, 8.0),
+], [2, 2])!
+row_means := stats.complex_mean_along_axis(values, 1, false)!
+row_variances := stats.complex_variance_along_axis(values, 1, 0, false)!
+assert row_means.shape == [2]
+assert row_variances.to_array() == [2.0, 2.0]
+```
+
 Complex tensors are an early part of VTL's complex-number support. Real-valued
-casts, other axis-wise reductions and statistics, linear algebra, random
-distributions, and `.npy`/`.npz` complex I/O do not yet support this dtype.
-Global sum, product, and mean return complex scalar values. FFT APIs have their
-own complex output types and are documented in the [FFT tutorial](./TUTORIAL_FFT.md).
+casts, complex linear algebra, random distributions, and `.npy`/`.npz` complex
+I/O do not yet support this dtype. FFT APIs have their own complex output types
+and are documented in the [FFT tutorial](./TUTORIAL_FFT.md).
 
 Run the [complex tensor example](../examples/complex_tensors/README.md) from
 `~/.vmodules`:
