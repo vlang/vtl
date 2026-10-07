@@ -43,7 +43,7 @@ pub fn cast[T](x TensorDataType) T {
 	} $else $if T is f64 {
 		return x.f64()
 	} $else $if T is i16 {
-		return x as i16
+		return x.i16()
 	} $else $if T is i64 {
 		return x.i64()
 	} $else $if T is i8 {
@@ -70,91 +70,183 @@ pub fn (v TensorDataType) string() string {
 	return v.str()
 }
 
-// int uses `TensorDataType` as an integer.
+// int converts a numeric TensorDataType value to int.
 pub fn (v TensorDataType) int() int {
 	match v {
-		int { return v }
-		i64, f32, f64, bool { return int(v) }
-		else { return 0 }
+		bool { return if v { 1 } else { 0 } }
+		int { return v as int }
+		i8 { return int(v as i8) }
+		i16 { return int(v as i16) }
+		i64 { return int(v as i64) }
+		u8 { return int(v as u8) }
+		u16 { return int(v as u16) }
+		u32 { return int(v as u32) }
+		u64 { return int(v as u64) }
+		f32 { return int(v as f32) }
+		f64 { return int(v as f64) }
+		string { return 0 }
 	}
 }
 
-// i64 uses `TensorDataType` as a 64-bit integer.
+// i64 converts a numeric TensorDataType value to i64.
 pub fn (v TensorDataType) i64() i64 {
 	match v {
-		i64 { return v }
-		int, f32, f64, bool { return i64(v) }
-		else { return 0 }
+		bool { return if v { 1 } else { 0 } }
+		int { return i64(v as int) }
+		i8 { return i64(v as i8) }
+		i16 { return i64(v as i16) }
+		i64 { return v as i64 }
+		u8 { return i64(v as u8) }
+		u16 { return i64(v as u16) }
+		u32 { return i64(v as u32) }
+		u64 { return i64(v as u64) }
+		f32 { return i64(v as f32) }
+		f64 { return i64(v as f64) }
+		string { return 0 }
 	}
 }
 
-// i8 uses `TensorDataType` as a 8-bit unsigned integer.
+// i8 converts a numeric TensorDataType value to i8.
 pub fn (v TensorDataType) i8() i8 {
 	match v {
-		i8 { return v }
-		else { return 0 }
+		bool { return if v { 1 } else { 0 } }
+		int { return i8(v as int) }
+		i8 { return v as i8 }
+		i16 { return i8(v as i16) }
+		i64 { return i8(v as i64) }
+		u8 { return i8(v as u8) }
+		u16 { return i8(v as u16) }
+		u32 { return i8(v as u32) }
+		u64 { return i8(v as u64) }
+		f32 { return i8(v as f32) }
+		f64 { return i8(v as f64) }
+		string { return 0 }
 	}
 }
 
-// i16 uses `TensorDataType` as a 16-bit unsigned integer.
+// i16 converts a numeric TensorDataType value to i16.
 pub fn (v TensorDataType) i16() i16 {
 	match v {
-		i16 { return v }
-		i8 { return i16(v) }
-		else { return 0 }
+		bool { return if v { 1 } else { 0 } }
+		int { return i16(v as int) }
+		i8 { return i16(v as i8) }
+		i16 { return v as i16 }
+		i64 { return i16(v as i64) }
+		u8 { return i16(v as u8) }
+		u16 { return i16(v as u16) }
+		u32 { return i16(v as u32) }
+		u64 { return i16(v as u64) }
+		f32 { return i16(v as f32) }
+		f64 { return i16(v as f64) }
+		string { return 0 }
 	}
 }
 
-// u8 uses `TensorDataType` as a 8-bit unsigned integer.
+// u8 converts a numeric TensorDataType value to u8.
 pub fn (v TensorDataType) u8() u8 {
 	match v {
-		u8 { return v }
-		else { return 0 }
+		bool { return if v { 1 } else { 0 } }
+		int { return u8(v as int) }
+		i8 { return u8(v as i8) }
+		i16 { return u8(v as i16) }
+		i64 { return u8(v as i64) }
+		u8 { return v as u8 }
+		u16 { return u8(v as u16) }
+		u32 { return u8(v as u32) }
+		u64 { return u8(v as u64) }
+		f32 { return u8(v as f32) }
+		f64 { return u8(v as f64) }
+		string { return 0 }
 	}
 }
 
-// u16 uses `TensorDataType` as a 16-bit unsigned integer.
+// u16 converts a numeric TensorDataType value to u16.
 pub fn (v TensorDataType) u16() u16 {
 	match v {
-		u16 { return v }
-		u8 { return u16(v) }
-		else { return 0 }
+		bool { return if v { 1 } else { 0 } }
+		int { return u16(v as int) }
+		i8 { return u16(v as i8) }
+		i16 { return u16(v as i16) }
+		i64 { return u16(v as i64) }
+		u8 { return u16(v as u8) }
+		u16 { return v as u16 }
+		u32 { return u16(v as u32) }
+		u64 { return u16(v as u64) }
+		f32 { return u16(v as f32) }
+		f64 { return u16(v as f64) }
+		string { return 0 }
 	}
 }
 
-// u32 uses `TensorDataType` as a 32-bit unsigned integer.
+// u32 converts a numeric TensorDataType value to u32.
 pub fn (v TensorDataType) u32() u32 {
 	match v {
-		u32 { return v }
-		int, f32, bool { return u32(v) }
-		else { return 0 }
+		bool { return if v { 1 } else { 0 } }
+		int { return u32(v as int) }
+		i8 { return u32(v as i8) }
+		i16 { return u32(v as i16) }
+		i64 { return u32(v as i64) }
+		u8 { return u32(v as u8) }
+		u16 { return u32(v as u16) }
+		u32 { return v as u32 }
+		u64 { return u32(v as u64) }
+		f32 { return u32(v as f32) }
+		f64 { return u32(v as f64) }
+		string { return 0 }
 	}
 }
 
-// u64 uses `TensorDataType` as a 64-bit unsigned integer.
+// u64 converts a numeric TensorDataType value to u64.
 pub fn (v TensorDataType) u64() u64 {
 	match v {
-		u64 { return v }
-		int, i64, f32, f64, bool { return u64(v) }
-		else { return 0 }
+		bool { return if v { 1 } else { 0 } }
+		int { return u64(v as int) }
+		i8 { return u64(v as i8) }
+		i16 { return u64(v as i16) }
+		i64 { return u64(v as i64) }
+		u8 { return u64(v as u8) }
+		u16 { return u64(v as u16) }
+		u32 { return u64(v as u32) }
+		u64 { return v as u64 }
+		f32 { return u64(v as f32) }
+		f64 { return u64(v as f64) }
+		string { return 0 }
 	}
 }
 
-// f32 uses `TensorDataType` as a 32-bit float.
+// f32 converts a numeric TensorDataType value to f32.
 pub fn (v TensorDataType) f32() f32 {
 	match v {
-		f32 { return v }
-		int, i64, f64 { return f32(v) }
-		else { return 0.0 }
+		bool { return if v { 1.0 } else { 0.0 } }
+		int { return f32(v as int) }
+		i8 { return f32(v as i8) }
+		i16 { return f32(v as i16) }
+		i64 { return f32(v as i64) }
+		u8 { return f32(v as u8) }
+		u16 { return f32(v as u16) }
+		u32 { return f32(v as u32) }
+		u64 { return f32(v as u64) }
+		f32 { return v as f32 }
+		f64 { return f32(v as f64) }
+		string { return 0.0 }
 	}
 }
 
-// f64 uses `TensorDataType` as a float.
+// f64 converts a numeric TensorDataType value to f64.
 pub fn (v TensorDataType) f64() f64 {
 	match v {
-		f64 { return v }
-		int, i64, f32 { return f64(v) }
-		else { return 0.0 }
+		bool { return if v { 1.0 } else { 0.0 } }
+		int { return f64(v as int) }
+		i8 { return f64(v as i8) }
+		i16 { return f64(v as i16) }
+		i64 { return f64(v as i64) }
+		u8 { return f64(v as u8) }
+		u16 { return f64(v as u16) }
+		u32 { return f64(v as u32) }
+		u64 { return f64(v as u64) }
+		f32 { return f64(v as f32) }
+		f64 { return v as f64 }
+		string { return 0.0 }
 	}
 }
 

@@ -89,6 +89,28 @@ assert interior_samples.to_array() == [0.0, 0.25, 0.5, 0.75]
 assert decades.to_array() == [1.0, 10.0, 100.0, 1000.0, 10000.0]
 ```
 
+## Numeric dtype conversion
+
+Use the explicit `as_*` methods when an operation needs a different tensor
+element type. Numeric casts cover the supported integer, floating-point, and
+boolean types while preserving the tensor's logical values and shape. A cast
+to the existing type returns the original tensor; a conversion creates a
+row-major tensor. Floating-point values converted to integers are truncated.
+
+```v
+import vtl
+
+samples := vtl.from_array[u32]([1, 2, 3, 4], [2, 2])!
+as_float := samples.as_f64()
+as_small_int := samples.as_i16()
+assert as_float.shape == samples.shape
+assert as_float.to_array() == [1.0, 2.0, 3.0, 4.0]
+assert as_small_int.to_array() == [1, 2, 3, 4]
+
+fractional := vtl.from_1d([1.75, 2.5])!
+assert fractional.as_int().to_array() == [1, 2]
+```
+
 `logspace` spaces samples evenly in the exponent; its default base is 10. Set
 `base` in the options to use another positive finite base.
 
