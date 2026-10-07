@@ -50,6 +50,8 @@ positive_noise := training_rng.gamma(2.0, 0.5, [128])!
 beta_samples := training_rng.beta(2.0, 5.0, [128])!
 positive_scales := training_rng.lognormal(0.0, 0.25, [128])!
 event_counts := training_rng.binomial(12, 0.25, [128])!
+class_probabilities := vtl.from_1d([0.6, 0.3, 0.1])!
+class_counts := training_rng.multinomial(12, class_probabilities, [128])!
 waiting_durations := validation_rng.exponential(0.5, [128])!
 ```
 
@@ -62,6 +64,8 @@ logical order and can enforce unique sampled positions. `permutation(size)`
 returns every integer from zero to `size - 1` exactly once in a seeded order.
 `choice_weighted(population, weights, size, replace)` samples in proportion to
 finite non-negative weights and can sample without replacement.
+`multinomial(trials, probabilities, sample_shape)` returns one count per
+category on the final axis; probabilities must sum to one.
 `permutation_tensor(tensor)` returns a copy with complete rows shuffled along
 the first axis, preserving all feature values in each row.
 `gamma(alpha, scale, shape)` samples positive values from a Gamma distribution

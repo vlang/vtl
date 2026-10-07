@@ -99,6 +99,30 @@ fn test_random_generator_supports_seeded_binomial_and_exponential() ! {
 	replay.free()
 }
 
+fn test_random_generator_supports_seeded_multinomial_counts() ! {
+	probabilities := from_1d([0.2, 0.3, 0.5])!
+	mut generator := new_random_generator(357)
+	counts := generator.multinomial(20, probabilities, [64])!
+	assert counts.shape == [64, 3]
+	for sample in 0 .. counts.shape[0] {
+		mut total := 0
+		for category in 0 .. counts.shape[1] {
+			count := counts.get([sample, category])
+			assert count >= 0
+			total += count
+		}
+		assert total == 20
+	}
+	mut replay := new_random_generator(357)
+	assert counts.array_equal(replay.multinomial(20, probabilities, [64])!)
+	assert generator.multinomial(5, from_1d([1.0, 0.0])!, [2])!.to_array() == [5, 0, 5, 0]
+	if _ := generator.multinomial(5, from_1d([0.2, 0.2])!, [1]) {
+		assert false, 'multinomial must reject probabilities whose sum is not one'
+	}
+	generator.free()
+	replay.free()
+}
+
 fn test_random_generator_choice_supports_replacement_modes() ! {
 	population := from_1d([10, 20, 30, 40, 50])!
 	mut generator := new_random_generator(456)
