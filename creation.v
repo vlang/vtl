@@ -78,6 +78,49 @@ pub fn meshgrid_n[T](vectors []&Tensor[T], indexing MeshgridIndexing) ![]&Tensor
 	return grids
 }
 
+// VandermondeData configures the column count and power order used by vander.
+@[params]
+pub struct VandermondeData {
+pub:
+	n          int = -1
+	increasing bool
+}
+
+// vander returns a Vandermonde matrix built from a one-dimensional input.
+// The default column count is input.size; powers descend by default and
+// increase when requested, matching NumPy's vander convention. T must be a
+// numeric element type.
+@[direct_array_access]
+pub fn vander[T](input &Tensor[T], params VandermondeData) !&Tensor[T] {
+	if input.rank() != 1 {
+		return error('vander expects a one-dimensional input')
+	}
+	if params.n < -1 {
+		return error('vander n must be non-negative')
+	}
+	columns := if params.n == -1 { input.size } else { params.n }
+	if columns > 0 && input.size > max_int / columns {
+		return error('vander output shape overflows the maximum tensor size')
+	}
+	mut result := empty[T]([input.size, columns], memory: .row_major)
+	for row in 0 .. input.size {
+		value := input.get_nth(row)
+		mut power := cast[T](1)
+		if params.increasing {
+			for column in 0 .. columns {
+				result.data.data[row * columns + column] = power
+				power *= value
+			}
+		} else {
+			for column := columns - 1; column >= 0; column-- {
+				result.data.data[row * columns + column] = power
+				power *= value
+			}
+		}
+	}
+	return result
+}
+
 // empty returns a new Tensor of given shape and type, without initializing entries
 
 // empty exposes this operation as part of the public API.

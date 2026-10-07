@@ -89,6 +89,19 @@ assert interior_samples.to_array() == [0.0, 0.25, 0.5, 0.75]
 assert decades.to_array() == [1.0, 10.0, 100.0, 1000.0, 10000.0]
 ```
 
+`vander` builds a polynomial feature matrix from a vector. By default it uses
+one column per input value with descending powers; set `increasing: true` for
+the order commonly used by polynomial regression features.
+
+```v
+import vtl
+
+x := vtl.from_1d([1.0, 2.0, 3.0])!
+features := vtl.vander(x, increasing: true)!
+println(features)
+// [[1, 1, 1], [1, 2, 4], [1, 3, 9]]
+```
+
 ## Numeric dtype conversion
 
 Use the explicit `as_*` methods when an operation needs a different tensor

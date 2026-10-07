@@ -16,6 +16,7 @@ CIFAR examples for CI-safe checks.
 | [pad](./pad) | Constant, edge, wrap, reflect, and symmetric tensor padding | `v run ./vtl/examples/pad/main.v` |
 | [diag](./diag) | Construct and extract offset diagonals, including N-D diagonal views | `v run ./vtl/examples/diag/main.v` |
 | [kron](./kron) | Build NumPy-style Kronecker products from tensors of any rank | `v run ./vtl/examples/kron/main.v` |
+| [vander](./vander) | Build polynomial features from powers of a vector | `v run ./vtl/examples/vander/main.v` |
 | [complex_tensors](./complex_tensors) | Create `complex128` tensors and use elementwise arithmetic | `v run ./vtl/examples/complex_tensors/main.v` |
 | [tensor_axis_manipulation](./tensor_axis_manipulation) | `moveaxis` and `rollaxis` views | `v run ./vtl/examples/tensor_axis_manipulation/main.v` |
 | [tensor_sorting](./tensor_sorting) | Sort, partially partition, and return local indices along tensor axes | `v run ./vtl/examples/tensor_sorting/main.v` |
@@ -26,7 +27,7 @@ CIFAR examples for CI-safe checks.
 | [autograd_scatter](./autograd_scatter) | Propagate gradients through indexed additions | `v run ./vtl/examples/autograd_scatter/main.v` |
 | [autograd_put](./autograd_put) | Propagate gradients through indexed replacement | `v run ./vtl/examples/autograd_put/main.v` |
 | [autograd_slice](./autograd_slice) | Route gradients through slice views | `v run ./vtl/examples/autograd_slice/main.v` |
-| [autograd_scalar_loss](./autograd_scalar_loss) | Reduce a tensor to a scalar sum or mean loss and backpropagate | `v run ./vtl/examples/autograd_scalar_loss/main.v` |
+| [autograd_scalar_loss](./autograd_scalar_loss) | Scalar sum/mean loss and backward pass | `v run ./vtl/examples/autograd_scalar_loss/main.v` |
 | [npy_round_trip](./npy_round_trip) | Read and write NumPy `.npy` arrays | `v run ./vtl/examples/npy_round_trip/main.v` |
 | [csv_round_trip](./csv_round_trip) | Read and write numeric CSV tensors with headers | `v run ./vtl/examples/csv_round_trip/main.v` |
 | [npz_round_trip](./npz_round_trip) | Write and read named arrays in `.npz` archives | `v run ./vtl/examples/npz_round_trip/main.v` |
@@ -65,7 +66,7 @@ CIFAR examples for CI-safe checks.
 | [bitwise](./bitwise) | Broadcast integer masks and shift flag bits | `v run ./vtl/examples/bitwise/main.v` |
 | [take_nd](./take_nd) | Gather along an axis while preserving a multidimensional index shape | `v run ./vtl/examples/take_nd/main.v` |
 | [mixed_index](./mixed_index) | Combine coordinate arrays, scalar indices, and Python-style slices | `v run ./vtl/examples/mixed_index/main.v` |
-| [masked_array](./masked_array) | Broadcast missing-data masks, fill or compress values, and reduce valid entries | `v run ./vtl/examples/masked_array/main.v` |
+| [masked_array](./masked_array) | Broadcast masks, fill or compress values, reduce valid entries | `v run ./vtl/examples/masked_array/main.v` |
 
 ## Neural networks
 
