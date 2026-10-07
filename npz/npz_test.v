@@ -1,6 +1,7 @@
 module npz
 
 import os
+import math.complex as vcomplex
 import vtl
 
 fn test_npz_round_trip_named_arrays_and_member_listing() ! {
@@ -47,6 +48,20 @@ fn test_npz_writes_and_reads_mixed_dtypes() ! {
 	assert read[f64](path, 'weights')!.to_array() == [1.5, -2.0]
 	assert read[i32](path, 'labels')!.to_array() == [i32(2), 0, 1]
 	assert read[bool](path, 'mask')!.to_array() == [true, false]
+}
+
+fn test_npz_writes_and_reads_complex128_arrays() ! {
+	path := os.join_path(os.temp_dir(), 'vtl_npz_complex128_round_trip.npz')
+	defer {
+		os.rm(path) or {}
+	}
+	values := [vcomplex.Complex{ re: 1.5, im: -2.25 }, vcomplex.Complex{ re: -3.0, im: 4.75 }]
+	write_arrays(path, {
+		'spectrum': array[vcomplex.Complex](vtl.from_1d[vcomplex.Complex](values)!)
+	})!
+	loaded := read[vcomplex.Complex](path, 'spectrum')!
+	assert loaded.dtype() == .complex128
+	assert loaded.to_array() == values
 }
 
 fn test_npz_rejects_missing_members_and_path_names() {

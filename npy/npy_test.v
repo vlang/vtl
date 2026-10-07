@@ -1,6 +1,8 @@
 module npy
 
 import encoding.binary
+import math
+import math.complex as vcomplex
 import os
 import vtl
 
@@ -54,6 +56,54 @@ fn test_npy_round_trips_all_primitive_numeric_types() {
 	check_npy_round_trip[u16]('u16', [u16(0), 65535])
 	check_npy_round_trip[u64]('u64', [u64(0), 18446744073709551615])
 	check_npy_round_trip[bool]('bool', [true, false, true])
+}
+
+fn test_npy_complex128_round_trip_and_descriptor() {
+	path := os.join_path(os.temp_dir(), 'vtl_npy_complex128_round_trip.npy')
+	defer {
+		os.rm(path) or {}
+	}
+	values := [vcomplex.Complex{ re: 1.5, im: -2.25 }, vcomplex.Complex{ re: -3.0, im: 4.75 }]
+	original := vtl.from_array[vcomplex.Complex](values, [2])!
+	write(path, original)!
+	bytes := os.read_bytes(path)!
+	header_length := int(binary.little_endian_u16(bytes[8..]))
+	header := bytes[10..10 + header_length].bytestr()
+	assert header.contains("'descr': '<c16'")
+	loaded := read[vcomplex.Complex](path)!
+	assert loaded.shape == [2]
+	assert loaded.to_array() == values
+}
+
+fn test_npy_reads_big_endian_complex128_components() {
+	path := os.join_path(os.temp_dir(), 'vtl_npy_big_endian_complex128.npy')
+	defer {
+		os.rm(path) or {}
+	}
+	mut payload := []u8{len: 16}
+	binary.little_endian_put_u64_at(mut payload, math.f64_bits(2.5), 0)
+	binary.little_endian_put_u64_at(mut payload, math.f64_bits(-7.25), 8)
+	for start in [0, 8] {
+		for offset in 0 .. 4 {
+			payload[start + offset], payload[start + 7 - offset] = payload[start + 7 - offset], payload[start + offset]
+		}
+	}
+	write_test_npy(path, 1, "{'descr': '>c16', 'fortran_order': False, 'shape': (1,), }", payload)
+	loaded := read[vcomplex.Complex](path)!
+	assert loaded.to_array() == [vcomplex.Complex{ re: 2.5, im: -7.25 }]
+}
+
+fn test_npy_reads_numpy_generated_complex128_fixture() ! {
+	path := os.join_path(os.dir(@FILE), 'testdata', 'numpy_complex128.npy')
+	bytes := os.read_bytes(path)!
+	loaded := read[vcomplex.Complex](path)!
+	assert loaded.shape == [2]
+	assert loaded.to_array() == [vcomplex.Complex{ re: 1.5, im: -2.25 },
+		vcomplex.Complex{ re: -3.0, im: 4.75 }]
+	encoded := to_bytes(loaded)!
+	encoded_offset := 10 + int(binary.little_endian_u16(encoded[8..]))
+	fixture_offset := 10 + int(binary.little_endian_u16(bytes[8..]))
+	assert encoded[encoded_offset..] == bytes[fixture_offset..]
 }
 
 fn test_npy_native_int_uses_platform_width() {
