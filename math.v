@@ -72,7 +72,7 @@ pub fn (t &Tensor[T]) clip[T](min_value T, max_value T) !&Tensor[T] {
 // minimum tensors or intermediate results. Stride-based offsets avoid creating
 // per-element coordinate arrays, including when an input is a view.
 pub fn clip_tensor[T](t &Tensor[T], lower &Tensor[T], upper &Tensor[T]) !&Tensor[T] {
-	shape := broadcast_shapes(t.shape, lower.shape, upper.shape)
+	shape := broadcast_shapes(t.shape, lower.shape, upper.shape)!
 	values := t.broadcast_to(shape)!
 	lower_values := lower.broadcast_to(shape)!
 	upper_values := upper.broadcast_to(shape)!

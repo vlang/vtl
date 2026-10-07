@@ -3,7 +3,7 @@ module vtl
 // where selects elements from x or y according to condition, broadcasting all
 // three tensors to their common shape. True condition elements select x.
 pub fn where[T](condition &Tensor[bool], x &Tensor[T], y &Tensor[T]) !&Tensor[T] {
-	shape := broadcast_shapes(condition.shape, x.shape, y.shape)
+	shape := broadcast_shapes(condition.shape, x.shape, y.shape)!
 	condition_view := condition.broadcast_to(shape)!
 	x_view := x.broadcast_to(shape)!
 	y_view := y.broadcast_to(shape)!
@@ -32,7 +32,7 @@ pub fn choose[T](indices &Tensor[int], choices []&Tensor[T]) !&Tensor[T] {
 	for choice in choices {
 		shapes << choice.shape
 	}
-	shape := broadcast_shapes(...shapes)
+	shape := broadcast_shapes(...shapes)!
 	broadcast_indices := indices.broadcast_to(shape)!
 	mut broadcast_choices := []&Tensor[T]{cap: choices.len}
 	for choice in choices {
