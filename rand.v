@@ -178,6 +178,16 @@ pub fn (mut generator RandomGenerator) permutation(size int) !&Tensor[int] {
 	return from_1d[int](values)
 }
 
+// permutation_tensor returns a copy with rows shuffled along the first axis,
+// matching NumPy's permutation behavior for an N-dimensional array.
+pub fn (mut generator RandomGenerator) permutation_tensor[T](input &Tensor[T]) !&Tensor[T] {
+	if input.rank() == 0 {
+		return error('permutation_tensor: input must have at least one dimension')
+	}
+	indices := generator.permutation(input.shape[0])!
+	return input.take(indices.to_array(), 0)
+}
+
 // gamma returns samples from a Gamma distribution using this generator's
 // independent stream. `alpha` is the shape and `scale` is the scale parameter.
 pub fn (mut generator RandomGenerator) gamma(alpha f64, scale f64, shape []int) !&Tensor[f64] {
