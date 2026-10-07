@@ -46,6 +46,30 @@ fn test_variable_sum_and_mean_support_zero_dimensional_inputs() ! {
 	assert mean_input.grad.get_nth(0) == 1.0
 }
 
+fn test_variable_axis_sum_and_mean_forward_backward() ! {
+	mut sum_context := autograd.ctx[f64]()
+	sum_input := sum_context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [
+		2,
+		3,
+	])!)
+	mut row_sums := sum_input.sum_along_axis(-1, false)!
+	assert row_sums.value.shape == [2]
+	assert row_sums.value.to_array() == [6.0, 15.0]
+	row_sums.backprop()!
+	assert sum_input.grad.to_array() == [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+	mut mean_context := autograd.ctx[f64]()
+	mean_input := mean_context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [
+		2,
+		3,
+	])!)
+	mut column_means := mean_input.mean_along_axis(0, true)!
+	assert column_means.value.shape == [1, 3]
+	assert column_means.value.to_array() == [2.5, 3.5, 4.5]
+	column_means.backprop()!
+	assert mean_input.grad.to_array() == [0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+}
+
 fn test_reshape_forward_backward() {
 	f64_ctx := autograd.ctx[f64]()
 	x := f64_ctx.variable(vtl.from_1d([1.0, 2.0, 3.0, 4.0])!)

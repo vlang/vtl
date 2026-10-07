@@ -27,6 +27,48 @@ pub fn (v &Variable[T]) mean() !&Variable[T] {
 	return result
 }
 
+// sum_along_axis reduces one axis. Set keepdims to retain it with length one.
+pub fn (v &Variable[T]) sum_along_axis(axis int, keepdims bool) !&Variable[T] {
+	rank := v.value.rank()
+	if rank == 0 {
+		return error('Variable.sum_along_axis: input has no dimensions')
+	}
+	na := if axis < 0 { axis + rank } else { axis }
+	if na < 0 || na >= rank {
+		return error('Variable.sum_along_axis: axis ${axis} out of bounds for shape ${v.value.shape}')
+	}
+	value := vtl_stats.sum_along_axis[T](v.value, na, keepdims)!
+	mut result := v.context.variable(value)
+	if v.requires_grad {
+		gate := sum_gate[T](v.value.shape, na)
+		gate.cache(mut result, v)!
+	}
+	return result
+}
+
+// mean_along_axis computes one-axis means. Set keepdims to retain the reduced
+// axis with length one.
+pub fn (v &Variable[T]) mean_along_axis(axis int, keepdims bool) !&Variable[T] {
+	rank := v.value.rank()
+	if rank == 0 {
+		return error('Variable.mean_along_axis: input has no dimensions')
+	}
+	na := if axis < 0 { axis + rank } else { axis }
+	if na < 0 || na >= rank {
+		return error('Variable.mean_along_axis: axis ${axis} out of bounds for shape ${v.value.shape}')
+	}
+	mean_values := vtl_stats.mean_along_axis[T](v.value, na, keepdims)!
+	value := mean_values.map[T](fn [T](mean f64, _ []int) T {
+		return vtl.cast[T](mean)
+	})
+	mut result := v.context.variable(value)
+	if v.requires_grad {
+		gate := mean_gate[T](v.value.shape, na, v.value.shape[na])
+		gate.cache(mut result, v)!
+	}
+	return result
+}
+
 // add Adds two variables together.
 pub fn (v &Variable[T]) add(other &Variable[T]) !&Variable[T] {
 	mut result := v.context.variable(v.value.add(other.value)!)

@@ -59,7 +59,8 @@ only to the final update at each destination.
 `Variable.slice` and `Variable.slice_hilo` propagate gradients through integer
 indices, range views, and positive steps.
 `Variable.sum` and `Variable.mean` reduce all elements to a one-element tensor
-and propagate gradients to every input element.
+and propagate gradients to every input element. Their `*_along_axis` variants
+support one-axis sum and mean, with either squeezed or retained dimensions.
 
 **Remaining:** document all bounds semantics.
 

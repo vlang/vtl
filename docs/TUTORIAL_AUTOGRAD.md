@@ -66,7 +66,10 @@ assert x.grad.to_array() == [4.0, 6.0]
 ```
 
 See the [scalar loss example](../examples/autograd_scalar_loss/README.md) for
-both reductions.
+global and axis reductions. `sum_along_axis(axis, keepdims)` and
+`mean_along_axis(axis, keepdims)` also route gradients back along the selected
+axis. When `keepdims` is false, the backward pass restores the removed axis
+before broadcasting.
 
 ## Gradient accumulation
 
