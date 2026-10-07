@@ -13,12 +13,12 @@ OUTPUT.mkdir(parents=True, exist_ok=True)
 sizes = [128, 256, 512]
 results = {
     "f64": {
-        "VTL pure V": [12.811, 23.364, 25.924],
-        "NumPy": [59.799, 74.822, 96.765],
+        "VTL pure V": [16.020, 27.363, 28.837],
+        "NumPy": [79.452, 81.609, 125.214],
     },
     "f32": {
-        "VTL pure V": [35.885, 53.213, 65.613],
-        "NumPy": [189.172, 243.789, 276.393],
+        "VTL pure V": [31.468, 54.813, 63.628],
+        "NumPy": [139.001, 157.691, 220.492],
     },
 }
 
@@ -54,7 +54,7 @@ fig.suptitle("VTL vs NumPy · Ryzen 9 5900X · 2 threads", fontsize=15, weight="
 fig.text(
     0.5,
     0.015,
-    "VTL -prod pure-V backend · NumPy 2.5.3 / scipy-openblas 0.3.34 · identical inputs",
+    "VTL -prod pure-V backend · NumPy 2.5.3 / scipy-openblas · identical inputs",
     ha="center",
     color="#475569",
     fontsize=8,
