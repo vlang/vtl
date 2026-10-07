@@ -101,6 +101,14 @@ fn test_isclose_nan_infinity_and_large_finite_values() {
 	assert got.array_equal(expected)
 }
 
+fn test_is_nan_matches_numpy_for_float_views_and_integer_tensors() {
+	nan := math.nan()
+	values := vtl.from_array([nan, 1.0, math.inf(1), -2.0], [2, 2])!.flip(1)!
+	expected := vtl.from_array([false, true, false, false], [2, 2])!
+	assert values.is_nan().array_equal(expected)
+	assert vtl.from_1d([1, -2, 0])!.is_nan().array_equal(vtl.from_1d([false, false, false])!)
+}
+
 fn test_allclose_broadcasts_without_changing_isclose_semantics() {
 	a := vtl.from_array([1.0, 2.0, 3.0, 4.0], [2, 2])!
 	b := vtl.from_1d([1.0, 2.0])!

@@ -179,16 +179,11 @@ pub fn (t &Tensor[T]) is_inf[T](sign int) &Tensor[bool] {
 	return ret
 }
 
-// is_nan reports whether f is an IEEE 754 ``not-a-number'' value.
+// is_nan returns true for NaN values and false for finite values and infinities.
 pub fn (t &Tensor[T]) is_nan[T]() &Tensor[bool] {
-	mut iter := t.iterator[T]()
-	mut ret := empty[bool](t.shape)
-	for {
-		val, i := iter.next() or { break }
-		next_val := math.is_nan(td[T](val).f64())
-		ret.set(i, next_val)
-	}
-	return ret
+	return t.map_values(fn [T](value T) bool {
+		return math.is_nan(td[T](value).f64())
+	})
 }
 
 // array_equal returns true if input arrays have the same shape and all elements
