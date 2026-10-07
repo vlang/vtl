@@ -11,6 +11,7 @@ fn main() {
 	waiting_times := validation_rng.geometric(0.1, [4])!
 	training_indices := vtl.from_1d([0, 1, 2, 3, 4, 5, 6, 7])!
 	batch_indices := training_rng.choice[int](training_indices, 4, false)!
+	epoch_order := training_rng.permutation(8)!
 	positive_noise := training_rng.gamma(2.0, 0.5, [4])!
 	probability_samples := training_rng.beta(2.0, 5.0, [4])!
 	noise := training_rng.uniform(-0.01, 0.01, [4])!
@@ -22,6 +23,7 @@ fn main() {
 	println('Validation mask: ${validation_mask.to_array()}')
 	println('Validation waiting times: ${waiting_times.to_array()}')
 	println('Sampled training indices: ${batch_indices.to_array()}')
+	println('Shuffled epoch order: ${epoch_order.to_array()}')
 	println('Positive gamma samples: ${positive_noise.to_array()}')
 	println('Beta probability samples: ${probability_samples.to_array()}')
 	println('Binomial event counts: ${event_counts.to_array()}')

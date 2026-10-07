@@ -102,6 +102,23 @@ fn test_random_generator_choice_supports_replacement_modes() ! {
 	replay.free()
 }
 
+fn test_random_generator_permutation_is_seeded_and_complete() ! {
+	mut generator := new_random_generator(753)
+	permuted := generator.permutation(32)!
+	assert permuted.shape == [32]
+	mut sorted := permuted.to_array()
+	sorted.sort()
+	assert sorted == irange(0, 32)
+	mut replay := new_random_generator(753)
+	assert permuted.array_equal(replay.permutation(32)!)
+	assert generator.permutation(0)!.size == 0
+	if _ := generator.permutation(-1) {
+		assert false, 'permutation must reject a negative size'
+	}
+	generator.free()
+	replay.free()
+}
+
 fn test_random_generator_gamma_is_seeded_and_positive() ! {
 	mut generator := new_random_generator(789)
 	values := generator.gamma(2.0, 3.0, [64])!
