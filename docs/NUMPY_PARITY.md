@@ -126,6 +126,8 @@ matrix in an N-D tensor, with optional retained matrix dimensions.
 `la.trace_axes` sums offset diagonals across selected axes and preserves the
 remaining dimensions as a batch.
 `la.svdvals` returns descending singular values for batched real matrices.
+`la.slogdet` returns determinant signs and log absolute determinants for batches,
+including singular matrices and values whose determinants would overflow.
 
 **Remaining:** expand eigen/SVD options, specify singular/non-finite behavior,
 and benchmark realistic shapes.
