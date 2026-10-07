@@ -28,6 +28,80 @@ pub fn (t &Tensor[T]) any[T]() bool {
 	return false
 }
 
+// all_axis reduces one axis with logical AND. The reduced dimension is removed
+// unless keepdims is true. Empty reductions follow NumPy's identity: true.
+pub fn (t &Tensor[T]) all_axis[T](axis int, keepdims bool) !&Tensor[bool] {
+	return logical_reduce_axis[T](t, axis, keepdims, true)
+}
+
+// any_axis reduces one axis with logical OR. The reduced dimension is removed
+// unless keepdims is true. Empty reductions follow NumPy's identity: false.
+pub fn (t &Tensor[T]) any_axis[T](axis int, keepdims bool) !&Tensor[bool] {
+	return logical_reduce_axis[T](t, axis, keepdims, false)
+}
+
+fn logical_reduce_axis[T](t &Tensor[T], axis int, keepdims bool, reduce_all bool) !&Tensor[bool] {
+	rank := t.rank()
+	if rank == 0 {
+		return error('logical axis reduction requires a tensor with at least one dimension')
+	}
+	axis_index := if axis < 0 { axis + rank } else { axis }
+	if axis_index < 0 || axis_index >= rank {
+		return error('axis ${axis} out of bounds for rank ${rank}')
+	}
+	mut output_shape := t.shape.clone()
+	if keepdims {
+		output_shape[axis_index] = 1
+	} else {
+		output_shape.delete(axis_index)
+	}
+	mut result := empty[bool](output_shape, memory: .row_major)
+	mut slice_count := 1
+	for dimension, size in t.shape {
+		if dimension != axis_index {
+			slice_count *= size
+		}
+	}
+	mut index := []int{len: rank}
+	for slice in 0 .. slice_count {
+		decode_logical_reduction_slice(slice, t.shape, axis_index, mut index)
+		mut reduced := reduce_all
+		for position in 0 .. t.shape[axis_index] {
+			index[axis_index] = position
+			value := td[T](t.get(index)).bool()
+			if reduce_all {
+				reduced = reduced && value
+			} else {
+				reduced = reduced || value
+			}
+			if reduced != reduce_all {
+				break
+			}
+		}
+		if keepdims {
+			index[axis_index] = 0
+			result.set(index, reduced)
+		} else {
+			mut output_index := index[..axis_index].clone()
+			output_index << index[axis_index + 1..]
+			result.set(output_index, reduced)
+		}
+	}
+	return result
+}
+
+fn decode_logical_reduction_slice(line int, shape []int, axis int, mut index []int) {
+	mut remainder := line
+	for dimension := shape.len - 1; dimension >= 0; dimension-- {
+		if dimension == axis {
+			index[dimension] = 0
+			continue
+		}
+		index[dimension] = remainder % shape[dimension]
+		remainder /= shape[dimension]
+	}
+}
+
 // is_finite returns true where x is not positive infinity, negative infinity, or NaN;
 // false otherwise.
 pub fn (t &Tensor[T]) is_finite[T]() &Tensor[bool] {

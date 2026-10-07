@@ -25,6 +25,7 @@ CIFAR examples for CI-safe checks.
 | [NPZ fixture](./npz_read_compressed) | Compressed NumPy fixture | `v run vtl/examples/npz_read_compressed/main.v vtl/npz/testdata/numpy_compressed.npz` |
 | [stats_variance](./stats_variance) | Stable population/sample variance and standard deviation | `v run ./vtl/examples/stats_variance/main.v` |
 | [stats_nan_reductions](./stats_nan_reductions) | NaN-aware sums, products, extrema, and axis reductions | `v run ./vtl/examples/stats_nan_reductions/main.v` |
+| [logical_reductions](./logical_reductions) | Axis-wise logical all/any reductions with keepdims | `v run ./vtl/examples/logical_reductions/main.v` |
 | [random_seed](./random_seed) | Repeat a random tensor sequence with an explicit seed | `v run ./vtl/examples/random_seed/main.v` |
 | [scatter](./scatter) | Add or assign values at indexed tensor positions | `v run ./vtl/examples/scatter/main.v` |
 | [argwhere](./argwhere) | Find non-zero coordinates in a tensor | `v run ./vtl/examples/argwhere/main.v` |

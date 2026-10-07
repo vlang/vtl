@@ -68,8 +68,8 @@ boundary differences.
 
 ### Reductions and statistics
 
-**Current:** single-axis and multi-axis sum/product with `keepdims`; weighted
-average globally and along an axis; scalar population/sample variance and
+**Current:** single-axis and multi-axis sum/product and logical all/any with
+`keepdims`; weighted average globally and along an axis; scalar population/sample variance and
 standard deviation; axis mean/variance/std with explicit `keepdims` and
 NaN-aware forms; axis-wise `trapezoid`; linear quantile/percentile and
 multi-quantile APIs, including NaN-aware global and axis variants; axis arg
@@ -79,6 +79,9 @@ integer/weighted `bincount`.
 
 **Remaining:** add `keepdims` options consistently across remaining reductions,
 accumulator dtype controls, and broader reduction families.
+
+Logical `all_axis` and `any_axis` reductions return `bool` tensors; empty
+reduced dimensions return the logical identities (true and false respectively).
 
 ### Linear algebra
 
