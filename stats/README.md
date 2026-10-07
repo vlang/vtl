@@ -17,6 +17,8 @@ output slice.
 `average_axis` keeps its reduced axis with length one. Use
 `average_along_axis(..., keepdims)` to choose whether to keep or remove it;
 weights may match the input or be a vector matching the selected axis.
+`average_along_axes` reduces several axes with explicit `keepdims` and requires
+weights with the same shape as the input.
 
 `trapezoid`, `trapezoid_axis`, and `trapezoid_x_axis` integrate numeric tensors
 with the composite trapezoidal rule and return `f64` tensors with the reduced

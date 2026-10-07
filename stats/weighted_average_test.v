@@ -35,6 +35,41 @@ fn test_average_along_axis_selects_keepdims_shape() ! {
 	assert scalar.get_nth(0) == 3.0
 }
 
+fn test_average_along_multiple_axes_with_full_weights() ! {
+	values := vtl.from_array[f64]([1, 2, 3, 4, 5, 6, 7, 8], [2, 2, 2])!
+	weights := vtl.from_array[f64]([1, 2, 3, 4, 5, 6, 7, 8], [2, 2, 2])!
+	means := average_along_axes(values, weights, [0, -1], false)!
+	assert means.shape == [2]
+	assert means.to_array() == [66.0 / 14.0, 138.0 / 22.0]
+	kept := average_along_axes(values, weights, [0, 2], true)!
+	assert kept.shape == [1, 2, 1]
+	assert kept.to_array() == means.to_array()
+	scalar := average_along_axes(values, weights, [0, 1, 2], false)!
+	assert scalar.rank() == 0
+	assert scalar.get_nth(0) == 204.0 / 36.0
+}
+
+fn test_average_along_multiple_axes_rejects_invalid_inputs() ! {
+	values := vtl.from_2d([[1.0, 2.0], [3.0, 4.0]])!
+	weights := vtl.ones[f64]([2, 2])
+	if _ := average_along_axes(values, weights, [0, -2], false) {
+		assert false, 'duplicate axes must fail'
+	}
+	if _ := average_along_axes(values, weights, [2], false) {
+		assert false, 'out-of-range axes must fail'
+	}
+	if _ := average_along_axes(values, vtl.ones[f64]([2]), [0], false) {
+		assert false, 'weights with a mismatched shape must fail'
+	}
+	if _ := average_along_axes(values, vtl.from_2d([[1.0, -1.0], [1.0, -1.0]])!, [1], false) {
+		assert false, 'zero-sum slice weights must fail'
+	}
+	empty := vtl.from_array[f64]([]f64{}, [2, 0])!
+	if _ := average_along_axes(empty, empty, [1], false) {
+		assert false, 'empty averaged axes must fail'
+	}
+}
+
 fn test_average_rejects_empty_mismatched_and_zero_weight_inputs() ! {
 	values := vtl.from_1d([1.0, 2.0])!
 	wrong_shape := vtl.from_2d([[1.0, 2.0]])!

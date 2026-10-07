@@ -88,3 +88,71 @@ pub fn average_along_axis[T, W](values &vtl.Tensor[T], weights &vtl.Tensor[W], a
 	}
 	return result.reshape[f64](shape)
 }
+
+// average_along_axes computes weighted means over multiple axes. Weights must
+// have the same shape as values. Reduced dimensions follow keepdims.
+pub fn average_along_axes[T, W](values &vtl.Tensor[T], weights &vtl.Tensor[W], axes []int, keepdims bool) !&vtl.Tensor[f64] {
+	if values.shape != weights.shape {
+		return error('average_along_axes: weights must match the input shape')
+	}
+	rank := values.rank()
+	if rank == 0 && axes.len > 0 {
+		return error('average_along_axes: values must have at least one axis')
+	}
+	mut reduced := []bool{len: rank}
+	for axis in axes {
+		index := if axis < 0 { axis + rank } else { axis }
+		if index < 0 || index >= rank {
+			return error('average_along_axes: axis ${axis} is out of bounds for rank ${rank}')
+		}
+		if reduced[index] {
+			return error('average_along_axes: axis ${axis} appears more than once')
+		}
+		if values.shape[index] == 0 {
+			return error('average_along_axes: cannot average an empty axis')
+		}
+		reduced[index] = true
+	}
+	mut output_shape := []int{cap: rank}
+	for dimension, size in values.shape {
+		if reduced[dimension] {
+			if keepdims {
+				output_shape << 1
+			}
+		} else {
+			output_shape << size
+		}
+	}
+	mut output := vtl.empty[f64](output_shape, memory: .row_major)
+	mut weighted_sums := []f64{len: output.size}
+	mut weight_sums := []f64{len: output.size}
+	for flat in 0 .. values.size {
+		output_index := weighted_average_axes_index(flat, values.shape, reduced)
+		value := vtl.cast[f64](values.get_nth[T](flat))
+		weight := vtl.cast[f64](weights.get_nth[W](flat))
+		weighted_sums[output_index] += value * weight
+		weight_sums[output_index] += weight
+	}
+	for flat in 0 .. output.size {
+		if weight_sums[flat] == 0.0 {
+			return error('average_along_axes: weights must have a non-zero sum in every slice')
+		}
+		output.set_nth(flat, weighted_sums[flat] / weight_sums[flat])
+	}
+	return output
+}
+
+fn weighted_average_axes_index(flat int, shape []int, reduced []bool) int {
+	mut remainder := flat
+	mut output_index := 0
+	mut output_stride := 1
+	for dimension := shape.len - 1; dimension >= 0; dimension-- {
+		coordinate := remainder % shape[dimension]
+		remainder /= shape[dimension]
+		if !reduced[dimension] {
+			output_index += coordinate * output_stride
+			output_stride *= shape[dimension]
+		}
+	}
+	return output_index
+}
