@@ -101,6 +101,23 @@ Axes can be negative, counting from the end. For example,
 `moveaxis([0], [-1])` moves the first axis to the last position. The source
 and destination lists must have the same length and contain unique axes.
 
+## Slicing with autograd
+
+`Variable.slice` and `Variable.slice_hilo` route gradients back to the source
+coordinates selected by the view, including integer-indexed axes and positive
+steps. Unselected positions receive zero gradients.
+
+```v ignore
+mut ctx := autograd.ctx[f64]()
+input := ctx.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [3, 2])!)
+mut rows := input.slice([0, 3, 2], []int{})!
+rows.backprop()!
+println(input.grad.to_array()) // [1.0, 1.0, 0.0, 0.0, 1.0, 1.0]
+```
+
+Run [the autograd slicing example](../examples/autograd_slice/README.md) to
+inspect the values and gradients.
+
 ## Gathering values with `take`
 
 `take` copies selected positions along an axis. Indices may be repeated or

@@ -187,3 +187,150 @@ fn flat_index_from_coordinate(coordinate []int, shape []int) int {
 	}
 	return flat_index
 }
+
+struct SliceBackwardMapping {
+	input_shape []int
+	starts      []int
+	steps       []int
+	output_axes []int
+}
+
+fn variable_slice_result[T](parent &Variable[T], value &vtl.Tensor[T], mapping SliceBackwardMapping) !&Variable[T] {
+	mut result := variable[T](parent.context, value, requires_grad: parent.requires_grad)
+	if parent.requires_grad {
+		gate := &SliceGate[T]{ mapping: mapping }
+		result.grad = vtl.zeros_like[T](value)
+		register[T]('Slice', voidptr(gate), slice_backward_dispatch[T], result, [parent])!
+	}
+	return result
+}
+
+fn slice_backward_mapping(input_shape []int, selectors [][]int, output_shape []int) !SliceBackwardMapping {
+	mut starts := []int{len: input_shape.len}
+	mut steps := []int{len: input_shape.len, init: 1}
+	mut output_axes := []int{len: input_shape.len, init: -1}
+	mut output_axis := 0
+	for dimension, size in input_shape {
+		selector := if dimension < selectors.len { selectors[dimension] } else { []int{} }
+		mut start := 0
+		mut step := 1
+		mut keep_axis := true
+		match selector.len {
+			0 {}
+			1 {
+				start = selector[0]
+				if start < 0 {
+					start += size
+				}
+				keep_axis = false
+			}
+			2 {
+				start = selector[0]
+				mut stop := selector[1]
+				if start < 0 {
+					start += size
+				}
+				if stop < 0 {
+					stop += size
+				}
+				keep_axis = start != stop
+			}
+			3 {
+				start = selector[0]
+				mut stop := selector[1]
+				step = selector[2]
+				if start < 0 {
+					start += size
+				}
+				if stop < 0 {
+					stop += size
+				}
+				abs_step := if step < 0 { -step } else { step }
+				offset := stop - start
+				slice_size := offset / abs_step + offset % abs_step
+				keep_axis = slice_size != 0
+			}
+			else {}
+		}
+		starts[dimension] = start
+		steps[dimension] = step
+		if keep_axis {
+			if output_axis >= output_shape.len {
+				return error('Variable.slice: output shape does not match the input slice mapping')
+			}
+			output_axes[dimension] = output_axis
+			output_axis++
+		}
+	}
+	if output_axis != output_shape.len {
+		return error('Variable.slice: output shape does not match the input slice mapping')
+	}
+	return SliceBackwardMapping{
+		input_shape: input_shape.clone()
+		starts:      starts
+		steps:       steps
+		output_axes: output_axes
+	}
+}
+
+fn slice_hilo_backward_mapping(input_shape []int, starts_in []int, stops_in []int, output_shape []int) !SliceBackwardMapping {
+	mut starts := []int{len: input_shape.len}
+	mut steps := []int{len: input_shape.len, init: 1}
+	mut output_axes := []int{len: input_shape.len, init: -1}
+	mut output_axis := 0
+	for dimension, size in input_shape {
+		mut start := if dimension < starts_in.len { starts_in[dimension] } else { 0 }
+		mut stop := if dimension < stops_in.len { stops_in[dimension] } else { size }
+		if start < 0 {
+			start += size
+		}
+		if stop < 0 {
+			stop += size
+		}
+		starts[dimension] = start
+		if start != stop {
+			if output_axis >= output_shape.len {
+				return error('Variable.slice_hilo: output shape does not match the input slice mapping')
+			}
+			output_axes[dimension] = output_axis
+			output_axis++
+		}
+	}
+	if output_axis != output_shape.len {
+		return error('Variable.slice_hilo: output shape does not match the input slice mapping')
+	}
+	return SliceBackwardMapping{
+		input_shape: input_shape.clone()
+		starts:      starts
+		steps:       steps
+		output_axes: output_axes
+	}
+}
+
+struct SliceGate[T] {
+	mapping SliceBackwardMapping
+}
+
+fn (g &SliceGate[T]) backward(gradient &vtl.Tensor[T]) ![]&vtl.Tensor[T] {
+	mut input_gradient := vtl.zeros[T](g.mapping.input_shape)
+	mut input_index := []int{len: g.mapping.input_shape.len}
+	for flat_index in 0 .. gradient.size {
+		output_index := gradient.nth_index(flat_index)
+		for dimension in 0 .. input_index.len {
+			input_index[dimension] = g.mapping.starts[dimension]
+			if g.mapping.output_axes[dimension] >= 0 {
+				axis := g.mapping.output_axes[dimension]
+				input_index[dimension] += output_index[axis] * g.mapping.steps[dimension]
+			}
+		}
+		input_gradient.set(input_index, gradient.get(output_index))
+	}
+	return [input_gradient]
+}
+
+fn slice_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_gate := unsafe { &SliceGate[T](gate) }
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := typed_gate.backward(typed_payload.variable.grad)!
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}

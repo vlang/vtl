@@ -90,3 +90,43 @@ fn test_put_along_axis_backward_supports_f32() ! {
 	assert input.grad.to_array() == [f32(4.0), 0.0]
 	assert updates.grad.to_array() == [f32(5.0)]
 }
+
+fn test_slice_backward_routes_gradient_to_integer_indexed_row() ! {
+	mut ctx := autograd.ctx[f64]()
+	input := ctx.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [3, 2])!)
+	mut selected := input.slice([1])!
+	assert selected.value.to_array() == [3.0, 4.0]
+	selected.backprop()!
+	assert input.grad.to_array() == [0.0, 0.0, 1.0, 1.0, 0.0, 0.0]
+}
+
+fn test_slice_backward_routes_gradient_through_positive_step() ! {
+	mut ctx := autograd.ctx[f64]()
+	input := ctx.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [3, 2])!)
+	mut selected := input.slice([0, 3, 2], []int{})!
+	assert selected.value.shape == [2, 2]
+	selected.backprop()!
+	assert input.grad.to_array() == [1.0, 1.0, 0.0, 0.0, 1.0, 1.0]
+}
+
+fn test_slice_rejects_zero_step() {
+	mut ctx := autograd.ctx[f64]()
+	input := ctx.variable(vtl.from_array([1.0, 2.0, 3.0], [3])!)
+	_ := input.slice([0, 3, 0]) or {
+		assert err.msg() == 'Variable.slice: step cannot be zero'
+		return
+	}
+	assert false, 'slice with a zero step should fail'
+}
+
+fn test_slice_hilo_backward_routes_gradient_to_view_bounds() ! {
+	mut ctx := autograd.ctx[f64]()
+	input := ctx.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0], [
+		3,
+		3,
+	])!)
+	mut selected := input.slice_hilo([1, 0], [3, 2])!
+	assert selected.value.to_array() == [4.0, 5.0, 7.0, 8.0]
+	selected.backprop()!
+	assert input.grad.to_array() == [0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0]
+}
