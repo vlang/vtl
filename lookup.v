@@ -110,6 +110,43 @@ fn decode_flat_coordinate(flat_index int, shape []int, mut coordinate []int) {
 	}
 }
 
+// advanced_index selects values using one integer coordinate tensor per input
+// axis. Coordinate tensors are broadcast together, and each output element is
+// read from the matching coordinate tuple. The result is an independent
+// row-major copy. This API handles full coordinate tuples; mixing coordinate
+// tensors with slices or scalar indices is not supported here.
+pub fn advanced_index[T](t &Tensor[T], indices []&Tensor[int]) !&Tensor[T] {
+	if t.rank() == 0 {
+		if indices.len != 0 {
+			return error('advanced_index: scalar tensors do not accept axis indices')
+		}
+		mut result := empty[T]([], memory: .row_major)
+		result.data.data[0] = t.get_nth[T](0)
+		return result
+	}
+	if indices.len != t.rank() {
+		return error('advanced_index: expected ${t.rank()} coordinate tensors, got ${indices.len}')
+	}
+	broadcasted := broadcast_n[int](indices)!
+	output_shape := broadcasted[0].shape
+	mut result := empty[T](output_shape, memory: .row_major)
+	mut output_index := []int{len: output_shape.len}
+	mut input_index := []int{len: t.rank()}
+	for flat_index in 0 .. result.size {
+		decode_flat_coordinate(flat_index, output_shape, mut output_index)
+		for axis, index_tensor in broadcasted {
+			selected := index_tensor.get(output_index)
+			normalized := if selected < 0 { selected + t.shape[axis] } else { selected }
+			if normalized < 0 || normalized >= t.shape[axis] {
+				return error('advanced_index: index ${selected} is out of range for axis ${axis} with size ${t.shape[axis]}')
+			}
+			input_index[axis] = normalized
+		}
+		result.data.data[flat_index] = t.get(input_index)
+	}
+	return result
+}
+
 // UniqueCounts contains sorted unique values and their occurrence counts.
 pub struct UniqueCounts[T] {
 pub:
