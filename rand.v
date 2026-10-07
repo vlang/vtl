@@ -178,6 +178,65 @@ pub fn (mut generator RandomGenerator) geometric(probability f64, shape []int) !
 	return result
 }
 
+// poisson returns integer event counts with the given finite, non-negative
+// expected rate using this generator's independent stream.
+pub fn (mut generator RandomGenerator) poisson(lambda f64, shape []int) !&Tensor[int] {
+	if lambda < 0 || math.is_nan(lambda) || math.is_inf(lambda, 0) || lambda >= f64(max_int) {
+		return error('poisson: lambda must be finite, non-negative, and fit in an int')
+	}
+	mut rng := generator.rng
+	mut values := []int{len: size_from_shape(shape)}
+	for i in 0 .. values.len {
+		values[i] = sample_poisson(lambda, mut rng)!
+	}
+	return from_array[int](values, shape)
+}
+
+fn sample_poisson(lambda f64, mut rng &rand.PRNG) !int {
+	if lambda == 0 {
+		return 0
+	}
+	// Knuth's product method is simple and fast when the expected count is small.
+	if lambda < 10 {
+		limit := math.exp(-lambda)
+		mut product := 1.0
+		mut count := 0
+		for product > limit {
+			count++
+			product *= rng.f64_in_range(0.0, 1.0)!
+		}
+		return count - 1
+	}
+	// Hörmann's PTRS transformed rejection method has constant expected work
+	// for large rates, unlike the product method whose cost grows with lambda.
+	sqrt_lambda := math.sqrt(lambda)
+	b := 0.931 + 2.53 * sqrt_lambda
+	a := -0.059 + 0.02483 * b
+	inverse_alpha := 1.1239 + 1.1328 / (b - 3.4)
+	quick_acceptance := 0.9277 - 3.6224 / (b - 2)
+	for _ in 0 .. 10000 {
+		u := rng.f64_in_range(0.0, 1.0)! - 0.5
+		v := rng.f64_in_range(0.0, 1.0)!
+		window := 0.5 - math.abs(u)
+		candidate := math.floor((2 * a / window + b) * u + lambda + 0.43)
+		if candidate < 0 || candidate >= f64(max_int) {
+			continue
+		}
+		if window >= 0.07 && v <= quick_acceptance {
+			return int(candidate)
+		}
+		if window < 0.013 && v > window {
+			continue
+		}
+		left := math.log(v * inverse_alpha / (a / (window * window) + b))
+		right := -lambda + candidate * math.log(lambda) - math.log_factorial(candidate)
+		if left <= right {
+			return int(candidate)
+		}
+	}
+	return error('poisson: rejection sampler did not converge')
+}
+
 // choice samples values from a tensor's flattened logical order. Without
 // replacement, selected positions are unique; the same value may still occur
 // more than once in the population.

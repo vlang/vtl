@@ -24,6 +24,7 @@ fn main() {
 	positive_scales := training_rng.lognormal(0.0, 0.25, [4])!
 	noise := training_rng.uniform(-0.01, 0.01, [4])!
 	event_counts := training_rng.binomial(12, 0.25, [4])!
+	arrival_counts := validation_rng.poisson(3.5, [4])!
 	waiting_durations := validation_rng.exponential(0.5, [4])!
 
 	println('Training batch shape: ${training_features.shape}')
@@ -40,6 +41,7 @@ fn main() {
 	println('Dirichlet class probability samples: ${class_probabilities_sample.to_array()}')
 	println('Log-normal positive scales: ${positive_scales.to_array()}')
 	println('Binomial event counts: ${event_counts.to_array()}')
+	println('Poisson arrival counts: ${arrival_counts.to_array()}')
 	println('Exponential waiting durations: ${waiting_durations.to_array()}')
 	println('Independent augmentation noise: ${noise.to_array()}')
 

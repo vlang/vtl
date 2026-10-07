@@ -50,6 +50,7 @@ positive_noise := training_rng.gamma(2.0, 0.5, [128])!
 beta_samples := training_rng.beta(2.0, 5.0, [128])!
 positive_scales := training_rng.lognormal(0.0, 0.25, [128])!
 event_counts := training_rng.binomial(12, 0.25, [128])!
+arrival_counts := validation_rng.poisson(3.5, [128])!
 class_probabilities := vtl.from_1d([0.6, 0.3, 0.1])!
 class_counts := training_rng.multinomial(12, class_probabilities, [128])!
 waiting_durations := validation_rng.exponential(0.5, [128])!
@@ -74,8 +75,10 @@ samples from a normal distribution; a zero `sigma` returns the constant
 `exp(mean)`. `beta(alpha, beta, shape)` samples values in
 `[0, 1]` using the same seeded stream. `binomial(trials, probability, shape)`
 returns integer success counts, and `exponential(lambda, shape)` returns
-non-negative samples for a positive finite rate. All distributions advance
-only their owning generator.
+non-negative samples for a positive finite rate. `poisson(lambda, shape)`
+returns integer event counts for a finite, non-negative expected rate, using a
+product sampler for small rates and transformed rejection for larger rates.
+All distributions advance only their owning generator.
 These methods return errors for invalid distribution parameters. Streams are
 reproducible with the same V/VTL versions, seed, and sequence of calls;
 cross-version compatibility is not guaranteed. See the complete data-pipeline
