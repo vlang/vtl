@@ -140,6 +140,22 @@ pub fn (mut generator RandomGenerator) choice[T](population &Tensor[T], size int
 	return from_1d[T](selected)
 }
 
+// permutation returns the integers in [0, size) in a seeded random order.
+pub fn (mut generator RandomGenerator) permutation(size int) !&Tensor[int] {
+	if size < 0 {
+		return error('permutation: size must be non-negative')
+	}
+	mut values := []int{len: size}
+	for i in 0 .. size {
+		values[i] = i
+	}
+	for i := size - 1; i > 0; i-- {
+		j := int(generator.rng.f64_in_range(0.0, f64(i + 1))!)
+		values[i], values[j] = values[j], values[i]
+	}
+	return from_1d[int](values)
+}
+
 // gamma returns samples from a Gamma distribution using this generator's
 // independent stream. `alpha` is the shape and `scale` is the scale parameter.
 pub fn (mut generator RandomGenerator) gamma(alpha f64, scale f64, shape []int) !&Tensor[f64] {

@@ -42,6 +42,7 @@ validation_mask := validation_rng.bernoulli(0.8, [128])!
 waiting_times := validation_rng.geometric(0.1, [128])!
 training_indices := vtl.from_1d([0, 1, 2, 3, 4, 5, 6, 7])!
 batch_indices := training_rng.choice[int](training_indices, 4, false)!
+epoch_order := training_rng.permutation(8)!
 positive_noise := training_rng.gamma(2.0, 0.5, [128])!
 beta_samples := training_rng.beta(2.0, 5.0, [128])!
 event_counts := training_rng.binomial(12, 0.25, [128])!
@@ -53,7 +54,8 @@ range `[minimum, maximum)`. `normal(shape, params)` produces `f64` samples, and
 `bernoulli(probability, shape)` produces boolean samples. `geometric(probability,
 shape)` returns the positive number of Bernoulli trials up to the first success.
 `choice(population, size, replace)` samples from the population in flattened
-logical order and can enforce unique sampled positions.
+logical order and can enforce unique sampled positions. `permutation(size)`
+returns every integer from zero to `size - 1` exactly once in a seeded order.
 `gamma(alpha, scale, shape)` samples positive values from a Gamma distribution
 on the same independent stream. `beta(alpha, beta, shape)` samples values in
 `[0, 1]` using the same seeded stream. `binomial(trials, probability, shape)`
