@@ -41,8 +41,9 @@ The VTL and NumPy cases use the same 500,000-element `f64` input, warm up
 three times, then report the mean of seven timed reductions. Input allocation
 is outside the timed region. For contiguous `f64` data and `ord=2`, VTL
 dispatches to VSL BLAS `dnrm2`. The default pure-V backend uses a scaled SIMD
-accumulation; builds with `-d vsl_blas_cblas` use the configured CBLAS
-implementation. Run both from `~/.vmodules`:
+accumulation with a direct-square fast path for ordinary magnitudes; builds
+with `-d vsl_blas_cblas` use the configured CBLAS implementation. Run both
+from `~/.vmodules`:
 
 ```bash
 systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
@@ -63,6 +64,13 @@ host, the CBLAS route backed by the system `libcblas` measured 0.371 ms, about
 1.4x faster than pure V but still about 2.2x slower than NumPy. This was not an
 OpenBLAS measurement and is not a claim of NumPy performance parity. The pure-V
 measurement used a 1.5 GiB `MemoryMax` and peaked at 1.1 GiB.
+
+After the VSL norm fast path landed, a rerun on 2026-10-07 measured 0.309 ms
+for VTL and 0.161 ms for NumPy on the same machine and input. Checksums matched;
+VTL remained 1.92x slower. This run used V 0.5.2 `b69f626`, NumPy 2.5.3, and
+`OPENBLAS_NUM_THREADS=2`. The OpenBLAS CBLAS build could not be rerun locally:
+the installed system provides `libcblas`, but not the `libopenblas` linker name
+required by `-d vsl_blas_cblas`.
 
 ## Matmul
 
