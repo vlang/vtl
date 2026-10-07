@@ -196,9 +196,10 @@ operations. Promotion with a complex operand produces `complex128`. Explicit
 logical order, and truncate floating-point values when converting to integers.
 
 **Remaining:** connect promotion to mixed-dtype arithmetic, add weak scalar
-promotion and string conversion, extend complex support to mathematical
-functions, reductions, linear algebra, random generation, and `.npy`/`.npz` I/O,
-add complex32, and define integer overflow and structured-data limits.
+promotion and string conversion, extend complex support to the rest of the
+mathematical functions, reductions, linear algebra, random generation, and
+`.npy`/`.npz` I/O, add complex32, and define integer overflow and structured-data
+limits.
 
 ### Masked and missing data
 
