@@ -149,17 +149,16 @@ overflow and structured-data limits.
 **Current:** `MaskedArray[T]` pairs values with a broadcastable boolean mask
 (`true` means missing). It supports broadcasted arithmetic and comparisons
 with mask union, scalar arithmetic, filling masked entries, compression,
-valid-value counting, aligned mixed indexing, and global, single-axis, or
-multi-axis sum/product/min/
-max/mean/variance/standard-deviation reductions. Axis reductions mark empty
-slices in the output mask; global reductions expose an
-`is_masked` flag when every value is missing. See
+valid-value counting, mixed indexing, and axis-wise gather/update that keeps
+values and masks aligned. Sum, product, min, max, mean, variance, and standard
+deviation work globally and across one or multiple axes. Axis reductions mark
+empty slices in the output mask; global reductions expose an `is_masked` flag
+when every value is missing. See
 [the masked data tutorial](./TUTORIAL_MASKED_DATA.md).
 
-**Remaining:** additional reductions and statistics, mask-aware mutation, and
-interoperability with autograd and neural-network operations.
-NaN-aware reductions are a separate feature and do not
-automatically treat NaN as masked data.
+**Remaining:** additional reductions and statistics, and interoperability with
+autograd and neural-network operations. NaN-aware reductions are separate and
+do not automatically treat NaN as masked data.
 
 ### Structured and record arrays
 
