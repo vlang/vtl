@@ -166,16 +166,17 @@ including result allocation. Higher GFLOPS is better.
 
 | dtype | size | VTL GFLOPS | NumPy GFLOPS | NumPy / VTL |
 | --- | ---: | ---: | ---: | ---: |
-| f64 | 128×128 | 13.46 | 64.00 | 4.8× |
-| f64 | 256×256 | 18.62 | 91.95 | 4.9× |
-| f64 | 512×512 | 26.60 | 109.66 | 4.1× |
-| f32 | 128×128 | 32.64 | 83.81 | 2.6× |
-| f32 | 256×256 | 58.71 | 169.19 | 2.9× |
-| f32 | 512×512 | 59.05 | 212.88 | 3.6× |
+| f64 | 128×128 | 12.81 | 59.80 | 4.7× |
+| f64 | 256×256 | 23.36 | 74.82 | 3.2× |
+| f64 | 512×512 | 25.92 | 96.77 | 3.7× |
+| f32 | 128×128 | 35.89 | 189.17 | 5.3× |
+| f32 | 256×256 | 53.21 | 243.79 | 4.6× |
+| f32 | 512×512 | 65.61 | 276.39 | 4.2× |
 
 ![VTL and NumPy matmul performance](../../docs/assets/matmul-ryzen-5900x.png)
 
-Regenerate the checked-in chart from these measured values with
+At 512×512, the measured f32 times were 4.091 ms for VTL and 0.971 ms for
+NumPy. Regenerate the checked-in chart from these measured values with
 `uv run --with matplotlib python ./vtl/benchmarks/vs_numpy/plot_local_matmul_results.py`
 from `~/.vmodules`. These results show the current CPU GEMM optimization gap;
 they do not establish general performance across hardware or workloads. The
