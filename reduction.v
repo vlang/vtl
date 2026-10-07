@@ -303,17 +303,37 @@ pub fn (t &Tensor[T]) min_axis[T](axis int) !&Tensor[T] {
 	return result
 }
 
+// max_axis_squeeze returns maximum values with the reduced axis removed,
+// matching NumPy's default keepdims=false shape behavior.
+pub fn (t &Tensor[T]) max_axis_squeeze[T](axis int) !&Tensor[T] {
+	result := t.max_axis[T](axis)!
+	na := if axis < 0 { axis + t.rank() } else { axis }
+	return squeeze_reduction_axis[T](result, na)
+}
+
+// min_axis_squeeze returns minimum values with the reduced axis removed,
+// matching NumPy's default keepdims=false shape behavior.
+pub fn (t &Tensor[T]) min_axis_squeeze[T](axis int) !&Tensor[T] {
+	result := t.min_axis[T](axis)!
+	na := if axis < 0 { axis + t.rank() } else { axis }
+	return squeeze_reduction_axis[T](result, na)
+}
+
+fn squeeze_reduction_axis[T](t &Tensor[T], axis int) !&Tensor[T] {
+	mut shape := t.shape.clone()
+	shape.delete(axis)
+	if shape.len == 0 {
+		shape = [1]
+	}
+	return t.reshape[T](shape)
+}
+
 // argmax_axis_squeeze returns the maximum indices with the reduced axis
 // removed, matching NumPy's default keepdims=false behavior.
 pub fn (t &Tensor[T]) argmax_axis_squeeze[T](axis int) !&Tensor[int] {
 	result := t.argmax_axis[T](axis)!
 	na := if axis < 0 { axis + t.rank() } else { axis }
-	mut shape := result.shape.clone()
-	shape.delete(na)
-	if shape.len == 0 {
-		shape = [1]
-	}
-	return result.reshape[int](shape)
+	return squeeze_reduction_axis[int](result, na)
 }
 
 // argmin_axis_squeeze returns the minimum indices with the reduced axis
@@ -321,12 +341,7 @@ pub fn (t &Tensor[T]) argmax_axis_squeeze[T](axis int) !&Tensor[int] {
 pub fn (t &Tensor[T]) argmin_axis_squeeze[T](axis int) !&Tensor[int] {
 	result := t.argmin_axis[T](axis)!
 	na := if axis < 0 { axis + t.rank() } else { axis }
-	mut shape := result.shape.clone()
-	shape.delete(na)
-	if shape.len == 0 {
-		shape = [1]
-	}
-	return result.reshape[int](shape)
+	return squeeze_reduction_axis[int](result, na)
 }
 
 // argmax returns the indices of the maximum values along the given axis.

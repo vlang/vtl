@@ -73,12 +73,12 @@ average globally and along an axis; scalar population/sample variance and
 standard deviation; axis mean/variance/std with explicit `keepdims` and
 NaN-aware forms; axis-wise `trapezoid`; linear quantile/percentile and
 multi-quantile APIs, including NaN-aware global and axis variants; axis arg
-reductions; histograms with automatic and custom bins, weighted density, and
-multiple bin-selection rules; integer/weighted
-`bincount`.
+reductions and squeezed min/max/argmin/argmax results; histograms with
+automatic and custom bins, weighted density, and multiple bin-selection rules;
+integer/weighted `bincount`.
 
-**Remaining:** extend `keepdims` to the remaining reduction families and add
-accumulator dtype controls and broader reductions.
+**Remaining:** add `keepdims` options consistently across remaining reductions,
+accumulator dtype controls, and broader reduction families.
 
 ### Linear algebra
 
