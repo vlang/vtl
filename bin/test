@@ -22,35 +22,35 @@ source "${ROOT}/util/logs.sh" || exit
 
 set -eo pipefail
 
-vtl_dir_path=$(dirname $(dirname "$0"))
+vtl_dir_path=$(dirname "$(dirname "$0")")
 
-flags=""
+flags=()
 
 if [[ -n "${use_cblas}" ]]; then
     echo "Running tests using Open BLAS"
-    flags="${flags} -d cblas"
+    flags+=( -d cblas )
 fi
 
 if [[ -n "${use_autofree}" ]]; then
     echo "Running tests using V Math"
-    flags="${flags} -autofree"
+    flags+=( -autofree )
 fi
 
 if [[ -n "${use_gc}" ]]; then
     echo "Running tests using V Math"
-    flags="${flags} -gc ${use_gc}"
+    flags+=( -gc "${use_gc}" )
 fi
 
 if [[ -n "${stats}" ]]; then
     echo "Running tests with stats"
-    flags="${flags} -stats"
+    flags+=( -stats )
 fi
 
 if [[ -n "${prod}" ]]; then
     echo "Running tests with prod"
     # Keep prod optimizations but avoid LTO, which overflows/corrupts objects on
     # GitHub runner toolchains.
-    flags="${flags} -prod -no-prod-options -cflags -O3 -cflags -fno-lto"
+    flags+=( -prod -no-prod-options -cflags -O3 -cflags -fno-lto )
 fi
 
 # Examples that OOM default GitHub runners at compile time (see docs/DEV_LIGHTWEIGHT.md).
@@ -66,30 +66,40 @@ export VJOBS="${VJOBS:-2}"
 
 if [[ -n "${full}" ]]; then
     echo "Full CI mode (high RAM): v test entire tree"
-    v ${flags} test ${vtl_dir_path}
+    v "${flags[@]}" test "${vtl_dir_path}"
 else
-    echo "Scoped CI mode (VJOBS=${VJOBS}): nn, autograd, autograd_tests, datasets, core, la, storage, stats, ml"
-    v ${flags} test \
-        ${vtl_dir_path}/nn \
-        ${vtl_dir_path}/autograd \
-        ${vtl_dir_path}/autograd_tests \
-        ${vtl_dir_path}/datasets \
-        ${vtl_dir_path}/tests/core \
-        ${vtl_dir_path}/la \
-        ${vtl_dir_path}/storage \
-        ${vtl_dir_path}/stats \
-        ${vtl_dir_path}/ml
+	echo "Scoped CI mode (VJOBS=${VJOBS}): run test areas separately to release compiler memory between areas"
+	nn_root_tests=()
+	for file in "${vtl_dir_path}"/nn/*_test.v; do
+		if [[ -f "${file}" ]]; then
+			nn_root_tests+=("${file}")
+		fi
+	done
+	if (( ${#nn_root_tests[@]} > 0 )); then
+		echo "Testing nn root"
+		v "${flags[@]}" test "${nn_root_tests[@]}"
+	fi
+	for area in nn/data nn/internal nn/layers nn/loss nn/optimizers autograd_tests datasets tests/core la storage stats ml; do
+		echo "Testing ${area}"
+		v "${flags[@]}" test "${vtl_dir_path}/${area}"
+	done
+	echo "Testing nn/models one file at a time to cap compiler memory"
+	for file in "${vtl_dir_path}"/nn/models/*_test.v; do
+		if [[ -f "${file}" ]]; then
+			v "${flags[@]}" test "${file}"
+		fi
+	done
 fi
 
-find ${vtl_dir_path} -name '*_test' -exec rm -f {} + 2>/dev/null || true
+find "${vtl_dir_path}" -name '*_test' -exec rm -f {} + 2>/dev/null || true
 
 if [[ -n "${prod}" ]]; then
     echo "Skipping example compilation in prod mode (covered by non-prod CI matrix)"
     exit 0
 fi
 
-echo "Compiling Examples with flags ${flags}"
-for file in $(find "${vtl_dir_path}" -wholename '*/examples/*/main.v' | sort); do
+echo "Compiling Examples with flags ${flags[*]}"
+while IFS= read -r -d '' file; do
     if [[ "${file}" == *"not_ci"* ]]; then
         echo "Skipping ${file} (not_ci)"
         continue
@@ -103,13 +113,13 @@ for file in $(find "${vtl_dir_path}" -wholename '*/examples/*/main.v' | sort); d
         continue
     fi
     echo "Compiling ${file}"
-    v ${flags} -o "${file}.bin" "${file}"
+    v "${flags[@]}" -o "${file}.bin" "${file}"
     rm -f "${file}.bin"
-done
+done < <(find "${vtl_dir_path}" -wholename '*/examples/*/main.v' -print0 | sort -z)
 
 if [[ -z "${full}" ]]; then
     echo "Running nn_cifar10_tiny_synth smoke (f64)"
-    v ${flags} run ${vtl_dir_path}/examples/nn_cifar10_tiny_synth/main.v
+    v "${flags[@]}" run "${vtl_dir_path}/examples/nn_cifar10_tiny_synth/main.v"
     echo "Running nn_cifar10_f32_tiny_synth smoke (f32)"
-    v ${flags} run ${vtl_dir_path}/examples/nn_cifar10_f32_tiny_synth/main.v
+    v "${flags[@]}" run "${vtl_dir_path}/examples/nn_cifar10_f32_tiny_synth/main.v"
 fi
