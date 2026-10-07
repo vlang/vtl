@@ -2,6 +2,13 @@ module vtl
 
 import math
 
+enum MaskedReduction {
+	sum
+	product
+	minimum
+	maximum
+}
+
 // MaskedArray pairs tensor values with a boolean missing-data mask. A true
 // mask entry marks the corresponding value as missing, following NumPy's
 // numpy.ma convention.
@@ -112,6 +119,37 @@ pub fn (array &MaskedArray[T]) prod[T]() MaskedValue[T] {
 	}
 }
 
+// min returns the smallest unmasked value. An entirely masked array returns a
+// masked result whose value is zero and must be ignored.
+pub fn (array &MaskedArray[T]) min[T]() MaskedValue[T] {
+	return masked_extreme[T](array, false)
+}
+
+// max returns the largest unmasked value. An entirely masked array returns a
+// masked result whose value is zero and must be ignored.
+pub fn (array &MaskedArray[T]) max[T]() MaskedValue[T] {
+	return masked_extreme[T](array, true)
+}
+
+fn masked_extreme[T](array &MaskedArray[T], maximum bool) MaskedValue[T] {
+	mut result := cast[T](0)
+	mut count := 0
+	for i in 0 .. array.values.size {
+		if array.mask.get_nth(i) {
+			continue
+		}
+		value := array.values.get_nth(i)
+		if count == 0 || (maximum && value > result) || (!maximum && value < result) {
+			result = value
+		}
+		count++
+	}
+	return MaskedValue[T]{
+		value:     result
+		is_masked: count == 0
+	}
+}
+
 // mean reduces all unmasked values. An entirely masked array returns a masked
 // NaN result.
 pub fn (array &MaskedArray[T]) mean[T]() MaskedValue[f64] {
@@ -141,7 +179,7 @@ pub fn (array &MaskedArray[T]) sum_along_axes[T](axes []int, keepdims bool) !Mas
 	if axes.len == 0 {
 		return *array
 	}
-	return masked_reduce_axes[T](array, axes, keepdims, false)
+	return masked_reduce_axes[T](array, axes, keepdims, .sum)
 }
 
 // prod_along_axis multiplies unmasked values along one axis.
@@ -155,13 +193,39 @@ pub fn (array &MaskedArray[T]) prod_along_axes[T](axes []int, keepdims bool) !Ma
 	if axes.len == 0 {
 		return *array
 	}
-	return masked_reduce_axes[T](array, axes, keepdims, true)
+	return masked_reduce_axes[T](array, axes, keepdims, .product)
 }
 
-fn masked_reduce_axes[T](array &MaskedArray[T], axes []int, keepdims bool, product bool) !MaskedArray[T] {
+// min_along_axis finds the smallest unmasked value in each axis slice.
+pub fn (array &MaskedArray[T]) min_along_axis[T](axis int, keepdims bool) !MaskedArray[T] {
+	return array.min_along_axes[T]([axis], keepdims)
+}
+
+// min_along_axes finds minima across several axes. Empty slices are masked.
+pub fn (array &MaskedArray[T]) min_along_axes[T](axes []int, keepdims bool) !MaskedArray[T] {
+	if axes.len == 0 {
+		return *array
+	}
+	return masked_reduce_axes[T](array, axes, keepdims, .minimum)
+}
+
+// max_along_axis finds the largest unmasked value in each axis slice.
+pub fn (array &MaskedArray[T]) max_along_axis[T](axis int, keepdims bool) !MaskedArray[T] {
+	return array.max_along_axes[T]([axis], keepdims)
+}
+
+// max_along_axes finds maxima across several axes. Empty slices are masked.
+pub fn (array &MaskedArray[T]) max_along_axes[T](axes []int, keepdims bool) !MaskedArray[T] {
+	if axes.len == 0 {
+		return *array
+	}
+	return masked_reduce_axes[T](array, axes, keepdims, .maximum)
+}
+
+fn masked_reduce_axes[T](array &MaskedArray[T], axes []int, keepdims bool, operation MaskedReduction) !MaskedArray[T] {
 	reduced := normalize_masked_axes(axes, array.values.rank())!
 	output_shape := masked_reduction_shape(array.values.shape, reduced, keepdims)
-	mut values := if product {
+	mut values := if operation == .product {
 		ones[T](output_shape, TensorData{})
 	} else {
 		zeros[T](output_shape, TensorData{})
@@ -175,10 +239,19 @@ fn masked_reduce_axes[T](array &MaskedArray[T], axes []int, keepdims bool, produ
 			continue
 		}
 		output_flat_index := masked_axes_output_index(input_index, array.values.shape, reduced)
-		if product {
-			values.set_nth(output_flat_index, values.get_nth(output_flat_index) * array.values.get_nth(flat_index))
+		value := array.values.get_nth(flat_index)
+		if operation == .sum {
+			values.set_nth(output_flat_index, values.get_nth(output_flat_index) + value)
+		} else if operation == .product {
+			values.set_nth(output_flat_index, values.get_nth(output_flat_index) * value)
+		} else if operation == .minimum {
+			if counts[output_flat_index] == 0 || value < values.get_nth(output_flat_index) {
+				values.set_nth(output_flat_index, value)
+			}
 		} else {
-			values.set_nth(output_flat_index, values.get_nth(output_flat_index) + array.values.get_nth(flat_index))
+			if counts[output_flat_index] == 0 || value > values.get_nth(output_flat_index) {
+				values.set_nth(output_flat_index, value)
+			}
 		}
 		counts[output_flat_index]++
 	}

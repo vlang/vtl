@@ -17,6 +17,10 @@ fn test_masked_array_broadcast_fill_compress_and_global_reductions() ! {
 	assert mean.value == 2.0 && !mean.is_masked
 	product := data.prod()
 	assert product.value == 3.0 && !product.is_masked
+	minimum := data.min()
+	maximum := data.max()
+	assert minimum.value == 1.0 && !minimum.is_masked
+	assert maximum.value == 3.0 && !maximum.is_masked
 
 	row_mask := vtl.from_array[bool]([true, false, true], [3])!
 	broadcast_data := vtl.masked_array(values, row_mask)!
@@ -41,6 +45,12 @@ fn test_masked_array_axis_reductions_preserve_masked_empty_slices() ! {
 	products := data.prod_along_axis(1, false)!
 	assert products.values.to_array() == [3, 1]
 	assert products.mask.to_array() == [false, true]
+	minima := data.min_along_axis(1, false)!
+	maxima := data.max_along_axis(1, false)!
+	assert minima.values.to_array() == [1, 0]
+	assert minima.mask.to_array() == [false, true]
+	assert maxima.values.to_array() == [3, 0]
+	assert maxima.mask.to_array() == [false, true]
 }
 
 fn test_masked_array_all_masked_and_invalid_shapes_or_axes() ! {
@@ -52,6 +62,8 @@ fn test_masked_array_all_masked_and_invalid_shapes_or_axes() ! {
 	assert math.is_nan(mean.value) && mean.is_masked
 	product := all_masked.prod()
 	assert product.value == 1 && product.is_masked
+	assert all_masked.min().is_masked
+	assert all_masked.max().is_masked
 	assert all_masked.count() == 0
 	assert all_masked.compressed()!.size == 0
 	if _ := vtl.masked_array(values, vtl.from_1d[bool]([true, false, true])!) {
@@ -87,6 +99,8 @@ fn test_masked_array_multi_axis_reductions_and_empty_axes() ! {
 	products := data.prod_along_axes([0, 2], false)!
 	assert products.values.to_array() == [1.0, 3.0]
 	assert products.mask.to_array() == [false, false]
+	assert data.min_along_axes([0, 2], false)!.values.to_array() == [1.0, 3.0]
+	assert data.max_along_axes([0, 2], false)!.values.to_array() == [1.0, 3.0]
 	means := data.mean_along_axes([-3, -1], true)!
 	assert means.values.shape == [1, 2, 1]
 	assert means.values.to_array() == [1.0, 3.0]
