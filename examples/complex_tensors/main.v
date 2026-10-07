@@ -13,4 +13,12 @@ fn main() {
 	println('sum: ${values.add(values)!.str()}')
 	println('product: ${values.multiply(values)!.str()}')
 	println('quotient: ${values.divide(values)!.str()}')
+	real_values := vtl.real(values) or { panic(err) }
+	imaginary_values := vtl.imag(values) or { panic(err) }
+	conjugated := vtl.conj(values) or { panic(err) }
+	magnitudes := vtl.absolute(values) or { panic(err) }
+	println('real: ${real_values.str()}')
+	println('imag: ${imaginary_values.str()}')
+	println('conjugate: ${conjugated.str()}')
+	println('magnitude: ${magnitudes.str()}')
 }
