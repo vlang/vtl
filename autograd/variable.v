@@ -57,14 +57,21 @@ pub fn variable[T](context &Context[T], value &vtl.Tensor[T], data VariableData)
 
 // slice exposes this operation as part of the public API.
 pub fn (v &Variable[T]) slice(idx ...[]int) !&Variable[T] {
+	for selector in idx {
+		if selector.len == 3 && selector[2] == 0 {
+			return error('Variable.slice: step cannot be zero')
+		}
+	}
 	value := v.value.slice(...idx)!
-	return variable[T](v.context, value, requires_grad: v.requires_grad)
+	mapping := slice_backward_mapping(v.value.shape, idx, value.shape)!
+	return variable_slice_result[T](v, value, mapping)!
 }
 
 // slice_hilo exposes this operation as part of the public API.
 pub fn (v &Variable[T]) slice_hilo(idx1 []int, idx2 []int) !&Variable[T] {
 	value := v.value.slice_hilo(idx1, idx2)!
-	return variable[T](v.context, value, requires_grad: v.requires_grad)
+	mapping := slice_hilo_backward_mapping(v.value.shape, idx1, idx2, value.shape)!
+	return variable_slice_result[T](v, value, mapping)!
 }
 
 // is_grad_needed exposes this operation as part of the public API.

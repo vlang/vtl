@@ -56,6 +56,8 @@ broadcast source dimensions.
 source and update values, including repeated destination indices.
 `Variable.put_along_axis` follows last-write-wins semantics and routes gradients
 only to the final update at each destination.
+`Variable.slice` and `Variable.slice_hilo` propagate gradients through integer
+indices, range views, and positive steps.
 
 **Remaining:** document all bounds semantics.
 
