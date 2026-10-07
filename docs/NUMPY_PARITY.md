@@ -54,9 +54,10 @@ source positions, including accumulation for repeated indices and reduction of
 broadcast source dimensions.
 `Variable.scatter_add` returns an updated copy and propagates gradients to its
 source and update values, including repeated destination indices.
+`Variable.put_along_axis` follows last-write-wins semantics and routes gradients
+only to the final update at each destination.
 
-**Remaining:** add autograd support for indexed replacement (`put_along_axis`)
-and document all bounds semantics.
+**Remaining:** document all bounds semantics.
 
 Axis-wise `argmax` and `argmin` retain a length-one axis for compatibility;
 `argmax_axis_squeeze` and `argmin_axis_squeeze` provide NumPy's default
