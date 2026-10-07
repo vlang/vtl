@@ -125,6 +125,7 @@ flattened and axis-wise p-norms, and covariance/correlation matrices.
 matrix in an N-D tensor, with optional retained matrix dimensions.
 `la.trace_axes` sums offset diagonals across selected axes and preserves the
 remaining dimensions as a batch.
+`la.svdvals` returns descending singular values for batched real matrices.
 
 **Remaining:** expand eigen/SVD options, specify singular/non-finite behavior,
 and benchmark realistic shapes.
