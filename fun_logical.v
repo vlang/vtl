@@ -40,6 +40,55 @@ pub fn (t &Tensor[T]) any_axis[T](axis int, keepdims bool) !&Tensor[bool] {
 	return logical_reduce_axis[T](t, axis, keepdims, false)
 }
 
+// all_axes reduces multiple axes with logical AND. Axes may be negative and
+// must be unique. An empty axes list converts values to bool without reducing.
+pub fn (t &Tensor[T]) all_axes[T](axes []int, keepdims bool) !&Tensor[bool] {
+	return logical_reduce_axes[T](t, axes, keepdims, true)
+}
+
+// any_axes reduces multiple axes with logical OR. Axes may be negative and
+// must be unique. An empty axes list converts values to bool without reducing.
+pub fn (t &Tensor[T]) any_axes[T](axes []int, keepdims bool) !&Tensor[bool] {
+	return logical_reduce_axes[T](t, axes, keepdims, false)
+}
+
+fn logical_reduce_axes[T](t &Tensor[T], axes []int, keepdims bool, reduce_all bool) !&Tensor[bool] {
+	if axes.len == 0 {
+		mut result := empty[bool](t.shape, memory: .row_major)
+		mut iter := t.iterator[T]()
+		for {
+			value, index := iter.next() or { break }
+			result.set(index, td[T](value).bool())
+		}
+		return result
+	}
+	mut normalized := []int{cap: axes.len}
+	for axis in axes {
+		axis_index := if axis < 0 { axis + t.rank() } else { axis }
+		if axis_index < 0 || axis_index >= t.rank() {
+			return error('axis ${axis} out of bounds for rank ${t.rank()}')
+		}
+		if axis_index in normalized {
+			return error('duplicate axis ${axis}')
+		}
+		normalized << axis_index
+	}
+	// Reduce from the highest axis down so removing dimensions does not change
+	// the indices of axes still to process.
+	for i in 0 .. normalized.len {
+		for j in i + 1 .. normalized.len {
+			if normalized[i] < normalized[j] {
+				normalized[i], normalized[j] = normalized[j], normalized[i]
+			}
+		}
+	}
+	mut result := logical_reduce_axis[T](t, normalized[0], keepdims, reduce_all)!
+	for axis_index in normalized[1..] {
+		result = logical_reduce_axis[bool](result, axis_index, keepdims, reduce_all)!
+	}
+	return result
+}
+
 fn logical_reduce_axis[T](t &Tensor[T], axis int, keepdims bool, reduce_all bool) !&Tensor[bool] {
 	rank := t.rank()
 	if rank == 0 {
