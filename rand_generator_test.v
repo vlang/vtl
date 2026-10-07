@@ -138,6 +138,28 @@ fn test_random_generator_permutation_is_seeded_and_complete() ! {
 	replay.free()
 }
 
+fn test_random_generator_permutation_tensor_shuffles_complete_rows() ! {
+	input := from_array([10, 11, 20, 21, 30, 31], [3, 2])!
+	mut generator := new_random_generator(951)
+	permuted := generator.permutation_tensor[int](input)!
+	assert permuted.shape == input.shape
+	mut first_column := []int{len: permuted.shape[0]}
+	for row in 0 .. permuted.shape[0] {
+		first := permuted.get([row, 0])
+		assert permuted.get([row, 1]) == first + 1
+		first_column[row] = first
+	}
+	first_column.sort()
+	assert first_column == [10, 20, 30]
+	mut replay := new_random_generator(951)
+	assert permuted.array_equal(replay.permutation_tensor[int](input)!)
+	if _ := generator.permutation_tensor[int](from_array[int]([1], []int{})!) {
+		assert false, 'permutation_tensor must reject scalar tensors'
+	}
+	generator.free()
+	replay.free()
+}
+
 fn test_random_generator_gamma_is_seeded_and_positive() ! {
 	mut generator := new_random_generator(789)
 	values := generator.gamma(2.0, 3.0, [64])!

@@ -12,6 +12,7 @@ fn main() {
 	training_indices := vtl.from_1d([0, 1, 2, 3, 4, 5, 6, 7])!
 	batch_indices := training_rng.choice[int](training_indices, 4, false)!
 	epoch_order := training_rng.permutation(8)!
+	shuffled_features := training_rng.permutation_tensor[f64](training_features)!
 	positive_noise := training_rng.gamma(2.0, 0.5, [4])!
 	probability_samples := training_rng.beta(2.0, 5.0, [4])!
 	positive_scales := training_rng.lognormal(0.0, 0.25, [4])!
@@ -25,6 +26,7 @@ fn main() {
 	println('Validation waiting times: ${waiting_times.to_array()}')
 	println('Sampled training indices: ${batch_indices.to_array()}')
 	println('Shuffled epoch order: ${epoch_order.to_array()}')
+	println('Shuffled feature rows shape: ${shuffled_features.shape}')
 	println('Positive gamma samples: ${positive_noise.to_array()}')
 	println('Beta probability samples: ${probability_samples.to_array()}')
 	println('Log-normal positive scales: ${positive_scales.to_array()}')

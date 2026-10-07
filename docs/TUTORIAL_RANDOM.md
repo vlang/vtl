@@ -37,12 +37,13 @@ import vtl
 
 mut training_rng := vtl.new_random_generator(42)
 mut validation_rng := vtl.new_random_generator(2026)
-training_noise := training_rng.normal([128, 32], vtl.NormalTensorData{ sigma: 0.1 })!
+training_features := training_rng.normal([128, 32], vtl.NormalTensorData{ sigma: 0.1 })!
 validation_mask := validation_rng.bernoulli(0.8, [128])!
 waiting_times := validation_rng.geometric(0.1, [128])!
 training_indices := vtl.from_1d([0, 1, 2, 3, 4, 5, 6, 7])!
 batch_indices := training_rng.choice[int](training_indices, 4, false)!
 epoch_order := training_rng.permutation(8)!
+shuffled_rows := training_rng.permutation_tensor(training_features)!
 positive_noise := training_rng.gamma(2.0, 0.5, [128])!
 beta_samples := training_rng.beta(2.0, 5.0, [128])!
 positive_scales := training_rng.lognormal(0.0, 0.25, [128])!
@@ -57,6 +58,8 @@ shape)` returns the positive number of Bernoulli trials up to the first success.
 `choice(population, size, replace)` samples from the population in flattened
 logical order and can enforce unique sampled positions. `permutation(size)`
 returns every integer from zero to `size - 1` exactly once in a seeded order.
+`permutation_tensor(tensor)` returns a copy with complete rows shuffled along
+the first axis, preserving all feature values in each row.
 `gamma(alpha, scale, shape)` samples positive values from a Gamma distribution
 on the same independent stream. `lognormal(mean, sigma, shape)` exponentiates
 samples from a normal distribution; a zero `sigma` returns the constant
