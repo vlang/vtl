@@ -322,7 +322,8 @@ pub fn (t &Tensor[T]) take_flat[T](indices &Tensor[int]) !&Tensor[T] {
 }
 
 // take_along_axis gathers values using an index tensor with the same rank as
-// the receiver. Dimensions must match except along `axis`.
+// the receiver. Non-axis dimensions broadcast; the result's axis length is
+// taken from the index tensor. Negative indices count from the end.
 pub fn (t &Tensor[T]) take_along_axis[T](indices &Tensor[int], axis int) !&Tensor[T] {
 	rank := t.rank()
 	axis_index := if axis < 0 { axis + rank } else { axis }
@@ -332,23 +333,48 @@ pub fn (t &Tensor[T]) take_along_axis[T](indices &Tensor[int], axis int) !&Tenso
 	if indices.rank() != rank {
 		return error('take_along_axis index tensor must have rank ${rank}')
 	}
+	mut output_shape := indices.shape.clone()
 	for dimension in 0 .. rank {
-		if dimension != axis_index && indices.shape[dimension] != t.shape[dimension] {
-			return error('take_along_axis index shape must match tensor shape outside the selected axis')
+		if dimension == axis_index {
+			continue
 		}
+		source_size := t.shape[dimension]
+		index_size := indices.shape[dimension]
+		if source_size != index_size && source_size != 1 && index_size != 1 {
+			return error('take_along_axis non-axis dimensions must be broadcastable')
+		}
+		output_shape[dimension] = if source_size == 1 { index_size } else { source_size }
 	}
 
-	mut result := empty[T](indices.shape, memory: t.memory)
+	mut result := empty[T](output_shape, memory: .row_major)
+	mut output_index := []int{len: rank}
+	mut input_index := []int{len: rank}
+	mut indices_index := []int{len: rank}
 	for flat_index in 0 .. result.size {
-		result_index := result.nth_index(flat_index)
-		mut input_index := result_index.clone()
-		selected := indices.get(result_index)
+		decode_flat_coordinate(flat_index, output_shape, mut output_index)
+		for dimension in 0 .. rank {
+			if dimension == axis_index {
+				indices_index[dimension] = output_index[dimension]
+			} else {
+				input_index[dimension] = if t.shape[dimension] == 1 {
+					0
+				} else {
+					output_index[dimension]
+				}
+				indices_index[dimension] = if indices.shape[dimension] == 1 {
+					0
+				} else {
+					output_index[dimension]
+				}
+			}
+		}
+		selected := indices.get(indices_index)
 		selected_index := if selected < 0 { selected + t.shape[axis_index] } else { selected }
 		if selected_index < 0 || selected_index >= t.shape[axis_index] {
 			return error('take_along_axis index ${selected} is out of range for axis size ${t.shape[axis_index]}')
 		}
 		input_index[axis_index] = selected_index
-		result.set(result_index, t.get(input_index))
+		result.data.data[flat_index] = t.get(input_index)
 	}
 	return result
 }

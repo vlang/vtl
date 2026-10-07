@@ -283,8 +283,18 @@ fn test_take_along_axis() {
 	assert taken.shape == [2, 2]
 	assert taken.to_array() == [2, 0, 4, 5]
 
-	if _ := t.take_along_axis(vtl.ones[int]([1, 2]), 1) {
-		assert false, 'take_along_axis must reject mismatched non-axis dimensions'
+	indices_broadcast_rows := vtl.from_array[int]([2, 0], [1, 2])!
+	broadcast_rows := t.take_along_axis(indices_broadcast_rows, 1)!
+	assert broadcast_rows.shape == [2, 2]
+	assert broadcast_rows.to_array() == [2, 0, 5, 3]
+
+	indices_broadcast_columns := vtl.from_array[int]([1, 0], [2, 1])!
+	broadcast_columns := t.take_along_axis(indices_broadcast_columns, 0)!
+	assert broadcast_columns.shape == [2, 3]
+	assert broadcast_columns.to_array() == [3, 4, 5, 0, 1, 2]
+
+	if _ := t.take_along_axis(vtl.ones[int]([3, 2]), 1) {
+		assert false, 'take_along_axis must reject incompatible non-axis dimensions'
 	} else {
 		assert true
 	}
