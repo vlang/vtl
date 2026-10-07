@@ -190,7 +190,8 @@ fixtures, and continue rejecting unsupported object/structured values.
 **Current:** V generic element types, `dtype()` introspection, and
 `promote_types` for supported array dtypes. `math.complex.Complex` is supported
 as `complex128` tensor storage with elementwise add, subtract, multiply, and
-divide. Promotion with a complex operand produces `complex128`. Explicit
+divide, plus NumPy-style `real`, `imag`, `conj`, `absolute`, and `abs`
+operations. Promotion with a complex operand produces `complex128`. Explicit
 `as_*` conversions cover real numeric and boolean types, preserve shape and
 logical order, and truncate floating-point values when converting to integers.
 

@@ -48,6 +48,35 @@ fn test_complex128_tensor_creation_and_elementwise_arithmetic() ! {
 		vcomplex.Complex{ re: 1.0, im: 0.0 }]
 }
 
+fn test_complex_real_imag_conj_and_absolute() ! {
+	values := vtl.from_1d([
+		vcomplex.Complex{ re: 3.0, im: 4.0 },
+		vcomplex.Complex{ re: -5.0, im: 12.0 },
+	])!
+
+	assert vtl.real(values)!.to_array() == [3.0, -5.0]
+	assert vtl.imag(values)!.to_array() == [4.0, 12.0]
+	assert vtl.conj(values)!.to_array() == [
+		vcomplex.Complex{ re: 3.0, im: -4.0 },
+		vcomplex.Complex{ re: -5.0, im: -12.0 },
+	]
+	assert vtl.absolute(values)!.to_array() == [5.0, 13.0]
+	assert vtl.abs(values)!.to_array() == [5.0, 13.0]
+
+	large := vtl.from_1d([vcomplex.Complex{ re: 1e308, im: 1e308 }])!
+	assert vtl.absolute(large)!.get_nth(0) < 1.5e308
+
+	matrix := vtl.from_array([
+		vcomplex.Complex{ re: 1.0, im: 2.0 },
+		vcomplex.Complex{ re: 3.0, im: 4.0 },
+		vcomplex.Complex{ re: 5.0, im: 6.0 },
+		vcomplex.Complex{ re: 7.0, im: 8.0 },
+	], [2, 2])!
+	transposed := matrix.transpose([1, 0])!
+	assert vtl.real(transposed)!.to_array() == [1.0, 5.0, 3.0, 7.0]
+	assert vtl.imag(transposed)!.to_array() == [2.0, 6.0, 4.0, 8.0]
+}
+
 fn test_promote_types_for_matching_numeric_kinds() {
 	assert vtl.promote_types(.int8, .int16)! == .int16
 	assert vtl.promote_types(.int16, .uint16)! == .int32

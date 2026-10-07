@@ -27,6 +27,23 @@ assert vtl.promote_types(.complex128, .float64)! == .complex128
 assert vtl.promote_types(.int32, .complex128)! == .complex128
 ```
 
+The NumPy-style `real`, `imag`, `conj`, `absolute`, and `abs` operations are
+available.
+Component and magnitude outputs use float64, while conjugation preserves the
+complex dtype and input shape:
+
+```v
+import math.complex as cmplx
+import vtl
+
+values := vtl.from_1d([cmplx.complex(3.0, 4.0), cmplx.complex(-5.0, 12.0)])!
+assert vtl.real(values)!.to_array() == [3.0, -5.0]
+assert vtl.imag(values)!.to_array() == [4.0, 12.0]
+assert vtl.conj(values)!.to_array()[0].im == -4.0
+assert vtl.absolute(values)!.to_array() == [5.0, 13.0]
+assert vtl.abs(values)!.to_array() == [5.0, 13.0]
+```
+
 Complex tensors are an early part of VTL's complex-number support. Real-valued
 casts, reductions, general complex mathematical functions, linear algebra,
 random distributions, and `.npy`/`.npz` complex I/O do not yet support this

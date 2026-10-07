@@ -1,7 +1,9 @@
 # Complex tensors
 
-This example creates a `complex128` tensor and applies elementwise arithmetic.
-It uses `math.complex.Complex`, V's standard f64 complex type.
+This example creates a `complex128` tensor and applies elementwise arithmetic,
+then extracts real/imaginary components, conjugates the values, and computes
+their magnitudes. It uses `math.complex.Complex`, V's standard f64 complex
+type.
 
 From `~/.vmodules`, run it under a memory limit:
 
