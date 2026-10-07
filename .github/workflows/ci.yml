@@ -100,7 +100,7 @@ jobs:
 
     strategy:
       matrix:
-        # Exercise both supported Linux releases, pure-V and CBLAS, an
+        # Exercise both supported Linux releases, pure-V, CBLAS, LAPACKE, an
         # optimized pure-V build, and macOS without running the full cross product.
         include:
           - os: ubuntu-22.04
@@ -112,6 +112,9 @@ jobs:
           - os: ubuntu-24.04
             flags: ''
             backend: cblas
+          - os: ubuntu-24.04
+            flags: ''
+            backend: lapacke
           - os: ubuntu-24.04
             flags: '--prod'
             backend: pure-v
@@ -188,6 +191,8 @@ jobs:
           cd ~/.vmodules
           if [[ "${{ matrix.backend }}" == "cblas" ]]; then
             backend_flag=--use-cblas
+          elif [[ "${{ matrix.backend }}" == "lapacke" ]]; then
+            backend_flag=--use-lapacke
           fi
           # Default: scoped tests + tiny_synth smoke (see bin/test, issue #109)
           if [[ "$RUNNER_OS" == "Linux" ]]; then

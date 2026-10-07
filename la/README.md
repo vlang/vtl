@@ -69,3 +69,5 @@ More examples:
 `svd` returns `(u, s, vt)` for real matrices and batches. Its default
 `full_matrices: true` matches NumPy's square-factor shapes; set it to `false`
 for reduced factors. Results use `f64`, and inputs must be finite.
+The default build uses a pure-V Jacobi algorithm. Add `-d vsl_lapack_lapacke`
+to use VSL's native LAPACKE backend for SVD when LAPACKE is installed.

@@ -134,6 +134,8 @@ remaining dimensions as a batch.
 real matrices, with NumPy-compatible full and reduced matrix shapes selected by
 `full_matrices` (default `true`). The pure-V one-sided Jacobi implementation
 supports rectangular inputs and rejects non-finite values.
+Build with `-d vsl_lapack_lapacke` to dispatch SVD to the native LAPACKE
+backend; the default build remains dependency-free and uses the pure-V path.
 `la.slogdet` returns determinant signs and log absolute determinants for batches,
 including singular matrices and values whose determinants would overflow.
 `la.matrix_power` uses exponentiation by squaring for batched integer powers and
@@ -157,7 +159,8 @@ rank from a relative singular-value cutoff, and returns squared residual sums
 only when NumPy does.
 
 **Remaining:** add general (non-symmetric, possibly complex) eigenproblems,
-complex SVD, and benchmark realistic shapes.
+complex SVD, and benchmark realistic shapes for both the default and LAPACKE
+backends.
 
 ### FFT
 
