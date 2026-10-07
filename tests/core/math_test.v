@@ -109,6 +109,15 @@ fn test_is_nan_matches_numpy_for_float_views_and_integer_tensors() {
 	assert vtl.from_1d([1, -2, 0])!.is_nan().array_equal(vtl.from_1d([false, false, false])!)
 }
 
+fn test_is_inf_and_is_finite_match_numpy_for_float_views_and_integers() {
+	values := vtl.from_1d([math.inf(1), math.nan(), -math.inf(1), 2.0])!.flip()!
+	assert values.is_inf(0).to_array() == [false, true, false, true]
+	assert values.is_inf(1).to_array() == [false, false, false, true]
+	assert values.is_inf(-1).to_array() == [false, true, false, false]
+	assert values.is_finite().to_array() == [true, false, false, false]
+	assert vtl.from_1d([1, -2, 0])!.is_finite().to_array() == [true, true, true]
+}
+
 fn test_allclose_broadcasts_without_changing_isclose_semantics() {
 	a := vtl.from_array([1.0, 2.0, 3.0, 4.0], [2, 2])!
 	b := vtl.from_1d([1.0, 2.0])!

@@ -25,7 +25,7 @@ CIFAR examples for CI-safe checks.
 | [NPZ fixture](./npz_read_compressed) | Compressed NumPy fixture | `v run vtl/examples/npz_read_compressed/main.v vtl/npz/testdata/numpy_compressed.npz` |
 | [stats_variance](./stats_variance) | Stable population/sample variance and standard deviation | `v run ./vtl/examples/stats_variance/main.v` |
 | [stats_nan_reductions](./stats_nan_reductions) | NaN-aware sums, products, extrema, and axis reductions | `v run ./vtl/examples/stats_nan_reductions/main.v` |
-| [is_nan](./is_nan) | Elementwise NaN detection, including on tensor views | `v run ./vtl/examples/is_nan/main.v` |
+| [is_nan](./is_nan) | NaN, infinity, and finite-value predicates on tensors and views | `v run ./vtl/examples/is_nan/main.v` |
 | [logical_reductions](./logical_reductions) | Axis-wise logical all/any reductions with keepdims | `v run ./vtl/examples/logical_reductions/main.v` |
 | [multi_axis_extrema](./multi_axis_extrema) | Multi-axis min/max reductions with NumPy-style output shapes | `v run ./vtl/examples/multi_axis_extrema/main.v` |
 | [nan_multi_axis_reductions](./nan_multi_axis_reductions) | NaN-aware multi-axis reductions | `v run ./vtl/examples/nan_multi_axis_reductions/main.v` |

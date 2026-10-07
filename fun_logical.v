@@ -154,14 +154,9 @@ fn decode_logical_reduction_slice(line int, shape []int, axis int, mut index []i
 // is_finite returns true where x is not positive infinity, negative infinity, or NaN;
 // false otherwise.
 pub fn (t &Tensor[T]) is_finite[T]() &Tensor[bool] {
-	mut iter := t.iterator[T]()
-	mut ret := empty[bool](t.shape)
-	for {
-		val, i := iter.next() or { break }
-		next_val := math.is_finite(td[T](val).f64())
-		ret.set(i, next_val)
-	}
-	return ret
+	return map_predicate[T](t, fn (value T) bool {
+		return math.is_finite(td[T](value).f64())
+	})
 }
 
 // is_inf reports whether t is an infinity, according to sign.
@@ -169,21 +164,35 @@ pub fn (t &Tensor[T]) is_finite[T]() &Tensor[bool] {
 // If sign < 0, is_inf reports whether t is negative infinity.
 // If sign == 0, is_inf reports whether t is either infinity.
 pub fn (t &Tensor[T]) is_inf[T](sign int) &Tensor[bool] {
-	mut iter := t.iterator[T]()
-	mut ret := empty[bool](t.shape)
-	for {
-		val, i := iter.next() or { break }
-		next_val := math.is_inf(td[T](val).f64(), sign)
-		ret.set(i, next_val)
-	}
-	return ret
+	return map_predicate[T](t, fn [sign] (value T) bool {
+		return math.is_inf(td[T](value).f64(), sign)
+	})
 }
 
 // is_nan returns true for NaN values and false for finite values and infinities.
 pub fn (t &Tensor[T]) is_nan[T]() &Tensor[bool] {
-	return t.map_values(fn [T](value T) bool {
+	return map_predicate[T](t, fn (value T) bool {
 		return math.is_nan(td[T](value).f64())
 	})
+}
+
+// map_predicate builds a boolean result with a linear fast path for contiguous
+// tensors and stride-aware iteration for views.
+@[direct_array_access]
+fn map_predicate[T](t &Tensor[T], predicate fn (value T) bool) &Tensor[bool] {
+	mut result := empty[bool](t.shape, memory: .row_major)
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		for i in 0 .. t.size {
+			result.data.data[i] = predicate(t.data.data[i])
+		}
+		return result
+	}
+	mut iter := t.iterator[T]()
+	for {
+		value, index := iter.next() or { break }
+		result.set(index, predicate(value))
+	}
+	return result
 }
 
 // array_equal returns true if input arrays have the same shape and all elements
