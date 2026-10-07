@@ -52,6 +52,9 @@ tensor. It uses direct access when both operands are contiguous and have the
 same shape, and stops at the first mismatch; the broadcast path preserves
 NumPy-style shape semantics.
 
+`stats.median` accepts unsorted input, uses quickselect-backed linear
+interpolation, and returns fractional `f64` results for integer tensors.
+
 ## Arraymancer comparison
 
 Track these capabilities in addition to the NumPy table:

@@ -210,20 +210,11 @@ pub fn harmonic_mean[T](t &vtl.Tensor[T]) T {
 	})
 }
 
-// Measure of Central Tendency
-// Median of the given input array ( input array is assumed to be sorted )
-// Based on
-// https://www.mathsisfun.com/data/central-measures.html
-pub fn median[T](t &vtl.Tensor[T]) T {
-	if t.size == 0 {
-		return vtl.cast[T](0)
-	}
-
-	if t.size % 2 == 0 {
-		return (t.get_nth(t.size / 2) + t.get_nth((t.size / 2) - 1)) / vtl.cast[T](2)
-	} else {
-		return t.get_nth(t.size / 2)
-	}
+// median returns the linearly interpolated median of the tensor values.
+// Input values can be in any order; integer tensors return an f64 so even-sized
+// inputs can have fractional medians. Empty inputs return NaN.
+pub fn median[T](t &vtl.Tensor[T]) f64 {
+	return quantile_linear[T](t, 0.5) or { math.nan() }
 }
 
 // Measure of Central Tendency

@@ -62,3 +62,6 @@ row_total := stats.sum_along_axis[f64](values, -1, true)!
 `quantile` currently expects its tensor argument to be sorted. See function
 comments in [`stats.v`](stats.v) for edge-case behavior and the
 [reductions tutorial](../docs/TUTORIAL_REDUCTIONS.md).
+
+`median` accepts unsorted tensors, uses linear interpolation, and returns
+`f64` for every input type. An empty tensor returns NaN.
