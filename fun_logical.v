@@ -3,7 +3,16 @@ module vtl
 import math
 
 // all returns whether all array elements evaluate to true.
+@[direct_array_access]
 pub fn (t &Tensor[T]) all[T]() bool {
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		for i in 0 .. t.size {
+			if !td[T](t.data.data[i]).bool() {
+				return false
+			}
+		}
+		return true
+	}
 	mut iter := t.iterator[T]()
 	for {
 		val, _ := iter.next() or { break }
@@ -16,7 +25,16 @@ pub fn (t &Tensor[T]) all[T]() bool {
 }
 
 // any returns whether any array elements evaluate to true.
+@[direct_array_access]
 pub fn (t &Tensor[T]) any[T]() bool {
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		for i in 0 .. t.size {
+			if td[T](t.data.data[i]).bool() {
+				return true
+			}
+		}
+		return false
+	}
 	mut iter := t.iterator[T]()
 	for {
 		val, _ := iter.next() or { break }

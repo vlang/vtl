@@ -7,7 +7,8 @@ import vtl
 
 fn main() {
 	n := 10_000
-	iterations := 3
+	iterations := 1000
+	warmup_iterations := 10
 	mut values := []f64{len: n}
 	for i in 0 .. n {
 		values[i] = f64(i % 997) / 997.0
@@ -18,11 +19,15 @@ fn main() {
 	changed_values[0] += 1.0
 	changed := vtl.from_1d(changed_values)!
 	println('elements,case,method,mean_ms,result')
-	bench(a, b, 'equal', iterations)!
-	bench(a, changed, 'first_element_differs', iterations)!
+	bench(a, b, 'equal', iterations, warmup_iterations)!
+	bench(a, changed, 'first_element_differs', iterations, warmup_iterations)!
 }
 
-fn bench(a &vtl.Tensor[f64], b &vtl.Tensor[f64], case_name string, iterations int) ! {
+fn bench(a &vtl.Tensor[f64], b &vtl.Tensor[f64], case_name string, iterations int, warmup_iterations int) ! {
+	for _ in 0 .. warmup_iterations {
+		_ = a.isclose(b)!.all()
+		_ = a.allclose(b)!
+	}
 	mut materialized_matches := 0
 	mut started := time.sys_mono_now()
 	for _ in 0 .. iterations {
@@ -40,6 +45,6 @@ fn bench(a &vtl.Tensor[f64], b &vtl.Tensor[f64], case_name string, iterations in
 	}
 	direct_ms := f64(time.sys_mono_now() - started) / f64(iterations) / 1_000_000.0
 	assert materialized_matches == direct_matches
-	println('${a.size},${case_name},isclose+all,${materialized_ms:.3f},${materialized_matches}')
-	println('${a.size},${case_name},allclose,${direct_ms:.3f},${direct_matches}')
+	println('${a.size},${case_name},isclose+all,${materialized_ms:.6f},${materialized_matches}')
+	println('${a.size},${case_name},allclose,${direct_ms:.6f},${direct_matches}')
 }

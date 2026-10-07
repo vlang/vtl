@@ -2,6 +2,22 @@ module core
 
 import vtl
 
+fn test_all_any_contiguous_empty_and_strided_tensors() ! {
+	truthy := vtl.from_1d([1, 2, 3])!
+	falsy := vtl.from_1d([0, 2, 0])!
+	empty := vtl.from_array([]int{}, [0])!
+	transposed := vtl.from_2d([[0, 1], [2, 3]])!.transpose([1, 0])!
+
+	assert truthy.all()
+	assert truthy.any()
+	assert !falsy.all()
+	assert falsy.any()
+	assert empty.all()
+	assert !empty.any()
+	assert !transposed.all()
+	assert transposed.any()
+}
+
 fn test_logical_axis_reductions_match_numpy_shapes_and_values() ! {
 	values := vtl.from_array([0, 1, 2, 0, 3, 4], [2, 3])!
 	all_rows := values.all_axis(1, false)!
