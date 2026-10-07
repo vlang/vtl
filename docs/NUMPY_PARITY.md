@@ -113,12 +113,15 @@ fixtures, and continue rejecting unsupported object/structured values.
 
 ### Data types
 
-**Current:** V generic element types and explicit `as_*` conversions across
-supported numeric and boolean types. Casts preserve shape and logical order;
-floating-point to integer conversion truncates.
+**Current:** V generic element types, `dtype()` introspection, and
+`promote_types` for supported array dtypes. Explicit `as_*` conversions cover
+numeric and boolean types, preserve shape and logical order, and truncate
+floating-point values when converting to integers.
 
-**Remaining:** define arithmetic promotion, string conversion, complex types,
-integer overflow, and structured-data limits.
+**Remaining:** add a signed 32-bit tensor dtype for exact promotion parity,
+connect promotion to mixed-dtype arithmetic, add weak scalar promotion and
+string conversion, support complex types, and define integer overflow and
+structured-data limits.
 
 ### Masked and missing data
 
