@@ -57,7 +57,8 @@ square root branch. `arcsin`, `arccos`, `arctan`, `arcsinh`, `arccosh`, and
 The direct `tan`, `sinh`, `cosh`, and `tanh` functions are also available.
 
 Global sum, product, and mean use complex arithmetic and return scalar complex
-values. Empty means return `NaN + NaN·i`, matching NumPy's invalid empty mean:
+values. Single- and multi-axis sum/product preserve complex dtype and shape.
+Empty means return `NaN + NaN·i`, matching NumPy's invalid empty mean:
 
 ```v
 import math.complex as cmplx
@@ -71,7 +72,7 @@ assert stats.mean(values) == cmplx.Complex{ re: 2.0, im: 3.0 }
 ```
 
 Complex tensors are an early part of VTL's complex-number support. Real-valued
-casts, axis-wise reductions, other statistics, linear algebra, random
+casts, other axis-wise reductions and statistics, linear algebra, random
 distributions, and `.npy`/`.npz` complex I/O do not yet support this dtype.
 Global sum, product, and mean return complex scalar values. FFT APIs have their
 own complex output types and are documented in the [FFT tutorial](./TUTORIAL_FFT.md).

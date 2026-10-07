@@ -34,7 +34,7 @@ fn reduce_axis[T](t &vtl.Tensor[T], axis int, keepdims bool, operation AxisReduc
 	} else {
 		output_shape.delete(axis_index)
 	}
-	mut result := vtl.empty[T](output_shape, memory: .row_major)
+	mut result := reduction_output[T](output_shape)!
 	mut slice_count := 1
 	for dimension, size in t.shape {
 		if dimension != axis_index {
@@ -44,7 +44,7 @@ fn reduce_axis[T](t &vtl.Tensor[T], axis int, keepdims bool, operation AxisReduc
 	mut index := []int{len: rank}
 	for slice in 0 .. slice_count {
 		decode_reduction_slice(slice, t.shape, axis_index, mut index)
-		mut reduced := if operation == .sum { vtl.cast[T](0) } else { vtl.cast[T](1) }
+		mut reduced := if operation == .sum { sum_identity[T]() } else { product_identity[T]() }
 		for position in 0 .. t.shape[axis_index] {
 			index[axis_index] = position
 			value := t.get(index)
