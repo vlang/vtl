@@ -114,9 +114,8 @@ assert fractional.as_int().to_array() == [1, 2]
 `dtype()` reports a tensor's element type. `promote_types` determines a
 common result type for two array dtypes and rejects string/numeric mixtures.
 The promotion helper models NumPy's array-dtype rules using VTL's current
-types. VTL has no signed 32-bit tensor type yet, so some mixed-integer pairs
-promote to the next supported signed type. VTL arithmetic operators do not yet
-automatically dispatch across different tensor types.
+types. VTL arithmetic operators do not yet automatically dispatch across
+different tensor types.
 
 ```v
 import vtl

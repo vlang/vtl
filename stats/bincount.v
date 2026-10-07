@@ -42,7 +42,7 @@ fn validate_bincount_input[T](input &vtl.Tensor[T], minlength int) ![]int {
 }
 
 fn bincount_index[T](value T) !int {
-	$if T is i8 || T is i16 || T is i64 || T is int {
+	$if T is i8 || T is i16 || T is i32 || T is i64 || T is int {
 		if value < 0 {
 			return error('bincount values must be non-negative')
 		}
@@ -62,7 +62,7 @@ fn bincount_index[T](value T) !int {
 }
 
 fn bincount_weight_value[W](value W) !f64 {
-	$if W is i8 || W is i16 || W is i64 || W is int || W is u8 || W is u16 || W is u32 || W is u64 || W is f32 || W is f64 {
+	$if W is i8 || W is i16 || W is i32 || W is i64 || W is int || W is u8 || W is u16 || W is u32 || W is u64 || W is f32 || W is f64 {
 		return f64(value)
 	} $else {
 		return error('bincount weights must have a numeric dtype')

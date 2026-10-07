@@ -230,7 +230,7 @@ pub fn (v &Variable[T]) tanh_op() !&Variable[T] {
 pub fn (v &Variable[T]) clamp(min_val T, max_val T) !&Variable[T] {
 	g := clamp_gate[T](min_val, max_val, v.value)
 	t := v.value.map(fn [min_val, max_val] [T](x T, _ []int) T {
-		$if T is f64 || T is f32 || T is i16 || T is i8 || T is int {
+		$if T is f64 || T is f32 || T is i16 || T is i32 || T is i8 || T is int {
 			return if x < min_val {
 				min_val
 			} else if x > max_val {

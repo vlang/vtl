@@ -1,7 +1,19 @@
 module vtl
 
 // TensorDataType is a sum type that lists the possible types to be used to define storage
-pub type TensorDataType = bool | f32 | f64 | i16 | i64 | i8 | int | string | u16 | u32 | u64 | u8
+pub type TensorDataType = bool
+	| f32
+	| f64
+	| i16
+	| i32
+	| i64
+	| i8
+	| int
+	| string
+	| u16
+	| u32
+	| u64
+	| u8
 
 // td exposes this operation as part of the public API.
 pub fn td[T](x T) TensorDataType {
@@ -12,6 +24,8 @@ pub fn td[T](x T) TensorDataType {
 	} $else $if T is f64 {
 		return TensorDataType(x)
 	} $else $if T is i16 {
+		return TensorDataType(x)
+	} $else $if T is i32 {
 		return TensorDataType(x)
 	} $else $if T is i64 {
 		return TensorDataType(x)
@@ -44,6 +58,8 @@ pub fn cast[T](x TensorDataType) T {
 		return x.f64()
 	} $else $if T is i16 {
 		return x.i16()
+	} $else $if T is i32 {
+		return x.i32()
 	} $else $if T is i64 {
 		return x.i64()
 	} $else $if T is i8 {
@@ -77,6 +93,7 @@ pub fn (v TensorDataType) int() int {
 		int { return v as int }
 		i8 { return int(v as i8) }
 		i16 { return int(v as i16) }
+		i32 { return int(v as i32) }
 		i64 { return int(v as i64) }
 		u8 { return int(v as u8) }
 		u16 { return int(v as u16) }
@@ -95,6 +112,7 @@ pub fn (v TensorDataType) i64() i64 {
 		int { return i64(v as int) }
 		i8 { return i64(v as i8) }
 		i16 { return i64(v as i16) }
+		i32 { return i64(v as i32) }
 		i64 { return v as i64 }
 		u8 { return i64(v as u8) }
 		u16 { return i64(v as u16) }
@@ -106,6 +124,25 @@ pub fn (v TensorDataType) i64() i64 {
 	}
 }
 
+// i32 converts a numeric TensorDataType value to i32.
+pub fn (v TensorDataType) i32() i32 {
+	match v {
+		bool { return if v { 1 } else { 0 } }
+		int { return i32(v as int) }
+		i8 { return i32(v as i8) }
+		i16 { return i32(v as i16) }
+		i32 { return v as i32 }
+		i64 { return i32(v as i64) }
+		u8 { return i32(v as u8) }
+		u16 { return i32(v as u16) }
+		u32 { return i32(v as u32) }
+		u64 { return i32(v as u64) }
+		f32 { return i32(v as f32) }
+		f64 { return i32(v as f64) }
+		string { return 0 }
+	}
+}
+
 // i8 converts a numeric TensorDataType value to i8.
 pub fn (v TensorDataType) i8() i8 {
 	match v {
@@ -113,6 +150,7 @@ pub fn (v TensorDataType) i8() i8 {
 		int { return i8(v as int) }
 		i8 { return v as i8 }
 		i16 { return i8(v as i16) }
+		i32 { return i8(v as i32) }
 		i64 { return i8(v as i64) }
 		u8 { return i8(v as u8) }
 		u16 { return i8(v as u16) }
@@ -131,6 +169,7 @@ pub fn (v TensorDataType) i16() i16 {
 		int { return i16(v as int) }
 		i8 { return i16(v as i8) }
 		i16 { return v as i16 }
+		i32 { return i16(v as i32) }
 		i64 { return i16(v as i64) }
 		u8 { return i16(v as u8) }
 		u16 { return i16(v as u16) }
@@ -149,6 +188,7 @@ pub fn (v TensorDataType) u8() u8 {
 		int { return u8(v as int) }
 		i8 { return u8(v as i8) }
 		i16 { return u8(v as i16) }
+		i32 { return u8(v as i32) }
 		i64 { return u8(v as i64) }
 		u8 { return v as u8 }
 		u16 { return u8(v as u16) }
@@ -167,6 +207,7 @@ pub fn (v TensorDataType) u16() u16 {
 		int { return u16(v as int) }
 		i8 { return u16(v as i8) }
 		i16 { return u16(v as i16) }
+		i32 { return u16(v as i32) }
 		i64 { return u16(v as i64) }
 		u8 { return u16(v as u8) }
 		u16 { return v as u16 }
@@ -185,6 +226,7 @@ pub fn (v TensorDataType) u32() u32 {
 		int { return u32(v as int) }
 		i8 { return u32(v as i8) }
 		i16 { return u32(v as i16) }
+		i32 { return u32(v as i32) }
 		i64 { return u32(v as i64) }
 		u8 { return u32(v as u8) }
 		u16 { return u32(v as u16) }
@@ -203,6 +245,7 @@ pub fn (v TensorDataType) u64() u64 {
 		int { return u64(v as int) }
 		i8 { return u64(v as i8) }
 		i16 { return u64(v as i16) }
+		i32 { return u64(v as i32) }
 		i64 { return u64(v as i64) }
 		u8 { return u64(v as u8) }
 		u16 { return u64(v as u16) }
@@ -221,6 +264,7 @@ pub fn (v TensorDataType) f32() f32 {
 		int { return f32(v as int) }
 		i8 { return f32(v as i8) }
 		i16 { return f32(v as i16) }
+		i32 { return f32(v as i32) }
 		i64 { return f32(v as i64) }
 		u8 { return f32(v as u8) }
 		u16 { return f32(v as u16) }
@@ -239,6 +283,7 @@ pub fn (v TensorDataType) f64() f64 {
 		int { return f64(v as int) }
 		i8 { return f64(v as i8) }
 		i16 { return f64(v as i16) }
+		i32 { return f64(v as i32) }
 		i64 { return f64(v as i64) }
 		u8 { return f64(v as u8) }
 		u16 { return f64(v as u16) }
@@ -259,6 +304,7 @@ pub fn (v TensorDataType) bool() bool {
 		f64 { return v != f64(0) }
 		i8 { return v != i8(0) }
 		i16 { return v != i16(0) }
+		i32 { return v != i32(0) }
 		i64 { return v != i64(0) }
 		int { return v != int(0) }
 		u8 { return v != u8(0) }

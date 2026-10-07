@@ -9,6 +9,8 @@ fn test_tensor_data_type_casts_between_numeric_variants() {
 	assert vtl.td(u64(50000)).f32() == 50000.0
 	assert vtl.td(i8(-12)).i16() == -12
 	assert vtl.td(i16(1234)).u32() == 1234
+	assert vtl.td(i32(-123456)).i64() == -123456
+	assert vtl.td(i16(321)).i32() == 321
 	assert vtl.td(f64(9.75)).int() == 9
 	assert vtl.td(f32(7.5)).u16() == 7
 	assert vtl.td(true).int() == 1
@@ -19,6 +21,7 @@ fn test_tensor_as_numeric_types_preserves_shape_and_logical_order() ! {
 	tensor := vtl.from_array[u32]([1, 2, 3, 4], [2, 2])!
 	assert tensor.as_i8().to_array() == [1, 2, 3, 4]
 	assert tensor.as_i16().to_array() == [1, 2, 3, 4]
+	assert tensor.as_i32().to_array() == [1, 2, 3, 4]
 	assert tensor.as_i64().to_array() == [1, 2, 3, 4]
 	assert tensor.as_int().to_array() == [1, 2, 3, 4]
 	assert tensor.as_u8().to_array() == [1, 2, 3, 4]
