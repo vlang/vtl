@@ -70,3 +70,11 @@ not implicitly treated as missing; use an explicit boolean mask when that is
 desired.
 
 See the [NumPy parity tracker](./NUMPY_PARITY.md) for remaining work.
+
+## Arithmetic
+
+Masked arrays support broadcasted `add`, `subtract`, `multiply`, and `divide`
+with another masked array. The result mask is the broadcasted logical OR of
+both input masks. The matching `*_scalar` methods apply a valid scalar and
+preserve the array's mask. Masked payload values are still computed; ignore
+them wherever the result mask is true.
