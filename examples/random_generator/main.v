@@ -11,6 +11,8 @@ fn main() {
 	waiting_times := validation_rng.geometric(0.1, [4])!
 	training_indices := vtl.from_1d([0, 1, 2, 3, 4, 5, 6, 7])!
 	batch_indices := training_rng.choice[int](training_indices, 4, false)!
+	weights := vtl.from_1d([1.0, 1.0, 3.0, 1.0, 1.0, 1.0, 1.0, 1.0])!
+	weighted_indices := training_rng.choice_weighted[int](training_indices, weights, 4, true)!
 	epoch_order := training_rng.permutation(8)!
 	shuffled_features := training_rng.permutation_tensor[f64](training_features)!
 	positive_noise := training_rng.gamma(2.0, 0.5, [4])!
@@ -25,6 +27,7 @@ fn main() {
 	println('Validation mask: ${validation_mask.to_array()}')
 	println('Validation waiting times: ${waiting_times.to_array()}')
 	println('Sampled training indices: ${batch_indices.to_array()}')
+	println('Weighted training indices: ${weighted_indices.to_array()}')
 	println('Shuffled epoch order: ${epoch_order.to_array()}')
 	println('Shuffled feature rows shape: ${shuffled_features.shape}')
 	println('Positive gamma samples: ${positive_noise.to_array()}')
