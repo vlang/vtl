@@ -319,6 +319,74 @@ pub fn (t &Tensor[T]) min_axis_squeeze[T](axis int) !&Tensor[T] {
 	return squeeze_reduction_axis[T](result, na)
 }
 
+// max_axes reduces several axes by maximum. Negative axes are supported;
+// duplicate axes return an error. An empty axes list returns a copy.
+pub fn (t &Tensor[T]) max_axes[T](axes []int, keepdims bool) !&Tensor[T] {
+	return extrema_axes[T](t, axes, keepdims, true)
+}
+
+// min_axes reduces several axes by minimum. Negative axes are supported;
+// duplicate axes return an error. An empty axes list returns a copy.
+pub fn (t &Tensor[T]) min_axes[T](axes []int, keepdims bool) !&Tensor[T] {
+	return extrema_axes[T](t, axes, keepdims, false)
+}
+
+fn extrema_axes[T](t &Tensor[T], axes []int, keepdims bool, maximum bool) !&Tensor[T] {
+	if axes.len == 0 {
+		return t.copy(.row_major)
+	}
+	mut normalized := []int{cap: axes.len}
+	for axis in axes {
+		axis_index := if axis < 0 { axis + t.rank() } else { axis }
+		if axis_index < 0 || axis_index >= t.rank() {
+			return error('axis ${axis} out of bounds for rank ${t.rank()}')
+		}
+		if axis_index in normalized {
+			return error('duplicate axis ${axis}')
+		}
+		normalized << axis_index
+	}
+	for i in 0 .. normalized.len {
+		for j in i + 1 .. normalized.len {
+			if normalized[i] < normalized[j] {
+				normalized[i], normalized[j] = normalized[j], normalized[i]
+			}
+		}
+	}
+	mut output_shape := t.shape.clone()
+	for axis_index in normalized {
+		if output_shape[axis_index] == 0 {
+			return error('cannot reduce an empty axis')
+		}
+		if keepdims {
+			output_shape[axis_index] = 1
+		}
+	}
+	if !keepdims {
+		for axis_index in normalized {
+			output_shape.delete(axis_index)
+		}
+	}
+	if 0 in output_shape {
+		return empty[T](output_shape)
+	}
+	mut result := t.copy(.row_major)
+	for axis_index in normalized {
+		if maximum {
+			if keepdims {
+				result = result.max_axis[T](axis_index)!
+			} else {
+				result = result.max_axis_squeeze[T](axis_index)!
+			}
+		} else if keepdims {
+			result = result.min_axis[T](axis_index)!
+		} else {
+			result = result.min_axis_squeeze[T](axis_index)!
+		}
+	}
+	return result
+}
+
 fn squeeze_reduction_axis[T](t &Tensor[T], axis int) !&Tensor[T] {
 	mut shape := t.shape.clone()
 	shape.delete(axis)

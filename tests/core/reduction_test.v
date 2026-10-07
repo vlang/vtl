@@ -87,6 +87,28 @@ fn test_min_max_axis_squeeze_matches_numpy_shape() {
 	assert vector.max_axis_squeeze(0)!.to_array() == [6.0]
 }
 
+fn test_min_max_multi_axis_reductions_match_numpy_shapes() {
+	t := vtl.from_array([0.0, 5.0, 3.0, 7.0, 4.0, 2.0, 8.0, 1.0], [2, 2, 2])!
+	maxima := t.max_axes([0, -1], false)!
+	assert maxima.shape == [2]
+	assert maxima.to_array() == [5.0, 8.0]
+	minima := t.min_axes([0, 2], true)!
+	assert minima.shape == [1, 2, 1]
+	assert minima.to_array() == [0.0, 1.0]
+	unchanged := t.min_axes([], false)!
+	assert unchanged.shape == t.shape
+	assert unchanged.to_array() == t.to_array()
+	if _ := t.max_axes([0, -3], false) {
+		assert false, 'duplicate axes must return an error'
+	}
+	empty_axis := vtl.from_array([]f64{}, [2, 0])!
+	if _ := empty_axis.max_axes([1], false) {
+		assert false, 'extrema over empty axes must return an error'
+	}
+	empty_output := vtl.from_array([]f64{}, [0, 2])!.max_axes([1], false)!
+	assert empty_output.shape == [0]
+}
+
 fn test_cumsum() {
 	t := vtl.from_1d([1.0, 2.0, 3.0, 4.0])!
 	result := t.cumsum(0)!
