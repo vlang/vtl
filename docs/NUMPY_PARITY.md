@@ -24,7 +24,8 @@ tests, documentation, and examples where users need them.
 **Current:** zeros, ones, full, eye, range, sequence, arrays, and Vandermonde
 matrices; `arange` with start/stop/step; endpoint-aware `linspace`; configurable
 `logspace`; 2-D `meshgrid` and N-D `meshgrid_n` with `xy` and `ij` indexing;
-dense stacked coordinate arrays through `indices`.
+dense stacked coordinates through `indices` and broadcastable per-axis sparse
+coordinates through `indices_sparse`.
 
 **Remaining:** validate edge cases and make dtype/device options consistent.
 

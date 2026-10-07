@@ -35,3 +35,26 @@ pub fn indices(dimensions []int) !&Tensor[int] {
 	}
 	return result
 }
+
+// indices_sparse returns one broadcastable coordinate tensor per dimension.
+// Each result has rank dimensions.len and only its own axis has non-unit
+// length, matching numpy.indices(..., sparse: true) without allocating the
+// dense coordinate stack.
+pub fn indices_sparse(dimensions []int) ![]&Tensor[int] {
+	for dimension in dimensions {
+		if dimension < 0 {
+			return error('indices dimensions must be non-negative')
+		}
+	}
+	mut coordinates := []&Tensor[int]{cap: dimensions.len}
+	for axis, dimension in dimensions {
+		mut shape := []int{len: dimensions.len, init: 1}
+		shape[axis] = dimension
+		mut coordinate := empty[int](shape, memory: .row_major)
+		for value in 0 .. dimension {
+			coordinate.set_nth(value, value)
+		}
+		coordinates << coordinate
+	}
+	return coordinates
+}
