@@ -68,17 +68,13 @@ if [[ -n "${full}" ]]; then
     echo "Full CI mode (high RAM): v test entire tree"
     v "${flags[@]}" test "${vtl_dir_path}"
 else
-	echo "Scoped CI mode (VJOBS=${VJOBS}): run test areas separately to release compiler memory between areas"
-	nn_root_tests=()
+	echo "Scoped CI mode (VJOBS=${VJOBS}): run test files separately to release compiler memory between tests"
+	echo "Testing nn root one file at a time"
 	for file in "${vtl_dir_path}"/nn/*_test.v; do
 		if [[ -f "${file}" ]]; then
-			nn_root_tests+=("${file}")
+			v "${flags[@]}" test "${file}"
 		fi
 	done
-	if (( ${#nn_root_tests[@]} > 0 )); then
-		echo "Testing nn root"
-		v "${flags[@]}" test "${nn_root_tests[@]}"
-	fi
 	for area in nn/data nn/internal nn/layers nn/loss nn/optimizers autograd_tests datasets tests/core la storage stats ml; do
 		echo "Testing ${area}"
 		v "${flags[@]}" test "${vtl_dir_path}/${area}"
