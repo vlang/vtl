@@ -2,6 +2,7 @@ module core
 
 import vtl
 import vtl.stats as vtl_stats
+import math.complex as cmplx
 
 fn test_sum_and_product_along_axis_keepdims_and_negative_axis() ! {
 	values := vtl.from_array([1, 2, 3, 4, 5, 6], [2, 3])!
@@ -34,4 +35,27 @@ fn test_axis_reductions_reject_invalid_axes() ! {
 	if _ := vtl_stats.sum_along_axis(vtl.from_array([1], []int{})!, 0, true) {
 		assert false, 'scalar axis reduction must return an error'
 	}
+}
+
+fn test_complex_axis_sum_and_product() ! {
+	values := vtl.from_array([
+		cmplx.Complex{ re: 1, im: 2 },
+		cmplx.Complex{ re: 3, im: 4 },
+		cmplx.Complex{ re: 5, im: 6 },
+		cmplx.Complex{ re: 7, im: 8 },
+	], [2, 2])!
+	sums := vtl_stats.sum_along_axis(values, 1, false)!
+	assert sums.to_array() == [cmplx.Complex{ re: 4, im: 6 }, cmplx.Complex{ re: 12, im: 14 }]
+	products := vtl_stats.product_along_axis(values, 1, false)!
+	assert products.to_array() == [cmplx.Complex{ re: -5, im: 10 }, cmplx.Complex{ re: -13, im: 82 }]
+
+	empty := vtl.from_array([]cmplx.Complex{}, [2, 0])!
+	assert vtl_stats.sum_along_axis(empty, 1, false)!.to_array() == [
+		cmplx.Complex{ re: 0, im: 0 },
+		cmplx.Complex{ re: 0, im: 0 },
+	]
+	assert vtl_stats.product_along_axis(empty, 1, false)!.to_array() == [
+		cmplx.Complex{ re: 1, im: 0 },
+		cmplx.Complex{ re: 1, im: 0 },
+	]
 }

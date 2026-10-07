@@ -205,6 +205,18 @@ fn product_identity[T]() T {
 	}
 }
 
+fn reduction_output[T](shape []int) !&vtl.Tensor[T] {
+	$if T is cmplx.Complex {
+		mut size := 1
+		for dimension in shape {
+			size *= dimension
+		}
+		return vtl.from_array[T]([]T{len: size}, shape)
+	} $else {
+		return vtl.empty[T](shape, memory: .row_major)
+	}
+}
+
 // Measure of Central Tendency
 // Geometric Mean of the given input array
 // Based on

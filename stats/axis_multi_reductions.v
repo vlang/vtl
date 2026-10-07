@@ -37,7 +37,7 @@ fn reduce_axes[T](t &vtl.Tensor[T], axes []int, keepdims bool, operation AxisRed
 	if axes.len == rank {
 		value := if operation == .sum { sum[T](t) } else { prod[T](t) }
 		output_shape := if keepdims { []int{len: rank, init: 1} } else { []int{} }
-		mut result := vtl.empty[T](output_shape, memory: .row_major)
+		mut result := reduction_output[T](output_shape)!
 		result.set_nth(0, value)
 		return result
 	}
@@ -54,8 +54,8 @@ fn reduce_axes[T](t &vtl.Tensor[T], axes []int, keepdims bool, operation AxisRed
 			output_dimension_by_input[dimension] = output_shape.len - 1
 		}
 	}
-	mut result := vtl.empty[T](output_shape, memory: .row_major)
-	identity := if operation == .sum { vtl.cast[T](0) } else { vtl.cast[T](1) }
+	mut result := reduction_output[T](output_shape)!
+	identity := if operation == .sum { sum_identity[T]() } else { product_identity[T]() }
 	for output_index in 0 .. result.size {
 		result.set_nth(output_index, identity)
 	}

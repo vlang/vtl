@@ -2,6 +2,7 @@ module core
 
 import vtl
 import vtl.stats as vtl_stats
+import math.complex as cmplx
 
 fn test_multi_axis_sum_and_product() ! {
 	values := vtl.from_array([1, 2, 3, 4, 5, 6, 7, 8], [2, 2, 2])!
@@ -55,4 +56,19 @@ fn test_multi_axis_reductions_reject_invalid_axes() ! {
 	if _ := vtl_stats.product_along_axes(values, [2], true) {
 		assert false, 'out-of-range axes must return an error'
 	}
+}
+
+fn test_complex_multi_axis_reductions() ! {
+	values := vtl.from_array([
+		cmplx.Complex{ re: 1, im: 2 },
+		cmplx.Complex{ re: 3, im: 4 },
+		cmplx.Complex{ re: 5, im: 6 },
+		cmplx.Complex{ re: 7, im: 8 },
+	], [2, 2])!
+	sum := vtl_stats.sum_along_axes(values, [0, 1], false)!
+	assert sum.rank() == 0
+	assert sum.get_nth(0) == cmplx.Complex{ re: 16, im: 20 }
+	product := vtl_stats.product_along_axes(values, [0, 1], true)!
+	assert product.shape == [1, 1]
+	assert product.get_nth(0) == cmplx.Complex{ re: -755, im: -540 }
 }
