@@ -2,6 +2,32 @@ module internal
 
 import vtl
 
+fn test_embedding_forward_uses_contiguous_storage() ! {
+	input := vtl.from_array([2.0, -1.0, 0.0], [1, 3])!
+	weight := vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [3, 2])!
+
+	result := embedding_forward[f64](input, weight)!
+	assert result.to_array() == [5.0, 6.0, 0.0, 0.0, 1.0, 2.0]
+}
+
+fn test_embedding_forward_supports_strided_inputs_and_weights() ! {
+	input_base := vtl.from_array([0.0, 1.0, 2.0, 3.0], [2, 2])!
+	input := input_base.transpose([1, 0])!
+	weight_base := vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0], [2, 4])!
+	weight := weight_base.transpose([1, 0])!
+
+	result := embedding_forward[f64](input, weight)!
+	assert result.to_array() == [1.0, 5.0, 3.0, 7.0, 2.0, 6.0, 4.0, 8.0]
+}
+
+fn test_embedding_forward_rejects_invalid_rank() {
+	input := vtl.zeros[f64]([2])
+	weight := vtl.zeros[f64]([3, 4])
+	if _ := embedding_forward[f64](input, weight) {
+		assert false, 'expected an invalid rank error'
+	}
+}
+
 fn test_embedding_backward_accumulates_repeated_indices() ! {
 	input := vtl.from_array([1.0, 0.0, 1.0], [1, 3])!
 	gradient := vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [1, 3, 2])!
