@@ -60,6 +60,10 @@ model.mse_loss() // loss function
 | `positional_encoding(embed_dim, max_len)` | Sinusoidal positional encoding |
 | `dropout()` | Dropout (eval mode: no-op) |
 
+`maxpool2d` saves each selected input's flat index for backpropagation. If
+overlapping windows select the same input, their gradients are added at that
+input; ties keep the first maximum in scan order.
+
 The three smooth/efficient activations can be selected directly in a Sequential
 model:
 

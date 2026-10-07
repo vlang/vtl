@@ -47,13 +47,13 @@ pub fn maxpool2d[T](input &vtl.Tensor[T], kernel []int, padding []int, stride []
 					hend = math.min(hend, hh)
 					wend = math.min(wend, ww)
 
-					mut max_val := vtl.cast[T](math.max_f64)
+					mut max_val := vtl.cast[T](0)
 					mut max_idx := -1
 					for i in hstart .. hend {
 						for j in wstart .. wend {
-							idx := i * ww + j
+							idx := ((n * cc + c) * hh + i) * ww + j
 							val := input.get([n, c, i, j])
-							if val > max_val {
+							if max_idx < 0 || val > max_val {
 								max_val = val
 								max_idx = idx
 							}
@@ -78,7 +78,10 @@ pub fn maxpool2d_backward[T](shape []int, max_indices &vtl.Tensor[int], grad_out
 	mut ret := vtl.zeros[T](shape)
 	for i in 0 .. grad_output.size {
 		idx := max_indices.get_nth[int](i)
-		ret.set_nth(idx, grad_output.get_nth(i))
+		if idx < 0 || idx >= ret.size {
+			return error('maxpool2d_backward: max index ${idx} is out of bounds')
+		}
+		ret.set_nth(idx, ret.get_nth(idx) + grad_output.get_nth(i))
 	}
 	return ret
 }
