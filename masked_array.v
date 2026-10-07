@@ -97,6 +97,15 @@ pub fn (array &MaskedArray[T]) compressed[T]() !&Tensor[T] {
 	return array.values.masked_select(visible)!
 }
 
+// mixed_index applies NumPy-style mixed basic and advanced indexing to both
+// values and mask, preserving their alignment and view/copy behavior.
+pub fn (array &MaskedArray[T]) mixed_index[T](indices []TensorIndex) !MaskedArray[T] {
+	return MaskedArray[T]{
+		values: mixed_index[T](array.values, indices)!
+		mask:   mixed_index[bool](array.mask, indices)!
+	}
+}
+
 // count returns the number of unmasked values.
 pub fn (array &MaskedArray[T]) count[T]() int {
 	mut valid := 0

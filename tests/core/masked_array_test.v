@@ -172,3 +172,19 @@ fn test_masked_array_broadcast_arithmetic_unions_masks() ! {
 	assert left.multiply_scalar(2.0)!.values.to_array() == [2, 4, 6, 8, 10, 12]
 	assert left.divide_scalar(2.0)!.values.to_array() == [0.5, 1, 1.5, 2, 2.5, 3]
 }
+
+fn test_masked_array_mixed_index_keeps_values_and_mask_aligned() ! {
+	values := vtl.from_array[int]([1, 2, 3, 4, 5, 6], [2, 3])!
+	mask := vtl.from_array[bool]([false, true, false, true, false, true], [2, 3])!
+	data := vtl.masked_array(values, mask)!
+	row := data.mixed_index([vtl.integer_index(-1), vtl.full_index()])!
+	assert row.values.shape == [3]
+	assert row.values.to_array() == [4, 5, 6]
+	assert row.mask.to_array() == [true, false, true]
+	column := data.mixed_index([vtl.full_index(), vtl.integer_index(1)])!
+	assert column.values.to_array() == [2, 5]
+	assert column.mask.to_array() == [true, false]
+	if _ := data.mixed_index([vtl.integer_index(2)]) {
+		assert false, 'masked mixed indexing must preserve bounds checks'
+	}
+}

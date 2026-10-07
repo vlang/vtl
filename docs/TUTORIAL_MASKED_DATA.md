@@ -82,3 +82,15 @@ them wherever the result mask is true.
 `equal`, `not_equal`, `less_than`, `less_equal`, `greater_than`, and
 `greater_equal` also broadcast operands and mask comparisons when either input
 is missing. They return `MaskedArray[bool]`.
+
+## Index values and masks together
+
+`mixed_index` applies the same basic or advanced index to both tensors and
+preserves their correspondence:
+
+```v
+row := data.mixed_index([vtl.integer_index(-1), vtl.full_index()])!
+```
+
+It follows VTL's normal view and copy behavior for mixed indexing. The mask
+uses the same bounds checks and output shape as the values.
