@@ -53,6 +53,28 @@ pub fn (mut generator RandomGenerator) normal(shape []int, params NormalTensorDa
 	return result
 }
 
+// lognormal returns samples whose natural logarithm follows a normal
+// distribution with the given mean and standard deviation.
+pub fn (mut generator RandomGenerator) lognormal(mean f64, sigma f64, shape []int) !&Tensor[f64] {
+	if math.is_nan(mean) || math.is_inf(mean, 0) || sigma < 0 || math.is_nan(sigma)
+		|| math.is_inf(sigma, 0) {
+		return error('lognormal: mean must be finite and sigma must be finite and non-negative')
+	}
+	mut result := zeros[f64](shape, TensorData{})
+	for i in 0 .. result.size {
+		log_value := if sigma == 0 {
+			mean
+		} else {
+			generator.rng.normal(config.NormalConfigStruct{
+				mu:    mean
+				sigma: sigma
+			})!
+		}
+		result.set_nth(i, math.exp(log_value))
+	}
+	return result
+}
+
 // bernoulli returns bool values sampled with the given probability of true.
 pub fn (mut generator RandomGenerator) bernoulli(probability f64, shape []int) !&Tensor[bool] {
 	if probability < 0 || probability > 1 {

@@ -111,7 +111,7 @@ audit.
 
 **Current:** uniform, normal, Bernoulli, binomial, geometric, gamma, beta, and
 exponential tensors; seeded `choice`; global `random_seed`; independent seeded
-`RandomGenerator` streams for f64 uniform/normal/gamma/beta, boolean Bernoulli,
+`RandomGenerator` streams for f64 uniform/normal/lognormal/gamma/beta, boolean Bernoulli,
 exponential, integer binomial/geometric, population choice, and integer
 permutation.
 

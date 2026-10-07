@@ -45,6 +45,7 @@ batch_indices := training_rng.choice[int](training_indices, 4, false)!
 epoch_order := training_rng.permutation(8)!
 positive_noise := training_rng.gamma(2.0, 0.5, [128])!
 beta_samples := training_rng.beta(2.0, 5.0, [128])!
+positive_scales := training_rng.lognormal(0.0, 0.25, [128])!
 event_counts := training_rng.binomial(12, 0.25, [128])!
 waiting_durations := validation_rng.exponential(0.5, [128])!
 ```
@@ -57,7 +58,9 @@ shape)` returns the positive number of Bernoulli trials up to the first success.
 logical order and can enforce unique sampled positions. `permutation(size)`
 returns every integer from zero to `size - 1` exactly once in a seeded order.
 `gamma(alpha, scale, shape)` samples positive values from a Gamma distribution
-on the same independent stream. `beta(alpha, beta, shape)` samples values in
+on the same independent stream. `lognormal(mean, sigma, shape)` exponentiates
+samples from a normal distribution; a zero `sigma` returns the constant
+`exp(mean)`. `beta(alpha, beta, shape)` samples values in
 `[0, 1]` using the same seeded stream. `binomial(trials, probability, shape)`
 returns integer success counts, and `exponential(lambda, shape)` returns
 non-negative samples for a positive finite rate. All distributions advance
