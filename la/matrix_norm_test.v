@@ -42,6 +42,15 @@ fn test_matrix_norm_svd_handles_tall_rectangular_inputs() ! {
 	assert math.abs(matrix_norm(input, ord: 'nuc')!.get_nth(0) - 10.039818672223753) < 1e-10
 }
 
+fn test_matrix_norm_svd_matches_numpy_for_wide_mixed_matrix() ! {
+	input := vtl.from_array([0.25, -1.5, 3, 2, -0.25, 4, 2.25, -0.5, 1.75, 5, -3, 0.75, 2.5, -4,
+		1, 6, -2, 0.5, 3.5, -1],
+		[4, 5])!
+	assert math.abs(matrix_norm(input, ord: '2')!.get_nth(0) - 9.65756322062387) < 1e-10
+	assert math.abs(matrix_norm(input, ord: '-2')!.get_nth(0) - 2.02844842801882) < 1e-10
+	assert math.abs(matrix_norm(input, ord: 'nuc')!.get_nth(0) - 21.823374602362687) < 1e-10
+}
+
 fn test_matrix_norm_rejects_invalid_rank_and_order() {
 	vector := vtl.from_1d([1, 2, 3])!
 	if _ := matrix_norm(vector) {
