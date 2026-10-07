@@ -13,7 +13,7 @@ CIFAR examples for CI-safe checks.
 
 | Example | What it shows | Command |
 |---------|---------------|---------|
-| [tensor_axis_manipulation](./tensor_axis_manipulation) | NumPy-style `moveaxis` and `rollaxis` views | `v run ./vtl/examples/tensor_axis_manipulation/main.v` |
+| [tensor_axis_manipulation](./tensor_axis_manipulation) | `moveaxis` and `rollaxis` views | `v run ./vtl/examples/tensor_axis_manipulation/main.v` |
 | [tensor_sorting](./tensor_sorting) | Sort, partially partition, and return local indices along tensor axes | `v run ./vtl/examples/tensor_sorting/main.v` |
 | [vtl_basic_usage](./vtl_basic_usage) | Tensor creation and basic operations | `v run ./vtl/examples/vtl_basic_usage/main.v` |
 | [vtl_vandermont](./vtl_vandermont) | Matrix construction and LA utilities | `v run ./vtl/examples/vtl_vandermont/main.v` |
@@ -21,13 +21,14 @@ CIFAR examples for CI-safe checks.
 | [npy_round_trip](./npy_round_trip) | Read and write NumPy `.npy` arrays | `v run ./vtl/examples/npy_round_trip/main.v` |
 | [csv_round_trip](./csv_round_trip) | Read and write numeric CSV tensors with headers | `v run ./vtl/examples/csv_round_trip/main.v` |
 | [npz_round_trip](./npz_round_trip) | Write and read named arrays in `.npz` archives | `v run ./vtl/examples/npz_round_trip/main.v` |
-| [npz_read_compressed](./npz_read_compressed) | Read an f64 member from a NumPy-generated compressed `.npz` archive | `v run ./vtl/examples/npz_read_compressed/main.v ./vtl/npz/testdata/numpy_compressed.npz` |
+| [NPZ fixture](./npz_read_compressed) | Compressed NumPy fixture | `v run vtl/examples/npz_read_compressed/main.v vtl/npz/testdata/numpy_compressed.npz` |
 | [stats_variance](./stats_variance) | Stable population/sample variance and standard deviation | `v run ./vtl/examples/stats_variance/main.v` |
 | [stats_nan_reductions](./stats_nan_reductions) | NaN-aware sums, products, extrema, and axis reductions | `v run ./vtl/examples/stats_nan_reductions/main.v` |
 | [random_seed](./random_seed) | Repeat a random tensor sequence with an explicit seed | `v run ./vtl/examples/random_seed/main.v` |
 | [scatter](./scatter) | Add or assign values at indexed tensor positions | `v run ./vtl/examples/scatter/main.v` |
 | [argwhere](./argwhere) | Find non-zero coordinates in a tensor | `v run ./vtl/examples/argwhere/main.v` |
 | [meshgrid_n](./meshgrid_n) | Build N-dimensional coordinate grids with `xy` or `ij` indexing | `v run ./vtl/examples/meshgrid_n/main.v` |
+| [indices](./indices) | Build a dense tensor of N-dimensional integer coordinates | `v run ./vtl/examples/indices/main.v` |
 | [diff](./diff) | Compute discrete differences in one-dimensional and multidimensional data | `v run ./vtl/examples/diff/main.v` |
 | [trapezoid](./trapezoid) | Integrate sampled data with the composite trapezoidal rule | `v run ./vtl/examples/trapezoid/main.v` |
 | [gradient](./gradient) | Estimate numerical derivatives along a tensor axis | `v run ./vtl/examples/gradient/main.v` |
@@ -37,7 +38,7 @@ CIFAR examples for CI-safe checks.
 | [vector_norm](./vector_norm) | Compute stable p-norms globally and along an axis | `v run ./vtl/examples/vector_norm/main.v` |
 | [fft_frequency](./fft_frequency) | Create FFT frequency bins and center a spectrum | `v run ./vtl/examples/fft_frequency/main.v` |
 | [fft_axis](./fft_axis) | Transform real or complex tensors along one selected axis | `v run ./vtl/examples/fft_axis/main.v` |
-| [covariance_correlation](./covariance_correlation) | Compute sample covariance and Pearson correlation matrices | `v run ./vtl/examples/covariance_correlation/main.v` |
+| [covariance_correlation](./covariance_correlation) | Sample covariance and Pearson correlation | `v run ./vtl/examples/covariance_correlation/main.v` |
 | [histogram](./histogram) | Count samples and compute weighted density with custom bin edges | `v run ./vtl/examples/histogram/main.v` |
 | [bincount](./bincount) | Count integer labels and sum per-label weights | `v run ./vtl/examples/bincount/main.v` |
 | [weighted_average](./weighted_average) | Compute weighted means globally and along an axis | `v run ./vtl/examples/weighted_average/main.v` |
@@ -75,9 +76,9 @@ CIFAR examples for CI-safe checks.
 | Example | Backend | Command |
 |---------|---------|---------|
 | [nn_cifar10_cuda](./nn_cifar10_cuda) | CUDA/cuBLAS/cuDNN via VSL | `VTL_USE_CUDA=1 v -d cuda run vtl/examples/nn_cifar10_cuda/main.v` |
-| [nn_cifar10_vulkan](./nn_cifar10_vulkan) | Vulkan f32 Linear/Conv2D/ReLU/Adam via VSL | `VTL_USE_VULKAN=1 v -prod -d vulkan run vtl/examples/nn_cifar10_vulkan/main.v` |
-| [nn_cifar10_f32_vulkan_tiny_synth](./nn_cifar10_f32_vulkan_tiny_synth) | f32 Vulkan-shaped tiny smoke | `VTL_USE_VULKAN=1 v -prod -d vulkan run vtl/examples/nn_cifar10_f32_vulkan_tiny_synth/main.v` |
-| [vtl_opencl_vcl_support](./vtl_opencl_vcl_support) | OpenCL VTL tensor transfer and VCL compute smoke | `v -d vcl run vtl/examples/vtl_opencl_vcl_support/main.v` |
+| [Vulkan CIFAR-10](./nn_cifar10_vulkan) | f32 Linear/Conv2D/ReLU/Adam | `VTL_USE_VULKAN=1 v -d vulkan run vtl/examples/nn_cifar10_vulkan/main.v` |
+| [synth](./nn_cifar10_f32_vulkan_tiny_synth) | Vulkan f32 smoke | `VTL_USE_VULKAN=1 v -d vulkan run vtl/examples/nn_cifar10_f32_vulkan_tiny_synth/main.v` |
+| [OpenCL smoke](./vtl_opencl_vcl_support) | OpenCL tensor transfer and VCL compute | `v -d vcl run vtl/examples/vtl_opencl_vcl_support/main.v` |
 
 ## Datasets and plotting
 

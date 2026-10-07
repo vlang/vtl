@@ -142,6 +142,17 @@ Other ways to create a tensor are:
 - `zeros_like` - creates a tensor of zeros with the same shape as the given tensor.
 - `ones_like` - creates a tensor of ones with the same shape as the given tensor.
 
+`indices` builds a dense tensor of integer coordinates. Its shape is the number
+of dimensions followed by the requested dimensions, as in NumPy.
+
+```v
+import vtl
+
+coordinates := vtl.indices([2, 3])!
+assert coordinates.shape == [2, 2, 3]
+assert coordinates.to_array() == [0, 0, 0, 1, 1, 1, 0, 1, 2, 0, 1, 2]
+```
+
 ```v
 import vtl
 
