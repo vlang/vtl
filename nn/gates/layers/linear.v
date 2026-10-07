@@ -3,7 +3,6 @@ module layers
 import vtl
 import vtl.autograd
 import vtl.la
-import vtl.stats as vtl_stats
 
 // LinearGate defines a public data structure for this module.
 pub struct LinearGate[T] {
@@ -49,7 +48,9 @@ pub fn (g &LinearGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[
 			result[1] = la.matmul[f64](grad.t()!, g.input.value)!
 		}
 		if g.bias.requires_grad {
-			result[2] = vtl_stats.sum_along_axis[f64](grad, 0, true)!
+			batch_size := grad.shape[0]
+			ones := vtl.ones[f64]([1, batch_size])
+			result[2] = la.matmul[f64](ones, grad)!
 		}
 		return result
 	} $else $if sizeof(T) == 4 {
@@ -72,7 +73,9 @@ pub fn (g &LinearGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[
 			result[1] = la.matmul[f32](grad.t()!, g.input.value)!
 		}
 		if g.bias.requires_grad {
-			result[2] = vtl_stats.sum_along_axis[f32](grad, 0, true)!
+			batch_size := grad.shape[0]
+			ones := vtl.ones[f32]([1, batch_size])
+			result[2] = la.matmul[f32](ones, grad)!
 		}
 		return result
 	} $else {
@@ -83,7 +86,9 @@ pub fn (g &LinearGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[
 			result[1] = la.matmul[T](grad.t()!, g.input.value)!
 		}
 		if g.bias.requires_grad {
-			result[2] = vtl_stats.sum_along_axis[T](grad, 0, true)!
+			batch_size := grad.shape[0]
+			ones := vtl.ones[T]([1, batch_size])
+			result[2] = la.matmul[T](ones, grad)!
 		}
 		return result
 	}
