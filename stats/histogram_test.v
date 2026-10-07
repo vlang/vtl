@@ -49,6 +49,8 @@ fn test_histogram_auto_supports_data_driven_bin_rules() ! {
 	assert constant.counts.shape[0] > 0
 	constant_stone := histogram_auto[int](vtl.from_1d([2, 2, 2, 2])!, .stone)!
 	assert constant_stone.counts.shape == [1]
+	assert constant_stone.counts.to_array() == [4]
+	assert constant_stone.bin_edges.to_array() == [1.5, 2.5]
 	empty := histogram_auto[int](vtl.from_array([]int{}, [0])!, .automatic)!
 	assert empty.counts.to_array() == [0]
 }

@@ -73,7 +73,8 @@ pub fn histogram_auto[T](data &vtl.Tensor[T], rule HistogramBinRule) !Histogram 
 		minimum = math.min(minimum, value)
 		maximum = math.max(maximum, value)
 	}
-	if minimum == maximum {
+	is_constant := minimum == maximum
+	if is_constant {
 		minimum -= 0.5
 		maximum += 0.5
 	}
@@ -102,7 +103,7 @@ pub fn histogram_auto[T](data &vtl.Tensor[T], rule HistogramBinRule) !Histogram 
 			bins = math.max(1, int(math.ceil(math.sqrt(f64(values.len)))))
 		}
 		.stone {
-			bins = histogram_stone_bins(values, minimum, maximum)
+			bins = if is_constant { 1 } else { histogram_stone_bins(values, minimum, maximum) }
 		}
 		.sturges {}
 	}
