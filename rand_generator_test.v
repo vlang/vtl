@@ -99,6 +99,43 @@ fn test_random_generator_supports_seeded_binomial_and_exponential() ! {
 	replay.free()
 }
 
+fn test_random_generator_poisson_is_seeded_and_handles_rate_edges() ! {
+	mut generator := new_random_generator(146)
+	mut replay := new_random_generator(146)
+	zero_rate := generator.poisson(0.0, [4])!
+	assert zero_rate.to_array() == [0, 0, 0, 0]
+	small_rate := generator.poisson(4.0, [4096])!
+	large_rate := generator.poisson(80.0, [4096])!
+	assert zero_rate.array_equal(replay.poisson(0.0, [4])!)
+	assert small_rate.array_equal(replay.poisson(4.0, [4096])!)
+	assert large_rate.array_equal(replay.poisson(80.0, [4096])!)
+	assert small_rate.shape == [4096]
+	assert large_rate.shape == [4096]
+	mut small_total := 0
+	mut large_total := 0
+	for sample in small_rate.to_array() {
+		assert sample >= 0
+		small_total += sample
+	}
+	for sample in large_rate.to_array() {
+		assert sample >= 0
+		large_total += sample
+	}
+	assert math.abs(f64(small_total) / 4096 - 4.0) < 0.2
+	assert math.abs(f64(large_total) / 4096 - 80.0) < 1.0
+	if _ := generator.poisson(-1.0, [1]) {
+		assert false, 'poisson must reject a negative rate'
+	}
+	if _ := generator.poisson(math.nan(), [1]) {
+		assert false, 'poisson must reject a NaN rate'
+	}
+	if _ := generator.poisson(math.inf(1), [1]) {
+		assert false, 'poisson must reject an infinite rate'
+	}
+	generator.free()
+	replay.free()
+}
+
 fn test_random_generator_supports_seeded_multinomial_counts() ! {
 	probabilities := from_1d([0.2, 0.3, 0.5])!
 	mut generator := new_random_generator(357)
