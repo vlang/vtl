@@ -36,3 +36,18 @@ fn test_logical_axis_reductions_reject_invalid_axes() ! {
 		assert false, 'scalar axis reductions must return an error'
 	}
 }
+
+fn test_logical_multi_axis_reductions_and_validation() ! {
+	values := vtl.from_array([0, 1, 2, 3, 0, 4, 5, 6], [2, 2, 2])!
+	all := values.all_axes([0, -1], false)!
+	assert all.shape == [2]
+	assert all.to_array() == [false, true]
+	any_keepdims := values.any_axes([0, 2], true)!
+	assert any_keepdims.shape == [1, 2, 1]
+	assert any_keepdims.to_array() == [true, true]
+	assert values.all_axes([], false)!.to_array() == [false, true, true, true, false, true, true,
+		true]
+	if _ := values.any_axes([0, -3], false) {
+		assert false, 'duplicate axes must return an error'
+	}
+}

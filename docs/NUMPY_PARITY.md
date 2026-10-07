@@ -80,8 +80,10 @@ integer/weighted `bincount`.
 **Remaining:** add `keepdims` options consistently across remaining reductions,
 accumulator dtype controls, and broader reduction families.
 
-Logical `all_axis` and `any_axis` reductions return `bool` tensors; empty
-reduced dimensions return the logical identities (true and false respectively).
+Logical `all_axis`/`any_axis` and multi-axis `all_axes`/`any_axes` reductions
+return `bool` tensors; empty reduced dimensions return the logical identities
+(true and false respectively). Empty axis lists perform elementwise truth
+conversion, matching NumPy's `axis=()` behavior.
 
 ### Linear algebra
 

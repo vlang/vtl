@@ -127,7 +127,10 @@ mn := t.min_axis_squeeze[f64](0)!
 `all_axis` and `any_axis` treat numeric zero as false and nonzero values as
 true. Pass `true` as the second argument to retain the reduced axis.
 Empty reductions return the logical identities: `all_axis` returns true and
-`any_axis` returns false.
+`any_axis` returns false. Use `all_axes` and `any_axes` to reduce several
+unique axes at once; negative axes are supported.
+An empty axis list converts values to booleans without reducing dimensions,
+matching NumPy's `axis=()` behavior.
 
 ```v
 import vtl
@@ -136,6 +139,9 @@ values := vtl.from_array([0, 1, 2, 0, 3, 4], [2, 3])!
 assert values.all_axis(1, false)!.to_array() == [false, false]
 assert values.any_axis(1, true)!.shape == [2, 1]
 assert values.any_axis(1, false)!.to_array() == [true, true]
+
+volume := vtl.from_array([0, 1, 2, 3, 0, 4, 5, 6], [2, 2, 2])!
+assert volume.all_axes([0, -1], false)!.to_array() == [false, true]
 ```
 
 ## cumsum / cumprod
