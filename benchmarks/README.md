@@ -31,7 +31,7 @@ inputs, and can stop at the first mismatch:
 
 ```bash
 cd ~/.vmodules
-systemd-run --user --scope --quiet -p MemoryMax=1536M -p MemorySwapMax=0 --setenv=VJOBS=2 -- \
+systemd-run --user --scope --quiet -p MemoryMax=2G -p MemorySwapMax=0 --setenv=VJOBS=2 -- \
 	v -prod run ./vtl/benchmarks/allclose_bench.v
 ```
 
