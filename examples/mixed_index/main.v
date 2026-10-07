@@ -18,6 +18,9 @@ fn main() {
 		vtl.array_index(inner)])!
 	assert separated.shape == [2, 3]
 	assert separated.to_array() == [1, 5, 9, 14, 18, 22]
+	with_new_axis := vtl.mixed_index[int](three_dimensional, [vtl.ellipsis_index(),
+		vtl.newaxis_index()])!
+	assert with_new_axis.shape == [2, 3, 4, 1]
 
 	mut last_row := vtl.mixed_index[int](matrix, [vtl.integer_index(-1)])!
 	last_row.set([0], 99)
@@ -25,5 +28,6 @@ fn main() {
 
 	println('coordinate and range result: ${selected.to_array()}')
 	println('separated coordinate result shape: ${separated.shape}')
+	println('ellipsis plus new axis shape: ${with_new_axis.shape}')
 	println('basic indexing shares source storage: ${matrix.get([4, 0])}')
 }

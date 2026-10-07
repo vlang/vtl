@@ -108,3 +108,40 @@ fn test_mixed_index_rejects_invalid_indices() ! {
 		assert false, 'mixed_index must reject more indices than tensor axes'
 	}
 }
+
+fn test_mixed_index_expands_ellipsis_and_newaxis_as_basic_views() ! {
+	values := vtl.from_array[int]([0, 1, 2, 3, 4, 5], [2, 3])!
+	selected := vtl.mixed_index[int](values, [vtl.ellipsis_index(), vtl.integer_index(1)])!
+	assert selected.shape == [2]
+	assert selected.to_array() == [1, 4]
+
+	mut expanded := vtl.mixed_index[int](values, [vtl.newaxis_index(), vtl.integer_index(1),
+		vtl.ellipsis_index()])!
+	assert expanded.shape == [1, 3]
+	expanded.set([0, 0], 99)
+	assert values.get([1, 0]) == 99
+
+	trailing_axis := vtl.mixed_index[int](values, [vtl.ellipsis_index(), vtl.newaxis_index()])!
+	assert trailing_axis.shape == [2, 3, 1]
+	assert trailing_axis.to_array() == [0, 1, 2, 99, 4, 5]
+}
+
+fn test_mixed_index_newaxis_separates_advanced_axes_like_numpy() ! {
+	values := vtl.from_array[int]([]int{len: 6, init: index}, [2, 3])!
+	rows := vtl.from_array[int]([0, 1], [2, 1])!
+	columns := vtl.from_array[int]([1, 2], [1, 2])!
+	selected := vtl.mixed_index[int](values, [vtl.array_index(rows), vtl.newaxis_index(),
+		vtl.array_index(columns)])!
+	assert selected.shape == [2, 2, 1]
+	assert selected.to_array() == [1, 2, 4, 5]
+}
+
+fn test_mixed_index_rejects_multiple_ellipses_and_extra_consuming_axes() ! {
+	values := vtl.from_array[int]([0, 1, 2, 3], [2, 2])!
+	if _ := vtl.mixed_index[int](values, [vtl.ellipsis_index(), vtl.ellipsis_index()]) {
+		assert false, 'mixed_index must reject multiple ellipses'
+	}
+	if _ := vtl.mixed_index[int](values, [vtl.full_index(), vtl.full_index(), vtl.integer_index(0)]) {
+		assert false, 'mixed_index must reject too many input-axis indices'
+	}
+}

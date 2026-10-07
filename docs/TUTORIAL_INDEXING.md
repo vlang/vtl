@@ -158,7 +158,26 @@ last_row.set([0], 99)
 assert matrix.get([4, 0]) == 99 // basic indexing shares storage
 ```
 
-`mixed_index` currently does not provide ellipsis or new-axis descriptors.
+Use `ellipsis_index` to select all remaining axes at that position, and
+`newaxis_index` to insert a size-one axis without consuming an input axis.
+New axes participate in advanced-index placement as basic dimensions; basic
+new-axis selections remain views. Multiple ellipses and excess consuming
+indices return errors.
+
+```v
+import vtl
+
+volume := vtl.from_array[int]([]int{len: 24, init: index}, [2, 3, 4])!
+last_columns := vtl.mixed_index[int](volume, [vtl.ellipsis_index(),
+	vtl.slice_index(1, 4, 2)!])!
+assert last_columns.shape == [2, 3, 2]
+
+row := vtl.from_array[int]([1], [1])!
+expanded := vtl.mixed_index[int](volume, [vtl.array_index(row), vtl.newaxis_index(),
+	vtl.ellipsis_index()])!
+assert expanded.shape == [1, 1, 3, 4]
+```
+
 Use `advanced_index` when each source axis has a coordinate tensor:
 
 ## Coordinate-array indexing

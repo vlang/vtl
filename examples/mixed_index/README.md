@@ -1,8 +1,9 @@
 # Mixed tensor indexing
 
-Combine broadcasted integer coordinate arrays with scalar indices and
-Python-style slices. Coordinate arrays with a slice between them place their
-broadcast dimensions at the front of the result, matching NumPy. Basic
+Combine broadcasted integer coordinate arrays with scalar indices, Python-style
+slices, ellipsis, and inserted size-one axes. Coordinate arrays with a slice
+between them place their broadcast dimensions at the front of the result,
+matching NumPy. Basic
 indexing returns a view; coordinate indexing returns a copy. Negative-step
 slices currently return a copy because VTL cannot safely represent
 negative-stride views.

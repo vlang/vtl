@@ -41,15 +41,16 @@ padding, and stable axis-wise `sort`/`argsort`.
 
 **Current:** integer indexing and slices; broadcasted coordinate-array
 `advanced_index`; mixed `mixed_index` selectors for coordinate arrays, scalar
-indices, and slices; sorted `unique` and its counts/inverse/first-index variants;
+indices, slices, ellipsis, and new axes; sorted `unique` and its counts,
+inverse, and first-index variants;
 `unique_axis`; `digitize`; ascending and descending `searchsorted`; global and
 axis `count_nonzero`; `argwhere` and per-axis `nonzero`; `take`, `take_nd`,
 `take_flat`; `take_along_axis` with broadcasting outside the selected axis;
 `put_along_axis` and `scatter_add`; lookup and DataLoader gathers; broadcastable
 `masked_select` and `masked_fill`.
 
-**Remaining:** add autograd support for indexed updates, add ellipsis and
-new-axis descriptors to mixed indexing, and document all bounds semantics.
+**Remaining:** add autograd support for indexed updates and document all
+bounds semantics.
 
 Axis-wise `argmax` and `argmin` retain a length-one axis for compatibility;
 `argmax_axis_squeeze` and `argmin_axis_squeeze` provide NumPy's default
