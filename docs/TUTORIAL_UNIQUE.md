@@ -31,6 +31,8 @@ replaced by the number of unique slices, plus counts, first source positions,
 and inverse indices for that axis:
 
 ```v
+import vtl
+
 rows := vtl.from_2d([[2, 1], [1, 4], [2, 1]])!
 unique_rows := vtl.unique_axis_result(rows, 0)!
 assert unique_rows.values.to_array() == [1, 4, 2, 1]

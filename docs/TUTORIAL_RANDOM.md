@@ -33,9 +33,11 @@ experiment does not change another experiment's sequence or V's global random
 state:
 
 ```v
+import vtl
+
 mut training_rng := vtl.new_random_generator(42)
 mut validation_rng := vtl.new_random_generator(2026)
-training_noise := training_rng.normal([128, 32], vtl.NormalTensorData{sigma: 0.1})!
+training_noise := training_rng.normal([128, 32], vtl.NormalTensorData{ sigma: 0.1 })!
 validation_mask := validation_rng.bernoulli(0.8, [128])!
 waiting_times := validation_rng.geometric(0.1, [128])!
 training_indices := vtl.from_1d([0, 1, 2, 3, 4, 5, 6, 7])!

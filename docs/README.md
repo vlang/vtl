@@ -75,5 +75,6 @@ tensors, autograd, datasets, layers, losses, optimizers, and training loops.
 | Statistics | [API overview](../stats/README.md) |
 | Storage backends | [API overview](../storage/README.md) |
 | ML metrics | [API overview](../ml/README.md) |
-| Neural networks | [Overview](../nn/README.md), [layers](../nn/layers/README.md), [models](../nn/models/README.md), [losses](../nn/loss/README.md), [optimizers](../nn/optimizers/README.md) |
+| Neural networks | [Overview](../nn/README.md), [layers](../nn/layers/README.md), [models](../nn/models/README.md) |
+| Neural network training | [Losses](../nn/loss/README.md), [optimizers](../nn/optimizers/README.md) |
 | NN implementation | [gates](../nn/gates/README.md), [types](../nn/types/README.md), [internal kernels](../nn/internal/README.md) |
