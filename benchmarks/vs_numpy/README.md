@@ -22,10 +22,10 @@ bundled OpenBLAS and `OPENBLAS_NUM_THREADS=2`, a matched run measured:
 
 | Size | VTL pure-V (ms) | NumPy (ms) | NumPy / VTL |
 | ---: | ---: | ---: | ---: |
-| 16×16 | 0.315 | 0.039 | 0.12× |
-| 32×32 | 4.524 | 0.047 | 0.01× |
-| 64×64 | 59.238 | 0.357 | 0.006× |
-| 128×128 | 875.938 | 2.296 | 0.003× |
+| 16×16 | 0.323 | 0.034 | 0.11× |
+| 32×32 | 4.582 | 0.049 | 0.01× |
+| 64×64 | 60.235 | 0.301 | 0.005× |
+| 128×128 | 907.526 | 1.559 | 0.002× |
 
 The pure-V SVD is substantially slower for these cases. This benchmark is a
 performance gap report, not evidence of parity; optimized SVD kernels remain a
