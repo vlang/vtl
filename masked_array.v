@@ -115,24 +115,27 @@ pub fn (array &MaskedArray[T]) mean[T]() MaskedValue[f64] {
 // sum_along_axis reduces unmasked values along one axis. Output mask entries
 // are true for slices containing no unmasked values.
 pub fn (array &MaskedArray[T]) sum_along_axis[T](axis int, keepdims bool) !MaskedArray[T] {
-	rank := array.values.rank()
-	axis_index := normalize_masked_axis(axis, rank)!
-	mut output_shape := array.values.shape.clone()
-	if keepdims {
-		output_shape[axis_index] = 1
-	} else {
-		output_shape.delete(axis_index)
+	return array.sum_along_axes[T]([axis], keepdims)
+}
+
+// sum_along_axes reduces unmasked values over several axes. Negative axes are
+// supported; duplicate axes are rejected. An empty axes list preserves data.
+pub fn (array &MaskedArray[T]) sum_along_axes[T](axes []int, keepdims bool) !MaskedArray[T] {
+	if axes.len == 0 {
+		return *array
 	}
+	reduced := normalize_masked_axes(axes, array.values.rank())!
+	output_shape := masked_reduction_shape(array.values.shape, reduced, keepdims)
 	mut values := zeros[T](output_shape, TensorData{})
 	mut output_mask := ones[bool](output_shape, TensorData{})
 	mut counts := []int{len: values.size}
-	mut input_index := []int{len: rank}
+	mut input_index := []int{len: array.values.rank()}
 	for flat_index in 0 .. array.values.size {
 		decode_flat_coordinate(flat_index, array.values.shape, mut input_index)
 		if array.mask.get_nth(flat_index) {
 			continue
 		}
-		output_flat_index := masked_output_index(input_index, array.values.shape, axis_index)
+		output_flat_index := masked_axes_output_index(input_index, array.values.shape, reduced)
 		values.set_nth(output_flat_index, values.get_nth(output_flat_index) + array.values.get_nth(flat_index))
 		counts[output_flat_index]++
 	}
@@ -148,25 +151,36 @@ pub fn (array &MaskedArray[T]) sum_along_axis[T](axis int, keepdims bool) !Maske
 // mean_along_axis computes the mean of unmasked values per axis slice. Slices
 // with no unmasked values carry a masked NaN result.
 pub fn (array &MaskedArray[T]) mean_along_axis[T](axis int, keepdims bool) !MaskedArray[f64] {
-	rank := array.values.rank()
-	axis_index := normalize_masked_axis(axis, rank)!
-	mut output_shape := array.values.shape.clone()
-	if keepdims {
-		output_shape[axis_index] = 1
-	} else {
-		output_shape.delete(axis_index)
+	return array.mean_along_axes[T]([axis], keepdims)
+}
+
+// mean_along_axes computes means over several axes. Negative axes are
+// supported; duplicate axes are rejected. An empty axes list converts each
+// unmasked value to f64 and preserves the mask.
+pub fn (array &MaskedArray[T]) mean_along_axes[T](axes []int, keepdims bool) !MaskedArray[f64] {
+	if axes.len == 0 {
+		mut values := empty[f64](array.values.shape, memory: .row_major)
+		for i in 0 .. array.values.size {
+			values.set_nth(i, td(array.values.get_nth(i)).f64())
+		}
+		return MaskedArray[f64]{
+			values: values
+			mask:   array.mask
+		}
 	}
+	reduced := normalize_masked_axes(axes, array.values.rank())!
+	output_shape := masked_reduction_shape(array.values.shape, reduced, keepdims)
 	mut values := zeros[f64](output_shape, TensorData{})
 	mut output_mask := ones[bool](output_shape, TensorData{})
 	mut totals := []f64{len: values.size}
 	mut counts := []int{len: values.size}
-	mut input_index := []int{len: rank}
+	mut input_index := []int{len: array.values.rank()}
 	for flat_index in 0 .. array.values.size {
 		decode_flat_coordinate(flat_index, array.values.shape, mut input_index)
 		if array.mask.get_nth(flat_index) {
 			continue
 		}
-		output_flat_index := masked_output_index(input_index, array.values.shape, axis_index)
+		output_flat_index := masked_axes_output_index(input_index, array.values.shape, reduced)
 		totals[output_flat_index] += td(array.values.get_nth(flat_index)).f64()
 		counts[output_flat_index]++
 	}
@@ -184,23 +198,42 @@ pub fn (array &MaskedArray[T]) mean_along_axis[T](axis int, keepdims bool) !Mask
 	}
 }
 
-fn normalize_masked_axis(axis int, rank int) !int {
+fn normalize_masked_axes(axes []int, rank int) ![]bool {
 	if rank == 0 {
 		return error('masked axis reduction requires at least one dimension')
 	}
-	axis_index := if axis < 0 { axis + rank } else { axis }
-	if axis_index < 0 || axis_index >= rank {
-		return error('axis ${axis} out of bounds for rank ${rank}')
+	mut reduced := []bool{len: rank}
+	for axis in axes {
+		axis_index := if axis < 0 { axis + rank } else { axis }
+		if axis_index < 0 || axis_index >= rank {
+			return error('axis ${axis} out of bounds for rank ${rank}')
+		}
+		if reduced[axis_index] {
+			return error('axis ${axis} appears more than once')
+		}
+		reduced[axis_index] = true
 	}
-	return axis_index
+	return reduced
 }
 
-fn masked_output_index(input_index []int, input_shape []int, reduced_axis int) int {
+fn masked_reduction_shape(input_shape []int, reduced []bool, keepdims bool) []int {
+	mut output_shape := []int{cap: input_shape.len}
+	for dimension, size in input_shape {
+		if reduced[dimension] {
+			if keepdims {
+				output_shape << 1
+			}
+		} else {
+			output_shape << size
+		}
+	}
+	return output_shape
+}
+
+fn masked_axes_output_index(input_index []int, input_shape []int, reduced []bool) int {
 	mut output_flat_index := 0
 	for dimension, coordinate in input_index {
-		// The reduced coordinate is omitted; for keepdims its destination
-		// dimension is one, so it does not change the flattened index.
-		if dimension != reduced_axis {
+		if !reduced[dimension] {
 			output_flat_index = output_flat_index * input_shape[dimension] + coordinate
 		}
 	}
