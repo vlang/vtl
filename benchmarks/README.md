@@ -39,6 +39,30 @@ Run it on the same host and build settings when comparing changes. It reports
 equal inputs and an input that differs at the first element; results are
 microbenchmark evidence, not a general NumPy performance comparison.
 
+## Embedding kernels
+
+`embedding_bench.v` compares contiguous `Embedding` forward and backward with
+the coordinate-indexed implementation used as a reference. It verifies exact
+output equality before reporting average times:
+
+```bash
+cd ~/.vmodules
+systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 --setenv=VJOBS=2 -- \
+	v -prod run ./vtl/benchmarks/embedding_bench.v
+```
+
+One local run on an AMD Ryzen 9 5900X, V 0.5.2 (`2b15bbc`), using 8,192
+tokens, embedding width 64, and 10 measured iterations reported:
+
+| Operation | Contiguous path | Coordinate reference | Relative time |
+| --- | ---: | ---: | ---: |
+| Forward | 3.34 ms | 17.87 ms | 5.4× faster |
+| Backward | 3.50 ms | 25.51 ms | 7.3× faster |
+
+These are local CPU microbenchmarks against the prior coordinate-indexed VTL
+loop, not comparisons with NumPy or other libraries. Repeat on the target host
+with the same V build and settings before drawing performance conclusions.
+
 ## CI
 
 The benchmark comment workflow from [#88](https://github.com/vlang/vtl/issues/88)
