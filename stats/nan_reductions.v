@@ -72,6 +72,65 @@ pub fn nanmax_axis_keepdims[T](t &vtl.Tensor[T], axis int) !&vtl.Tensor[f64] {
 	return nan_reduce_axis[T](t, axis, .maximum, true)
 }
 
+// nansum_axes reduces multiple axes, ignoring NaN values, and selects whether
+// reduced dimensions remain in the output.
+pub fn nansum_axes[T](t &vtl.Tensor[T], axes []int, keepdims bool) !&vtl.Tensor[f64] {
+	return nan_reduce_axes[T](t, axes, .sum, keepdims)
+}
+
+// nanprod_axes reduces multiple axes, ignoring NaN values, and selects whether
+// reduced dimensions remain in the output.
+pub fn nanprod_axes[T](t &vtl.Tensor[T], axes []int, keepdims bool) !&vtl.Tensor[f64] {
+	return nan_reduce_axes[T](t, axes, .product, keepdims)
+}
+
+// nanmin_axes reduces multiple axes to their minimum, ignoring NaN values.
+// Slices containing no non-NaN values produce NaN.
+pub fn nanmin_axes[T](t &vtl.Tensor[T], axes []int, keepdims bool) !&vtl.Tensor[f64] {
+	return nan_reduce_axes[T](t, axes, .minimum, keepdims)
+}
+
+// nanmax_axes reduces multiple axes to their maximum, ignoring NaN values.
+// Slices containing no non-NaN values produce NaN.
+pub fn nanmax_axes[T](t &vtl.Tensor[T], axes []int, keepdims bool) !&vtl.Tensor[f64] {
+	return nan_reduce_axes[T](t, axes, .maximum, keepdims)
+}
+
+fn nan_reduce_axes[T](t &vtl.Tensor[T], axes []int, operation NanReduction, keepdims bool) !&vtl.Tensor[f64] {
+	if axes.len == 0 {
+		mut result := vtl.empty[f64](t.shape, memory: .row_major)
+		mut iter := t.iterator[T]()
+		for {
+			value, index := iter.next() or { break }
+			result.set(index, f64(value))
+		}
+		return result
+	}
+	mut normalized := []int{cap: axes.len}
+	for axis in axes {
+		axis_index := if axis < 0 { axis + t.rank() } else { axis }
+		if axis_index < 0 || axis_index >= t.rank() {
+			return error('NaN reduction axis ${axis} out of bounds for rank ${t.rank()}')
+		}
+		if axis_index in normalized {
+			return error('duplicate NaN reduction axis ${axis}')
+		}
+		normalized << axis_index
+	}
+	for i in 0 .. normalized.len {
+		for j in i + 1 .. normalized.len {
+			if normalized[i] < normalized[j] {
+				normalized[i], normalized[j] = normalized[j], normalized[i]
+			}
+		}
+	}
+	mut result := nan_reduce_axis[T](t, normalized[0], operation, keepdims)!
+	for axis_index in normalized[1..] {
+		result = nan_reduce_axis[f64](result, axis_index, operation, keepdims)!
+	}
+	return result
+}
+
 fn nan_reduce_scalar[T](t &vtl.Tensor[T], operation NanReduction) f64 {
 	mut has_value := false
 	mut result := match operation {

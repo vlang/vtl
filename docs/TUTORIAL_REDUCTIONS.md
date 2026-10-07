@@ -74,6 +74,24 @@ assert sample_std.shape == [1, 3]
 assert sample_std.to_array() == [2.1213203435596424, 2.1213203435596424, 2.1213203435596424]
 ```
 
+NaN-aware sum, product, minimum, and maximum also support multiple axes and
+`keepdims` through `nansum_axes`, `nanprod_axes`, `nanmin_axes`, and
+`nanmax_axes`. Slices with no non-NaN values yield NaN for min/max.
+
+```v
+import math
+import vtl
+import vtl.stats
+
+volume := vtl.from_array[f64]([math.nan(), 2.0, 3.0, 4.0, 5.0, math.nan(), 7.0, 8.0], [
+	2,
+	2,
+	2,
+])!
+mins := stats.nanmin_axes(volume, [0, -1], false)!
+assert mins.to_array() == [2.0, 3.0]
+```
+
 ## argmax / argmin
 
 `argmax_axis(axis)` and `argmin_axis(axis)` retain the reduced axis with
