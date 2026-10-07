@@ -30,12 +30,15 @@ coordinate arrays through `indices`.
 
 ### Shape and manipulation
 
-**Current:** reshape, transpose, squeeze/expand, move/roll axes,
-concatenate/stack/split, `ravel`, copying `flatten`, `flip`, `repeat`,
+**Current:** reshape, transpose, squeeze/expand, move/roll axes, N-D
+`diagonal` views over two selected axes with NumPy-style offset and output
+shape, concatenate/stack/split, `ravel`, copying `flatten`, `flip`, `repeat`,
 `repeat_axis`, block `tile`, `rot90`, constant/edge/wrap/reflect/symmetric
 padding, and stable axis-wise `sort`/`argsort`.
 
 **Remaining:** test broadcasting helpers and audit copy-versus-view behavior.
+VTL diagonal views share writable storage; NumPy exposes its diagonal views as
+read-only by default.
 
 ### Indexing and set operations
 

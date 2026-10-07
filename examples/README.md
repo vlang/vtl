@@ -14,7 +14,7 @@ CIFAR examples for CI-safe checks.
 | Example | What it shows | Command |
 |---------|---------------|---------|
 | [pad](./pad) | Constant, edge, wrap, reflect, and symmetric tensor padding | `v run ./vtl/examples/pad/main.v` |
-| [diag](./diag) | Construct or extract offset matrix diagonals | `v run ./vtl/examples/diag/main.v` |
+| [diag](./diag) | Construct and extract offset diagonals, including N-D diagonal views | `v run ./vtl/examples/diag/main.v` |
 | [complex_tensors](./complex_tensors) | Create `complex128` tensors and use elementwise arithmetic | `v run ./vtl/examples/complex_tensors/main.v` |
 | [tensor_axis_manipulation](./tensor_axis_manipulation) | `moveaxis` and `rollaxis` views | `v run ./vtl/examples/tensor_axis_manipulation/main.v` |
 | [tensor_sorting](./tensor_sorting) | Sort, partially partition, and return local indices along tensor axes | `v run ./vtl/examples/tensor_sorting/main.v` |
