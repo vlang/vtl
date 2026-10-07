@@ -83,6 +83,7 @@ fn test_complex_transcendental_functions() ! {
 		vcomplex.Complex{ re: 0.0, im: 0.0 },
 		vcomplex.Complex{ re: -4.0, im: 0.0 },
 		vcomplex.Complex{ re: 3.0, im: 4.0 },
+		vcomplex.Complex{ re: 1.0, im: 0.0 },
 	])!
 
 	assert vtl.exp(values)!.get_nth(0) == vcomplex.Complex{ re: 1.0, im: 0.0 }
@@ -91,9 +92,20 @@ fn test_complex_transcendental_functions() ! {
 		vcomplex.Complex{ re: 0.0, im: 0.0 },
 		vcomplex.Complex{ re: 0.0, im: 2.0 },
 		vcomplex.Complex{ re: 2.0, im: 1.0 },
+		vcomplex.Complex{ re: 1.0, im: 0.0 },
 	]
 	assert vtl.sin(values)!.get_nth(0) == vcomplex.Complex{ re: 0.0, im: 0.0 }
 	assert vtl.cos(values)!.get_nth(0) == vcomplex.Complex{ re: 1.0, im: 0.0 }
+	assert vtl.tan(values)!.get_nth(0) == vcomplex.Complex{ re: 0.0, im: 0.0 }
+	assert vtl.sinh(values)!.get_nth(0) == vcomplex.Complex{ re: 0.0, im: 0.0 }
+	assert vtl.cosh(values)!.get_nth(0) == vcomplex.Complex{ re: 1.0, im: 0.0 }
+	assert vtl.tanh(values)!.get_nth(0) == vcomplex.Complex{ re: 0.0, im: 0.0 }
+	assert vtl.arcsin(values)!.get_nth(0) == vcomplex.Complex{ re: 0.0, im: 0.0 }
+	assert vtl.arccos(values)!.get_nth(3) == vcomplex.Complex{ re: 0.0, im: 0.0 }
+	assert vtl.arctan(values)!.get_nth(0) == vcomplex.Complex{ re: 0.0, im: 0.0 }
+	assert vtl.arcsinh(values)!.get_nth(0) == vcomplex.Complex{ re: 0.0, im: 0.0 }
+	assert vtl.arccosh(values)!.get_nth(3) == vcomplex.Complex{ re: 0.0, im: 0.0 }
+	assert vtl.arctanh(values)!.get_nth(0) == vcomplex.Complex{ re: 0.0, im: 0.0 }
 }
 
 fn test_promote_types_for_matching_numeric_kinds() {

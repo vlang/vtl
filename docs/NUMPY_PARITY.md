@@ -191,15 +191,16 @@ fixtures, and continue rejecting unsupported object/structured values.
 `promote_types` for supported array dtypes. `math.complex.Complex` is supported
 as `complex128` tensor storage with elementwise add, subtract, multiply, and
 divide, plus NumPy-style `real`, `imag`, `conj`, `absolute`, and `abs`
-operations. Promotion with a complex operand produces `complex128`. Explicit
+operations, exponentials/logarithms, square root, trigonometric and
+hyperbolic functions, and their common inverse families. Promotion with a
+complex operand produces `complex128`. Explicit
 `as_*` conversions cover real numeric and boolean types, preserve shape and
 logical order, and truncate floating-point values when converting to integers.
 
 **Remaining:** connect promotion to mixed-dtype arithmetic, add weak scalar
-promotion and string conversion, extend complex support to the rest of the
-mathematical functions, reductions, linear algebra, random generation, and
-`.npy`/`.npz` I/O, add complex32, and define integer overflow and structured-data
-limits.
+promotion and string conversion, extend complex support to other mathematical
+functions, reductions, linear algebra, random generation, and `.npy`/`.npz`
+I/O, add complex32, and define integer overflow and structured-data limits.
 
 ### Masked and missing data
 
