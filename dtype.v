@@ -5,6 +5,7 @@ pub enum DType {
 	boolean
 	int8
 	int16
+	int32
 	int64
 	native_int
 	uint8
@@ -24,6 +25,8 @@ pub fn dtype_of[T]() DType {
 		return .int8
 	} $else $if T is i16 {
 		return .int16
+	} $else $if T is i32 {
+		return .int32
 	} $else $if T is i64 {
 		return .int64
 	} $else $if T is int {
@@ -112,7 +115,8 @@ pub fn promote_types(a DType, b DType) !DType {
 }
 
 fn is_signed_integer_dtype(dtype DType) bool {
-	return dtype == .int8 || dtype == .int16 || dtype == .int64 || dtype == .native_int
+	return dtype == .int8 || dtype == .int16 || dtype == .int32 || dtype == .int64
+		|| dtype == .native_int
 }
 
 fn is_unsigned_integer_dtype(dtype DType) bool {
@@ -123,6 +127,7 @@ fn dtype_bits(dtype DType) int {
 	return match dtype {
 		.int8, .uint8 { 8 }
 		.int16, .uint16 { 16 }
+		.int32 { 32 }
 		.uint32 { 32 }
 		.int64, .uint64 { 64 }
 		.native_int { int(sizeof(int) * 8) }
@@ -153,7 +158,7 @@ fn widest_unsigned_dtype(a DType, b DType) DType {
 }
 
 fn smallest_signed_dtype(minimum_bits int) ?DType {
-	candidates := [DType.int8, DType.int16, DType.native_int, DType.int64]
+	candidates := [DType.int8, DType.int16, DType.int32, DType.native_int, DType.int64]
 	mut best_bits := 65
 	mut best := DType.native_int
 	for candidate in candidates {

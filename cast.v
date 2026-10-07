@@ -65,6 +65,15 @@ pub fn (t &Tensor[T]) as_i64[T]() &Tensor[i64] {
 	}
 }
 
+// as_i32 casts each tensor value to i32 while preserving its logical shape.
+pub fn (t &Tensor[T]) as_i32[T]() &Tensor[i32] {
+	$if T is i32 {
+		return t
+	} $else {
+		return cast_tensor_values[T, i32](t)
+	}
+}
+
 // as_i16 casts tensor values to signed 16-bit integers.
 
 // as_i16 exposes this operation as part of the public API.

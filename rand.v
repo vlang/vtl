@@ -290,6 +290,9 @@ fn random_in_range[T](min T, max T) T {
 	$if T is i8 {
 		return i8(rand.int_in_range(int(min), int(max)) or { i8(min) })
 	}
+	$if T is i32 {
+		return i32(rand.int_in_range(int(min), int(max)) or { int(min) })
+	}
 	$if T is int {
 		return rand.int_in_range(min, max) or { min }
 	}

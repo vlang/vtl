@@ -7,6 +7,7 @@ fn test_bincount_counts_values_and_respects_minlength() ! {
 	assert bincount[int](input, 0)!.to_array() == [1, 3, 1, 1]
 	assert bincount[int](input, 6)!.to_array() == [1, 3, 1, 1, 0, 0]
 	assert bincount(vtl.from_1d([]u8{})!, 3)!.to_array() == [0, 0, 0]
+	assert bincount(vtl.from_1d[i32]([0, 2, 2])!, 4)!.to_array() == [1, 0, 2, 0]
 }
 
 fn test_bincount_weighted_sums_values() ! {

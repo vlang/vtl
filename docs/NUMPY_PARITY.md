@@ -118,10 +118,9 @@ fixtures, and continue rejecting unsupported object/structured values.
 numeric and boolean types, preserve shape and logical order, and truncate
 floating-point values when converting to integers.
 
-**Remaining:** add a signed 32-bit tensor dtype for exact promotion parity,
-connect promotion to mixed-dtype arithmetic, add weak scalar promotion and
-string conversion, support complex types, and define integer overflow and
-structured-data limits.
+**Remaining:** connect promotion to mixed-dtype arithmetic, add weak scalar
+promotion and string conversion, support complex types, and define integer
+overflow and structured-data limits.
 
 ### Masked and missing data
 
