@@ -21,4 +21,11 @@ fn main() {
 	println('imag: ${imaginary_values.str()}')
 	println('conjugate: ${conjugated.str()}')
 	println('magnitude: ${magnitudes.str()}')
+	transcendental_input := vtl.from_1d([
+		cmplx.complex(0.0, 0.0),
+		cmplx.complex(-4.0, 0.0),
+	]) or { panic(err) }
+	println('square root: ${vtl.sqrt(transcendental_input)!.str()}')
+	println('exponential: ${vtl.exp(transcendental_input)!.str()}')
+	println('natural logarithm: ${vtl.log(transcendental_input)!.str()}')
 }

@@ -29,8 +29,9 @@ assert vtl.promote_types(.int32, .complex128)! == .complex128
 
 The NumPy-style `real`, `imag`, `conj`, `absolute`, and `abs` operations are
 available.
-Component and magnitude outputs use float64, while conjugation preserves the
-complex dtype and input shape:
+These functions return new tensors with the input shape. Component and magnitude
+outputs use float64, while the complex-valued functions preserve the complex
+dtype:
 
 ```v
 import math.complex as cmplx
@@ -42,7 +43,16 @@ assert vtl.imag(values)!.to_array() == [4.0, 12.0]
 assert vtl.conj(values)!.to_array()[0].im == -4.0
 assert vtl.absolute(values)!.to_array() == [5.0, 13.0]
 assert vtl.abs(values)!.to_array() == [5.0, 13.0]
+
+origin := vtl.from_1d([cmplx.complex(0.0, 0.0), cmplx.complex(-4.0, 0.0)])!
+assert vtl.exp(origin)!.get_nth(0).re == 1.0
+assert vtl.sqrt(origin)!.get_nth(1).im == 2.0
+assert vtl.sin(origin)!.get_nth(0).re == 0.0
+assert vtl.cos(origin)!.get_nth(0).re == 1.0
 ```
+
+`log` uses the principal natural logarithm, and `sqrt` uses the principal
+square root branch.
 
 Complex tensors are an early part of VTL's complex-number support. Real-valued
 casts, reductions, general complex mathematical functions, linear algebra,

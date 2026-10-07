@@ -1,6 +1,7 @@
 module core
 
 import vtl
+import math
 import math.complex as vcomplex
 
 fn test_dtype_of_and_tensor_dtype_report_element_types() {
@@ -75,6 +76,24 @@ fn test_complex_real_imag_conj_and_absolute() ! {
 	transposed := matrix.transpose([1, 0])!
 	assert vtl.real(transposed)!.to_array() == [1.0, 5.0, 3.0, 7.0]
 	assert vtl.imag(transposed)!.to_array() == [2.0, 6.0, 4.0, 8.0]
+}
+
+fn test_complex_transcendental_functions() ! {
+	values := vtl.from_1d([
+		vcomplex.Complex{ re: 0.0, im: 0.0 },
+		vcomplex.Complex{ re: -4.0, im: 0.0 },
+		vcomplex.Complex{ re: 3.0, im: 4.0 },
+	])!
+
+	assert vtl.exp(values)!.get_nth(0) == vcomplex.Complex{ re: 1.0, im: 0.0 }
+	assert math.abs(vtl.log(values)!.get_nth(2).re - 1.6094379124341003) < 1e-15
+	assert vtl.sqrt(values)!.to_array() == [
+		vcomplex.Complex{ re: 0.0, im: 0.0 },
+		vcomplex.Complex{ re: 0.0, im: 2.0 },
+		vcomplex.Complex{ re: 2.0, im: 1.0 },
+	]
+	assert vtl.sin(values)!.get_nth(0) == vcomplex.Complex{ re: 0.0, im: 0.0 }
+	assert vtl.cos(values)!.get_nth(0) == vcomplex.Complex{ re: 1.0, im: 0.0 }
 }
 
 fn test_promote_types_for_matching_numeric_kinds() {

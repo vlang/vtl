@@ -2,8 +2,9 @@
 
 This example creates a `complex128` tensor and applies elementwise arithmetic,
 then extracts real/imaginary components, conjugates the values, and computes
-their magnitudes. It uses `math.complex.Complex`, V's standard f64 complex
-type.
+their magnitudes. It also demonstrates complex exponentials, natural
+logarithms, and square roots. It uses `math.complex.Complex`, V's standard f64
+complex type.
 
 From `~/.vmodules`, run it under a memory limit:
 
