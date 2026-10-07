@@ -22,9 +22,23 @@ pub fn dropout_gate[T](mask &vtl.Tensor[T], prob f64) &DropoutGate[T] {
 pub fn (g &DropoutGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	prob := g.prob
-	result := gradient.nmap([g.mask], fn [prob] [T](xs []T, i []int) {
-		return xs[0] * xs[1] / prob
-	})!
+	$if T is f64 {
+		result := dropout_gate_backward_f64(gradient, g.mask, prob)!
+		return [result]
+	}
+	if gradient.shape != g.mask.shape {
+		return error('dropout backward: gradient and mask shapes must match')
+	}
+	if prob <= 0 || prob > 1 {
+		return error('dropout backward: keep probability must be in (0, 1]')
+	}
+	mut values := gradient.to_array()
+	mask_values := g.mask.to_array()
+	keep_prob := T(prob)
+	for i in 0 .. values.len {
+		values[i] = values[i] * mask_values[i] / keep_prob
+	}
+	result := vtl.from_array[T](values, gradient.shape)!
 
 	return [result]
 }

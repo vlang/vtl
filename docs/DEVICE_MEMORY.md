@@ -11,7 +11,7 @@ Status: **Phase 1** complete · **Phase 2** done (`VTL_GPU_ACTIVATIONS=1`, #101/
 | Parameters (weights, bias) | CPU (`CpuStorage`) | Stable serialization/autograd interface |
 | Forward (Linear/Conv2D) | Compute on GPU when enabled | CUDA cuBLAS/cuDNN or Vulkan GEMM/im2col |
 | Forward output | **CPU tensor** | `Variable` and gates expect `CpuStorage` |
-| Backward | CPU by default; GPU when eligible | CUDA Linear/Conv2D; Vulkan Linear/Conv2D `d_weight` |
+| Backward | CPU by default; GPU when eligible | CUDA Linear/Conv2D and f64 Dropout; Vulkan Linear/Conv2D `d_weight` |
 | Optimizer (Adam) | CPU by default; GPU when enabled | CUDA persistent slots; Vulkan fused f32 shader |
 | Optimizer step | CPU sync result | Host tensors remain canonical |
 
@@ -53,10 +53,16 @@ mut model := models.sequential_from_ctx[f64](ctx)
 // ... train — Linear layers use session when f64 + CUDA enabled
 ```
 
+CUDA Dropout backward multiplies the upstream gradient by the saved mask through
+cuBLAS, then applies the inverted keep probability. The current implementation
+uploads and downloads the arrays per call; it provides CUDA correctness
+coverage but does not keep this operation device-resident.
+
 ## Roadmap (issue #91 follow-ups)
 
 - **Phase 2**: GPU-resident `Variable` (`gpu_activation`, #101) — done (#104)
 - **Phase 3**: CUDA backward for Linear + Conv2D (opt-in `VTL_CUDA_BACKWARD`) — done (#107)
+- **Follow-up**: f64 Dropout backward uses cuBLAS when CUDA backward is enabled; other layers remain tracked in [#161](https://github.com/vlang/vtl/issues/161)
 - **Phase 4**: Adam on GPU with persistent m/v/θ in `DeviceSession` — done
 
 See [DEV_LIGHTWEIGHT.md](DEV_LIGHTWEIGHT.md) for safe test commands.
