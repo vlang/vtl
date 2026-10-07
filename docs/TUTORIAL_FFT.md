@@ -44,8 +44,8 @@ unitary_spectrum := fft.fft_norm(complex_signal, .ortho)!
 unitary_restored := fft.ifft_norm(unitary_spectrum, .ortho)!
 
 complex32_signal := vtl.from_1d[fft.Complex32]([
-	fft.Complex32{re: 1, im: 0},
-	fft.Complex32{re: 0, im: 0},
+	fft.Complex32{ re: 1, im: 0 },
+	fft.Complex32{ re: 0, im: 0 },
 ])!
 complex32_spectrum := fft.fft_f32(complex32_signal)!
 complex32_restored := fft.ifft_norm_f32(complex32_spectrum, .ortho)!

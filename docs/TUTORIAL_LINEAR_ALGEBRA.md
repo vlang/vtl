@@ -90,6 +90,9 @@ scalar tensor, matrix-vector and vector-matrix return vectors, and vector
 operands broadcast across batches of matrices. Scalar operands are rejected.
 
 ```v
+import vtl
+import vtl.la
+
 u := vtl.from_1d([1.0, 2.0])!
 m := vtl.from_2d([[3.0, 4.0], [5.0, 6.0]])!
 dot_result := la.matmul(u, u)! // scalar tensor: 5
