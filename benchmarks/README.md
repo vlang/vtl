@@ -63,6 +63,19 @@ These are local CPU microbenchmarks against the prior coordinate-indexed VTL
 loop, not comparisons with NumPy or other libraries. Repeat on the target host
 with the same V build and settings before drawing performance conclusions.
 
+## Linear bias gradient reduction
+
+`linear_bias_reduction_bench.v` compares summing the batch axis with the
+previous one-row matrix multiplication used by the linear layer backward pass.
+It checks that both produce close results before timing them. Keep the GEMM
+path unless measurements on supported build configurations show the reduction
+is faster. Run it from `~/.vmodules` under a memory-limited systemd scope:
+
+```bash
+systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 --setenv=VJOBS=2 -- \
+	v run ./vtl/benchmarks/linear_bias_reduction_bench.v
+```
+
 ## CI
 
 The benchmark comment workflow from [#88](https://github.com/vlang/vtl/issues/88)
