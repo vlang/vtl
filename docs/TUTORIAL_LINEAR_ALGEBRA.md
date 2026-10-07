@@ -255,6 +255,18 @@ spectral := la.cond(matrix, la.CondOptions{})!
 one_norm := la.cond(matrix, la.CondOptions{ ord: '1' })!
 ```
 
+`la.det` and `la.inv` accept a stack of square matrices and preserve its batch
+dimensions. `la.inv` returns an error when any matrix is singular:
+
+```v
+import vtl
+import vtl.la
+
+batch := vtl.from_array([1.0, 2, 3, 4, 2, 0, 0, 4], [2, 2, 2])!
+determinants := la.det(batch)!
+inverses := la.inv(batch)!
+```
+
 ## Transpose
 
 Pass the desired axis order to `transpose`.  For a 2-D matrix, swap axes `[1, 0]`:

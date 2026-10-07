@@ -133,6 +133,8 @@ partial-pivot inversion for negative exponents.
 `la.cond` computes spectral and induced-norm condition numbers for stacked
 square matrices, with singular spectral cases returning infinity or zero for
 orders `2` and `-2` respectively.
+`la.det` and `la.inv` operate on stacks of square matrices; inverse results
+are checked against their input layout and singular inputs report errors.
 
 **Remaining:** expand eigen/SVD options, specify singular/non-finite behavior,
 and benchmark realistic shapes.

@@ -3,6 +3,7 @@ module la
 import vsl.la as vsl_la
 import vtl
 import vtl.storage
+import math
 
 // dot exposes this operation as part of the public API.
 pub fn dot[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[f64] {
@@ -17,22 +18,58 @@ pub fn dot[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 
 // det exposes this operation as part of the public API.
 pub fn det[T](t &vtl.Tensor[T]) !&vtl.Tensor[f64] {
-	t.assert_square_matrix()!
-	m := t.shape[0]
-	n := t.shape[1]
-	mat := vsl_la.Matrix.raw(m, n, tensor_to_f64_array[T](t))
-	return vtl.from_1d([vsl_la.matrix_det(mat)])
+	if t.rank() < 2 {
+		return error('det requires input with rank at least 2')
+	}
+	rows := t.shape[t.rank() - 2]
+	columns := t.shape[t.rank() - 1]
+	if rows != columns {
+		return error('det requires square matrices, got ${rows}x${columns}')
+	}
+	signs, logabsdets := slogdet(t)!
+	output_shape := if t.rank() == 2 { [1] } else { t.shape[..t.rank() - 2].clone() }
+	mut result := vtl.empty[f64](output_shape, memory: .row_major)
+	for i, sign in signs.to_array() {
+		value := if sign == 0 { 0.0 } else { sign * math.exp(logabsdets.get_nth(i)) }
+		result.set_nth(i, value)
+	}
+	return result
 }
 
 // inv exposes this operation as part of the public API.
 pub fn inv[T](t &vtl.Tensor[T]) !&vtl.Tensor[f64] {
-	t.assert_square_matrix()!
-	mut colmajort := t.copy(.col_major)
-	mut ret_m := vsl_la.Matrix.new[f64](colmajort.shape[0], colmajort.shape[1])
-	mut colmajorm := vsl_la.Matrix.raw(colmajort.shape[0], colmajort.shape[1],
-		tensor_to_f64_array[T](colmajort))
-	vsl_la.matrix_inv(mut ret_m, mut colmajorm, true)
-	return vtl.from_2d[f64](ret_m.get_deep2())
+	if t.rank() < 2 {
+		return error('inv requires input with rank at least 2')
+	}
+	rows := t.shape[t.rank() - 2]
+	columns := t.shape[t.rank() - 1]
+	if rows != columns {
+		return error('inv requires square matrices, got ${rows}x${columns}')
+	}
+	batch_shape := t.shape[..t.rank() - 2].clone()
+	mut batch_count := 1
+	for dimension in batch_shape {
+		batch_count *= dimension
+	}
+	mut result := vtl.empty[f64](t.shape, memory: .row_major)
+	mut input_index := []int{len: t.rank()}
+	for batch in 0 .. batch_count {
+		decode_matrix_batch(batch, batch_shape, mut input_index)
+		mut matrix := []f64{len: rows * columns}
+		for row in 0 .. rows {
+			input_index[t.rank() - 2] = row
+			for column in 0 .. columns {
+				input_index[t.rank() - 1] = column
+				matrix[row * columns + column] = f64(t.get[T](input_index))
+			}
+		}
+		inverse := invert_square_matrix(matrix, rows)!
+		start := batch * rows * columns
+		for i, value in inverse {
+			result.set_nth(start + i, value)
+		}
+	}
+	return result
 }
 
 // matmul exposes this operation as part of the public API.
