@@ -70,6 +70,42 @@ fn test_standard_statistical_reductions_along_axis_propagate_nan() ! {
 	}
 }
 
+fn test_statistical_reductions_select_keepdims_shape() ! {
+	values := vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [2, 3])!
+	means := mean_along_axis(values, -1, false)!
+	assert means.shape == [2]
+	assert means.to_array() == [2.0, 5.0]
+	means_keepdims := mean_along_axis(values, 1, true)!
+	assert means_keepdims.shape == [2, 1]
+	assert means_keepdims.to_array() == [2.0, 5.0]
+
+	variances := variance_along_axis(values, 1, 0, false)!
+	assert variances.shape == [2]
+	assert variances.to_array() == [2.0 / 3.0, 2.0 / 3.0]
+	variances_keepdims := variance_along_axis(values, 0, 1, true)!
+	assert variances_keepdims.shape == [1, 3]
+	assert variances_keepdims.to_array() == [4.5, 4.5, 4.5]
+
+	deviations := std_along_axis(values, 1, 0, false)!
+	assert deviations.shape == [2]
+	assert math.abs(deviations.get([0]) - math.sqrt(2.0 / 3.0)) < 1e-12
+	deviations_keepdims := std_along_axis(values, -2, 0, true)!
+	assert deviations_keepdims.shape == [1, 3]
+	assert deviations_keepdims.to_array() == [1.5, 1.5, 1.5]
+
+	with_nan := vtl.from_array([1.0, math.nan(), 3.0, 4.0, 5.0, 6.0], [2, 3])!
+	nan_means := nanmean_along_axis(with_nan, 0, false)!
+	assert nan_means.shape == [3]
+	assert nan_means.to_array() == [2.5, 5.0, 4.5]
+	nan_variances := nanvar_along_axis(with_nan, -1, 0, true)!
+	assert nan_variances.shape == [2, 1]
+	assert nan_variances.to_array()[0] == 1.0
+	assert nan_variances.to_array()[1] == 2.0 / 3.0
+	nan_deviations := nanstd_along_axis(with_nan, 0, 0, false)!
+	assert nan_deviations.shape == [3]
+	assert math.abs(nan_deviations.get([0]) - 1.5) < 1e-12
+}
+
 fn test_nan_quantiles_ignore_nan_globally_and_by_axis() ! {
 	values := vtl.from_array([1.0, math.nan(), 3.0, 5.0, math.nan(), math.nan()], [3, 2])!
 	assert nanquantile_linear(values, 0.5)! == 3.0

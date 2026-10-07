@@ -91,6 +91,57 @@ pub fn std_axis[T](t &vtl.Tensor[T], axis int, ddof int) !&vtl.Tensor[f64] {
 	return variances.map[T](fn (value f64, _ []int) f64 { return math.sqrt(value) })
 }
 
+// mean_along_axis computes means along axis and optionally removes that axis.
+pub fn mean_along_axis[T](t &vtl.Tensor[T], axis int, keepdims bool) !&vtl.Tensor[f64] {
+	result := mean_axis[T](t, axis)!
+	return reshape_reduction_axis[T](result, axis, keepdims)
+}
+
+// variance_along_axis computes variance along axis and optionally removes it.
+pub fn variance_along_axis[T](t &vtl.Tensor[T], axis int, ddof int, keepdims bool) !&vtl.Tensor[f64] {
+	result := variance_axis[T](t, axis, ddof)!
+	return reshape_reduction_axis[f64](result, axis, keepdims)
+}
+
+// std_along_axis computes standard deviation and optionally removes its axis.
+pub fn std_along_axis[T](t &vtl.Tensor[T], axis int, ddof int, keepdims bool) !&vtl.Tensor[f64] {
+	result := std_axis[T](t, axis, ddof)!
+	return reshape_reduction_axis[f64](result, axis, keepdims)
+}
+
+// nanmean_along_axis computes NaN-ignoring means and optionally removes axis.
+pub fn nanmean_along_axis[T](t &vtl.Tensor[T], axis int, keepdims bool) !&vtl.Tensor[f64] {
+	result := nanmean_axis[T](t, axis)!
+	return reshape_reduction_axis[f64](result, axis, keepdims)
+}
+
+// nanvar_along_axis computes NaN-ignoring variance and optionally removes axis.
+pub fn nanvar_along_axis[T](t &vtl.Tensor[T], axis int, ddof int, keepdims bool) !&vtl.Tensor[f64] {
+	result := nanvar_axis[T](t, axis, ddof)!
+	return reshape_reduction_axis[f64](result, axis, keepdims)
+}
+
+// nanstd_along_axis computes NaN-ignoring std and optionally removes axis.
+pub fn nanstd_along_axis[T](t &vtl.Tensor[T], axis int, ddof int, keepdims bool) !&vtl.Tensor[f64] {
+	result := nanstd_axis[T](t, axis, ddof)!
+	return reshape_reduction_axis[f64](result, axis, keepdims)
+}
+
+fn reshape_reduction_axis[T](result &vtl.Tensor[T], axis int, keepdims bool) !&vtl.Tensor[T] {
+	if keepdims {
+		return result
+	}
+	rank := result.rank()
+	axis_index := if axis < 0 { axis + rank } else { axis }
+	mut shape := []int{cap: rank - 1}
+	for dimension, size in result.shape {
+		if dimension != axis_index {
+			shape << size
+		}
+	}
+	return result.reshape[T](shape)
+}
+
 enum NanMomentOutput {
 	mean
 	variance
