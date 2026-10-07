@@ -2,6 +2,7 @@ module main
 
 import math.complex as cmplx
 import vtl
+import vtl.stats
 
 fn main() {
 	values := vtl.from_1d([
@@ -11,6 +12,8 @@ fn main() {
 
 	println('dtype: ${values.dtype()}')
 	println('sum: ${values.add(values)!.str()}')
+	println('complex total: ${stats.sum(values)}')
+	println('complex mean: ${stats.mean(values)}')
 	println('product: ${values.multiply(values)!.str()}')
 	println('quotient: ${values.divide(values)!.str()}')
 	real_values := vtl.real(values) or { panic(err) }
