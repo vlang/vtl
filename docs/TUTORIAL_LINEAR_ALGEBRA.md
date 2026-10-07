@@ -215,6 +215,20 @@ batch := vtl.from_array([3, 0, 0, 0, 4, 0, 5, 0, 0, 0, 12, 0], [2, 2, 3])!
 singular_values := la.svdvals(batch)! // [[4, 3], [12, 5]]
 ```
 
+`la.slogdet` computes the sign and log absolute determinant without forming
+the determinant, so very large or very small determinants do not overflow or
+underflow. Singular matrices return sign `0` and log absolute determinant
+`-Inf`:
+
+```v
+import vtl
+import vtl.la
+
+matrix := vtl.from_2d([[1.0, 2.0], [3.0, 4.0]])!
+sign, logabsdet := la.slogdet(matrix)!
+println('${sign.to_array()}, ${logabsdet.to_array()}') // [-1], [0.693...]
+```
+
 ## Transpose
 
 Pass the desired axis order to `transpose`.  For a 2-D matrix, swap axes `[1, 0]`:
