@@ -148,7 +148,8 @@ overflow and structured-data limits.
 
 **Current:** `MaskedArray[T]` pairs values with a broadcastable boolean mask
 (`true` means missing). It supports filling masked entries, compression,
-valid-value counting, and global, single-axis, or multi-axis sum/mean reductions. Axis
+valid-value counting, and global, single-axis, or multi-axis sum/product/mean
+reductions. Axis
 reductions mark empty slices in the output mask; global reductions expose an
 `is_masked` flag when every value is missing. See
 [the masked data tutorial](./TUTORIAL_MASKED_DATA.md).
