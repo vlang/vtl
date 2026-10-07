@@ -70,3 +70,21 @@ pub fn average_axis[T, W](values &vtl.Tensor[T], weights &vtl.Tensor[W], axis in
 	}
 	return output
 }
+
+// average_along_axis computes weighted means along one axis. It preserves the
+// reduced axis when keepdims is true and removes it otherwise.
+pub fn average_along_axis[T, W](values &vtl.Tensor[T], weights &vtl.Tensor[W], axis int, keepdims bool) !&vtl.Tensor[f64] {
+	result := average_axis[T, W](values, weights, axis)!
+	if keepdims {
+		return result
+	}
+	rank := result.rank()
+	axis_index := if axis < 0 { axis + rank } else { axis }
+	mut shape := []int{cap: rank - 1}
+	for dimension, size in result.shape {
+		if dimension != axis_index {
+			shape << size
+		}
+	}
+	return result.reshape[f64](shape)
+}
