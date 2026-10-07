@@ -101,14 +101,33 @@ fn test_isclose_nan_infinity_and_large_finite_values() {
 	assert got.array_equal(expected)
 }
 
+fn test_allclose_broadcasts_without_changing_isclose_semantics() {
+	a := vtl.from_array([1.0, 2.0, 3.0, 4.0], [2, 2])!
+	b := vtl.from_1d([1.0, 2.0])!
+	assert !a.allclose(b)!
+	assert a.allclose(a)!
+	repeated_rows := vtl.from_array([1.0, 2.0, 1.0, 2.0], [2, 2])!
+	assert repeated_rows.allclose(b)!
+	transposed := a.t()!
+	transposed_expected := vtl.from_array([1.0, 3.0, 2.0, 4.0], [2, 2])!
+	assert transposed.allclose(transposed_expected)!
+}
+
 fn test_isclose_rejects_invalid_tolerances() {
 	a := vtl.from_1d([1.0])!
 	expect_isclose_error(a, -1.0, 0.0)
 	expect_isclose_error(a, 0.0, math.inf(1))
+	expect_allclose_error(a, -1.0, 0.0)
+	expect_allclose_error(a, 0.0, math.inf(1))
 }
 
 fn expect_isclose_error(a &vtl.Tensor[f64], rtol f64, atol f64) {
 	a.isclose(a, rtol: rtol, atol: atol) or { return }
+	panic('expected invalid tolerance to return an error')
+}
+
+fn expect_allclose_error(a &vtl.Tensor[f64], rtol f64, atol f64) {
+	a.allclose(a, rtol: rtol, atol: atol) or { return }
 	panic('expected invalid tolerance to return an error')
 }
 
