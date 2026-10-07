@@ -34,6 +34,25 @@ fn test_random_generator_supports_normal_and_bernoulli_distributions() ! {
 	generator.free()
 }
 
+fn test_random_generator_supports_seeded_lognormal() ! {
+	mut generator := new_random_generator(258)
+	values := generator.lognormal(0.25, 0.5, [64])!
+	for value in values.to_array() {
+		assert value > 0
+	}
+	mut replay := new_random_generator(258)
+	assert values.array_equal(replay.lognormal(0.25, 0.5, [64])!)
+	constant := generator.lognormal(2.0, 0.0, [3])!
+	for value in constant.to_array() {
+		assert value == math.exp(2.0)
+	}
+	if _ := generator.lognormal(0.0, -1.0, [1]) {
+		assert false, 'lognormal must reject a negative sigma'
+	}
+	generator.free()
+	replay.free()
+}
+
 fn test_random_generator_supports_geometric_sampling() ! {
 	mut generator := new_random_generator(987)
 	values := generator.geometric(0.25, [64])!
