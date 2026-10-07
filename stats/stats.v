@@ -905,11 +905,31 @@ pub fn nanpercentile_linear[T](t &vtl.Tensor[T], percentile f64) !f64 {
 	return nanquantile_linear[T](t, q)
 }
 
+// percentiles_linear computes several linearly interpolated percentiles on
+// the 0..100 scale and returns them in input order.
+pub fn percentiles_linear[T](t &vtl.Tensor[T], percentiles []f64) !&vtl.Tensor[f64] {
+	return quantiles_linear[T](t, percentiles_to_quantiles(percentiles)!)
+}
+
+// nanpercentiles_linear computes several NaN-ignoring percentiles on the
+// 0..100 scale and returns them in input order.
+pub fn nanpercentiles_linear[T](t &vtl.Tensor[T], percentiles []f64) !&vtl.Tensor[f64] {
+	return nanquantiles_linear[T](t, percentiles_to_quantiles(percentiles)!)
+}
+
 fn percentile_quantile(percentile f64) !f64 {
 	if math.is_nan(percentile) || math.is_inf(percentile, 0) || percentile < 0 || percentile > 100 {
 		return error('percentile must be between 0 and 100')
 	}
 	return percentile / 100
+}
+
+fn percentiles_to_quantiles(percentiles []f64) ![]f64 {
+	mut quantiles := []f64{len: percentiles.len}
+	for i, percentile in percentiles {
+		quantiles[i] = percentile_quantile(percentile)!
+	}
+	return quantiles
 }
 
 // percentile_axis computes one linearly interpolated percentile per axis slice
@@ -937,6 +957,18 @@ pub fn nanpercentile_axis[T](t &vtl.Tensor[T], percentile f64, axis int) !&vtl.T
 pub fn nanpercentile_axis_squeeze[T](t &vtl.Tensor[T], percentile f64, axis int) !&vtl.Tensor[f64] {
 	q := percentile_quantile(percentile)!
 	return nanquantile_axis_squeeze[T](t, q, axis)
+}
+
+// percentiles_axis computes several percentiles per axis slice. The percentile
+// dimension is prepended to the output shape.
+pub fn percentiles_axis[T](t &vtl.Tensor[T], percentiles []f64, axis int) !&vtl.Tensor[f64] {
+	return quantiles_axis[T](t, percentiles_to_quantiles(percentiles)!, axis)
+}
+
+// nanpercentiles_axis computes several NaN-ignoring percentiles per axis slice.
+// The percentile dimension is prepended to the output shape.
+pub fn nanpercentiles_axis[T](t &vtl.Tensor[T], percentiles []f64, axis int) !&vtl.Tensor[f64] {
+	return nanquantiles_axis[T](t, percentiles_to_quantiles(percentiles)!, axis)
 }
 
 // quantile_axis computes linearly interpolated quantiles along axis and keeps

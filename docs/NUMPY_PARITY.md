@@ -56,7 +56,8 @@ NumPy-style shape semantics.
 interpolation, and returns fractional `f64` results for integer tensors.
 The `nanmedian` variants provide the matching NaN-ignoring scalar and axis
 reductions. Percentile APIs now cover scalar and per-axis operations, with
-NaN-ignoring variants and keep-dimension/squeezed output shapes.
+NaN-ignoring variants, multiple requested values, and
+keep-dimension/squeezed output shapes.
 
 ## Arraymancer comparison
 
