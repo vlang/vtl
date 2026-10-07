@@ -5,6 +5,11 @@ tensors; many decompositions currently return `f64` results even when the input
 has another numeric type. Check each function's signature when preserving dtype
 matters.
 
+`matmul` supports complex128 vector, matrix, and broadcast-batch products via a
+pure-V kernel. Complex vector products follow NumPy's convention and do not
+conjugate either operand. Complex decomposition and solve routines remain
+unsupported.
+
 ```v
 import vtl
 import vtl.la

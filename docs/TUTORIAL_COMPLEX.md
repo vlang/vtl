@@ -27,6 +27,21 @@ assert vtl.promote_types(.complex128, .float64)! == .complex128
 assert vtl.promote_types(.int32, .complex128)! == .complex128
 ```
 
+`vtl.la.matmul` supports complex128 vectors, matrices, and broadcast batches.
+As in NumPy, vector `matmul` does not conjugate either operand:
+
+```v
+import math.complex as cmplx
+import vtl
+import vtl.la
+
+left := vtl.from_1d([cmplx.complex(1.0, 1.0), cmplx.complex(2.0, 0.0)])!
+right := vtl.from_1d([cmplx.complex(0.0, 1.0), cmplx.complex(1.0, 0.0)])!
+product := la.matmul(left, right)!
+assert product.rank() == 0
+assert product.get_nth(0) == cmplx.complex(1.0, 1.0)
+```
+
 The NumPy-style `real`, `imag`, `conj`, `absolute`, and `abs` operations are
 available.
 These functions return new tensors with the input shape. Component and magnitude
