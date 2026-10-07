@@ -60,16 +60,28 @@ fn test_lu_shape() {
 
 fn test_matrix_rank_identity() {
 	a := vtl.from_2d([[1.0, 0.0], [0.0, 1.0]])!
-	r := matrix_rank(a, 1e-10) or { return }
-	// NOTE: matrix_rank relies on VSL SVD which may have a known bug;
-	// accept any non-negative result
-	assert r >= 0
+	r := matrix_rank(a, 1e-10)!
+	assert r == 2
 }
 
 fn test_matrix_rank_singular() {
 	a := vtl.from_2d([[1.0, 2.0], [2.0, 4.0]])!
-	r := matrix_rank(a, 1e-10) or { return }
-	assert r >= 0
+	r := matrix_rank(a, 1e-10)!
+	assert r == 1
+}
+
+fn test_matrix_rank_uses_dtype_aware_default_tolerance() {
+	f64_matrix := vtl.from_2d([[1e-200, 0.0], [0.0, 2e-200]])!
+	assert matrix_rank(f64_matrix, 0)! == 2
+	f32_matrix := vtl.from_array([f32(1), 0, 0, 1e-8], [2, 2])!
+	assert matrix_rank(f32_matrix, 0)! == 1
+}
+
+fn test_matrix_rank_batch_supports_stacked_rectangular_matrices() {
+	input := vtl.from_array([1.0, 0, 0, 1, 1, 1, 1, 2, 2, 4, 3, 6], [2, 3, 2])!
+	ranks := matrix_rank_batch(input, 1e-10)!
+	assert ranks.shape == [2]
+	assert ranks.to_array() == [2, 1]
 }
 
 fn test_tensordot_contracts_trailing_a_with_leading_b_axes() {

@@ -17,14 +17,12 @@ determinant := la.det[f64](a)!
 main_diagonal := la.diag[f64](a, 0)!
 ```
 
-Available operations include `dot`, `matmul`, `tensordot`, `diag`, `det`, `inv`,
-batched `det` and `inv`, `trace`, matrix `norm`, vector `vector_norm`, axis `vector_norm_axis`,
-`vector_norm_axis_keepdims`, and multi-axis `vector_norm_axes`,
-`outer`, `cross`, `solve`, `lstsq`, `qr`, `lu`, `cholesky`, `pinv`, and
-`matrix_rank`, `slogdet`, `svdvals`, batched `matrix_norm`, and batched
-`matrix_power` and `cond`. Matrix multiplication and decomposition requirements (rank,
-shape, and tolerances) are checked by the individual functions. Symmetric
-eigenproblems are available through batched `eigh` and `eigvalsh`.
+Available operations include `dot`, `matmul`, `tensordot`, `diag`, batched
+`det` and `inv`, `trace`, matrix `norm`, vector `vector_norm` and its axis
+variants, `outer`, `cross`, `solve`, `lstsq`, `qr`, `lu`, `cholesky`, `pinv`,
+`matrix_rank`, `matrix_rank_batch`, `slogdet`, `svdvals`, batched `matrix_norm`,
+`matrix_power`, `cond`, and symmetric `eigh`/`eigvalsh`. Shape and tolerance
+requirements are checked by each function.
 
 `tensordot(a, b, axes)` contracts the last `axes` dimensions of `a` with the
 first `axes` dimensions of `b`. Use `tensordot_axes(a, b, axes_a, axes_b)` to

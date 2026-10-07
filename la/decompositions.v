@@ -245,16 +245,65 @@ pub fn pinv[T](a &vtl.Tensor[T], tol f64) !&vtl.Tensor[f64] {
 
 // matrix_rank returns the effective numerical rank of A.
 pub fn matrix_rank[T](a &vtl.Tensor[T], tol f64) !int {
-	m := a.shape[0]
-	n := a.shape[1]
-
-	mut a_mat := vsl_la.Matrix.new[f64](m, n)
-	for i := 0; i < m; i++ {
-		for j := 0; j < n; j++ {
-			a_mat.set(i, j, a.get([i, j]))
+	if a.rank() != 2 {
+		return error('matrix_rank requires a 2D matrix')
+	}
+	rows := a.shape[0]
+	columns := a.shape[1]
+	values := svdvals[T](a)!
+	mut largest := 0.0
+	if values.size > 0 {
+		largest = values.get_nth(0)
+	}
+	threshold := matrix_rank_threshold[T](tol, largest, rows, columns)
+	mut rank := 0
+	for value in values.to_array() {
+		if value > threshold {
+			rank++
 		}
 	}
+	return rank
+}
 
-	safe_tol := if tol > 0 { tol } else { 1e-8 }
-	return vsl_la.rank(a_mat, safe_tol)
+// matrix_rank_batch returns the numerical rank of each trailing matrix. A
+// positive tol is an absolute threshold; non-positive tol selects NumPy's
+// dtype-aware default threshold.
+pub fn matrix_rank_batch[T](input &vtl.Tensor[T], tol f64) !&vtl.Tensor[int] {
+	if input.rank() < 2 {
+		return error('matrix_rank_batch requires input with rank at least 2')
+	}
+	rows := input.shape[input.rank() - 2]
+	columns := input.shape[input.rank() - 1]
+	values := svdvals[T](input)!
+	value_count := values.shape[values.rank() - 1]
+	batch_shape := input.shape[..input.rank() - 2].clone()
+	mut batch_count := 1
+	for dimension in batch_shape {
+		batch_count *= dimension
+	}
+	output_shape := if batch_shape.len == 0 { [1] } else { batch_shape.clone() }
+	mut result := vtl.empty[int](output_shape, memory: .row_major)
+	for batch in 0 .. batch_count {
+		largest := if value_count == 0 { 0.0 } else { values.get_nth(batch * value_count) }
+		threshold := matrix_rank_threshold[T](tol, largest, rows, columns)
+		mut rank := 0
+		for i in 0 .. value_count {
+			if values.get_nth(batch * value_count + i) > threshold {
+				rank++
+			}
+		}
+		result.set_nth(batch, rank)
+	}
+	return result
+}
+
+fn matrix_rank_threshold[T](tol f64, largest f64, rows int, columns int) f64 {
+	if tol > 0 {
+		return tol
+	}
+	mut epsilon := 2.220446049250313e-16
+	$if T is f32 {
+		epsilon = 1.1920928955078125e-7
+	}
+	return largest * f64(int_max(rows, columns)) * epsilon
 }
