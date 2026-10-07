@@ -636,6 +636,70 @@ pub fn beta(alpha f64, beta f64, shape []int, params TensorData) !&Tensor[f64] {
 	return result
 }
 
+// lognormal returns samples whose natural logarithm follows a normal
+// distribution using VTL's global random stream.
+pub fn lognormal(mean f64, sigma f64, shape []int, params TensorData) !&Tensor[f64] {
+	if math.is_nan(mean) || math.is_inf(mean, 0) || sigma < 0 || math.is_nan(sigma)
+		|| math.is_inf(sigma, 0) {
+		return error('lognormal: mean must be finite and sigma must be finite and non-negative')
+	}
+	mut result := zeros[f64](shape, params)
+	for i in 0 .. result.size {
+		log_value := if sigma == 0 {
+			mean
+		} else {
+			rand.normal(config.NormalConfigStruct{
+				mu:    mean
+				sigma: sigma
+			})!
+		}
+		result.set_nth(i, math.exp(log_value))
+	}
+	return result
+}
+
+// dirichlet returns normalized Gamma samples. The final output axis contains
+// categories and sample_shape defines the preceding axes.
+pub fn dirichlet[T](alpha &Tensor[T], sample_shape []int, params TensorData) !&Tensor[f64] {
+	if alpha.rank() != 1 || alpha.size == 0 {
+		return error('dirichlet: concentration parameters must be a non-empty vector')
+	}
+	for dimension in sample_shape {
+		if dimension < 0 {
+			return error('dirichlet: sample dimensions must be non-negative')
+		}
+	}
+	mut concentrations := []f64{len: alpha.size}
+	for i in 0 .. alpha.size {
+		value := td(alpha.get_nth(i)).f64()
+		if value <= 0 || math.is_nan(value) || math.is_inf(value, 0) {
+			return error('dirichlet: concentration parameters must be finite and positive')
+		}
+		concentrations[i] = value
+	}
+	mut output_shape := sample_shape.clone()
+	output_shape << alpha.size
+	sample_count := size_from_shape(sample_shape)
+	mut result := zeros[f64](output_shape, params)
+	for sample in 0 .. sample_count {
+		start := sample * alpha.size
+		mut total := 0.0
+		for category, concentration in concentrations {
+			value := sample_gamma_global(concentration, 1.0)!
+			result.set_nth(start + category, value)
+			total += value
+		}
+		if total == 0 || math.is_inf(total, 0) {
+			return error('dirichlet: sampled gamma values could not be normalized')
+		}
+		for category in 0 .. alpha.size {
+			index := start + category
+			result.set_nth(index, result.get_nth(index) / total)
+		}
+	}
+	return result
+}
+
 // chi_square returns samples from a chi-square distribution using VTL's
 // global random stream.
 pub fn chi_square(degrees_of_freedom f64, shape []int, params TensorData) !&Tensor[f64] {

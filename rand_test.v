@@ -136,3 +136,48 @@ fn sample_mean_for_test(values []f64) f64 {
 	}
 	return total / values.len
 }
+
+fn test_global_lognormal_and_dirichlet_are_seeded_and_validated() ! {
+	random_seed(703)
+	lognormal_samples := lognormal(0.5, 0.75, [2048], TensorData{})!
+	constant_samples := lognormal(1.25, 0.0, [4], TensorData{})!
+	concentrations := from_array[f64]([1.0, 2.0, 3.0], [3])!
+	dirichlet_samples := dirichlet(concentrations, [1024], TensorData{})!
+	random_seed(703)
+	assert lognormal_samples.array_equal(lognormal(0.5, 0.75, [2048], TensorData{})!)
+	assert dirichlet_samples.array_equal(dirichlet(concentrations, [1024], TensorData{})!)
+	for value in constant_samples.to_array() {
+		assert value == math.exp(1.25)
+	}
+	for value in lognormal_samples.to_array() {
+		assert value > 0 && !math.is_nan(value) && !math.is_inf(value, 0)
+	}
+	assert math.abs(sample_mean_for_test(lognormal_samples.to_array()) - math.exp(0.5 + 0.75 * 0.75 / 2)) < 0.15
+	assert dirichlet_samples.shape == [1024, 3]
+	values := dirichlet_samples.to_array()
+	mut category_totals := [3]f64{}
+	for sample in 0 .. 1024 {
+		mut total := 0.0
+		for category in 0 .. 3 {
+			value := values[sample * 3 + category]
+			assert value >= 0 && value <= 1 && !math.is_nan(value) && !math.is_inf(value, 0)
+			category_totals[category] += value
+			total += value
+		}
+		assert math.abs(total - 1.0) < 1e-12
+	}
+	assert math.abs(category_totals[0] / 1024 - (1.0 / 6.0)) < 0.02
+	assert math.abs(category_totals[1] / 1024 - (2.0 / 6.0)) < 0.02
+	assert math.abs(category_totals[2] / 1024 - (3.0 / 6.0)) < 0.02
+	if _ := lognormal(0.0, -1.0, [1], TensorData{}) {
+		assert false, 'lognormal must reject negative sigma'
+	}
+	invalid_concentrations := from_array[f64]([1.0, 0.0], [2])!
+	if _ := dirichlet(invalid_concentrations, [1], TensorData{}) {
+		assert false, 'dirichlet must reject non-positive concentrations'
+	}
+	rank_two_concentrations := from_array[f64]([1.0], [1, 1])!
+	if _ := dirichlet(rank_two_concentrations, [1], TensorData{}) {
+		assert false, 'dirichlet must require a vector of concentrations'
+	}
+}
