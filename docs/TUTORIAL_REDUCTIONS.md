@@ -56,9 +56,10 @@ assert products.to_array() == [60, 672]
 ## Statistical reductions along an axis
 
 `mean_along_axis`, `variance_along_axis`, and `std_along_axis` accept an
-explicit `keepdims` argument. Their `nanmean_`, `nanvar_`, and `nanstd_`
-counterparts ignore NaN values. Variance and standard deviation also accept
-`ddof`, the delta subtracted from the sample count:
+explicit `keepdims` argument. The `*_along_axes` forms reduce several axes in
+one pass; their `nan*_along_axes` counterparts ignore NaNs. Variance and
+standard deviation also accept `ddof`, the delta subtracted from the sample
+count:
 
 ```v
 import vtl
@@ -72,7 +73,15 @@ assert means.to_array() == [2.0, 5.0]
 sample_std := stats.std_along_axis(values, 0, 1, true)!
 assert sample_std.shape == [1, 3]
 assert sample_std.to_array() == [2.1213203435596424, 2.1213203435596424, 2.1213203435596424]
+
+volume := vtl.from_array[f64]([1, 2, 3, 4, 5, 6, 7, 8], [2, 2, 2])!
+means := stats.mean_along_axes(volume, [0, -1], false)!
+assert means.shape == [2]
+assert means.to_array() == [3.5, 5.5]
 ```
+
+See the runnable [multi-axis statistics example](../examples/multi_axis_stats)
+for keep-dimension variance and NaN-ignoring reductions.
 
 NaN-aware sum, product, minimum, and maximum also support multiple axes and
 `keepdims` through `nansum_axes`, `nanprod_axes`, `nanmin_axes`, and
