@@ -3,7 +3,8 @@
     <img
       style="width: 200px"
       width="200"
-      src="https://github.com/vlang/vtl/blob/main/static/vtl-logo.png?sanitize=true&raw=true"
+      src="static/vtl-logo.png"
+      alt="VTL tensor network logo"
     >
   </p>
   <h1>The V Tensor Library</h1>
@@ -33,6 +34,14 @@ CUDA, and Vulkan compute paths from one V-native API.
 [VSL](https://github.com/vlang/vsl)
 
 </div>
+
+<a href="docs/README.md">
+  <img
+    src="static/vtl-feature-banner.svg"
+    alt="VTL tensors, autograd, numerical computing, and CPU and GPU training paths"
+    width="100%"
+  >
+</a>
 
 ```v ignore
 import vtl
@@ -103,28 +112,28 @@ opt.update()!
 
 ## Module overview
 
-| Module | Purpose | Guide / entry point |
-|--------|---------|---------------------|
-| `vtl` | Core `Tensor[T]`; creation, slicing, broadcasting, and reductions | [First steps](docs/TUTORIAL_FIRST_STEPS.md) · [API docs](https://vlang.github.io/vtl/vtl.html) |
-| `vtl.fft` | 1D/N-D real and complex FFTs via VSL PocketFFT | [FFT tutorial](docs/TUTORIAL_FFT.md) |
-| `vtl.csv` | Typed numeric CSV tensor input/output with row and column selection | [NumPy I/O tutorial](docs/TUTORIAL_NUMPY_IO.md) |
-| `vtl.npy` / `vtl.npz` | Typed NumPy `.npy` input/output and mixed-dtype `.npz` archives | [NumPy I/O tutorial](docs/TUTORIAL_NUMPY_IO.md) |
-| `vtl.autograd` | `Context`, `Variable`, differentiable operations, and `backprop()` | [Autograd tutorial](docs/TUTORIAL_AUTOGRAD.md) · [API docs](https://vlang.github.io/vtl/vtl.autograd.html) |
-| `vtl.autograd_cuda` | Optional CUDA device sessions and GPU-backed autograd | [Device memory guide](docs/DEVICE_MEMORY.md) · [CUDA example](examples/nn_cifar10_cuda/README.md) · [Source](autograd_cuda/) |
-| `vtl.la` | Linear algebra operations backed by VSL | [Linear algebra tutorial](docs/TUTORIAL_LINEAR_ALGEBRA.md) · [Advanced LA](docs/TUTORIAL_ADVANCED_LA.md) · [API docs](https://vlang.github.io/vtl/vtl.la.html) |
-| `vtl.nn` | Neural-network layers, losses, optimizers, and training utilities | [Neural networks](docs/TUTORIAL_NEURAL_NETWORKS.md) · [API docs](https://vlang.github.io/vtl/vtl.nn.html) |
-| `vtl.nn.models` | `Sequential` model construction, training, and serialization | [Neural networks](docs/TUTORIAL_NEURAL_NETWORKS.md) · [API docs](https://vlang.github.io/vtl/vtl.nn.models.html) |
-| `vtl.nn.layers` | Reusable dense, convolutional, recurrent, attention, and activation layers | [Neural networks](docs/TUTORIAL_NEURAL_NETWORKS.md) · [API docs](https://vlang.github.io/vtl/vtl.nn.layers.html) |
-| `vtl.nn.loss` | Loss functions for regression and classification | [Neural networks](docs/TUTORIAL_NEURAL_NETWORKS.md) · [API docs](https://vlang.github.io/vtl/vtl.nn.loss.html) |
-| `vtl.nn.optimizers` | SGD, Adam, AdamW, RMSProp, AdaGrad, and schedulers | [Optimizer tutorial](docs/TUTORIAL_OPTIMIZERS.md) · [API docs](https://vlang.github.io/vtl/vtl.nn.optimizers.html) |
-| `vtl.nn.data` | Data loaders used by neural-network examples | [Examples](examples/README.md) · [API docs](https://vlang.github.io/vtl/vtl.nn.data.html) |
-| `vtl.nn.internal` | Internal tensor operations, activations, losses, and weight initialization | [API docs](https://vlang.github.io/vtl/vtl.nn.internal.html) |
-| `vtl.nn.gates` | Autograd gate implementations used by neural-network layers | [Autograd tutorial](docs/TUTORIAL_AUTOGRAD.md) · [API docs](https://vlang.github.io/vtl/vtl.nn.gates.html) |
-| `vtl.datasets` | MNIST, CIFAR-10, and IMDB dataset loaders | [Datasets guide](datasets/README.md) · [Examples](examples/README.md) · [API docs](https://vlang.github.io/vtl/vtl.datasets.html) |
-| `vtl.stats` | Weighted averages, descriptive statistics, and statistical summaries | [Reduction tutorial](docs/TUTORIAL_REDUCTIONS.md) · [Source](stats/) · [Tests](stats/) |
-| Core lookup | Sorted unique values/indices, partial `partition`/`argpartition`, axis slices/counts, `count_nonzero`, coordinate lookup, `isin`, `digitize`, and ascending/descending `searchsorted` | [Indexing tutorial](docs/TUTORIAL_INDEXING.md) · [Unique values tutorial](docs/TUTORIAL_UNIQUE.md) · [Example](examples/digitize/main.v) |
-| `vtl.ml.metrics` | Machine-learning metrics and evaluation helpers | [Source](ml/metrics/) · [Tests](ml/metrics/metrics_test.v) |
-| `vtl.storage` | CPU storage plus optional CUDA, VCL, and Vulkan storage backends | [Device memory guide](docs/DEVICE_MEMORY.md) · [Source](storage/) |
+| Module | Purpose | Guide |
+|--------|---------|-------|
+| `vtl` | Tensor creation, slicing, broadcasting, reductions | [First steps](docs/TUTORIAL_FIRST_STEPS.md) |
+| `vtl.fft` | Real and complex FFTs via VSL PocketFFT | [FFT](docs/TUTORIAL_FFT.md) |
+| `vtl.csv` | Numeric CSV tensor input and output | [NumPy I/O](docs/TUTORIAL_NUMPY_IO.md) |
+| `vtl.npy` / `vtl.npz` | Typed NumPy array and archive I/O | [NumPy I/O](docs/TUTORIAL_NUMPY_IO.md) |
+| `vtl.autograd` | Differentiable operations and backpropagation | [Autograd](docs/TUTORIAL_AUTOGRAD.md) |
+| `vtl.autograd_cuda` | Optional CUDA autograd | [Device memory](docs/DEVICE_MEMORY.md) |
+| `vtl.la` | VSL-backed linear algebra | [Linear algebra](docs/TUTORIAL_LINEAR_ALGEBRA.md) |
+| `vtl.nn` | Layers, losses, optimizers, and training | [Neural networks](docs/TUTORIAL_NEURAL_NETWORKS.md) |
+| `vtl.nn.models` | Model construction, training, serialization | [Neural networks](docs/TUTORIAL_NEURAL_NETWORKS.md) |
+| `vtl.nn.layers` | Dense, convolutional, recurrent, and attention layers | [Neural networks](docs/TUTORIAL_NEURAL_NETWORKS.md) |
+| `vtl.nn.loss` | Regression and classification losses | [Neural networks](docs/TUTORIAL_NEURAL_NETWORKS.md) |
+| `vtl.nn.optimizers` | Optimizers and learning-rate schedulers | [Optimizers](docs/TUTORIAL_OPTIMIZERS.md) |
+| `vtl.nn.data` | Neural-network data loaders | [Examples](examples/README.md) |
+| `vtl.nn.internal` | Internal tensor and activation operations | [Source](nn/internal/) |
+| `vtl.nn.gates` | Neural-network autograd gates | [Autograd](docs/TUTORIAL_AUTOGRAD.md) |
+| `vtl.datasets` | MNIST, CIFAR-10, and IMDB loaders | [Datasets](datasets/README.md) |
+| `vtl.stats` | Averages, descriptive statistics, and summaries | [Reductions](docs/TUTORIAL_REDUCTIONS.md) |
+| Core lookup | Unique values, indexing, and set operations | [Indexing](docs/TUTORIAL_INDEXING.md) |
+| `vtl.ml.metrics` | Machine-learning metrics and evaluation | [Source](ml/metrics/) |
+| `vtl.storage` | CPU, CUDA, VCL, and Vulkan storage | [Device memory](docs/DEVICE_MEMORY.md) |
 
 ## Installation
 
@@ -185,7 +194,7 @@ Full index: [`docs/README.md`](docs/README.md).
 > The core was reimplemented while keeping that lineage and inspiration.
 
 <a href="https://github.com/vlang/vtl/contributors">
-  <img src="https://contrib.rocks/image?repo=vlang/vtl"/>
+  <img src="https://contrib.rocks/image?repo=vlang/vtl" alt="VTL contributors"/>
 </a>
 
 Made with [contributors-img](https://contrib.rocks).

@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="340" viewBox="0 0 1200 340" role="img" aria-labelledby="title desc">
+  <title id="title">VTL: tensors and machine learning in V</title>
+  <desc id="desc">A tensor grid and connected computation graph represent VTL's n-dimensional arrays, autograd, numerical computing, and CPU and GPU training paths.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1728"/>
+      <stop offset="0.58" stop-color="#162d49"/>
+      <stop offset="1" stop-color="#273254"/>
+    </linearGradient>
+    <linearGradient id="tensor-face" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#49d6c4"/>
+      <stop offset="1" stop-color="#297bb5"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#58dfca"/>
+      <stop offset="1" stop-color="#9be778"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#020812" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="340" rx="28" fill="url(#background)"/>
+  <path d="M0 278C214 211 333 317 510 256s356-109 690-21" fill="none" stroke="#58dfca" stroke-opacity="0.14" stroke-width="2"/>
+  <path d="M0 68C203 142 375 17 590 73s370 98 610 5" fill="none" stroke="#9be778" stroke-opacity="0.12" stroke-width="2"/>
+
+  <g filter="url(#shadow)" transform="translate(76 69)">
+    <path d="M94 4 228 77v154L94 308-40 231V77z" fill="#0c2035" stroke="#8ee8d8" stroke-opacity="0.72" stroke-width="3"/>
+    <path d="M94 4 228 77 94 151-40 77z" fill="#42cbbd" fill-opacity="0.34" stroke="#a4f0df" stroke-width="2"/>
+    <path d="M-40 77 94 151v157L-40 231z" fill="url(#tensor-face)" fill-opacity="0.76" stroke="#80e4da" stroke-width="2"/>
+    <path d="M94 151 228 77v154L94 308z" fill="#3477b7" fill-opacity="0.72" stroke="#9ac6ff" stroke-width="2"/>
+    <g fill="none" stroke="#d8fff6" stroke-opacity="0.72" stroke-width="2">
+      <path d="m5 102 134 74M49 127l134 74M94 151v157M-40 128l134 74M-40 179l134 74M49 52v74M138 28v74M-40 128l134-52M-40 179l134-52M94 102l134-74M94 151l134-74"/>
+    </g>
+    <g fill="url(#accent)" stroke="#0b1728" stroke-width="4">
+      <circle cx="5" cy="102" r="8"/><circle cx="49" cy="127" r="8"/><circle cx="94" cy="151" r="8"/>
+      <circle cx="138" cy="176" r="8"/><circle cx="183" cy="201" r="8"/><circle cx="49" cy="52" r="8"/>
+      <circle cx="138" cy="28" r="8"/><circle cx="94" cy="253" r="8"/><circle cx="-40" cy="179" r="8"/>
+    </g>
+  </g>
+
+  <g font-family="Inter, Segoe UI, Arial, sans-serif">
+    <text x="390" y="82" fill="#8fe9d8" font-size="17" font-weight="700" letter-spacing="2.4">THE V TENSOR LIBRARY</text>
+    <text x="386" y="143" fill="#ffffff" font-size="47" font-weight="800">Numerical computing</text>
+    <text x="390" y="194" fill="#ffffff" font-size="39" font-weight="750">and machine learning in V</text>
+    <text x="392" y="236" fill="#d5e1f4" font-size="20">N-dimensional tensors, autograd, statistics, and linear algebra.</text>
+
+    <g font-size="15" font-weight="700">
+      <rect x="390" y="270" width="105" height="36" rx="18" fill="#58dfca" fill-opacity="0.16" stroke="#58dfca" stroke-opacity="0.52"/>
+      <text x="412" y="293" fill="#dcfff8">Tensors</text>
+      <rect x="507" y="270" width="112" height="36" rx="18" fill="#9be778" fill-opacity="0.14" stroke="#9be778" stroke-opacity="0.5"/>
+      <text x="529" y="293" fill="#efffe7">Autograd</text>
+      <rect x="631" y="270" width="127" height="36" rx="18" fill="#72a9ed" fill-opacity="0.16" stroke="#72a9ed" stroke-opacity="0.52"/>
+      <text x="650" y="293" fill="#e6f1ff">Linear algebra</text>
+      <rect x="770" y="270" width="94" height="36" rx="18" fill="#e685a3" fill-opacity="0.15" stroke="#e685a3" stroke-opacity="0.5"/>
+      <text x="792" y="293" fill="#ffe7ef">CPU</text>
+      <rect x="876" y="270" width="124" height="36" rx="18" fill="#75c87d" fill-opacity="0.15" stroke="#75c87d" stroke-opacity="0.5"/>
+      <text x="897" y="293" fill="#edffed">CUDA · Vulkan</text>
+    </g>
+  </g>
+</svg>
