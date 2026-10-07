@@ -23,6 +23,36 @@ fn test_meshgrid_requires_vectors() {
 	}
 }
 
+fn test_indices_sparse_returns_broadcastable_coordinate_tensors() ! {
+	coordinates := vtl.indices_sparse([2, 3, 4])!
+	assert coordinates.len == 3
+	assert coordinates[0].shape == [2, 1, 1]
+	assert coordinates[1].shape == [1, 3, 1]
+	assert coordinates[2].shape == [1, 1, 4]
+	assert coordinates[0].get_nth(1) == 1
+	assert coordinates[1].get_nth(2) == 2
+	assert coordinates[2].get_nth(3) == 3
+	assert coordinates[0].size == 2
+	assert coordinates[1].size == 3
+	assert coordinates[2].size == 4
+}
+
+fn test_indices_sparse_handles_empty_and_zero_dimensions() ! {
+	assert vtl.indices_sparse([])!.len == 0
+	coordinates := vtl.indices_sparse([0, 3])!
+	assert coordinates[0].shape == [0, 1]
+	assert coordinates[1].shape == [1, 3]
+	assert coordinates[1].get_nth(2) == 2
+}
+
+fn test_indices_sparse_rejects_negative_dimensions() {
+	if _ := vtl.indices_sparse([2, -1]) {
+		assert false, 'indices_sparse must reject negative dimensions'
+	} else {
+		assert true
+	}
+}
+
 fn test_empty() {
 	mut t := vtl.empty[f64]([3])
 	t.fill(1.0)

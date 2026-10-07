@@ -166,6 +166,16 @@ assert coordinates.shape == [2, 2, 3]
 assert coordinates.to_array() == [0, 0, 0, 1, 1, 1, 0, 1, 2, 0, 1, 2]
 ```
 
+Use `indices_sparse` when the coordinates will be broadcast later. It returns
+one tensor per axis and stores only each axis's coordinate vector:
+
+```v
+import vtl
+
+coordinates := vtl.indices_sparse([2, 3, 4])!
+// Shapes: [2, 1, 1], [1, 3, 1], [1, 1, 4]
+```
+
 ```v
 import vtl
 
