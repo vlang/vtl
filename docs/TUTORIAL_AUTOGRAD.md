@@ -50,6 +50,24 @@ println(x.grad) // [6.0]  — because d(x^2)/dx = 2x = 2*3 = 6
 println(y.grad) // [9.887...] — because d(x^y)/dy = x^y * ln(x)
 ```
 
+Use `sum()` or `mean()` to turn a tensor into a one-element loss. Their
+backward passes broadcast the scalar gradient to the input; `mean()` divides
+each input gradient by the number of elements:
+
+```v
+import vtl
+import vtl.autograd
+
+mut ctx := autograd.ctx[f64]()
+x := ctx.variable(vtl.from_1d([2.0, 3.0])!)
+mut loss := x.multiply(x)!.sum()!
+loss.backprop()!
+assert x.grad.to_array() == [4.0, 6.0]
+```
+
+See the [scalar loss example](../examples/autograd_scalar_loss/README.md) for
+both reductions.
+
 ## Gradient accumulation
 
 Gradients accumulate across calls.  Zero them before each training step
@@ -139,8 +157,8 @@ joined.backprop()!
 
 ## Supported operations
 
-The autograd engine tracks every VTL tensor operation.  Common ones used
-in neural networks:
+Only operations with a registered autograd rule are tracked. Common ones used
+in neural networks include:
 
 - `add`, `subtract`, `multiply` — element-wise arithmetic
 - `matmul` — matrix multiplication (used by `linear` layers)

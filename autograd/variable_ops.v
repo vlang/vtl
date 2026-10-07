@@ -1,6 +1,31 @@
 module autograd
 
 import vtl
+import vtl.stats as vtl_stats
+
+// sum reduces every tensor element into a one-element tensor and records the
+// broadcast backward rule when this variable requires gradients.
+pub fn (v &Variable[T]) sum() !&Variable[T] {
+	value := vtl.from_1d([vtl_stats.sum[T](v.value)])!
+	mut result := v.context.variable(value)
+	if v.requires_grad {
+		gate := sum_gate[T](v.value.shape, -1)
+		gate.cache(mut result, v)!
+	}
+	return result
+}
+
+// mean reduces every tensor element into a one-element tensor and distributes
+// the backward gradient uniformly over the input elements.
+pub fn (v &Variable[T]) mean() !&Variable[T] {
+	value := vtl.from_1d([vtl_stats.mean[T](v.value)])!
+	mut result := v.context.variable(value)
+	if v.requires_grad {
+		gate := mean_gate[T](v.value.shape, -1, v.value.size)
+		gate.cache(mut result, v)!
+	}
+	return result
+}
 
 // add Adds two variables together.
 pub fn (v &Variable[T]) add(other &Variable[T]) !&Variable[T] {
