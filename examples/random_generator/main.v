@@ -19,6 +19,8 @@ fn main() {
 	shuffled_features := training_rng.permutation_tensor[f64](training_features)!
 	positive_noise := training_rng.gamma(2.0, 0.5, [4])!
 	probability_samples := training_rng.beta(2.0, 5.0, [4])!
+	class_concentration := vtl.from_1d([0.5, 1.5, 3.0])!
+	class_probabilities_sample := training_rng.dirichlet[f64](class_concentration, [2])!
 	positive_scales := training_rng.lognormal(0.0, 0.25, [4])!
 	noise := training_rng.uniform(-0.01, 0.01, [4])!
 	event_counts := training_rng.binomial(12, 0.25, [4])!
@@ -35,6 +37,7 @@ fn main() {
 	println('Shuffled feature rows shape: ${shuffled_features.shape}')
 	println('Positive gamma samples: ${positive_noise.to_array()}')
 	println('Beta probability samples: ${probability_samples.to_array()}')
+	println('Dirichlet class probability samples: ${class_probabilities_sample.to_array()}')
 	println('Log-normal positive scales: ${positive_scales.to_array()}')
 	println('Binomial event counts: ${event_counts.to_array()}')
 	println('Exponential waiting durations: ${waiting_durations.to_array()}')

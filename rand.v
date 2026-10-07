@@ -364,6 +364,47 @@ pub fn (mut generator RandomGenerator) beta(alpha f64, beta f64, shape []int) !&
 	return from_array[f64](values, shape)
 }
 
+// dirichlet returns samples from a Dirichlet distribution. The final output
+// axes match the concentration tensor's shape; sample_shape is prepended.
+pub fn (mut generator RandomGenerator) dirichlet[T](alpha &Tensor[T], sample_shape []int) !&Tensor[f64] {
+	if alpha.rank() != 1 || alpha.size == 0 {
+		return error('dirichlet: concentration parameters must be a non-empty vector')
+	}
+	for dimension in sample_shape {
+		if dimension < 0 {
+			return error('dirichlet: sample dimensions must be non-negative')
+		}
+	}
+	mut concentrations := []f64{len: alpha.size}
+	for i in 0 .. alpha.size {
+		value := td(alpha.get_nth(i)).f64()
+		if value <= 0 || math.is_nan(value) || math.is_inf(value, 0) {
+			return error('dirichlet: concentration parameters must be finite and positive')
+		}
+		concentrations[i] = value
+	}
+	mut output_shape := sample_shape.clone()
+	output_shape << alpha.size
+	sample_count := size_from_shape(sample_shape)
+	mut values := []f64{len: sample_count * alpha.size}
+	mut rng := generator.rng
+	for sample in 0 .. sample_count {
+		start := sample * alpha.size
+		mut total := 0.0
+		for category, concentration in concentrations {
+			values[start + category] = sample_gamma(concentration, 1.0, mut rng)!
+			total += values[start + category]
+		}
+		if total == 0 || math.is_inf(total, 0) {
+			return error('dirichlet: sampled gamma values could not be normalized')
+		}
+		for category in 0 .. alpha.size {
+			values[start + category] /= total
+		}
+	}
+	return from_array[f64](values, output_shape)
+}
+
 // bernoulli returns a tensor of bernoulli random variables.
 pub fn bernoulli[T](prob f64, shape []int, params TensorData) &Tensor[T] {
 	mut t := zeros[T](shape, params)
