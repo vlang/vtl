@@ -53,6 +53,27 @@ assert products.shape == [1, 2, 1]
 assert products.to_array() == [60, 672]
 ```
 
+## Statistical reductions along an axis
+
+`mean_along_axis`, `variance_along_axis`, and `std_along_axis` accept an
+explicit `keepdims` argument. Their `nanmean_`, `nanvar_`, and `nanstd_`
+counterparts ignore NaN values. Variance and standard deviation also accept
+`ddof`, the delta subtracted from the sample count:
+
+```v
+import vtl
+import vtl.stats
+
+values := vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [2, 3])!
+means := stats.mean_along_axis(values, 1, false)!
+assert means.shape == [2]
+assert means.to_array() == [2.0, 5.0]
+
+sample_std := stats.std_along_axis(values, 0, 1, true)!
+assert sample_std.shape == [1, 3]
+assert sample_std.to_array() == [2.1213203435596424, 2.1213203435596424, 2.1213203435596424]
+```
+
 ## argmax / argmin
 
 `argmax_axis(axis)` returns the index of the maximum value along `axis`.

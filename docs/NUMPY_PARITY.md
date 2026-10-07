@@ -63,14 +63,15 @@ boundary differences.
 
 **Current:** single-axis and multi-axis sum/product with `keepdims`; weighted
 average globally and along an axis; scalar population/sample variance and
-standard deviation; axis mean/variance/std; axis-wise `trapezoid`; linear
-quantile/percentile and multi-quantile APIs, including NaN-aware global and
-axis variants; axis arg reductions; histograms with automatic and custom bins,
-weighted density, and multiple bin-selection rules; integer/weighted
+standard deviation; axis mean/variance/std with explicit `keepdims` and
+NaN-aware forms; axis-wise `trapezoid`; linear quantile/percentile and
+multi-quantile APIs, including NaN-aware global and axis variants; axis arg
+reductions; histograms with automatic and custom bins, weighted density, and
+multiple bin-selection rules; integer/weighted
 `bincount`.
 
-**Remaining:** extend `keepdims` across reduction families and add accumulator
-dtype controls and broader reductions.
+**Remaining:** extend `keepdims` to the remaining reduction families and add
+accumulator dtype controls and broader reductions.
 
 ### Linear algebra
 
