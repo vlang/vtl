@@ -102,3 +102,88 @@ fn scatter_add_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
 	tensors := typed_gate.backward(typed_payload.variable.grad)!
 	return tensor_ptrs_to_voidptrs[T](tensors)
 }
+
+// put_along_axis writes updates into a copy and tracks gradients. When multiple
+// updates target the same position, only the last update receives its gradient.
+pub fn (v &Variable[T]) put_along_axis(indices &vtl.Tensor[int], updates &Variable[T], axis int) !&Variable[T] {
+	mut value := v.value.copy(.row_major)
+	value.put_along_axis[T](indices, updates.value, axis)!
+	needs_grad := v.requires_grad || updates.requires_grad
+	mut result := variable[T](v.context, value, requires_grad: needs_grad)
+	if needs_grad {
+		axis_index := if axis < 0 { axis + v.value.rank() } else { axis }
+		gate := &PutAlongAxisGate[T]{
+			indices:     indices.copy(.row_major)
+			input_shape: v.value.shape.clone()
+			axis:        axis_index
+		}
+		result.grad = vtl.zeros_like[T](value)
+		register[T]('PutAlongAxis', voidptr(gate), put_along_axis_backward_dispatch[T], result,
+			[v, updates])!
+	}
+	return result
+}
+
+struct PutAlongAxisGate[T] {
+	indices     &vtl.Tensor[int]
+	input_shape []int
+	axis        int
+}
+
+fn (g &PutAlongAxisGate[T]) backward(gradient &vtl.Tensor[T]) ![]&vtl.Tensor[T] {
+	mut input_gradient := gradient.copy(.row_major)
+	mut last_update_by_destination := map[int]int{}
+	mut destinations := []int{len: g.indices.size}
+	for update_position in 0 .. g.indices.size {
+		mut destination_index := g.indices.nth_index(update_position)
+		selected := g.indices.get(destination_index)
+		destination_index[g.axis] = if selected < 0 {
+			selected + g.input_shape[g.axis]
+		} else {
+			selected
+		}
+		destination := flat_index_from_coordinate(destination_index, g.input_shape)
+		destinations[update_position] = destination
+		last_update_by_destination[destination] = update_position
+	}
+	for destination, _ in last_update_by_destination {
+		mut destination_index := []int{len: g.input_shape.len}
+		mut remaining := destination
+		for dimension := g.input_shape.len - 1; dimension >= 0; dimension-- {
+			destination_index[dimension] = remaining % g.input_shape[dimension]
+			remaining /= g.input_shape[dimension]
+		}
+		input_gradient.set(destination_index, vtl.cast[T](0))
+	}
+	mut update_gradient_values := []T{len: g.indices.size}
+	for update_position in 0 .. g.indices.size {
+		if last_update_by_destination[destinations[update_position]] != update_position {
+			continue
+		}
+		update_index := g.indices.nth_index(update_position)
+		selected := g.indices.get(update_index)
+		update_index[g.axis] = if selected < 0 {
+			selected + g.input_shape[g.axis]
+		} else {
+			selected
+		}
+		update_gradient_values[update_position] = gradient.get(update_index)
+	}
+	update_gradient := vtl.from_array[T](update_gradient_values, g.indices.shape)!
+	return [input_gradient, update_gradient]
+}
+
+fn put_along_axis_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_gate := unsafe { &PutAlongAxisGate[T](gate) }
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := typed_gate.backward(typed_payload.variable.grad)!
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
+fn flat_index_from_coordinate(coordinate []int, shape []int) int {
+	mut flat_index := 0
+	for dimension, value in coordinate {
+		flat_index = flat_index * shape[dimension] + value
+	}
+	return flat_index
+}

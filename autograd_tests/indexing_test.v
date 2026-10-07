@@ -60,3 +60,33 @@ fn test_scatter_add_backward_propagates_to_source_and_updates() ! {
 	assert input.grad.to_array() == [2.0, 3.0, 5.0]
 	assert updates.grad.to_array() == [3.0, 3.0, 5.0]
 }
+
+fn test_put_along_axis_backward_tracks_last_duplicate_update() ! {
+	mut ctx := autograd.ctx[f64]()
+	input := ctx.variable(vtl.from_array([10.0, 20.0, 30.0], [1, 3])!)
+	updates := ctx.variable(vtl.from_array([100.0, 200.0, 300.0], [1, 3])!)
+	mut indices := vtl.from_array[int]([1, 1, 2], [1, 3])!
+	weights := ctx.variable(vtl.from_array([2.0, 3.0, 5.0], [1, 3])!)
+
+	put := input.put_along_axis(indices, updates, 1)!
+	assert put.value.to_array() == [10.0, 200.0, 300.0]
+	indices.fill(0)
+	mut objective := put.multiply(weights)!
+	objective.backprop()!
+	assert input.grad.to_array() == [2.0, 0.0, 0.0]
+	assert updates.grad.to_array() == [0.0, 3.0, 5.0]
+}
+
+fn test_put_along_axis_backward_supports_f32() ! {
+	mut ctx := autograd.ctx[f32]()
+	input := ctx.variable(vtl.from_array([f32(1.0), 2.0], [1, 2])!)
+	updates := ctx.variable(vtl.from_array([f32(3.0)], [1, 1])!)
+	indices := vtl.from_array[int]([1], [1, 1])!
+	weights := ctx.variable(vtl.from_array([f32(4.0), 5.0], [1, 2])!)
+
+	put := input.put_along_axis(indices, updates, 1)!
+	mut objective := put.multiply(weights)!
+	objective.backprop()!
+	assert input.grad.to_array() == [f32(4.0), 0.0]
+	assert updates.grad.to_array() == [f32(5.0)]
+}

@@ -48,6 +48,14 @@ gradient.
 See the runnable [autograd scatter example](../examples/autograd_scatter/README.md)
 for an indexed update with a non-uniform downstream gradient.
 
+`Variable.put_along_axis` follows replacement semantics. The source gradient is
+zero at overwritten positions, and when an index is repeated only the last
+update receives the destination gradient. Earlier updates to that same
+position receive zero.
+
+See the runnable [autograd put example](../examples/autograd_put/README.md) for
+duplicate destinations and their gradients.
+
 ## Count non-zero values
 
 `count_nonzero` counts all non-zero tensor values. `count_nonzero_axis` counts
