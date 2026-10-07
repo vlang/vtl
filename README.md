@@ -54,7 +54,7 @@ t.get([1, 1])
 
 - **Tensors** — create, slice, indexed `take`/`take_nd`/`take_flat`, `choose`,
   `compress`, `indices`, `pad`, set membership, reshape, transpose, move/roll axes,
-  broadcast, map/reduce, and `einsum`
+  broadcast, map/reduce, `einsum`, and `complex128` storage with elementwise arithmetic
 - **Autograd** — reverse-mode AD; arbitrary computational graphs
 - **Neural networks** — `Sequential` API; Linear, Conv2D, LSTM, Attention, …
 - **Losses & optimizers** — MSE, MAE, BCE, Hinge, Focal, CrossEntropy, Huber;
@@ -115,6 +115,7 @@ opt.update()!
 | Module | Purpose | Guide |
 |--------|---------|-------|
 | `vtl` | Tensor creation, slicing, broadcasting, reductions | [First steps](docs/TUTORIAL_FIRST_STEPS.md) |
+| Complex tensors | `math.complex.Complex` storage and elementwise arithmetic | [Complex tensors](docs/TUTORIAL_COMPLEX.md) |
 | `vtl.fft` | Real and complex FFTs via VSL PocketFFT | [FFT](docs/TUTORIAL_FFT.md) |
 | `vtl.csv` | Numeric CSV tensor input and output | [NumPy I/O](docs/TUTORIAL_NUMPY_IO.md) |
 | `vtl.npy` / `vtl.npz` | Typed NumPy array and archive I/O | [NumPy I/O](docs/TUTORIAL_NUMPY_IO.md) |

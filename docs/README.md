@@ -18,6 +18,7 @@ neural network module.
 |------|------|
 | New to VTL | [Tutorial overview](./TUTORIAL.md) |
 | Tensor creation, indexing, slicing | [First steps](./TUTORIAL_FIRST_STEPS.md), [Slicing](./TUTORIAL_SLICING.md) |
+| Complex tensor storage and arithmetic | [Complex tensors](./TUTORIAL_COMPLEX.md) |
 | Unique values and occurrence counts | [Unique values](./TUTORIAL_UNIQUE.md) |
 | Missing values and masked reductions | [Masked data](./TUTORIAL_MASKED_DATA.md) |
 | Gather and indexed updates | [Indexing and scatter](./TUTORIAL_INDEXING.md) |
@@ -62,7 +63,7 @@ VSL for linear algebra and backend kernels where available. Install/import VSL
 directly when you need standalone scientific computing; use VTL when you need
 tensors, autograd, datasets, layers, losses, optimizers, and training loops.
 
-![VTL and VSL architecture: data inputs flow through VTL tensors and workflows into VSL numerical kernels and CPU/GPU backends.](./assets/vtl-architecture.png)
+![VTL data and compute flow through VSL CPU and GPU backends](./assets/vtl-architecture.png)
 
 [Open the editable SVG source](./assets/vtl-architecture.svg).
 
