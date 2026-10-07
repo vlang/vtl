@@ -122,7 +122,10 @@ import vtl
 
 integers := vtl.from_1d[u16]([1, 2, 3])!
 assert integers.dtype() == .uint16
+signed32 := integers.as_i32()
+assert signed32.dtype() == .int32
 assert vtl.promote_types(integers.dtype(), .float32)! == .float32
+assert vtl.promote_types(.int16, .uint16)! == .int32
 assert vtl.promote_types(.int64, .uint64)! == .float64
 ```
 
