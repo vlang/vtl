@@ -130,6 +130,10 @@ matrix in an N-D tensor, with optional retained matrix dimensions.
 `la.trace_axes` sums offset diagonals across selected axes and preserves the
 remaining dimensions as a batch.
 `la.svdvals` returns descending singular values for batched real matrices.
+`la.svd` returns U, descending singular values, and V transpose for batched
+real matrices, with NumPy-compatible full and reduced matrix shapes selected by
+`full_matrices` (default `true`). The pure-V one-sided Jacobi implementation
+supports rectangular inputs and rejects non-finite values.
 `la.slogdet` returns determinant signs and log absolute determinants for batches,
 including singular matrices and values whose determinants would overflow.
 `la.matrix_power` uses exponentiation by squaring for batched integer powers and
@@ -152,8 +156,8 @@ leading batch dimensions.
 rank from a relative singular-value cutoff, and returns squared residual sums
 only when NumPy does.
 
-**Remaining:** add general (non-symmetric, possibly complex) eigenproblems and
-full SVD options, and benchmark realistic shapes.
+**Remaining:** add general (non-symmetric, possibly complex) eigenproblems,
+complex SVD, and benchmark realistic shapes.
 
 ### FFT
 
