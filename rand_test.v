@@ -19,3 +19,16 @@ fn test_random_i32_values_stay_within_requested_range() {
 		assert value >= -20 && value < 20
 	}
 }
+
+fn test_random_i16_and_u8_values_stay_within_requested_ranges() {
+	random_seed(43)
+	signed := random[i16](-200, 201, [64], TensorData{})
+	for value in signed.to_array() {
+		assert value >= -200 && value < 201
+	}
+
+	unsigned := random[u8](10, 200, [64], TensorData{})
+	for value in unsigned.to_array() {
+		assert value >= 10 && value < 200
+	}
+}

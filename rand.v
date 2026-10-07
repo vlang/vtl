@@ -281,6 +281,9 @@ fn random_in_range[T](min T, max T) T {
 	$if T is u16 {
 		return u16(rand.int_in_range(int(min), int(max)) or { u16(min) })
 	}
+	$if T is u8 {
+		return u8(rand.int_in_range(int(min), int(max)) or { int(min) })
+	}
 	$if T is u32 {
 		return rand.u32_in_range(min, max) or { min }
 	}
@@ -289,6 +292,9 @@ fn random_in_range[T](min T, max T) T {
 	}
 	$if T is i8 {
 		return i8(rand.int_in_range(int(min), int(max)) or { i8(min) })
+	}
+	$if T is i16 {
+		return i16(rand.int_in_range(int(min), int(max)) or { int(min) })
 	}
 	$if T is i32 {
 		return i32(rand.int_in_range(int(min), int(max)) or { int(min) })
