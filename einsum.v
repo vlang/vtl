@@ -1,6 +1,7 @@
 module vtl
 
 import vsl.la as vsl_la
+import math.complex as vcomplex
 
 // einsum evaluates an Einstein summation expression over one or more tensors.
 // It supports alphabetic axis labels, explicit or implicit output labels,
@@ -156,13 +157,13 @@ pub fn einsum[T](subscripts string, operands ...&Tensor[T]) !&Tensor[T] {
 		for i, label in output_labels {
 			label_values[label_positions[label]] = output_index[i]
 		}
-		mut sum := T(0)
+		mut sum := einsum_zero[T]()
 		for reduction_linear in 0 .. reduction_size {
 			einsum_fill_index(reduction_linear, reduction_shape, mut reduction_index)
 			for i, label in reduction_labels {
 				label_values[label_positions[label]] = reduction_index[i]
 			}
-			mut product := T(1)
+			mut product := einsum_one[T]()
 			for operand_index, operand in operands {
 				for axis, label in operand_labels[operand_index] {
 					operand_indices[operand_index][axis] = if operand.shape[axis] == 1 {
@@ -178,6 +179,22 @@ pub fn einsum[T](subscripts string, operands ...&Tensor[T]) !&Tensor[T] {
 		result.set(output_index, sum)
 	}
 	return result
+}
+
+fn einsum_zero[T]() T {
+	$if T is vcomplex.Complex {
+		return T(vcomplex.Complex{})
+	} $else {
+		return T(0)
+	}
+}
+
+fn einsum_one[T]() T {
+	$if T is vcomplex.Complex {
+		return T(vcomplex.Complex{ re: 1, im: 0 })
+	} $else {
+		return T(1)
+	}
 }
 
 struct EinsumTerm {

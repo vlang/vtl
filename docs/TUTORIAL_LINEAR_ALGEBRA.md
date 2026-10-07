@@ -334,6 +334,26 @@ ellipsis notation for batched operations are supported. Labels are single ASCII
 letters. Two-dimensional floating-point matrix products use the VSL linear
 algebra kernel; other expressions use the general contraction evaluator.
 
+The general evaluator also supports `math.complex.Complex` tensors, so complex
+matrix products and contractions use the same notation without conjugating
+either operand:
+
+```v
+import math.complex as cmplx
+import vtl
+
+a := vtl.from_2d[cmplx.Complex]([
+	[cmplx.complex(1.0, 1.0), cmplx.complex(2.0, 0.0)],
+	[cmplx.complex(3.0, -1.0), cmplx.complex(4.0, 0.0)],
+])!
+b := vtl.from_2d[cmplx.Complex]([
+	[cmplx.complex(0.0, 1.0), cmplx.complex(2.0, 0.0)],
+	[cmplx.complex(1.0, 0.0), cmplx.complex(0.0, -1.0)],
+])!
+product := vtl.einsum[cmplx.Complex]('ij,jk->ik', a, b)!
+assert product.get_nth(0) == cmplx.complex(1.0, 1.0)
+```
+
 ## See also
 
 - [First Steps](./TUTORIAL_FIRST_STEPS.md) — tensor creation and shapes

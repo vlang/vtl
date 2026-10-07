@@ -1,6 +1,7 @@
 module core
 
 import vtl
+import math.complex as vcomplex
 
 fn test_einsum_matrix_multiplication_explicit_and_implicit() ! {
 	a := vtl.from_2d([[f64(1), 2], [3, 4]])!
@@ -23,6 +24,29 @@ fn test_einsum_float32_matrix_product_uses_typed_results() ! {
 	assert result.get_nth(1) == f32(4)
 	assert result.get_nth(2) == f32(6)
 	assert result.get_nth(3) == f32(8)
+}
+
+fn test_einsum_complex128_matrix_product_matches_matmul() ! {
+	a := vtl.from_array[vcomplex.Complex]([
+		vcomplex.Complex{ re: 1, im: 1 },
+		vcomplex.Complex{ re: 2, im: 0 },
+		vcomplex.Complex{ re: 3, im: -1 },
+		vcomplex.Complex{ re: 4, im: 0 },
+	], [2, 2])!
+	b := vtl.from_array[vcomplex.Complex]([
+		vcomplex.Complex{ re: 0, im: 1 },
+		vcomplex.Complex{ re: 2, im: 0 },
+		vcomplex.Complex{ re: 1, im: 0 },
+		vcomplex.Complex{ re: 0, im: -1 },
+	], [2, 2])!
+	result := vtl.einsum[vcomplex.Complex]('ij,jk->ik', a, b)!
+	assert result.shape == [2, 2]
+	assert result.to_array() == [
+		vcomplex.Complex{ re: 1, im: 1 },
+		vcomplex.Complex{ re: 2, im: 0 },
+		vcomplex.Complex{ re: 5, im: 3 },
+		vcomplex.Complex{ re: 6, im: -6 },
+	]
 }
 
 fn test_einsum_batched_matrix_multiplication_with_ellipsis() ! {

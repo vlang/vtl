@@ -1,5 +1,7 @@
 module vtl
 
+import math.complex as vcomplex
+
 // TensorDataType is a sum type that lists the possible types to be used to define storage
 pub type TensorDataType = bool
 	| f32
@@ -50,7 +52,9 @@ pub fn td[T](x T) TensorDataType {
 
 // cast exposes this operation as part of the public API.
 pub fn cast[T](x TensorDataType) T {
-	$if T is bool {
+	$if T is vcomplex.Complex {
+		return T(vcomplex.Complex{ re: x.f64(), im: 0 })
+	} $else $if T is bool {
 		return x.bool()
 	} $else $if T is f32 {
 		return x.f32()
