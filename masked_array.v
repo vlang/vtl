@@ -16,6 +16,15 @@ enum MaskedBinaryOperation {
 	divide
 }
 
+enum MaskedComparison {
+	equal
+	not_equal
+	less
+	less_equal
+	greater
+	greater_equal
+}
+
 // MaskedArray pairs tensor values with a boolean missing-data mask. A true
 // mask entry marks the corresponding value as missing, following NumPy's
 // numpy.ma convention.
@@ -119,6 +128,36 @@ pub fn (array &MaskedArray[T]) divide[T](other &MaskedArray[T]) !MaskedArray[T] 
 	return masked_binary[T](array, other, .divide)
 }
 
+// equal performs a broadcasted equality comparison and masks invalid pairs.
+pub fn (array &MaskedArray[T]) equal[T](other &MaskedArray[T]) !MaskedArray[bool] {
+	return masked_compare[T](array, other, .equal)
+}
+
+// not_equal performs a broadcasted inequality comparison and masks invalid pairs.
+pub fn (array &MaskedArray[T]) not_equal[T](other &MaskedArray[T]) !MaskedArray[bool] {
+	return masked_compare[T](array, other, .not_equal)
+}
+
+// less_than compares values with < and masks invalid pairs.
+pub fn (array &MaskedArray[T]) less_than[T](other &MaskedArray[T]) !MaskedArray[bool] {
+	return masked_compare[T](array, other, .less)
+}
+
+// less_equal compares values with <= and masks invalid pairs.
+pub fn (array &MaskedArray[T]) less_equal[T](other &MaskedArray[T]) !MaskedArray[bool] {
+	return masked_compare[T](array, other, .less_equal)
+}
+
+// greater_than compares values with > and masks invalid pairs.
+pub fn (array &MaskedArray[T]) greater_than[T](other &MaskedArray[T]) !MaskedArray[bool] {
+	return masked_compare[T](array, other, .greater)
+}
+
+// greater_equal compares values with >= and masks invalid pairs.
+pub fn (array &MaskedArray[T]) greater_equal[T](other &MaskedArray[T]) !MaskedArray[bool] {
+	return masked_compare[T](array, other, .greater_equal)
+}
+
 // add_scalar adds a valid scalar to every value and preserves the mask.
 pub fn (array &MaskedArray[T]) add_scalar[T](scalar T) !MaskedArray[T] {
 	return MaskedArray[T]{
@@ -163,6 +202,32 @@ fn masked_binary[T](array &MaskedArray[T], other &MaskedArray[T], operation Mask
 	}
 	mask := array.mask.logical_or[bool](other.mask)!
 	return masked_array[T](values, mask)
+}
+
+fn masked_compare[T](array &MaskedArray[T], other &MaskedArray[T], operation MaskedComparison) !MaskedArray[bool] {
+	mut iterators, shape := array.values.iterators[T]([other.values])!
+	mut values := empty[bool](shape)
+	for {
+		pair, index := iterators.next() or { break }
+		left := pair[0]
+		right := pair[1]
+		result := if operation == .equal {
+			left == right
+		} else if operation == .not_equal {
+			left != right
+		} else if operation == .less {
+			left < right
+		} else if operation == .less_equal {
+			left <= right
+		} else if operation == .greater {
+			left > right
+		} else {
+			left >= right
+		}
+		values.set(index, result)
+	}
+	mask := array.mask.logical_or[bool](other.mask)!
+	return masked_array[bool](values, mask)
 }
 
 // sum reduces all unmasked values. An entirely masked array returns a masked

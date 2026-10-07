@@ -78,3 +78,7 @@ with another masked array. The result mask is the broadcasted logical OR of
 both input masks. The matching `*_scalar` methods apply a valid scalar and
 preserve the array's mask. Masked payload values are still computed; ignore
 them wherever the result mask is true.
+
+`equal`, `not_equal`, `less_than`, `less_equal`, `greater_than`, and
+`greater_equal` also broadcast operands and mask comparisons when either input
+is missing. They return `MaskedArray[bool]`.
