@@ -39,7 +39,9 @@ them for release claims.
 
 The VTL and NumPy cases use the same 500,000-element `f64` input, warm up
 three times, then report the mean of seven timed reductions. Input allocation
-is outside the timed region. Run both from `~/.vmodules`:
+is outside the timed region. For contiguous `f64` data and `ord=2`, VTL
+dispatches to VSL BLAS `dnrm2`; VSL uses a scaled SIMD accumulation to retain
+numerical stability. Run both from `~/.vmodules`:
 
 ```bash
 systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
@@ -50,10 +52,11 @@ systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env V
 ```
 
 Record V version, NumPy version, CPU, and BLAS build when comparing results.
-On an AMD Ryzen 9 5900X with V 0.5.2 `-prod`, this VTL path measured 0.545 ms;
-NumPy 2.5.3 measured 0.172 ms with `OPENBLAS_NUM_THREADS=2`. VTL is still
-about 3.2x slower for this case, so this is a tracked optimization target rather
-than a claim of parity or superiority.
+On an AMD Ryzen 9 5900X with V 0.5.2 `-prod`, a matched run measured 0.517 ms
+for VTL and 0.170 ms for NumPy 2.5.3 with `OPENBLAS_NUM_THREADS=2`; checksums
+matched within floating-point rounding. VTL is still about 3.0x slower for this
+case, so this is a tracked optimization target rather than a claim of parity or
+superiority. The V measurement used a 1.5 GiB `MemoryMax` and peaked at 1.1 GiB.
 
 ## Matmul
 
