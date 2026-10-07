@@ -68,6 +68,9 @@ coordinate-based updates; they are not a tuple of per-axis index arrays.
 Use `nonzero` when you need one index tensor per axis:
 
 ```v
+import vtl
+
+values := vtl.from_2d([[0, 2, 0], [3, 4, 0]])!
 indices := vtl.nonzero[int](values)!
 assert indices[0].to_array() == [0, 1, 1]
 assert indices[1].to_array() == [1, 0, 1]
@@ -117,3 +120,26 @@ row_mask := vtl.from_array([true, false], [2, 1])!
 filled := values.masked_fill(row_mask, -1)!
 assert filled.to_array() == [-1, -1, -1, 4, 5, 6]
 ```
+
+## Coordinate-array indexing
+
+`advanced_index` accepts one integer coordinate tensor for each input axis.
+Those coordinate tensors broadcast together, and each matching coordinate
+tuple selects one value. Negative coordinates count from the end. The result
+is an independent row-major copy, including when the source is a view.
+
+```v
+import vtl
+
+matrix := vtl.from_2d([[10, 11, 12], [20, 21, 22]])!
+rows := vtl.from_array[int]([0, 1], [2, 1])!
+columns := vtl.from_1d([1, 2, 0])!
+selected := vtl.advanced_index[int](matrix, [rows, columns])!
+assert selected.shape == [2, 3]
+assert selected.to_array() == [11, 12, 10, 21, 22, 20]
+```
+
+This covers coordinate-array selection such as NumPy's `matrix[rows, columns]`.
+The current API requires a coordinate tensor for every axis; combining
+coordinate arrays with slices or scalar indices is not supported yet. Use
+`take` or `take_nd` when gathering along one axis.

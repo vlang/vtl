@@ -29,7 +29,7 @@ fn test_isin_supports_boolean_tensors() {
 fn test_isin_nan_does_not_match_and_views_keep_logical_order() {
 	elements := vtl.from_2d([[math.nan(), 2.0], [3.0, 2.0]])!.transpose([1, 0])!
 	choices := vtl.from_1d([math.nan(), 2.0])!
-	assert vtl.isin(elements, choices).to_array() == [false, true, true, false]
+	assert vtl.isin(elements, choices).to_array() == [false, false, true, true]
 }
 
 fn test_count_nonzero_globally_and_by_axis_with_keepdims() ! {
@@ -117,6 +117,79 @@ fn test_nonzero_returns_one_index_tensor_per_axis() ! {
 	false_scalar := vtl.nonzero[int](vtl.from_array([0], [])!)!
 	assert false_scalar.len == 1
 	assert false_scalar[0].shape == [0]
+}
+
+fn test_advanced_index_pairs_coordinate_arrays() ! {
+	tensor := vtl.from_2d([[10, 11, 12], [20, 21, 22]])!
+	rows := vtl.from_1d([0, 1])!
+	columns := vtl.from_1d([2, 0])!
+	got := vtl.advanced_index[int](tensor, [rows, columns])!
+	assert got.shape == [2]
+	assert got.to_array() == [12, 20]
+}
+
+fn test_advanced_index_broadcasts_coordinates_and_supports_negative_values() ! {
+	tensor := vtl.from_2d([[10, 11, 12], [20, 21, 22]])!
+	rows := vtl.from_array[int]([0, 1], [2, 1])!
+	columns := vtl.from_1d([1, 2, 0])!
+	got := vtl.advanced_index[int](tensor, [rows, columns])!
+	assert got.shape == [2, 3]
+	assert got.to_array() == [11, 12, 10, 21, 22, 20]
+
+	negative_rows := vtl.from_1d([-1, 0])!
+	negative_columns := vtl.from_1d([-1, -2])!
+	negative := vtl.advanced_index[int](tensor, [negative_rows, negative_columns])!
+	assert negative.to_array() == [22, 11]
+}
+
+fn test_advanced_index_reads_views_and_returns_an_independent_copy() ! {
+	tensor := vtl.from_2d([[10, 11, 12], [20, 21, 22]])!
+	view := tensor.t()!
+	rows := vtl.from_1d([0, 2])!
+	columns := vtl.from_1d([1, 0])!
+	mut got := vtl.advanced_index[int](view, [rows, columns])!
+	assert got.shape == [2]
+	assert got.to_array() == [20, 12]
+	assert got.is_row_major_contiguous()
+	got.set([0], 99)
+	assert tensor.get([0, 1]) == 11
+}
+
+fn test_advanced_index_handles_scalar_and_empty_coordinates() ! {
+	scalar := vtl.from_array[int]([7], [])!
+	selected_scalar := vtl.advanced_index[int](scalar, [])!
+	assert selected_scalar.shape.len == 0
+	assert selected_scalar.get_nth[int](0) == 7
+
+	tensor := vtl.from_2d([[1, 2], [3, 4]])!
+	empty_rows := vtl.from_1d([]int{})!
+	columns := vtl.from_1d([]int{})!
+	empty := vtl.advanced_index[int](tensor, [empty_rows, columns])!
+	assert empty.shape == [0]
+	assert empty.size == 0
+}
+
+fn test_advanced_index_rejects_invalid_coordinate_inputs() {
+	tensor := vtl.from_2d([[1, 2], [3, 4]])!
+	if _ := vtl.advanced_index[int](tensor, [vtl.from_1d([0])!]) {
+		assert false, 'advanced_index must require one coordinate tensor per axis'
+	}
+	rows := vtl.from_array[int]([0, 1], [2, 1])!
+	columns := vtl.from_array[int]([0, 1, 0], [3])!
+	depths := vtl.from_1d([0])!
+	if _ := vtl.advanced_index[int](tensor, [rows, columns, depths]) {
+		assert false, 'advanced_index must reject coordinate count mismatch'
+	}
+	bad_columns := vtl.from_1d([2])!
+	if _ := vtl.advanced_index[int](tensor, [vtl.from_1d([0])!, bad_columns]) {
+		assert false, 'advanced_index must reject out-of-range coordinates'
+	}
+	if _ := vtl.advanced_index[int](tensor, [vtl.from_1d([0, 1])!, vtl.from_1d([0, 1, 0])!]) {
+		assert false, 'advanced_index must reject incompatible broadcast shapes'
+	}
+	if _ := vtl.advanced_index[int](vtl.from_array[int]([1], [])!, [vtl.from_1d([0])!]) {
+		assert false, 'advanced_index must reject coordinates on scalar tensors'
+	}
 }
 
 fn test_take_axis() {
