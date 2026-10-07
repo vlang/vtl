@@ -22,8 +22,15 @@ pub fn sum_gate[T](shape []int, axis int) &SumGate[T] {
 pub fn (g &SumGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	// Broadcast gradient back to original shape
-	r0 := gradient.broadcast_to[T](g.shape)!
+	r0 := reduction_gradient_broadcast[T](gradient, g.shape)!
 	return [r0]
+}
+
+fn reduction_gradient_broadcast[T](gradient &vtl.Tensor[T], shape []int) !&vtl.Tensor[T] {
+	if shape.len == 0 {
+		return vtl.from_array([gradient.get_nth(0)], []int{})
+	}
+	return gradient.broadcast_to[T](shape)
 }
 
 fn sum_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
@@ -68,7 +75,7 @@ pub fn mean_gate[T](shape []int, axis int, num_elems int) &MeanGate[T] {
 // backward exposes this operation as part of the public API.
 pub fn (g &MeanGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
-	broadcasted := gradient.broadcast_to[T](g.shape)!
+	broadcasted := reduction_gradient_broadcast[T](gradient, g.shape)!
 	scale := vtl.cast[T](g.num_elems)
 	r0 := broadcasted.divide_scalar[T](scale)!
 	return [r0]

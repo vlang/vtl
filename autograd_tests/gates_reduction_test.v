@@ -3,6 +3,49 @@ module autograd_tests
 import vtl.autograd
 import vtl
 
+fn test_variable_sum_and_mean_forward_backward() ! {
+	mut context := autograd.ctx[f64]()
+	input := context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0], [2, 2])!)
+	mut total := input.sum()!
+	assert total.value.shape == [1]
+	assert total.value.to_array() == [10.0]
+	total.backprop()!
+	assert input.grad.to_array() == [1.0, 1.0, 1.0, 1.0]
+
+	mut mean_input := context.variable(vtl.from_1d([1.0, 2.0, 3.0, 4.0])!)
+	mut average := mean_input.mean()!
+	assert average.value.to_array() == [2.5]
+	average.backprop()!
+	assert mean_input.grad.to_array() == [0.25, 0.25, 0.25, 0.25]
+}
+
+fn test_variable_sum_backpropagates_through_computation() ! {
+	mut context := autograd.ctx[f64]()
+	input := context.variable(vtl.from_1d([2.0, 3.0])!)
+	squared := input.multiply(input)!
+	mut loss := squared.sum()!
+	loss.backprop()!
+	assert input.grad.to_array() == [4.0, 6.0]
+}
+
+fn test_variable_sum_and_mean_support_zero_dimensional_inputs() ! {
+	mut context := autograd.ctx[f64]()
+	input := context.variable(vtl.from_array([5.0], []int{})!)
+	mut total := input.sum()!
+	assert total.value.to_array() == [5.0]
+	total.backprop()!
+	assert input.grad.shape.len == 0
+	assert input.grad.get_nth(0) == 1.0
+
+	mut mean_context := autograd.ctx[f64]()
+	mean_input := mean_context.variable(vtl.from_array([5.0], []int{})!)
+	mut average := mean_input.mean()!
+	assert average.value.to_array() == [5.0]
+	average.backprop()!
+	assert mean_input.grad.shape.len == 0
+	assert mean_input.grad.get_nth(0) == 1.0
+}
+
 fn test_reshape_forward_backward() {
 	f64_ctx := autograd.ctx[f64]()
 	x := f64_ctx.variable(vtl.from_1d([1.0, 2.0, 3.0, 4.0])!)

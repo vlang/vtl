@@ -58,6 +58,8 @@ source and update values, including repeated destination indices.
 only to the final update at each destination.
 `Variable.slice` and `Variable.slice_hilo` propagate gradients through integer
 indices, range views, and positive steps.
+`Variable.sum` and `Variable.mean` reduce all elements to a one-element tensor
+and propagate gradients to every input element.
 
 **Remaining:** document all bounds semantics.
 
