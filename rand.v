@@ -65,6 +65,35 @@ pub fn (mut generator RandomGenerator) bernoulli(probability f64, shape []int) !
 	return result
 }
 
+// binomial returns the number of successful trials in each sample using this
+// generator's independent stream.
+pub fn (mut generator RandomGenerator) binomial(trials int, probability f64, shape []int) !&Tensor[int] {
+	if trials < 0 {
+		return error('binomial: trials must be non-negative')
+	}
+	if probability < 0 || probability > 1 || math.is_nan(probability) || math.is_inf(probability, 0) {
+		return error('binomial: probability must be finite and in [0, 1]')
+	}
+	mut result := zeros[int](shape, TensorData{})
+	for i in 0 .. result.size {
+		result.set_nth(i, generator.rng.binomial(trials, probability)!)
+	}
+	return result
+}
+
+// exponential returns f64 samples from an exponential distribution with the
+// given positive finite rate using this generator's independent stream.
+pub fn (mut generator RandomGenerator) exponential(lambda f64, shape []int) !&Tensor[f64] {
+	if lambda <= 0 || math.is_nan(lambda) || math.is_inf(lambda, 0) {
+		return error('exponential: lambda must be finite and positive')
+	}
+	mut result := zeros[f64](shape, TensorData{})
+	for i in 0 .. result.size {
+		result.set_nth(i, generator.rng.exponential(lambda))
+	}
+	return result
+}
+
 // geometric returns the number of Bernoulli trials needed for the first
 // success, independently sampled from this generator. Results start at 1.
 pub fn (mut generator RandomGenerator) geometric(probability f64, shape []int) !&Tensor[int] {

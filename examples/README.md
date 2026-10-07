@@ -30,6 +30,7 @@ CIFAR examples for CI-safe checks.
 | [multi_axis_extrema](./multi_axis_extrema) | Multi-axis min/max reductions with NumPy-style output shapes | `v run ./vtl/examples/multi_axis_extrema/main.v` |
 | [nan_multi_axis_reductions](./nan_multi_axis_reductions) | NaN-aware multi-axis reductions | `v run ./vtl/examples/nan_multi_axis_reductions/main.v` |
 | [random_seed](./random_seed) | Repeat a random tensor sequence with an explicit seed | `v run ./vtl/examples/random_seed/main.v` |
+| [random_generator](./random_generator) | Independent seeded streams and common probability distributions | `v run ./vtl/examples/random_generator/main.v` |
 | [scatter](./scatter) | Add or assign values at indexed tensor positions | `v run ./vtl/examples/scatter/main.v` |
 | [argwhere](./argwhere) | Find non-zero coordinates in a tensor | `v run ./vtl/examples/argwhere/main.v` |
 | [meshgrid_n](./meshgrid_n) | Build N-dimensional coordinate grids with `xy` or `ij` indexing | `v run ./vtl/examples/meshgrid_n/main.v` |

@@ -14,6 +14,8 @@ fn main() {
 	positive_noise := training_rng.gamma(2.0, 0.5, [4])!
 	probability_samples := training_rng.beta(2.0, 5.0, [4])!
 	noise := training_rng.uniform(-0.01, 0.01, [4])!
+	event_counts := training_rng.binomial(12, 0.25, [4])!
+	waiting_durations := validation_rng.exponential(0.5, [4])!
 
 	println('Training batch shape: ${training_features.shape}')
 	println('Training feature mean: ${stats.mean(training_features)}')
@@ -22,6 +24,8 @@ fn main() {
 	println('Sampled training indices: ${batch_indices.to_array()}')
 	println('Positive gamma samples: ${positive_noise.to_array()}')
 	println('Beta probability samples: ${probability_samples.to_array()}')
+	println('Binomial event counts: ${event_counts.to_array()}')
+	println('Exponential waiting durations: ${waiting_durations.to_array()}')
 	println('Independent augmentation noise: ${noise.to_array()}')
 
 	training_rng.free()
