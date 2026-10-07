@@ -64,3 +64,41 @@ fn take_along_axis_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidpt
 	tensors := typed_gate.backward(typed_payload.variable.grad)!
 	return tensor_ptrs_to_voidptrs[T](tensors)
 }
+
+// scatter_add adds updates at indexed positions and tracks gradients for both
+// the source tensor and update values.
+pub fn (v &Variable[T]) scatter_add(indices &vtl.Tensor[int], updates &Variable[T], axis int) !&Variable[T] {
+	mut value := v.value.copy(.row_major)
+	value.scatter_add[T](indices, updates.value, axis)!
+	needs_grad := v.requires_grad || updates.requires_grad
+	mut result := variable[T](v.context, value, requires_grad: needs_grad)
+	if needs_grad {
+		axis_index := if axis < 0 { axis + v.value.rank() } else { axis }
+		gate := &ScatterAddGate[T]{
+			indices: indices.copy(.row_major)
+			axis:    axis_index
+		}
+		result.grad = vtl.zeros_like[T](value)
+		register[T]('ScatterAdd', voidptr(gate), scatter_add_backward_dispatch[T], result, [
+			v,
+			updates,
+		])!
+	}
+	return result
+}
+
+struct ScatterAddGate[T] {
+	indices &vtl.Tensor[int]
+	axis    int
+}
+
+fn (g &ScatterAddGate[T]) backward(gradient &vtl.Tensor[T]) ![]&vtl.Tensor[T] {
+	return [gradient.copy(.row_major), gradient.take_along_axis[T](g.indices, g.axis)!]
+}
+
+fn scatter_add_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_gate := unsafe { &ScatterAddGate[T](gate) }
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := typed_gate.backward(typed_payload.variable.grad)!
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
