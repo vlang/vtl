@@ -111,6 +111,22 @@ fractional := vtl.from_1d([1.75, 2.5])!
 assert fractional.as_int().to_array() == [1, 2]
 ```
 
+`dtype()` reports a tensor's element type. `promote_types` determines a
+common result type for two array dtypes and rejects string/numeric mixtures.
+The promotion helper models NumPy's array-dtype rules using VTL's current
+types. VTL has no signed 32-bit tensor type yet, so some mixed-integer pairs
+promote to the next supported signed type. VTL arithmetic operators do not yet
+automatically dispatch across different tensor types.
+
+```v
+import vtl
+
+integers := vtl.from_1d[u16]([1, 2, 3])!
+assert integers.dtype() == .uint16
+assert vtl.promote_types(integers.dtype(), .float32)! == .float32
+assert vtl.promote_types(.int64, .uint64)! == .float64
+```
+
 `logspace` spaces samples evenly in the exponent; its default base is 10. Set
 `base` in the options to use another positive finite base.
 
