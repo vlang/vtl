@@ -278,9 +278,16 @@ fn handle_equal[T](vals []T, _ []int) bool {
 // equal exposes this operation as part of the public API.
 
 // equal exposes this operation as part of the public API.
-@[inline]
+@[direct_array_access]
 pub fn (t &Tensor[T]) equal[T](other &Tensor[T]) !&Tensor[bool] {
-	// TODO: Implement using nmap
+	if t.shape == other.shape && t.is_row_major_contiguous() && other.is_row_major_contiguous()
+		&& t.data.data.len == t.size && other.data.data.len == other.size {
+		mut ret := empty[bool](t.shape)
+		for i in 0 .. t.size {
+			ret.data.data[i] = t.data.data[i] == other.data.data[i]
+		}
+		return ret
+	}
 	mut iters, shape := t.iterators[T]([other])!
 	mut ret := empty[bool](shape)
 	for {
@@ -296,9 +303,16 @@ pub fn (t &Tensor[T]) equal[T](other &Tensor[T]) !&Tensor[bool] {
 // not_equal exposes this operation as part of the public API.
 
 // not_equal exposes this operation as part of the public API.
-@[inline]
+@[direct_array_access]
 pub fn (t &Tensor[T]) not_equal[T](other &Tensor[T]) !&Tensor[bool] {
-	// TODO: Implement using nmap
+	if t.shape == other.shape && t.is_row_major_contiguous() && other.is_row_major_contiguous()
+		&& t.data.data.len == t.size && other.data.data.len == other.size {
+		mut ret := empty[bool](t.shape)
+		for i in 0 .. t.size {
+			ret.data.data[i] = t.data.data[i] != other.data.data[i]
+		}
+		return ret
+	}
 	mut iters, shape := t.iterators[T]([other])!
 	mut ret := empty[bool](shape)
 	for {
