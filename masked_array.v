@@ -95,6 +95,23 @@ pub fn (array &MaskedArray[T]) sum[T]() MaskedValue[T] {
 	}
 }
 
+// prod reduces all unmasked values. An entirely masked array returns a masked
+// multiplicative identity with value one.
+pub fn (array &MaskedArray[T]) prod[T]() MaskedValue[T] {
+	mut total := cast[T](1)
+	mut count := 0
+	for i in 0 .. array.values.size {
+		if !array.mask.get_nth(i) {
+			total *= array.values.get_nth(i)
+			count++
+		}
+	}
+	return MaskedValue[T]{
+		value:     total
+		is_masked: count == 0
+	}
+}
+
 // mean reduces all unmasked values. An entirely masked array returns a masked
 // NaN result.
 pub fn (array &MaskedArray[T]) mean[T]() MaskedValue[f64] {
@@ -124,9 +141,31 @@ pub fn (array &MaskedArray[T]) sum_along_axes[T](axes []int, keepdims bool) !Mas
 	if axes.len == 0 {
 		return *array
 	}
+	return masked_reduce_axes[T](array, axes, keepdims, false)
+}
+
+// prod_along_axis multiplies unmasked values along one axis.
+pub fn (array &MaskedArray[T]) prod_along_axis[T](axis int, keepdims bool) !MaskedArray[T] {
+	return array.prod_along_axes[T]([axis], keepdims)
+}
+
+// prod_along_axes multiplies unmasked values over several axes. Negative axes
+// are supported; duplicate axes are rejected. An empty axes list preserves data.
+pub fn (array &MaskedArray[T]) prod_along_axes[T](axes []int, keepdims bool) !MaskedArray[T] {
+	if axes.len == 0 {
+		return *array
+	}
+	return masked_reduce_axes[T](array, axes, keepdims, true)
+}
+
+fn masked_reduce_axes[T](array &MaskedArray[T], axes []int, keepdims bool, product bool) !MaskedArray[T] {
 	reduced := normalize_masked_axes(axes, array.values.rank())!
 	output_shape := masked_reduction_shape(array.values.shape, reduced, keepdims)
-	mut values := zeros[T](output_shape, TensorData{})
+	mut values := if product {
+		ones[T](output_shape, TensorData{})
+	} else {
+		zeros[T](output_shape, TensorData{})
+	}
 	mut output_mask := ones[bool](output_shape, TensorData{})
 	mut counts := []int{len: values.size}
 	mut input_index := []int{len: array.values.rank()}
@@ -136,7 +175,11 @@ pub fn (array &MaskedArray[T]) sum_along_axes[T](axes []int, keepdims bool) !Mas
 			continue
 		}
 		output_flat_index := masked_axes_output_index(input_index, array.values.shape, reduced)
-		values.set_nth(output_flat_index, values.get_nth(output_flat_index) + array.values.get_nth(flat_index))
+		if product {
+			values.set_nth(output_flat_index, values.get_nth(output_flat_index) * array.values.get_nth(flat_index))
+		} else {
+			values.set_nth(output_flat_index, values.get_nth(output_flat_index) + array.values.get_nth(flat_index))
+		}
 		counts[output_flat_index]++
 	}
 	for i in 0 .. values.size {
