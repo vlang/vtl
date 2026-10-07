@@ -194,13 +194,15 @@ divide, plus NumPy-style `real`, `imag`, `conj`, `absolute`, and `abs`
 operations, exponentials/logarithms, square root, trigonometric and
 hyperbolic functions, and their common inverse families. Global sum, product,
 and mean return complex scalars; single- and multi-axis sum/product return
-complex tensors. Promotion with a complex operand produces `complex128`. Explicit
+complex tensors. Complex means along one or several axes return complex tensors;
+complex variance and standard deviation return real tensors and support
+`keepdims` and `ddof`. Promotion with a complex operand produces `complex128`. Explicit
 `as_*` conversions cover real numeric and boolean types, preserve shape and
 logical order, and truncate floating-point values when converting to integers.
 
 **Remaining:** connect promotion to mixed-dtype arithmetic, add weak scalar
 promotion and string conversion, extend complex support to other mathematical
-functions, other axis-wise reductions, linear algebra, random generation, and
+functions, linear algebra, random generation, and
 `.npy`/`.npz` I/O, add complex32, and define integer overflow and structured-data
 limits.
 
