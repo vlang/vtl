@@ -18,7 +18,7 @@ main_diagonal := la.diag[f64](a, 0)!
 ```
 
 Available operations include `dot`, `matmul`, `tensordot`, `diag`, `det`, `inv`,
-`trace`, matrix `norm`, vector `vector_norm`, axis `vector_norm_axis`,
+batched `det` and `inv`, `trace`, matrix `norm`, vector `vector_norm`, axis `vector_norm_axis`,
 `vector_norm_axis_keepdims`, and multi-axis `vector_norm_axes`,
 `outer`, `cross`, `solve`, `lstsq`, `qr`, `lu`, `cholesky`, `pinv`, and
 `matrix_rank`, `slogdet`, `svdvals`, batched `matrix_norm`, and batched

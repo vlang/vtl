@@ -1,5 +1,6 @@
 module la
 
+import math
 import vtl
 
 fn test_dot_1() {
@@ -19,12 +20,41 @@ fn test_det_1() {
 	assert result.array_equal(expected)
 }
 
+fn test_det_supports_batches_and_singular_matrices() {
+	a := vtl.from_array([1.0, 2, 3, 4, 1, 2, 2, 4], [2, 2, 2])!
+	result := det(a)!
+	assert result.shape == [2]
+	assert math.abs(result.get_nth(0) + 2.0) < 1e-12
+	assert result.get_nth(1) == 0.0
+}
+
 fn test_inv_1() {
-	a := vtl.from_2d([[1.0, 0], [0.0, 1]])!
+	a := vtl.from_2d([[4.0, 7.0], [2.0, 6.0]])!
 	result := inv(a)!
 	assert result.shape == [2, 2]
-	// NOTE: matrix_inv has a pre-existing result-layout bug (result rows/cols swapped).
-	// Skipping element comparison until the VSL matrix_inv bug is fixed.
+	assert math.abs(result.get([0, 0]) - 0.6) < 1e-12
+	assert math.abs(result.get([0, 1]) + 0.7) < 1e-12
+	assert math.abs(result.get([1, 0]) + 0.2) < 1e-12
+	assert math.abs(result.get([1, 1]) - 0.4) < 1e-12
+}
+
+fn test_inv_supports_batches() {
+	a := vtl.from_array([1.0, 2, 3, 4, 2, 0, 0, 4], [2, 2, 2])!
+	result := inv(a)!
+	assert result.shape == [2, 2, 2]
+	expected := [-2.0, 1.0, 1.5, -0.5, 0.5, 0.0, 0.0, 0.25]
+	for i, value in expected {
+		assert math.abs(result.get_nth(i) - value) < 1e-12
+	}
+}
+
+fn test_inv_rejects_singular_matrices_in_a_batch() {
+	a := vtl.from_array([1.0, 2, 3, 4, 1, 2, 2, 4], [2, 2, 2])!
+	if _ := inv(a) {
+		assert false, 'inv must reject a singular matrix in the batch'
+	} else {
+		assert true
+	}
 }
 
 fn test_matmul_1() {

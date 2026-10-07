@@ -54,6 +54,7 @@ CIFAR examples for CI-safe checks.
 | [slogdet](./slogdet) | Compute determinant signs and stable log absolute determinants | `v run ./vtl/examples/slogdet/main.v` |
 | [matrix_power](./matrix_power) | Raise each matrix in a batch to an integer exponent | `v run ./vtl/examples/matrix_power/main.v` |
 | [condition_number](./condition_number) | Compute matrix condition numbers for stacked matrices | `v run ./vtl/examples/condition_number/main.v` |
+| [batched_inverse](./batched_inverse) | Compute determinants and inverses of stacked matrices | `v run ./vtl/examples/batched_inverse/main.v` |
 | [diff](./diff) | Compute discrete differences in one-dimensional and multidimensional data | `v run ./vtl/examples/diff/main.v` |
 | [trapezoid](./trapezoid) | Integrate sampled data with the composite trapezoidal rule | `v run ./vtl/examples/trapezoid/main.v` |
 | [gradient](./gradient) | Estimate numerical derivatives along a tensor axis | `v run ./vtl/examples/gradient/main.v` |
