@@ -25,6 +25,13 @@ pub:
 	is_masked bool
 }
 
+struct MaskedMoment {
+mut:
+	count int
+	mean  f64
+	m2    f64
+}
+
 // masked_array creates a masked tensor. The mask broadcasts against values;
 // the returned values and mask are views with the common broadcast shape.
 pub fn masked_array[T](values &Tensor[T], mask &Tensor[bool]) !MaskedArray[T] {
@@ -167,6 +174,37 @@ pub fn (array &MaskedArray[T]) mean[T]() MaskedValue[f64] {
 	}
 }
 
+// variance computes population or sample variance over unmasked values. ddof
+// is subtracted from the valid count; insufficient data returns a masked NaN.
+pub fn (array &MaskedArray[T]) variance[T](ddof int) !MaskedValue[f64] {
+	validate_masked_ddof(ddof)!
+	mut moment := MaskedMoment{}
+	for i in 0 .. array.values.size {
+		if !array.mask.get_nth(i) {
+			moment.add(td(array.values.get_nth(i)).f64())
+		}
+	}
+	if moment.count <= ddof {
+		return MaskedValue[f64]{
+			value:     math.nan()
+			is_masked: true
+		}
+	}
+	return MaskedValue[f64]{
+		value:     moment.m2 / f64(moment.count - ddof)
+		is_masked: false
+	}
+}
+
+// std computes population or sample standard deviation over unmasked values.
+pub fn (array &MaskedArray[T]) std[T](ddof int) !MaskedValue[f64] {
+	variance := array.variance[T](ddof)!
+	return MaskedValue[f64]{
+		value:     math.sqrt(variance.value)
+		is_masked: variance.is_masked
+	}
+}
+
 // sum_along_axis reduces unmasked values along one axis. Output mask entries
 // are true for slices containing no unmasked values.
 pub fn (array &MaskedArray[T]) sum_along_axis[T](axis int, keepdims bool) !MaskedArray[T] {
@@ -220,6 +258,76 @@ pub fn (array &MaskedArray[T]) max_along_axes[T](axes []int, keepdims bool) !Mas
 		return *array
 	}
 	return masked_reduce_axes[T](array, axes, keepdims, .maximum)
+}
+
+// variance_along_axis computes variance along one axis, marking slices with
+// insufficient valid values as masked NaN results.
+pub fn (array &MaskedArray[T]) variance_along_axis[T](axis int, ddof int, keepdims bool) !MaskedArray[f64] {
+	return array.variance_along_axes[T]([axis], ddof, keepdims)
+}
+
+// variance_along_axes computes population or sample variance over several
+// axes. Empty axes compute elementwise zero variance for valid values.
+pub fn (array &MaskedArray[T]) variance_along_axes[T](axes []int, ddof int, keepdims bool) !MaskedArray[f64] {
+	return masked_moment_reduction[T](array, axes, ddof, keepdims, false)
+}
+
+// std_along_axis computes standard deviation along one axis.
+pub fn (array &MaskedArray[T]) std_along_axis[T](axis int, ddof int, keepdims bool) !MaskedArray[f64] {
+	return array.std_along_axes[T]([axis], ddof, keepdims)
+}
+
+// std_along_axes computes standard deviation over several axes.
+pub fn (array &MaskedArray[T]) std_along_axes[T](axes []int, ddof int, keepdims bool) !MaskedArray[f64] {
+	return masked_moment_reduction[T](array, axes, ddof, keepdims, true)
+}
+
+fn masked_moment_reduction[T](array &MaskedArray[T], axes []int, ddof int, keepdims bool, standard_deviation bool) !MaskedArray[f64] {
+	validate_masked_ddof(ddof)!
+	mut reduced := []bool{len: array.values.rank()}
+	if axes.len > 0 {
+		reduced = normalize_masked_axes(axes, array.values.rank())!
+	}
+	output_shape := masked_reduction_shape(array.values.shape, reduced, keepdims)
+	mut values := zeros[f64](output_shape, TensorData{})
+	mut output_mask := ones[bool](output_shape, TensorData{})
+	mut moments := []MaskedMoment{len: values.size}
+	mut input_index := []int{len: array.values.rank()}
+	for flat_index in 0 .. array.values.size {
+		decode_flat_coordinate(flat_index, array.values.shape, mut input_index)
+		if array.mask.get_nth(flat_index) {
+			continue
+		}
+		output_flat_index := masked_axes_output_index(input_index, array.values.shape, reduced)
+		moments[output_flat_index].add(td(array.values.get_nth(flat_index)).f64())
+	}
+	for i in 0 .. values.size {
+		moment := moments[i]
+		if moment.count > ddof {
+			variance := moment.m2 / f64(moment.count - ddof)
+			values.set_nth(i, if standard_deviation { math.sqrt(variance) } else { variance })
+			output_mask.set_nth(i, false)
+		} else {
+			values.set_nth(i, math.nan())
+		}
+	}
+	return MaskedArray[f64]{
+		values: values
+		mask:   output_mask
+	}
+}
+
+fn validate_masked_ddof(ddof int) ! {
+	if ddof < 0 {
+		return error('ddof must be non-negative')
+	}
+}
+
+fn (mut moment MaskedMoment) add(value f64) {
+	moment.count++
+	delta := value - moment.mean
+	moment.mean += delta / f64(moment.count)
+	moment.m2 += delta * (value - moment.mean)
 }
 
 fn masked_reduce_axes[T](array &MaskedArray[T], axes []int, keepdims bool, operation MaskedReduction) !MaskedArray[T] {

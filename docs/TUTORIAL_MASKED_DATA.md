@@ -37,10 +37,13 @@ average := data.mean()
 product := data.prod()
 minimum := data.min()
 maximum := data.max()
+sample_variance := data.variance(1)!
+sample_deviation := data.std(1)!
 column_sums := data.sum_along_axis(0, false)!
 row_means := data.mean_along_axis(1, true)!
-batch_sums := data.sum_along_axes([0, 2], false)!
-batch_products := data.prod_along_axes([0, 2], false)!
+all_values_sum := data.sum_along_axes([0, 1], false)!
+all_values_product := data.prod_along_axes([0, 1], false)!
+all_values_variance := data.variance_along_axes([0, 1], 1, false)!
 ```
 
 Global `sum` and `mean` return `MaskedValue`, whose `is_masked` field is true
@@ -53,13 +56,17 @@ still marks slices with no valid values. `min` and `max` return the extreme
 valid values globally or across one or more axes, and mask any slice with no
 valid values. The payload of a masked min/max result is unspecified and should
 be ignored.
+`variance` and `std` use Welford's online algorithm; `ddof=0` computes
+population statistics and `ddof=1` computes sample statistics. Global or
+per-slice results with `count <= ddof` are masked and carry a NaN payload.
 The `*_along_axes` variants reduce a list of axes in one operation; negative
 axes are supported and duplicates are rejected. An empty axes list preserves
 values and masks elementwise (the mean variant converts values to `f64`).
 
 This API currently covers filling, compression, counting, and sum/product/
-minimum/maximum/mean. It does not yet implement masked elementwise operations
-or other mask-aware statistics. NaN values are not implicitly treated as
-missing; use an explicit boolean mask when that is desired.
+minimum/maximum/mean/variance/standard deviation. It does not yet implement
+masked elementwise operations or other mask-aware statistics. NaN values are
+not implicitly treated as missing; use an explicit boolean mask when that is
+desired.
 
 See the [NumPy parity tracker](./NUMPY_PARITY.md) for remaining work.
