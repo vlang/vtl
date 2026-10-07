@@ -36,6 +36,8 @@ coordinates through `indices_sparse`.
 shape, concatenate/stack/split, `ravel`, copying `flatten`, `flip`, `repeat`,
 `repeat_axis`, block `tile`, `rot90`, constant/edge/wrap/reflect/symmetric
 padding, and stable axis-wise `sort`/`argsort`.
+Top-level `tril` and `triu` copy N-D inputs and apply NumPy's diagonal offset
+to each trailing matrix.
 
 **Current:** `broadcast_to`, `broadcast2`, `broadcast3`, and `broadcast_n`
 create zero-copy views, validate incompatible shapes, and follow NumPy's
@@ -118,6 +120,9 @@ broadcasting; N-D Kronecker products with NumPy rank-promotion semantics;
 offset diagonal construction and extraction; solve,
 QR/LU/Cholesky, pseudoinverse, trace, matrix norms,
 flattened and axis-wise p-norms, and covariance/correlation matrices.
+
+`la.matrix_norm` computes NumPy's eight standard matrix norms for each trailing
+matrix in an N-D tensor, with optional retained matrix dimensions.
 
 **Remaining:** expand eigen/SVD options, specify singular/non-finite behavior,
 and benchmark realistic shapes.

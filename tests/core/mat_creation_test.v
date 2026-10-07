@@ -20,6 +20,41 @@ fn test_diag() {
 	assert diag.get([8]) == 9
 }
 
+fn test_tril_and_triu_support_batched_matrices_and_offsets() ! {
+	input := vtl.from_array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], [2, 2, 3])!
+	lower := vtl.tril(input, k: 0)!
+	upper := vtl.triu(input, k: 1)!
+	assert lower.shape == input.shape
+	assert vtl.tril(input)!.array_equal(lower)
+	assert vtl.triu(input)!.array_equal(vtl.from_array([1, 2, 3, 0, 5, 6, 7, 8, 9, 0, 11, 12],
+		[2, 2, 3])!)
+	assert lower.array_equal(vtl.from_array([1, 0, 0, 4, 5, 0, 7, 0, 0, 10, 11, 0], [
+		2,
+		2,
+		3,
+	])!)
+	assert upper.array_equal(vtl.from_array([0, 2, 3, 0, 0, 6, 0, 8, 9, 0, 0, 12], [2, 2, 3])!)
+	assert input.get_nth(1) == 2
+	lower.set_nth(0, 99)
+	assert input.get_nth(0) == 1
+}
+
+fn test_tril_and_triu_reject_rank_below_two() {
+	vector := vtl.from_1d([1, 2, 3])!
+	if _ := vtl.tril(vector, k: 0) {
+		assert false, 'tril must reject rank-one input'
+	}
+	if _ := vtl.triu(vector, k: 0) {
+		assert false, 'triu must reject rank-one input'
+	}
+}
+
+fn test_tril_supports_boolean_tensors() ! {
+	input := vtl.from_2d([[true, true], [true, false]])!
+	upper := vtl.triu(input, k: 1)!
+	assert upper.array_equal(vtl.from_2d([[false, true], [false, false]])!)
+}
+
 fn test_diag_flat_from_1d() {
 	t := vtl.from_1d([1, 2, 3, 4, 5, 6, 7, 8, 9])!
 	assert t.shape == [9]

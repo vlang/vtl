@@ -47,6 +47,8 @@ CIFAR examples for CI-safe checks.
 | [meshgrid_n](./meshgrid_n) | Build N-dimensional coordinate grids with `xy` or `ij` indexing | `v run ./vtl/examples/meshgrid_n/main.v` |
 | [indices](./indices) | Build a dense tensor of N-dimensional integer coordinates | `v run ./vtl/examples/indices/main.v` |
 | [indices_sparse](./indices_sparse) | Build broadcastable coordinate tensors without a dense grid | `v run ./vtl/examples/indices_sparse/main.v` |
+| [triangular_matrices](./triangular_matrices) | Extract lower and upper triangles from batched matrices | `v run ./vtl/examples/triangular_matrices/main.v` |
+| [matrix_norm](./matrix_norm) | Compute batched Frobenius, nuclear, and spectral matrix norms | `v run ./vtl/examples/matrix_norm/main.v` |
 | [diff](./diff) | Compute discrete differences in one-dimensional and multidimensional data | `v run ./vtl/examples/diff/main.v` |
 | [trapezoid](./trapezoid) | Integrate sampled data with the composite trapezoidal rule | `v run ./vtl/examples/trapezoid/main.v` |
 | [gradient](./gradient) | Estimate numerical derivatives along a tensor axis | `v run ./vtl/examples/gradient/main.v` |
