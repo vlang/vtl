@@ -44,6 +44,7 @@ square-root, Rice, Scott, Freedman-Diaconis, Stone, or the NumPy-style
 automatic maximum of Sturges and Freedman-Diaconis. Stone minimizes the
 cross-validated integrated squared error over candidate counts up to
 `max(100, floor(sqrt(n)))`. Degenerate estimates fall back to Sturges.
+For constant input, the Stone rule returns one bin over the expanded range.
 
 `bincount(input, minlength)` counts non-negative integer labels in a vector;
 `bincount_weighted(input, weights, minlength)` sums numeric weights for each
