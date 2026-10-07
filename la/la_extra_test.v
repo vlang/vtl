@@ -84,6 +84,45 @@ fn test_matrix_rank_batch_supports_stacked_rectangular_matrices() {
 	assert ranks.to_array() == [2, 1]
 }
 
+fn test_solve_handles_row_pivoting_and_multiple_rhs() {
+	a := vtl.from_2d([[0.0, 2.0], [1.0, 3.0]])!
+	b := vtl.from_1d([4.0, 7.0])!
+	assert solve(a, b)!.to_array() == [1.0, 2.0]
+	rhs := vtl.from_2d([[4.0, 6.0], [7.0, 11.0]])!
+	solution := solve(a, rhs)!
+	assert solution.shape == [2, 2]
+	assert solution.to_array() == [1.0, 2.0, 2.0, 3.0]
+}
+
+fn test_solve_broadcasts_matrix_and_vector_batches() {
+	a := vtl.from_array([1.0, 0, 0, 1, 2, 0, 0, 2], [2, 2, 2])!
+	rhs_matrix := vtl.from_array([4.0, 6, 8, 10], [1, 2, 2])!
+	matrix_solution := solve(a, rhs_matrix)!
+	assert matrix_solution.shape == [2, 2, 2]
+	assert matrix_solution.to_array() == [4.0, 6.0, 8.0, 10.0, 2.0, 3.0, 4.0, 5.0]
+	rhs_vectors := vtl.from_2d([[4.0, 8.0], [6.0, 10.0]])!
+	vector_solution := solve(a, rhs_vectors)!
+	assert vector_solution.shape == [2, 2]
+	assert vector_solution.to_array() == [4.0, 8.0, 3.0, 5.0]
+}
+
+fn test_solve_rejects_singular_and_incompatible_batches() {
+	singular := vtl.from_2d([[1.0, 2.0], [2.0, 4.0]])!
+	rhs := vtl.from_1d([1.0, 2.0])!
+	if _ := solve(singular, rhs) {
+		assert false, 'solve must reject singular matrices'
+	} else {
+		assert true
+	}
+	a := vtl.ones[f64]([2, 2, 2])
+	b := vtl.ones[f64]([3, 2])
+	if _ := solve(a, b) {
+		assert false, 'solve must reject incompatible batch dimensions'
+	} else {
+		assert true
+	}
+}
+
 fn test_tensordot_contracts_trailing_a_with_leading_b_axes() {
 	a := vtl.from_2d([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])!
 	b := vtl.from_2d([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]])!

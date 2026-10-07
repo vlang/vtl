@@ -57,6 +57,7 @@ CIFAR examples for CI-safe checks.
 | [batched_inverse](./batched_inverse) | Compute determinants and inverses of stacked matrices | `v run ./vtl/examples/batched_inverse/main.v` |
 | [symmetric_eigen](./symmetric_eigen) | Compute symmetric eigenvalues and eigenvectors for batches | `v run ./vtl/examples/symmetric_eigen/main.v` |
 | [matrix_rank](./matrix_rank) | Estimate matrix ranks with dtype-aware tolerances | `v run ./vtl/examples/matrix_rank/main.v` |
+| [batched_solve](./batched_solve) | Solve stacked linear systems with vector or matrix right-hand sides | `v run ./vtl/examples/batched_solve/main.v` |
 | [diff](./diff) | Compute discrete differences in one-dimensional and multidimensional data | `v run ./vtl/examples/diff/main.v` |
 | [trapezoid](./trapezoid) | Integrate sampled data with the composite trapezoidal rule | `v run ./vtl/examples/trapezoid/main.v` |
 | [gradient](./gradient) | Estimate numerical derivatives along a tensor axis | `v run ./vtl/examples/gradient/main.v` |
