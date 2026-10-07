@@ -3,6 +3,26 @@
 VTL supports slicing. It allows for selecting dimension subsets, whole dimension,
 stepping (one out of 2 rows), reversing dimensions, counting from the end.
 
+## Pad tensor boundaries
+
+`vtl.pad` adds a before/after width for each axis. Choose constant fill,
+edge replication, wrapping, reflection without repeating the edge, or symmetric
+reflection with the edge included:
+
+```v
+import vtl
+
+signal := vtl.from_1d([1, 2, 3])!
+reflected := vtl.pad[int](signal, [[2, 2]], .reflect, 0)!
+wrapped := vtl.pad[int](signal, [[1, 1]], .wrap, 0)!
+assert reflected.to_array() == [3, 2, 1, 2, 3, 2, 1]
+assert wrapped.to_array() == [3, 1, 2, 3, 1]
+```
+
+Widths must contain one non-negative `[before, after]` pair per dimension.
+Non-constant modes require non-empty input dimensions whenever the padded
+output contains elements.
+
 ```v
 import math
 import vtl
