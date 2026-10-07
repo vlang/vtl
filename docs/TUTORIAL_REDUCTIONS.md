@@ -200,10 +200,12 @@ import math
 values := vtl.from_1d([30.0, 0.0, 20.0, 10.0])!
 median := stats.median(values) // 15.0; input does not need sorting
 median_percentile := stats.percentile_linear(values, 50)! // 15.0
+quartiles := stats.percentiles_linear(values, [25, 50, 75])!
 integer_median := stats.median(vtl.from_1d([1, 2])!) // 1.5
 rows := vtl.from_array([1.0, 3.0, 5.0, 7.0], [2, 2])!
 row_medians := stats.quantile_axis(rows, 0.5, 1)! // shape [2, 1]
 row_percentiles := stats.percentile_axis(rows, 50, 1)! // shape [2, 1]
+row_quartiles := stats.percentiles_axis(rows, [25, 50, 75], 1)! // shape [3, 2]
 
 measurements := vtl.from_array([1.0, math.nan(), 3.0, 5.0, math.nan(), math.nan()], [
 	3,

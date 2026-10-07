@@ -73,3 +73,6 @@ it.
 `percentile_axis` and `nanpercentile_axis` accept percentiles on the 0..100
 scale. Their `_squeeze` variants remove the reduced axis; the base variants
 keep it with length one.
+`percentiles_linear` and `percentiles_axis` accept multiple requested values
+and prepend the percentile dimension to their results; `nanpercentiles_*`
+counterparts ignore NaNs.

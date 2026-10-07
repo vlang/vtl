@@ -123,6 +123,11 @@ fn test_percentile_linear_aliases_quantile_and_axis_quantile_retains_axis() ! {
 	percentile_rows := percentile_axis_squeeze(values, 50, 1)!
 	assert percentile_rows.shape == [3]
 	assert percentile_rows.to_array() == [5.5, 11.5, 17.5]
+	percentile_values := percentiles_linear(values, [25, 50, 75])!
+	assert percentile_values.to_array() == [3.5, 7.5, 17.5]
+	percentile_values_axis := percentiles_axis(values, [25, 50, 75], 0)!
+	assert percentile_values_axis.shape == [3, 2]
+	assert percentile_values_axis.to_array() == [2.0, 15.0, 3.0, 20.0, 4.0, 25.0]
 	rows := quantile_axis(values, 0.5, -1)!
 	assert rows.shape == [3, 1]
 	assert rows.get([0, 0]) == 5.5

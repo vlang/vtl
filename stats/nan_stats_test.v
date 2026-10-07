@@ -86,6 +86,11 @@ fn test_nan_quantiles_ignore_nan_globally_and_by_axis() ! {
 	assert nan_percentile_rows.shape == [3]
 	assert nan_percentile_rows.to_array()[0..2] == [1.0, 4.0]
 	assert math.is_nan(nan_percentile_rows.get([2]))
+	nan_percentiles := nanpercentiles_linear(values, [0, 50, 100])!
+	assert nan_percentiles.to_array() == [1.0, 3.0, 5.0]
+	nan_percentiles_axis := nanpercentiles_axis(values, [0, 50, 100], 0)!
+	assert nan_percentiles_axis.shape == [3, 2]
+	assert nan_percentiles_axis.to_array() == [1.0, 5.0, 2.0, 5.0, 3.0, 5.0]
 	nan_median_columns := nanmedian_axis(values, 0)!
 	assert nan_median_columns.shape == [1, 2]
 	assert nan_median_columns.get([0, 0]) == 2.0
