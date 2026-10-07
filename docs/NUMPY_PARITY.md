@@ -68,8 +68,9 @@ boundary differences.
 
 ### Reductions and statistics
 
-**Current:** single-axis and multi-axis sum/product and logical all/any with
-`keepdims`; weighted average globally and along an axis; scalar population/sample variance and
+**Current:** single-axis and multi-axis sum/product, NaN-aware sum/product/
+min/max, and logical all/any with `keepdims`; weighted average globally and
+along an axis; scalar population/sample variance and
 standard deviation; axis mean/variance/std with explicit `keepdims` and
 NaN-aware forms; axis-wise `trapezoid`; linear quantile/percentile and
 multi-quantile APIs, including NaN-aware global and axis variants; axis arg

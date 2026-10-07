@@ -62,3 +62,26 @@ fn test_nan_axis_reductions_reject_scalar_and_invalid_axis() ! {
 		assert false, 'axis reduction must reject out-of-range axes'
 	}
 }
+
+fn test_nan_multi_axis_reductions_and_shapes() ! {
+	values := vtl.from_array([math.nan(), 2.0, 3.0, 4.0, 5.0, math.nan(), 7.0, 8.0], [
+		2,
+		2,
+		2,
+	])!
+	assert nansum_axes(values, [0, -1], false)!.shape == [2]
+	assert nansum_axes(values, [0, -1], false)!.to_array() == [7.0, 22.0]
+	assert nanprod_axes(values, [0, 2], true)!.shape == [1, 2, 1]
+	assert nanprod_axes(values, [0, 2], true)!.to_array() == [10.0, 672.0]
+	assert nanmin_axes(values, [0, 2], false)!.to_array() == [2.0, 3.0]
+	assert nanmax_axes(values, [0, 2], false)!.to_array() == [5.0, 8.0]
+	assert nanmax_axes(values, [], false)!.to_array()[1] == 2.0
+	if _ := nanmax_axes(values, [0, -3], false) {
+		assert false, 'duplicate axes must return an error'
+	}
+	empty_axis := vtl.empty[f64]([2, 0])
+	assert nansum_axes(empty_axis, [1], false)!.to_array() == [0.0, 0.0]
+	assert nanprod_axes(empty_axis, [1], false)!.to_array() == [1.0, 1.0]
+	assert math.is_nan(nanmin_axes(empty_axis, [1], false)!.get([0]))
+	assert math.is_nan(nanmax_axes(empty_axis, [1], false)!.get([1]))
+}
