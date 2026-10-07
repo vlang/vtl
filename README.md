@@ -43,6 +43,14 @@ CUDA, and Vulkan compute paths from one V-native API.
   >
 </a>
 
+<details>
+  <summary>VTL and VSL architecture</summary>
+
+  ![Architecture of VTL data, tensor operations, VSL kernels, and execution backends](docs/assets/vtl-architecture.png)
+
+  [View SVG source](docs/assets/vtl-architecture.svg) · [PNG](docs/assets/vtl-architecture.png)
+</details>
+
 ```v ignore
 import vtl
 t := vtl.from_array([1.0, 2, 3, 4], [2, 2])!
