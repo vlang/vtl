@@ -181,33 +181,17 @@ fn test_harmonic_mean() {
 }
 
 fn test_median() {
-	// Tests were also verified on Wolfram Alpha
-	// Assumes sorted array
-
-	// Even
-	mut data := vtl.from_1d([f64(2.7), f64(4.45), f64(5.9), f64(10.0)])!
-	mut o := median(data)
-	// Some issue with precision comparison in f64 using == operator hence serializing to string
-	assert tst_res(o.str(), '5.175000')
-	data = vtl.from_1d([f64(-3.0), f64(1.89), f64(4.4), f64(67.31)])!
-	o = median(data)
-	// Some issue with precision comparison in f64 using == operator hence serializing to string
-	assert tst_res(o.str(), '3.145000')
-	data = vtl.from_1d([f64(7.88), f64(12.0), f64(54.83), f64(76.122)])!
-	o = median(data)
-	// Some issue with precision comparison in f64 using == operator hence serializing to string
-	assert tst_res(o.str(), '33.415000')
-
-	// Odd
-	data = vtl.from_1d([f64(2.7), f64(4.45), f64(5.9), f64(10.0), f64(22)])!
-	o = median(data)
-	assert o == f64(5.9)
-	data = vtl.from_1d([f64(-3.0), f64(1.89), f64(4.4), f64(9), f64(67.31)])!
-	o = median(data)
-	assert o == f64(4.4)
-	data = vtl.from_1d([f64(7.88), f64(3.3), f64(12.0), f64(54.83), f64(76.122)])!
-	o = median(data)
-	assert o == f64(12.0)
+	data := vtl.from_1d([10.0, 0.0, 20.0, 30.0])!
+	assert median(data) == 15.0
+	assert data.to_array() == [10.0, 0.0, 20.0, 30.0]
+	unsorted_odd := vtl.from_1d([22.0, 5.9, 2.7, 10.0, 4.45])!
+	assert median(unsorted_odd) == 5.9
+	integer_data := vtl.from_1d([1, 3, 2, 4])!
+	assert median(integer_data) == 2.5
+	nan_values := vtl.from_1d([1.0, math.nan(), 3.0])!
+	assert math.is_nan(median(nan_values))
+	empty := vtl.from_1d([]f64{})!
+	assert math.is_nan(median(empty))
 }
 
 fn test_mode() {
@@ -436,7 +420,7 @@ fn test_passing_empty() {
 	assert mean(data) == f64(0)
 	assert geometric_mean(data) == f64(0)
 	assert harmonic_mean(data) == f64(0)
-	assert median(data) == f64(0)
+	assert math.is_nan(median(data))
 	assert mode(data) == f64(0)
 	assert rms(data) == f64(0)
 	assert population_variance(data) == f64(0)

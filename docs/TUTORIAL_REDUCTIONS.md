@@ -198,8 +198,9 @@ import vtl.stats
 import math
 
 values := vtl.from_1d([30.0, 0.0, 20.0, 10.0])!
-median := stats.quantile_linear(values, 0.5)! // 15.0
+median := stats.median(values) // 15.0; input does not need sorting
 median_percentile := stats.percentile_linear(values, 50)! // 15.0
+integer_median := stats.median(vtl.from_1d([1, 2])!) // 1.5
 rows := vtl.from_array([1.0, 3.0, 5.0, 7.0], [2, 2])!
 row_medians := stats.quantile_axis(rows, 0.5, 1)! // shape [2, 1]
 
@@ -212,6 +213,8 @@ column_medians := stats.nanquantile_axis(measurements, 0.5, 0)! // [[2.0, 5.0]]
 
 Empty tensors and out-of-range quantiles return errors. The NaN-aware variants
 return NaN when all values in a reduction slice are NaN.
+`stats.median` returns NaN for an empty tensor and returns `f64`, including
+for integer inputs with a fractional median.
 
 ```v
 import vtl
