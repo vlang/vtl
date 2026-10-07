@@ -93,11 +93,12 @@ See [docs/DEVICE_MEMORY.md](docs/DEVICE_MEMORY.md).
 
 | Priority | Work item |
 |----------|-----------|
-| P1 | Close the remaining correctness and API gaps listed in [NumPy and Arraymancer parity](docs/NUMPY_PARITY.md) |
-| P1 | Expand cross-language tensor I/O, starting with NumPy NPY/NPZ interoperability |
-| P2 | [#63](https://github.com/vlang/vtl/issues/63) ARM GPU support |
-| P2 | Improve Windows CI coverage beyond the creation smoke test |
-| P2 | Add YOLO-oriented gate fusion and benchmark it against the current autograd path ([#40](https://github.com/vlang/vtl/issues/40)) |
+| P1 | Implement CUDA backward coverage for the remaining neural-network layers ([#161](https://github.com/vlang/vtl/issues/161)) |
+| P1 | Close the remaining correctness, API, and performance gaps in [NumPy and Arraymancer parity](docs/NUMPY_PARITY.md) |
+| P2 | Improve CPU kernel performance and evaluate aliasing/compiler optimizations ([#3](https://github.com/vlang/vtl/issues/3)) |
+| P2 | Add ARM GPU support ([#63](https://github.com/vlang/vtl/issues/63)) |
+| P2 | Benchmark YOLO-oriented gate fusion against the current autograd path ([#40](https://github.com/vlang/vtl/issues/40)) |
+| Research | Assess the [Burn](https://github.com/tracel-ai/burn) feature set against VTL ([#52](https://github.com/vlang/vtl/issues/52)) |
 
 ---
 
@@ -105,13 +106,11 @@ See [docs/DEVICE_MEMORY.md](docs/DEVICE_MEMORY.md).
 
 | # | Title | Priority | Notes |
 |---|-------|----------|-------|
-| [#41](https://github.com/vlang/vtl/issues/41) | Windows example crash | ✅ Closed | Confirmed closed; retain Windows coverage follow-up in #157 |
-| [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support | 🟡 P2 | Open |
-| [#43](https://github.com/vlang/vtl/issues/43) | `stats.to_array` performance | ✅ Closed | Confirmed closed |
-| [#40](https://github.com/vlang/vtl/issues/40) | YOLO for autograd gates | 🟡 Medium | |
-| [#52](https://github.com/vlang/vtl/issues/52) | Tracel-AI/Burn reference | Research | |
-| [#2](https://github.com/vlang/vtl/issues/2) | Float comparison undefined behavior | 🔴 Correctness | Open; review comparison semantics before expanding numeric APIs |
-| [#6](https://github.com/vlang/vtl/issues/6) | Tensor operator overloads | 🟡 API | Open; check V operator limitations and provide named alternatives |
+| [#3](https://github.com/vlang/vtl/issues/3) | Fortran-like performance (`restrict`) | 🟡 Performance | Open; evaluate V compiler support and benchmark before adopting aliasing assumptions |
+| [#40](https://github.com/vlang/vtl/issues/40) | YOLO for autograd gates | 🟡 Performance | Open; requires end-to-end benchmark evidence |
+| [#52](https://github.com/vlang/vtl/issues/52) | Tracel-AI/Burn reference | Research | Open; compare concrete capabilities and architecture |
+| [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support | 🟡 P2 | Open; requires ARM GPU hardware for device validation |
+| [#161](https://github.com/vlang/vtl/issues/161) | CUDA backward for remaining layers | 🔴 ML | Open; current CUDA backward covers Linear and Conv2D only |
 
 The complete NumPy and Arraymancer comparison is tracked in
 [docs/NUMPY_PARITY.md](docs/NUMPY_PARITY.md). The GitHub project board is not
