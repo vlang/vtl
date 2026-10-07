@@ -69,9 +69,18 @@ jobs:
 
       - name: Validate changed Markdown
         if: steps.markdown.outputs.files != ''
+        env:
+          MARKDOWN_FILES: ${{ steps.markdown.outputs.files }}
         run: |
           cd ~/.vmodules
-          printf '%s\n' "${{ steps.markdown.outputs.files }}" | xargs v check-md -hide-warnings
+          mapfile -t markdown_files <<< "$MARKDOWN_FILES"
+          sudo systemd-run --scope --wait \
+            --property=MemoryMax=4G \
+            --property=MemorySwapMax=0 \
+            --setenv=HOME="$HOME" \
+            --setenv=PATH="$PATH" \
+            --setenv=VJOBS=2 -- \
+            v check-md -hide-warnings "${markdown_files[@]}"
 
       - name: Skip when no Markdown changed
         if: steps.markdown.outputs.files == ''
