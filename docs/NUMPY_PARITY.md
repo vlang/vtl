@@ -192,7 +192,8 @@ fixtures, and continue rejecting unsupported object/structured values.
 as `complex128` tensor storage with elementwise add, subtract, multiply, and
 divide, plus NumPy-style `real`, `imag`, `conj`, `absolute`, and `abs`
 operations, exponentials/logarithms, square root, trigonometric and
-hyperbolic functions, and their common inverse families. Global sum, product,
+hyperbolic functions, their common inverse families, phase/angle, and complex
+NaN/infinity/finite predicates. Global sum, product,
 and mean return complex scalars; single- and multi-axis sum/product return
 complex tensors. Complex means along one or several axes return complex tensors;
 complex variance and standard deviation return real tensors and support

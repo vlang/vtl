@@ -68,6 +68,47 @@ pub fn abs(input &Tensor[complex.Complex]) !&Tensor[f64] {
 	return absolute(input)
 }
 
+// complex_angle returns the phase of each value in radians, or degrees when
+// requested. The result range follows atan2 and is [-pi, pi].
+pub fn complex_angle(input &Tensor[complex.Complex], degrees bool) !&Tensor[f64] {
+	mut values := []f64{len: input.size}
+	for i in 0 .. input.size {
+		value := input.get_nth(i)
+		angle := math.atan2(value.im, value.re)
+		values[i] = if degrees { angle * 180.0 / math.pi } else { angle }
+	}
+	return from_array[f64](values, input.shape)
+}
+
+// complex_is_nan reports whether either component of each value is NaN.
+pub fn complex_is_nan(input &Tensor[complex.Complex]) !&Tensor[bool] {
+	return map_complex_predicate(input, fn (value complex.Complex) bool {
+		return math.is_nan(value.re) || math.is_nan(value.im)
+	})
+}
+
+// complex_is_inf reports whether either component of each value is infinite.
+pub fn complex_is_inf(input &Tensor[complex.Complex]) !&Tensor[bool] {
+	return map_complex_predicate(input, fn (value complex.Complex) bool {
+		return math.is_inf(value.re, 0) || math.is_inf(value.im, 0)
+	})
+}
+
+// complex_is_finite reports whether both components of each value are finite.
+pub fn complex_is_finite(input &Tensor[complex.Complex]) !&Tensor[bool] {
+	return map_complex_predicate(input, fn (value complex.Complex) bool {
+		return math.is_finite(value.re) && math.is_finite(value.im)
+	})
+}
+
+fn map_complex_predicate(input &Tensor[complex.Complex], predicate fn (complex.Complex) bool) !&Tensor[bool] {
+	mut values := []bool{len: input.size}
+	for i in 0 .. input.size {
+		values[i] = predicate(input.get_nth(i))
+	}
+	return from_array[bool](values, input.shape)
+}
+
 // exp applies the complex exponential to every complex tensor element.
 pub fn exp(input &Tensor[complex.Complex]) !&Tensor[complex.Complex] {
 	return map_complex_unary(input, .exp)
