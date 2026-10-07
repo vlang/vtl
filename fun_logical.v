@@ -230,10 +230,7 @@ pub:
 }
 
 pub fn (t &Tensor[T]) isclose[T](other &Tensor[T], params IsCloseData) !&Tensor[bool] {
-	if params.rtol < 0 || params.atol < 0 || math.is_nan(params.rtol) || math.is_nan(params.atol)
-		|| math.is_inf(params.rtol, 0) || math.is_inf(params.atol, 0) {
-		return error('rtol and atol must be non-negative finite numbers')
-	}
+	validate_isclose_tolerances(params)!
 	mut iters, shape := t.iterators[T]([other])!
 	mut ret := empty[bool](shape)
 	for {
@@ -246,8 +243,37 @@ pub fn (t &Tensor[T]) isclose[T](other &Tensor[T], params IsCloseData) !&Tensor[
 }
 
 // allclose returns true if all broadcasted elements satisfy isclose.
+@[direct_array_access]
 pub fn (t &Tensor[T]) allclose[T](other &Tensor[T], params IsCloseData) !bool {
-	return t.isclose[T](other, params)!.all()
+	validate_isclose_tolerances(params)!
+	if t.shape == other.shape && t.is_row_major_contiguous() && other.is_row_major_contiguous()
+		&& t.data.data.len == t.size && other.data.data.len == other.size {
+		for i in 0 .. t.size {
+			a := td[T](t.data.data[i]).f64()
+			b := td[T](other.data.data[i]).f64()
+			if !isclose_values(a, b, params.rtol, params.atol, params.equal_nan) {
+				return false
+			}
+		}
+		return true
+	}
+	mut iters, _ := t.iterators[T]([other])!
+	for {
+		vals, _ := iters.next() or { break }
+		a := td[T](vals[0]).f64()
+		b := td[T](vals[1]).f64()
+		if !isclose_values(a, b, params.rtol, params.atol, params.equal_nan) {
+			return false
+		}
+	}
+	return true
+}
+
+fn validate_isclose_tolerances(params IsCloseData) ! {
+	if params.rtol < 0 || params.atol < 0 || math.is_nan(params.rtol) || math.is_nan(params.atol)
+		|| math.is_inf(params.rtol, 0) || math.is_inf(params.atol, 0) {
+		return error('rtol and atol must be non-negative finite numbers')
+	}
 }
 
 fn isclose_values(a f64, b f64, rtol f64, atol f64, equal_nan bool) bool {
