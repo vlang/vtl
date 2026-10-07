@@ -39,6 +39,15 @@ println(input.grad.to_array()) // [0.0, 2.0, 1.0]
 See the runnable [autograd gather example](../examples/autograd_gather/README.md)
 for repeated indices and the resulting gradient.
 
+`Variable.scatter_add` returns an updated copy and records gradients for both
+the source and update tensors. The source receives the output gradient at each
+position; each update receives the gradient at its destination. Duplicate
+destinations accumulate in the forward pass while each update keeps its own
+gradient.
+
+See the runnable [autograd scatter example](../examples/autograd_scatter/README.md)
+for an indexed update with a non-uniform downstream gradient.
+
 ## Count non-zero values
 
 `count_nonzero` counts all non-zero tensor values. `count_nonzero_axis` counts

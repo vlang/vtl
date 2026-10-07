@@ -44,3 +44,19 @@ fn test_take_along_axis_backward_uses_forward_index_snapshot() ! {
 	selected.backprop()!
 	assert input.grad.to_array() == [0.0, 2.0, 0.0]
 }
+
+fn test_scatter_add_backward_propagates_to_source_and_updates() ! {
+	mut ctx := autograd.ctx[f64]()
+	input := ctx.variable(vtl.from_array([1.0, 2.0, 3.0], [1, 3])!)
+	updates := ctx.variable(vtl.from_array([10.0, 20.0, 30.0], [1, 3])!)
+	mut indices := vtl.from_array[int]([1, 1, 2], [1, 3])!
+	weights := ctx.variable(vtl.from_array([2.0, 3.0, 5.0], [1, 3])!)
+
+	scattered := input.scatter_add(indices, updates, 1)!
+	assert scattered.value.to_array() == [1.0, 32.0, 33.0]
+	indices.fill(0)
+	mut objective := scattered.multiply(weights)!
+	objective.backprop()!
+	assert input.grad.to_array() == [2.0, 3.0, 5.0]
+	assert updates.grad.to_array() == [3.0, 3.0, 5.0]
+}

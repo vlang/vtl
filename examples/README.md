@@ -20,6 +20,7 @@ CIFAR examples for CI-safe checks.
 | [vtl_vandermont](./vtl_vandermont) | Matrix construction and LA utilities | `v run ./vtl/examples/vtl_vandermont/main.v` |
 | [autograd_backprop](./autograd_backprop) | Manual autograd/backprop flow | `v run ./vtl/examples/autograd_backprop/main.v` |
 | [autograd_gather](./autograd_gather) | Gather gradients with repeated-index accumulation | `v run ./vtl/examples/autograd_gather/main.v` |
+| [autograd_scatter](./autograd_scatter) | Propagate gradients through indexed additions | `v run ./vtl/examples/autograd_scatter/main.v` |
 | [npy_round_trip](./npy_round_trip) | Read and write NumPy `.npy` arrays | `v run ./vtl/examples/npy_round_trip/main.v` |
 | [csv_round_trip](./csv_round_trip) | Read and write numeric CSV tensors with headers | `v run ./vtl/examples/csv_round_trip/main.v` |
 | [npz_round_trip](./npz_round_trip) | Write and read named arrays in `.npz` archives | `v run ./vtl/examples/npz_round_trip/main.v` |
