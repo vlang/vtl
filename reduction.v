@@ -303,6 +303,32 @@ pub fn (t &Tensor[T]) min_axis[T](axis int) !&Tensor[T] {
 	return result
 }
 
+// argmax_axis_squeeze returns the maximum indices with the reduced axis
+// removed, matching NumPy's default keepdims=false behavior.
+pub fn (t &Tensor[T]) argmax_axis_squeeze[T](axis int) !&Tensor[int] {
+	result := t.argmax_axis[T](axis)!
+	na := if axis < 0 { axis + t.rank() } else { axis }
+	mut shape := result.shape.clone()
+	shape.delete(na)
+	if shape.len == 0 {
+		shape = [1]
+	}
+	return result.reshape[int](shape)
+}
+
+// argmin_axis_squeeze returns the minimum indices with the reduced axis
+// removed, matching NumPy's default keepdims=false behavior.
+pub fn (t &Tensor[T]) argmin_axis_squeeze[T](axis int) !&Tensor[int] {
+	result := t.argmin_axis[T](axis)!
+	na := if axis < 0 { axis + t.rank() } else { axis }
+	mut shape := result.shape.clone()
+	shape.delete(na)
+	if shape.len == 0 {
+		shape = [1]
+	}
+	return result.reshape[int](shape)
+}
+
 // argmax returns the indices of the maximum values along the given axis.
 
 // argmax exposes this operation as part of the public API.
