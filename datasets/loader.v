@@ -72,7 +72,7 @@ fn download_dataset(data DatasetDownload) !string {
 			println('Extracting ${data.file}')
 		}
 		if is_tar {
-			result := os.execute('tar -xvzf ${target} -C ${dataset_dir}')
+			result := os.exec(['tar', '-xzf', target, '-C', dataset_dir])
 			if result.exit_code != 0 {
 				$if debug ? {
 					println('Error extracting ${target}')
