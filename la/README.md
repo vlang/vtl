@@ -14,9 +14,10 @@ b := vtl.from_2d[f64]([[1.0, 2.0], [3.0, 4.0]])!
 c := la.matmul[f64](a, b)!
 contracted := la.tensordot[f64](a, b, 1)!
 determinant := la.det[f64](a)!
+main_diagonal := la.diag[f64](a, 0)!
 ```
 
-Available operations include `dot`, `matmul`, `tensordot`, `det`, `inv`,
+Available operations include `dot`, `matmul`, `tensordot`, `diag`, `det`, `inv`,
 `trace`, matrix `norm`, vector `vector_norm`, axis `vector_norm_axis`,
 `vector_norm_axis_keepdims`, and multi-axis `vector_norm_axes`,
 `outer`, `cross`, `solve`, `lstsq`, `qr`, `lu`, `cholesky`, `pinv`, and
@@ -31,6 +32,11 @@ choose arbitrary axis pairs.
 operation. It requires at least one axis; axes may be negative but must be
 unique. For example, `vector_norm_axes(t, 2, [0, 2], false)` reduces the first
 and last dimensions and keeps the middle dimension.
+
+`diag(input, offset)` builds a matrix from a vector or extracts a diagonal
+vector from a matrix. Positive offsets select diagonals above the main one;
+negative offsets select diagonals below it. It accepts rank-1 and rank-2
+inputs and returns a copy.
 
 `covariance_matrix(data, rowvar, ddof)` and `correlation_matrix(data, rowvar)`
 accept rank-2 tensors. With `rowvar: true`, each row is a variable and columns

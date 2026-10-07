@@ -105,7 +105,8 @@ conversion, matching NumPy's `axis=()` behavior.
 ### Linear algebra
 
 **Current:** NumPy-style vector/matrix `matmul` promotion and batched
-broadcasting; solve, QR/LU/Cholesky, pseudoinverse, trace, matrix norms,
+broadcasting; offset diagonal construction and extraction; solve,
+QR/LU/Cholesky, pseudoinverse, trace, matrix norms,
 flattened and axis-wise p-norms, and covariance/correlation matrices.
 
 **Remaining:** expand eigen/SVD options, specify singular/non-finite behavior,
