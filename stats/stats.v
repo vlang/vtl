@@ -894,19 +894,49 @@ fn interpolate_sorted_quantile(values []f64, q f64) f64 {
 // percentile_linear computes NumPy's default linearly interpolated percentile.
 // The percentile is expressed on the 0..100 scale.
 pub fn percentile_linear[T](t &vtl.Tensor[T], percentile f64) !f64 {
-	if math.is_nan(percentile) || math.is_inf(percentile, 0) || percentile < 0 || percentile > 100 {
-		return error('percentile must be between 0 and 100')
-	}
-	return quantile_linear[T](t, percentile / 100)
+	q := percentile_quantile(percentile)!
+	return quantile_linear[T](t, q)
 }
 
 // nanpercentile_linear computes a NaN-ignoring linearly interpolated
 // percentile on the 0..100 scale.
 pub fn nanpercentile_linear[T](t &vtl.Tensor[T], percentile f64) !f64 {
+	q := percentile_quantile(percentile)!
+	return nanquantile_linear[T](t, q)
+}
+
+fn percentile_quantile(percentile f64) !f64 {
 	if math.is_nan(percentile) || math.is_inf(percentile, 0) || percentile < 0 || percentile > 100 {
 		return error('percentile must be between 0 and 100')
 	}
-	return nanquantile_linear[T](t, percentile / 100)
+	return percentile / 100
+}
+
+// percentile_axis computes one linearly interpolated percentile per axis slice
+// and retains the reduced axis with length one.
+pub fn percentile_axis[T](t &vtl.Tensor[T], percentile f64, axis int) !&vtl.Tensor[f64] {
+	q := percentile_quantile(percentile)!
+	return quantile_axis[T](t, q, axis)
+}
+
+// percentile_axis_squeeze removes the reduced axis from the percentile result.
+pub fn percentile_axis_squeeze[T](t &vtl.Tensor[T], percentile f64, axis int) !&vtl.Tensor[f64] {
+	q := percentile_quantile(percentile)!
+	return quantile_axis_squeeze[T](t, q, axis)
+}
+
+// nanpercentile_axis computes a NaN-ignoring percentile per axis slice and
+// retains the reduced axis with length one.
+pub fn nanpercentile_axis[T](t &vtl.Tensor[T], percentile f64, axis int) !&vtl.Tensor[f64] {
+	q := percentile_quantile(percentile)!
+	return nanquantile_axis[T](t, q, axis)
+}
+
+// nanpercentile_axis_squeeze removes the reduced axis from the NaN-ignoring
+// percentile result.
+pub fn nanpercentile_axis_squeeze[T](t &vtl.Tensor[T], percentile f64, axis int) !&vtl.Tensor[f64] {
+	q := percentile_quantile(percentile)!
+	return nanquantile_axis_squeeze[T](t, q, axis)
 }
 
 // quantile_axis computes linearly interpolated quantiles along axis and keeps

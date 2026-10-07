@@ -117,6 +117,12 @@ fn test_percentile_linear_aliases_quantile_and_axis_quantile_retains_axis() ! {
 	assert columns.shape == [1, 2]
 	assert columns.get([0, 0]) == 3.0
 	assert columns.get([0, 1]) == 20.0
+	percentile_columns := percentile_axis(values, 50, 0)!
+	assert percentile_columns.shape == [1, 2]
+	assert percentile_columns.to_array() == [3.0, 20.0]
+	percentile_rows := percentile_axis_squeeze(values, 50, 1)!
+	assert percentile_rows.shape == [3]
+	assert percentile_rows.to_array() == [5.5, 11.5, 17.5]
 	rows := quantile_axis(values, 0.5, -1)!
 	assert rows.shape == [3, 1]
 	assert rows.get([0, 0]) == 5.5

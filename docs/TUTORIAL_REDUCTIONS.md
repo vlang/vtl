@@ -203,6 +203,7 @@ median_percentile := stats.percentile_linear(values, 50)! // 15.0
 integer_median := stats.median(vtl.from_1d([1, 2])!) // 1.5
 rows := vtl.from_array([1.0, 3.0, 5.0, 7.0], [2, 2])!
 row_medians := stats.quantile_axis(rows, 0.5, 1)! // shape [2, 1]
+row_percentiles := stats.percentile_axis(rows, 50, 1)! // shape [2, 1]
 
 measurements := vtl.from_array([1.0, math.nan(), 3.0, 5.0, math.nan(), math.nan()], [
 	3,
@@ -211,6 +212,7 @@ measurements := vtl.from_array([1.0, math.nan(), 3.0, 5.0, math.nan(), math.nan(
 column_medians := stats.nanquantile_axis(measurements, 0.5, 0)! // [[2.0, 5.0]]
 overall_nanmedian := stats.nanmedian(measurements) // 3.0
 column_nanmedians := stats.nanmedian_axis_squeeze(measurements, 0)! // [2.0, 5.0]
+column_nanpercentiles := stats.nanpercentile_axis_squeeze(measurements, 50, 0)! // [2.0, 5.0]
 ```
 
 Empty tensors and out-of-range quantiles return errors. The NaN-aware variants
