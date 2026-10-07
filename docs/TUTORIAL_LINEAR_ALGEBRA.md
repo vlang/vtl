@@ -100,6 +100,25 @@ matrix_vector := la.matmul(m, u)! // shape [2]: [11, 17]
 vector_matrix := la.matmul(u, m)! // shape [2]: [13, 16]
 ```
 
+## Kronecker product
+
+`kron(a, b)` builds the block-wise Kronecker product. It supports tensors of
+any rank; the lower-rank shape is left-padded with ones before multiplying
+aligned dimensions, matching NumPy's rank behavior. Inputs may be views, and
+the result is a new row-major tensor.
+
+```v
+import vtl
+
+a := vtl.from_2d([[1, 2], [3, 4]])!
+b := vtl.from_2d([[0, 5], [6, 7]])!
+product := vtl.kron(a, b)!
+println(product.shape) // [4, 4]
+println(product)
+// [[0, 5, 0, 10], [6, 7, 12, 14],
+//  [0, 15, 0, 20], [18, 21, 24, 28]]
+```
+
 ## Tensor contraction
 
 `tensordot` generalizes dot products and matrix multiplication by summing over

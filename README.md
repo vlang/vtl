@@ -54,8 +54,8 @@ t.get([1, 1])
 
 - **Tensors** — create, slice, indexed `take`/`take_nd`/`take_flat`, `choose`,
   `compress`, `indices`, `pad`, set membership, reshape, transpose, move/roll axes,
-  N-D diagonal views, broadcast, map/reduce, `einsum`, and `complex128` storage
-  with elementwise arithmetic
+  N-D diagonal views, NumPy-style Kronecker products, broadcast, map/reduce,
+  `einsum`, and `complex128` storage with elementwise arithmetic
 - **Autograd** — reverse-mode AD; arbitrary computational graphs
 - **Neural networks** — `Sequential` API; Linear, Conv2D, LSTM, Attention, …
 - **Losses & optimizers** — MSE, MAE, BCE, Hinge, Focal, CrossEntropy, Huber;
