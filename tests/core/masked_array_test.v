@@ -64,3 +64,30 @@ fn test_masked_array_broadcasts_empty_dimensions() ! {
 	assert data.count() == 0
 	assert data.compressed()!.size == 0
 }
+
+fn test_masked_array_multi_axis_reductions_and_empty_axes() ! {
+	values := vtl.from_array[f64]([1, 2, 3, 4, 5, 6, 7, 8], [2, 2, 2])!
+	mask := vtl.from_array[bool]([false, true, false, true, true, true, true, true], [
+		2,
+		2,
+		2,
+	])!
+	data := vtl.masked_array(values, mask)!
+	sums := data.sum_along_axes([0, 2], false)!
+	assert sums.values.shape == [2]
+	assert sums.values.to_array() == [1.0, 3.0]
+	assert sums.mask.to_array() == [false, false]
+	means := data.mean_along_axes([-3, -1], true)!
+	assert means.values.shape == [1, 2, 1]
+	assert means.values.to_array() == [1.0, 3.0]
+	assert means.mask.to_array() == [false, false]
+	unchanged := data.sum_along_axes([], false)!
+	assert unchanged.values.to_array() == values.to_array()
+	assert unchanged.mask.to_array() == mask.to_array()
+	elementwise_mean := data.mean_along_axes([], false)!
+	assert elementwise_mean.values.to_array() == values.as_f64().to_array()
+	assert elementwise_mean.mask.to_array() == mask.to_array()
+	if _ := data.sum_along_axes([0, -3], false) {
+		assert false, 'multi-axis reductions must reject duplicate axes'
+	}
+}
