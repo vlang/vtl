@@ -139,6 +139,9 @@ are checked against their input layout and singular inputs report errors.
 symmetric matrices, with eigenvectors in columns and selectable upper/lower
 triangle input. Inputs must be finite; the Jacobi method returns an error if
 it does not converge within 100 sweeps.
+`la.matrix_rank` computes one matrix's numerical rank with an explicit or
+dtype-aware NumPy-style default tolerance; `la.matrix_rank_batch` preserves
+leading batch dimensions.
 
 **Remaining:** add general (non-symmetric, possibly complex) eigenproblems and
 full SVD options, and benchmark realistic shapes.

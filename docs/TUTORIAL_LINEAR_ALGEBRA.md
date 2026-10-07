@@ -283,6 +283,19 @@ println(values.to_array())
 println(vectors.to_array())
 ```
 
+`la.matrix_rank` uses an explicit positive absolute tolerance or a dtype-aware
+default. `la.matrix_rank_batch` applies the same rule independently to every
+trailing matrix and preserves the batch dimensions:
+
+```v
+import vtl
+import vtl.la
+
+batch := vtl.from_array([1.0, 0, 0, 1, 1, 1, 1, 2, 2, 4, 3, 6], [2, 3, 2])!
+ranks := la.matrix_rank_batch(batch, 0)!
+println(ranks.to_array()) // [2, 1]
+```
+
 ## Transpose
 
 Pass the desired axis order to `transpose`.  For a 2-D matrix, swap axes `[1, 0]`:
