@@ -52,6 +52,7 @@ CIFAR examples for CI-safe checks.
 | [trace_axes](./trace_axes) | Sum diagonals across selected tensor axes | `v run ./vtl/examples/trace_axes/main.v` |
 | [svdvals](./svdvals) | Compute descending singular values for batched matrices | `v run ./vtl/examples/svdvals/main.v` |
 | [slogdet](./slogdet) | Compute determinant signs and stable log absolute determinants | `v run ./vtl/examples/slogdet/main.v` |
+| [matrix_power](./matrix_power) | Raise each matrix in a batch to an integer exponent | `v run ./vtl/examples/matrix_power/main.v` |
 | [diff](./diff) | Compute discrete differences in one-dimensional and multidimensional data | `v run ./vtl/examples/diff/main.v` |
 | [trapezoid](./trapezoid) | Integrate sampled data with the composite trapezoidal rule | `v run ./vtl/examples/trapezoid/main.v` |
 | [gradient](./gradient) | Estimate numerical derivatives along a tensor axis | `v run ./vtl/examples/gradient/main.v` |

@@ -229,6 +229,19 @@ sign, logabsdet := la.slogdet(matrix)!
 println('${sign.to_array()}, ${logabsdet.to_array()}') // [-1], [0.693...]
 ```
 
+`la.matrix_power` raises every trailing square matrix to an integer exponent.
+It uses exponentiation by squaring; negative powers invert each matrix first
+and return an error for singular inputs:
+
+```v
+import vtl
+import vtl.la
+
+rotation := vtl.from_2d([[0.0, 1.0], [-1.0, 0.0]])!
+fourth_power := la.matrix_power(rotation, 4)! // identity matrix
+inverse := la.matrix_power(rotation, -1)!
+```
+
 ## Transpose
 
 Pass the desired axis order to `transpose`.  For a 2-D matrix, swap axes `[1, 0]`:
