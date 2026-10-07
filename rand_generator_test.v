@@ -136,6 +136,54 @@ fn test_random_generator_poisson_is_seeded_and_handles_rate_edges() ! {
 	replay.free()
 }
 
+fn test_random_generator_supports_weibull_and_statistical_distributions() ! {
+	mut generator := new_random_generator(264)
+	mut replay := new_random_generator(264)
+	weibull_values := generator.weibull(1.5, [4096])!
+	chi_square_values := generator.chi_square(5.0, [4096])!
+	student_t_values := generator.student_t(7.0, [4096])!
+	f_values := generator.f_distribution(5.0, 10.0, [4096])!
+	assert weibull_values.array_equal(replay.weibull(1.5, [4096])!)
+	assert chi_square_values.array_equal(replay.chi_square(5.0, [4096])!)
+	assert student_t_values.array_equal(replay.student_t(7.0, [4096])!)
+	assert f_values.array_equal(replay.f_distribution(5.0, 10.0, [4096])!)
+	mut chi_square_total := 0.0
+	mut student_t_total := 0.0
+	mut f_total := 0.0
+	for value in weibull_values.to_array() {
+		assert value >= 0 && !math.is_nan(value) && !math.is_inf(value, 0)
+	}
+	for value in chi_square_values.to_array() {
+		assert value > 0 && !math.is_nan(value) && !math.is_inf(value, 0)
+		chi_square_total += value
+	}
+	for value in student_t_values.to_array() {
+		assert !math.is_nan(value) && !math.is_inf(value, 0)
+		student_t_total += value
+	}
+	for value in f_values.to_array() {
+		assert value > 0 && !math.is_nan(value) && !math.is_inf(value, 0)
+		f_total += value
+	}
+	assert math.abs(chi_square_total / 4096 - 5.0) < 0.25
+	assert math.abs(student_t_total / 4096) < 0.08
+	assert math.abs(f_total / 4096 - 1.25) < 0.12
+	if _ := generator.weibull(0.0, [1]) {
+		assert false, 'weibull must reject a non-positive shape parameter'
+	}
+	if _ := generator.chi_square(math.inf(1), [1]) {
+		assert false, 'chi_square must reject infinite degrees of freedom'
+	}
+	if _ := generator.student_t(-1.0, [1]) {
+		assert false, 'student_t must reject non-positive degrees of freedom'
+	}
+	if _ := generator.f_distribution(2.0, math.nan(), [1]) {
+		assert false, 'f_distribution must reject NaN degrees of freedom'
+	}
+	generator.free()
+	replay.free()
+}
+
 fn test_random_generator_supports_seeded_multinomial_counts() ! {
 	probabilities := from_1d([0.2, 0.3, 0.5])!
 	mut generator := new_random_generator(357)
