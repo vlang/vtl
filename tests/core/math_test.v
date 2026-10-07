@@ -128,6 +128,7 @@ fn test_allclose_broadcasts_without_changing_isclose_semantics() {
 	transposed := a.t()!
 	transposed_expected := vtl.from_array([1.0, 3.0, 2.0, 4.0], [2, 2])!
 	assert transposed.allclose(transposed_expected)!
+	assert transposed.isclose(transposed_expected, rtol: 0.0, atol: 0.0)!.all()
 }
 
 fn test_isclose_rejects_invalid_tolerances() {
