@@ -21,6 +21,10 @@ fn test_masked_array_broadcast_fill_compress_and_global_reductions() ! {
 	maximum := data.max()
 	assert minimum.value == 1.0 && !minimum.is_masked
 	assert maximum.value == 3.0 && !maximum.is_masked
+	variance := data.variance(1)!
+	assert variance.value == 2.0 && !variance.is_masked
+	deviation := data.std(1)!
+	assert math.sqrt(2.0) - 1e-12 < deviation.value && deviation.value < math.sqrt(2.0) + 1e-12
 
 	row_mask := vtl.from_array[bool]([true, false, true], [3])!
 	broadcast_data := vtl.masked_array(values, row_mask)!
@@ -51,6 +55,12 @@ fn test_masked_array_axis_reductions_preserve_masked_empty_slices() ! {
 	assert minima.mask.to_array() == [false, true]
 	assert maxima.values.to_array() == [3, 0]
 	assert maxima.mask.to_array() == [false, true]
+	variances := data.variance_along_axis(1, 1, false)!
+	assert variances.values.to_array()[0] == 2.0
+	assert math.is_nan(variances.values.to_array()[1])
+	assert variances.mask.to_array() == [false, true]
+	deviations := data.std_along_axis(1, 1, false)!
+	assert deviations.mask.to_array() == [false, true]
 }
 
 fn test_masked_array_all_masked_and_invalid_shapes_or_axes() ! {
@@ -64,6 +74,8 @@ fn test_masked_array_all_masked_and_invalid_shapes_or_axes() ! {
 	assert product.value == 1 && product.is_masked
 	assert all_masked.min().is_masked
 	assert all_masked.max().is_masked
+	assert all_masked.variance(0)!.is_masked
+	assert all_masked.std(0)!.is_masked
 	assert all_masked.count() == 0
 	assert all_masked.compressed()!.size == 0
 	if _ := vtl.masked_array(values, vtl.from_1d[bool]([true, false, true])!) {
@@ -101,6 +113,13 @@ fn test_masked_array_multi_axis_reductions_and_empty_axes() ! {
 	assert products.mask.to_array() == [false, false]
 	assert data.min_along_axes([0, 2], false)!.values.to_array() == [1.0, 3.0]
 	assert data.max_along_axes([0, 2], false)!.values.to_array() == [1.0, 3.0]
+	variances := data.variance_along_axes([0, 2], 0, true)!
+	assert variances.values.shape == [1, 2, 1]
+	assert variances.values.to_array() == [0.0, 0.0]
+	assert variances.mask.to_array() == [false, false]
+	if _ := data.variance(-1) {
+		assert false, 'variance must reject negative ddof'
+	}
 	means := data.mean_along_axes([-3, -1], true)!
 	assert means.values.shape == [1, 2, 1]
 	assert means.values.to_array() == [1.0, 3.0]
