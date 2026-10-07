@@ -56,11 +56,25 @@ square root branch. `arcsin`, `arccos`, `arctan`, `arcsinh`, `arccosh`, and
 `arctanh` use V's standard complex library for their principal inverse branches.
 The direct `tan`, `sinh`, `cosh`, and `tanh` functions are also available.
 
+Global sum, product, and mean use complex arithmetic and return scalar complex
+values. Empty means return `NaN + NaN·i`, matching NumPy's invalid empty mean:
+
+```v
+import math.complex as cmplx
+import vtl
+import vtl.stats
+
+values := vtl.from_1d([cmplx.complex(1.0, 2.0), cmplx.complex(3.0, 4.0)])!
+assert stats.sum(values) == cmplx.Complex{ re: 4.0, im: 6.0 }
+assert stats.prod(values) == cmplx.Complex{ re: -5.0, im: 10.0 }
+assert stats.mean(values) == cmplx.Complex{ re: 2.0, im: 3.0 }
+```
+
 Complex tensors are an early part of VTL's complex-number support. Real-valued
-casts, reductions, general complex mathematical functions, linear algebra,
-random distributions, and `.npy`/`.npz` complex I/O do not yet support this
-dtype. FFT APIs have their own complex output types and are documented in the
-[FFT tutorial](./TUTORIAL_FFT.md).
+casts, axis-wise reductions, other statistics, linear algebra, random
+distributions, and `.npy`/`.npz` complex I/O do not yet support this dtype.
+Global sum, product, and mean return complex scalar values. FFT APIs have their
+own complex output types and are documented in the [FFT tutorial](./TUTORIAL_FFT.md).
 
 Run the [complex tensor example](../examples/complex_tensors/README.md) from
 `~/.vmodules`:

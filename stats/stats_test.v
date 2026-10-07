@@ -2,6 +2,7 @@ module stats
 
 import vtl
 import math
+import math.complex as cmplx
 
 fn test_variance_uses_f64_for_integer_input_and_ddof() {
 	data := vtl.from_1d([1, 2, 3])!
@@ -68,6 +69,23 @@ fn test_mean() {
 	o = mean(data)
 	// Some issue with precision comparison in f64 using == operator hence serializing to string
 	assert tst_res(o.str(), '37.708000')
+}
+
+fn test_complex_scalar_sum_product_and_mean() {
+	values := vtl.from_1d([
+		cmplx.Complex{ re: 1, im: 2 },
+		cmplx.Complex{ re: 3, im: 4 },
+	])!
+	assert sum(values) == cmplx.Complex{ re: 4, im: 6 }
+	assert prod(values) == cmplx.Complex{ re: -5, im: 10 }
+	assert mean(values) == cmplx.Complex{ re: 2, im: 3 }
+
+	empty := vtl.from_1d([]cmplx.Complex{})!
+	assert sum(empty) == cmplx.Complex{ re: 0, im: 0 }
+	assert prod(empty) == cmplx.Complex{ re: 1, im: 0 }
+	empty_mean := mean(empty)
+	assert math.is_nan(empty_mean.re)
+	assert math.is_nan(empty_mean.im)
 }
 
 fn test_quantile_linear_interpolates_and_sorts_copy() {

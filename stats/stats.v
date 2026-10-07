@@ -2,6 +2,7 @@ module stats
 
 import vtl
 import math
+import math.complex as cmplx
 
 // VarianceData configures the degrees of freedom used by variance and std.
 pub struct VarianceData {
@@ -50,14 +51,14 @@ pub:
 pub fn sum[T](t &vtl.Tensor[T]) T {
 	if is_flat_tensor_storage(t) {
 		data := t.data.data
-		mut total0 := vtl.cast[T](0)
-		mut total1 := vtl.cast[T](0)
-		mut total2 := vtl.cast[T](0)
-		mut total3 := vtl.cast[T](0)
-		mut total4 := vtl.cast[T](0)
-		mut total5 := vtl.cast[T](0)
-		mut total6 := vtl.cast[T](0)
-		mut total7 := vtl.cast[T](0)
+		mut total0 := sum_identity[T]()
+		mut total1 := sum_identity[T]()
+		mut total2 := sum_identity[T]()
+		mut total3 := sum_identity[T]()
+		mut total4 := sum_identity[T]()
+		mut total5 := sum_identity[T]()
+		mut total6 := sum_identity[T]()
+		mut total7 := sum_identity[T]()
 		mut index := 0
 		for index + 7 < data.len {
 			total0 += data[index]
@@ -77,7 +78,7 @@ pub fn sum[T](t &vtl.Tensor[T]) T {
 		}
 		return total
 	}
-	return t.reduce(vtl.cast[T](0), fn [T](acc T, val T, i []int) T {
+	return t.reduce(sum_identity[T](), fn [T](acc T, val T, i []int) T {
 		return acc + val
 	})
 }
@@ -90,7 +91,7 @@ fn is_flat_tensor_storage[T](t &vtl.Tensor[T]) bool {
 // axis
 pub fn sum_axis[T](t &vtl.Tensor[T], data AxisData) T {
 	mut iter := t.axis_iterator(data.axis)
-	mut acc := vtl.cast[T](0)
+	mut acc := sum_identity[T]()
 	for {
 		val, _ := iter.next() or { break }
 		acc += val
@@ -102,7 +103,7 @@ pub fn sum_axis[T](t &vtl.Tensor[T], data AxisData) T {
 // axis with the reduced dimension intact
 pub fn sum_axis_with_dims[T](t &vtl.Tensor[T], data AxisData) T {
 	mut iter := t.axis_with_dims_iterator(data.axis)
-	mut acc := vtl.cast[T](0)
+	mut acc := sum_identity[T]()
 	for {
 		val, _ := iter.next() or { break }
 		acc += val
@@ -114,13 +115,13 @@ pub fn sum_axis_with_dims[T](t &vtl.Tensor[T], data AxisData) T {
 @[direct_array_access]
 pub fn prod[T](t &vtl.Tensor[T]) T {
 	if is_flat_tensor_storage(t) {
-		mut product := vtl.cast[T](1)
+		mut product := product_identity[T]()
 		for value in t.data.data {
 			product *= value
 		}
 		return product
 	}
-	return t.reduce(vtl.cast[T](1), fn [T](acc T, val T, i []int) T {
+	return t.reduce(product_identity[T](), fn [T](acc T, val T, i []int) T {
 		return acc * val
 	})
 }
@@ -129,7 +130,7 @@ pub fn prod[T](t &vtl.Tensor[T]) T {
 // axis with the reduced dimension intact
 pub fn prod_axis[T](t &vtl.Tensor[T], data AxisData) T {
 	mut iter := t.axis_iterator(data.axis)
-	mut acc := vtl.cast[T](1)
+	mut acc := product_identity[T]()
 	for {
 		val, _ := iter.next() or { break }
 		acc *= val
@@ -141,7 +142,7 @@ pub fn prod_axis[T](t &vtl.Tensor[T], data AxisData) T {
 // axis with the reduced dimension intact
 pub fn prod_axis_with_dims[T](t &vtl.Tensor[T], data AxisData) T {
 	mut iter := t.axis_with_dims_iterator(data.axis)
-	mut acc := vtl.cast[T](1)
+	mut acc := product_identity[T]()
 	for {
 		val, _ := iter.next() or { break }
 		acc *= val
@@ -175,10 +176,33 @@ pub fn freq[T](t &vtl.Tensor[T], val T) int {
 // https://www.mathsisfun.com/data/central-measures.html
 pub fn mean[T](t &vtl.Tensor[T]) T {
 	if t.size == 0 {
+		$if T is cmplx.Complex {
+			return T(cmplx.Complex{ re: math.nan(), im: math.nan() })
+		} $else {
+			return sum_identity[T]()
+		}
+	}
+	$if T is cmplx.Complex {
+		return sum(t) / T(cmplx.Complex{ re: f64(t.size), im: 0 })
+	} $else {
+		return sum(t) / vtl.cast[T](t.size)
+	}
+}
+
+fn sum_identity[T]() T {
+	$if T is cmplx.Complex {
+		return T(cmplx.Complex{ re: 0, im: 0 })
+	} $else {
 		return vtl.cast[T](0)
 	}
+}
 
-	return sum(t) / vtl.cast[T](t.size)
+fn product_identity[T]() T {
+	$if T is cmplx.Complex {
+		return T(cmplx.Complex{ re: 1, im: 0 })
+	} $else {
+		return vtl.cast[T](1)
+	}
 }
 
 // Measure of Central Tendency
