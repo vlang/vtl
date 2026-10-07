@@ -25,6 +25,10 @@ fn main() {
 	noise := training_rng.uniform(-0.01, 0.01, [4])!
 	event_counts := training_rng.binomial(12, 0.25, [4])!
 	arrival_counts := validation_rng.poisson(3.5, [4])!
+	lifetimes := validation_rng.weibull(1.5, [4])!
+	chi_square_samples := validation_rng.chi_square(5.0, [4])!
+	test_statistics := validation_rng.student_t(7.0, [4])!
+	variance_ratios := validation_rng.f_distribution(5.0, 10.0, [4])!
 	waiting_durations := validation_rng.exponential(0.5, [4])!
 
 	println('Training batch shape: ${training_features.shape}')
@@ -42,6 +46,10 @@ fn main() {
 	println('Log-normal positive scales: ${positive_scales.to_array()}')
 	println('Binomial event counts: ${event_counts.to_array()}')
 	println('Poisson arrival counts: ${arrival_counts.to_array()}')
+	println('Weibull lifetimes: ${lifetimes.to_array()}')
+	println('Chi-square samples: ${chi_square_samples.to_array()}')
+	println('Student t samples: ${test_statistics.to_array()}')
+	println('F-distribution ratios: ${variance_ratios.to_array()}')
 	println('Exponential waiting durations: ${waiting_durations.to_array()}')
 	println('Independent augmentation noise: ${noise.to_array()}')
 

@@ -237,6 +237,73 @@ fn sample_poisson(lambda f64, mut rng &rand.PRNG) !int {
 	return error('poisson: rejection sampler did not converge')
 }
 
+// weibull returns samples from the unit-scale Weibull distribution. The
+// positive shape parameter controls the distribution's tail and hazard rate.
+pub fn (mut generator RandomGenerator) weibull(shape_parameter f64, shape []int) !&Tensor[f64] {
+	if shape_parameter <= 0 || math.is_nan(shape_parameter) || math.is_inf(shape_parameter, 0) {
+		return error('weibull: shape parameter must be finite and positive')
+	}
+	mut values := []f64{len: size_from_shape(shape)}
+	for i in 0 .. values.len {
+		u := generator.rng.f64_in_range(0.0, 1.0)!
+		values[i] = math.pow(-math.log(1.0 - u), 1.0 / shape_parameter)
+	}
+	return from_array[f64](values, shape)
+}
+
+// chi_square returns samples from a chi-square distribution with the given
+// positive degrees of freedom.
+pub fn (mut generator RandomGenerator) chi_square(degrees_of_freedom f64, shape []int) !&Tensor[f64] {
+	validate_degrees_of_freedom(degrees_of_freedom, 'chi_square')!
+	mut rng := generator.rng
+	mut values := []f64{len: size_from_shape(shape)}
+	for i in 0 .. values.len {
+		values[i] = sample_gamma(degrees_of_freedom / 2, 2, mut rng)!
+	}
+	return from_array[f64](values, shape)
+}
+
+// student_t returns samples from the standard Student's t distribution.
+pub fn (mut generator RandomGenerator) student_t(degrees_of_freedom f64, shape []int) !&Tensor[f64] {
+	validate_degrees_of_freedom(degrees_of_freedom, 'student_t')!
+	mut rng := generator.rng
+	mut values := []f64{len: size_from_shape(shape)}
+	for i in 0 .. values.len {
+		normal_sample := rng.normal(config.NormalConfigStruct{})!
+		chi_square := sample_gamma(degrees_of_freedom / 2, 2, mut rng)!
+		if chi_square <= 0 {
+			return error('student_t: sampled chi-square value underflowed to zero')
+		}
+		values[i] = normal_sample / math.sqrt(chi_square / degrees_of_freedom)
+	}
+	return from_array[f64](values, shape)
+}
+
+// f_distribution returns samples from an F distribution with the specified
+// numerator and denominator degrees of freedom.
+pub fn (mut generator RandomGenerator) f_distribution(numerator_df f64, denominator_df f64, shape []int) !&Tensor[f64] {
+	validate_degrees_of_freedom(numerator_df, 'f_distribution')!
+	validate_degrees_of_freedom(denominator_df, 'f_distribution')!
+	mut rng := generator.rng
+	mut values := []f64{len: size_from_shape(shape)}
+	for i in 0 .. values.len {
+		numerator := sample_gamma(numerator_df / 2, 2, mut rng)!
+		denominator := sample_gamma(denominator_df / 2, 2, mut rng)!
+		if denominator <= 0 {
+			return error('f_distribution: sampled denominator underflowed to zero')
+		}
+		values[i] = (numerator / numerator_df) / (denominator / denominator_df)
+	}
+	return from_array[f64](values, shape)
+}
+
+fn validate_degrees_of_freedom(degrees_of_freedom f64, distribution string) ! {
+	if degrees_of_freedom <= 0 || math.is_nan(degrees_of_freedom)
+		|| math.is_inf(degrees_of_freedom, 0) {
+		return error('${distribution}: degrees of freedom must be finite and positive')
+	}
+}
+
 // choice samples values from a tensor's flattened logical order. Without
 // replacement, selected positions are unique; the same value may still occur
 // more than once in the population.
