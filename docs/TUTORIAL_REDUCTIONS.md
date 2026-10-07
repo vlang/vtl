@@ -108,7 +108,8 @@ global_max := t.argmax[f64](0)!
 `max_axis(axis)` and `min_axis(axis)` retain the reduced axis with length one.
 Use `max_axis_squeeze(axis)` or `min_axis_squeeze(axis)` to remove it, matching
 NumPy's default `keepdims=false` shape behavior. VTL represents scalar-shaped
-reductions as shape `[1]`.
+reductions as shape `[1]`. Use `max_axes(axes, keepdims)` or
+`min_axes(axes, keepdims)` to reduce multiple unique axes in one call.
 
 ```v
 import vtl
@@ -120,6 +121,9 @@ mx := t.max_axis_squeeze[f64](1)!
 
 mn := t.min_axis_squeeze[f64](0)!
 // mn = [1.0, 4.0]
+
+volume := vtl.from_array[f64]([0.0, 5.0, 3.0, 7.0, 4.0, 2.0, 8.0, 1.0], [2, 2, 2])!
+assert volume.max_axes([0, -1], false)!.to_array() == [5.0, 8.0]
 ```
 
 ## Logical all / any along an axis

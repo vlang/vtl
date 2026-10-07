@@ -73,7 +73,8 @@ boundary differences.
 standard deviation; axis mean/variance/std with explicit `keepdims` and
 NaN-aware forms; axis-wise `trapezoid`; linear quantile/percentile and
 multi-quantile APIs, including NaN-aware global and axis variants; axis arg
-reductions and squeezed min/max/argmin/argmax results; histograms with
+reductions and squeezed min/max/argmin/argmax results; multi-axis min/max;
+histograms with
 automatic and custom bins, weighted density, and multiple bin-selection rules;
 integer/weighted `bincount`.
 
