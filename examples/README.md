@@ -53,6 +53,7 @@ CIFAR examples for CI-safe checks.
 | [matrix_norm](./matrix_norm) | Compute batched Frobenius, nuclear, and spectral matrix norms | `v run ./vtl/examples/matrix_norm/main.v` |
 | [trace_axes](./trace_axes) | Sum diagonals across selected tensor axes | `v run ./vtl/examples/trace_axes/main.v` |
 | [svdvals](./svdvals) | Compute descending singular values for batched matrices | `v run ./vtl/examples/svdvals/main.v` |
+| [svd](./svd) | Decompose rectangular matrices into U, singular values, and V transpose | `v run ./vtl/examples/svd/main.v` |
 | [slogdet](./slogdet) | Compute determinant signs and stable log absolute determinants | `v run ./vtl/examples/slogdet/main.v` |
 | [matrix_power](./matrix_power) | Raise each matrix in a batch to an integer exponent | `v run ./vtl/examples/matrix_power/main.v` |
 | [condition_number](./condition_number) | Compute matrix condition numbers for stacked matrices | `v run ./vtl/examples/condition_number/main.v` |

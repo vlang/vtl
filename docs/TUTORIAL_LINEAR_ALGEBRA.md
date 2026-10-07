@@ -215,6 +215,18 @@ batch := vtl.from_array([3, 0, 0, 0, 4, 0, 5, 0, 0, 0, 12, 0], [2, 2, 3])!
 singular_values := la.svdvals(batch)! // [[4, 3], [12, 5]]
 ```
 
+`la.svd` also returns the factors. By default, `u` and `vt` are square as in
+NumPy; pass `full_matrices: false` for the smaller reduced factors:
+
+```v
+import vtl
+import vtl.la
+
+matrix := vtl.from_2d([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]])!
+u, singular_values, vt := la.svd(matrix, full_matrices: false)!
+println('Shapes: ${u.shape}, ${singular_values.shape}, ${vt.shape}') // [3, 2], [2], [2, 2]
+```
+
 `la.slogdet` computes the sign and log absolute determinant without forming
 the determinant, so very large or very small determinants do not overflow or
 underflow. Singular matrices return sign `0` and log absolute determinant

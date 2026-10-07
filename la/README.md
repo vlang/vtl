@@ -25,7 +25,7 @@ main_diagonal := la.diag[f64](a, 0)!
 Available operations include `dot`, `matmul`, `tensordot`, `diag`, batched
 `det` and `inv`, `trace`, matrix `norm`, vector `vector_norm` and its axis
 variants, `outer`, `cross`, `solve`, `lstsq`, `qr`, `lu`, `cholesky`, `pinv`,
-`matrix_rank`, `matrix_rank_batch`, `slogdet`, `svdvals`, batched `matrix_norm`,
+`matrix_rank`, `matrix_rank_batch`, `slogdet`, `svd`, `svdvals`, batched `matrix_norm`,
 `matrix_power`, `cond`, and symmetric `eigh`/`eigvalsh`. Shape and tolerance
 requirements are checked by each function.
 
@@ -65,3 +65,7 @@ constant variables.
 More examples:
 [linear algebra tutorial](../docs/TUTORIAL_LINEAR_ALGEBRA.md) and
 [advanced tutorial](../docs/TUTORIAL_ADVANCED_LA.md).
+
+`svd` returns `(u, s, vt)` for real matrices and batches. Its default
+`full_matrices: true` matches NumPy's square-factor shapes; set it to `false`
+for reduced factors. Results use `f64`, and inputs must be finite.
