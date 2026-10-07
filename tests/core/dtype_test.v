@@ -49,6 +49,13 @@ fn test_complex128_tensor_creation_and_elementwise_arithmetic() ! {
 		vcomplex.Complex{ re: 1.0, im: 0.0 }]
 }
 
+fn test_complex_tensor_zeros_and_ones() {
+	zeros := vtl.zeros[vcomplex.Complex]([2])
+	ones := vtl.ones[vcomplex.Complex]([2])
+	assert zeros.to_array() == [vcomplex.Complex{}, vcomplex.Complex{}]
+	assert ones.to_array() == [vcomplex.Complex{ re: 1, im: 0 }, vcomplex.Complex{ re: 1, im: 0 }]
+}
+
 fn test_complex_real_imag_conj_and_absolute() ! {
 	values := vtl.from_1d([
 		vcomplex.Complex{ re: 3.0, im: 4.0 },
