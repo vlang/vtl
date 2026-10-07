@@ -192,6 +192,18 @@ nuclear := la.matrix_norm(batch, ord: 'nuc')! // [7, 17]
 kept := la.matrix_norm(batch, keepdims: true)! // shape [2, 1, 1]
 ```
 
+`la.trace_axes` traces selected axes in a batched tensor. Axes may be negative,
+and `offset` selects an upper or lower diagonal:
+
+```v
+import vtl
+import vtl.la
+
+batch := vtl.from_array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], [2, 2, 3])!
+traces := la.trace_axes(batch, axis1: 1, axis2: 2)! // [6, 18]
+offset_traces := la.trace_axes(batch, axis1: 1, axis2: 2, offset: 1)! // [8, 20]
+```
+
 ## Transpose
 
 Pass the desired axis order to `transpose`.  For a 2-D matrix, swap axes `[1, 0]`:
