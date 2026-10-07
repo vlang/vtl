@@ -71,6 +71,10 @@ comments in [`stats.v`](stats.v) for edge-case behavior and the
 `nanmedian_axis` keeps the reduced dimension; `nanmedian_axis_squeeze` removes
 it.
 
+`mean_along_axes`, `variance_along_axes`, and `std_along_axes` reduce multiple
+axes in one pass, with matching NaN-ignoring `nan*_along_axes` variants. All
+accept `keepdims`; variance and standard deviation accept `ddof`.
+
 `percentile_axis` and `nanpercentile_axis` accept percentiles on the 0..100
 scale. Their `_squeeze` variants remove the reduced axis; the base variants
 keep it with length one.
