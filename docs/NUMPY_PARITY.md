@@ -49,8 +49,12 @@ axis `count_nonzero`; `argwhere` and per-axis `nonzero`; `take`, `take_nd`,
 `put_along_axis` and `scatter_add`; lookup and DataLoader gathers; broadcastable
 `masked_select` and `masked_fill`.
 
-**Remaining:** add autograd support for indexed updates and document all
-bounds semantics.
+`Variable.take_along_axis` propagates gradients by scattering them to selected
+source positions, including accumulation for repeated indices and reduction of
+broadcast source dimensions.
+
+**Remaining:** add autograd support for indexed writes (`put_along_axis` and
+`scatter_add`) and document all bounds semantics.
 
 Axis-wise `argmax` and `argmin` retain a length-one axis for compatibility;
 `argmax_axis_squeeze` and `argmin_axis_squeeze` provide NumPy's default

@@ -15,6 +15,30 @@ assert selected.shape == [2, 2]
 assert selected.to_array() == [12, 10, 22, 20]
 ```
 
+## Gathering with autograd
+
+`Variable.take_along_axis` records the gather in the computation graph. During
+backpropagation, gradients are scattered to the selected source positions;
+repeated indices accumulate, and broadcast source dimensions sum their
+contributions. Integer indices are treated as constants and snapshotted when
+the gather is recorded, so later edits to the index tensor do not change the
+backward path.
+
+```v ignore
+import vtl
+import vtl.autograd
+
+mut ctx := autograd.ctx[f64]()
+input := ctx.variable(vtl.from_array([10.0, 20.0, 30.0], [1, 3])!)
+indices := vtl.from_array[int]([1, 1, 2], [1, 3])!
+mut selected := input.take_along_axis(indices, 1)!
+selected.backprop()!
+println(input.grad.to_array()) // [0.0, 2.0, 1.0]
+```
+
+See the runnable [autograd gather example](../examples/autograd_gather/README.md)
+for repeated indices and the resulting gradient.
+
 ## Count non-zero values
 
 `count_nonzero` counts all non-zero tensor values. `count_nonzero_axis` counts
@@ -168,8 +192,7 @@ indices return errors.
 import vtl
 
 volume := vtl.from_array[int]([]int{len: 24, init: index}, [2, 3, 4])!
-last_columns := vtl.mixed_index[int](volume, [vtl.ellipsis_index(),
-	vtl.slice_index(1, 4, 2)!])!
+last_columns := vtl.mixed_index[int](volume, [vtl.ellipsis_index(), vtl.slice_index(1, 4, 2)!])!
 assert last_columns.shape == [2, 3, 2]
 
 row := vtl.from_array[int]([1], [1])!
