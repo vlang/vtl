@@ -181,6 +181,6 @@
     <circle cx="153" cy="0" r="5" fill="#34d399"/><text x="166" y="4" class="tiny">tensor core</text>
     <circle cx="282" cy="0" r="5" fill="#a78bfa"/><text x="295" y="4" class="tiny">VSL kernels</text>
     <circle cx="430" cy="0" r="5" fill="#fbbf24"/><text x="443" y="4" class="tiny">execution backends</text>
-    <text x="1376" y="4" class="muted" text-anchor="end">VTL / VSL architecture</text>
+    <text x="1030" y="4" class="muted">VTL / VSL architecture</text>
   </g>
 </svg>
