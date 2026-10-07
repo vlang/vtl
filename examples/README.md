@@ -13,6 +13,7 @@ CIFAR examples for CI-safe checks.
 
 | Example | What it shows | Command |
 |---------|---------------|---------|
+| [pad](./pad) | Constant, edge, wrap, reflect, and symmetric tensor padding | `v run ./vtl/examples/pad/main.v` |
 | [tensor_axis_manipulation](./tensor_axis_manipulation) | `moveaxis` and `rollaxis` views | `v run ./vtl/examples/tensor_axis_manipulation/main.v` |
 | [tensor_sorting](./tensor_sorting) | Sort, partially partition, and return local indices along tensor axes | `v run ./vtl/examples/tensor_sorting/main.v` |
 | [vtl_basic_usage](./vtl_basic_usage) | Tensor creation and basic operations | `v run ./vtl/examples/vtl_basic_usage/main.v` |

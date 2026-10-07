@@ -32,7 +32,8 @@ coordinate arrays through `indices`.
 
 **Current:** reshape, transpose, squeeze/expand, move/roll axes,
 concatenate/stack/split, `ravel`, copying `flatten`, `flip`, `repeat`,
-`repeat_axis`, block `tile`, `rot90`, and stable axis-wise `sort`/`argsort`.
+`repeat_axis`, block `tile`, `rot90`, constant/edge/wrap/reflect/symmetric
+padding, and stable axis-wise `sort`/`argsort`.
 
 **Remaining:** test broadcasting helpers and audit copy-versus-view behavior.
 
