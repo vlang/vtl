@@ -134,3 +134,31 @@ fn test_masked_array_multi_axis_reductions_and_empty_axes() ! {
 		assert false, 'multi-axis reductions must reject duplicate axes'
 	}
 }
+
+fn test_masked_array_broadcast_arithmetic_unions_masks() ! {
+	left_values := vtl.from_array[f64]([1, 2, 3, 4, 5, 6], [2, 3])!
+	left_mask := vtl.from_1d[bool]([false, true, false])!
+	left := vtl.masked_array(left_values, left_mask)!
+	right_values := vtl.from_1d[f64]([10, 20, 30])!
+	right_mask := vtl.from_array[bool]([true, false], [2, 1])!
+	right := vtl.masked_array(right_values, right_mask)!
+
+	sums := left.add(right)!
+	assert sums.values.shape == [2, 3]
+	assert sums.values.to_array() == [11, 22, 33, 14, 25, 36]
+	assert sums.mask.to_array() == [true, true, true, false, true, false]
+
+	differences := left.subtract(right)!
+	assert differences.values.to_array() == [-9, -18, -27, -6, -15, -24]
+	products := left.multiply(right)!
+	assert products.values.to_array() == [10, 40, 90, 40, 100, 180]
+	quotients := left.divide(right)!
+	assert quotients.values.to_array() == [0.1, 0.1, 0.1, 0.4, 0.25, 0.2]
+
+	shifted := left.add_scalar(2.0)!
+	assert shifted.values.to_array() == [3, 4, 5, 6, 7, 8]
+	assert shifted.mask.to_array() == left.mask.to_array()
+	assert left.subtract_scalar(1.0)!.values.to_array() == [0, 1, 2, 3, 4, 5]
+	assert left.multiply_scalar(2.0)!.values.to_array() == [2, 4, 6, 8, 10, 12]
+	assert left.divide_scalar(2.0)!.values.to_array() == [0.5, 1, 1.5, 2, 2.5, 3]
+}

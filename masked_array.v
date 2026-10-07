@@ -9,6 +9,13 @@ enum MaskedReduction {
 	maximum
 }
 
+enum MaskedBinaryOperation {
+	add
+	subtract
+	multiply
+	divide
+}
+
 // MaskedArray pairs tensor values with a boolean missing-data mask. A true
 // mask entry marks the corresponding value as missing, following NumPy's
 // numpy.ma convention.
@@ -90,6 +97,72 @@ pub fn (array &MaskedArray[T]) count[T]() int {
 		}
 	}
 	return valid
+}
+
+// add adds two masked arrays with broadcasting and combines their masks.
+pub fn (array &MaskedArray[T]) add[T](other &MaskedArray[T]) !MaskedArray[T] {
+	return masked_binary[T](array, other, .add)
+}
+
+// subtract subtracts another masked array with broadcasting.
+pub fn (array &MaskedArray[T]) subtract[T](other &MaskedArray[T]) !MaskedArray[T] {
+	return masked_binary[T](array, other, .subtract)
+}
+
+// multiply multiplies two masked arrays with broadcasting.
+pub fn (array &MaskedArray[T]) multiply[T](other &MaskedArray[T]) !MaskedArray[T] {
+	return masked_binary[T](array, other, .multiply)
+}
+
+// divide divides by another masked array with broadcasting.
+pub fn (array &MaskedArray[T]) divide[T](other &MaskedArray[T]) !MaskedArray[T] {
+	return masked_binary[T](array, other, .divide)
+}
+
+// add_scalar adds a valid scalar to every value and preserves the mask.
+pub fn (array &MaskedArray[T]) add_scalar[T](scalar T) !MaskedArray[T] {
+	return MaskedArray[T]{
+		values: array.values.add_scalar[T](scalar)!
+		mask:   array.mask
+	}
+}
+
+// subtract_scalar subtracts a valid scalar from every value and preserves the mask.
+pub fn (array &MaskedArray[T]) subtract_scalar[T](scalar T) !MaskedArray[T] {
+	return MaskedArray[T]{
+		values: array.values.subtract_scalar[T](scalar)!
+		mask:   array.mask
+	}
+}
+
+// multiply_scalar multiplies every value by a valid scalar and preserves the mask.
+pub fn (array &MaskedArray[T]) multiply_scalar[T](scalar T) !MaskedArray[T] {
+	return MaskedArray[T]{
+		values: array.values.multiply_scalar[T](scalar)!
+		mask:   array.mask
+	}
+}
+
+// divide_scalar divides every value by a valid scalar and preserves the mask.
+pub fn (array &MaskedArray[T]) divide_scalar[T](scalar T) !MaskedArray[T] {
+	return MaskedArray[T]{
+		values: array.values.divide_scalar[T](scalar)!
+		mask:   array.mask
+	}
+}
+
+fn masked_binary[T](array &MaskedArray[T], other &MaskedArray[T], operation MaskedBinaryOperation) !MaskedArray[T] {
+	values := if operation == .add {
+		array.values.add[T](other.values)!
+	} else if operation == .subtract {
+		array.values.subtract[T](other.values)!
+	} else if operation == .multiply {
+		array.values.multiply[T](other.values)!
+	} else {
+		array.values.divide[T](other.values)!
+	}
+	mask := array.mask.logical_or[bool](other.mask)!
+	return masked_array[T](values, mask)
 }
 
 // sum reduces all unmasked values. An entirely masked array returns a masked
