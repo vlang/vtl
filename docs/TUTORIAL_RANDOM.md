@@ -93,11 +93,13 @@ cross-version compatibility is not guaranteed. See the complete data-pipeline
 example in [`examples/random_generator/main.v`](../examples/random_generator/main.v).
 
 VTL also provides global tensor constructors for uniform range, normal,
-Bernoulli, binomial, geometric, exponential, Poisson, and Weibull distributions.
-For example, `poisson(lambda, shape, params)` returns integer event counts and
-`weibull(shape_parameter, shape, params)` returns unit-scale lifetime samples.
-Both use the global stream reset by `random_seed`. See [`rand.v`](../rand.v) for
-the complete API.
+Bernoulli, binomial, geometric, exponential, Poisson, Weibull, Gamma, Beta,
+chi-square, Student's t, and F distributions. `gamma(alpha, scale, shape,
+params)`, `beta(alpha, beta, shape, params)`, `chi_square(df, shape, params)`,
+`student_t(df, shape, params)`, and `f_distribution(numerator_df,
+denominator_df, shape, params)` use the global stream reset by `random_seed`.
+As with the independent generator APIs, distribution parameters must be finite
+and positive where applicable. See [`rand.v`](../rand.v) for the complete API.
 
 `random[T](minimum, maximum, shape, params)` creates uniform values in the
 half-open range `[minimum, maximum)`. Integer tensors support `i8`, `i16`,

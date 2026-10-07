@@ -78,3 +78,61 @@ fn test_global_poisson_and_weibull_are_seeded_and_validated() ! {
 		assert false, 'weibull must reject an infinite shape parameter'
 	}
 }
+
+fn test_global_statistical_distributions_are_seeded_and_validated() ! {
+	random_seed(702)
+	gamma_samples := gamma(2.0, 3.0, [4096], TensorData{})!
+	beta_samples := beta(2.0, 5.0, [4096], TensorData{})!
+	chi_samples := chi_square(4.0, [4096], TensorData{})!
+	t_samples := student_t(12.0, [4096], TensorData{})!
+	f_samples := f_distribution(5.0, 20.0, [4096], TensorData{})!
+	random_seed(702)
+	assert gamma_samples.array_equal(gamma(2.0, 3.0, [4096], TensorData{})!)
+	assert beta_samples.array_equal(beta(2.0, 5.0, [4096], TensorData{})!)
+	assert chi_samples.array_equal(chi_square(4.0, [4096], TensorData{})!)
+	assert t_samples.array_equal(student_t(12.0, [4096], TensorData{})!)
+	assert f_samples.array_equal(f_distribution(5.0, 20.0, [4096], TensorData{})!)
+	for value in beta_samples.to_array() {
+		assert value >= 0 && value <= 1 && !math.is_nan(value) && !math.is_inf(value, 0)
+	}
+	for value in gamma_samples.to_array() {
+		assert value > 0 && !math.is_nan(value) && !math.is_inf(value, 0)
+	}
+	for value in chi_samples.to_array() {
+		assert value > 0 && !math.is_nan(value) && !math.is_inf(value, 0)
+	}
+	for value in t_samples.to_array() {
+		assert !math.is_nan(value) && !math.is_inf(value, 0)
+	}
+	for value in f_samples.to_array() {
+		assert value > 0 && !math.is_nan(value) && !math.is_inf(value, 0)
+	}
+	assert math.abs(sample_mean_for_test(gamma_samples.to_array()) - 6.0) < 0.3
+	assert math.abs(sample_mean_for_test(beta_samples.to_array()) - (2.0 / 7.0)) < 0.02
+	assert math.abs(sample_mean_for_test(chi_samples.to_array()) - 4.0) < 0.2
+	assert math.abs(sample_mean_for_test(t_samples.to_array())) < 0.1
+	assert math.abs(sample_mean_for_test(f_samples.to_array()) - (20.0 / 18.0)) < 0.12
+	if _ := gamma(0.0, 1.0, [1], TensorData{}) {
+		assert false, 'gamma must reject a non-positive shape parameter'
+	}
+	if _ := beta(1.0, math.inf(1), [1], TensorData{}) {
+		assert false, 'beta must reject a non-finite shape parameter'
+	}
+	if _ := chi_square(0.0, [1], TensorData{}) {
+		assert false, 'chi_square must reject non-positive degrees of freedom'
+	}
+	if _ := student_t(math.nan(), [1], TensorData{}) {
+		assert false, 'student_t must reject non-finite degrees of freedom'
+	}
+	if _ := f_distribution(1.0, 0.0, [1], TensorData{}) {
+		assert false, 'f_distribution must reject non-positive denominator degrees of freedom'
+	}
+}
+
+fn sample_mean_for_test(values []f64) f64 {
+	mut total := 0.0
+	for value in values {
+		total += value
+	}
+	return total / values.len
+}
