@@ -209,6 +209,8 @@ measurements := vtl.from_array([1.0, math.nan(), 3.0, 5.0, math.nan(), math.nan(
 	2,
 ])!
 column_medians := stats.nanquantile_axis(measurements, 0.5, 0)! // [[2.0, 5.0]]
+overall_nanmedian := stats.nanmedian(measurements) // 3.0
+column_nanmedians := stats.nanmedian_axis_squeeze(measurements, 0)! // [2.0, 5.0]
 ```
 
 Empty tensors and out-of-range quantiles return errors. The NaN-aware variants

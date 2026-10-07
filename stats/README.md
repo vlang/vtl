@@ -65,3 +65,7 @@ comments in [`stats.v`](stats.v) for edge-case behavior and the
 
 `median` accepts unsorted tensors, uses linear interpolation, and returns
 `f64` for every input type. An empty tensor returns NaN.
+
+`nanmedian` ignores NaN values and returns NaN for empty or all-NaN inputs.
+`nanmedian_axis` keeps the reduced dimension; `nanmedian_axis_squeeze` removes
+it.
