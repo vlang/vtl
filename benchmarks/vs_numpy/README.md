@@ -203,6 +203,31 @@ installation.
 These resident-buffer kernel measurements exclude CPU↔GPU transfers, so they
 do not establish end-to-end superiority over NumPy.
 
+## Pure-V baseline rerun (2026-10-07)
+
+After the default Linux `dlange` path was made LAPACKE-free, the VTL end-to-end
+benchmark and NumPy baselines ran on the Ryzen 9 5900X with V 0.5.2 `-prod`,
+NumPy 2.5.3 backed by scipy-openblas 0.3.34.106.0, `VJOBS=2`, and
+`OPENBLAS_NUM_THREADS=2`. The deterministic inputs and output checksums
+matched. These measurements use VTL's default pure-V GEMM path, including
+fresh output allocation; no temporary CBLAS shim is involved.
+
+| dtype | size | VTL pure-V GFLOPS | NumPy GFLOPS | NumPy / VTL |
+| --- | ---: | ---: | ---: | ---: |
+| f64 | 128×128 | 15.76 | 95.63 | 6.07× |
+| f64 | 256×256 | 20.41 | 96.50 | 4.73× |
+| f64 | 512×512 | 27.10 | 122.42 | 4.52× |
+| f32 | 128×128 | 31.10 | 140.43 | 4.52× |
+| f32 | 256×256 | 57.45 | 238.49 | 4.15× |
+| f32 | 512×512 | 61.53 | 274.72 | 4.46× |
+
+Compiling VTL with `-cflags -march=native` improved the 512×512 result to
+34.05 GFLOPS for f64 and 95.00 GFLOPS for f32, still below NumPy's 122.42 and
+274.72 GFLOPS. This is a measured optimization gap, not a performance claim.
+The chart below isolates this pure-V run from the earlier CBLAS measurements.
+
+![VTL pure-V and NumPy matmul performance](../../docs/assets/matmul-pure-v-ryzen-5900x.png)
+
 ## Conv2D (CPU path)
 
 ```bash
