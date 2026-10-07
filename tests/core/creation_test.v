@@ -227,6 +227,32 @@ fn test_from_1d() {
 	assert t.array_equal(expected)
 }
 
+fn test_vander_matches_numpy_power_order_and_dimensions() ! {
+	input := vtl.from_1d([1, 2, 3])!
+	descending := vtl.vander(input)!
+	assert descending.shape == [3, 3]
+	assert descending.to_array() == [1, 1, 1, 4, 2, 1, 9, 3, 1]
+
+	increasing := vtl.vander(input, increasing: true)!
+	assert increasing.to_array() == [1, 1, 1, 1, 2, 4, 1, 3, 9]
+
+	custom := vtl.vander(input, n: 2)!
+	assert custom.shape == [3, 2]
+	assert custom.to_array() == [1, 1, 2, 1, 3, 1]
+	assert vtl.vander(input, n: 0)!.shape == [3, 0]
+}
+
+fn test_vander_rejects_invalid_input() {
+	input := vtl.from_2d([[1, 2]])!
+	if _ := vtl.vander(input) {
+		assert false, 'expected a rank error'
+	}
+	vector := vtl.from_1d([1, 2])!
+	if _ := vtl.vander(vector, n: -2) {
+		assert false, 'expected a negative column count error'
+	}
+}
+
 // Regression for #41: shape slice must be owned (Windows heap corruption if aliased).
 fn test_from_array_shape_not_aliased() {
 	mut sh := [4]
