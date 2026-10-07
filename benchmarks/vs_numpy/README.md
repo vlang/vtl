@@ -166,34 +166,40 @@ Earlier NumPy runs on the same host with two CPU BLAS threads measured 1.0 ms,
 
 ## Local matched run (2026-10-07)
 
-The following `-prod` run was collected on an AMD Ryzen 9 5900X with
-`VJOBS=2`. VTL used its pure-V backend; NumPy 2.5.3 used its bundled
-scipy-openblas 0.3.34.106.0 build with `OPENBLAS_NUM_THREADS=2`. Both sides
-used the benchmark's deterministic inputs and timed matrix multiplication
-including result allocation. Higher GFLOPS is better.
+The following `-prod` samples were collected on an AMD Ryzen 9 5900X with
+`VJOBS=2` and `OPENBLAS_NUM_THREADS=2`. NumPy 2.5.3 used its bundled
+scipy-openblas 0.3.34.106.0. VTL's optional CBLAS build was linked to the
+cached scipy-openblas32 library through a temporary local symbol-alias shim;
+the machine still has no system OpenBLAS installation. This exercises VTL's
+`vsl_blas_cblas` path against optimized OpenBLAS, while the separately measured
+pure-V path shows the no-BLAS baseline. Both used deterministic inputs and
+timed matrix multiplication including result allocation. Higher GFLOPS is
+better.
 
-| dtype | size | VTL GFLOPS | NumPy GFLOPS | NumPy / VTL |
-| --- | ---: | ---: | ---: | ---: |
-| f64 | 128×128 | 16.02 | 79.45 | 5.0× |
-| f64 | 256×256 | 27.36 | 81.61 | 3.0× |
-| f64 | 512×512 | 28.84 | 125.21 | 4.3× |
-| f32 | 128×128 | 31.47 | 139.00 | 4.4× |
-| f32 | 256×256 | 54.81 | 157.69 | 2.9× |
-| f32 | 512×512 | 63.63 | 220.49 | 3.5× |
+| dtype | size | VTL pure-V GFLOPS | VTL CBLAS GFLOPS | NumPy GFLOPS | NumPy / VTL CBLAS |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| f64 | 128×128 | 15.44 | 43.10 | 56.54 | 1.31× |
+| f64 | 256×256 | 21.06 | 86.80 | 73.93 | 0.85× |
+| f64 | 512×512 | 26.24 | 111.41 | 100.25 | 0.90× |
+| f32 | 128×128 | 29.67 | 127.88 | 84.03 | 0.66× |
+| f32 | 256×256 | 46.37 | 175.97 | 196.32 | 1.12× |
+| f32 | 512×512 | 59.28 | 239.91 | 228.40 | 0.95× |
 
 ![VTL and NumPy matmul performance](../../docs/assets/matmul-ryzen-5900x.png)
 
-At 512×512, the measured times were 9.309 ms for VTL f64 and 2.144 ms for
-NumPy, and 4.219 ms for VTL f32 and 1.217 ms for NumPy. The system CBLAS
-backend measured 35.127 ms (f64) and 34.619 ms (f32) at 512×512, showing that
-this host's generic CBLAS is not a useful acceleration backend. Regenerate the
-checked-in chart from the pure-V and NumPy measurements with
+At 512×512, VTL CBLAS measured 2.409 ms for f64 and 1.119 ms for f32; NumPy
+measured 2.678 ms and 1.175 ms respectively in the same run. At 2048×2048 f32,
+VTL CBLAS measured 71.619 ms and NumPy 66.222 ms, so the result varies by size
+and dtype. The system's generic CBLAS backend measured 35.127 ms (f64) and
+34.619 ms (f32) at 512×512 and is not representative of optimized OpenBLAS.
+Regenerate the checked-in chart from the committed measurements with
 `uv run --with matplotlib python ./vtl/benchmarks/vs_numpy/plot_local_matmul_results.py`
-from `~/.vmodules`. These results show the current CPU GEMM optimization gap;
-they do not establish general performance across hardware or workloads. The
-machine does not have system OpenBLAS installed, so VTL's `vsl_blas_cblas`
-build could not be measured here; the generic system CBLAS path was slower
-than VTL pure V in this run.
+from `~/.vmodules`. These single-host results do not establish general
+performance across hardware or workloads. The pure-V path remains several
+times slower than optimized NumPy for the larger cases, while CBLAS results are
+close and alternate which library is faster. The temporary shim is a local
+benchmark aid only; normal users should link VTL against a supported CBLAS
+installation.
 These resident-buffer kernel measurements exclude CPU↔GPU transfers, so they
 do not establish end-to-end superiority over NumPy.
 

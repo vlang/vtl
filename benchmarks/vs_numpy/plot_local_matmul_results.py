@@ -13,12 +13,14 @@ OUTPUT.mkdir(parents=True, exist_ok=True)
 sizes = [128, 256, 512]
 results = {
     "f64": {
-        "VTL pure V": [16.020, 27.363, 28.837],
-        "NumPy": [79.452, 81.609, 125.214],
+        "VTL pure V": [15.437, 21.056, 26.238],
+        "VTL CBLAS": [43.101, 86.799, 111.410],
+        "NumPy": [56.544, 73.933, 100.248],
     },
     "f32": {
-        "VTL pure V": [31.468, 54.813, 63.628],
-        "NumPy": [139.001, 157.691, 220.492],
+        "VTL pure V": [29.668, 46.374, 59.277],
+        "VTL CBLAS": [127.884, 175.969, 239.913],
+        "NumPy": [84.029, 196.316, 228.397],
     },
 }
 
@@ -32,13 +34,13 @@ plt.rcParams.update(
     }
 )
 fig, axes = plt.subplots(1, 2, figsize=(10.5, 4.6), sharey=False)
-colors = {"VTL pure V": "#2563eb", "NumPy": "#475569"}
+colors = {"VTL pure V": "#94a3b8", "VTL CBLAS": "#2563eb", "NumPy": "#475569"}
 x = np.arange(len(sizes))
-width = 0.34
+width = 0.25
 
 for axis, (dtype, measurements) in zip(axes, results.items()):
     for offset, (label, values) in enumerate(measurements.items()):
-        positions = x + (offset - 0.5) * width
+        positions = x + (offset - 1) * width
         bars = axis.bar(positions, values, width, label=label, color=colors[label])
         axis.bar_label(bars, fmt="%.0f", padding=3, fontsize=8)
     axis.set_title(f"{dtype} matrix multiplication")
@@ -54,7 +56,7 @@ fig.suptitle("VTL vs NumPy · Ryzen 9 5900X · 2 threads", fontsize=15, weight="
 fig.text(
     0.5,
     0.015,
-    "VTL -prod pure-V backend · NumPy 2.5.3 / scipy-openblas · identical inputs",
+    "VTL -prod pure V / CBLAS · NumPy 2.5.3 · identical inputs · 2 threads",
     ha="center",
     color="#475569",
     fontsize=8,
