@@ -118,7 +118,9 @@ conversion, matching NumPy's `axis=()` behavior.
 
 **Current:** NumPy-style vector/matrix `matmul` promotion and batched
 broadcasting for real and complex128 tensors; N-D Kronecker products with
-NumPy rank-promotion semantics;
+NumPy rank-promotion semantics; Einstein summation for labeled contractions,
+repeated-label diagonals, multi-operand expressions, ellipses, broadcasting,
+and complex128 values;
 offset diagonal construction and extraction; solve, least squares,
 QR/LU/Cholesky, pseudoinverse, trace, matrix norms,
 flattened and axis-wise p-norms, and covariance/correlation matrices.
@@ -192,8 +194,9 @@ fixtures, and continue rejecting unsupported object/structured values.
 
 **Current:** V generic element types, `dtype()` introspection, and
 `promote_types` for supported array dtypes. `math.complex.Complex` is supported
-as `complex128` tensor storage with elementwise add, subtract, multiply, and
-divide, plus NumPy-style `real`, `imag`, `conj`, `absolute`, and `abs`
+as `complex128` tensor storage, including `zeros`/`ones`, elementwise add,
+subtract, multiply, and divide, plus NumPy-style `real`, `imag`, `conj`,
+`absolute`, and `abs`
 operations, exponentials/logarithms, square root, trigonometric and
 hyperbolic functions, their common inverse families, phase/angle, and complex
 NaN/infinity/finite predicates. Global sum, product,
@@ -205,9 +208,10 @@ complex variance and standard deviation return real tensors and support
 logical order, and truncate floating-point values when converting to integers.
 
 **Remaining:** connect promotion to mixed-dtype arithmetic, add weak scalar
-promotion and string conversion, extend complex support beyond `matmul` to
-other mathematical functions, general linear algebra, and random generation,
-add complex32, and define integer overflow and structured-data limits.
+promotion and string conversion, extend complex support beyond elementwise
+operations, `matmul`, and Einstein contractions to general linear algebra and
+random generation, add complex32, and define integer overflow and
+structured-data limits.
 
 ### Masked and missing data
 
