@@ -162,6 +162,71 @@ pub fn (mut generator RandomGenerator) choice[T](population &Tensor[T], size int
 	return from_1d[T](selected)
 }
 
+// choice_weighted samples values from a tensor's flattened logical order in
+// proportion to non-negative weights. Without replacement, each selected
+// position is removed from the remaining weight distribution.
+pub fn (mut generator RandomGenerator) choice_weighted[T](population &Tensor[T], weights &Tensor[f64], size int, replace bool) !&Tensor[T] {
+	if population.size == 0 {
+		return error('choice_weighted: population must not be empty')
+	}
+	if weights.size != population.size {
+		return error('choice_weighted: weights must match the flattened population size')
+	}
+	if size < 0 {
+		return error('choice_weighted: sample size must be non-negative')
+	}
+	if !replace && size > population.size {
+		return error('choice_weighted: cannot sample more positions than the population without replacement')
+	}
+	mut remaining := weights.to_array()
+	mut total_weight := 0.0
+	mut positive_weights := 0
+	for weight in remaining {
+		if weight < 0 || math.is_nan(weight) || math.is_inf(weight, 0) {
+			return error('choice_weighted: weights must be finite and non-negative')
+		}
+		total_weight += weight
+		if weight > 0 {
+			positive_weights++
+		}
+	}
+	if total_weight <= 0 || math.is_inf(total_weight, 0) {
+		return error('choice_weighted: weights must have a finite positive sum')
+	}
+	if !replace && size > positive_weights {
+		return error('choice_weighted: not enough positive weights for sampling without replacement')
+	}
+	mut selected := []T{len: size}
+	for draw in 0 .. size {
+		threshold := generator.rng.f64_in_range(0.0, total_weight)!
+		mut cumulative := 0.0
+		mut selected_index := -1
+		for index, weight in remaining {
+			if weight <= 0 {
+				continue
+			}
+			cumulative += weight
+			if threshold < cumulative {
+				selected_index = index
+				break
+			}
+		}
+		if selected_index < 0 {
+			for index, weight in remaining {
+				if weight > 0 {
+					selected_index = index
+				}
+			}
+		}
+		selected[draw] = population.get_nth(selected_index)
+		if !replace {
+			total_weight -= remaining[selected_index]
+			remaining[selected_index] = 0
+		}
+	}
+	return from_1d[T](selected)
+}
+
 // permutation returns the integers in [0, size) in a seeded random order.
 pub fn (mut generator RandomGenerator) permutation(size int) !&Tensor[int] {
 	if size < 0 {

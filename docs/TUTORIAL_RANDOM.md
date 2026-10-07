@@ -42,6 +42,8 @@ validation_mask := validation_rng.bernoulli(0.8, [128])!
 waiting_times := validation_rng.geometric(0.1, [128])!
 training_indices := vtl.from_1d([0, 1, 2, 3, 4, 5, 6, 7])!
 batch_indices := training_rng.choice[int](training_indices, 4, false)!
+sampling_weights := vtl.from_1d([1.0, 1.0, 3.0, 1.0, 1.0, 1.0, 1.0, 1.0])!
+weighted_indices := training_rng.choice_weighted[int](training_indices, sampling_weights, 4, true)!
 epoch_order := training_rng.permutation(8)!
 shuffled_rows := training_rng.permutation_tensor(training_features)!
 positive_noise := training_rng.gamma(2.0, 0.5, [128])!
@@ -58,6 +60,8 @@ shape)` returns the positive number of Bernoulli trials up to the first success.
 `choice(population, size, replace)` samples from the population in flattened
 logical order and can enforce unique sampled positions. `permutation(size)`
 returns every integer from zero to `size - 1` exactly once in a seeded order.
+`choice_weighted(population, weights, size, replace)` samples in proportion to
+finite non-negative weights and can sample without replacement.
 `permutation_tensor(tensor)` returns a copy with complete rows shuffled along
 the first axis, preserving all feature values in each row.
 `gamma(alpha, scale, shape)` samples positive values from a Gamma distribution

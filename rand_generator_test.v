@@ -121,6 +121,31 @@ fn test_random_generator_choice_supports_replacement_modes() ! {
 	replay.free()
 }
 
+fn test_random_generator_weighted_choice_respects_zero_weights_and_seed() ! {
+	population := from_1d(['excluded', 'selected', 'also_excluded'])!
+	weights := from_1d([0.0, 3.0, 0.0])!
+	mut generator := new_random_generator(852)
+	with_replacement := generator.choice_weighted[string](population, weights, 8, true)!
+	for value in with_replacement.to_array() {
+		assert value == 'selected'
+	}
+	without_replacement := generator.choice_weighted[string](population, weights, 1, false)!
+	assert without_replacement.get_nth(0) == 'selected'
+	mut replay := new_random_generator(852)
+	assert with_replacement.array_equal(replay.choice_weighted[string](population, weights, 8, true)!)
+	if _ := generator.choice_weighted[string](population, weights, 2, false) {
+		assert false, 'weighted sampling without replacement must require positive weights'
+	}
+	if _ := generator.choice_weighted[string](population, from_1d([1.0, -1.0, 1.0])!, 1, true) {
+		assert false, 'weighted choice must reject negative weights'
+	}
+	if _ := generator.choice_weighted[string](population, from_1d([0.0, 0.0, 0.0])!, 1, true) {
+		assert false, 'weighted choice must reject zero total weight'
+	}
+	generator.free()
+	replay.free()
+}
+
 fn test_random_generator_permutation_is_seeded_and_complete() ! {
 	mut generator := new_random_generator(753)
 	permuted := generator.permutation(32)!
