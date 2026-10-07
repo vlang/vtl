@@ -2,7 +2,7 @@ module la
 
 import math
 import vtl
-import vsl.blas.blas64
+import vsl.blas
 
 // vector_norm computes a p-norm over all tensor elements and returns a one
 // element f64 tensor. Positive and negative finite p, zero, and +/-infinity are
@@ -202,7 +202,7 @@ fn accumulate_norm2(value f64, scale f64, sum_squares f64) (f64, f64) {
 }
 
 fn vector_norm2_f64(values []f64) f64 {
-	return blas64.dnrm2(values.len, values, 1)
+	return blas.dnrm2(values.len, values, 1)
 }
 
 fn vector_norm_axis_impl[T](t &vtl.Tensor[T], ord f64, axis int, keepdims bool) !&vtl.Tensor[f64] {

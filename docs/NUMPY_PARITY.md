@@ -146,7 +146,8 @@ table/dataframe package.
 ### Performance and devices
 
 **Current:** pure-V CPU and optional CBLAS paths, f32 GEMM, and optional GPU
-backends.
+backends. Contiguous `f64` p=2 vector norms use VSL's backend-dispatching
+`dnrm2`, so CBLAS builds can call the configured implementation.
 
 **Remaining:** publish reproducible per-backend benchmarks and optimize while
 preserving numerical behavior.
