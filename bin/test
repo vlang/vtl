@@ -68,20 +68,57 @@ if [[ -n "${full}" ]]; then
     echo "Full CI mode (high RAM): v test entire tree"
     v "${flags[@]}" test "${vtl_dir_path}"
 else
-	echo "Scoped CI mode (VJOBS=${VJOBS}): run test files separately to release compiler memory between tests"
-	echo "Testing nn root one file at a time"
-	for file in "${vtl_dir_path}"/nn/*_test.v; do
+	echo "Scoped CI mode (VJOBS=${VJOBS}): discover all test packages and release compiler memory between packages"
+	for file in "${vtl_dir_path}"/*_test.v; do
 		if [[ -f "${file}" ]]; then
+			echo "Testing ${file#"${vtl_dir_path}"/}"
 			v "${flags[@]}" test "${file}"
+	fi
+	done
+	test_dirs=()
+	while IFS= read -r test_dir; do
+		if [[ "${test_dir}" == "${vtl_dir_path}" ]]; then
+			continue
 		fi
+		test_dirs+=("${test_dir}")
+	done < <(find "${vtl_dir_path}" -type f -name '*_test.v' -exec dirname {} \; | sort -u)
+	for test_dir in "${test_dirs[@]}"; do
+		relative_dir=${test_dir#"${vtl_dir_path}"/}
+		case "${relative_dir}" in
+			nn|nn/models) continue ;;
+		esac
+		if [[ "${relative_dir}" == "nn/layers" ]]; then
+			echo "Testing nn/layers one file at a time to cap compiler memory"
+			for file in "${test_dir}"/*_test.v; do
+				if [[ -f "${file}" ]]; then
+					echo "Testing ${file#"${vtl_dir_path}"/}"
+					v "${flags[@]}" test "${file}"
+				fi
+			done
+			continue
+		fi
+		has_test_parent=false
+		case "${relative_dir}" in
+			nn/*) ;;
+			*)
+				for parent_dir in "${test_dirs[@]}"; do
+					if [[ "${test_dir}" == "${parent_dir}/"* ]]; then
+						has_test_parent=true
+						break
+					fi
+				done
+				;;
+		esac
+		if [[ "${has_test_parent}" == true ]]; then
+			continue
+		fi
+		echo "Testing ${relative_dir}"
+		v "${flags[@]}" test "${test_dir}"
 	done
-	for area in nn/data nn/internal nn/layers nn/loss nn/optimizers autograd_tests datasets tests/core la storage stats ml; do
-		echo "Testing ${area}"
-		v "${flags[@]}" test "${vtl_dir_path}/${area}"
-	done
-	echo "Testing nn/models one file at a time to cap compiler memory"
-	for file in "${vtl_dir_path}"/nn/models/*_test.v; do
+	echo "Testing nn root and nn/models one file at a time to cap compiler memory"
+	for file in "${vtl_dir_path}"/nn/*_test.v "${vtl_dir_path}"/nn/models/*_test.v; do
 		if [[ -f "${file}" ]]; then
+			echo "Testing ${file#"${vtl_dir_path}"/}"
 			v "${flags[@]}" test "${file}"
 		fi
 	done
