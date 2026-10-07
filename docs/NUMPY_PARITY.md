@@ -146,9 +146,17 @@ overflow and structured-data limits.
 
 ### Masked and missing data
 
-**Current:** no general tensor-level masked-data representation.
+**Current:** `MaskedArray[T]` pairs values with a broadcastable boolean mask
+(`true` means missing). It supports filling masked entries, compression,
+valid-value counting, and global or single-axis sum/mean reductions. Axis
+reductions mark empty slices in the output mask; global reductions expose an
+`is_masked` flag when every value is missing. See
+[the masked data tutorial](./TUTORIAL_MASKED_DATA.md).
 
-**Remaining:** define masks and NaN/missing-value reduction behavior.
+**Remaining:** masked elementwise arithmetic, additional reductions and
+statistics, mask-aware indexing and mutation, and interoperability with
+autograd and neural-network operations. NaN-aware reductions are a separate
+feature and do not automatically treat NaN as masked data.
 
 ### Structured and record arrays
 

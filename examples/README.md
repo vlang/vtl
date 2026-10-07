@@ -57,6 +57,7 @@ CIFAR examples for CI-safe checks.
 | [bitwise](./bitwise) | Broadcast integer masks and shift flag bits | `v run ./vtl/examples/bitwise/main.v` |
 | [take_nd](./take_nd) | Gather along an axis while preserving a multidimensional index shape | `v run ./vtl/examples/take_nd/main.v` |
 | [mixed_index](./mixed_index) | Combine coordinate arrays, scalar indices, and Python-style slices | `v run ./vtl/examples/mixed_index/main.v` |
+| [masked_array](./masked_array) | Broadcast missing-data masks, fill or compress values, and reduce valid entries | `v run ./vtl/examples/masked_array/main.v` |
 
 ## Neural networks
 
