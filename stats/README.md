@@ -14,6 +14,10 @@ Pass `true` for `keepdims` to retain that axis with length one; negative axes
 are accepted. Empty reduction axes return the corresponding identity for every
 output slice.
 
+`average_axis` keeps its reduced axis with length one. Use
+`average_along_axis(..., keepdims)` to choose whether to keep or remove it;
+weights may match the input or be a vector matching the selected axis.
+
 `trapezoid`, `trapezoid_axis`, and `trapezoid_x_axis` integrate numeric tensors
 with the composite trapezoidal rule and return `f64` tensors with the reduced
 axis removed. Explicit sample coordinates remain in their given order.

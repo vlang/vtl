@@ -75,9 +75,9 @@ assert sample_std.shape == [1, 3]
 assert sample_std.to_array() == [2.1213203435596424, 2.1213203435596424, 2.1213203435596424]
 
 volume := vtl.from_array[f64]([1, 2, 3, 4, 5, 6, 7, 8], [2, 2, 2])!
-means := stats.mean_along_axes(volume, [0, -1], false)!
-assert means.shape == [2]
-assert means.to_array() == [3.5, 5.5]
+multi_means := stats.mean_along_axes(volume, [0, -1], false)!
+assert multi_means.shape == [2]
+assert multi_means.to_array() == [3.5, 5.5]
 ```
 
 See the runnable [multi-axis statistics example](../examples/multi_axis_stats)
@@ -320,7 +320,8 @@ assert deviation > 0.81 && deviation < 0.82
 `stats.average` calculates one weighted mean when values and weights have the
 same shape. `stats.average_axis` accepts either full-shaped weights or a
 one-dimensional weight vector matching the selected axis; the result keeps
-that axis with length one.
+that axis with length one. `stats.average_along_axis` adds a `keepdims` option
+when you need the reduced axis removed, matching NumPy's `average` shape choice.
 
 ```v
 import vtl
@@ -329,7 +330,10 @@ import vtl.stats
 measurements := vtl.from_2d([[4.0, 5.0, 4.5], [3.0, 4.0, 5.0]])!
 reliability := vtl.from_1d([1.0, 2.0, 1.0])!
 row_means := stats.average_axis(measurements, reliability, 1)!
+row_means_squeezed := stats.average_along_axis(measurements, reliability, 1, false)!
 assert row_means.to_array() == [4.625, 4.0]
+assert row_means_squeezed.shape == [2]
+assert row_means_squeezed.to_array() == [4.625, 4.0]
 ```
 
 Empty input, incompatible shapes, or a zero sum of weights returns an error.
