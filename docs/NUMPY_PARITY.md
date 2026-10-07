@@ -112,10 +112,12 @@ fixtures, and continue rejecting unsupported object/structured values.
 
 ### Data types
 
-**Current:** V generic element types.
+**Current:** V generic element types and explicit `as_*` conversions across
+supported numeric and boolean types. Casts preserve shape and logical order;
+floating-point to integer conversion truncates.
 
-**Remaining:** define promotion/casting, complex and boolean support, integer
-overflow, and structured-data limits.
+**Remaining:** define arithmetic promotion, string conversion, complex types,
+integer overflow, and structured-data limits.
 
 ### Masked and missing data
 

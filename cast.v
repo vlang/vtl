@@ -1,5 +1,13 @@
 module vtl
 
+fn cast_tensor_values[T, U](t &Tensor[T]) &Tensor[U] {
+	mut result := empty[U](t.shape, memory: .row_major)
+	for flat_index in 0 .. t.size {
+		result.data.data[flat_index] = cast[U](td[T](t.get_nth[T](flat_index)))
+	}
+	return result
+}
+
 // as_bool casts the Tensor to a Tensor of bools.
 // If the original Tensor is not a Tensor of bools, then each value is cast to a bool,
 // otherwise the original Tensor is returned.
@@ -12,15 +20,7 @@ pub fn (t &Tensor[T]) as_bool[T]() &Tensor[bool] {
 	$if T is bool {
 		return t
 	} $else {
-		// TODO: Implement using map
-		mut iter := t.iterator[T]()
-		mut ret := empty[bool](t.shape)
-		for {
-			val, i := iter.next() or { break }
-			bool_val := td[T](val).bool()
-			ret.set(i, bool_val)
-		}
-		return ret
+		return cast_tensor_values[T, bool](t)
 	}
 }
 
@@ -36,15 +36,7 @@ pub fn (t &Tensor[T]) as_f32[T]() &Tensor[f32] {
 	$if T is f32 {
 		return t
 	} $else {
-		// TODO: Implement using map
-		mut iter := t.iterator[T]()
-		mut ret := empty[f32](t.shape)
-		for {
-			val, i := iter.next() or { break }
-			f32_val := td[T](val).f32()
-			ret.set(i, f32_val)
-		}
-		return ret
+		return cast_tensor_values[T, f32](t)
 	}
 }
 
@@ -60,21 +52,20 @@ pub fn (t &Tensor[T]) as_f64[T]() &Tensor[f64] {
 	$if T is f64 {
 		return t
 	} $else {
-		// TODO: Implement using map
-		mut iter := t.iterator[T]()
-		mut ret := empty[f64](t.shape)
-		for {
-			val, i := iter.next() or { break }
-			f64_val := td[T](val).f64()
-			ret.set(i, f64_val)
-		}
-		return ret
+		return cast_tensor_values[T, f64](t)
 	}
 }
 
-// as_i16 casts the Tensor to a Tensor of i16 values.
-// If the original Tensor is not a Tensor of i16s, then each value is cast to a i16,
-// otherwise the original Tensor is returned.
+// as_i64 casts each tensor value to i64 while preserving its logical shape.
+pub fn (t &Tensor[T]) as_i64[T]() &Tensor[i64] {
+	$if T is i64 {
+		return t
+	} $else {
+		return cast_tensor_values[T, i64](t)
+	}
+}
+
+// as_i16 casts tensor values to signed 16-bit integers.
 
 // as_i16 exposes this operation as part of the public API.
 
@@ -84,21 +75,11 @@ pub fn (t &Tensor[T]) as_i16[T]() &Tensor[i16] {
 	$if T is i16 {
 		return t
 	} $else {
-		// TODO: Implement using map
-		mut iter := t.iterator[T]()
-		mut ret := empty[i16](t.shape)
-		for {
-			val, i := iter.next() or { break }
-			i16_val := td[T](val).i16()
-			ret.set(i, i16_val)
-		}
-		return ret
+		return cast_tensor_values[T, i16](t)
 	}
 }
 
-// as_i8 casts the Tensor to a Tensor of i8 values.
-// If the original Tensor is not a Tensor of i8s, then each value is cast to a i8,
-// otherwise the original Tensor is returned.
+// as_i8 casts tensor values to signed 8-bit integers.
 
 // as_i8 exposes this operation as part of the public API.
 
@@ -108,21 +89,11 @@ pub fn (t &Tensor[T]) as_i8[T]() &Tensor[i8] {
 	$if T is i8 {
 		return t
 	} $else {
-		// TODO: Implement using map
-		mut iter := t.iterator[T]()
-		mut ret := empty[i8](t.shape)
-		for {
-			val, i := iter.next() or { break }
-			i8_val := td[T](val).i8()
-			ret.set(i, i8_val)
-		}
-		return ret
+		return cast_tensor_values[T, i8](t)
 	}
 }
 
-// as_int casts the Tensor to a Tensor of ints.
-// If the original Tensor is not a Tensor of ints, then each value is cast to a int,
-// otherwise the original Tensor is returned.
+// as_int casts tensor values to V ints.
 
 // as_int exposes this operation as part of the public API.
 
@@ -132,15 +103,7 @@ pub fn (t &Tensor[T]) as_int[T]() &Tensor[int] {
 	$if T is int {
 		return t
 	} $else {
-		// TODO: Implement using map
-		mut iter := t.iterator[T]()
-		mut ret := empty[int](t.shape)
-		for {
-			val, i := iter.next() or { break }
-			int_val := td[T](val).int()
-			ret.set(i, int_val)
-		}
-		return ret
+		return cast_tensor_values[T, int](t)
 	}
 }
 
@@ -156,21 +119,11 @@ pub fn (t &Tensor[T]) as_string[T]() &Tensor[string] {
 	$if T is string {
 		return t
 	} $else {
-		// TODO: Implement using map
-		mut iter := t.iterator[T]()
-		mut ret := empty[string](t.shape)
-		for {
-			val, i := iter.next() or { break }
-			string_val := td[T](val).string()
-			ret.set(i, string_val)
-		}
-		return ret
+		return cast_tensor_values[T, string](t)
 	}
 }
 
-// as_u8 casts the Tensor to a Tensor of u8 values.
-// If the original Tensor is not a Tensor of u8s, then each value is cast to a u8,
-// otherwise the original Tensor is returned.
+// as_u8 casts tensor values to unsigned 8-bit integers.
 
 // as_u8 exposes this operation as part of the public API.
 
@@ -180,14 +133,33 @@ pub fn (t &Tensor[T]) as_u8[T]() &Tensor[u8] {
 	$if T is u8 {
 		return t
 	} $else {
-		// TODO: Implement using map
-		mut iter := t.iterator[T]()
-		mut ret := empty[u8](t.shape)
-		for {
-			val, i := iter.next() or { break }
-			u8_val := td[T](val).u8()
-			ret.set(i, u8_val)
-		}
-		return ret
+		return cast_tensor_values[T, u8](t)
+	}
+}
+
+// as_u16 casts each tensor value to u16 while preserving its logical shape.
+pub fn (t &Tensor[T]) as_u16[T]() &Tensor[u16] {
+	$if T is u16 {
+		return t
+	} $else {
+		return cast_tensor_values[T, u16](t)
+	}
+}
+
+// as_u32 casts each tensor value to u32 while preserving its logical shape.
+pub fn (t &Tensor[T]) as_u32[T]() &Tensor[u32] {
+	$if T is u32 {
+		return t
+	} $else {
+		return cast_tensor_values[T, u32](t)
+	}
+}
+
+// as_u64 casts each tensor value to u64 while preserving its logical shape.
+pub fn (t &Tensor[T]) as_u64[T]() &Tensor[u64] {
+	$if T is u64 {
+		return t
+	} $else {
+		return cast_tensor_values[T, u64](t)
 	}
 }
