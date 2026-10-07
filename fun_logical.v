@@ -408,8 +408,19 @@ pub:
 	equal_nan bool
 }
 
+@[direct_array_access]
 pub fn (t &Tensor[T]) isclose[T](other &Tensor[T], params IsCloseData) !&Tensor[bool] {
 	validate_isclose_tolerances(params)!
+	if t.shape == other.shape && t.is_row_major_contiguous() && other.is_row_major_contiguous()
+		&& t.data.data.len == t.size && other.data.data.len == other.size {
+		mut ret := empty[bool](t.shape)
+		for i in 0 .. t.size {
+			a := td[T](t.data.data[i]).f64()
+			b := td[T](other.data.data[i]).f64()
+			ret.data.data[i] = isclose_values(a, b, params.rtol, params.atol, params.equal_nan)
+		}
+		return ret
+	}
 	mut iters, shape := t.iterators[T]([other])!
 	mut ret := empty[bool](shape)
 	for {
