@@ -74,6 +74,19 @@ fn test_min_axis_1() {
 	assert result.get_nth(1) == f64(2)
 }
 
+fn test_min_max_axis_squeeze_matches_numpy_shape() {
+	t := vtl.from_2d([[1.0, 5.0], [3.0, 2.0]])!
+	maxima := t.max_axis_squeeze(1)!
+	assert maxima.shape == [2]
+	assert maxima.to_array() == [5.0, 3.0]
+	minima := t.min_axis_squeeze(-2)!
+	assert minima.shape == [2]
+	assert minima.to_array() == [1.0, 2.0]
+
+	vector := vtl.from_1d([4.0, 2.0, 6.0])!
+	assert vector.max_axis_squeeze(0)!.to_array() == [6.0]
+}
+
 fn test_cumsum() {
 	t := vtl.from_1d([1.0, 2.0, 3.0, 4.0])!
 	result := t.cumsum(0)!

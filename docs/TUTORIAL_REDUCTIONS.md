@@ -105,18 +105,20 @@ global_max := t.argmax[f64](0)!
 
 ## max / min per axis
 
-`max_axis(axis)` returns a tensor containing the maximum value per slice along `axis`.
-`min_axis` does the same for the minimum.
+`max_axis(axis)` and `min_axis(axis)` retain the reduced axis with length one.
+Use `max_axis_squeeze(axis)` or `min_axis_squeeze(axis)` to remove it, matching
+NumPy's default `keepdims=false` shape behavior. VTL represents scalar-shaped
+reductions as shape `[1]`.
 
 ```v
 import vtl
 
 t := vtl.from_array[f64]([3.0, 5.0, 1.0, 4.0], [2, 2])!
 
-mx := t.max_axis[f64](1)!
+mx := t.max_axis_squeeze[f64](1)!
 // mx = [5.0, 4.0]
 
-mn := t.min_axis[f64](0)!
+mn := t.min_axis_squeeze[f64](0)!
 // mn = [1.0, 4.0]
 ```
 
