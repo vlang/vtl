@@ -66,3 +66,48 @@ svg_path = OUTPUT / "matmul-ryzen-5900x.svg"
 fig.savefig(svg_path, bbox_inches="tight")
 svg_path.write_text(svg_path.read_text().replace(" \n", "\n"))
 fig.savefig(OUTPUT / "matmul-ryzen-5900x.png", dpi=180, bbox_inches="tight")
+
+# Keep the no-BLAS baseline separate from the older CBLAS comparison above:
+# those CBLAS and pure-V measurements were collected in different runs.
+pure_v_results = {
+    "f64": {
+        "VTL pure V": [15.762, 20.412, 27.103],
+        "NumPy": [95.633, 96.504, 122.420],
+    },
+    "f32": {
+        "VTL pure V": [31.100, 57.454, 61.526],
+        "NumPy": [140.427, 238.485, 274.718],
+    },
+}
+fig, axes = plt.subplots(1, 2, figsize=(10.5, 4.6), sharey=False)
+pure_v_colors = {"VTL pure V": "#94a3b8", "NumPy": "#475569"}
+width = 0.32
+
+for axis, (dtype, measurements) in zip(axes, pure_v_results.items()):
+    for offset, (label, values) in enumerate(measurements.items()):
+        positions = x + (offset - 0.5) * width
+        bars = axis.bar(positions, values, width, label=label, color=pure_v_colors[label])
+        axis.bar_label(bars, fmt="%.0f", padding=3, fontsize=8)
+    axis.set_title(f"{dtype} matrix multiplication")
+    axis.set_xticks(x, [f"{size}×{size}" for size in sizes])
+    axis.set_xlabel("Matrix dimensions")
+    axis.set_ylabel("GFLOPS (higher is better)")
+    axis.grid(axis="y", color="#cbd5e1", alpha=0.55, linewidth=0.8)
+    axis.set_axisbelow(True)
+    axis.spines[["top", "right"]].set_visible(False)
+    axis.legend(frameon=False, loc="upper left")
+
+fig.suptitle("VTL pure-V vs NumPy · Ryzen 9 5900X", fontsize=15, weight="bold")
+fig.text(
+    0.5,
+    0.015,
+    "VTL -prod · NumPy 2.5.3 · identical inputs · 2 threads",
+    ha="center",
+    color="#475569",
+    fontsize=8,
+)
+fig.tight_layout(rect=(0, 0.055, 1, 0.92))
+svg_path = OUTPUT / "matmul-pure-v-ryzen-5900x.svg"
+fig.savefig(svg_path, bbox_inches="tight")
+svg_path.write_text(svg_path.read_text().replace(" \n", "\n"))
+fig.savefig(OUTPUT / "matmul-pure-v-ryzen-5900x.png", dpi=180, bbox_inches="tight")
