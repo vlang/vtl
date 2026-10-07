@@ -63,3 +63,16 @@ example in [`examples/random_generator/main.v`](../examples/random_generator/mai
 VTL also provides global tensor constructors for uniform range, normal,
 Bernoulli, binomial, geometric, and exponential distributions. See
 [`rand.v`](../rand.v) for the complete API.
+
+`random[T](minimum, maximum, shape, params)` creates uniform values in the
+half-open range `[minimum, maximum)`. Integer tensors support `i8`, `i16`,
+`i32`, `i64`, `int`, `u8`, `u16`, `u32`, and `u64`:
+
+```v
+import vtl
+
+labels := vtl.random[u8](0, 10, [8], vtl.TensorData{})
+for label in labels.to_array() {
+	assert label >= 0 && label < 10
+}
+```
