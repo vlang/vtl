@@ -154,6 +154,16 @@ fn test_masked_array_broadcast_arithmetic_unions_masks() ! {
 	assert products.values.to_array() == [10, 40, 90, 40, 100, 180]
 	quotients := left.divide(right)!
 	assert quotients.values.to_array() == [0.1, 0.1, 0.1, 0.4, 0.25, 0.2]
+	less := left.less_than(right)!
+	assert less.values.to_array() == [true, true, true, true, true, true]
+	assert less.mask.to_array() == sums.mask.to_array()
+	equal := left.equal(right)!
+	assert equal.values.to_array() == [false, false, false, false, false, false]
+	assert left.not_equal(right)!.values.to_array() == [true, true, true, true, true, true]
+	assert left.less_equal(right)!.values.to_array() == less.values.to_array()
+	assert left.greater_than(right)!.values.to_array() == [false, false, false, false, false, false]
+	assert left.greater_equal(right)!.values.to_array() == [false, false, false, false, false,
+		false]
 
 	shifted := left.add_scalar(2.0)!
 	assert shifted.values.to_array() == [3, 4, 5, 6, 7, 8]
