@@ -28,4 +28,6 @@ fn main() {
 	println('square root: ${vtl.sqrt(transcendental_input)!.str()}')
 	println('exponential: ${vtl.exp(transcendental_input)!.str()}')
 	println('natural logarithm: ${vtl.log(transcendental_input)!.str()}')
+	println('sine: ${vtl.sin(transcendental_input)!.str()}')
+	println('inverse sine: ${vtl.arcsin(transcendental_input)!.str()}')
 }

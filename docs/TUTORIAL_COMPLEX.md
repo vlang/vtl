@@ -52,7 +52,9 @@ assert vtl.cos(origin)!.get_nth(0).re == 1.0
 ```
 
 `log` uses the principal natural logarithm, and `sqrt` uses the principal
-square root branch.
+square root branch. `arcsin`, `arccos`, `arctan`, `arcsinh`, `arccosh`, and
+`arctanh` use V's standard complex library for their principal inverse branches.
+The direct `tan`, `sinh`, `cosh`, and `tanh` functions are also available.
 
 Complex tensors are an early part of VTL's complex-number support. Real-valued
 casts, reductions, general complex mathematical functions, linear algebra,

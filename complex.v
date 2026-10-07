@@ -9,6 +9,16 @@ enum ComplexUnaryOperation {
 	sqrt
 	sin
 	cos
+	tan
+	sinh
+	cosh
+	tanh
+	arcsin
+	arccos
+	arctan
+	arcsinh
+	arccosh
+	arctanh
 }
 
 // real returns the real components of a complex tensor as a float64 tensor.
@@ -83,6 +93,56 @@ pub fn cos(input &Tensor[complex.Complex]) !&Tensor[complex.Complex] {
 	return map_complex_unary(input, .cos)
 }
 
+// tan applies the complex tangent to every element.
+pub fn tan(input &Tensor[complex.Complex]) !&Tensor[complex.Complex] {
+	return map_complex_unary(input, .tan)
+}
+
+// sinh applies the complex hyperbolic sine to every element.
+pub fn sinh(input &Tensor[complex.Complex]) !&Tensor[complex.Complex] {
+	return map_complex_unary(input, .sinh)
+}
+
+// cosh applies the complex hyperbolic cosine to every element.
+pub fn cosh(input &Tensor[complex.Complex]) !&Tensor[complex.Complex] {
+	return map_complex_unary(input, .cosh)
+}
+
+// tanh applies the complex hyperbolic tangent to every element.
+pub fn tanh(input &Tensor[complex.Complex]) !&Tensor[complex.Complex] {
+	return map_complex_unary(input, .tanh)
+}
+
+// arcsin applies the principal inverse complex sine to every element.
+pub fn arcsin(input &Tensor[complex.Complex]) !&Tensor[complex.Complex] {
+	return map_complex_unary(input, .arcsin)
+}
+
+// arccos applies the principal inverse complex cosine to every element.
+pub fn arccos(input &Tensor[complex.Complex]) !&Tensor[complex.Complex] {
+	return map_complex_unary(input, .arccos)
+}
+
+// arctan applies the principal inverse complex tangent to every element.
+pub fn arctan(input &Tensor[complex.Complex]) !&Tensor[complex.Complex] {
+	return map_complex_unary(input, .arctan)
+}
+
+// arcsinh applies the principal inverse complex hyperbolic sine to every element.
+pub fn arcsinh(input &Tensor[complex.Complex]) !&Tensor[complex.Complex] {
+	return map_complex_unary(input, .arcsinh)
+}
+
+// arccosh applies the principal inverse complex hyperbolic cosine to every element.
+pub fn arccosh(input &Tensor[complex.Complex]) !&Tensor[complex.Complex] {
+	return map_complex_unary(input, .arccosh)
+}
+
+// arctanh applies the principal inverse complex hyperbolic tangent to every element.
+pub fn arctanh(input &Tensor[complex.Complex]) !&Tensor[complex.Complex] {
+	return map_complex_unary(input, .arctanh)
+}
+
 fn map_complex_unary(input &Tensor[complex.Complex], operation ComplexUnaryOperation) !&Tensor[complex.Complex] {
 	mut values := []complex.Complex{len: input.size}
 	for i in 0 .. input.size {
@@ -93,6 +153,16 @@ fn map_complex_unary(input &Tensor[complex.Complex], operation ComplexUnaryOpera
 			.sqrt { complex_sqrt(value) }
 			.sin { value.sin() }
 			.cos { value.cos() }
+			.tan { value.tan() }
+			.sinh { value.sinh() }
+			.cosh { value.cosh() }
+			.tanh { value.tanh() }
+			.arcsin { value.asin() }
+			.arccos { value.acos() }
+			.arctan { value.atan() }
+			.arcsinh { value.asinh() }
+			.arccosh { value.acosh() }
+			.arctanh { value.atanh() }
 		}
 	}
 	return from_array[complex.Complex](values, input.shape)
