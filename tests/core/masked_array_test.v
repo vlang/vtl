@@ -188,3 +188,22 @@ fn test_masked_array_mixed_index_keeps_values_and_mask_aligned() ! {
 		assert false, 'masked mixed indexing must preserve bounds checks'
 	}
 }
+
+fn test_masked_array_take_and_put_along_axis_keep_masks_aligned() ! {
+	values := vtl.from_array[int]([1, 2, 3, 4, 5, 6], [2, 3])!
+	mask := vtl.from_array[bool]([false, true, false, true, false, true], [2, 3])!
+	data := vtl.masked_array(values, mask)!
+	indices := vtl.from_array[int]([0, 1], [2, 1])!
+	updates := vtl.masked_array(vtl.from_array[int]([9, 8], [2, 1])!,
+		vtl.from_array[bool]([true, true], [2, 1])!)!
+
+	updated := data.put_along_axis(indices, updates, 1)!
+	assert updated.values.to_array() == [9, 2, 3, 4, 8, 6]
+	assert updated.mask.to_array() == [true, true, false, true, true, true]
+	assert data.values.to_array() == values.to_array()
+	assert data.mask.to_array() == mask.to_array()
+
+	taken := updated.take_along_axis(indices, 1)!
+	assert taken.values.to_array() == [9, 8]
+	assert taken.mask.to_array() == [true, true]
+}

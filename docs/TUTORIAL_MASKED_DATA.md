@@ -90,7 +90,12 @@ preserves their correspondence:
 
 ```v
 row := data.mixed_index([vtl.integer_index(-1), vtl.full_index()])!
+gathered := data.take_along_axis(indices, 1)!
+updated := data.put_along_axis(indices, replacement, 1)!
 ```
 
 It follows VTL's normal view and copy behavior for mixed indexing. The mask
 uses the same bounds checks and output shape as the values.
+`take_along_axis` gathers values and masks together. `put_along_axis` takes a
+masked update array and returns a copy with both payloads updated; the input
+array remains unchanged.

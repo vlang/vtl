@@ -106,6 +106,29 @@ pub fn (array &MaskedArray[T]) mixed_index[T](indices []TensorIndex) !MaskedArra
 	}
 }
 
+// take_along_axis gathers matching values and mask entries using the same
+// broadcastable index tensor.
+pub fn (array &MaskedArray[T]) take_along_axis[T](indices &Tensor[int], axis int) !MaskedArray[T] {
+	return MaskedArray[T]{
+		values: array.values.take_along_axis[T](indices, axis)!
+		mask:   array.mask.take_along_axis[bool](indices, axis)!
+	}
+}
+
+// put_along_axis returns a copy with masked-array updates written along axis.
+// Update values and masks must match the index shape and are broadcast under
+// the same shape rules as Tensor.put_along_axis.
+pub fn (array &MaskedArray[T]) put_along_axis[T](indices &Tensor[int], updates &MaskedArray[T], axis int) !MaskedArray[T] {
+	mut values := array.values.copy(.row_major)
+	mut mask := array.mask.copy(.row_major)
+	values.put_along_axis[T](indices, updates.values, axis)!
+	mask.put_along_axis[bool](indices, updates.mask, axis)!
+	return MaskedArray[T]{
+		values: values
+		mask:   mask
+	}
+}
+
 // count returns the number of unmasked values.
 pub fn (array &MaskedArray[T]) count[T]() int {
 	mut valid := 0
