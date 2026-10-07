@@ -1,6 +1,7 @@
 module la
 
 import vtl
+import math
 
 fn test_trace_identity() {
 	a := vtl.from_2d([[1.0, 0.0], [0.0, 1.0]])!
@@ -118,6 +119,35 @@ fn test_solve_rejects_singular_and_incompatible_batches() {
 	b := vtl.ones[f64]([3, 2])
 	if _ := solve(a, b) {
 		assert false, 'solve must reject incompatible batch dimensions'
+	} else {
+		assert true
+	}
+}
+
+fn test_lstsq_vector_rhs_preserves_numpy_shape_and_squared_residuals() {
+	a := vtl.from_2d([[1.0, 0], [0, 1], [1, 1]])!
+	b := vtl.from_1d([1.0, 2, 4])!
+	x, residuals, rank, singular_values := lstsq(a, b)!
+	assert x.shape == [2]
+	assert math.abs(x.get([0]) - 4.0 / 3.0) < 1e-10
+	assert math.abs(x.get([1]) - 7.0 / 3.0) < 1e-10
+	assert residuals.shape == [1]
+	assert math.abs(residuals.get([0]) - 1.0 / 3.0) < 1e-10
+	assert rank == 2
+	assert singular_values.shape == [2]
+}
+
+fn test_lstsq_rank_deficient_system_has_empty_residuals_and_validates_rows() {
+	a := vtl.from_2d([[1.0, 1], [2, 2], [3, 3]])!
+	b := vtl.from_1d([2.0, 4, 6])!
+	x, residuals, rank, _ := lstsq(a, b)!
+	assert x.shape == [2]
+	assert x.to_array() == [1.0, 1.0]
+	assert residuals.shape == [0]
+	assert rank == 1
+	wrong_rows := vtl.from_1d([1.0, 2])!
+	if _, _, _, _ := lstsq(a, wrong_rows) {
+		assert false, 'lstsq must reject mismatched row counts'
 	} else {
 		assert true
 	}

@@ -133,7 +133,11 @@ la.solve(stacked_a, matrix_rhs)!.shape // [2, 2, 2]
 ## Least Squares
 
 `la.lstsq(a, b)` solves the overdetermined linear least-squares problem:
-`min ||A·x − B||₂` using SVD-based pseudo-inverse.
+`min ||A·x − B||₂` using an SVD-based pseudo-inverse. `b` may be a vector or
+a matrix with one or more right-hand sides. Vector input returns a vector
+solution. Residuals contain squared errors only when the system is
+overdetermined and `A` has full column rank; otherwise the residual tensor is
+empty. The returned rank uses a dtype-aware relative singular-value cutoff.
 
 Returns `(x, residuals, rank, singular_values)`.
 
@@ -143,9 +147,9 @@ import vtl
 
 // y = c0 + c1*x  fitted through (1,1), (2,3), (3,5)
 a := vtl.from_array[f64]([1.0, 1.0, 1.0, 2.0, 1.0, 3.0], [3, 2])!
-b := vtl.from_array[f64]([1.0, 3.0, 5.0], [3, 1])!
+b := vtl.from_1d[f64]([1.0, 3.0, 5.0])!
 x, residuals, rank, sv := la.lstsq(a, b)!
-// x ≈ [[1.0], [2.0]]  →  y = 1 + 2·x
+// x ≈ [1.0, 2.0]  →  y = 1 + 2·x
 ```
 
 ## Cholesky Decomposition
