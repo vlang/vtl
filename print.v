@@ -1,5 +1,7 @@
 module vtl
 
+import math.complex as vcomplex
+
 // for arrays that are too large, calculate only the leading and trailing
 // items along each axis
 fn leading_trailing[T](t &Tensor[T], edgeitems int, lo []int, hi []int) !&Tensor[T] {
@@ -46,7 +48,7 @@ fn rprint[T](t &Tensor[T], index []int, hanging_indent string, curr_width int, s
 	axis := index.len
 	axes_left := t.rank() - axis
 	if axes_left == 0 {
-		return rjust(t.get(index).str(), max_len)
+		return rjust(tensor_element_str[T](t.get(index)), max_len)
 	}
 	next_hanging_indent := hanging_indent + ' '
 	next_width := curr_width - 1
@@ -166,12 +168,20 @@ fn max_str_len[T](t &Tensor[T]) int {
 	mut iter := t.iterator()
 	for {
 		val, _ := iter.next() or { break }
-		val_str := val.str()
+		val_str := tensor_element_str[T](val)
 		if val_str.len > mx {
 			mx = val_str.len
 		}
 	}
 	return mx
+}
+
+fn tensor_element_str[T](value T) string {
+	$if T is vcomplex.Complex {
+		return value.str()
+	} $else {
+		return value.str()
+	}
 }
 
 // adjusts a string to be aligned with one side

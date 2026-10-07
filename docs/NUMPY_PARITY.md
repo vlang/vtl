@@ -148,13 +148,16 @@ fixtures, and continue rejecting unsupported object/structured values.
 ### Data types
 
 **Current:** V generic element types, `dtype()` introspection, and
-`promote_types` for supported array dtypes. Explicit `as_*` conversions cover
-numeric and boolean types, preserve shape and logical order, and truncate
-floating-point values when converting to integers.
+`promote_types` for supported array dtypes. `math.complex.Complex` is supported
+as `complex128` tensor storage with elementwise add, subtract, multiply, and
+divide. Promotion with a complex operand produces `complex128`. Explicit
+`as_*` conversions cover real numeric and boolean types, preserve shape and
+logical order, and truncate floating-point values when converting to integers.
 
 **Remaining:** connect promotion to mixed-dtype arithmetic, add weak scalar
-promotion and string conversion, support complex types, and define integer
-overflow and structured-data limits.
+promotion and string conversion, extend complex support to mathematical
+functions, reductions, linear algebra, random generation, and `.npy`/`.npz` I/O,
+add complex32, and define integer overflow and structured-data limits.
 
 ### Masked and missing data
 

@@ -1,6 +1,7 @@
 module core
 
 import vtl
+import math.complex as vcomplex
 
 fn test_dtype_of_and_tensor_dtype_report_element_types() {
 	assert vtl.dtype_of[bool]() == .boolean
@@ -15,6 +16,7 @@ fn test_dtype_of_and_tensor_dtype_report_element_types() {
 	assert vtl.dtype_of[u64]() == .uint64
 	assert vtl.dtype_of[f32]() == .float32
 	assert vtl.dtype_of[f64]() == .float64
+	assert vtl.dtype_of[vcomplex.Complex]() == .complex128
 	assert vtl.dtype_of[string]() == .string
 
 	tensor := vtl.from_1d([1, 2, 3])!
@@ -22,6 +24,28 @@ fn test_dtype_of_and_tensor_dtype_report_element_types() {
 	tensor32 := vtl.from_1d[i32]([1, 2, 3])!
 	assert tensor32.dtype() == .int32
 	assert tensor32.add(tensor32)!.to_array() == [i32(2), 4, 6]
+}
+
+fn test_complex128_tensor_creation_and_elementwise_arithmetic() ! {
+	a := vcomplex.Complex{ re: 1.0, im: 2.0 }
+	b := vcomplex.Complex{ re: 3.0, im: -1.0 }
+	tensor := vtl.from_1d([a, b])!
+
+	assert tensor.dtype() == .complex128
+	assert tensor.shape == [2]
+	assert tensor.str().contains('1.000000+2.000000i')
+	assert tensor.add(tensor)!.to_array() == [vcomplex.Complex{ re: 2.0, im: 4.0 },
+		vcomplex.Complex{ re: 6.0, im: -2.0 }]
+	assert tensor.subtract(tensor)!.to_array() == [
+		vcomplex.Complex{ re: 0.0, im: 0.0 },
+		vcomplex.Complex{ re: 0.0, im: 0.0 },
+	]
+	assert tensor.multiply(tensor)!.to_array() == [
+		vcomplex.Complex{ re: -3.0, im: 4.0 },
+		vcomplex.Complex{ re: 8.0, im: -6.0 },
+	]
+	assert tensor.divide(tensor)!.to_array() == [vcomplex.Complex{ re: 1.0, im: 0.0 },
+		vcomplex.Complex{ re: 1.0, im: 0.0 }]
 }
 
 fn test_promote_types_for_matching_numeric_kinds() {
@@ -38,6 +62,9 @@ fn test_promote_types_for_matching_numeric_kinds() {
 	assert vtl.promote_types(.float32, .native_int)! == .float64
 	assert vtl.promote_types(.boolean, .uint8)! == .uint8
 	assert vtl.promote_types(.float32, .float64)! == .float64
+	assert vtl.promote_types(.complex128, .float64)! == .complex128
+	assert vtl.promote_types(.int32, .complex128)! == .complex128
+	assert vtl.promote_types(.boolean, .complex128)! == .complex128
 	assert vtl.promote_types(.boolean, .boolean)! == .boolean
 	assert vtl.promote_types(.string, .string)! == .string
 }

@@ -1,5 +1,7 @@
 module vtl
 
+import math.complex as vcomplex
+
 // DType describes the element types currently supported by VTL tensors.
 pub enum DType {
 	boolean
@@ -15,6 +17,7 @@ pub enum DType {
 	float32
 	float64
 	string
+	complex128
 }
 
 // dtype_of returns the VTL dtype corresponding to the compile-time type T.
@@ -43,6 +46,8 @@ pub fn dtype_of[T]() DType {
 		return .float32
 	} $else $if T is f64 {
 		return .float64
+	} $else $if T is vcomplex.Complex {
+		return .complex128
 	} $else $if T is string {
 		return .string
 	} $else {
@@ -72,6 +77,9 @@ pub fn promote_types(a DType, b DType) !DType {
 	}
 	if b == .boolean {
 		return a
+	}
+	if a == .complex128 || b == .complex128 {
+		return .complex128
 	}
 	if a == .float64 || b == .float64 {
 		return .float64
