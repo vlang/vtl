@@ -69,3 +69,7 @@ comments in [`stats.v`](stats.v) for edge-case behavior and the
 `nanmedian` ignores NaN values and returns NaN for empty or all-NaN inputs.
 `nanmedian_axis` keeps the reduced dimension; `nanmedian_axis_squeeze` removes
 it.
+
+`percentile_axis` and `nanpercentile_axis` accept percentiles on the 0..100
+scale. Their `_squeeze` variants remove the reduced axis; the base variants
+keep it with length one.

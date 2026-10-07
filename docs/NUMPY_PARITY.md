@@ -55,7 +55,8 @@ NumPy-style shape semantics.
 `stats.median` accepts unsorted input, uses quickselect-backed linear
 interpolation, and returns fractional `f64` results for integer tensors.
 The `nanmedian` variants provide the matching NaN-ignoring scalar and axis
-reductions.
+reductions. Percentile APIs now cover scalar and per-axis operations, with
+NaN-ignoring variants and keep-dimension/squeezed output shapes.
 
 ## Arraymancer comparison
 
