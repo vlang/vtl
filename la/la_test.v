@@ -1,6 +1,7 @@
 module la
 
 import math
+import math.complex as vcomplex
 import vtl
 
 fn test_dot_1() {
@@ -80,6 +81,83 @@ fn test_matmul_preserves_f32_dtype() {
 	result := matmul(a, b)!
 	assert result.shape == [2, 2]
 	assert result.to_array() == [f32(19), 22, 43, 50]
+}
+
+fn test_matmul_complex128_matrix_product() {
+	a := vtl.from_array[vcomplex.Complex]([
+		vcomplex.Complex{ re: 1, im: 1 },
+		vcomplex.Complex{ re: 2, im: 0 },
+		vcomplex.Complex{ re: 3, im: -1 },
+		vcomplex.Complex{ re: 4, im: 0 },
+	], [2, 2])!
+	b := vtl.from_array[vcomplex.Complex]([
+		vcomplex.Complex{ re: 0, im: 1 },
+		vcomplex.Complex{ re: 2, im: 0 },
+		vcomplex.Complex{ re: 1, im: 0 },
+		vcomplex.Complex{ re: 0, im: -1 },
+	], [2, 2])!
+	result := matmul(a, b)!
+	assert result.dtype() == .complex128
+	assert result.shape == [2, 2]
+	assert result.to_array() == [
+		vcomplex.Complex{ re: 1, im: 1 },
+		vcomplex.Complex{ re: 2, im: 0 },
+		vcomplex.Complex{ re: 5, im: 3 },
+		vcomplex.Complex{ re: 6, im: -6 },
+	]
+}
+
+fn test_matmul_complex128_vector_dot_does_not_conjugate() {
+	a := vtl.from_1d[vcomplex.Complex]([
+		vcomplex.Complex{ re: 1, im: 1 },
+		vcomplex.Complex{ re: 2, im: 0 },
+	])!
+	b := vtl.from_1d[vcomplex.Complex]([
+		vcomplex.Complex{ re: 0, im: 1 },
+		vcomplex.Complex{ re: 1, im: 0 },
+	])!
+	result := matmul(a, b)!
+	assert result.rank() == 0
+	assert result.get_nth[vcomplex.Complex](0) == vcomplex.Complex{ re: 1, im: 1 }
+}
+
+fn test_matmul_broadcasts_complex128_batch_dimensions() {
+	a := vtl.from_array[vcomplex.Complex]([
+		vcomplex.Complex{ re: 1, im: 1 },
+		vcomplex.Complex{ re: 2, im: 0 },
+	], [1, 1, 2])!
+	b := vtl.from_array[vcomplex.Complex]([
+		vcomplex.Complex{ re: 0, im: 1 },
+		vcomplex.Complex{ re: 1, im: 0 },
+		vcomplex.Complex{ re: 2, im: 0 },
+		vcomplex.Complex{ re: 0, im: -1 },
+	], [2, 2, 1])!
+	result := matmul(a, b)!
+	assert result.shape == [2, 1, 1]
+	assert result.to_array() == [vcomplex.Complex{ re: 1, im: 1 }, vcomplex.Complex{ re: 2, im: 0 }]
+}
+
+fn test_matmul_complex128_reads_non_contiguous_views() {
+	input := vtl.from_array[vcomplex.Complex]([
+		vcomplex.Complex{ re: 1, im: 0 },
+		vcomplex.Complex{ re: 2, im: 0 },
+		vcomplex.Complex{ re: 3, im: 0 },
+		vcomplex.Complex{ re: 4, im: 0 },
+	], [2, 2])!
+	transposed := input.transpose([1, 0])!
+	identity := vtl.from_array[vcomplex.Complex]([
+		vcomplex.Complex{ re: 1, im: 0 },
+		vcomplex.Complex{ re: 0, im: 0 },
+		vcomplex.Complex{ re: 0, im: 0 },
+		vcomplex.Complex{ re: 1, im: 0 },
+	], [2, 2])!
+	result := matmul(transposed, identity)!
+	assert result.to_array() == [
+		vcomplex.Complex{ re: 1, im: 0 },
+		vcomplex.Complex{ re: 3, im: 0 },
+		vcomplex.Complex{ re: 2, im: 0 },
+		vcomplex.Complex{ re: 4, im: 0 },
+	]
 }
 
 fn test_matmul_f32_rectangular_matrix() {

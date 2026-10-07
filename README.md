@@ -46,7 +46,7 @@ CUDA, and Vulkan compute paths from one V-native API.
 <details>
   <summary>VTL and VSL architecture</summary>
 
-  ![Architecture of VTL data, tensor operations, VSL kernels, and execution backends](docs/assets/vtl-architecture.png)
+  ![VTL tensor, VSL kernel, and compute backend architecture](docs/assets/vtl-architecture.png)
 
   [View SVG source](docs/assets/vtl-architecture.svg) · [PNG](docs/assets/vtl-architecture.png)
 </details>
@@ -63,12 +63,13 @@ t.get([1, 1])
 - **Tensors** — create, slice, indexed `take`/`take_nd`/`take_flat`, `choose`,
   `compress`, `indices`, `pad`, set membership, reshape, transpose, move/roll axes,
   N-D diagonal views, NumPy-style Kronecker products, broadcast, map/reduce,
-  `einsum`, and `complex128` storage with elementwise arithmetic
+  `einsum`, and `complex128` storage with elementwise and matrix products
 - **Autograd** — reverse-mode AD; arbitrary computational graphs
 - **Neural networks** — `Sequential` API; Linear, Conv2D, LSTM, Attention, …
 - **Losses & optimizers** — MSE, MAE, BCE, Hinge, Focal, CrossEntropy, Huber;
   Adam, AdamW, NAdam, RAdam, SGD, …
-- **Linear algebra** — VSL-backed matmul, solve, QR, LU, Cholesky, SVD, pinv
+- **Linear algebra** — VSL-backed real matmul, pure-V complex128 matmul, solve,
+  QR, LU, Cholesky, SVD, pinv
 - **Hardware** — zero-copy `Tensor.data` for C libs; optional CUDA and Vulkan training paths
 
 ## ML Release Highlights

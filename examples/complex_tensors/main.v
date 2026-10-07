@@ -2,6 +2,7 @@ module main
 
 import math.complex as cmplx
 import vtl
+import vtl.la
 import vtl.stats
 
 fn main() {
@@ -16,6 +17,10 @@ fn main() {
 	println('complex mean: ${stats.mean(values)}')
 	println('product: ${values.multiply(values)!.str()}')
 	println('quotient: ${values.divide(values)!.str()}')
+	left := vtl.from_1d([cmplx.complex(1.0, 1.0), cmplx.complex(2.0, 0.0)])!
+	right := vtl.from_1d([cmplx.complex(0.0, 1.0), cmplx.complex(1.0, 0.0)])!
+	vector_product := la.matmul(left, right)!
+	println('complex vector matmul: ${vector_product.get_nth[cmplx.Complex](0)}')
 	real_values := vtl.real(values) or { panic(err) }
 	imaginary_values := vtl.imag(values) or { panic(err) }
 	conjugated := vtl.conj(values) or { panic(err) }

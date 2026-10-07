@@ -4,6 +4,7 @@ import vsl.la as vsl_la
 import vtl
 import vtl.storage
 import math
+import math.complex as vcomplex
 
 // dot exposes this operation as part of the public API.
 pub fn dot[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[f64] {
@@ -100,6 +101,9 @@ pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
 		}
 		return result.reshape(result_shape)
 	}
+	$if T is vcomplex.Complex {
+		return matmul_complex(a, b)
+	}
 	$if T is f32 {
 		return matmul_f32(a, b)
 	}
@@ -166,6 +170,46 @@ pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
 		result_data := res.to_array().map(vtl.cast[T](it))
 		return vtl.from_array[T](result_data, [a.shape[0], b.shape[1]])
 	}
+}
+
+fn matmul_complex(a &vtl.Tensor[vcomplex.Complex], b &vtl.Tensor[vcomplex.Complex]) !&vtl.Tensor[vcomplex.Complex] {
+	if a.rank() < 2 || b.rank() < 2 || a.shape[a.rank() - 1] != b.shape[b.rank() - 2] {
+		return error('Invalid shapes for matrix multiplication ${a.shape} and ${b.shape}')
+	}
+	a_batch_shape := a.shape[..a.rank() - 2]
+	b_batch_shape := b.shape[..b.rank() - 2]
+	batch_shape := matmul_broadcast_shape(a_batch_shape, b_batch_shape) or {
+		return error('Batch shapes ${a_batch_shape} and ${b_batch_shape} cannot be broadcast for matrix multiplication ${a.shape} and ${b.shape}')
+	}
+	mut batch_size := 1
+	for dimension in batch_shape {
+		batch_size *= dimension
+	}
+	rows := a.shape[a.rank() - 2]
+	inner := a.shape[a.rank() - 1]
+	columns := b.shape[b.rank() - 1]
+	mut result_shape := batch_shape.clone()
+	result_shape << rows
+	result_shape << columns
+	a_data := a.to_array()
+	b_data := b.to_array()
+	mut result_data := []vcomplex.Complex{len: batch_size * rows * columns}
+	for batch in 0 .. batch_size {
+		a_batch := matmul_broadcast_offset(batch, batch_shape, a_batch_shape)
+		b_batch := matmul_broadcast_offset(batch, batch_shape, b_batch_shape)
+		a_start := a_batch * rows * inner
+		b_start := b_batch * inner * columns
+		for row in 0 .. rows {
+			for column in 0 .. columns {
+				mut sum := vcomplex.Complex{}
+				for k in 0 .. inner {
+					sum += a_data[a_start + row * inner + k] * b_data[b_start + k * columns + column]
+				}
+				result_data[batch * rows * columns + row * columns + column] = sum
+			}
+		}
+	}
+	return vtl.from_array[vcomplex.Complex](result_data, result_shape)
 }
 
 fn matmul_f32(a &vtl.Tensor[f32], b &vtl.Tensor[f32]) !&vtl.Tensor[f32] {

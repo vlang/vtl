@@ -117,7 +117,8 @@ conversion, matching NumPy's `axis=()` behavior.
 ### Linear algebra
 
 **Current:** NumPy-style vector/matrix `matmul` promotion and batched
-broadcasting; N-D Kronecker products with NumPy rank-promotion semantics;
+broadcasting for real and complex128 tensors; N-D Kronecker products with
+NumPy rank-promotion semantics;
 offset diagonal construction and extraction; solve, least squares,
 QR/LU/Cholesky, pseudoinverse, trace, matrix norms,
 flattened and axis-wise p-norms, and covariance/correlation matrices.
@@ -204,9 +205,9 @@ complex variance and standard deviation return real tensors and support
 logical order, and truncate floating-point values when converting to integers.
 
 **Remaining:** connect promotion to mixed-dtype arithmetic, add weak scalar
-promotion and string conversion, extend complex support to other mathematical
-functions, linear algebra, and random generation, add complex32, and define
-integer overflow and structured-data limits.
+promotion and string conversion, extend complex support beyond `matmul` to
+other mathematical functions, general linear algebra, and random generation,
+add complex32, and define integer overflow and structured-data limits.
 
 ### Masked and missing data
 
