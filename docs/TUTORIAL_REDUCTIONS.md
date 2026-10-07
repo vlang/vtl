@@ -336,6 +336,20 @@ assert row_means_squeezed.shape == [2]
 assert row_means_squeezed.to_array() == [4.625, 4.0]
 ```
 
+`stats.average_along_axes` reduces a tuple of dimensions in one pass. For
+multi-axis weighted means, provide a weight tensor matching the input shape:
+
+```v
+import vtl
+import vtl.stats
+
+measurements := vtl.from_array[f64]([1, 2, 3, 4, 5, 6, 7, 8], [2, 2, 2])!
+reliability := vtl.from_array[f64]([1, 2, 3, 4, 5, 6, 7, 8], [2, 2, 2])!
+means := stats.average_along_axes(measurements, reliability, [0, -1], false)!
+assert means.shape == [2]
+assert means.to_array() == [66.0 / 14.0, 138.0 / 22.0]
+```
+
 Empty input, incompatible shapes, or a zero sum of weights returns an error.
 
 ## NaN-aware sums and extrema
