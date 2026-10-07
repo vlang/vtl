@@ -21,4 +21,24 @@ fn main_run() ! {
 	mean_loss.backprop()!
 	println('mean loss: ${mean_loss.value.to_array()}')
 	println('mean gradient: ${mean_input.grad.to_array()}')
+
+	mut axis_sum_context := autograd.ctx[f64]()
+	axis_sum_input := axis_sum_context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [
+		2,
+		3,
+	])!)
+	mut row_sums := axis_sum_input.sum_along_axis(-1, false)!
+	row_sums.backprop()!
+	println('row sums: ${row_sums.value.to_array()}')
+	println('axis sum gradient: ${axis_sum_input.grad.to_array()}')
+
+	mut axis_mean_context := autograd.ctx[f64]()
+	axis_mean_input := axis_mean_context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [
+		2,
+		3,
+	])!)
+	mut column_means := axis_mean_input.mean_along_axis(0, true)!
+	column_means.backprop()!
+	println('column means: ${column_means.value.to_array()}')
+	println('axis mean gradient: ${axis_mean_input.grad.to_array()}')
 }

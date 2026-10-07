@@ -18,4 +18,8 @@ sum loss: [13.0]
 sum gradient: [4.0, 6.0]
 mean loss: [6.5]
 mean gradient: [2.0, 3.0]
+row sums: [6.0, 15.0]
+axis sum gradient: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+column means: [2.5, 3.5, 4.5]
+axis mean gradient: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
 ```
