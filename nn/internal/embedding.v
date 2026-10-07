@@ -7,11 +7,30 @@ import vtl
 // weight: [vocab_size, embedding_dim]
 // returns: [batch, seq_len, embedding_dim]
 pub fn embedding_forward[T](input &vtl.Tensor[T], weight &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	if input.rank() != 2 || weight.rank() != 2 {
+		return error('embedding_forward: expected input [batch, seq_len] and weight [vocab_size, embedding_dim]')
+	}
 	batch := input.shape[0]
 	seq_len := input.shape[1]
 	embedding_dim := weight.shape[1]
 
 	mut output := vtl.zeros[T]([batch, seq_len, embedding_dim])
+	if input.is_row_major_contiguous() && weight.is_row_major_contiguous()
+		&& output.is_row_major_contiguous() {
+		indices := input.data.data[..input.size]
+		weights := weight.data.data[..weight.size]
+		for token in 0 .. batch * seq_len {
+			idx := int(vtl.cast[T](indices[token]))
+			if idx >= 0 && idx < weight.shape[0] {
+				weight_offset := idx * embedding_dim
+				output_offset := token * embedding_dim
+				for d in 0 .. embedding_dim {
+					output.data.data[output_offset + d] = weights[weight_offset + d]
+				}
+			}
+		}
+		return output
+	}
 	for b in 0 .. batch {
 		for s in 0 .. seq_len {
 			idx := int(input.get([b, s]))
