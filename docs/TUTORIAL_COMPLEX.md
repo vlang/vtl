@@ -51,6 +51,27 @@ assert vtl.sin(origin)!.get_nth(0).re == 0.0
 assert vtl.cos(origin)!.get_nth(0).re == 1.0
 ```
 
+`complex_angle` returns each value's phase in radians, or degrees when its
+second argument is `true`. `complex_is_nan`, `complex_is_inf`, and
+`complex_is_finite` inspect either or both components using NumPy's complex
+predicate behavior:
+
+```v
+import math
+import math.complex as cmplx
+import vtl
+
+values := vtl.from_1d([
+	cmplx.complex(0.0, 1.0),
+	cmplx.complex(math.nan(), 0.0),
+	cmplx.complex(math.inf(1), 0.0),
+])!
+assert vtl.complex_angle(values, true)!.to_array()[0] == 90.0
+assert vtl.complex_is_nan(values)!.to_array() == [false, true, false]
+assert vtl.complex_is_inf(values)!.to_array() == [false, false, true]
+assert vtl.complex_is_finite(values)!.to_array() == [true, false, false]
+```
+
 `log` uses the principal natural logarithm, and `sqrt` uses the principal
 square root branch. `arcsin`, `arccos`, `arctan`, `arcsinh`, `arccosh`, and
 `arctanh` use V's standard complex library for their principal inverse branches.

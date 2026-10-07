@@ -78,6 +78,27 @@ fn test_complex_real_imag_conj_and_absolute() ! {
 	assert vtl.imag(transposed)!.to_array() == [2.0, 6.0, 4.0, 8.0]
 }
 
+fn test_complex_angle_and_finite_value_predicates() ! {
+	values := vtl.from_1d([
+		vcomplex.Complex{ re: 1.0, im: 0.0 },
+		vcomplex.Complex{ re: 0.0, im: 1.0 },
+		vcomplex.Complex{ re: -1.0, im: 0.0 },
+		vcomplex.Complex{ re: math.nan(), im: 2.0 },
+		vcomplex.Complex{ re: math.inf(1), im: math.nan() },
+	])!
+	angles := vtl.complex_angle(values, false)!
+	assert angles.get_nth(0) == 0.0
+	assert angles.get_nth(1) == math.pi / 2.0
+	assert angles.get_nth(2) == math.pi
+	degrees := vtl.complex_angle(values, true)!
+	assert degrees.to_array()[0] == 0.0
+	assert degrees.to_array()[1] == 90.0
+	assert degrees.to_array()[2] == 180.0
+	assert vtl.complex_is_nan(values)!.to_array() == [false, false, false, true, true]
+	assert vtl.complex_is_inf(values)!.to_array() == [false, false, false, false, true]
+	assert vtl.complex_is_finite(values)!.to_array() == [true, true, true, false, false]
+}
+
 fn test_complex_transcendental_functions() ! {
 	values := vtl.from_1d([
 		vcomplex.Complex{ re: 0.0, im: 0.0 },
