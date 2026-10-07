@@ -72,7 +72,7 @@ accelerators rather than stable user contracts.
 | Area | Status |
 |------|--------|
 | f32 training | `Sequential` + MSE + Adam smoke tests |
-| CUDA | Experimental opt-in Linear/Conv2D forward, CUDA backward, activation chain, Adam slots |
+| CUDA | Experimental opt-in Linear/Conv2D forward; f64 Linear/Conv2D/Dropout backward; activation chain and Adam slots |
 | Vulkan | Experimental opt-in f32 Linear, Conv2D same-padding, ReLU/Sigmoid/Softplus/SELU/HardSwish, fused Adam shader |
 | Datasets | MNIST, IMDB, CIFAR-10 loaders plus CI-safe synthetic examples |
 | Benchmarks | VTL vs NumPy/PyTorch scripts and PR benchmark workflow |

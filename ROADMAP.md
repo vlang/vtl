@@ -110,7 +110,7 @@ See [docs/DEVICE_MEMORY.md](docs/DEVICE_MEMORY.md).
 | [#40](https://github.com/vlang/vtl/issues/40) | YOLO for autograd gates | 🟡 Performance | Open; requires end-to-end benchmark evidence |
 | [#52](https://github.com/vlang/vtl/issues/52) | Tracel-AI/Burn reference | Research | Open; compare concrete capabilities and architecture |
 | [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support | 🟡 P2 | Open; requires ARM GPU hardware for device validation |
-| [#161](https://github.com/vlang/vtl/issues/161) | CUDA backward for remaining layers | 🔴 ML | Open; current CUDA backward covers Linear and Conv2D only |
+| [#161](https://github.com/vlang/vtl/issues/161) | CUDA backward for remaining layers | 🔴 ML | Open; Linear, Conv2D, and f64 Dropout have paths; LSTM, Attention, normalization, Embedding, and pooling remain |
 
 The complete NumPy and Arraymancer comparison is tracked in
 [docs/NUMPY_PARITY.md](docs/NUMPY_PARITY.md). The GitHub project board is not
