@@ -794,6 +794,12 @@ pub fn nanquantile_linear[T](t &vtl.Tensor[T], q f64) !f64 {
 	return interpolate_quantile(mut values, q)
 }
 
+// nanmedian returns the median of non-NaN values as f64. Empty and all-NaN
+// inputs return NaN.
+pub fn nanmedian[T](t &vtl.Tensor[T]) f64 {
+	return nanquantile_linear[T](t, 0.5) or { math.nan() }
+}
+
 fn interpolate_quantile(mut values []f64, q f64) f64 {
 	for value in values {
 		if math.is_nan(value) {
@@ -922,10 +928,22 @@ pub fn nanquantile_axis[T](t &vtl.Tensor[T], q f64, axis int) !&vtl.Tensor[f64] 
 	return quantile_axis_impl[T](t, q, axis, true, true)
 }
 
+// nanmedian_axis computes the NaN-ignoring median per axis slice and retains
+// the reduced axis with length one.
+pub fn nanmedian_axis[T](t &vtl.Tensor[T], axis int) !&vtl.Tensor[f64] {
+	return nanquantile_axis[T](t, 0.5, axis)
+}
+
 // nanquantile_axis_squeeze ignores NaNs and removes the reduced axis from the
 // result shape. Slices containing only NaNs produce NaN.
 pub fn nanquantile_axis_squeeze[T](t &vtl.Tensor[T], q f64, axis int) !&vtl.Tensor[f64] {
 	return quantile_axis_impl[T](t, q, axis, true, false)
+}
+
+// nanmedian_axis_squeeze computes the NaN-ignoring median per axis slice and
+// removes the reduced axis from the result shape.
+pub fn nanmedian_axis_squeeze[T](t &vtl.Tensor[T], axis int) !&vtl.Tensor[f64] {
+	return nanquantile_axis_squeeze[T](t, 0.5, axis)
 }
 
 // quantiles_axis computes several linearly interpolated quantiles for each
