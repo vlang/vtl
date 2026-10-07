@@ -99,7 +99,7 @@ fn test_real_f32_fft_rejects_incompatible_shapes() {
 		assert false
 	}
 	spectrum := rfft_f32(input)!
-	if _ := irfft_f32(spectrum, 5) {
+	if _ := irfft_f32(spectrum, 6) {
 		assert false
 	}
 	if _ := rfft2_f32(input) {
