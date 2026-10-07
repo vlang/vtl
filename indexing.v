@@ -6,6 +6,8 @@ pub enum IndexKind {
 	slice
 	integer
 	array
+	ellipsis
+	newaxis
 }
 
 struct AxisRange {
@@ -114,17 +116,33 @@ pub fn array_index(indices &Tensor[int]) TensorIndex {
 	}
 }
 
-// mixed_index combines full slices, ranges, scalar integers, and broadcasted
-// coordinate tensors. Omitted trailing axes select the full axis. If every
-// index is basic, the result is a view; if any coordinate tensor is used, the
-// result is an independent row-major copy, matching NumPy's indexing rules.
-pub fn mixed_index[T](t &Tensor[T], indices []TensorIndex) !&Tensor[T] {
-	rank := t.rank()
-	if indices.len > rank {
-		return error('mixed_index: got ${indices.len} axis indices for rank ${rank}')
+// ellipsis_index expands to enough full axes to cover the unindexed dimensions.
+// At most one ellipsis is allowed in a mixed_index call.
+pub fn ellipsis_index() TensorIndex {
+	return TensorIndex{
+		kind:    .ellipsis
+		indices: unsafe { nil }
 	}
+}
+
+// newaxis_index inserts a size-one axis at this position without consuming an
+// input axis. Basic indexing with a new axis remains a view.
+pub fn newaxis_index() TensorIndex {
+	return TensorIndex{
+		kind:    .newaxis
+		indices: unsafe { nil }
+	}
+}
+
+// mixed_index combines full slices, ranges, scalar integers, broadcasted
+// coordinate tensors, ellipsis, and inserted size-one axes. Omitted trailing
+// axes select the full axis. If every index is basic, the result is a view; if
+// any coordinate tensor is used, the result is an independent row-major copy.
+pub fn mixed_index[T](t &Tensor[T], indices []TensorIndex) !&Tensor[T] {
+	indexed_tensor, expanded_indices := expand_mixed_index[T](t, indices)!
+	rank := indexed_tensor.rank()
 	mut axis_indices := []TensorIndex{len: rank, init: full_index()}
-	for axis, index in indices {
+	for axis, index in expanded_indices {
 		axis_indices[axis] = index
 	}
 
@@ -136,17 +154,17 @@ pub fn mixed_index[T](t &Tensor[T], indices []TensorIndex) !&Tensor[T] {
 	for axis, index in axis_indices {
 		match index.kind {
 			.full {
-				ranges[axis] = axis_range(t.shape[axis])
+				ranges[axis] = axis_range(indexed_tensor.shape[axis])
 				slice_axes << axis
 			}
 			.slice {
-				ranges[axis] = normalized_slice_range(t.shape[axis], index) or {
+				ranges[axis] = normalized_slice_range(indexed_tensor.shape[axis], index) or {
 					return error('mixed_index: axis ${axis}: ${err}')
 				}
 				slice_axes << axis
 			}
 			.integer {
-				normalized := normalize_scalar_index(index.integer, t.shape[axis], axis) or {
+				normalized := normalize_scalar_index(index.integer, indexed_tensor.shape[axis], axis) or {
 					return err
 				}
 				axis_indices[axis].integer = normalized
@@ -173,7 +191,7 @@ pub fn mixed_index[T](t &Tensor[T], indices []TensorIndex) !&Tensor[T] {
 	}
 
 	if coordinate_axes.len == 0 {
-		return mixed_basic_index[T](t, axis_indices, ranges, slice_axes)
+		return mixed_basic_index[T](indexed_tensor, axis_indices, ranges, slice_axes)
 	}
 
 	mut coordinate_tensors := []&Tensor[int]{cap: coordinate_axes.len}
@@ -261,16 +279,74 @@ pub fn mixed_index[T](t &Tensor[T], indices []TensorIndex) !&Tensor[T] {
 				}
 				.array {
 					selected := broadcast_coordinates[coordinate_cursor].get(advanced_index)
-					input_index[axis] = normalize_scalar_index(selected, t.shape[axis], axis) or {
+					input_index[axis] = normalize_scalar_index(selected, indexed_tensor.shape[axis], axis) or {
 						return err
 					}
 					coordinate_cursor++
 				}
 			}
 		}
-		result.data.data[flat_index] = t.get(input_index)
+		result.data.data[flat_index] = indexed_tensor.get(input_index)
 	}
 	return result
+}
+
+fn expand_mixed_index[T](t &Tensor[T], indices []TensorIndex) !(&Tensor[T], []TensorIndex) {
+	rank := t.rank()
+	mut ellipsis_position := -1
+	mut consuming_count := 0
+	mut newaxis_count := 0
+	for position, index in indices {
+		match index.kind {
+			.ellipsis {
+				if ellipsis_position >= 0 {
+					return error('mixed_index: only one ellipsis is allowed')
+				}
+				ellipsis_position = position
+			}
+			.newaxis {
+				newaxis_count++
+			}
+			else {
+				consuming_count++
+			}
+		}
+	}
+	if consuming_count > rank {
+		return error('mixed_index: got ${consuming_count} input-axis indices for rank ${rank}')
+	}
+	ellipsis_axes := if ellipsis_position >= 0 { rank - consuming_count } else { 0 }
+	mut expanded_tensor := t
+	mut expanded_indices := []TensorIndex{cap: rank + newaxis_count}
+	mut original_axis := 0
+	mut expanded_axis := 0
+	for index in indices {
+		if index.kind == .ellipsis {
+			for _ in 0 .. ellipsis_axes {
+				expanded_indices << full_index()
+				original_axis++
+				expanded_axis++
+			}
+			continue
+		}
+		if index.kind == .newaxis {
+			mut shape := expanded_tensor.shape.clone()
+			mut strides := expanded_tensor.strides.clone()
+			shape.insert(expanded_axis, 1)
+			strides.insert(expanded_axis, 0)
+			expanded_tensor = expanded_tensor.as_strided[T](shape, strides)!
+			expanded_indices << full_index()
+			expanded_axis++
+			continue
+		}
+		expanded_indices << index
+		original_axis++
+		expanded_axis++
+	}
+	for _ in original_axis .. rank {
+		expanded_indices << full_index()
+	}
+	return expanded_tensor, expanded_indices
 }
 
 fn mixed_basic_index[T](t &Tensor[T], indices []TensorIndex, ranges []AxisRange, slice_axes []int) !&Tensor[T] {
