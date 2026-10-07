@@ -103,6 +103,56 @@ pub fn (mut generator RandomGenerator) binomial(trials int, probability f64, sha
 	return result
 }
 
+// multinomial returns category counts for repeated samples from one
+// categorical distribution. The final output axis contains the categories.
+pub fn (mut generator RandomGenerator) multinomial(trials int, probabilities &Tensor[f64], sample_shape []int) !&Tensor[int] {
+	if trials < 0 {
+		return error('multinomial: trials must be non-negative')
+	}
+	if probabilities.size == 0 {
+		return error('multinomial: probabilities must not be empty')
+	}
+	mut values := probabilities.to_array()
+	mut total_probability := 0.0
+	for probability in values {
+		if probability < 0 || math.is_nan(probability) || math.is_inf(probability, 0) {
+			return error('multinomial: probabilities must be finite and non-negative')
+		}
+		total_probability += probability
+	}
+	if total_probability <= 0 || math.is_inf(total_probability, 0) {
+		return error('multinomial: probabilities must have a finite positive sum')
+	}
+	if math.abs(total_probability - 1.0) > 1e-12 {
+		return error('multinomial: probabilities must sum to one')
+	}
+	for i in 0 .. values.len {
+		values[i] /= total_probability
+	}
+	category_count := values.len
+	mut output_shape := sample_shape.clone()
+	output_shape << category_count
+	mut counts := []int{len: size_from_shape(output_shape)}
+	sample_count := size_from_shape(sample_shape)
+	for sample in 0 .. sample_count {
+		mut remaining_trials := trials
+		mut remaining_probability := 1.0
+		for category in 0 .. category_count - 1 {
+			probability := if remaining_probability <= 0 {
+				0.0
+			} else {
+				values[category] / remaining_probability
+			}
+			count := generator.rng.binomial(remaining_trials, math.min(probability, 1.0))!
+			counts[sample * category_count + category] = count
+			remaining_trials -= count
+			remaining_probability -= values[category]
+		}
+		counts[sample * category_count + category_count - 1] = remaining_trials
+	}
+	return from_array[int](counts, output_shape)
+}
+
 // exponential returns f64 samples from an exponential distribution with the
 // given positive finite rate using this generator's independent stream.
 pub fn (mut generator RandomGenerator) exponential(lambda f64, shape []int) !&Tensor[f64] {
