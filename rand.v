@@ -252,11 +252,11 @@ pub fn (mut generator RandomGenerator) student_t(degrees_of_freedom f64, shape [
 	mut values := []f64{len: size_from_shape(shape)}
 	for i in 0 .. values.len {
 		normal_sample := rng.normal(config.NormalConfigStruct{})!
-		chi_square := sample_gamma(degrees_of_freedom / 2, 2, mut rng)!
-		if chi_square <= 0 {
+		chi_square_sample := sample_gamma(degrees_of_freedom / 2, 2, mut rng)!
+		if chi_square_sample <= 0 {
 			return error('student_t: sampled chi-square value underflowed to zero')
 		}
-		values[i] = normal_sample / math.sqrt(chi_square / degrees_of_freedom)
+		values[i] = normal_sample / math.sqrt(chi_square_sample / degrees_of_freedom)
 	}
 	return from_array[f64](values, shape)
 }
@@ -436,15 +436,12 @@ fn sample_gamma(alpha f64, scale f64, mut rng &rand.PRNG) !f64 {
 	c := 1.0 / math.sqrt(9 * d)
 	for _ in 0 .. 10000 {
 		x := rng.normal(config.NormalConfigStruct{})!
-		base := 1 + c * x
-		if base <= 0 {
+		if 1 + c * x <= 0 {
 			continue
 		}
-		v := base * base * base
 		u := rng.f64_in_range(0.0, 1.0)!
-		if u < 1 - 0.0331 * x * x * x * x
-			|| math.log(u) < 0.5 * x * x + d * (1 - v + math.log(v)) {
-			mut sample := d * v
+		mut sample, accepted := gamma_candidate(d, c, x, u)
+		if accepted {
 			if alpha < 1 {
 				sample *= math.pow(rng.f64_in_range(0.0, 1.0)!, 1 / alpha)
 			}
@@ -452,6 +449,19 @@ fn sample_gamma(alpha f64, scale f64, mut rng &rand.PRNG) !f64 {
 		}
 	}
 	return error('gamma: rejection sampler did not converge')
+}
+
+fn gamma_candidate(d f64, c f64, x f64, uniform_value f64) (f64, bool) {
+	base := 1 + c * x
+	if base <= 0 {
+		return 0, false
+	}
+	v := base * base * base
+	if uniform_value < 1 - 0.0331 * x * x * x * x
+		|| math.log(uniform_value) < 0.5 * x * x + d * (1 - v + math.log(v)) {
+		return d * v, true
+	}
+	return 0, false
 }
 
 // beta returns samples from a Beta distribution using this generator's
@@ -597,6 +607,98 @@ pub fn weibull(shape_parameter f64, shape []int, params TensorData) !&Tensor[f64
 		result.set_nth(i, math.pow(-math.log(1.0 - u), 1.0 / shape_parameter))
 	}
 	return result
+}
+
+// gamma returns samples from a Gamma distribution on VTL's global random
+// stream. `alpha` is the shape and `scale` is the scale parameter.
+pub fn gamma(alpha f64, scale f64, shape []int, params TensorData) !&Tensor[f64] {
+	validate_gamma_parameters(alpha, scale)!
+	mut result := zeros[f64](shape, params)
+	for i in 0 .. result.size {
+		result.set_nth(i, sample_gamma_global(alpha, scale)!)
+	}
+	return result
+}
+
+// beta returns samples from the Beta distribution using VTL's global stream.
+pub fn beta(alpha f64, beta f64, shape []int, params TensorData) !&Tensor[f64] {
+	validate_gamma_parameters(alpha, 1)!
+	validate_gamma_parameters(beta, 1)!
+	mut result := zeros[f64](shape, params)
+	for i in 0 .. result.size {
+		x := sample_gamma_global(alpha, 1)!
+		y := sample_gamma_global(beta, 1)!
+		if x + y == 0 {
+			return error('beta: sampled gamma values underflowed to zero')
+		}
+		result.set_nth(i, x / (x + y))
+	}
+	return result
+}
+
+// chi_square returns samples from a chi-square distribution using VTL's
+// global random stream.
+pub fn chi_square(degrees_of_freedom f64, shape []int, params TensorData) !&Tensor[f64] {
+	validate_degrees_of_freedom(degrees_of_freedom, 'chi_square')!
+	mut result := zeros[f64](shape, params)
+	for i in 0 .. result.size {
+		result.set_nth(i, sample_gamma_global(degrees_of_freedom / 2, 2)!)
+	}
+	return result
+}
+
+// student_t returns samples from the standard Student's t distribution using
+// VTL's global random stream.
+pub fn student_t(degrees_of_freedom f64, shape []int, params TensorData) !&Tensor[f64] {
+	validate_degrees_of_freedom(degrees_of_freedom, 'student_t')!
+	mut result := zeros[f64](shape, params)
+	for i in 0 .. result.size {
+		normal_sample := rand.normal(config.NormalConfigStruct{})!
+		chi_square_sample := sample_gamma_global(degrees_of_freedom / 2, 2)!
+		if chi_square_sample <= 0 {
+			return error('student_t: sampled chi-square value underflowed to zero')
+		}
+		result.set_nth(i, normal_sample / math.sqrt(chi_square_sample / degrees_of_freedom))
+	}
+	return result
+}
+
+// f_distribution returns samples from the F distribution using VTL's global
+// random stream.
+pub fn f_distribution(numerator_df f64, denominator_df f64, shape []int, params TensorData) !&Tensor[f64] {
+	validate_degrees_of_freedom(numerator_df, 'f_distribution')!
+	validate_degrees_of_freedom(denominator_df, 'f_distribution')!
+	mut result := zeros[f64](shape, params)
+	for i in 0 .. result.size {
+		numerator := sample_gamma_global(numerator_df / 2, 2)!
+		denominator := sample_gamma_global(denominator_df / 2, 2)!
+		if denominator <= 0 {
+			return error('f_distribution: sampled denominator underflowed to zero')
+		}
+		result.set_nth(i, (numerator / numerator_df) / (denominator / denominator_df))
+	}
+	return result
+}
+
+fn sample_gamma_global(alpha f64, scale f64) !f64 {
+	shape := if alpha < 1 { alpha + 1 } else { alpha }
+	d := shape - 1.0 / 3.0
+	c := 1.0 / math.sqrt(9 * d)
+	for _ in 0 .. 10000 {
+		x := rand.normal(config.NormalConfigStruct{})!
+		if 1 + c * x <= 0 {
+			continue
+		}
+		u := rand.f64_in_range(0.0, 1.0)!
+		mut sample, accepted := gamma_candidate(d, c, x, u)
+		if accepted {
+			if alpha < 1 {
+				sample *= math.pow(rand.f64_in_range(0.0, 1.0)!, 1 / alpha)
+			}
+			return sample * scale
+		}
+	}
+	return error('gamma: rejection sampler did not converge')
 }
 
 fn validate_poisson_rate(lambda f64) ! {

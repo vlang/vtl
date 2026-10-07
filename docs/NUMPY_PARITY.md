@@ -112,8 +112,9 @@ audit.
 ### Random
 
 **Current:** global uniform, normal, Bernoulli, binomial, geometric,
-exponential, Poisson, and Weibull tensors; `random_seed`; independent seeded `RandomGenerator`
-streams for f64 uniform, normal, lognormal, gamma, beta, Dirichlet, exponential,
+exponential, Poisson, Weibull, gamma, beta, chi-square, Student's t, and F
+tensors; `random_seed`; independent seeded `RandomGenerator` streams for f64
+uniform, normal, lognormal, gamma, beta, Dirichlet, exponential,
 Poisson, Weibull, chi-square, Student's t, F, and boolean Bernoulli; integer
 binomial/geometric/multinomial/Poisson; uniform and weighted population choice;
 and integer or first-axis tensor permutations.
