@@ -1,0 +1,1052 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="x-ua-compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>fft | vdoc</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link
+			href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+		<link rel="manifest" href="site.webmanifest" />
+		<link rel="mask-icon" href="safari-pinned-tab.svg" color="#5bbad5" />
+		<meta name="msapplication-TileColor" content="#da532c" />
+		<meta name="theme-color" content="#ffffff" />
+		<link rel="stylesheet" href="doc.css" />
+		<link rel="stylesheet" href="normalize.css" />
+		<script src="dark-mode.js"></script>
+	</head>
+
+	<body>
+		<div><a id="skip-to-content-link" href="#main-content">Skip to content</a></div>
+		<div id="page">
+			<header class="doc-nav hidden">
+				<div class="heading-container">
+					<div class="heading">
+						<div class="info">
+							<div class="module">vtl</div>
+							<div class="toggle-version-container">
+								<span>0.2.0-beta.1 </span>
+								<div
+									id="dark-mode-toggle"
+									role="switch"
+									aria-checked="false"
+									aria-label="Toggle dark mode"
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" class="light-icon" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" class="dark-icon" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><g><rect fill="none" height="24" width="24"/></g><g><g><g><path d="M11.1,12.08C8.77,7.57,10.6,3.6,11.63,2.01C6.27,2.2,1.98,6.59,1.98,12c0,0.14,0.02,0.28,0.02,0.42 C2.62,12.15,3.29,12,4,12c1.66,0,3.18,0.83,4.1,2.15C9.77,14.63,11,16.17,11,18c0,1.52-0.87,2.83-2.12,3.51 c0.98,0.32,2.03,0.5,3.11,0.5c3.5,0,6.58-1.8,8.37-4.52C18,17.72,13.38,16.52,11.1,12.08z"/></g><path d="M7,16l-0.18,0C6.4,14.84,5.3,14,4,14c-1.66,0-3,1.34-3,3s1.34,3,3,3c0.62,0,2.49,0,3,0c1.1,0,2-0.9,2-2 C9,16.9,8.1,16,7,16z"/></g></g></svg>
+
+								</div>
+							</div>
+							<svg xmlns="http://www.w3.org/2000/svg" id="toggle-menu" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+
+						</div>
+						<div id="search">
+							<input type="text" placeholder="Search... (beta)" autocomplete="off" />
+						</div>
+					</div>
+				</div>
+				<nav class="search hidden"></nav>
+				<nav class="content hidden">
+					<ul>
+						<li class="open">
+<div class="menu-row"><a href="./index.html">README</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./vtl.html">vtl</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./autograd.html">autograd</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./autograd_cuda.html">autograd_cuda</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./main.html">main</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./util.html">util</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./csv.html">csv</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./datasets.html">datasets</a></div>
+</li>
+<li class="open active">
+<div class="menu-row"><a href="./fft.html">fft</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./la.html">la</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./metrics.html">metrics</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./data.html">data</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./activation.html">activation</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./layers.html">layers</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./loss.html">loss</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./internal.html">internal</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./models.html">models</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./optimizers.html">optimizers</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./types.html">types</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./npy.html">npy</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./npz.html">npz</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./stats.html">stats</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./storage.html">storage</a></div>
+</li>
+
+					</ul>
+				</nav>
+			</header>
+			<div class="doc-scrollview" tabindex="-1" id="main-content">
+				<div class="doc-container">
+					<div class="doc-content">
+								<section id="fft" class="doc-node">
+			<div class="title"><h1> fft</h1></div>
+
+
+</section>
+
+		<section id="create_rfft_f32_plan" class="doc-node">
+			<div class="title"><h2>fn create_rfft_f32_plan <a href="#create_rfft_f32_plan">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/real_f32.v#L18"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">create_rfft_f32_plan</span><span class="token punctuation">(</span>length <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span>RealFftPlanF32</code></pre>
+<p>create_rfft_f32_plan creates a reusable real f32 FFT plan that returns Complex32 output without promoting values to f64.</p>
+
+</section>
+
+		<section id="create_rfft_plan" class="doc-node">
+			<div class="title"><h2>fn create_rfft_plan <a href="#create_rfft_plan">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L123"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> create_rfft_plan<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>length <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span>RealFftPlan<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>create_rfft_plan creates a reusable one-dimensional real FFT plan.</p>
+
+</section>
+
+		<section id="fft" class="doc-node">
+			<div class="title"><h2>fn fft <a href="#fft">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L255"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">fft</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>fft computes a one-dimensional discrete Fourier transform of complex f64 values, returning all positive and negative frequencies in native order.</p>
+
+</section>
+
+		<section id="fft2" class="doc-node">
+			<div class="title"><h2>fn fft2 <a href="#fft2">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L289"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">fft2</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>fft2 computes a two-dimensional complex discrete Fourier transform.</p>
+
+</section>
+
+		<section id="fft2_f32" class="doc-node">
+			<div class="title"><h2>fn fft2_f32 <a href="#fft2_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L335"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">fft2_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span></code></pre>
+<p>fft2_f32 computes a two-dimensional complex f32 DFT.</p>
+
+</section>
+
+		<section id="fft2_norm" class="doc-node">
+			<div class="title"><h2>fn fft2_norm <a href="#fft2_norm">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L53"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">fft2_norm</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>fft2_norm computes a two-dimensional complex FFT with explicit normalization.</p>
+
+</section>
+
+		<section id="fft2_norm_f32" class="doc-node">
+			<div class="title"><h2>fn fft2_norm_f32 <a href="#fft2_norm_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L103"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">fft2_norm_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span></code></pre>
+<p>fft2_norm_f32 computes a 2-D complex f32 FFT with explicit normalization.</p>
+
+</section>
+
+		<section id="fft_axis" class="doc-node">
+			<div class="title"><h2>fn fft_axis <a href="#fft_axis">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L267"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">fft_axis</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">,</span> axis <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>fft_axis transforms one axis of a complex tensor and preserves its shape. Negative axis values count backward from the final dimension.</p>
+
+</section>
+
+		<section id="fft_axis_f32" class="doc-node">
+			<div class="title"><h2>fn fft_axis_f32 <a href="#fft_axis_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L315"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">fft_axis_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span><span class="token punctuation">,</span> axis <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span></code></pre>
+<p>fft_axis_f32 transforms one axis of a complex f32 tensor.</p>
+
+</section>
+
+		<section id="fft_axis_norm" class="doc-node">
+			<div class="title"><h2>fn fft_axis_norm <a href="#fft_axis_norm">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L27"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">fft_axis_norm</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">,</span> axis <span class="token builtin">int</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>fft_axis_norm transforms one complex tensor axis using an explicit normalization mode.</p>
+
+</section>
+
+		<section id="fft_axis_norm_f32" class="doc-node">
+			<div class="title"><h2>fn fft_axis_norm_f32 <a href="#fft_axis_norm_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L77"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">fft_axis_norm_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span><span class="token punctuation">,</span> axis <span class="token builtin">int</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span></code></pre>
+<p>fft_axis_norm_f32 transforms one complex f32 tensor axis with explicit normalization.</p>
+
+</section>
+
+		<section id="fft_f32" class="doc-node">
+			<div class="title"><h2>fn fft_f32 <a href="#fft_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L305"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">fft_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span></code></pre>
+<p>fft_f32 computes a one-dimensional DFT of single-precision complex values.</p>
+
+</section>
+
+		<section id="fft_norm" class="doc-node">
+			<div class="title"><h2>fn fft_norm <a href="#fft_norm">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L15"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">fft_norm</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>fft_norm computes a one-dimensional complex FFT with an explicit normalization mode.</p>
+
+</section>
+
+		<section id="fft_norm_f32" class="doc-node">
+			<div class="title"><h2>fn fft_norm_f32 <a href="#fft_norm_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L65"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">fft_norm_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span></code></pre>
+<p>fft_norm_f32 computes a one-dimensional complex f32 FFT with explicit normalization.</p>
+
+</section>
+
+		<section id="fftfreq" class="doc-node">
+			<div class="title"><h2>fn fftfreq <a href="#fftfreq">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L18"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">fftfreq</span><span class="token punctuation">(</span>n <span class="token builtin">int</span><span class="token punctuation">,</span> d <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
+<p>fftfreq returns the discrete Fourier Transform sample frequencies for a transform of length n and sample spacing d, in NumPy's native FFT order.</p>
+
+</section>
+
+		<section id="fftn" class="doc-node">
+			<div class="title"><h2>fn fftn <a href="#fftn">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L279"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">fftn</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>fftn computes the complex discrete Fourier transform across every axis.</p>
+
+</section>
+
+		<section id="fftn_f32" class="doc-node">
+			<div class="title"><h2>fn fftn_f32 <a href="#fftn_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L325"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">fftn_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span></code></pre>
+<p>fftn_f32 transforms every axis of a complex f32 tensor.</p>
+
+</section>
+
+		<section id="fftn_norm" class="doc-node">
+			<div class="title"><h2>fn fftn_norm <a href="#fftn_norm">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L41"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">fftn_norm</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>fftn_norm transforms every complex tensor axis with an explicit normalization mode.</p>
+
+</section>
+
+		<section id="fftn_norm_f32" class="doc-node">
+			<div class="title"><h2>fn fftn_norm_f32 <a href="#fftn_norm_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L91"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">fftn_norm_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span></code></pre>
+<p>fftn_norm_f32 transforms all complex f32 axes with explicit normalization.</p>
+
+</section>
+
+		<section id="fftshift" class="doc-node">
+			<div class="title"><h2>fn fftshift <a href="#fftshift">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L54"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> fftshift<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>fftshift moves the zero-frequency component to the center of every axis.</p>
+
+</section>
+
+		<section id="fftshift_axis" class="doc-node">
+			<div class="title"><h2>fn fftshift_axis <a href="#fftshift_axis">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L73"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> fftshift_axis<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> axis <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>fftshift_axis shifts one axis so its zero-frequency component is centered.</p>
+
+</section>
+
+		<section id="ifft" class="doc-node">
+			<div class="title"><h2>fn ifft <a href="#ifft">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L261"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">ifft</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>ifft computes the normalized one-dimensional inverse transform of complex f64 values.</p>
+
+</section>
+
+		<section id="ifft2" class="doc-node">
+			<div class="title"><h2>fn ifft2 <a href="#ifft2">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L297"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">ifft2</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>ifft2 computes the normalized two-dimensional complex inverse transform.</p>
+
+</section>
+
+		<section id="ifft2_f32" class="doc-node">
+			<div class="title"><h2>fn ifft2_f32 <a href="#ifft2_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L343"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">ifft2_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span></code></pre>
+<p>ifft2_f32 computes a normalized two-dimensional complex f32 inverse DFT.</p>
+
+</section>
+
+		<section id="ifft2_norm" class="doc-node">
+			<div class="title"><h2>fn ifft2_norm <a href="#ifft2_norm">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L59"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">ifft2_norm</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>ifft2_norm computes a two-dimensional complex inverse FFT with explicit normalization.</p>
+
+</section>
+
+		<section id="ifft2_norm_f32" class="doc-node">
+			<div class="title"><h2>fn ifft2_norm_f32 <a href="#ifft2_norm_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L109"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">ifft2_norm_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span></code></pre>
+<p>ifft2_norm_f32 computes a 2-D complex f32 inverse FFT with explicit normalization.</p>
+
+</section>
+
+		<section id="ifft_axis" class="doc-node">
+			<div class="title"><h2>fn ifft_axis <a href="#ifft_axis">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L273"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">ifft_axis</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">,</span> axis <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>ifft_axis computes a normalized inverse complex transform along one axis.</p>
+
+</section>
+
+		<section id="ifft_axis_f32" class="doc-node">
+			<div class="title"><h2>fn ifft_axis_f32 <a href="#ifft_axis_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L320"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">ifft_axis_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span><span class="token punctuation">,</span> axis <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span></code></pre>
+<p>ifft_axis_f32 computes a normalized inverse complex f32 transform on one axis.</p>
+
+</section>
+
+		<section id="ifft_axis_norm" class="doc-node">
+			<div class="title"><h2>fn ifft_axis_norm <a href="#ifft_axis_norm">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L34"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">ifft_axis_norm</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">,</span> axis <span class="token builtin">int</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>ifft_axis_norm applies an explicit normalization mode to one complex inverse FFT axis.</p>
+
+</section>
+
+		<section id="ifft_axis_norm_f32" class="doc-node">
+			<div class="title"><h2>fn ifft_axis_norm_f32 <a href="#ifft_axis_norm_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L84"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">ifft_axis_norm_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span><span class="token punctuation">,</span> axis <span class="token builtin">int</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span></code></pre>
+<p>ifft_axis_norm_f32 applies explicit inverse normalization on one complex f32 axis.</p>
+
+</section>
+
+		<section id="ifft_f32" class="doc-node">
+			<div class="title"><h2>fn ifft_f32 <a href="#ifft_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L310"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">ifft_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span></code></pre>
+<p>ifft_f32 computes a normalized one-dimensional inverse complex f32 transform.</p>
+
+</section>
+
+		<section id="ifft_norm" class="doc-node">
+			<div class="title"><h2>fn ifft_norm <a href="#ifft_norm">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L21"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">ifft_norm</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>ifft_norm computes a one-dimensional complex inverse FFT with an explicit normalization mode.</p>
+
+</section>
+
+		<section id="ifft_norm_f32" class="doc-node">
+			<div class="title"><h2>fn ifft_norm_f32 <a href="#ifft_norm_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L71"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">ifft_norm_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span></code></pre>
+<p>ifft_norm_f32 computes a normalized one-dimensional inverse complex f32 FFT.</p>
+
+</section>
+
+		<section id="ifftn" class="doc-node">
+			<div class="title"><h2>fn ifftn <a href="#ifftn">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L284"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">ifftn</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>ifftn computes the normalized complex inverse transform across every axis.</p>
+
+</section>
+
+		<section id="ifftn_f32" class="doc-node">
+			<div class="title"><h2>fn ifftn_f32 <a href="#ifftn_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L330"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">ifftn_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span></code></pre>
+<p>ifftn_f32 computes a normalized inverse complex f32 transform over every axis.</p>
+
+</section>
+
+		<section id="ifftn_norm" class="doc-node">
+			<div class="title"><h2>fn ifftn_norm <a href="#ifftn_norm">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L47"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">ifftn_norm</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>ifftn_norm inversely transforms every complex tensor axis with an explicit normalization mode.</p>
+
+</section>
+
+		<section id="ifftn_norm_f32" class="doc-node">
+			<div class="title"><h2>fn ifftn_norm_f32 <a href="#ifftn_norm_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L97"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">ifftn_norm_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span></code></pre>
+<p>ifftn_norm_f32 applies explicit inverse normalization across all complex f32 axes.</p>
+
+</section>
+
+		<section id="ifftshift" class="doc-node">
+			<div class="title"><h2>fn ifftshift <a href="#ifftshift">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L64"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> ifftshift<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>ifftshift moves the zero-frequency component back to the start of every axis. It is the inverse of fftshift for odd and even dimensions.</p>
+
+</section>
+
+		<section id="ifftshift_axis" class="doc-node">
+			<div class="title"><h2>fn ifftshift_axis <a href="#ifftshift_axis">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L79"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> ifftshift_axis<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> axis <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>ifftshift_axis reverses fftshift_axis for one axis.</p>
+
+</section>
+
+		<section id="irfft" class="doc-node">
+			<div class="title"><h2>fn irfft <a href="#irfft">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L479"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">irfft</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">,</span> length <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
+<p>irfft reconstructs a real signal of <code>length</code> samples from its non-negative frequency components. The inverse transform is normalized by <code>length</code>.</p>
+
+</section>
+
+		<section id="irfft2" class="doc-node">
+			<div class="title"><h2>fn irfft2 <a href="#irfft2">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L470"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">irfft2</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">,</span> shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
+<p>irfft2 reconstructs a two-dimensional real tensor from rfft2 output.</p>
+
+</section>
+
+		<section id="irfft2_f32" class="doc-node">
+			<div class="title"><h2>fn irfft2_f32 <a href="#irfft2_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/real_f32.v#L229"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">irfft2_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span><span class="token punctuation">,</span> shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span></code></pre>
+<p>irfft2_f32 reconstructs a two-dimensional f32 tensor from compact bins.</p>
+
+</section>
+
+		<section id="irfft2_norm" class="doc-node">
+			<div class="title"><h2>fn irfft2_norm <a href="#irfft2_norm">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L158"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">irfft2_norm</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">,</span> shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
+<p>irfft2_norm reconstructs a two-dimensional real tensor with explicit normalization.</p>
+
+</section>
+
+		<section id="irfft2_norm_f32" class="doc-node">
+			<div class="title"><h2>fn irfft2_norm_f32 <a href="#irfft2_norm_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L207"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">irfft2_norm_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span><span class="token punctuation">,</span> shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span></code></pre>
+<p>irfft2_norm_f32 reconstructs a real f32 tensor with explicit 2-D normalization.</p>
+
+</section>
+
+		<section id="irfft_axis" class="doc-node">
+			<div class="title"><h2>fn irfft_axis <a href="#irfft_axis">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L515"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">irfft_axis</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">,</span> axis <span class="token builtin">int</span><span class="token punctuation">,</span> length <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
+<p>irfft_axis reconstructs a real tensor from compact frequencies along one axis. <code>length</code> is the original real axis length, including for odd lengths.</p>
+
+</section>
+
+		<section id="irfft_axis_f32" class="doc-node">
+			<div class="title"><h2>fn irfft_axis_f32 <a href="#irfft_axis_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/real_f32.v#L151"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">irfft_axis_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span><span class="token punctuation">,</span> axis <span class="token builtin">int</span><span class="token punctuation">,</span> length <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span></code></pre>
+<p>irfft_axis_f32 reconstructs one real f32 tensor axis from compact bins.</p>
+
+</section>
+
+		<section id="irfft_axis_norm" class="doc-node">
+			<div class="title"><h2>fn irfft_axis_norm <a href="#irfft_axis_norm">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L134"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">irfft_axis_norm</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">,</span> axis <span class="token builtin">int</span><span class="token punctuation">,</span> length <span class="token builtin">int</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
+<p>irfft_axis_norm reconstructs one real tensor axis with explicit normalization.</p>
+
+</section>
+
+		<section id="irfft_axis_norm_f32" class="doc-node">
+			<div class="title"><h2>fn irfft_axis_norm_f32 <a href="#irfft_axis_norm_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L183"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">irfft_axis_norm_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span><span class="token punctuation">,</span> axis <span class="token builtin">int</span><span class="token punctuation">,</span> length <span class="token builtin">int</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span></code></pre>
+<p>irfft_axis_norm_f32 applies inverse normalization when reconstructing one f32 axis.</p>
+
+</section>
+
+		<section id="irfft_f32" class="doc-node">
+			<div class="title"><h2>fn irfft_f32 <a href="#irfft_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/real_f32.v#L127"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">irfft_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span><span class="token punctuation">,</span> length <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span></code></pre>
+<p>irfft_f32 reconstructs a real f32 vector from compact f32 complex bins.</p>
+
+</section>
+
+		<section id="irfft_norm" class="doc-node">
+			<div class="title"><h2>fn irfft_norm <a href="#irfft_norm">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L121"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">irfft_norm</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">,</span> length <span class="token builtin">int</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
+<p>irfft_norm reconstructs a real signal with an explicit inverse normalization mode.</p>
+
+</section>
+
+		<section id="irfft_norm_f32" class="doc-node">
+			<div class="title"><h2>fn irfft_norm_f32 <a href="#irfft_norm_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L170"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">irfft_norm_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span><span class="token punctuation">,</span> length <span class="token builtin">int</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span></code></pre>
+<p>irfft_norm_f32 reconstructs a real f32 signal with explicit inverse normalization.</p>
+
+</section>
+
+		<section id="irfftn" class="doc-node">
+			<div class="title"><h2>fn irfftn <a href="#irfftn">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L412"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">irfftn</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">,</span> shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
+<p>irfftn reconstructs a real tensor from a compact multidimensional spectrum. The original shape is required to disambiguate odd and even final axes.</p>
+
+</section>
+
+		<section id="irfftn_f32" class="doc-node">
+			<div class="title"><h2>fn irfftn_f32 <a href="#irfftn_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/real_f32.v#L183"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">irfftn_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span><span class="token punctuation">,</span> shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span></code></pre>
+<p>irfftn_f32 reconstructs a real f32 tensor from its compact N-D spectrum.</p>
+
+</section>
+
+		<section id="irfftn_norm" class="doc-node">
+			<div class="title"><h2>fn irfftn_norm <a href="#irfftn_norm">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L146"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">irfftn_norm</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">,</span> shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
+<p>irfftn_norm reconstructs a real tensor with explicit N-dimensional normalization.</p>
+
+</section>
+
+		<section id="irfftn_norm_f32" class="doc-node">
+			<div class="title"><h2>fn irfftn_norm_f32 <a href="#irfftn_norm_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L195"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">irfftn_norm_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span><span class="token punctuation">,</span> shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span></code></pre>
+<p>irfftn_norm_f32 reconstructs a real f32 tensor with explicit N-D normalization.</p>
+
+</section>
+
+		<section id="rfft" class="doc-node">
+			<div class="title"><h2>fn rfft <a href="#rfft">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L181"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> rfft<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>rfft computes the one-dimensional real-input discrete Fourier transform. It returns the non-negative frequencies as complex f64 values, matching the compact layout used by NumPy's rfft. Input tensors may contain f32 or f64.</p>
+
+</section>
+
+		<section id="rfft2" class="doc-node">
+			<div class="title"><h2>fn rfft2 <a href="#rfft2">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L403"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> rfft2<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>rfft2 computes a real-input two-dimensional Fourier transform.</p>
+
+</section>
+
+		<section id="rfft2_f32" class="doc-node">
+			<div class="title"><h2>fn rfft2_f32 <a href="#rfft2_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/real_f32.v#L119"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">rfft2_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span></code></pre>
+<p>rfft2_f32 computes a compact real f32 FFT for a two-dimensional tensor.</p>
+
+</section>
+
+		<section id="rfft2_norm" class="doc-node">
+			<div class="title"><h2>fn rfft2_norm <a href="#rfft2_norm">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L152"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> rfft2_norm<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>rfft2_norm computes a compact two-dimensional real FFT with explicit normalization.</p>
+
+</section>
+
+		<section id="rfft2_norm_f32" class="doc-node">
+			<div class="title"><h2>fn rfft2_norm_f32 <a href="#rfft2_norm_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L201"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">rfft2_norm_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span></code></pre>
+<p>rfft2_norm_f32 computes a normalized two-dimensional real f32 transform.</p>
+
+</section>
+
+		<section id="rfft_axis" class="doc-node">
+			<div class="title"><h2>fn rfft_axis <a href="#rfft_axis">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L207"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> rfft_axis<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> axis <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>rfft_axis computes a compact real-input Fourier transform along one axis. The selected dimension becomes floor(n/2)+1; other axes are unchanged.</p>
+
+</section>
+
+		<section id="rfft_axis_f32" class="doc-node">
+			<div class="title"><h2>fn rfft_axis_f32 <a href="#rfft_axis_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/real_f32.v#L74"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">rfft_axis_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">,</span> axis <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span></code></pre>
+<p>rfft_axis_f32 computes a compact real f32 FFT along one selected axis.</p>
+
+</section>
+
+		<section id="rfft_axis_norm" class="doc-node">
+			<div class="title"><h2>fn rfft_axis_norm <a href="#rfft_axis_norm">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L127"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> rfft_axis_norm<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> axis <span class="token builtin">int</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>rfft_axis_norm computes a selected-axis real FFT with explicit normalization.</p>
+
+</section>
+
+		<section id="rfft_axis_norm_f32" class="doc-node">
+			<div class="title"><h2>fn rfft_axis_norm_f32 <a href="#rfft_axis_norm_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L176"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">rfft_axis_norm_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">,</span> axis <span class="token builtin">int</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span></code></pre>
+<p>rfft_axis_norm_f32 computes a selected-axis real f32 FFT with normalization.</p>
+
+</section>
+
+		<section id="rfft_f32" class="doc-node">
+			<div class="title"><h2>fn rfft_f32 <a href="#rfft_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/real_f32.v#L57"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">rfft_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span></code></pre>
+<p>rfft_f32 computes a one-dimensional real f32 transform and returns compact f32 complex bins without promoting the spectrum to f64.</p>
+
+</section>
+
+		<section id="rfft_norm" class="doc-node">
+			<div class="title"><h2>fn rfft_norm <a href="#rfft_norm">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L115"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> rfft_norm<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>rfft_norm computes a one-dimensional real FFT with an explicit normalization mode.</p>
+
+</section>
+
+		<section id="rfft_norm_f32" class="doc-node">
+			<div class="title"><h2>fn rfft_norm_f32 <a href="#rfft_norm_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L164"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">rfft_norm_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span></code></pre>
+<p>rfft_norm_f32 computes a one-dimensional real f32 transform with normalization.</p>
+
+</section>
+
+		<section id="rfftfreq" class="doc-node">
+			<div class="title"><h2>fn rfftfreq <a href="#rfftfreq">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L34"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">rfftfreq</span><span class="token punctuation">(</span>n <span class="token builtin">int</span><span class="token punctuation">,</span> d <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
+<p>rfftfreq returns the non-negative discrete Fourier Transform sample frequencies for a real-input transform of length n and sample spacing d.</p>
+
+</section>
+
+		<section id="rfftn" class="doc-node">
+			<div class="title"><h2>fn rfftn <a href="#rfftn">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L352"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> rfftn<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>rfftn computes a real-input Fourier transform across every tensor axis. The final axis is stored compactly, with length floor(n/2)+1.</p>
+
+</section>
+
+		<section id="rfftn_f32" class="doc-node">
+			<div class="title"><h2>fn rfftn_f32 <a href="#rfftn_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/real_f32.v#L106"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">rfftn_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span></code></pre>
+<p>rfftn_f32 computes a compact real f32 FFT over all tensor axes.</p>
+
+</section>
+
+		<section id="rfftn_norm" class="doc-node">
+			<div class="title"><h2>fn rfftn_norm <a href="#rfftn_norm">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L140"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> rfftn_norm<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>rfftn_norm computes a compact real FFT over all input axes with explicit normalization.</p>
+
+</section>
+
+		<section id="rfftn_norm_f32" class="doc-node">
+			<div class="title"><h2>fn rfftn_norm_f32 <a href="#rfftn_norm_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L189"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">rfftn_norm_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">,</span> norm FftNorm<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span></code></pre>
+<p>rfftn_norm_f32 computes a normalized real f32 transform over all axes.</p>
+
+</section>
+
+		<section id="RealFftPlan[T].forward" class="doc-node">
+			<div class="title"><h2>fn (RealFftPlan[T]) forward <a href="#RealFftPlan[T].forward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L154"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> plan RealFftPlan<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">forward</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>complex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>forward computes a compact real FFT using the plan. The input length must match the plan length; a new output tensor is allocated for each call. The plan reuses an internal mutable work buffer, so calls on one plan must not run concurrently.</p>
+
+</section>
+
+		<section id="RealFftPlan[T].destroy" class="doc-node">
+			<div class="title"><h2>fn (RealFftPlan[T]) destroy <a href="#RealFftPlan[T].destroy">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L171"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> plan RealFftPlan<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">destroy</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<p>destroy releases the native PocketFFT plan. Repeated calls are safe.</p>
+
+</section>
+
+		<section id="FftNorm" class="doc-node">
+			<div class="title"><h2>enum FftNorm <a href="#FftNorm">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/norm.v#L8"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">enum</span> FftNorm <span class="token punctuation">{</span>
+	backward
+	forward
+	ortho
+<span class="token punctuation">}</span></code></pre>
+<p>FftNorm selects the forward/inverse scaling convention used by NumPy.</p>
+
+</section>
+
+		<section id="Complex32" class="doc-node">
+			<div class="title"><h2>struct Complex32 <a href="#Complex32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L10"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> Complex32 <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	re <span class="token builtin">f32</span>
+	im <span class="token builtin">f32</span>
+<span class="token punctuation">}</span></code></pre>
+<p>Complex32 stores a single-precision complex value for FFT operations.</p>
+
+</section>
+
+		<section id="RealFftPlan" class="doc-node">
+			<div class="title"><h2>struct RealFftPlan <a href="#RealFftPlan">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/fft.v#L112"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> RealFftPlan<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	length <span class="token builtin">int</span>
+<span class="token keyword">mut</span><span class="token punctuation">:</span>
+	plan        vsl_fft<span class="token punctuation">.</span>Fftplan
+	destroyed   <span class="token builtin">bool</span>
+	scratch_f32 <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f32</span>
+	scratch_f64 <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span>
+<span class="token punctuation">}</span></code></pre>
+<p>RealFftPlan stores a reusable PocketFFT plan for one real input length. Call destroy when finished to release the native backend plan.</p>
+
+</section>
+
+		<section id="RealFftPlanF32" class="doc-node">
+			<div class="title"><h2>struct RealFftPlanF32 <a href="#RealFftPlanF32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/real_f32.v#L7"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> RealFftPlanF32 <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	length <span class="token builtin">int</span>
+<span class="token keyword">mut</span><span class="token punctuation">:</span>
+	plan      vsl_fft<span class="token punctuation">.</span>Fftplan
+	destroyed <span class="token builtin">bool</span>
+	scratch   <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f32</span>
+<span class="token punctuation">}</span></code></pre>
+<p>RealFftPlanF32 stores a reusable native plan for one real f32 vector length.</p>
+
+</section>
+
+		<section id="RealFftPlanF32.forward" class="doc-node">
+			<div class="title"><h2>fn (RealFftPlanF32) forward <a href="#RealFftPlanF32.forward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/real_f32.v#L33"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> plan RealFftPlanF32<span class="token punctuation">)</span> <span class="token function">forward</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>Complex32<span class="token punctuation">]</span></code></pre>
+<p>forward computes a compact real f32 FFT, reusing the native plan and scratch. Calls on one plan are mutable and must not run concurrently.</p>
+
+</section>
+
+		<section id="RealFftPlanF32.destroy" class="doc-node">
+			<div class="title"><h2>fn (RealFftPlanF32) destroy <a href="#RealFftPlanF32.destroy">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/fft/real_f32.v#L48"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> plan RealFftPlanF32<span class="token punctuation">)</span> <span class="token function">destroy</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<p>destroy releases the native plan. Repeated calls are safe.</p>
+
+</section>
+
+
+						<div class="footer">Powered by vdoc. Generated on: 8 Oct 2026 15:02:27</div>
+					</div>
+					<div class="doc-toc"><ul><li class="open"><a href="#create_rfft_f32_plan">fn create_rfft_f32_plan</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#create_rfft_plan">fn create_rfft_plan</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#fft">fn fft</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#fft2">fn fft2</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#fft2_f32">fn fft2_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#fft2_norm">fn fft2_norm</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#fft2_norm_f32">fn fft2_norm_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#fft_axis">fn fft_axis</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#fft_axis_f32">fn fft_axis_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#fft_axis_norm">fn fft_axis_norm</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#fft_axis_norm_f32">fn fft_axis_norm_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#fft_f32">fn fft_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#fft_norm">fn fft_norm</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#fft_norm_f32">fn fft_norm_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#fftfreq">fn fftfreq</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#fftn">fn fftn</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#fftn_f32">fn fftn_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#fftn_norm">fn fftn_norm</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#fftn_norm_f32">fn fftn_norm_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#fftshift">fn fftshift</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#fftshift_axis">fn fftshift_axis</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ifft">fn ifft</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ifft2">fn ifft2</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ifft2_f32">fn ifft2_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ifft2_norm">fn ifft2_norm</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ifft2_norm_f32">fn ifft2_norm_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ifft_axis">fn ifft_axis</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ifft_axis_f32">fn ifft_axis_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ifft_axis_norm">fn ifft_axis_norm</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ifft_axis_norm_f32">fn ifft_axis_norm_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ifft_f32">fn ifft_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ifft_norm">fn ifft_norm</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ifft_norm_f32">fn ifft_norm_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ifftn">fn ifftn</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ifftn_f32">fn ifftn_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ifftn_norm">fn ifftn_norm</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ifftn_norm_f32">fn ifftn_norm_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ifftshift">fn ifftshift</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ifftshift_axis">fn ifftshift_axis</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#irfft">fn irfft</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#irfft2">fn irfft2</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#irfft2_f32">fn irfft2_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#irfft2_norm">fn irfft2_norm</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#irfft2_norm_f32">fn irfft2_norm_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#irfft_axis">fn irfft_axis</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#irfft_axis_f32">fn irfft_axis_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#irfft_axis_norm">fn irfft_axis_norm</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#irfft_axis_norm_f32">fn irfft_axis_norm_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#irfft_f32">fn irfft_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#irfft_norm">fn irfft_norm</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#irfft_norm_f32">fn irfft_norm_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#irfftn">fn irfftn</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#irfftn_f32">fn irfftn_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#irfftn_norm">fn irfftn_norm</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#irfftn_norm_f32">fn irfftn_norm_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#rfft">fn rfft</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#rfft2">fn rfft2</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#rfft2_f32">fn rfft2_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#rfft2_norm">fn rfft2_norm</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#rfft2_norm_f32">fn rfft2_norm_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#rfft_axis">fn rfft_axis</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#rfft_axis_f32">fn rfft_axis_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#rfft_axis_norm">fn rfft_axis_norm</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#rfft_axis_norm_f32">fn rfft_axis_norm_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#rfft_f32">fn rfft_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#rfft_norm">fn rfft_norm</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#rfft_norm_f32">fn rfft_norm_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#rfftfreq">fn rfftfreq</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#rfftn">fn rfftn</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#rfftn_f32">fn rfftn_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#rfftn_norm">fn rfftn_norm</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#rfftn_norm_f32">fn rfftn_norm_f32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#RealFftPlan[T].forward">type RealFftPlan[T]</a>        <ul>
+<li><a href="#RealFftPlan[T].forward">fn forward</a></li>
+<li><a href="#RealFftPlan[T].destroy">fn destroy</a></li>
+</ul>
+</li>
+<li class="open"><a href="#FftNorm">enum FftNorm</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#Complex32">struct Complex32</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#RealFftPlan">struct RealFftPlan</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#RealFftPlanF32">struct RealFftPlanF32</a>        <ul>
+<li><a href="#RealFftPlanF32.forward">fn forward</a></li>
+<li><a href="#RealFftPlanF32.destroy">fn destroy</a></li>
+</ul>
+</li>
+</ul></div>
+				</div>
+			</div>
+		</div>
+		<script src="doc.js"></script>
+		<script async src="search_index.js"></script>
+	</body>
+</html>

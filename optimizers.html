@@ -1,0 +1,1121 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="x-ua-compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>optimizers | vdoc</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link
+			href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+		<link rel="manifest" href="site.webmanifest" />
+		<link rel="mask-icon" href="safari-pinned-tab.svg" color="#5bbad5" />
+		<meta name="msapplication-TileColor" content="#da532c" />
+		<meta name="theme-color" content="#ffffff" />
+		<link rel="stylesheet" href="doc.css" />
+		<link rel="stylesheet" href="normalize.css" />
+		<script src="dark-mode.js"></script>
+	</head>
+
+	<body>
+		<div><a id="skip-to-content-link" href="#main-content">Skip to content</a></div>
+		<div id="page">
+			<header class="doc-nav hidden">
+				<div class="heading-container">
+					<div class="heading">
+						<div class="info">
+							<div class="module">vtl</div>
+							<div class="toggle-version-container">
+								<span>0.2.0-beta.1 </span>
+								<div
+									id="dark-mode-toggle"
+									role="switch"
+									aria-checked="false"
+									aria-label="Toggle dark mode"
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" class="light-icon" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" class="dark-icon" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><g><rect fill="none" height="24" width="24"/></g><g><g><g><path d="M11.1,12.08C8.77,7.57,10.6,3.6,11.63,2.01C6.27,2.2,1.98,6.59,1.98,12c0,0.14,0.02,0.28,0.02,0.42 C2.62,12.15,3.29,12,4,12c1.66,0,3.18,0.83,4.1,2.15C9.77,14.63,11,16.17,11,18c0,1.52-0.87,2.83-2.12,3.51 c0.98,0.32,2.03,0.5,3.11,0.5c3.5,0,6.58-1.8,8.37-4.52C18,17.72,13.38,16.52,11.1,12.08z"/></g><path d="M7,16l-0.18,0C6.4,14.84,5.3,14,4,14c-1.66,0-3,1.34-3,3s1.34,3,3,3c0.62,0,2.49,0,3,0c1.1,0,2-0.9,2-2 C9,16.9,8.1,16,7,16z"/></g></g></svg>
+
+								</div>
+							</div>
+							<svg xmlns="http://www.w3.org/2000/svg" id="toggle-menu" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+
+						</div>
+						<div id="search">
+							<input type="text" placeholder="Search... (beta)" autocomplete="off" />
+						</div>
+					</div>
+				</div>
+				<nav class="search hidden"></nav>
+				<nav class="content hidden">
+					<ul>
+						<li class="open">
+<div class="menu-row"><a href="./index.html">README</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./vtl.html">vtl</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./autograd.html">autograd</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./autograd_cuda.html">autograd_cuda</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./main.html">main</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./util.html">util</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./csv.html">csv</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./datasets.html">datasets</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./fft.html">fft</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./la.html">la</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./metrics.html">metrics</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./data.html">data</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./activation.html">activation</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./layers.html">layers</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./loss.html">loss</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./internal.html">internal</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./models.html">models</a></div>
+</li>
+<li class="open active">
+<div class="menu-row"><a href="./optimizers.html">optimizers</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./types.html">types</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./npy.html">npy</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./npz.html">npz</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./stats.html">stats</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./storage.html">storage</a></div>
+</li>
+
+					</ul>
+				</nav>
+			</header>
+			<div class="doc-scrollview" tabindex="-1" id="main-content">
+				<div class="doc-container">
+					<div class="doc-content">
+								<section id="readme_optimizers" class="doc-node">
+			<div class="title"><h1> optimizers <a href="#readme_optimizers">#</a></h1></div>
+<h1 id="neural-network-optimizers">Neural network optimizers</h1>
+<p>VTL optimizers update <code>autograd.Variable[T]</code> parameters after a loss has been backpropagated. Construct an optimizer, register the model layers once with <code>build_params</code>, then call <code>update()</code> after each <code>backprop()</code>.</p>
+<pre><code class="language-v"><span class="token keyword">mut</span> optimizer <span class="token operator">:=</span> optimizers<span class="token punctuation">.</span>radam_optimizer<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">(</span>learning_rate<span class="token punctuation">:</span> <span class="token number">0.001</span><span class="token punctuation">)</span>
+optimizer<span class="token punctuation">.</span><span class="token function">build_params</span><span class="token punctuation">(</span>model<span class="token punctuation">.</span>info<span class="token punctuation">.</span>layers<span class="token punctuation">)</span>
+loss<span class="token punctuation">.</span><span class="token function">backprop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">!</span>
+optimizer<span class="token punctuation">.</span><span class="token function">update</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">!</span></code></pre>
+<p>See the <a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_OPTIMIZERS.md">optimizer tutorial</a> for end-to-end training examples and <a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_NEURAL_NETWORKS.md">neural network tutorial</a> for <code>Sequential</code> models.</p>
+<h2 id="optimizers">Optimizers</h2>
+<table>
+<thead>
+<tr>
+<th>Constructor</th>
+<th>Defaults</th>
+<th>Notes</th></tr></thead>
+<tbody>
+<tr>
+<td><code>sgd[T](learning_rate: 0.01)</code></td>
+<td>Learning rate 0.01</td>
+<td>Stochastic gradient descent</td></tr>
+<tr>
+<td><code>adagrad[T](...)</code></td>
+<td>Learning rate 0.01</td>
+<td>Accumulates squared gradients</td></tr>
+<tr>
+<td><code>rmsprop[T](...)</code></td>
+<td>Learning rate 0.001</td>
+<td>Exponential squared-gradient average</td></tr>
+<tr>
+<td><code>adam_optimizer[T](...)</code></td>
+<td>LR 0.001, β₁ 0.9, β₂ 0.999</td>
+<td>Adam with bias correction; existing CUDA/Vulkan acceleration</td></tr>
+<tr>
+<td><code>adamw[T](...)</code></td>
+<td>LR 0.001, decay 0.01</td>
+<td>Adam with decoupled weight decay</td></tr>
+<tr>
+<td><code>nadam_optimizer[T](...)</code></td>
+<td>LR 0.002, β₁ 0.9, β₂ 0.999, momentum decay 0.004</td>
+<td>Dozat momentum schedule; f32/f64 CPU paths</td></tr>
+<tr>
+<td><code>radam_optimizer[T](...)</code></td>
+<td>LR 0.001, β₁ 0.9, β₂ 0.999</td>
+<td>Rectified Adam variance estimate; f32 and f64 CPU paths</td></tr></tbody></table>
+<p>NAdam and RAdam configuration structs accept <code>weight_decay</code> (default <code>0</code>). Set <code>decoupled_weight_decay: true</code> to apply decay directly to parameter values, without adding it to the gradient or moment estimates. NAdam additionally accepts <code>momentum_decay</code> (default <code>0.004</code>).</p>
+<h2 id="nadam">NAdam</h2>
+<p>NAdam incorporates Nesterov momentum into Adam. It uses the scheduled momentum coefficient <code>μ_t = β₁(1 - 0.5 × 0.96^(t × momentum_decay))</code> and the corresponding bias-corrected look-ahead estimate. Its defaults follow PyTorch's NAdam API.</p>
+<pre><code class="language-v"><span class="token keyword">mut</span> optimizer <span class="token operator">:=</span> optimizers<span class="token punctuation">.</span>nadam_optimizer<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span>
+    learning_rate<span class="token punctuation">:</span> <span class="token number">0.002</span>
+    momentum_decay<span class="token punctuation">:</span> <span class="token number">0.004</span>
+<span class="token punctuation">)</span></code></pre>
+<h2 id="radam">RAdam</h2>
+<p>RAdam rectifies the adaptive variance once its running estimate is reliable. It uses the unrectified bias-corrected momentum during early steps and the rectification factor after <code>rho_t &gt; 5</code>, matching PyTorch's threshold and epsilon placement.</p>
+<pre><code class="language-v"><span class="token keyword">mut</span> optimizer <span class="token operator">:=</span> optimizers<span class="token punctuation">.</span>radam_optimizer<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span>
+    learning_rate<span class="token punctuation">:</span> <span class="token number">0.001</span>
+    weight_decay<span class="token punctuation">:</span> <span class="token number">0.01</span>
+    decoupled_weight_decay<span class="token punctuation">:</span> <span class="token boolean">true</span>
+<span class="token punctuation">)</span></code></pre>
+<h2 id="validation">Validation</h2>
+<p>Run commands from the V module workspace, outside this repository:</p>
+<pre><code class="language-sh">cd <span class="token operator">~</span><span class="token operator">/</span><span class="token punctuation">.</span>vmodules
+systemd<span class="token operator">-</span>run <span class="token operator">--</span>user <span class="token operator">--</span>scope <span class="token operator">--</span>quiet <span class="token operator">--</span>property<span class="token operator">=</span>MemoryMax<span class="token operator">=</span><span class="token number">768M</span> <span class="token operator">--</span>property<span class="token operator">=</span>MemorySwapMax<span class="token operator">=</span><span class="token number">0</span> <span class="token operator">--</span>setenv<span class="token operator">=</span>VJOBS<span class="token operator">=</span><span class="token number">2</span> <span class="token operator">--</span> v test <span class="token punctuation">.</span><span class="token operator">/</span>vtl<span class="token operator">/</span>nn<span class="token operator">/</span>optimizers
+systemd<span class="token operator">-</span>run <span class="token operator">--</span>user <span class="token operator">--</span>scope <span class="token operator">--</span>quiet <span class="token operator">--</span>property<span class="token operator">=</span>MemoryMax<span class="token operator">=</span><span class="token number">768M</span> <span class="token operator">--</span>property<span class="token operator">=</span>MemorySwapMax<span class="token operator">=</span><span class="token number">0</span> <span class="token operator">--</span>setenv<span class="token operator">=</span>VJOBS<span class="token operator">=</span><span class="token number">2</span> <span class="token operator">--</span> v <span class="token operator">-</span>prod test <span class="token punctuation">.</span><span class="token operator">/</span>vtl<span class="token operator">/</span>nn<span class="token operator">/</span>optimizers</code></pre>
+<p>In constrained environments, run each command under a systemd scope with an appropriate <code>MemoryMax</code>.</p>
+
+</section>
+
+		<section id="adagrad" class="doc-node">
+			<div class="title"><h2>fn adagrad <a href="#adagrad">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adagrad.v#L31"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> adagrad<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>config AdaGradOptimizerConfig<span class="token punctuation">)</span> <span class="token operator">&amp;</span>AdaGradOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>adagrad creates a new AdaGradOptimizer.</p>
+
+</section>
+
+		<section id="adam_optimizer" class="doc-node">
+			<div class="title"><h2>fn adam_optimizer <a href="#adam_optimizer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adam.v#L62"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> adam_optimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>config AdamOptimizerConfig<span class="token punctuation">)</span> <span class="token operator">&amp;</span>AdamOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>adam_optimizer creates a new AdamOptimizer with the given configuration.</p>
+
+<section class="doc-node examples"><h4>Example</h4>
+<pre>
+<code class="language-v"><span class="token keyword">import</span> vtl<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>optimizers
+opt <span class="token operator">:=</span> optimizers<span class="token punctuation">.</span>adam_optimizer<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span>learning_rate<span class="token punctuation">:</span> <span class="token number">0.001</span><span class="token punctuation">)</span>
+opt<span class="token punctuation">.</span><span class="token function">build_params</span><span class="token punctuation">(</span>model<span class="token punctuation">.</span><span class="token function">layers</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token comment">// inside training loop:</span>
+opt<span class="token punctuation">.</span><span class="token function">update</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">!</span></code></pre>
+</section>
+</section>
+
+		<section id="adam_step_f32_cpu" class="doc-node">
+			<div class="title"><h2>fn adam_step_f32_cpu <a href="#adam_step_f32_cpu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adam_step_f32.v#L6"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">adam_step_f32_cpu</span><span class="token punctuation">(</span>grad <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f32</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> theta <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f32</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> m <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f32</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> v <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f32</span><span class="token punctuation">,</span> p AdamStepParams<span class="token punctuation">)</span></code></pre>
+<p>adam_step_f32_cpu performs one Adam update on flat f32 buffers (same math as napply path).</p>
+
+</section>
+
+		<section id="adam_step_f64" class="doc-node">
+			<div class="title"><h2>fn adam_step_f64 <a href="#adam_step_f64">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adam_step_cuda_notd_cuda.v#L4"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">adam_step_f64</span><span class="token punctuation">(</span>grad <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> theta <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> m <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> v <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> p AdamStepParams<span class="token punctuation">,</span>
+	session <span class="token builtin">voidptr</span><span class="token punctuation">,</span> slot <span class="token builtin">int</span><span class="token punctuation">)</span></code></pre>
+<p>adam_step_f64 without CUDA build delegates to CPU (opaque session avoids autograd_cuda import).</p>
+
+</section>
+
+		<section id="adam_step_f64_cpu" class="doc-node">
+			<div class="title"><h2>fn adam_step_f64_cpu <a href="#adam_step_f64_cpu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adam_step_f64.v#L15"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">adam_step_f64_cpu</span><span class="token punctuation">(</span>grad <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> theta <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> m <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> v <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> p AdamStepParams<span class="token punctuation">)</span></code></pre>
+<p>adam_step_f64_cpu performs one Adam update on flat CPU buffers.</p>
+
+</section>
+
+		<section id="adam_use_cuda_optimizer" class="doc-node">
+			<div class="title"><h2>fn adam_use_cuda_optimizer <a href="#adam_use_cuda_optimizer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adam_cuda_hooks_notd_cuda.v#L4"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">adam_use_cuda_optimizer</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">bool</span></code></pre>
+<p>adam_use_cuda_optimizer exposes this operation as part of the public API.</p>
+
+</section>
+
+		<section id="adam_use_vulkan_optimizer" class="doc-node">
+			<div class="title"><h2>fn adam_use_vulkan_optimizer <a href="#adam_use_vulkan_optimizer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adam_f32_vulkan_notd_vulkan.v#L7"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">adam_use_vulkan_optimizer</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">bool</span></code></pre>
+<p>adam_use_vulkan_optimizer exposes this operation as part of the public API.</p>
+
+</section>
+
+		<section id="adamw" class="doc-node">
+			<div class="title"><h2>fn adamw <a href="#adamw">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adamw.v#L54"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> adamw<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>config AdamWOptimizerConfig<span class="token punctuation">)</span> <span class="token operator">&amp;</span>AdamWOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>adamw creates a new AdamWOptimizer.</p>
+
+</section>
+
+		<section id="clip_grad_norm" class="doc-node">
+			<div class="title"><h2>fn clip_grad_norm <a href="#clip_grad_norm">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/gradient_clipping.v#L17"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> clip_grad_norm<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> parameters <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> max_norm <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token builtin">f64</span></code></pre>
+<p>clip_grad_norm scales trainable gradients in parameters in place when their global L2 norm exceeds max_norm. It returns the norm before clipping.</p>
+
+</section>
+
+		<section id="clip_grad_value" class="doc-node">
+			<div class="title"><h2>fn clip_grad_value <a href="#clip_grad_value">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/gradient_clipping.v#L70"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> clip_grad_value<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> parameters <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> max_value <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<p>clip_grad_value clamps every trainable gradient element to [-max_value, max_value].</p>
+
+</section>
+
+		<section id="cosine_annealing_lr" class="doc-node">
+			<div class="title"><h2>fn cosine_annealing_lr <a href="#cosine_annealing_lr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L59"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> cosine_annealing_lr<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>t_max <span class="token builtin">int</span><span class="token punctuation">,</span> lrd <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>CosineAnnealingLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>cosine_annealing_lr creates a CosineAnnealingLR scheduler: LR decays from <code>current_lr</code> to <code>lrd</code> following a cosine schedule over <code>t_max</code> steps.</p>
+
+</section>
+
+		<section id="exponential_lr" class="doc-node">
+			<div class="title"><h2>fn exponential_lr <a href="#exponential_lr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L39"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> exponential_lr<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>gamma <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>ExponentialLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>exponential_lr creates an ExponentialLR scheduler: LR decays by <code>gamma</code> at every step. new_lr = current_lr * gamma^step</p>
+
+</section>
+
+		<section id="nadam_optimizer" class="doc-node">
+			<div class="title"><h2>fn nadam_optimizer <a href="#nadam_optimizer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/nadam.v#L42"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> nadam_optimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>config NAdamOptimizerConfig<span class="token punctuation">)</span> <span class="token operator">&amp;</span>NAdamOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>nadam_optimizer creates a NAdam optimizer.</p>
+
+</section>
+
+		<section id="nadam_step_f32_cpu" class="doc-node">
+			<div class="title"><h2>fn nadam_step_f32_cpu <a href="#nadam_step_f32_cpu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/nadam_step_f32.v#L6"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">nadam_step_f32_cpu</span><span class="token punctuation">(</span>grad <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f32</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> theta <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f32</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> m <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f32</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> v <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f32</span><span class="token punctuation">,</span> p NAdamStepParams<span class="token punctuation">)</span></code></pre>
+<p>nadam_step_f32_cpu applies one Dozat NAdam update in f32.</p>
+
+</section>
+
+		<section id="nadam_step_f64_cpu" class="doc-node">
+			<div class="title"><h2>fn nadam_step_f64_cpu <a href="#nadam_step_f64_cpu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/nadam_step_f64.v#L25"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">nadam_step_f64_cpu</span><span class="token punctuation">(</span>grad <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> theta <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> m <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> v <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> p NAdamStepParams<span class="token punctuation">)</span></code></pre>
+<p>nadam_step_f64_cpu applies one Dozat NAdam update in f64.</p>
+
+</section>
+
+		<section id="radam_optimizer" class="doc-node">
+			<div class="title"><h2>fn radam_optimizer <a href="#radam_optimizer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/radam.v#L38"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> radam_optimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>config RAdamOptimizerConfig<span class="token punctuation">)</span> <span class="token operator">&amp;</span>RAdamOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>radam_optimizer creates a RAdam optimizer.</p>
+
+</section>
+
+		<section id="radam_step_f32_cpu" class="doc-node">
+			<div class="title"><h2>fn radam_step_f32_cpu <a href="#radam_step_f32_cpu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/radam_step_f32.v#L6"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">radam_step_f32_cpu</span><span class="token punctuation">(</span>grad <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f32</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> theta <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f32</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> m <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f32</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> v <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f32</span><span class="token punctuation">,</span> p RAdamStepParams<span class="token punctuation">)</span></code></pre>
+<p>radam_step_f32_cpu applies one Rectified Adam update in f32.</p>
+
+</section>
+
+		<section id="radam_step_f64_cpu" class="doc-node">
+			<div class="title"><h2>fn radam_step_f64_cpu <a href="#radam_step_f64_cpu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/radam_step_f64.v#L20"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">radam_step_f64_cpu</span><span class="token punctuation">(</span>grad <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> theta <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> m <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> v <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> p RAdamStepParams<span class="token punctuation">)</span></code></pre>
+<p>radam_step_f64_cpu applies one Rectified Adam update in f64.</p>
+
+</section>
+
+		<section id="reduce_lr_on_plateau" class="doc-node">
+			<div class="title"><h2>fn reduce_lr_on_plateau <a href="#reduce_lr_on_plateau">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L102"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> reduce_lr_on_plateau<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>config ReduceLROnPlateauConfig<span class="token punctuation">)</span> <span class="token operator">&amp;</span>ReduceLROnPlateau<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>reduce_lr_on_plateau creates a ReduceLROnPlateau scheduler. Reduces LR by <code>factor</code> when the monitored metric stops improving for <code>patience</code> steps. Pass <code>metric_delta</code> to <code>next_lr</code> each step: negative = improvement.</p>
+
+</section>
+
+		<section id="rmsprop" class="doc-node">
+			<div class="title"><h2>fn rmsprop <a href="#rmsprop">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/rmsprop.v#L50"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> rmsprop<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>config RMSPropOptimizerConfig<span class="token punctuation">)</span> <span class="token operator">&amp;</span>RMSPropOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>rmsprop creates a new RMSPropOptimizer.</p>
+
+</section>
+
+		<section id="sgd" class="doc-node">
+			<div class="title"><h2>fn sgd <a href="#sgd">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/sgd.v#L30"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> sgd<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>config SgdOptimizerConfig<span class="token punctuation">)</span> <span class="token operator">&amp;</span>SgdOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>sgd creates a new SgdOptimizer.</p>
+
+</section>
+
+		<section id="step_lr" class="doc-node">
+			<div class="title"><h2>fn step_lr <a href="#step_lr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L20"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> step_lr<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>step_size <span class="token builtin">int</span><span class="token punctuation">,</span> gamma <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>StepLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>step_lr creates a StepLR scheduler: LR decays by <code>gamma</code> every <code>step_size</code> steps. e.g. step_size=30, gamma=0.1 → LR is 10× smaller after each 30 steps.</p>
+
+</section>
+
+		<section id="try_adam_update_f32_vulkan" class="doc-node">
+			<div class="title"><h2>fn try_adam_update_f32_vulkan <a href="#try_adam_update_f32_vulkan">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adam_f32_vulkan_notd_vulkan.v#L12"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">try_adam_update_f32_vulkan</span><span class="token punctuation">(</span><span class="token keyword">mut</span> v autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> m_tensor vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+	<span class="token keyword">mut</span> v_tensor vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">,</span> step AdamStepParams<span class="token punctuation">)</span> <span class="token builtin">bool</span></code></pre>
+<p>try_adam_update_f32_vulkan exposes this operation as part of the public API.</p>
+
+</section>
+
+		<section id="Scheduler" class="doc-node">
+			<div class="title"><h2>interface Scheduler <a href="#Scheduler">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L8"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">interface</span> Scheduler<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	<span class="token function">next_lr</span><span class="token punctuation">(</span>current_lr <span class="token builtin">f64</span><span class="token punctuation">,</span> step <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">f64</span>
+<span class="token punctuation">}</span></code></pre>
+<p>Scheduler is the interface for learning rate schedulers. Scheduler is the interface for learning rate schedulers. Implementations update the learning rate based on the current training step.</p>
+
+</section>
+
+		<section id="AdaGradOptimizer[T].build_params" class="doc-node">
+			<div class="title"><h2>fn (AdaGradOptimizer[T]) build_params <a href="#AdaGradOptimizer[T].build_params">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adagrad.v#L40"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o AdaGradOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">build_params</span><span class="token punctuation">(</span>layers <span class="token punctuation">[</span><span class="token punctuation">]</span>types<span class="token punctuation">.</span>Layer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+<p>build_params registers all trainable variables from <code>layers</code>. Call once before training.</p>
+
+</section>
+
+		<section id="AdaGradOptimizer[T].update" class="doc-node">
+			<div class="title"><h2>fn (AdaGradOptimizer[T]) update <a href="#AdaGradOptimizer[T].update">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adagrad.v#L50"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o AdaGradOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">update</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<p>update performs one AdaGrad parameter update and zeros all gradients.</p>
+
+</section>
+
+		<section id="AdamOptimizer[T].build_params" class="doc-node">
+			<div class="title"><h2>fn (AdamOptimizer[T]) build_params <a href="#AdamOptimizer[T].build_params">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adam.v#L75"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o AdamOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">build_params</span><span class="token punctuation">(</span>layers <span class="token punctuation">[</span><span class="token punctuation">]</span>types<span class="token punctuation">.</span>Layer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+<p>build_params registers all trainable variables from <code>layers</code> into the optimizer. Call once after constructing the model, before the first <code>update()</code>.</p>
+
+</section>
+
+		<section id="AdamOptimizer[T].update" class="doc-node">
+			<div class="title"><h2>fn (AdamOptimizer[T]) update <a href="#AdamOptimizer[T].update">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adam.v#L87"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o AdamOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">update</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<p>update performs one Adam parameter update step and zeros all gradients. Must be called after <code>loss.backward()</code>.</p>
+
+</section>
+
+		<section id="AdamWOptimizer[T].build_params" class="doc-node">
+			<div class="title"><h2>fn (AdamWOptimizer[T]) build_params <a href="#AdamWOptimizer[T].build_params">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adamw.v#L67"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o AdamWOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">build_params</span><span class="token punctuation">(</span>layers <span class="token punctuation">[</span><span class="token punctuation">]</span>types<span class="token punctuation">.</span>Layer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+<p>build_params registers all trainable variables from <code>layers</code>. Call once before training.</p>
+
+</section>
+
+		<section id="AdamWOptimizer[T].update" class="doc-node">
+			<div class="title"><h2>fn (AdamWOptimizer[T]) update <a href="#AdamWOptimizer[T].update">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adamw.v#L78"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o AdamWOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">update</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<p>update performs one AdamW parameter update and zeros all gradients.</p>
+
+</section>
+
+		<section id="CosineAnnealingLR[T].next_lr" class="doc-node">
+			<div class="title"><h2>fn (CosineAnnealingLR[T]) next_lr <a href="#CosineAnnealingLR[T].next_lr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L67"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span>CosineAnnealingLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">next_lr</span><span class="token punctuation">(</span>current_lr <span class="token builtin">f64</span><span class="token punctuation">,</span> step <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">f64</span></code></pre>
+<p>next_lr exposes this operation as part of the public API.</p>
+
+</section>
+
+		<section id="ExponentialLR[T].next_lr" class="doc-node">
+			<div class="title"><h2>fn (ExponentialLR[T]) next_lr <a href="#ExponentialLR[T].next_lr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L46"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span>ExponentialLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">next_lr</span><span class="token punctuation">(</span>current_lr <span class="token builtin">f64</span><span class="token punctuation">,</span> step <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">f64</span></code></pre>
+<p>next_lr exposes this operation as part of the public API.</p>
+
+</section>
+
+		<section id="NAdamOptimizer[T].build_params" class="doc-node">
+			<div class="title"><h2>fn (NAdamOptimizer[T]) build_params <a href="#NAdamOptimizer[T].build_params">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/nadam.v#L58"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o NAdamOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">build_params</span><span class="token punctuation">(</span>layers <span class="token punctuation">[</span><span class="token punctuation">]</span>types<span class="token punctuation">.</span>Layer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+<p>build_params registers trainable variables and initializes moment estimates.</p>
+
+</section>
+
+		<section id="NAdamOptimizer[T].update" class="doc-node">
+			<div class="title"><h2>fn (NAdamOptimizer[T]) update <a href="#NAdamOptimizer[T].update">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/nadam.v#L69"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o NAdamOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">update</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<p>update performs one NAdam parameter update and zeros gradients.</p>
+
+</section>
+
+		<section id="RAdamOptimizer[T].build_params" class="doc-node">
+			<div class="title"><h2>fn (RAdamOptimizer[T]) build_params <a href="#RAdamOptimizer[T].build_params">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/radam.v#L52"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o RAdamOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">build_params</span><span class="token punctuation">(</span>layers <span class="token punctuation">[</span><span class="token punctuation">]</span>types<span class="token punctuation">.</span>Layer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+<p>build_params registers trainable variables and initializes moment estimates.</p>
+
+</section>
+
+		<section id="RAdamOptimizer[T].update" class="doc-node">
+			<div class="title"><h2>fn (RAdamOptimizer[T]) update <a href="#RAdamOptimizer[T].update">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/radam.v#L63"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o RAdamOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">update</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<p>update performs one RAdam parameter update and zeros gradients.</p>
+
+</section>
+
+		<section id="RMSPropOptimizer[T].build_params" class="doc-node">
+			<div class="title"><h2>fn (RMSPropOptimizer[T]) build_params <a href="#RMSPropOptimizer[T].build_params">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/rmsprop.v#L60"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o RMSPropOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">build_params</span><span class="token punctuation">(</span>layers <span class="token punctuation">[</span><span class="token punctuation">]</span>types<span class="token punctuation">.</span>Layer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+<p>build_params registers all trainable variables from <code>layers</code>. Call once before training.</p>
+
+</section>
+
+		<section id="RMSPropOptimizer[T].update" class="doc-node">
+			<div class="title"><h2>fn (RMSPropOptimizer[T]) update <a href="#RMSPropOptimizer[T].update">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/rmsprop.v#L70"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o RMSPropOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">update</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<p>update performs one RMSProp parameter update and zeros all gradients.</p>
+
+</section>
+
+		<section id="ReduceLROnPlateau[T].next_lr" class="doc-node">
+			<div class="title"><h2>fn (ReduceLROnPlateau[T]) next_lr <a href="#ReduceLROnPlateau[T].next_lr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L114"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> s ReduceLROnPlateau<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">next_lr</span><span class="token punctuation">(</span>current_lr <span class="token builtin">f64</span><span class="token punctuation">,</span> step <span class="token builtin">int</span><span class="token punctuation">,</span> metric_delta <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token builtin">f64</span></code></pre>
+<p>next_lr exposes this operation as part of the public API.</p>
+
+</section>
+
+		<section id="SgdOptimizer[T].build_params" class="doc-node">
+			<div class="title"><h2>fn (SgdOptimizer[T]) build_params <a href="#SgdOptimizer[T].build_params">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/sgd.v#L37"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o SgdOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">build_params</span><span class="token punctuation">(</span>layers <span class="token punctuation">[</span><span class="token punctuation">]</span>types<span class="token punctuation">.</span>Layer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+<p>build_params registers all trainable variables from <code>layers</code>. Call once before training.</p>
+
+</section>
+
+		<section id="SgdOptimizer[T].update" class="doc-node">
+			<div class="title"><h2>fn (SgdOptimizer[T]) update <a href="#SgdOptimizer[T].update">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/sgd.v#L46"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o SgdOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">update</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<p>update performs one SGD parameter update and zeros all gradients.</p>
+
+</section>
+
+		<section id="StepLR[T].next_lr" class="doc-node">
+			<div class="title"><h2>fn (StepLR[T]) next_lr <a href="#StepLR[T].next_lr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L28"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span>StepLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">next_lr</span><span class="token punctuation">(</span>current_lr <span class="token builtin">f64</span><span class="token punctuation">,</span> step <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">f64</span></code></pre>
+<p>next_lr exposes this operation as part of the public API.</p>
+
+</section>
+
+		<section id="AdaGradOptimizer" class="doc-node">
+			<div class="title"><h2>struct AdaGradOptimizer <a href="#AdaGradOptimizer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adagrad.v#L10"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> AdaGradOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	learning_rate <span class="token builtin">f64</span>
+	epsilon       <span class="token builtin">f64</span>
+<span class="token keyword">pub</span> <span class="token keyword">mut</span><span class="token punctuation">:</span>
+	weight_decay         <span class="token builtin">f64</span>
+	params               <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+	accumulated_sq_grads <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+<p>AdaGradOptimizer implements the AdaGrad (Adaptive Gradient) algorithm. Accumulates squared gradients and adapts the learning rate per parameter.</p>
+
+</section>
+
+		<section id="AdaGradOptimizerConfig" class="doc-node">
+			<div class="title"><h2>struct AdaGradOptimizerConfig <a href="#AdaGradOptimizerConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adagrad.v#L23"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[params]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> AdaGradOptimizerConfig <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	learning_rate <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">0.01</span>
+	epsilon       <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">1e-8</span>
+	weight_decay  <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">0.0</span>
+<span class="token punctuation">}</span></code></pre>
+<p>AdaGradOptimizerConfig defines a public data structure for this module.</p>
+
+</section>
+
+		<section id="AdamOptimizer" class="doc-node">
+			<div class="title"><h2>struct AdamOptimizer <a href="#AdamOptimizer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adam.v#L19"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> AdamOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	learning_rate <span class="token builtin">f64</span>
+	epsilon       <span class="token builtin">f64</span>
+<span class="token keyword">pub</span> <span class="token keyword">mut</span><span class="token punctuation">:</span>
+	beta1          <span class="token builtin">f64</span>
+	beta2          <span class="token builtin">f64</span>
+	beta1_t        <span class="token builtin">f64</span>
+	beta2_t        <span class="token builtin">f64</span>
+	params         <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+	first_moments  <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+	second_moments <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+<p>AdamOptimizer implements the Adam optimiser (Adaptive Moment Estimation).</p>
+<p>Maintains per-parameter first-moment (mean) and second-moment (uncentred variance) moving averages of the gradients, with bias correction applied at each step.</p>
+<p>Update rule: m = β₁·m + (1-β₁)·g v = β₂·v + (1-β₂)·g² θ = θ - lr · √(1-β₂ᵗ) / (1-β₁ᵗ) · m / (√v + ε)</p>
+<p>Reference: Kingma &amp; Ba, "Adam: A Method for Stochastic Optimization" (2014).</p>
+
+</section>
+
+		<section id="AdamOptimizerConfig" class="doc-node">
+			<div class="title"><h2>struct AdamOptimizerConfig <a href="#AdamOptimizerConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adam.v#L44"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[params]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> AdamOptimizerConfig <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	learning_rate <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">0.001</span>
+	beta1         <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">0.9</span>
+	beta2         <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">0.999</span>
+	epsilon       <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">1e-8</span>
+<span class="token punctuation">}</span></code></pre>
+<p>AdamOptimizerConfig defines a public data structure for this module.</p>
+
+</section>
+
+		<section id="AdamStepParams" class="doc-node">
+			<div class="title"><h2>struct AdamStepParams <a href="#AdamStepParams">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adam_step_f64.v#L6"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> AdamStepParams <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	beta1   <span class="token builtin">f64</span>
+	beta2   <span class="token builtin">f64</span>
+	lr_t    <span class="token builtin">f64</span>
+	epsilon <span class="token builtin">f64</span>
+<span class="token punctuation">}</span></code></pre>
+<p>AdamStepParams holds scalar Adam state for one flat parameter vector.</p>
+
+</section>
+
+		<section id="AdamWOptimizer" class="doc-node">
+			<div class="title"><h2>struct AdamWOptimizer <a href="#AdamWOptimizer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adamw.v#L17"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> AdamWOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	learning_rate <span class="token builtin">f64</span>
+	epsilon       <span class="token builtin">f64</span>
+<span class="token keyword">pub</span> <span class="token keyword">mut</span><span class="token punctuation">:</span>
+	beta1          <span class="token builtin">f64</span>
+	beta2          <span class="token builtin">f64</span>
+	beta1_t        <span class="token builtin">f64</span>
+	beta2_t        <span class="token builtin">f64</span>
+	weight_decay   <span class="token builtin">f64</span>
+	params         <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+	first_moments  <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+	second_moments <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+<p>AdamWOptimizer implements AdamW (Adam with Decoupled Weight Decay).</p>
+<p>Identical to Adam but weight decay is applied directly to the parameters (not through the gradient), which typically gives better generalisation.</p>
+<p>Update rule (after bias correction): θ = θ - lr · (m̂ / (√v̂ + ε) + weight_decay · θ)</p>
+<p>Reference: Loshchilov &amp; Hutter, "Decoupled Weight Decay Regularization" (2017).</p>
+
+</section>
+
+		<section id="AdamWOptimizerConfig" class="doc-node">
+			<div class="title"><h2>struct AdamWOptimizerConfig <a href="#AdamWOptimizerConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adamw.v#L44"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[params]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> AdamWOptimizerConfig <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	learning_rate <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">0.001</span>
+	beta1         <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">0.9</span>
+	beta2         <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">0.999</span>
+	epsilon       <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">1e-8</span>
+	weight_decay  <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">0.01</span>
+<span class="token punctuation">}</span></code></pre>
+<p>AdamWOptimizerConfig defines a public data structure for this module.</p>
+
+</section>
+
+		<section id="CosineAnnealingLR" class="doc-node">
+			<div class="title"><h2>struct CosineAnnealingLR <a href="#CosineAnnealingLR">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L51"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> CosineAnnealingLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	t_max <span class="token builtin">int</span> <span class="token comment">// maximum number of iterations</span>
+	lrd   <span class="token builtin">f64</span> <span class="token comment">// lower bound lr (default: 0)</span>
+<span class="token punctuation">}</span></code></pre>
+<p>CosineAnnealingLR decays using a cosine schedule from <code>lrd</code> to 0.</p>
+
+</section>
+
+		<section id="ExponentialLR" class="doc-node">
+			<div class="title"><h2>struct ExponentialLR <a href="#ExponentialLR">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L33"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> ExponentialLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	gamma <span class="token builtin">f64</span>
+<span class="token punctuation">}</span></code></pre>
+<p>ExponentialLR decays the learning rate by <code>gamma</code> at every step.</p>
+
+</section>
+
+		<section id="NAdamOptimizer" class="doc-node">
+			<div class="title"><h2>struct NAdamOptimizer <a href="#NAdamOptimizer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/nadam.v#L10"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> NAdamOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	learning_rate          <span class="token builtin">f64</span>
+	epsilon                <span class="token builtin">f64</span>
+	weight_decay           <span class="token builtin">f64</span>
+	momentum_decay         <span class="token builtin">f64</span>
+	decoupled_weight_decay <span class="token builtin">bool</span>
+<span class="token keyword">pub</span> <span class="token keyword">mut</span><span class="token punctuation">:</span>
+	beta1          <span class="token builtin">f64</span>
+	beta2          <span class="token builtin">f64</span>
+	beta1_t        <span class="token builtin">f64</span>
+	beta2_t        <span class="token builtin">f64</span>
+	mu_product_t   <span class="token builtin">f64</span>
+	step           <span class="token builtin">int</span>
+	params         <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+	first_moments  <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+	second_moments <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+<p>NAdamOptimizer implements Nesterov-accelerated Adam for f32 and f64 parameters. Reference: Dozat (2016), Incorporating Nesterov Momentum into Adam; PyTorch NAdam.</p>
+
+</section>
+
+		<section id="NAdamOptimizerConfig" class="doc-node">
+			<div class="title"><h2>struct NAdamOptimizerConfig <a href="#NAdamOptimizerConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/nadam.v#L30"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[params]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> NAdamOptimizerConfig <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	learning_rate          <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">0.002</span>
+	beta1                  <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">0.9</span>
+	beta2                  <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">0.999</span>
+	epsilon                <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">1e-8</span>
+	weight_decay           <span class="token builtin">f64</span>
+	momentum_decay         <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">0.004</span>
+	decoupled_weight_decay <span class="token builtin">bool</span>
+<span class="token punctuation">}</span></code></pre>
+<p>NAdamOptimizerConfig configures NAdamOptimizer.</p>
+
+</section>
+
+		<section id="NAdamStepParams" class="doc-node">
+			<div class="title"><h2>struct NAdamStepParams <a href="#NAdamStepParams">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/nadam_step_f64.v#L6"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> NAdamStepParams <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	beta1           <span class="token builtin">f64</span>
+	beta2           <span class="token builtin">f64</span>
+	beta1_t         <span class="token builtin">f64</span>
+	beta2_t         <span class="token builtin">f64</span>
+	mu_product_t    <span class="token builtin">f64</span>
+	mu_product_t1   <span class="token builtin">f64</span>
+	mu_t            <span class="token builtin">f64</span>
+	mu_next         <span class="token builtin">f64</span>
+	momentum_decay  <span class="token builtin">f64</span>
+	step            <span class="token builtin">int</span>
+	lr              <span class="token builtin">f64</span>
+	epsilon         <span class="token builtin">f64</span>
+	weight_decay    <span class="token builtin">f64</span>
+	decoupled_decay <span class="token builtin">bool</span>
+<span class="token punctuation">}</span></code></pre>
+<p>NAdamStepParams holds one CPU NAdam update's scalar state.</p>
+
+</section>
+
+		<section id="RAdamOptimizer" class="doc-node">
+			<div class="title"><h2>struct RAdamOptimizer <a href="#RAdamOptimizer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/radam.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> RAdamOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	learning_rate          <span class="token builtin">f64</span>
+	epsilon                <span class="token builtin">f64</span>
+	weight_decay           <span class="token builtin">f64</span>
+	decoupled_weight_decay <span class="token builtin">bool</span>
+<span class="token keyword">pub</span> <span class="token keyword">mut</span><span class="token punctuation">:</span>
+	beta1          <span class="token builtin">f64</span>
+	beta2          <span class="token builtin">f64</span>
+	beta1_t        <span class="token builtin">f64</span>
+	beta2_t        <span class="token builtin">f64</span>
+	step           <span class="token builtin">int</span>
+	params         <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+	first_moments  <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+	second_moments <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+<p>RAdamOptimizer implements Rectified Adam with adaptive variance rectification. Rectification threshold and epsilon placement follow the PyTorch RAdam algorithm.</p>
+
+</section>
+
+		<section id="RAdamOptimizerConfig" class="doc-node">
+			<div class="title"><h2>struct RAdamOptimizerConfig <a href="#RAdamOptimizerConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/radam.v#L27"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[params]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> RAdamOptimizerConfig <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	learning_rate          <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">0.001</span>
+	beta1                  <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">0.9</span>
+	beta2                  <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">0.999</span>
+	epsilon                <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">1e-8</span>
+	weight_decay           <span class="token builtin">f64</span>
+	decoupled_weight_decay <span class="token builtin">bool</span>
+<span class="token punctuation">}</span></code></pre>
+<p>RAdamOptimizerConfig configures RAdamOptimizer.</p>
+
+</section>
+
+		<section id="RAdamStepParams" class="doc-node">
+			<div class="title"><h2>struct RAdamStepParams <a href="#RAdamStepParams">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/radam_step_f64.v#L6"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> RAdamStepParams <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	beta1           <span class="token builtin">f64</span>
+	beta2           <span class="token builtin">f64</span>
+	beta1_t         <span class="token builtin">f64</span>
+	beta2_t         <span class="token builtin">f64</span>
+	step            <span class="token builtin">int</span>
+	lr              <span class="token builtin">f64</span>
+	epsilon         <span class="token builtin">f64</span>
+	weight_decay    <span class="token builtin">f64</span>
+	decoupled_decay <span class="token builtin">bool</span>
+<span class="token punctuation">}</span></code></pre>
+<p>RAdamStepParams holds one CPU RAdam update's scalar state.</p>
+
+</section>
+
+		<section id="RMSPropOptimizer" class="doc-node">
+			<div class="title"><h2>struct RMSPropOptimizer <a href="#RMSPropOptimizer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/rmsprop.v#L19"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> RMSPropOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	learning_rate <span class="token builtin">f64</span>
+	epsilon       <span class="token builtin">f64</span>
+<span class="token keyword">pub</span> <span class="token keyword">mut</span><span class="token punctuation">:</span>
+	alpha        <span class="token builtin">f64</span> <span class="token comment">// smoothing constant</span>
+	weight_decay <span class="token builtin">f64</span>
+	params       <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+	sq_avg       <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+<p>RMSPropOptimizer implements the RMSProp optimiser.</p>
+<p>Maintains a running average of the squared gradient per parameter and normalises the update by it, allowing different effective learning rates per parameter.</p>
+<p>Update rule: sq_avg = α·sq_avg + (1-α)·g² θ = θ - lr · (g / (√sq_avg + ε) + wd·θ)</p>
+<p>Reference: Hinton, "Neural Networks for Machine Learning", Lecture 6e.</p>
+
+</section>
+
+		<section id="RMSPropOptimizerConfig" class="doc-node">
+			<div class="title"><h2>struct RMSPropOptimizerConfig <a href="#RMSPropOptimizerConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/rmsprop.v#L41"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[params]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> RMSPropOptimizerConfig <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	learning_rate <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">0.001</span>
+	alpha         <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">0.99</span>
+	epsilon       <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">1e-8</span>
+	weight_decay  <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">0.0</span>
+<span class="token punctuation">}</span></code></pre>
+<p>RMSPropOptimizerConfig defines a public data structure for this module.</p>
+
+</section>
+
+		<section id="ReduceLROnPlateau" class="doc-node">
+			<div class="title"><h2>struct ReduceLROnPlateau <a href="#ReduceLROnPlateau">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L75"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> ReduceLROnPlateau<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	factor    <span class="token builtin">f64</span>
+	patience  <span class="token builtin">int</span>
+	threshold <span class="token builtin">f64</span>
+	epsilon   <span class="token builtin">f64</span>
+	cooldown  <span class="token builtin">int</span>
+<span class="token keyword">pub</span> <span class="token keyword">mut</span><span class="token punctuation">:</span>
+	wait       <span class="token builtin">int</span>
+	current_lr <span class="token builtin">f64</span>
+<span class="token punctuation">}</span></code></pre>
+<p>ReduceLROnPlateau reduces LR when a metric has stopped improving.</p>
+
+</section>
+
+		<section id="ReduceLROnPlateauConfig" class="doc-node">
+			<div class="title"><h2>struct ReduceLROnPlateauConfig <a href="#ReduceLROnPlateauConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L90"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[params]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> ReduceLROnPlateauConfig <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	factor    <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">0.1</span>
+	patience  <span class="token builtin">int</span> <span class="token operator">=</span> <span class="token number">10</span>
+	threshold <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">1e-4</span>
+	epsilon   <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">1e-8</span>
+	cooldown  <span class="token builtin">int</span>
+<span class="token punctuation">}</span></code></pre>
+<p>ReduceLROnPlateauConfig defines a public data structure for this module.</p>
+
+</section>
+
+		<section id="SgdOptimizer" class="doc-node">
+			<div class="title"><h2>struct SgdOptimizer <a href="#SgdOptimizer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/sgd.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> SgdOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	learning_rate <span class="token builtin">f64</span>
+<span class="token keyword">pub</span> <span class="token keyword">mut</span><span class="token punctuation">:</span>
+	params <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+<p>SgdOptimizer implements vanilla Stochastic Gradient Descent with optional momentum.</p>
+
+</section>
+
+		<section id="SgdOptimizerConfig" class="doc-node">
+			<div class="title"><h2>struct SgdOptimizerConfig <a href="#SgdOptimizerConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/sgd.v#L24"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[params]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> SgdOptimizerConfig <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	learning_rate <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">0.001</span>
+<span class="token punctuation">}</span></code></pre>
+<p>SgdOptimizerConfig defines a public data structure for this module.</p>
+
+</section>
+
+		<section id="StepLR" class="doc-node">
+			<div class="title"><h2>struct StepLR <a href="#StepLR">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L13"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> StepLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	step_size <span class="token builtin">int</span>
+	gamma     <span class="token builtin">f64</span>
+<span class="token punctuation">}</span></code></pre>
+<p>StepLR decays the learning rate by <code>gamma</code> every <code>step_size</code> steps.</p>
+
+</section>
+
+
+						<div class="footer">Powered by vdoc. Generated on: 8 Oct 2026 15:02:27</div>
+					</div>
+					<div class="doc-toc"><ul><li class="open"><a href="#readme_optimizers">README</a></li>
+<li class="open"><a href="#adagrad">fn adagrad</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#adam_optimizer">fn adam_optimizer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#adam_step_f32_cpu">fn adam_step_f32_cpu</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#adam_step_f64">fn adam_step_f64</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#adam_step_f64_cpu">fn adam_step_f64_cpu</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#adam_use_cuda_optimizer">fn adam_use_cuda_optimizer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#adam_use_vulkan_optimizer">fn adam_use_vulkan_optimizer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#adamw">fn adamw</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#clip_grad_norm">fn clip_grad_norm</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#clip_grad_value">fn clip_grad_value</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#cosine_annealing_lr">fn cosine_annealing_lr</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#exponential_lr">fn exponential_lr</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#nadam_optimizer">fn nadam_optimizer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#nadam_step_f32_cpu">fn nadam_step_f32_cpu</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#nadam_step_f64_cpu">fn nadam_step_f64_cpu</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#radam_optimizer">fn radam_optimizer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#radam_step_f32_cpu">fn radam_step_f32_cpu</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#radam_step_f64_cpu">fn radam_step_f64_cpu</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#reduce_lr_on_plateau">fn reduce_lr_on_plateau</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#rmsprop">fn rmsprop</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#sgd">fn sgd</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#step_lr">fn step_lr</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#try_adam_update_f32_vulkan">fn try_adam_update_f32_vulkan</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#Scheduler">interface Scheduler</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#AdaGradOptimizer[T].build_params">type AdaGradOptimizer[T]</a>        <ul>
+<li><a href="#AdaGradOptimizer[T].build_params">fn build_params</a></li>
+<li><a href="#AdaGradOptimizer[T].update">fn update</a></li>
+</ul>
+</li>
+<li class="open"><a href="#AdamOptimizer[T].build_params">type AdamOptimizer[T]</a>        <ul>
+<li><a href="#AdamOptimizer[T].build_params">fn build_params</a></li>
+<li><a href="#AdamOptimizer[T].update">fn update</a></li>
+</ul>
+</li>
+<li class="open"><a href="#AdamWOptimizer[T].build_params">type AdamWOptimizer[T]</a>        <ul>
+<li><a href="#AdamWOptimizer[T].build_params">fn build_params</a></li>
+<li><a href="#AdamWOptimizer[T].update">fn update</a></li>
+</ul>
+</li>
+<li class="open"><a href="#CosineAnnealingLR[T].next_lr">type CosineAnnealingLR[T]</a>        <ul>
+<li><a href="#CosineAnnealingLR[T].next_lr">fn next_lr</a></li>
+</ul>
+</li>
+<li class="open"><a href="#ExponentialLR[T].next_lr">type ExponentialLR[T]</a>        <ul>
+<li><a href="#ExponentialLR[T].next_lr">fn next_lr</a></li>
+</ul>
+</li>
+<li class="open"><a href="#NAdamOptimizer[T].build_params">type NAdamOptimizer[T]</a>        <ul>
+<li><a href="#NAdamOptimizer[T].build_params">fn build_params</a></li>
+<li><a href="#NAdamOptimizer[T].update">fn update</a></li>
+</ul>
+</li>
+<li class="open"><a href="#RAdamOptimizer[T].build_params">type RAdamOptimizer[T]</a>        <ul>
+<li><a href="#RAdamOptimizer[T].build_params">fn build_params</a></li>
+<li><a href="#RAdamOptimizer[T].update">fn update</a></li>
+</ul>
+</li>
+<li class="open"><a href="#RMSPropOptimizer[T].build_params">type RMSPropOptimizer[T]</a>        <ul>
+<li><a href="#RMSPropOptimizer[T].build_params">fn build_params</a></li>
+<li><a href="#RMSPropOptimizer[T].update">fn update</a></li>
+</ul>
+</li>
+<li class="open"><a href="#ReduceLROnPlateau[T].next_lr">type ReduceLROnPlateau[T]</a>        <ul>
+<li><a href="#ReduceLROnPlateau[T].next_lr">fn next_lr</a></li>
+</ul>
+</li>
+<li class="open"><a href="#SgdOptimizer[T].build_params">type SgdOptimizer[T]</a>        <ul>
+<li><a href="#SgdOptimizer[T].build_params">fn build_params</a></li>
+<li><a href="#SgdOptimizer[T].update">fn update</a></li>
+</ul>
+</li>
+<li class="open"><a href="#StepLR[T].next_lr">type StepLR[T]</a>        <ul>
+<li><a href="#StepLR[T].next_lr">fn next_lr</a></li>
+</ul>
+</li>
+<li class="open"><a href="#AdaGradOptimizer">struct AdaGradOptimizer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#AdaGradOptimizerConfig">struct AdaGradOptimizerConfig</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#AdamOptimizer">struct AdamOptimizer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#AdamOptimizerConfig">struct AdamOptimizerConfig</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#AdamStepParams">struct AdamStepParams</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#AdamWOptimizer">struct AdamWOptimizer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#AdamWOptimizerConfig">struct AdamWOptimizerConfig</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#CosineAnnealingLR">struct CosineAnnealingLR</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ExponentialLR">struct ExponentialLR</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#NAdamOptimizer">struct NAdamOptimizer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#NAdamOptimizerConfig">struct NAdamOptimizerConfig</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#NAdamStepParams">struct NAdamStepParams</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#RAdamOptimizer">struct RAdamOptimizer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#RAdamOptimizerConfig">struct RAdamOptimizerConfig</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#RAdamStepParams">struct RAdamStepParams</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#RMSPropOptimizer">struct RMSPropOptimizer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#RMSPropOptimizerConfig">struct RMSPropOptimizerConfig</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ReduceLROnPlateau">struct ReduceLROnPlateau</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ReduceLROnPlateauConfig">struct ReduceLROnPlateauConfig</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#SgdOptimizer">struct SgdOptimizer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#SgdOptimizerConfig">struct SgdOptimizerConfig</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#StepLR">struct StepLR</a>        <ul>
+</ul>
+</li>
+</ul></div>
+				</div>
+			</div>
+		</div>
+		<script src="doc.js"></script>
+		<script async src="search_index.js"></script>
+	</body>
+</html>
