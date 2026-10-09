@@ -2,6 +2,28 @@ module internal
 
 import vtl
 
+fn test_avgpool2d_forward_computes_window_means() ! {
+	input := vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0], [1, 1, 3, 3])!
+
+	result := avgpool2d_forward[f64](input, [2, 2], [0, 0], [1, 1])!
+
+	assert result.shape == [1, 1, 2, 2]
+	assert result.to_array() == [3.0, 4.0, 6.0, 7.0]
+}
+
+fn test_avgpool2d_forward_rejects_invalid_parameters() {
+	input := vtl.ones[f64]([1, 1, 3, 3])
+	if _ := avgpool2d_forward[f64](input, [0, 2], [0, 0], [1, 1]) {
+		assert false, 'expected an invalid kernel size error'
+	}
+	if _ := avgpool2d_forward[f64](input, [2, 2], [0, 0], [0, 1]) {
+		assert false, 'expected a zero stride error'
+	}
+	if _ := avgpool2d_forward[f64](input, [4, 2], [0, 0], [3, 1]) {
+		assert false, 'expected an empty output error'
+	}
+}
+
 fn test_avgpool2d_backward_distributes_overlapping_window_gradients() ! {
 	input := vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0], [1, 1, 3, 3])!
 	grad_out := vtl.ones[f64]([1, 1, 2, 2])
