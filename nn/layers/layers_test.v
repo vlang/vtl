@@ -70,6 +70,16 @@ fn test_batchnorm_variables_count() {
 	assert vars.len == 2, 'batchnorm should have 2 variables (gamma + beta), got ${vars.len}'
 }
 
+fn test_avgpool_backward_propagates_input_gradients() ! {
+	c := ctx[f64]()
+	input := variable[f64](c, [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0], [1, 1, 3, 3])!
+	layer := avgpool2d_layer[f64](c, [1, 3, 3], [2, 2], [0, 0], [1, 1])
+	mut output := layer.forward(input)!
+	output.backprop()!
+
+	assert input.grad.to_array() == [0.25, 0.5, 0.25, 0.5, 1.0, 0.5, 0.25, 0.5, 0.25]
+}
+
 // Embedding layer: output shape and variables
 fn test_embedding_output_shape() {
 	c := ctx[f64]()

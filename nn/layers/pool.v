@@ -98,7 +98,8 @@ pub fn avgpool2d_gate[T](input &vtl.Tensor[T], kernel []int, padding []int, stri
 
 // backward exposes this operation as part of the public API.
 pub fn (g &AvgPool2DGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
-	grad := internal.avgpool2d_backward[T](payload.variable.grad, g.kernel, g.padding, g.stride)!
+	grad := internal.avgpool2d_backward[T](payload.variable.grad, g.input, g.kernel, g.padding,
+		g.stride)!
 	return [grad]
 }
 
