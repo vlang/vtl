@@ -26,6 +26,7 @@ coordinates produce a negative integral, matching
 [NumPy's `trapezoid`](https://numpy.org/doc/stable/reference/generated/numpy.trapezoid.html).
 
 ```v
+import math
 import vtl
 import vtl.stats
 
@@ -108,9 +109,16 @@ length one. Use `argmax_axis_squeeze(axis)` or `argmin_axis_squeeze(axis)` to
 remove it, matching NumPy's default `keepdims=false` shape behavior. VTL's
 one-dimensional tensors use shape `[1]` for scalar results.
 
-If no axis is specified, the tensor is flattened first.
+Use `argmax_flat()` or `argmin_flat()` to get the first extremum's flattened
+index. The axis methods keep the reduced axis with length one; their
+`*_squeeze` forms remove that axis. Standard arg reductions return the first
+NaN index when one is present, while `nanargmax()` and `nanargmin()` skip NaNs
+and return an error when no non-NaN value exists. `nanargmax_axis(axis,
+keepdims)` and `nanargmin_axis(axis, keepdims)` provide the same NaN-ignoring
+behavior over one axis.
 
 ```v
+import math
 import vtl
 
 // 2-D tensor: rows = [3,5], [1,4]
@@ -125,9 +133,13 @@ amin := t.argmin_axis_squeeze[f64](0)!
 assert amin.shape == [2]
 // amin = [1, 0]  → col 0: min is at row 1 (1.0), col 1: min is at row 0 (4.0)
 
-// Global: index of the largest element (no axis)
-global_max := t.argmax[f64](0)!
-// global_max = 1  → t.data[1] == 5.0 is the largest element
+// Global: flattened index of the largest element
+global_max := t.argmax_flat[f64]()!
+// global_max = 1  → flattened element 1 (5.0) is the largest
+
+with_nan := vtl.from_1d[f64]([3.0, math.nan(), 5.0])!
+assert with_nan.argmax_flat[f64]()! == 1
+assert with_nan.nanargmax[f64]()! == 2
 ```
 
 ## max / min per axis
