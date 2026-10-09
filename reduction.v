@@ -22,16 +22,16 @@ pub fn (t &Tensor[T]) argmax_axis[T](axis int) !&Tensor[int] {
 		return error('argmax_axis: axis ${axis} out of bounds for shape ${shape}')
 	}
 
-	mut strides := []int{len: rank}
-	strides[rank - 1] = 1
-	for i := rank - 2; i >= 0; i-- {
-		strides[i] = strides[i + 1] * shape[i + 1]
+	if shape[na] == 0 {
+		return error('argmax_axis: cannot reduce an empty axis')
 	}
 
 	mut out_shape := shape.clone()
 	out_shape[na] = 1
 	mut result := empty[int](out_shape)
-	axis_stride := strides[na]
+	if result.size == 0 {
+		return result
+	}
 
 	mut out_strides := []int{len: rank}
 	out_strides[rank - 1] = 1
@@ -41,14 +41,20 @@ pub fn (t &Tensor[T]) argmax_axis[T](axis int) !&Tensor[int] {
 
 	mut outer_idx := []int{len: rank}
 	for {
-		mut base_lin := 0
-		for i := 0; i < rank; i++ {
-			base_lin += outer_idx[i] * strides[i]
-		}
-		mut best_val := t.get_nth(base_lin)
+		mut input_idx := outer_idx.clone()
+		mut best_val := t.get(input_idx)
+		mut best_is_nan := math.is_nan(f64(best_val))
 		mut best_arg := 0
 		for j := 1; j < shape[na]; j++ {
-			val := t.get_nth(base_lin + j * axis_stride)
+			input_idx[na] = j
+			val := t.get(input_idx)
+			if math.is_nan(f64(val)) {
+				best_arg = j
+				break
+			}
+			if best_is_nan {
+				continue
+			}
 			if val > best_val {
 				best_val = val
 				best_arg = j
@@ -99,16 +105,16 @@ pub fn (t &Tensor[T]) argmin_axis[T](axis int) !&Tensor[int] {
 		return error('argmin_axis: axis ${axis} out of bounds for shape ${shape}')
 	}
 
-	mut strides := []int{len: rank}
-	strides[rank - 1] = 1
-	for i := rank - 2; i >= 0; i-- {
-		strides[i] = strides[i + 1] * shape[i + 1]
+	if shape[na] == 0 {
+		return error('argmin_axis: cannot reduce an empty axis')
 	}
 
 	mut out_shape := shape.clone()
 	out_shape[na] = 1
 	mut result := empty[int](out_shape)
-	axis_stride := strides[na]
+	if result.size == 0 {
+		return result
+	}
 
 	mut out_strides := []int{len: rank}
 	out_strides[rank - 1] = 1
@@ -118,14 +124,20 @@ pub fn (t &Tensor[T]) argmin_axis[T](axis int) !&Tensor[int] {
 
 	mut outer_idx := []int{len: rank}
 	for {
-		mut base_lin := 0
-		for i := 0; i < rank; i++ {
-			base_lin += outer_idx[i] * strides[i]
-		}
-		mut best_val := t.get_nth(base_lin)
+		mut input_idx := outer_idx.clone()
+		mut best_val := t.get(input_idx)
+		mut best_is_nan := math.is_nan(f64(best_val))
 		mut best_arg := 0
 		for j := 1; j < shape[na]; j++ {
-			val := t.get_nth(base_lin + j * axis_stride)
+			input_idx[na] = j
+			val := t.get(input_idx)
+			if math.is_nan(f64(val)) {
+				best_arg = j
+				break
+			}
+			if best_is_nan {
+				continue
+			}
 			if val < best_val {
 				best_val = val
 				best_arg = j

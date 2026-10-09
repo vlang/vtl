@@ -35,6 +35,26 @@ fn test_argmin_axis_1() {
 	assert result.get_nth(1) == 1
 }
 
+fn test_arg_extrema_axis_respect_strides_and_numpy_nan_order() {
+	base := vtl.from_2d[f64]([[math.nan(), 4.0, 2.0], [7.0, math.nan(), 1.0]])!
+	transposed := base.transpose([1, 0])!
+	assert transposed.argmax_axis(1)!.to_array() == [0, 1, 0]
+	assert transposed.argmin_axis(0)!.to_array() == [0, 1]
+}
+
+fn test_arg_axis_rejects_empty_reduced_axis_and_preserves_empty_output() {
+	empty_axis := vtl.zeros[f64]([2, 0])
+	if _ := empty_axis.argmax_axis(1) {
+		assert false, 'argmax_axis must reject an empty reduction axis'
+	}
+	if _ := empty_axis.argmin_axis(1) {
+		assert false, 'argmin_axis must reject an empty reduction axis'
+	}
+	empty_output := vtl.zeros[f64]([0, 2])
+	assert empty_output.argmax_axis(1)!.shape == [0, 1]
+	assert empty_output.argmin_axis(1)!.shape == [0, 1]
+}
+
 fn test_arg_extrema_axis_squeeze_matches_numpy_shape() {
 	t := vtl.from_2d([[1.0, 5.0], [3.0, 2.0]])!
 	max_indices := t.argmax_axis_squeeze(1)!
