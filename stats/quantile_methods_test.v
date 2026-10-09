@@ -86,3 +86,22 @@ fn test_nanquantile_methods_reduce_multiple_axes() ! {
 		8.0,
 	]
 }
+
+fn test_default_multi_axis_quantile_convenience_apis() ! {
+	values := vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0], [2, 2, 2])!
+	assert quantile_axes(values, 0.5, [0, 2], false)!.to_array() == [3.5, 5.5]
+	assert quantiles_axes(values, [0.0, 0.5, 1.0], [0, 2])!.to_array() == [1.0, 3.0, 3.5, 5.5,
+		6.0, 8.0]
+	assert percentile_axes(values, 50, [0, 2], true)!.shape == [1, 2, 1]
+	assert percentiles_axes(values, [0, 50, 100], [0, 2])!.to_array() == [1.0, 3.0, 3.5, 5.5, 6.0,
+		8.0]
+	nan_values := vtl.from_array([1.0, math.nan(), 3.0, 4.0, 5.0, 6.0, math.nan(), 8.0], [
+		2,
+		2,
+		2,
+	])!
+	assert nanquantile_axes(nan_values, 0.5, [0, 2], false)!.to_array() == [5.0, 4.0]
+	assert nanquantiles_axes(nan_values, [0.0, 1.0], [0, 2])!.to_array() == [1.0, 3.0, 6.0, 8.0]
+	assert nanpercentile_axes(nan_values, 50, [0, 2], false)!.to_array() == [5.0, 4.0]
+	assert nanpercentiles_axes(nan_values, [0, 100], [0, 2])!.to_array() == [1.0, 3.0, 6.0, 8.0]
+}
