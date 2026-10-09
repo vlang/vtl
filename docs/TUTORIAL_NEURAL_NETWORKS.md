@@ -87,6 +87,11 @@ assert sequence.grad.shape == sequence.value.shape
 overlapping windows select the same input, their gradients are added at that
 input; ties keep the first maximum in scan order.
 
+`avgpool2d` distributes each output gradient evenly across its window. With
+padding, padded positions receive no input gradient, while the divisor remains
+the full kernel area. The [average pooling example](../examples/nn_average_pooling/README.md)
+prints both the pooled values and the input gradients.
+
 The three smooth/efficient activations can be selected directly in a Sequential
 model:
 
