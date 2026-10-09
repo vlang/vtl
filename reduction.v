@@ -1,5 +1,7 @@
 module vtl
 
+import math
+
 // argmax_axis returns the indices of the maximum values along the given axis.
 
 // argmax_axis exposes this operation as part of the public API.
@@ -430,6 +432,52 @@ pub fn (t &Tensor[T]) argmax[T](axis int) !&Tensor[int] {
 @[inline]
 pub fn (t &Tensor[T]) argmin[T](axis int) !&Tensor[int] {
 	return t.argmin_axis(axis)
+}
+
+// nanargmax returns the flattened index of the largest non-NaN value. The
+// first index wins ties, matching NumPy. Empty and all-NaN tensors return an error.
+pub fn (t &Tensor[T]) nanargmax[T]() !int {
+	mut found := false
+	mut best_value := f64(0)
+	mut best_index := 0
+	for index in 0 .. t.size {
+		value := f64(t.get_nth(index))
+		if math.is_nan(value) {
+			continue
+		}
+		if !found || value > best_value {
+			found = true
+			best_value = value
+			best_index = index
+		}
+	}
+	if !found {
+		return error('nanargmax: tensor contains no non-NaN values')
+	}
+	return best_index
+}
+
+// nanargmin returns the flattened index of the smallest non-NaN value. The
+// first index wins ties, matching NumPy. Empty and all-NaN tensors return an error.
+pub fn (t &Tensor[T]) nanargmin[T]() !int {
+	mut found := false
+	mut best_value := f64(0)
+	mut best_index := 0
+	for index in 0 .. t.size {
+		value := f64(t.get_nth(index))
+		if math.is_nan(value) {
+			continue
+		}
+		if !found || value < best_value {
+			found = true
+			best_value = value
+			best_index = index
+		}
+	}
+	if !found {
+		return error('nanargmin: tensor contains no non-NaN values')
+	}
+	return best_index
 }
 
 // cumsum returns the cumulative sum along the given axis.
