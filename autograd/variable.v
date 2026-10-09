@@ -109,8 +109,30 @@ pub fn (mut v Variable[T]) backprop() ! {
 			diff := unsafe { &vtl.Tensor[T](diff_ptr) }
 			mut parent_i := cur_node.parents[i]
 			if parent_i.requires_grad {
-				parent_i.grad = parent_i.grad.add(diff)!
+				parent_i.grad = accumulate_gradient[T](parent_i.grad, diff)!
 			}
 		}
 	}
+}
+
+// accumulate_gradient adds one backward contribution to a variable gradient.
+// Matching tensor shapes can be accumulated into the existing gradient buffer,
+// avoiding a new tensor allocation for each parent edge in the graph.
+@[direct_array_access]
+fn accumulate_gradient[T](gradient &vtl.Tensor[T], contribution &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	if gradient.shape == contribution.shape {
+		mut result := gradient
+		if result.is_row_major_contiguous() && contribution.is_row_major_contiguous()
+			&& result.data.data.len == result.size && contribution.data.data.len == contribution.size {
+			for i in 0 .. result.size {
+				result.data.data[i] = result.data.data[i] + contribution.data.data[i]
+			}
+			return result
+		}
+		result.napply[T]([contribution], fn [T](values []T, _ []int) T {
+			return values[0] + values[1]
+		})!
+		return result
+	}
+	return gradient.add[T](contribution)
 }
