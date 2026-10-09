@@ -62,3 +62,16 @@ fn test_divide() {
 
 	assert x.grad.array_equal(expected_grad)
 }
+
+fn test_backprop_accumulates_branch_gradients_in_existing_buffer() {
+	ctx := autograd.ctx[f64]()
+	x := ctx.variable(vtl.from_1d([2.0])!)
+	initial_grad := x.grad
+
+	mut loss := x.multiply(x)!.add(x)!
+	loss.backprop()!
+
+	expected_grad := vtl.from_1d([5.0])!
+	assert x.grad.array_equal(expected_grad)
+	assert voidptr(x.grad) == voidptr(initial_grad)
+}
