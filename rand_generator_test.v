@@ -130,6 +130,54 @@ fn test_random_generator_supports_seeded_binomial_and_exponential() ! {
 	replay.free()
 }
 
+fn test_random_generator_supports_location_scale_distributions() ! {
+	mut generator := new_random_generator(9401)
+	gumbel_values := generator.gumbel(2.0, 1.5, [128])!
+	laplace_values := generator.laplace(-1.0, 0.75, [128])!
+	logistic_values := generator.logistic(0.5, 2.0, [128])!
+	for values in [gumbel_values.to_array(), laplace_values.to_array(), logistic_values.to_array()] {
+		for value in values {
+			assert !math.is_nan(value) && !math.is_inf(value, 0)
+		}
+	}
+	mut replay := new_random_generator(9401)
+	assert gumbel_values.array_equal(replay.gumbel(2.0, 1.5, [128])!)
+	assert laplace_values.array_equal(replay.laplace(-1.0, 0.75, [128])!)
+	assert logistic_values.array_equal(replay.logistic(0.5, 2.0, [128])!)
+	assert generator.gumbel(3.0, 0.0, [3])!.to_array() == [3.0, 3.0, 3.0]
+	assert generator.laplace(-2.0, 0.0, [3])!.to_array() == [-2.0, -2.0, -2.0]
+	assert generator.logistic(4.0, 0.0, [3])!.to_array() == [4.0, 4.0, 4.0]
+	large_gumbel_sample := generator.gumbel(2.0, 1.5, [4096])!
+	large_laplace_sample := generator.laplace(-1.0, 0.75, [4096])!
+	large_logistic_sample := generator.logistic(0.5, 2.0, [4096])!
+	mut gumbel_mean := 0.0
+	mut laplace_mean := 0.0
+	mut logistic_mean := 0.0
+	for value in large_gumbel_sample.to_array() {
+		gumbel_mean += value
+	}
+	for value in large_laplace_sample.to_array() {
+		laplace_mean += value
+	}
+	for value in large_logistic_sample.to_array() {
+		logistic_mean += value
+	}
+	assert math.abs(gumbel_mean / 4096 - (2.0 + 0.5772156649015329 * 1.5)) < 0.2
+	assert math.abs(laplace_mean / 4096 + 1.0) < 0.1
+	assert math.abs(logistic_mean / 4096 - 0.5) < 0.2
+	if _ := generator.gumbel(math.nan(), 1.0, [1]) {
+		assert false, 'gumbel must reject non-finite location'
+	}
+	if _ := generator.laplace(0.0, -1.0, [1]) {
+		assert false, 'laplace must reject negative scale'
+	}
+	if _ := generator.logistic(0.0, math.inf(1), [1]) {
+		assert false, 'logistic must reject non-finite scale'
+	}
+	generator.free()
+	replay.free()
+}
+
 fn test_random_generator_poisson_is_seeded_and_handles_rate_edges() ! {
 	mut generator := new_random_generator(146)
 	mut replay := new_random_generator(146)
