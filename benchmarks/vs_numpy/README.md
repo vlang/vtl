@@ -17,19 +17,26 @@ systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJO
 The checksum sums all singular values across timed calls. Compare timings only
 when recording the V backend, NumPy/BLAS build, CPU, and thread count.
 
-On an AMD Ryzen 9 5900X with V `b69f626` `-prod`, NumPy 2.5.3 using its
-bundled OpenBLAS and `OPENBLAS_NUM_THREADS=2`, a matched run measured:
+On an AMD Ryzen 9 5900X on 2026-10-09 with V 0.5.2 `b69f626` `-prod` and
+NumPy 2.5.3 using scipy-openblas 0.3.34 with `OPENBLAS_NUM_THREADS=2`, a
+matched run measured:
 
 | Size | VTL pure-V (ms) | NumPy (ms) | NumPy / VTL |
 | ---: | ---: | ---: | ---: |
-| 16×16 | 0.323 | 0.034 | 0.11× |
-| 32×32 | 4.582 | 0.049 | 0.01× |
-| 64×64 | 60.235 | 0.301 | 0.005× |
-| 128×128 | 907.526 | 1.559 | 0.002× |
+| 16×16 | 0.318 | 0.038 | 0.12× |
+| 32×32 | 4.247 | 0.064 | 0.015× |
+| 64×64 | 58.056 | 0.481 | 0.0083× |
+| 128×128 | 858.147 | 3.011 | 0.0035× |
 
 The pure-V SVD is substantially slower for these cases. This benchmark is a
 performance gap report, not evidence of parity; optimized SVD kernels remain a
 priority before making CPU performance claims.
+
+The PR benchmark comment reports pure-V, optional LAPACKE, and NumPy timings
+for the same deterministic matrices. LAPACKE results use
+`-d vsl_lapack_lapacke` and require LAPACKE to be installed. Changes under
+`la/` trigger this comparison so future linear algebra work stays tied to
+measured performance.
 
 Run both sides from `~/.vmodules` under a memory-limited systemd scope. The VTL
 benchmark calls `vtl.la.matmul` end to end, including tensor conversion and
