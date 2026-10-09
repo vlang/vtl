@@ -64,6 +64,16 @@ fn test_svd_full_shapes_and_orthogonality() ! {
 	}
 }
 
+fn test_svd_singleton_matrix() ! {
+	input := vtl.from_2d([[-3.5]])!
+	u, s, vt := svd(input, full_matrices: false)!
+	assert u.shape == [1, 1]
+	assert s.shape == [1]
+	assert vt.shape == [1, 1]
+	assert math.abs(s.get_nth(0) - 3.5) < 1e-12
+	assert_svd_reconstruct(input, u, s, vt, 1e-12)
+}
+
 fn test_svd_batched_rank_deficient_and_zero_inputs() ! {
 	batch := vtl.from_array([1.0, 2.0, 2.0, 4.0, 0.0, 0.0, 0.0, 0.0], [2, 2, 2])!
 	u, s, vt := svd(batch, full_matrices: false)!
