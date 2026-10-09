@@ -64,6 +64,9 @@ axis `count_nonzero`; `argwhere` and per-axis `nonzero`; `take`, `take_nd`,
 `put_along_axis` and `scatter_add`; lookup and DataLoader gathers; broadcastable
 `masked_select` and `masked_fill`; leading-dimension boolean-mask indexing via
 `boolean_index`, which preserves trailing dimensions like NumPy `array[mask]`.
+`Tensor.put` and `put_with_mode` update row-major logical flat indices with
+NumPy's `raise`, `wrap`, and `clip` modes; short value tensors repeat, and
+validation completes before mutation.
 
 `Variable.take_along_axis` propagates gradients by scattering them to selected
 source positions, including accumulation for repeated indices and reduction of
@@ -78,7 +81,8 @@ indices, range views, and positive steps.
 and propagate gradients to every input element. Their `*_along_axis` variants
 support one-axis sum and mean, with either squeezed or retained dimensions.
 
-**Remaining:** document all bounds semantics.
+**Remaining:** document all bounds semantics and add flat `put` updates to
+autograd. Tensor indexed writes are currently in-place and non-differentiable.
 
 Axis-wise `argmax` and `argmin` retain a length-one axis for compatibility;
 `argmax_axis_squeeze` and `argmin_axis_squeeze` provide NumPy's default

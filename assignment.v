@@ -1,5 +1,12 @@
 module vtl
 
+// PutMode controls how flat indices outside a tensor's range are handled.
+pub enum PutMode {
+	raise
+	wrap
+	clip
+}
+
 // set copies a scalar value into a Tensor at the provided index
 
 // set exposes this operation as part of the public API.
@@ -42,6 +49,88 @@ pub fn (mut t Tensor[T]) assign[T](other &Tensor[T]) !&Tensor[T] {
 		t.set(i, vals[1])
 	}
 	return t
+}
+
+// put replaces values at row-major logical flat indices. Values repeat when
+// there are fewer values than indices. Negative indices count from the end.
+// Invalid indices return an error without changing the tensor.
+pub fn (mut t Tensor[T]) put[T](indices &Tensor[int], values &Tensor[T]) ! {
+	t.put_with_mode[T](indices, values, .raise)!
+}
+
+// put_with_mode replaces values at row-major logical flat indices, using mode
+// to handle indices outside the flattened tensor's range. Repeated indices
+// follow row-major write order, so the last value wins. All indices are
+// validated before any writes are made.
+pub fn (mut t Tensor[T]) put_with_mode[T](indices &Tensor[int], values &Tensor[T], mode PutMode) ! {
+	if indices.size == 0 {
+		return
+	}
+	if t.size == 0 {
+		return error('put cannot index an empty tensor')
+	}
+	if values.size == 0 {
+		return error('put requires at least one value when indices are non-empty')
+	}
+	mut selected_indices := []int{}
+	if tensor_shares_storage[T, int](t, indices) {
+		selected_indices = indices.to_array()
+	}
+	for position in 0 .. indices.size {
+		selected := if selected_indices.len > 0 {
+			selected_indices[position]
+		} else {
+			indices.get_nth[int](position)
+		}
+		_ = normalize_put_index(selected, t.size, mode)!
+	}
+	mut update_values := []T{}
+	if tensor_shares_storage[T, T](t, values) {
+		update_values = values.to_array()
+	}
+	for position in 0 .. indices.size {
+		selected := if selected_indices.len > 0 {
+			selected_indices[position]
+		} else {
+			indices.get_nth[int](position)
+		}
+		index := normalize_put_index(selected, t.size, mode)!
+		update := if update_values.len > 0 {
+			update_values[position % values.size]
+		} else {
+			values.get_nth[T](position % values.size)
+		}
+		t.set_nth[T](index, update)
+	}
+}
+
+fn tensor_shares_storage[T, U](a &Tensor[T], b &Tensor[U]) bool {
+	return unsafe { voidptr(a.data) == voidptr(b.data) }
+}
+
+fn normalize_put_index(selected int, size int, mode PutMode) !int {
+	return match mode {
+		.raise {
+			index := if selected < 0 { selected + size } else { selected }
+			if index < 0 || index >= size {
+				return error('put index ${selected} is out of range for flattened size ${size}')
+			}
+			index
+		}
+		.wrap {
+			remainder := selected % size
+			if remainder < 0 { remainder + size } else { remainder }
+		}
+		.clip {
+			if selected < 0 {
+				0
+			} else if selected >= size {
+				size - 1
+			} else {
+				selected
+			}
+		}
+	}
 }
 
 // put_along_axis writes values at indices along axis. Indices and values must

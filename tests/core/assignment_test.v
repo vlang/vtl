@@ -52,6 +52,60 @@ fn test_assign() {
 	assert t.array_equal(expected)
 }
 
+fn test_put_flat_indices_repeat_values_and_preserve_logical_view_order() ! {
+	mut target := vtl.from_array([1, 2, 3, 4, 5, 6], [2, 3])!
+	indices := vtl.from_1d([0, -1, 0])!
+	values := vtl.from_1d([10, 20])!
+	target.put(indices, values)!
+	assert target.to_array() == [10, 2, 3, 4, 5, 20]
+
+	mut matrix := vtl.from_array([1, 2, 3, 4, 5, 6], [2, 3])!
+	mut transposed := matrix.transpose([1, 0])!
+	transposed.put(vtl.from_1d([1])!, vtl.from_1d([99])!)!
+	assert matrix.to_array() == [1, 2, 3, 99, 5, 6]
+}
+
+fn test_put_flat_indices_snapshot_aliased_indices() ! {
+	mut target := vtl.from_1d([1, 0, 2])!
+	indices := target.view()
+	updates := vtl.from_1d([7, 3, 0])!
+	target.put(indices, updates)!
+	assert target.to_array() == [3, 7, 0]
+}
+
+fn test_put_flat_indices_snapshot_aliased_values() ! {
+	mut target := vtl.from_1d([1, 2, 3, 4])!
+	indices := vtl.from_1d([3, 2, 1, 0])!
+	values := target.view()
+	target.put(indices, values)!
+	assert target.to_array() == [4, 3, 2, 1]
+}
+
+fn test_put_flat_indices_support_wrap_and_clip_modes() ! {
+	mut wrapped := vtl.zeros[int]([4])
+	wrapped.put_with_mode(vtl.from_1d([-1, 4, -5])!, vtl.from_1d([1, 2, 3])!, .wrap)!
+	assert wrapped.to_array() == [2, 0, 0, 3]
+
+	mut clipped := vtl.zeros[int]([4])
+	clipped.put_with_mode(vtl.from_1d([-4, 4])!, vtl.from_1d([7, 8])!, .clip)!
+	assert clipped.to_array() == [7, 0, 0, 8]
+}
+
+fn test_put_flat_indices_validates_before_mutating() ! {
+	mut target := vtl.from_1d([1, 2, 3])!
+	if _ := target.put(vtl.from_1d([0, 3])!, vtl.from_1d([9, 8])!) {
+		assert false, 'put must reject out-of-range indices'
+	}
+	assert target.to_array() == [1, 2, 3]
+
+	if _ := target.put(vtl.from_1d([1])!, vtl.from_1d[int]([])!) {
+		assert false, 'put must reject empty values for non-empty indices'
+	}
+	assert target.to_array() == [1, 2, 3]
+
+	target.put(vtl.from_1d[int]([])!, vtl.from_1d[int]([])!)!
+}
+
 fn test_put_along_axis_supports_negative_indices_and_last_duplicate_write() ! {
 	mut target := vtl.from_array([1, 2, 3, 4, 5, 6], [2, 3])!
 	indices := vtl.from_array([-1, 1, 0, 0], [2, 2])!
