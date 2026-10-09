@@ -259,10 +259,14 @@ println(t)
 // [[1, 2, 3, 4], [10, 5, 6, 7]]
 ```
 
-## Copying a tensor
+## Reshaping and copying a tensor
 
-Warning: When you do the following, both tensors `a` and `b` will share the same data.
-Full copy must be explicitly requested via the `copy()` function.
+`reshape` preserves row-major logical element order. A row-major contiguous
+input can be reshaped as a view, so writes through either tensor are visible
+through the other. A transposed or column-major input is copied into row-major
+order when needed. Use `copy()` when you want to explicitly select a memory
+layout; use `flatten()` when you always need an independent one-dimensional
+copy. These view and copy rules match NumPy's reshape behavior.
 
 ```v
 import vtl
@@ -278,4 +282,16 @@ println(b)
 // [[1, 2], [3, 4], [5, 6], [7, 8]]
 ```
 
-Here modifying `b` WILL modify `a`. This behaviour is the same as Numpy and Julia.
+Because `a` is contiguous, `b` shares its storage. A transpose changes the
+logical order, so reshaping it copies those values instead:
+
+```v
+import vtl
+
+mut matrix := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
+transposed := matrix.transpose([1, 0])!
+mut flat := transposed.reshape([6])!
+assert flat.to_array() == [1, 4, 2, 5, 3, 6]
+flat.set_nth(0, 99)
+assert matrix.get([0, 0]) == 1 // the reshape result owns a copy
+```
