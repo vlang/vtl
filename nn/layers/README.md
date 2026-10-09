@@ -13,6 +13,10 @@ optimizers. Implementations on `main` include:
 
 The common low-level constructor returns a `types.Layer[T]`:
 
+`lstm_layer` uses batch-first `[batch, sequence, features]` inputs and returns
+the output at every timestep. It supports stacked layers and full CPU BPTT for
+input and parameters, with gate matrices ordered input, forget, cell, output.
+
 ```v ignore
 import vtl.autograd
 import vtl.nn.layers

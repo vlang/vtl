@@ -60,6 +60,29 @@ model.mse_loss() // loss function
 | `positional_encoding(embed_dim, max_len)` | Sinusoidal positional encoding |
 | `dropout()` | Dropout (eval mode: no-op) |
 
+## LSTM sequences
+
+`lstm_layer` accepts batch-first input shaped `[batch, sequence, features]`
+and returns `[batch, sequence, hidden_size]`. It supports stacked layers and
+computes gradients for the input, each gate matrix, and each bias through
+backpropagation through time. Gate matrices use input, forget, cell, output
+order.
+
+```v
+import vtl
+import vtl.autograd
+import vtl.nn.layers
+
+ctx := autograd.ctx[f64]()
+recurrent := layers.lstm_layer[f64](ctx, 2, 4, 2)
+sequence := ctx.variable(vtl.ones[f64]([3, 5, 2]))
+prediction := recurrent.forward(sequence)!
+assert prediction.value.shape == [3, 5, 4]
+assert recurrent.variables().len == 8
+prediction.backprop()!
+assert sequence.grad.shape == sequence.value.shape
+```
+
 `maxpool2d` saves each selected input's flat index for backpropagation. If
 overlapping windows select the same input, their gradients are added at that
 input; ties keep the first maximum in scan order.
