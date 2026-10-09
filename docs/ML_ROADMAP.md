@@ -49,8 +49,11 @@ GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 | P1 | [#161](https://github.com/vlang/vtl/issues/161) | CUDA backward for LSTM, attention, norms, embeddings, and pooling; validation pending |
 | P2 | [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support |
 | P2 | [#40](https://github.com/vlang/vtl/issues/40) | YOLO/fused autograd gates; requires benchmark evidence |
-| P2 | [#3](https://github.com/vlang/vtl/issues/3) | Evaluate compiler aliasing support without unsafe assumptions |
+| P2 | [#3](https://github.com/vlang/vtl/issues/3) | Await a safe V compiler alias contract; continue benchmarking CPU kernels |
 | Research | [#52](https://github.com/vlang/vtl/issues/52) | Compare Burn capabilities and architecture |
+
+V 0.5.2 does not emit a `restrict` alias contract. `@[direct_array_access]`
+removes bounds checks only; it does not establish non-aliasing.
 
 Project #8 contains all five open VTL issues: #3, #40, #52, #63, and #161.
 Issue #161 is tracked as a P1 backend correctness item in M2-GPU-Core. Issue

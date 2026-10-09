@@ -95,7 +95,7 @@ See [docs/DEVICE_MEMORY.md](docs/DEVICE_MEMORY.md).
 |----------|-----------|
 | P1 | Implement CUDA backward coverage for the remaining neural-network layers ([#161](https://github.com/vlang/vtl/issues/161)) |
 | P1 | Close the remaining correctness, API, and performance gaps in [NumPy and Arraymancer parity](docs/NUMPY_PARITY.md) |
-| P2 | Improve CPU kernel performance and evaluate aliasing/compiler optimizations ([#3](https://github.com/vlang/vtl/issues/3)) |
+| P2 | Improve CPU kernel performance and revisit alias/compiler optimizations when V provides a safe contract ([#3](https://github.com/vlang/vtl/issues/3)) |
 | P2 | Add ARM GPU support ([#63](https://github.com/vlang/vtl/issues/63)) |
 | P2 | Benchmark YOLO-oriented gate fusion against the current autograd path ([#40](https://github.com/vlang/vtl/issues/40)) |
 | Research | Assess the [Burn](https://github.com/tracel-ai/burn) feature set against VTL ([#52](https://github.com/vlang/vtl/issues/52)) |
@@ -106,11 +106,16 @@ See [docs/DEVICE_MEMORY.md](docs/DEVICE_MEMORY.md).
 
 | # | Title | Priority | Notes |
 |---|-------|----------|-------|
-| [#3](https://github.com/vlang/vtl/issues/3) | Fortran-like performance (`restrict`) | 🟡 Performance | Open; evaluate V compiler support and benchmark before adopting aliasing assumptions |
+| [#3](https://github.com/vlang/vtl/issues/3) | V aliasing (`restrict`) | 🟡 Perf | Open; await safe compiler support; see note below |
 | [#40](https://github.com/vlang/vtl/issues/40) | YOLO for autograd gates | 🟡 Performance | Open; requires end-to-end benchmark evidence |
 | [#52](https://github.com/vlang/vtl/issues/52) | Tracel-AI/Burn reference | Research | Open; compare concrete capabilities and architecture |
 | [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support | 🟡 P2 | Open; requires ARM GPU hardware for device validation |
-| [#161](https://github.com/vlang/vtl/issues/161) | CUDA backward for remaining layers | 🔴 ML | Open; Linear, Conv2D, and f64 Dropout have paths; LSTM, Attention, normalization, Embedding, and pooling remain |
+| [#161](https://github.com/vlang/vtl/issues/161) | CUDA backward gaps | 🔴 ML | Open; LSTM, attention, norms, embeddings, and pooling remain |
+
+**Issue #3 compiler status:** Installed V 0.5.2 does not emit a `restrict`
+alias contract. `@[direct_array_access]` removes bounds checks but does not
+establish non-aliasing. Keep #3 open; benchmark safe kernel changes and revisit
+when upstream compiler support is available.
 
 The complete NumPy and Arraymancer comparison is tracked in
 [docs/NUMPY_PARITY.md](docs/NUMPY_PARITY.md). The GitHub project board is not
