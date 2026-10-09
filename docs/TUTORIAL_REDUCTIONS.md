@@ -68,6 +68,19 @@ wide_rows := stats.sum_along_axis_as[f32, f64](measurements, 0, true)!
 assert wide_rows.to_array() == [1.0]
 ```
 
+`sum_accurate` uses compensated accumulation when cancellation makes small
+terms important. This costs extra work, so the regular `sum` remains the faster
+choice when ordinary rounding is sufficient:
+
+```v
+import vtl
+import vtl.stats
+
+values := vtl.from_1d([1e16, 1.0, -1e16])!
+assert stats.sum(values) == 0.0
+assert stats.sum_accurate(values) == 1.0
+```
+
 ## Statistical reductions along an axis
 
 `mean_along_axis`, `variance_along_axis`, and `std_along_axis` accept an

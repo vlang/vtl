@@ -420,6 +420,30 @@ fn test_sum() {
 fn test_sum_preserves_logical_order_for_column_major_views() {
 	values := vtl.from_2d([[1e16, 1.0], [-1e16, 1.0]])!.transpose([1, 0])!
 	assert sum(values) == 2.0
+	assert sum_accurate(values) == 2.0
+}
+
+fn test_sum_accurate_preserves_small_floating_point_contributions() {
+	values := vtl.from_1d([1e16, 1.0, -1e16])!
+	assert sum(values) == 0.0
+	assert sum_accurate(values) == 1.0
+
+	f32_values := vtl.from_1d([f32(1e8), 1.0, -1e8])!
+	assert sum_accurate(f32_values) == 1.0
+
+	integer_values := vtl.from_1d([1, 2, 3])!
+	assert sum_accurate(integer_values) == sum(integer_values)
+}
+
+fn test_sum_accurate_preserves_non_finite_sum_semantics() {
+	values := vtl.from_1d([math.inf(1), 1.0])!
+	assert math.is_inf(sum_accurate(values), 1)
+
+	nan_values := vtl.from_1d([math.nan(), 1.0])!
+	assert math.is_nan(sum_accurate(nan_values))
+
+	overflowing := vtl.from_1d([1e308, 1e308, -1e308])!
+	assert math.is_inf(sum_accurate(overflowing), 1)
 }
 
 fn test_contiguous_sum_handles_unrolled_tail() {
