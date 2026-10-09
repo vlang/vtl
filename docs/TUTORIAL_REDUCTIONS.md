@@ -383,9 +383,25 @@ assert quartiles.shape == [3]
 assert row_quartiles.shape == [2, 1]
 ```
 
+Use the `*_axes_with_method` variants to reduce a tuple of axes in one pass.
+Single-quantile results can retain the reduced dimensions; multi-quantile
+results prepend a quantile dimension:
+
+```v
+import vtl
+import vtl.stats
+
+volume := vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0], [2, 2, 2])!
+medians := stats.quantile_axes_with_method(volume, 0.5, [0, -1], .linear, false)!
+assert medians.to_array() == [3.5, 5.5]
+levels := stats.quantiles_axes_with_method(volume, [0.0, 0.5, 1.0], [0, 2], .linear)!
+assert levels.shape == [3, 2]
+```
+
 `nanquantile_*_with_method` and `nanquantiles_*_with_method` skip NaNs.
 Axis single-quantile helpers take `keepdims`; multiple quantiles prepend a
-quantile dimension. Percentile counterparts accept levels from 0 through 100.
+quantile dimension. Multi-axis, percentile, and NaN-aware counterparts follow
+the same output rules and accept levels from 0 through 100.
 
 Weighted quantiles use NumPy's `inverted_cdf` estimator. Global weights must
 match the input shape. Axis reductions also accept a one-dimensional weight

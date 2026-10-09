@@ -69,9 +69,11 @@ row_total := stats.sum_along_axis[f64](values, -1, true)!
 The legacy `quantile` helper expects sorted input. The `*_with_method` APIs
 sort a copy and support all thirteen NumPy estimators through
 `QuantileMethod`, including global, multi-quantile, axis, percentile, and
-NaN-ignoring forms. Axis quantiles accept `keepdims`; multi-quantile results
-prepend the quantile dimension. See [`stats.v`](stats.v) and
-[`quantile_methods.v`](quantile_methods.v) for edge-case behavior and the
+NaN-ignoring forms, including multi-axis reductions. Axis quantiles accept
+`keepdims`; multi-quantile results prepend the quantile dimension. See
+[`stats.v`](stats.v) and
+[`quantile_methods.v`](quantile_methods.v) and
+[`quantile_multi_axes.v`](quantile_multi_axes.v) for edge-case behavior and the
 [reductions tutorial](../docs/TUTORIAL_REDUCTIONS.md).
 
 Weighted quantiles and percentiles use NumPy's `inverted_cdf` estimator.

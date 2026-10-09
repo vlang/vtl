@@ -104,7 +104,7 @@ one axis, and over multiple axes with optional `keepdims`; scalar
 population/sample variance and standard deviation; single-axis and multi-axis
 mean/variance/std with explicit `keepdims` and NaN-aware forms; axis-wise
 `trapezoid`; all thirteen NumPy quantile estimators via `QuantileMethod`, with
-global, axis, multi-quantile, percentile, and NaN-aware forms; axis arg
+global, axis, multi-axis, multi-quantile, percentile, and NaN-aware forms; axis arg
 reductions and squeezed min/max/argmin/argmax results; multi-axis min/max;
 weighted inverted-CDF quantile, multi-quantile, percentile, and multi-percentile
 forms globally and along one or several axes, with same-shape or reduced-shape
