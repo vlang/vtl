@@ -255,6 +255,44 @@ pub fn (mut generator RandomGenerator) binomial(trials int, probability f64, sha
 	return result
 }
 
+// negative_binomial counts failures before n successes using this generator's
+// independent stream. n is the positive real-valued success threshold and p
+// is the success probability for each trial.
+pub fn (mut generator RandomGenerator) negative_binomial(n f64, probability f64, shape []int) !&Tensor[int] {
+	validate_negative_binomial_parameters(n, probability)!
+	mut rng := generator.rng
+	mut values := []int{len: size_from_shape(shape)}
+	for i in 0 .. values.len {
+		values[i] = sample_negative_binomial(n, probability, mut rng)!
+	}
+	return from_array[int](values, shape)
+}
+
+fn validate_negative_binomial_parameters(n f64, probability f64) ! {
+	if n <= 0 || math.is_nan(n) || math.is_inf(n, 0) {
+		return error('negative_binomial: n must be finite and positive')
+	}
+	if probability <= 0 || probability > 1 || math.is_nan(probability)
+		|| math.is_inf(probability, 0) {
+		return error('negative_binomial: probability must be finite and in (0, 1]')
+	}
+	if probability < 1 {
+		scale := (1 - probability) / probability
+		if math.is_inf(scale, 0) || scale <= 0 {
+			return error('negative_binomial: probability is too small for a finite sample scale')
+		}
+	}
+}
+
+fn sample_negative_binomial(n f64, probability f64, mut rng &rand.PRNG) !int {
+	if probability == 1 {
+		return 0
+	}
+	lambda := sample_gamma(n, (1 - probability) / probability, mut rng)!
+	validate_poisson_rate(lambda)!
+	return sample_poisson(lambda, mut rng)
+}
+
 // hypergeometric samples the number of good items in draws made without
 // replacement from a population containing ngood good and nbad bad items.
 pub fn (mut generator RandomGenerator) hypergeometric(ngood int, nbad int, nsample int, shape []int) !&Tensor[int] {
@@ -1050,6 +1088,26 @@ pub fn geometric(probability f64, shape []int, params TensorData) !&Tensor[int] 
 		result.set_nth(i, geometric_sample(probability, u))
 	}
 	return result
+}
+
+// negative_binomial counts failures before n successes on VTL's global
+// random stream. n may be any finite positive real value.
+pub fn negative_binomial(n f64, probability f64, shape []int, params TensorData) !&Tensor[int] {
+	validate_negative_binomial_parameters(n, probability)!
+	mut result := zeros[int](shape, params)
+	for i in 0 .. result.size {
+		result.set_nth(i, sample_negative_binomial_global(n, probability)!)
+	}
+	return result
+}
+
+fn sample_negative_binomial_global(n f64, probability f64) !int {
+	if probability == 1 {
+		return 0
+	}
+	lambda := sample_gamma_global(n, (1 - probability) / probability)!
+	validate_poisson_rate(lambda)!
+	return sample_poisson_global(lambda)
 }
 
 fn validate_geometric_probability(probability f64) ! {
