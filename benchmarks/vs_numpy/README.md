@@ -142,6 +142,45 @@ VTL remained 1.92x slower. This run used V 0.5.2 `b69f626`, NumPy 2.5.3, and
 the installed system provides `libcblas`, but not the `libopenblas` linker name
 required by `-d vsl_blas_cblas`.
 
+## Matrix-chain ordering
+
+This benchmark compares VTL and NumPy optimal matrix-chain ordering with a
+left-associated chain for the same `400x40`, `40x4000`, and `4000x40` all-ones
+matrices. The optimal association uses 7.04 million scalar multiplications; the
+left-associated order uses 128 million. Both versions warm up twice, time ten
+calls, and verify matching checksums.
+
+Run from `~/.vmodules` with a memory-limited systemd scope:
+
+```bash
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -cc gcc -keepc -prod run ./vtl/benchmarks/vs_numpy/multi_dot_bench.v
+systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
+	OPENBLAS_NUM_THREADS=2 uv run --with numpy python \
+	./vtl/benchmarks/vs_numpy/numpy_multi_dot_baseline.py
+```
+
+Record CPU, V version/build, NumPy/BLAS version, and thread count with results.
+The shape-cost reduction does not imply that VTL matmul kernels are faster than
+NumPy; compare the measured times on the same machine.
+
+On an AMD Ryzen 9 5900X, VTL used V 0.5.2 `5bd6709`, `-prod`, GCC, and the
+pure-V matmul backend. NumPy 2.5.3 used scipy-openblas 0.3.34.106.0 with
+`OPENBLAS_NUM_THREADS=2`. The identical inputs measured:
+
+| Implementation | Ordering | Mean (ms) | Checksum |
+| --- | --- | ---: | ---: |
+| VTL | `multi_dot` | 0.9364 | 25600000000.0 |
+| VTL | left-associated | 12.1205 | 25600000000.0 |
+| NumPy | `multi_dot` | 0.2070 | 25600000000.0 |
+| NumPy | left-associated | 2.5193 | 25600000000.0 |
+
+The optimal order was 12.9× faster than the left-associated VTL chain; NumPy
+`multi_dot` was 4.5× faster than VTL for this case. This is one matrix chain
+and does not establish general NumPy performance parity. On this workstation the default V
+`-prod run` path crashes during interface type checking; the shown GCC command
+succeeds. `-keepc` retains generated C files for debugging.
+
 ## Matmul
 
 For the 768 MiB workstation cap, run the f64 and f32 cases as separate
