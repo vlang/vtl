@@ -1,5 +1,6 @@
 module stats
 
+import math
 import vtl
 
 fn test_weighted_quantiles_match_inverted_cdf_semantics() ! {
@@ -43,4 +44,33 @@ fn test_weighted_quantiles_reduce_axis_with_shared_or_full_weights() ! {
 	kept := quantile_weighted_axis(values, vtl.from_1d([1.0, 1.0, 7.0])!, 0.5, 1, true)!
 	assert kept.shape == [2, 1]
 	assert kept.to_array() == [4.0, 1.0]
+}
+
+fn test_nanweighted_quantiles_skip_values_and_their_weights() ! {
+	values := vtl.from_1d([1.0, math.nan(), 3.0, 4.0])!
+	weights := vtl.from_1d([1.0, 100.0, 1.0, 2.0])!
+	assert nanquantile_weighted(values, weights, 0.5)! == 3.0
+	assert nanquantiles_weighted(values, weights, [0.25, 0.5, 1.0])!.to_array() == [
+		1.0,
+		3.0,
+		4.0,
+	]
+	all_nan := vtl.from_1d([math.nan(), math.nan()])!
+	assert math.is_nan(nanquantile_weighted(all_nan, vtl.from_1d([1.0, 1.0])!, 0.5)!)
+	if _ := nanquantile_weighted(vtl.from_1d([1.0, 2.0])!, vtl.from_1d([0.0, 0.0])!, 0.5) {
+		assert false, 'zero total weight among non-NaN values must fail'
+	}
+}
+
+fn test_nanweighted_quantile_axis_preserves_nan_policy_and_shapes() ! {
+	values := vtl.from_array([1.0, math.nan(), 3.0, 4.0, 5.0, math.nan()], [2, 3])!
+	weights := vtl.from_array([1.0, 10.0, 1.0, 1.0, 1.0, 1.0], [2, 3])!
+	ordinary := quantile_weighted_axis(values, weights, 0.5, 1, false)!
+	assert math.is_nan(ordinary.get([0]))
+	assert math.is_nan(ordinary.get([1]))
+	ignored := nanquantile_weighted_axis(values, weights, 0.5, 1, false)!
+	assert ignored.to_array() == [1.0, 4.0]
+	multiple := nanquantiles_weighted_axis(values, weights, [0.0, 0.5, 1.0], 1)!
+	assert multiple.shape == [3, 2]
+	assert multiple.to_array() == [1.0, 4.0, 1.0, 4.0, 3.0, 5.0]
 }
