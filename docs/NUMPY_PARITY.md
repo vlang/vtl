@@ -171,7 +171,9 @@ layout and singular inputs report errors.
 `la.eigh` and `la.eigvalsh` compute ascending eigenvalues for batches of real
 symmetric matrices, with eigenvectors in columns and selectable upper/lower
 triangle input. Inputs must be finite; the Jacobi method returns an error if
-it does not converge within 100 sweeps.
+it does not converge within 100 sweeps. `la.eig` and `la.eigvals` handle batches
+of finite real non-symmetric matrices and return complex eigenvalues; `la.eig`
+also returns right eigenvectors in columns, including conjugate pairs.
 `la.matrix_rank` computes one matrix's numerical rank with an explicit or
 dtype-aware NumPy-style default tolerance; `la.matrix_rank_batch` preserves
 leading batch dimensions.
@@ -179,8 +181,8 @@ leading batch dimensions.
 rank from a relative singular-value cutoff, and returns squared residual sums
 only when NumPy does.
 
-**Remaining:** add general (non-symmetric, possibly complex) eigenproblems,
-complex SVD, and benchmark realistic shapes for both the default and LAPACKE
+**Remaining:** add complex-input general eigenproblems and complex SVD, and
+benchmark realistic shapes for both the default and LAPACKE
 backends.
 
 ### FFT

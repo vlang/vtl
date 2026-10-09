@@ -7,7 +7,8 @@ matters.
 
 `matmul` supports complex128 vector, matrix, and broadcast-batch products via a
 pure-V kernel. Complex vector products follow NumPy's convention and do not
-conjugate either operand. Complex decomposition and solve routines remain
+conjugate either operand. General `eig` accepts real matrices and can return
+complex eigenpairs; complex-input decomposition and solve routines remain
 unsupported.
 
 ```v
@@ -26,8 +27,8 @@ Available operations include `dot`, `matmul`, `tensordot`, `diag`, batched
 `det` and `inv`, `trace`, matrix `norm`, vector `vector_norm` and its axis
 variants, `outer`, `cross`, `solve`, `lstsq`, `qr`, `lu`, `cholesky`, `pinv`,
 `matrix_rank`, `matrix_rank_batch`, `slogdet`, `svd`, `svdvals`, batched `matrix_norm`,
-`matrix_power`, `cond`, and symmetric `eigh`/`eigvalsh`. Shape and tolerance
-requirements are checked by each function.
+`matrix_power`, `cond`, symmetric `eigh`/`eigvalsh`, and general `eig`/`eigvals`.
+Shape and tolerance requirements are checked by each function.
 
 `solve(a, b)` accepts square matrices or stacks of square matrices. Leading
 batch dimensions follow NumPy broadcasting. A vector right-hand side has shape

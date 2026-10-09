@@ -197,6 +197,23 @@ la.matrix_rank(a, 1e-10)!
 // = 2  (one singular value is zero)
 ```
 
+## General Eigenvalues
+
+`la.eig(a)` computes eigenvalues and right eigenvectors for real square
+matrices, including non-symmetric matrices with complex conjugate eigenpairs.
+Eigenvalues have shape `[..., n]`; eigenvectors have shape `[..., n, n]`, with
+eigenvectors in columns. `la.eigvals(a)` skips eigenvector computation.
+
+```v
+import vtl
+import vtl.la
+
+rotation := vtl.from_2d([[0.0, -1.0], [1.0, 0.0]])!
+eigenvalues, eigenvectors := la.eig(rotation)!
+println(eigenvalues) // [0+1i, 0-1i]
+println(eigenvectors.shape) // [2, 2]
+```
+
 ## Combining with Autograd
 
 All LA functions in `vtl.la` work seamlessly with `autograd.Variable`.

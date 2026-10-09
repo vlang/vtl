@@ -68,8 +68,8 @@ t.get([1, 1])
 - **Neural networks** — `Sequential` API; Linear, Conv2D, LSTM, Attention, …
 - **Losses & optimizers** — MSE, MAE, BCE, Hinge, Focal, CrossEntropy, Huber;
   Adam, AdamW, NAdam, RAdam, SGD, …
-- **Linear algebra** — VSL-backed real matmul, pure-V complex128 matmul, solve,
-  QR, LU, Cholesky, SVD, pinv
+- **Linear algebra** — VSL-backed real matmul and general eigensolvers,
+  pure-V complex128 matmul, solve, QR, LU, Cholesky, SVD, pinv
 - **Hardware** — zero-copy `Tensor.data` for C libs; optional CUDA and Vulkan training paths
 
 ## ML Release Highlights
