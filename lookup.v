@@ -31,9 +31,31 @@ pub fn count_nonzero_axis[T](t &Tensor[T], axis int, keepdims bool) !&Tensor[int
 	if axis_index < 0 || axis_index >= rank {
 		return error('count_nonzero_axis: axis ${axis} out of bounds for rank ${rank}')
 	}
-	mut output_shape := []int{cap: if keepdims { rank } else { rank - 1 }}
+	return count_nonzero_axes[T](t, [axis], keepdims)
+}
+
+// count_nonzero_axes counts non-zero values along multiple axes. Negative axes
+// are supported, axes must be unique, and an empty axis list preserves the
+// input shape while converting each value to zero or one.
+pub fn count_nonzero_axes[T](t &Tensor[T], axes []int, keepdims bool) !&Tensor[int] {
+	rank := t.rank()
+	if axes.len > 0 && rank == 0 {
+		return error('count_nonzero_axes: axes require a tensor with at least one dimension')
+	}
+	mut normalized_axes := []int{cap: axes.len}
+	for axis in axes {
+		axis_index := if axis < 0 { axis + rank } else { axis }
+		if axis_index < 0 || axis_index >= rank {
+			return error('count_nonzero_axes: axis ${axis} out of bounds for rank ${rank}')
+		}
+		if axis_index in normalized_axes {
+			return error('count_nonzero_axes: duplicate axis ${axis}')
+		}
+		normalized_axes << axis_index
+	}
+	mut output_shape := []int{cap: rank}
 	for dim, dimension in t.shape {
-		if dim == axis_index {
+		if dim in normalized_axes {
 			if keepdims {
 				output_shape << 1
 			}
@@ -49,18 +71,17 @@ pub fn count_nonzero_axis[T](t &Tensor[T], axis int, keepdims bool) !&Tensor[int
 		}
 		decode_flat_coordinate(flat_index, t.shape, mut coordinates)
 		mut output_flat_index := 0
-		mut output_stride := 1
-		mut output_dim := output_shape.len - 1
-		for dim := rank - 1; dim >= 0; dim-- {
-			if dim == axis_index {
+		mut output_dim := 0
+		for dim in 0 .. rank {
+			if dim in normalized_axes {
 				if keepdims {
-					output_dim--
+					output_flat_index *= output_shape[output_dim]
+					output_dim++
 				}
-				continue
+			} else {
+				output_flat_index = output_flat_index * output_shape[output_dim] + coordinates[dim]
+				output_dim++
 			}
-			output_flat_index += coordinates[dim] * output_stride
-			output_stride *= output_shape[output_dim]
-			output_dim--
 		}
 		counts[output_flat_index]++
 	}
