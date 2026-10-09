@@ -28,6 +28,55 @@ fn gru_test_objective(input_data []f64, wih_data []f64, whh_data []f64, bih_data
 	return total
 }
 
+fn gru_test_objective_with_final_state(input_data []f64, wih_data []f64, whh_data []f64,
+	bih_data []f64, bhh_data []f64, h0_data []f64) !f64 {
+	x := vtl.from_array(input_data, [2, 1, 2])!
+	wih := vtl.from_array(wih_data, [6, 2])!
+	whh := vtl.from_array(whh_data, [6, 2])!
+	bih := vtl.from_array(bih_data, [6])!
+	bhh := vtl.from_array(bhh_data, [6])!
+	h0 := vtl.from_array(h0_data, [1, 2])!
+	y, final_state := gru_forward_single[f64](x, wih, whh, bih, bhh, h0)!
+	mut total := f64(0)
+	for i, value in y.to_array() { total += value * f64(i + 1) }
+	final_values := final_state.to_array()
+	return total + final_values[0] * 0.7 - final_values[1] * 0.4
+}
+
+fn test_gru_backward_propagates_final_state_gradient() ! {
+	input_data := [0.2, -0.1, 0.4, 0.3]
+	wih_data := [0.1, -0.2, 0.05, 0.1, -0.1, 0.2, 0.3, 0.1, -0.2, 0.15, 0.05, -0.1]
+	whh_data := [0.2, 0.1, -0.15, 0.05, 0.1, -0.2, -0.1, 0.15, 0.3, -0.25, 0.05, 0.2]
+	bih_data := [0.01, -0.02, 0.03, 0.01, -0.01, 0.02]
+	bhh_data := [-0.01, 0.02, 0.01, -0.03, 0.02, -0.01]
+	h0_data := [0.1, -0.2]
+	x := vtl.from_array(input_data, [2, 1, 2])!
+	wih := vtl.from_array(wih_data, [6, 2])!
+	whh := vtl.from_array(whh_data, [6, 2])!
+	bih := vtl.from_array(bih_data, [6])!
+	bhh := vtl.from_array(bhh_data, [6])!
+	h0 := vtl.from_array(h0_data, [1, 2])!
+	grad_output := vtl.from_array([1.0, 2.0, 3.0, 4.0], [2, 1, 2])!
+	grad_final_state := vtl.from_array([0.7, -0.4], [1, 2])!
+	grads := gru_backward_single_with_final_state[f64](x, wih, whh, bih, bhh, h0,
+		grad_output, grad_final_state)!
+	for index in 0 .. h0_data.len {
+		mut plus_state := h0_data.clone()
+		mut minus_state := h0_data.clone()
+		eps := 1e-6
+		plus_state[index] += eps
+		minus_state[index] -= eps
+		plus := gru_test_objective_with_final_state(input_data, wih_data, whh_data, bih_data,
+			bhh_data, plus_state)!
+		minus := gru_test_objective_with_final_state(input_data, wih_data, whh_data, bih_data,
+			bhh_data, minus_state)!
+		numerical := (plus - minus) / (2 * eps)
+		analytic := grads[5].get_nth(index)
+		delta := numerical - analytic
+		assert delta > -1e-6 && delta < 1e-6, 'GRU final-state gradient for h0[${index}] mismatch: analytic ${analytic}, numerical ${numerical}'
+	}
+}
+
 fn test_gru_forward_shapes_and_finite_difference_gradients() ! {
 	input_data := [0.2, -0.1, 0.4, 0.3]
 	wih_data := [0.1, -0.2, 0.05, 0.1, -0.1, 0.2, 0.3, 0.1, -0.2, 0.15, 0.05, -0.1]

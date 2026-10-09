@@ -190,8 +190,33 @@ GRU with a zero initial hidden state. It accepts
 `[sequence, batch, hidden_size]`. Its reset, update, and candidate weights use
 PyTorch's `[reset, update, new]` gate order. The lower-level
 `vtl.nn.internal.gru_forward_single` also accepts an explicit initial state and
-returns the final state. CPU backpropagation computes gradients for the input
-and all four parameter tensors.
+returns the final state. CPU backpropagation computes gradients for the input,
+initial hidden state, and all four parameter tensors.
+
+For stateful inference or truncated backpropagation, construct a typed layer
+with `new_gru_layer` and call `forward_with_state`. It returns both the output
+sequence and final hidden state; gradients from either result flow through the
+same GRU recurrence and back to `h0`.
+
+```v
+import vtl
+import vtl.autograd
+import vtl.nn.layers
+
+ctx := autograd.ctx[f64]()
+layer := layers.new_gru_layer[f64](ctx, 2, 4)
+sequence := ctx.variable(vtl.from_array([0.1, 0.2, 0.3, 0.4], [2, 1, 2])!)
+h0 := ctx.variable(vtl.zeros[f64]([1, 4]))
+mut output, mut final_state := layer.forward_with_state(sequence, h0)!
+loss := output.sum()!.add(final_state.sum()!)!
+loss.backprop()!
+println(final_state.value.shape) // [1, 4]
+println(h0.grad.shape) // [1, 4]
+```
+
+`Sequential.gru` continues to initialize the hidden state to zero and returns
+the output sequence. Use `new_gru_layer` when the caller needs to provide or
+carry the hidden state between batches.
 
 ```v
 import vtl
