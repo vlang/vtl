@@ -74,7 +74,7 @@ jobs:
         run: |
           cd ~/.vmodules
           mapfile -t markdown_files <<< "$MARKDOWN_FILES"
-          sudo systemd-run --scope --wait \
+          sudo systemd-run --scope \
             --property=MemoryMax=4G \
             --property=MemorySwapMax=0 \
             --setenv=HOME="$HOME" \
