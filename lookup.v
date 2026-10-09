@@ -42,11 +42,12 @@ pub fn count_nonzero_axis[T](t &Tensor[T], axis int, keepdims bool) !&Tensor[int
 		}
 	}
 	mut counts := []int{len: size_from_shape(output_shape)}
+	mut coordinates := []int{len: rank}
 	for flat_index in 0 .. t.size {
 		if !td[T](t.get_nth[T](flat_index)).bool() {
 			continue
 		}
-		coordinates := t.nth_index(flat_index)
+		decode_flat_coordinate(flat_index, t.shape, mut coordinates)
 		mut output_flat_index := 0
 		mut output_stride := 1
 		mut output_dim := output_shape.len - 1
