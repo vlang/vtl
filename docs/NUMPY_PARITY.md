@@ -58,8 +58,9 @@ read-only by default.
 `advanced_index`; mixed `mixed_index` selectors for coordinate arrays, scalar
 indices, slices, ellipsis, and new axes; sorted `unique` and its counts,
 inverse, and first-index variants;
-`unique_axis`; `digitize`; ascending and descending `searchsorted`; global and
-axis `count_nonzero`; `argwhere` and per-axis `nonzero`; `take`, `take_nd`,
+`unique_axis`; `digitize`; ascending and descending `searchsorted`; global,
+single-axis, and multiple-axis `count_nonzero`; `argwhere` and per-axis `nonzero`;
+`take`, `take_nd`,
 `take_flat`; `take_along_axis` with broadcasting outside the selected axis;
 `put_along_axis` and `scatter_add`; lookup and DataLoader gathers; broadcastable
 `masked_select` and `masked_fill`; leading-dimension boolean-mask indexing via

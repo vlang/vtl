@@ -53,12 +53,40 @@ fn test_count_nonzero_globally_and_by_axis_with_keepdims() ! {
 	assert vtl.count_nonzero_axis[int](series, 0, true)!.shape == [1]
 }
 
+fn test_count_nonzero_multiple_axes_and_keepdims() ! {
+	tensor := vtl.from_array([0, 1, 2, 0, 3, 0, 0, 4], [2, 2, 2])!
+	got := vtl.count_nonzero_axes[int](tensor, [0, 2], false)!
+	assert got.shape == [2]
+	assert got.to_array() == [2, 2]
+	kept := vtl.count_nonzero_axes[int](tensor, [-3, -1], true)!
+	assert kept.shape == [1, 2, 1]
+	assert kept.to_array() == [2, 2]
+	all_axes := vtl.count_nonzero_axes[int](tensor, [0, 1, 2], false)!
+	assert all_axes.shape == []
+	assert all_axes.get_nth[int](0) == 4
+}
+
+fn test_count_nonzero_empty_axes_and_views() ! {
+	tensor := vtl.from_2d([[0, 2, 0], [3, 0, 4]])!
+	unchanged_shape := vtl.count_nonzero_axes[int](tensor, [], false)!
+	assert unchanged_shape.shape == tensor.shape
+	assert unchanged_shape.to_array() == [0, 1, 0, 1, 0, 1]
+	transposed := tensor.transpose([1, 0])!
+	assert vtl.count_nonzero_axes[int](transposed, [0], false)!.to_array() == [1, 2]
+	if _ := vtl.count_nonzero_axes[int](tensor, [0, -2], false) {
+		assert false, 'count_nonzero_axes must reject duplicate axes'
+	} else {
+		assert true
+	}
+}
+
 fn test_count_nonzero_handles_empty_scalar_and_nan() ! {
 	empty := vtl.from_array([]int{}, [0, 3])!
 	assert vtl.count_nonzero[int](empty) == 0
 	assert vtl.count_nonzero_axis[int](empty, 1, false)!.shape == [0]
 	scalar := vtl.from_array([7], [])!
 	assert vtl.count_nonzero[int](scalar) == 1
+	assert vtl.count_nonzero_axes[int](scalar, [], false)!.get_nth[int](0) == 1
 	values := vtl.from_1d([0.0, math.nan(), 2.0])!
 	assert vtl.count_nonzero[f64](values) == 2
 	if _ := vtl.count_nonzero_axis[int](scalar, 0, false) {

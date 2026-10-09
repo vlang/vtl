@@ -59,8 +59,10 @@ duplicate destinations and their gradients.
 ## Count non-zero values
 
 `count_nonzero` counts all non-zero tensor values. `count_nonzero_axis` counts
-along one axis and removes it; pass `keepdims: true` to retain that axis with
-length one.
+along one axis, while `count_nonzero_axes` reduces a list of axes. Reduced axes
+are removed by default; pass `keepdims: true` to retain them with length one.
+Axes may be negative and must be unique. An empty axes list preserves the shape
+and converts each value to zero or one.
 
 ```v
 import vtl
@@ -69,6 +71,10 @@ values := vtl.from_2d([[0, 2, 0], [3, 0, 4]])!
 assert vtl.count_nonzero[int](values) == 3
 assert vtl.count_nonzero_axis[int](values, 1, false)!.to_array() == [1, 2]
 assert vtl.count_nonzero_axis[int](values, 1, true)!.shape == [2, 1]
+
+cube := vtl.from_array([0, 1, 2, 0, 3, 0, 0, 4], [2, 2, 2])!
+assert vtl.count_nonzero_axes[int](cube, [0, 2], false)!.to_array() == [2, 2]
+assert vtl.count_nonzero_axes[int](cube, [-3, -1], true)!.shape == [1, 2, 1]
 ```
 
 ## Search and digitize
