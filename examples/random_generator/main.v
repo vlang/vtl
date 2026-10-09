@@ -25,6 +25,7 @@ fn main() {
 	class_probabilities_sample := training_rng.dirichlet[f64](class_concentration, [2])!
 	positive_scales := training_rng.lognormal(0.0, 0.25, [4])!
 	noise := training_rng.uniform(-0.01, 0.01, [4])!
+	integer_noise := training_rng.integers(-2, 3, [4])!
 	event_counts := training_rng.binomial(12, 0.25, [4])!
 	arrival_counts := validation_rng.poisson(3.5, [4])!
 	lifetimes := validation_rng.weibull(1.5, [4])!
@@ -56,6 +57,7 @@ fn main() {
 	println('F-distribution ratios: ${variance_ratios.to_array()}')
 	println('Exponential waiting durations: ${waiting_durations.to_array()}')
 	println('Independent augmentation noise: ${noise.to_array()}')
+	println('Seeded integer offsets: ${integer_noise.to_array()}')
 
 	training_rng.free()
 	validation_rng.free()

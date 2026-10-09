@@ -34,6 +34,37 @@ fn test_random_generator_supports_normal_and_bernoulli_distributions() ! {
 	generator.free()
 }
 
+fn test_random_generator_integers_are_seeded_and_obey_endpoint() ! {
+	mut generator := new_random_generator(421)
+	values := generator.integers(-3, 7, [256])!
+	mut replay := new_random_generator(421)
+	assert values.array_equal(replay.integers(-3, 7, [256])!)
+	for value in values.to_array() {
+		assert value >= -3 && value < 7
+	}
+	inclusive := generator.integers_with_endpoint(4, 4, [32], true)!
+	assert inclusive.to_array() == []int{len: 32, init: 4}
+	mut empty_rng := new_random_generator(422)
+	empty := empty_rng.integers(0, 5, [0])!
+	assert empty.size == 0
+	if _ := generator.integers(4, 4, [1]) {
+		assert false, 'integers must reject an empty half-open range'
+	}
+	exclusive := generator.integers_with_endpoint(0, 2, [128], false)!
+	for value in exclusive.to_array() {
+		assert value >= 0 && value < 2
+	}
+	if _ := generator.integers_with_endpoint(0, max_int, [1], true) {
+		assert false, 'integers must reject an inclusive max_int upper bound'
+	}
+	if _ := generator.integers(-max_int, max_int, [1]) {
+		assert false, 'integers must reject ranges too wide for the RNG'
+	}
+	generator.free()
+	replay.free()
+	empty_rng.free()
+}
+
 fn test_random_generator_supports_seeded_lognormal() ! {
 	mut generator := new_random_generator(258)
 	values := generator.lognormal(0.25, 0.5, [64])!
