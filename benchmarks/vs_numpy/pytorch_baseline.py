@@ -13,13 +13,14 @@ except ImportError:
 
 
 class MLP(nn.Module):
-    """Three-layer MLP with direct layer calls, matching the VTL benchmark."""
+    """Three-layer f64 MLP matching the VTL benchmark's dtype and layer sizes."""
 
     def __init__(self):
         super().__init__()
         self.first = nn.Linear(128, 64)
         self.second = nn.Linear(64, 64)
         self.third = nn.Linear(64, 32)
+        self.double()
 
     def forward(self, x):
         x = torch.relu(self.first(x))
@@ -28,10 +29,12 @@ class MLP(nn.Module):
 
 
 def bench_autograd():
+    torch.set_num_threads(2)
+    torch.set_num_interop_threads(2)
     for batch in (32, 64):
         model = MLP()
-        x = torch.ones(batch, 128)
-        y = torch.zeros(batch, 32)
+        x = torch.ones(batch, 128, dtype=torch.float64)
+        y = torch.zeros(batch, 32, dtype=torch.float64)
         criterion = nn.MSELoss()
 
         def step():
@@ -40,8 +43,9 @@ def bench_autograd():
             loss = criterion(pred, y)
             loss.backward()
 
-        step()  # warmup
-        sec = timeit.timeit(step, number=2) / 2.0
+        for _ in range(5):
+            step()
+        sec = timeit.timeit(step, number=10) / 10.0
         print(f"pytorch mlp_backprop {batch}x128 | {sec * 1000:.2f} ms | -")
 
 

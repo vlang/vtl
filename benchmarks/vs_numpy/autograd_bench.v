@@ -17,14 +17,14 @@ const sizes = [32, 64]
 fn main() {
 	bu.print_header('VTL autograd MLP backprop (3-layer, f64)')
 	config := bu.BenchConfig{
-		iterations:  2
-		warmup_runs: 1
+		iterations:  10
+		warmup_runs: 5
 	}
 	bu.print_table_header()
 	for n in sizes {
 		bench_mlp_backprop(n, config)!
 	}
-	println('\nCompare with PyTorch: python3 vtl/benchmarks/vs_numpy/pytorch_baseline.py autograd')
+	println('\nCompare with PyTorch: uv run --with torch python ./vtl/benchmarks/vs_numpy/pytorch_baseline.py autograd')
 }
 
 fn bench_mlp_backprop(batch int, config bu.BenchConfig) ! {

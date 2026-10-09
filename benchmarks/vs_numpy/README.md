@@ -359,18 +359,21 @@ systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tm
 
 ## Autograd (3-layer MLP backprop)
 
-VTL and PyTorch use the same batch sizes (32 and 64), one warmup step, and two
-timed forward/backward steps. Both call three linear layers directly, apply ReLU
-after the first two layers, clear parameter gradients before each backward
-pass, and compute mean squared error. No optimizer update is included. Timings
-use a monotonic nanosecond clock for VTL.
+VTL and PyTorch use the same batch sizes (32 and 64), f64 dtype, five warmup
+steps, and ten timed forward/backward steps. Both call three linear layers
+directly, apply ReLU after the first two layers, clear parameter gradients
+before each backward pass, and compute mean squared error. No optimizer update
+is included. PyTorch is pinned to two CPU threads; timings use a monotonic
+nanosecond clock for VTL. This VTL command measures the default pure-V backend;
+it does not claim parity with an optimized CBLAS build.
 
 ```bash
 systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
-	v -prod -o /tmp/vtl-autograd-bench ./vtl/benchmarks/vs_numpy/autograd_bench.v
+	v -no-parallel -cc gcc -prod \
+	-cflags "-march=native" -o /tmp/vtl-autograd-bench ./vtl/benchmarks/vs_numpy/autograd_bench.v
 systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-autograd-bench
 systemd-run --user --scope --quiet -p MemoryMax=2G -p MemorySwapMax=0 -- env VJOBS=2 \
-	python3 ./vtl/benchmarks/vs_numpy/pytorch_baseline.py autograd
+	OMP_NUM_THREADS=2 MKL_NUM_THREADS=2 uv run --with torch python ./vtl/benchmarks/vs_numpy/pytorch_baseline.py autograd
 ```
 
 Use `-prod` for comparable performance measurements. Development builds do not
