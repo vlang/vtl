@@ -22,5 +22,5 @@ fn test_linear_bias_gradient_sums_the_f32_batch() ! {
 	loss.backprop()!
 	bias_gradient := layer.variables()[1].grad
 	assert bias_gradient.shape == [1, 2]
-	assert bias_gradient.to_array() == [3.0, 3.0]
+	assert bias_gradient.to_array() == [f32(3), 3]
 }

@@ -193,7 +193,7 @@ pub fn (array &MaskedArray[T]) greater_equal[T](other &MaskedArray[T]) !MaskedAr
 // add_scalar adds a valid scalar to every value and preserves the mask.
 pub fn (array &MaskedArray[T]) add_scalar[T](scalar T) !MaskedArray[T] {
 	return MaskedArray[T]{
-		values: array.values.add_scalar[T](scalar)!
+		values: array.values.add_scalar(scalar)!
 		mask:   array.mask
 	}
 }
