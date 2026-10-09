@@ -158,10 +158,14 @@ pub fn (t &Tensor[T]) flatten[T]() !&Tensor[T] {
 	return from_1d[T](t.to_array())
 }
 
-// reshape returns an Tensor with a new shape
+// reshape returns a Tensor with a new shape in row-major logical order.
+// Row-major contiguous tensors share storage; other layouts are copied.
 pub fn (t &Tensor[T]) reshape[T](shape []int) !&Tensor[T] {
 	size := size_from_shape(t.shape)
 	newshape, _ := shape_with_autosize(shape, size)!
+	if !t.is_row_major_contiguous() {
+		return from_array[T](t.to_array(), newshape)
+	}
 	mut ret := tensor_like_with_shape[T](t, newshape)
 	ret.data = t.data
 	ret.ensure_memory()
