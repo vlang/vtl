@@ -130,6 +130,54 @@ fn test_random_generator_supports_seeded_binomial_and_exponential() ! {
 	replay.free()
 }
 
+fn test_random_generator_supports_hypergeometric_sampling() ! {
+	mut generator := new_random_generator(751)
+	values := generator.hypergeometric(5, 5, 4, [4096])!
+	mut replay := new_random_generator(751)
+	assert values.array_equal(replay.hypergeometric(5, 5, 4, [4096])!)
+	mut total := 0
+	for value in values.to_array() {
+		assert value >= 0 && value <= 4
+		total += value
+	}
+	assert math.abs(f64(total) / f64(values.size) - 2.0) < 0.06
+	complement_draw := generator.hypergeometric(5, 5, 8, [512])!
+	mut complement_total := 0
+	for value in complement_draw.to_array() {
+		assert value >= 3 && value <= 5
+		complement_total += value
+	}
+	assert math.abs(f64(complement_total) / f64(complement_draw.size) - 4.0) < 0.1
+	hrua_draw := generator.hypergeometric(50, 50, 80, [1024])!
+	mut hrua_total := 0
+	for value in hrua_draw.to_array() {
+		assert value >= 30 && value <= 50
+		hrua_total += value
+	}
+	assert math.abs(f64(hrua_total) / f64(hrua_draw.size) - 40.0) < 0.25
+	reflected_draw := generator.hypergeometric(80, 20, 60, [512])!
+	mut reflected_total := 0
+	for value in reflected_draw.to_array() {
+		assert value >= 40 && value <= 60
+		reflected_total += value
+	}
+	assert math.abs(f64(reflected_total) / f64(reflected_draw.size) - 48.0) < 0.4
+	assert generator.hypergeometric(7, 0, 3, [4])!.to_array() == [3, 3, 3, 3]
+	assert generator.hypergeometric(7, 5, 0, [2])!.to_array() == [0, 0]
+	assert generator.hypergeometric(0, 0, 0, [1])!.to_array() == [0]
+	if _ := generator.hypergeometric(-1, 2, 1, [1]) {
+		assert false, 'hypergeometric must reject negative population counts'
+	}
+	if _ := generator.hypergeometric(1, 2, 4, [1]) {
+		assert false, 'hypergeometric must reject samples larger than the population'
+	}
+	if _ := generator.hypergeometric(max_int, 1, 0, [1]) {
+		assert false, 'hypergeometric must reject population-size overflow'
+	}
+	generator.free()
+	replay.free()
+}
+
 fn test_random_generator_supports_location_scale_distributions() ! {
 	mut generator := new_random_generator(9401)
 	gumbel_values := generator.gumbel(2.0, 1.5, [128])!

@@ -79,6 +79,38 @@ fn test_global_poisson_and_weibull_are_seeded_and_validated() ! {
 	}
 }
 
+fn test_global_hypergeometric_is_seeded_and_validated() ! {
+	assert hypergeometric(8, 0, 3, [4], TensorData{})!.to_array() == [3, 3, 3, 3]
+	assert hypergeometric(8, 5, 0, [2], TensorData{})!.to_array() == [0, 0]
+	random_seed(512)
+	values := hypergeometric(5, 5, 4, [2048], TensorData{})!
+	random_seed(512)
+	assert values.array_equal(hypergeometric(5, 5, 4, [2048], TensorData{})!)
+	for value in values.to_array() {
+		assert value >= 0 && value <= 4
+	}
+	large_sample := hypergeometric(50, 50, 80, [512], TensorData{})!
+	mut large_sample_total := 0
+	for value in large_sample.to_array() {
+		assert value >= 30 && value <= 50
+		large_sample_total += value
+	}
+	assert math.abs(f64(large_sample_total) / f64(large_sample.size) - 40.0) < 0.35
+	reflected_sample := hypergeometric(80, 20, 60, [512], TensorData{})!
+	mut reflected_total := 0
+	for value in reflected_sample.to_array() {
+		assert value >= 40 && value <= 60
+		reflected_total += value
+	}
+	assert math.abs(f64(reflected_total) / f64(reflected_sample.size) - 48.0) < 0.4
+	if _ := hypergeometric(1, -1, 0, [1], TensorData{}) {
+		assert false, 'hypergeometric must reject negative population counts'
+	}
+	if _ := hypergeometric(1, 2, 4, [1], TensorData{}) {
+		assert false, 'hypergeometric must reject samples larger than the population'
+	}
+}
+
 fn test_global_statistical_distributions_are_seeded_and_validated() ! {
 	random_seed(702)
 	gamma_samples := gamma(2.0, 3.0, [4096], TensorData{})!
