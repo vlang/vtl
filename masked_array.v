@@ -110,8 +110,8 @@ pub fn (array &MaskedArray[T]) mixed_index[T](indices []TensorIndex) !MaskedArra
 // broadcastable index tensor.
 pub fn (array &MaskedArray[T]) take_along_axis[T](indices &Tensor[int], axis int) !MaskedArray[T] {
 	return MaskedArray[T]{
-		values: array.values.take_along_axis[T](indices, axis)!
-		mask:   array.mask.take_along_axis[bool](indices, axis)!
+		values: array.values.take_along_axis(indices, axis)!
+		mask:   array.mask.take_along_axis(indices, axis)!
 	}
 }
 

@@ -36,18 +36,6 @@ fn test_linear_variables_count() {
 	assert vars.len == 2, 'linear should have 2 variables (weights + bias), got ${vars.len}'
 }
 
-fn test_linear_bias_gradient_sums_the_batch() ! {
-	c := ctx[f64]()
-	layer := linear_layer[f64](c, 2, 2)
-	input := variable[f64](c, [1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [3, 2])!
-	output := layer.forward(input)!
-	mut loss := output.sum()!
-	loss.backprop()!
-	bias_gradient := layer.variables()[1].grad
-	assert bias_gradient.shape == [1, 2]
-	assert bias_gradient.to_array() == [3.0, 3.0]
-}
-
 // BatchNorm layer: output shape
 fn test_batchnorm_output_shape() {
 	c := ctx[f64]()

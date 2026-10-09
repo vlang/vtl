@@ -22,6 +22,24 @@ fn test_axis_reductions_empty_reduced_dimension() ! {
 	values := vtl.from_array([]int{}, [2, 0])!
 	assert vtl_stats.sum_along_axis(values, 1, false)!.to_array() == [0, 0]
 	assert vtl_stats.product_along_axis(values, 1, true)!.to_array() == [1, 1]
+	empty_rows := vtl.from_array([]f64{}, [0, 2])!
+	assert vtl_stats.sum_along_axis(empty_rows, 0, true)!.to_array() == [0.0, 0.0]
+}
+
+fn test_sum_axis0_contiguous_rank_three() ! {
+	values := vtl.from_array[f64]([1, 2, 3, 4, 5, 6, 7, 8], [2, 2, 2])!
+	assert vtl_stats.sum_along_axis(values, 0, false)!.shape == [2, 2]
+	assert vtl_stats.sum_along_axis(values, 0, false)!.to_array() == [6, 8, 10, 12]
+	assert vtl_stats.sum_along_axis(values, 0, true)!.shape == [1, 2, 2]
+	f32_values := vtl.from_array[f32]([1, 2, 3, 4, 5, 6], [2, 3])!
+	assert vtl_stats.sum_along_axis(f32_values, 0, false)!.to_array() == [5, 7, 9]
+}
+
+fn test_sum_axis0_noncontiguous_view_uses_strided_path() ! {
+	values := vtl.from_array[f64]([1, 2, 3, 4, 5, 6], [2, 3])!
+	transposed := values.transpose([1, 0])!
+	assert !transposed.is_row_major_contiguous()
+	assert vtl_stats.sum_along_axis(transposed, 0, false)!.to_array() == [6, 15]
 }
 
 fn test_axis_reductions_reject_invalid_axes() ! {
@@ -46,6 +64,8 @@ fn test_complex_axis_sum_and_product() ! {
 	], [2, 2])!
 	sums := vtl_stats.sum_along_axis(values, 1, false)!
 	assert sums.to_array() == [cmplx.Complex{ re: 4, im: 6 }, cmplx.Complex{ re: 12, im: 14 }]
+	column_sums := vtl_stats.sum_along_axis(values, 0, false)!
+	assert column_sums.to_array() == [cmplx.Complex{ re: 6, im: 8 }, cmplx.Complex{ re: 10, im: 12 }]
 	products := vtl_stats.product_along_axis(values, 1, false)!
 	assert products.to_array() == [cmplx.Complex{ re: -5, im: 10 }, cmplx.Complex{ re: -13, im: 82 }]
 
