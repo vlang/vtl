@@ -106,16 +106,15 @@ mean/variance/std with explicit `keepdims` and NaN-aware forms; axis-wise
 `trapezoid`; all thirteen NumPy quantile estimators via `QuantileMethod`, with
 global, axis, multi-quantile, percentile, and NaN-aware forms; axis arg
 reductions and squeezed min/max/argmin/argmax results; multi-axis min/max;
-flattened weighted inverted-CDF quantile and multi-quantile forms with
-same-shape weights;
+weighted inverted-CDF quantile and multi-quantile forms globally and along one
+axis, with same-shape or one-dimensional axis weights;
 histograms with
 automatic and custom bins, weighted density, and multiple bin-selection rules;
 integer/weighted `bincount`.
 
-**Remaining:** add weighted quantile axis reductions and NumPy's 1-D axis
-weights form; add consistent NaN-aware weighted behavior and `keepdims` options
-across remaining reductions, accumulator dtype controls, and broader reduction
-families.
+**Remaining:** add consistent NaN-aware weighted behavior and `keepdims`
+options across remaining reductions, accumulator dtype controls, and broader
+reduction families.
 
 Logical `all_axis`/`any_axis` and multi-axis `all_axes`/`any_axes` reductions
 return `bool` tensors; empty reduced dimensions return the logical identities

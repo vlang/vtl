@@ -30,3 +30,17 @@ fn test_weighted_quantiles_validate_shape_and_weights() ! {
 	}
 	assert quantile_weighted(values, vtl.from_1d([1.0, 1.0])!, 0.5)! == 1.0
 }
+
+fn test_weighted_quantiles_reduce_axis_with_shared_or_full_weights() ! {
+	values := vtl.from_array([10.0, 7.0, 4.0, 3.0, 2.0, 1.0], [2, 3])!
+	full_weights := vtl.from_array([1.0, 1.0, 7.0, 1.0, 1.0, 1.0], [2, 3])!
+	by_column := quantile_weighted_axis(values, full_weights, 0.5, 0, false)!
+	assert by_column.shape == [3]
+	assert by_column.to_array() == [3.0, 2.0, 4.0]
+	by_row := quantiles_weighted_axis(values, vtl.from_1d([1.0, 1.0, 7.0])!, [0.0, 0.5, 1.0], -1)!
+	assert by_row.shape == [3, 2]
+	assert by_row.to_array() == [4.0, 1.0, 4.0, 1.0, 10.0, 3.0]
+	kept := quantile_weighted_axis(values, vtl.from_1d([1.0, 1.0, 7.0])!, 0.5, 1, true)!
+	assert kept.shape == [2, 1]
+	assert kept.to_array() == [4.0, 1.0]
+}
