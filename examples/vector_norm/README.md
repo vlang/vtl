@@ -12,4 +12,5 @@ v run ./vtl/examples/vector_norm/main.v
 
 ## Notes
 
-The zero-order norm counts nonzero elements. See [linear algebra tutorial](../../docs/TUTORIAL_LINEAR_ALGEBRA.md).
+The zero-order norm counts nonzero elements. See [linear algebra
+tutorial](../../docs/TUTORIAL_LINEAR_ALGEBRA.md).

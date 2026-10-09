@@ -1,6 +1,7 @@
 # FFT frequency bins and shifting
 
-Build real and complex spectra, derive their frequency coordinates, and center a spectrum with `fftshift`.
+Build real and complex spectra, derive their frequency coordinates, and center a spectrum with
+`fftshift`.
 
 ## Run
 
