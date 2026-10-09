@@ -294,6 +294,41 @@ fn test_random_generator_permutation_tensor_shuffles_complete_rows() ! {
 	replay.free()
 }
 
+fn test_random_generator_permutation_axis_shuffles_complete_slices() ! {
+	mut values := []int{}
+	for i in 0 .. 2 {
+		for j in 0 .. 3 {
+			for k in 0 .. 2 {
+				values << i * 100 + j * 10 + k
+			}
+		}
+	}
+	input := from_array(values, [2, 3, 2])!
+	mut generator := new_random_generator(952)
+	permuted := generator.permutation_axis[int](input, -2)!
+	assert permuted.shape == input.shape
+	for i in 0 .. 2 {
+		for k in 0 .. 2 {
+			mut slice_ids := []int{len: 3}
+			for j in 0 .. 3 {
+				slice_ids[j] = permuted.get([i, j, k]) / 10
+			}
+			slice_ids.sort()
+			assert slice_ids == [i * 10, i * 10 + 1, i * 10 + 2]
+		}
+	}
+	mut replay := new_random_generator(952)
+	assert permuted.array_equal(replay.permutation_axis[int](input, 1)!)
+	if _ := generator.permutation_axis[int](input, 3) {
+		assert false, 'permutation_axis must reject axes outside the input rank'
+	}
+	if _ := generator.permutation_axis[int](from_array[int]([1], []int{})!, 0) {
+		assert false, 'permutation_axis must reject scalar tensors'
+	}
+	generator.free()
+	replay.free()
+}
+
 fn test_random_generator_gamma_is_seeded_and_positive() ! {
 	mut generator := new_random_generator(789)
 	values := generator.gamma(2.0, 3.0, [64])!

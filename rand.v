@@ -411,6 +411,21 @@ pub fn (mut generator RandomGenerator) permutation_tensor[T](input &Tensor[T]) !
 	return input.take(indices.to_array(), 0)
 }
 
+// permutation_axis returns a copy with slices shuffled along the selected axis.
+// Negative axes are accepted, matching Tensor.take and NumPy's axis convention.
+pub fn (mut generator RandomGenerator) permutation_axis[T](input &Tensor[T], axis int) !&Tensor[T] {
+	rank := input.rank()
+	if rank == 0 {
+		return error('permutation_axis: input must have at least one dimension')
+	}
+	axis_index := if axis < 0 { axis + rank } else { axis }
+	if axis_index < 0 || axis_index >= rank {
+		return error('permutation_axis: axis ${axis} is out of range for rank ${rank}')
+	}
+	indices := generator.permutation(input.shape[axis_index])!
+	return input.take(indices.to_array(), axis_index)
+}
+
 // gamma returns samples from a Gamma distribution using this generator's
 // independent stream. `alpha` is the shape and `scale` is the scale parameter.
 pub fn (mut generator RandomGenerator) gamma(alpha f64, scale f64, shape []int) !&Tensor[f64] {
