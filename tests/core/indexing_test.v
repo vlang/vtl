@@ -2,6 +2,42 @@ module core
 
 import vtl
 
+fn test_boolean_index_selects_matching_prefix_and_preserves_trailing_axes() ! {
+	values := vtl.from_array[int]([]int{len: 24, init: index}, [2, 3, 4])!
+	mask := vtl.from_2d([[true, false, true], [false, true, false]])!
+	mut selected := vtl.boolean_index[int](values, mask)!
+	assert selected.shape == [3, 4]
+	assert selected.to_array() == [0, 1, 2, 3, 8, 9, 10, 11, 16, 17, 18, 19]
+	selected.set([0, 0], 99)
+	assert values.get([0, 0, 0]) == 0
+}
+
+fn test_boolean_index_accepts_non_contiguous_masks_and_empty_matches() ! {
+	values := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
+	mask := vtl.from_2d([[true, false], [false, true], [true, false]])!.transpose([1, 0])!
+	selected := vtl.boolean_index[int](values, mask)!
+	assert selected.shape == [3]
+	assert selected.to_array() == [1, 3, 5]
+	empty_mask := vtl.from_1d([false, false])!
+	empty := vtl.boolean_index[int](values, empty_mask)!
+	assert empty.shape == [0, 3]
+	assert empty.size == 0
+}
+
+fn test_boolean_index_rejects_non_prefix_shapes() ! {
+	values := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
+	wrong_shape := vtl.from_1d([true, false, true])!
+	if _ := vtl.boolean_index[int](values, wrong_shape) {
+		assert false, 'boolean_index must require a mask matching leading tensor dimensions'
+	}
+	if _ := vtl.boolean_index[int](values, vtl.from_1d([true, false, true])!.reshape([
+		3,
+		1,
+	])!) {
+		assert false, 'boolean_index must reject dimensions that do not match the tensor prefix'
+	}
+}
+
 fn test_mixed_index_pairs_coordinates_with_slice() ! {
 	values := vtl.from_array[int]([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
 		18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34],
