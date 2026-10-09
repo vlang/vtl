@@ -27,6 +27,7 @@ fn main() {
 	noise := training_rng.uniform(-0.01, 0.01, [4])!
 	integer_noise := training_rng.integers(-2, 3, [4])!
 	event_counts := training_rng.binomial(12, 0.25, [4])!
+	failure_counts := training_rng.negative_binomial(4.0, 0.5, [4])!
 	sampled_good_counts := training_rng.hypergeometric(200, 800, 50, [4])!
 	arrival_counts := validation_rng.poisson(3.5, [4])!
 	lifetimes := validation_rng.weibull(1.5, [4])!
@@ -57,6 +58,7 @@ fn main() {
 	println('Dirichlet class probability samples: ${class_probabilities_sample.to_array()}')
 	println('Log-normal positive scales: ${positive_scales.to_array()}')
 	println('Binomial event counts: ${event_counts.to_array()}')
+	println('Negative-binomial failure counts: ${failure_counts.to_array()}')
 	println('Hypergeometric good-item counts: ${sampled_good_counts.to_array()}')
 	println('Poisson arrival counts: ${arrival_counts.to_array()}')
 	println('Weibull lifetimes: ${lifetimes.to_array()}')

@@ -190,6 +190,44 @@ fn test_random_generator_supports_seeded_binomial_and_exponential() ! {
 	replay.free()
 }
 
+fn test_random_generator_negative_binomial_is_seeded_and_matches_moments() ! {
+	mut generator := new_random_generator(8721)
+	values := generator.negative_binomial(4.0, 0.5, [4096])!
+	assert values.shape == [4096]
+	mut total := 0
+	for value in values.to_array() {
+		assert value >= 0
+		total += value
+	}
+	mean := f64(total) / 4096
+	mut squared_deviation := 0.0
+	for value in values.to_array() {
+		delta := f64(value) - mean
+		squared_deviation += delta * delta
+	}
+	variance := squared_deviation / 4096
+	assert math.abs(mean - 4.0) < 0.2
+	assert math.abs(variance - 8.0) < 0.8
+	mut replay := new_random_generator(8721)
+	assert values.array_equal(replay.negative_binomial(4.0, 0.5, [4096])!)
+	fractional_shape_samples := generator.negative_binomial(2.5, 0.4, [64])!
+	for value in fractional_shape_samples.to_array() {
+		assert value >= 0
+	}
+	assert generator.negative_binomial(2.5, 1.0, [3])!.to_array() == [0, 0, 0]
+	if _ := generator.negative_binomial(0, 0.5, [1]) {
+		assert false, 'negative_binomial must reject non-positive n'
+	}
+	if _ := generator.negative_binomial(2, 0, [1]) {
+		assert false, 'negative_binomial must reject zero probability'
+	}
+	if _ := generator.negative_binomial(2, math.nan(), [1]) {
+		assert false, 'negative_binomial must reject non-finite probability'
+	}
+	generator.free()
+	replay.free()
+}
+
 fn test_random_generator_supports_hypergeometric_sampling() ! {
 	mut generator := new_random_generator(751)
 	values := generator.hypergeometric(5, 5, 4, [4096])!

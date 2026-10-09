@@ -92,6 +92,10 @@ complement.
 dimension to `sample_shape`; both global and seeded-generator APIs accept
 positive-semidefinite covariance matrices, including singular ones. The
 covariance must be finite, symmetric, and positive semidefinite.
+`negative_binomial(n, probability, shape)` counts failures before `n` successes;
+`n` may be a positive real value and the success probability must be in `(0, 1]`.
+Both global and seeded APIs use a Gamma-Poisson mixture, with probability one
+returning only zeros.
 `weibull(shape_parameter, shape)` returns unit-scale Weibull samples;
 `chi_square(df, shape)`, `student_t(df, shape)`, and
 `f_distribution(numerator_df, denominator_df, shape)` sample the corresponding

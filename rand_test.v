@@ -36,6 +36,26 @@ fn test_global_multivariate_normal_supports_seeded_singular_covariance() ! {
 	}
 }
 
+fn test_global_negative_binomial_is_seeded_and_validated() ! {
+	random_seed(1204)
+	values := negative_binomial(3.0, 0.4, [2048], TensorData{})!
+	random_seed(1204)
+	assert values.array_equal(negative_binomial(3.0, 0.4, [2048], TensorData{})!)
+	mut total := 0
+	for value in values.to_array() {
+		assert value >= 0
+		total += value
+	}
+	assert math.abs(f64(total) / 2048 - 4.5) < 0.3
+	assert negative_binomial(2.0, 1.0, [3], TensorData{})!.to_array() == [0, 0, 0]
+	if _ := negative_binomial(math.inf(1), 0.5, [1], TensorData{}) {
+		assert false, 'negative_binomial must reject non-finite n'
+	}
+	if _ := negative_binomial(2, 1.1, [1], TensorData{}) {
+		assert false, 'negative_binomial must reject probability above one'
+	}
+}
+
 fn test_random_i32_values_stay_within_requested_range() {
 	random_seed(42)
 	values := random[i32](-20, 20, [32], TensorData{})

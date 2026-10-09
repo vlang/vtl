@@ -16,7 +16,8 @@ v run ./vtl/examples/random_generator/main.v
 
 The example includes Gumbel extreme-value, Laplace robust, Logistic, Pareto,
 Rayleigh, and Triangular samples in addition to seeded normal, Bernoulli,
-binomial, hypergeometric, Poisson, Weibull, Gamma, Beta, and Student distributions.
+binomial, negative-binomial, hypergeometric, Poisson, Weibull, Gamma, Beta, and
+Student distributions.
 Hypergeometric sampling draws without replacement from good and bad population
 counts. Location and scale
 must be finite; scale may be zero to produce a constant tensor. The same seed
