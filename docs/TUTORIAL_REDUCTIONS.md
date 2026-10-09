@@ -398,6 +398,11 @@ levels := stats.quantiles_axes_with_method(volume, [0.0, 0.5, 1.0], [0, 2], .lin
 assert levels.shape == [3, 2]
 ```
 
+The `quantile_axes`, `nanquantile_axes`, `quantiles_axes`, and percentile
+variants use NumPy's default linear estimator, so pass a `QuantileMethod` only
+when a different estimator is needed. Multi-quantile results prepend the
+quantile dimension to the un-reduced shape.
+
 `nanquantile_*_with_method` and `nanquantiles_*_with_method` skip NaNs.
 Axis single-quantile helpers take `keepdims`; multiple quantiles prepend a
 quantile dimension. Multi-axis, percentile, and NaN-aware counterparts follow

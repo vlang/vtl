@@ -109,6 +109,8 @@ reductions and squeezed min/max/argmin/argmax results; multi-axis min/max;
 weighted inverted-CDF quantile, multi-quantile, percentile, and multi-percentile
 forms globally and along one or several axes, with same-shape or reduced-shape
 weights, including NaN-aware forms that discard weights for NaN observations;
+multi-axis quantile and percentile convenience APIs default to NumPy's linear
+estimator, alongside forms that expose all thirteen estimator methods;
 histograms with
 automatic and custom bins, weighted density, and multiple bin-selection rules;
 integer/weighted `bincount`.
