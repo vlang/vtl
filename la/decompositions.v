@@ -153,6 +153,85 @@ pub fn inv_complex(input &vtl.Tensor[vcomplex.Complex]) !&vtl.Tensor[vcomplex.Co
 	return solve_complex(input, identity)
 }
 
+// det_complex computes determinants of complex128 square matrices.
+// Leading batch dimensions are preserved; singular matrices have determinant 0.
+pub fn det_complex(input &vtl.Tensor[vcomplex.Complex]) !&vtl.Tensor[vcomplex.Complex] {
+	if input.rank() < 2 {
+		return error('det_complex: input must contain at least one matrix')
+	}
+	n := input.shape[input.rank() - 1]
+	if input.shape[input.rank() - 2] != n {
+		return error('det_complex: matrices must be square')
+	}
+	batch_shape := input.shape[..input.rank() - 2]
+	mut batch_count := 1
+	for dimension in batch_shape {
+		batch_count *= dimension
+	}
+	mut output_shape := batch_shape.clone()
+	if output_shape.len == 0 {
+		output_shape = [1]
+	}
+	mut output := vtl.empty[vcomplex.Complex](output_shape, memory: .row_major)
+	mut index := []int{len: input.rank()}
+	for batch in 0 .. batch_count {
+		batch_coordinates := decode_batch_coordinates(batch, batch_shape)
+		fill_broadcast_batch_index(batch_shape, batch_shape, batch_coordinates, mut index)
+		mut matrix := []vcomplex.Complex{len: n * n}
+		for row in 0 .. n {
+			index[input.rank() - 2] = row
+			for column in 0 .. n {
+				index[input.rank() - 1] = column
+				matrix[row * n + column] = input.get[vcomplex.Complex](index)
+			}
+		}
+		mut determinant := vcomplex.Complex{ re: 1 }
+		mut sign := 1.0
+		mut singular := false
+		for pivot_column in 0 .. n {
+			mut pivot_row := pivot_column
+			mut pivot_magnitude := complex_magnitude(matrix[pivot_column * n + pivot_column])
+			for row in pivot_column + 1 .. n {
+				magnitude := complex_magnitude(matrix[row * n + pivot_column])
+				if magnitude > pivot_magnitude {
+					pivot_row = row
+					pivot_magnitude = magnitude
+				}
+			}
+			if pivot_magnitude == 0 {
+				singular = true
+				break
+			}
+			if pivot_row != pivot_column {
+				for column in 0 .. n {
+					top := pivot_column * n + column
+					bottom := pivot_row * n + column
+					matrix[top], matrix[bottom] = matrix[bottom], matrix[top]
+				}
+				sign = -sign
+			}
+			pivot := matrix[pivot_column * n + pivot_column]
+			determinant = determinant.multiply(pivot)
+			for row in pivot_column + 1 .. n {
+				row_offset := row * n
+				factor := matrix[row_offset + pivot_column] / pivot
+				matrix[row_offset + pivot_column] = vcomplex.Complex{}
+				for column in pivot_column + 1 .. n {
+					position := row_offset + column
+					matrix[position] = matrix[position].subtract(factor.multiply(matrix[pivot_column * n + column]))
+				}
+			}
+		}
+		if singular {
+			determinant = vcomplex.Complex{}
+		} else if sign < 0 {
+			determinant = vcomplex.Complex{ re: -determinant.re, im: -determinant.im }
+		}
+		output.set_nth(batch, determinant)
+	}
+	return output
+}
+
 // solve solves A * X = B for stacks of square A matrices. Leading dimensions
 // broadcast like NumPy; B may be a vector or a matrix of right-hand sides.
 pub fn solve[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[f64] {

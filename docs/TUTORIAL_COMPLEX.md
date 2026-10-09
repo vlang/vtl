@@ -60,7 +60,9 @@ matrix := vtl.from_array[cmplx.Complex]([
 ], [2, 2])!
 inverse := la.inv_complex(matrix)!
 identity := la.matmul(matrix, inverse)!
+determinant := la.det_complex(matrix)!
 assert math.abs(identity.get([0, 0]).re - 1.0) < 1e-12
+assert math.abs(determinant.get_nth(0).re - 1.0) < 1e-12
 ```
 
 The NumPy-style `real`, `imag`, `conj`, `absolute`, and `abs` operations are
