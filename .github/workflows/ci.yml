@@ -1,5 +1,8 @@
 name: Continuous Integration
 
+env:
+  VJOBS: '2'
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   # Main pushes are serialized to the newest revision, so rapid merges do not
@@ -60,9 +63,7 @@ jobs:
         run: |
           cd ~/.vmodules
           if [[ "$RUNNER_OS" == "Linux" ]]; then
-            sudo systemd-run --scope --property=MemoryMax=4G \
-              --property=MemorySwapMax=0 --setenv=HOME="$HOME" \
-              --setenv=PATH="$PATH" --setenv=VJOBS=2 -- v doctor
+            env HOME="$HOME" PATH="$PATH" VJOBS=2 v doctor
           else
             v doctor
           fi
@@ -88,9 +89,7 @@ jobs:
         run: |
           cd ~/.vmodules
           if [[ "$RUNNER_OS" == "Linux" ]]; then
-            sudo systemd-run --scope --property=MemoryMax=4G \
-              --property=MemorySwapMax=0 --setenv=HOME="$HOME" \
-              --setenv=PATH="$PATH" --setenv=VJOBS=2 -- v fmt -verify vtl
+            env HOME="$HOME" PATH="$PATH" VJOBS=2 v fmt -verify vtl
           else
             v fmt -verify vtl
           fi
@@ -156,9 +155,7 @@ jobs:
         run: |
           cd ~/.vmodules
           if [[ "$RUNNER_OS" == "Linux" ]]; then
-            sudo systemd-run --scope --property=MemoryMax=4G \
-              --property=MemorySwapMax=0 --setenv=HOME="$HOME" \
-              --setenv=PATH="$PATH" --setenv=VJOBS=2 -- v doctor
+            env HOME="$HOME" PATH="$PATH" VJOBS=2 v doctor
           else
             v doctor
           fi
@@ -196,9 +193,7 @@ jobs:
           fi
           # Default: scoped tests + tiny_synth smoke (see bin/test, issue #109)
           if [[ "$RUNNER_OS" == "Linux" ]]; then
-            sudo systemd-run --scope --property=MemoryMax=4G \
-              --property=MemorySwapMax=0 --setenv=HOME="$HOME" \
-              --setenv=PATH="$PATH" --setenv=VJOBS=2 --setenv=TERM="$TERM" -- \
+            env HOME="$HOME" PATH="$PATH" VJOBS=2 TERM="$TERM" \
               "$HOME/.vmodules/vtl/bin/test" ${{ matrix.flags }} $backend_flag
           else
             ~/.vmodules/vtl/bin/test ${{ matrix.flags }} $backend_flag
@@ -236,9 +231,7 @@ jobs:
       - name: V doctor
         run: |
           cd ~/.vmodules
-          sudo systemd-run --scope --property=MemoryMax=4G \
-            --property=MemorySwapMax=0 --setenv=HOME="$HOME" \
-            --setenv=PATH="$PATH" --setenv=VJOBS=2 -- v doctor
+          env HOME="$HOME" PATH="$PATH" VJOBS=2 v doctor
 
       - name: Install OpenCL CPU runtime
         run: |
@@ -250,9 +243,7 @@ jobs:
           VJOBS: '2'
         run: |
           cd ~/.vmodules
-          sudo systemd-run --scope --property=MemoryMax=4G \
-            --property=MemorySwapMax=0 --setenv=HOME="$HOME" \
-            --setenv=PATH="$PATH" --setenv=VJOBS=2 -- \
+          env HOME="$HOME" PATH="$PATH" VJOBS=2 \
             v -d vcl run vtl/examples/vtl_opencl_vcl_support/main.v
 
   vulkan-activation-smoke:
@@ -292,14 +283,9 @@ jobs:
       - name: Run Vulkan activation layer tests
         run: |
           cd ~/.vmodules
-          sudo systemd-run --scope --property=MemoryMax=4G \
-            --property=MemorySwapMax=0 \
-            --setenv=HOME="$HOME" --setenv=PATH="$PATH" -- \
+          env HOME="$HOME" PATH="$PATH" \
             env VJOBS=2 vulkaninfo --summary
-          sudo systemd-run --scope --property=MemoryMax=4G \
-            --property=MemorySwapMax=0 \
-            --setenv=HOME="$HOME" --setenv=PATH="$PATH" \
-            --setenv=VTL_USE_VULKAN=1 -- \
+          env HOME="$HOME" PATH="$PATH" VTL_USE_VULKAN=1 \
             env VJOBS=2 VTL_USE_VULKAN=1 v -d vulkan test \
             ./vtl/nn/layers/activation_vulkan_extra_f32_d_vulkan_test.v
 

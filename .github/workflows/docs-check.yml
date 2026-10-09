@@ -1,5 +1,8 @@
 name: Docs Check
 
+env:
+  VJOBS: '2'
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -74,12 +77,7 @@ jobs:
         run: |
           cd ~/.vmodules
           mapfile -t markdown_files <<< "$MARKDOWN_FILES"
-          sudo systemd-run --scope \
-            --property=MemoryMax=4G \
-            --property=MemorySwapMax=0 \
-            --setenv=HOME="$HOME" \
-            --setenv=PATH="$PATH" \
-            --setenv=VJOBS=2 -- \
+          env HOME="$HOME" PATH="$PATH" VJOBS=2 \
             v check-md -hide-warnings "${markdown_files[@]}"
 
       - name: Skip when no Markdown changed

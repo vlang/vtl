@@ -1,5 +1,58 @@
 # VTL vs NumPy baselines
 
+## Linear bias gradient reduction
+
+The VTL and NumPy microbenchmarks reduce contiguous `f32` matrices along axis 0
+and compare direct reduction with multiplying by a row of ones. The VTL
+benchmark also measures `vsl.blas.sgemv(.trans, ...)`, once with pure V BLAS and
+once with the system CBLAS backend. Each operation allocates its output inside
+the timed region; input construction is outside it. Both programs use the same
+deterministic values, eight `(batch, features)` shapes, five warmups, and 50
+timed calls. This isolates the linear-layer bias-gradient operation; it does
+not claim overall NumPy parity. Run from `~/.vmodules`:
+
+```bash
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -no-parallel -cc gcc -prod -cflags "-march=native" -o /tmp/vtl-linear-bias-bench \
+	./vtl/benchmarks/linear_bias_reduction_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 \
+	/tmp/vtl-linear-bias-bench
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -no-parallel -cc gcc -prod -cflags "-march=native" -d vsl_blas_generic_cblas \
+	-o /tmp/vtl-linear-bias-cblas-bench ./vtl/benchmarks/linear_bias_reduction_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 \
+	/tmp/vtl-linear-bias-cblas-bench
+systemd-run --user --scope --quiet -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 \
+	OPENBLAS_NUM_THREADS=2 uv run --offline --no-project --with numpy python \
+	./vtl/benchmarks/vs_numpy/numpy_linear_bias_reduction_baseline.py
+```
+
+Compile each V program before running its binary separately. The production
+build uses GCC `-O3 -flto` through `-prod`; `-no-parallel` caps compiler-side
+parallel work for this memory-constrained workstation. `-march=native` enables
+CPU-specific code and must be omitted for portable binaries. Record the V
+version, compiler, CPU, NumPy version, NumPy BLAS configuration, and thread
+count with new results. The system `vsl_blas_generic_cblas` build exercises the
+installed CBLAS and may not use OpenBLAS.
+
+On an AMD Ryzen 9 5900X on 2026-10-09, with V 0.5.2 `407c52e`, GCC 16.2.1,
+NumPy 2.5.3, scipy-openblas 0.3.34.106.0, and
+`OPENBLAS_NUM_THREADS=2`, one `-prod -march=native` run measured:
+
+| Shape | VTL pure-V sum (ms) | System CBLAS GEMV (ms) | NumPy sum (ms) | NumPy `ones @ matrix` (ms) |
+| ---: | ---: | ---: | ---: | ---: |
+| 32×64 | 0.0009 | 0.0006 | 0.0031 | 0.0012 |
+| 128×256 | 0.0079 | 0.0086 | 0.0070 | 0.0027 |
+| 1024×256 | 0.0581 | 0.0690 | 0.0279 | 0.0136 |
+| 4096×512 | 0.4669 | 0.4798 | 0.1764 | 0.0618 |
+
+The direct VTL reduction is competitive on small inputs but falls behind
+NumPy/OpenBLAS as matrices grow. The host's generic CBLAS does not improve the
+large reduction; this machine has no system OpenBLAS library, while NumPy's
+wheel bundles a tuned, two-thread OpenBLAS. Treat these as workload-specific
+measurements, not an overall performance claim. A fair backend parity run still
+needs VTL linked to the same optimized BLAS implementation and thread count.
+
 ## Hypergeometric sampling
 
 Both benchmarks draw 100,000 variates with `ngood=50,000`, `nbad=50,000`, and
