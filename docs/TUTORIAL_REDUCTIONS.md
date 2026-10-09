@@ -409,7 +409,8 @@ assert medians.to_array() == [4.0, 1.0]
 Weights must be finite, non-negative, and have a positive sum in each reduced
 slice. `nanquantile_weighted`, `nanquantiles_weighted`, and their axis forms
 ignore NaN values and remove the corresponding weights from each slice. The
-ordinary weighted forms propagate NaNs.
+ordinary weighted forms propagate NaNs. Weighted percentile APIs accept the
+equivalent 0..100 scale.
 
 ## NaN-aware sums and extrema
 

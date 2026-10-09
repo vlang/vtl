@@ -87,26 +87,7 @@ pub fn quantiles_weighted[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], qu
 		return error('quantiles_weighted: weights must have a finite positive sum')
 	}
 	pairs.sort_with_compare(weighted_quantile_value_compare)
-	mut results := []f64{len: quantiles.len}
-	for index, q in quantiles {
-		if q <= 0 {
-			results[index] = pairs[0].value
-			continue
-		}
-		if q >= 1 {
-			results[index] = pairs[pairs.len - 1].value
-			continue
-		}
-		target := q * total_weight
-		mut cumulative := 0.0
-		for pair in pairs {
-			cumulative += pair.weight
-			if cumulative >= target {
-				results[index] = pair.value
-				break
-			}
-		}
-	}
+	results := weighted_quantiles_sorted(pairs, quantiles, total_weight)
 	return vtl.from_1d[f64](results)
 }
 
@@ -131,11 +112,28 @@ pub fn nanquantiles_weighted[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64],
 		return vtl.from_1d[f64]([]f64{len: quantiles.len, init: math.nan()})
 	}
 	sorted := weighted_sorted_sample(sample.pairs)
-	mut results := []f64{len: quantiles.len}
-	for index, q in quantiles {
-		results[index] = weighted_quantile_sorted(sorted, q, sample.total_weight)
-	}
+	results := weighted_quantiles_sorted(sorted, quantiles, sample.total_weight)
 	return vtl.from_1d[f64](results)
+}
+
+// percentile_weighted is the 0..100-scale form of quantile_weighted.
+pub fn percentile_weighted[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], percentile f64) !f64 {
+	return quantile_weighted[T](values, weights, percentile_quantile(percentile)!)
+}
+
+// percentiles_weighted computes several weighted 0..100-scale percentiles.
+pub fn percentiles_weighted[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], percentiles []f64) !&vtl.Tensor[f64] {
+	return quantiles_weighted[T](values, weights, percentiles_to_quantiles(percentiles)!)
+}
+
+// nanpercentile_weighted is the NaN-aware 0..100-scale weighted quantile.
+pub fn nanpercentile_weighted[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], percentile f64) !f64 {
+	return nanquantile_weighted[T](values, weights, percentile_quantile(percentile)!)
+}
+
+// nanpercentiles_weighted computes several NaN-aware weighted percentiles.
+pub fn nanpercentiles_weighted[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], percentiles []f64) !&vtl.Tensor[f64] {
+	return nanquantiles_weighted[T](values, weights, percentiles_to_quantiles(percentiles)!)
 }
 
 fn weighted_nan_sample[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64]) !WeightedQuantileSample {
@@ -185,6 +183,18 @@ pub fn quantile_weighted_axis[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64]
 // corresponding weights.
 pub fn nanquantile_weighted_axis[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], q f64, axis int, keepdims bool) !&vtl.Tensor[f64] {
 	return weighted_quantile_axis_impl[T](values, weights, q, axis, keepdims, true)
+}
+
+// percentile_weighted_axis computes one weighted percentile per axis slice.
+pub fn percentile_weighted_axis[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], percentile f64, axis int, keepdims bool) !&vtl.Tensor[f64] {
+	return quantile_weighted_axis[T](values, weights, percentile_quantile(percentile)!, axis,
+		keepdims)
+}
+
+// nanpercentile_weighted_axis computes NaN-aware weighted percentiles per slice.
+pub fn nanpercentile_weighted_axis[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], percentile f64, axis int, keepdims bool) !&vtl.Tensor[f64] {
+	return nanquantile_weighted_axis[T](values, weights, percentile_quantile(percentile)!,
+		axis, keepdims)
 }
 
 fn weighted_quantile_axis_impl[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], q f64, axis int, keepdims bool, ignore_nan bool) !&vtl.Tensor[f64] {
@@ -264,6 +274,18 @@ pub fn nanquantiles_weighted_axis[T](values &vtl.Tensor[T], weights &vtl.Tensor[
 	return weighted_quantiles_axis_impl[T](values, weights, quantiles, axis, true)
 }
 
+// percentiles_weighted_axis computes several weighted percentiles per slice.
+pub fn percentiles_weighted_axis[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], percentiles []f64, axis int) !&vtl.Tensor[f64] {
+	return quantiles_weighted_axis[T](values, weights, percentiles_to_quantiles(percentiles)!,
+		axis)
+}
+
+// nanpercentiles_weighted_axis computes NaN-aware weighted percentiles per slice.
+pub fn nanpercentiles_weighted_axis[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], percentiles []f64, axis int) !&vtl.Tensor[f64] {
+	return nanquantiles_weighted_axis[T](values, weights, percentiles_to_quantiles(percentiles)!,
+		axis)
+}
+
 fn weighted_quantiles_axis_impl[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], quantiles []f64, axis int, ignore_nan bool) !&vtl.Tensor[f64] {
 	validate_quantiles(quantiles)!
 	axis_index := validate_weighted_axis(values, weights, axis)!
@@ -321,9 +343,10 @@ fn weighted_quantiles_axis_impl[T](values &vtl.Tensor[T], weights &vtl.Tensor[f6
 			}
 		} else {
 			pairs.sort_with_compare(weighted_quantile_value_compare)
-			for quantile_index, q in quantiles {
+			slice_quantiles := weighted_quantiles_sorted(pairs, quantiles, total_weight)
+			for quantile_index, quantile in slice_quantiles {
 				output_index[0] = quantile_index
-				result.set(output_index, weighted_quantile_sorted(pairs, q, total_weight))
+				result.set(output_index, quantile)
 			}
 		}
 	}
@@ -390,6 +413,41 @@ fn weighted_quantile_sorted(pairs []WeightedQuantileValue, q f64, total_weight f
 		}
 	}
 	return pairs[pairs.len - 1].value
+}
+
+// weighted_quantiles_sorted builds the cumulative distribution once, then
+// resolves each requested probability with a lower-bound binary search.
+fn weighted_quantiles_sorted(pairs []WeightedQuantileValue, quantiles []f64, total_weight f64) []f64 {
+	mut cumulative_weights := []f64{len: pairs.len}
+	mut cumulative := 0.0
+	for index, pair in pairs {
+		cumulative += pair.weight
+		cumulative_weights[index] = cumulative
+	}
+	mut results := []f64{len: quantiles.len}
+	for quantile_index, q in quantiles {
+		if q <= 0 {
+			results[quantile_index] = pairs[0].value
+			continue
+		}
+		if q >= 1 {
+			results[quantile_index] = pairs[pairs.len - 1].value
+			continue
+		}
+		target := q * total_weight
+		mut low := 0
+		mut high := cumulative_weights.len
+		for low < high {
+			middle := low + (high - low) / 2
+			if cumulative_weights[middle] < target {
+				low = middle + 1
+			} else {
+				high = middle
+			}
+		}
+		results[quantile_index] = pairs[math.min(low, pairs.len - 1)].value
+	}
+	return results
 }
 
 fn weighted_quantile_value_compare(a &WeightedQuantileValue, b &WeightedQuantileValue) int {
