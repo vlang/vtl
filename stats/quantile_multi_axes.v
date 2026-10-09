@@ -20,10 +20,20 @@ pub fn quantiles_axes_with_method[T](t &vtl.Tensor[T], quantiles []f64, axes []i
 	return quantiles_multi_axis_impl[T](t, quantiles, axes, method, false, false, true)
 }
 
+// quantiles_axes_with_method_keepdims retains reduced dimensions as length one.
+pub fn quantiles_axes_with_method_keepdims[T](t &vtl.Tensor[T], quantiles []f64, axes []int, method QuantileMethod, keepdims bool) !&vtl.Tensor[f64] {
+	return quantiles_multi_axis_impl[T](t, quantiles, axes, method, false, keepdims, true)
+}
+
 // nanquantiles_axes_with_method computes multiple NaN-aware estimator values
 // per reduced multi-axis slice.
 pub fn nanquantiles_axes_with_method[T](t &vtl.Tensor[T], quantiles []f64, axes []int, method QuantileMethod) !&vtl.Tensor[f64] {
 	return quantiles_multi_axis_impl[T](t, quantiles, axes, method, true, false, true)
+}
+
+// nanquantiles_axes_with_method_keepdims retains reduced dimensions as length one.
+pub fn nanquantiles_axes_with_method_keepdims[T](t &vtl.Tensor[T], quantiles []f64, axes []int, method QuantileMethod, keepdims bool) !&vtl.Tensor[f64] {
+	return quantiles_multi_axis_impl[T](t, quantiles, axes, method, true, keepdims, true)
 }
 
 // percentile_axes_with_method is the 0..100-scale multi-axis quantile form.
@@ -48,6 +58,18 @@ pub fn percentiles_axes_with_method[T](t &vtl.Tensor[T], percentiles []f64, axes
 pub fn nanpercentiles_axes_with_method[T](t &vtl.Tensor[T], percentiles []f64, axes []int, method QuantileMethod) !&vtl.Tensor[f64] {
 	return nanquantiles_axes_with_method[T](t, percentiles_to_quantiles(percentiles)!, axes,
 		method)
+}
+
+// percentiles_axes_with_method_keepdims retains reduced dimensions as length one.
+pub fn percentiles_axes_with_method_keepdims[T](t &vtl.Tensor[T], percentiles []f64, axes []int, method QuantileMethod, keepdims bool) !&vtl.Tensor[f64] {
+	return quantiles_axes_with_method_keepdims[T](t, percentiles_to_quantiles(percentiles)!, axes,
+		method, keepdims)
+}
+
+// nanpercentiles_axes_with_method_keepdims is the NaN-aware retained-shape form.
+pub fn nanpercentiles_axes_with_method_keepdims[T](t &vtl.Tensor[T], percentiles []f64, axes []int, method QuantileMethod, keepdims bool) !&vtl.Tensor[f64] {
+	return nanquantiles_axes_with_method_keepdims[T](t, percentiles_to_quantiles(percentiles)!, axes,
+		method, keepdims)
 }
 
 fn quantiles_multi_axis_impl[T](t &vtl.Tensor[T], quantiles []f64, axes []int, method QuantileMethod, ignore_nan bool, keepdims bool, multi bool) !&vtl.Tensor[f64] {
@@ -76,7 +98,7 @@ fn quantiles_multi_axis_impl[T](t &vtl.Tensor[T], quantiles []f64, axes []int, m
 	}
 	for dimension, size in t.shape {
 		if reduced[dimension] {
-			if keepdims && !multi {
+			if keepdims {
 				output_shape << 1
 			}
 		} else {
@@ -128,7 +150,12 @@ fn quantiles_multi_axis_impl[T](t &vtl.Tensor[T], quantiles []f64, axes []int, m
 			output_index[0] = 0
 			mut output_dimension := 1
 			for dimension in 0 .. rank {
-				if !reduced[dimension] {
+				if reduced[dimension] {
+					if keepdims {
+						output_index[output_dimension] = 0
+						output_dimension++
+					}
+				} else {
 					output_index[output_dimension] = input_index[dimension]
 					output_dimension++
 				}
