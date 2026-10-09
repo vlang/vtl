@@ -66,8 +66,12 @@ spread := stats.sample_stddev[f64](values)
 row_total := stats.sum_along_axis[f64](values, -1, true)!
 ```
 
-`quantile` currently expects its tensor argument to be sorted. See function
-comments in [`stats.v`](stats.v) for edge-case behavior and the
+The legacy `quantile` helper expects sorted input. The `*_with_method` APIs
+sort a copy and support all thirteen NumPy estimators through
+`QuantileMethod`, including global, multi-quantile, axis, percentile, and
+NaN-ignoring forms. Axis quantiles accept `keepdims`; multi-quantile results
+prepend the quantile dimension. See [`stats.v`](stats.v) and
+[`quantile_methods.v`](quantile_methods.v) for edge-case behavior and the
 [reductions tutorial](../docs/TUTORIAL_REDUCTIONS.md).
 
 `median` accepts unsorted tensors, uses linear interpolation, and returns

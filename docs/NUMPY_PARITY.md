@@ -103,8 +103,8 @@ min/max, and logical all/any with `keepdims`; weighted average globally, over
 one axis, and over multiple axes with optional `keepdims`; scalar
 population/sample variance and standard deviation; single-axis and multi-axis
 mean/variance/std with explicit `keepdims` and NaN-aware forms; axis-wise
-`trapezoid`; linear quantile/percentile and multi-quantile APIs, including
-NaN-aware global and axis variants; axis arg
+`trapezoid`; all thirteen NumPy quantile estimators via `QuantileMethod`, with
+global, axis, multi-quantile, percentile, and NaN-aware forms; axis arg
 reductions and squeezed min/max/argmin/argmax results; multi-axis min/max;
 histograms with
 automatic and custom bins, weighted density, and multiple bin-selection rules;
