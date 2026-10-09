@@ -35,6 +35,7 @@ CIFAR examples for CI-safe checks.
 | [npz_round_trip](./npz_round_trip) | Write and read named arrays in `.npz` archives | `v run ./vtl/examples/npz_round_trip/main.v` |
 | [NPZ fixture](./npz_read_compressed) | Compressed NumPy fixture | `v run vtl/examples/npz_read_compressed/main.v vtl/npz/testdata/numpy_compressed.npz` |
 | [stats_variance](./stats_variance) | Stable population/sample variance and standard deviation | `v run ./vtl/examples/stats_variance/main.v` |
+| [stats_weighted_quantiles](./stats_weighted_quantiles) | Weighted global and axis-wise inverted-CDF quantiles | `v run ./vtl/examples/stats_weighted_quantiles/main.v` |
 | [stats_nan_reductions](./stats_nan_reductions) | NaN-aware sums, products, extrema, and axis reductions | `v run ./vtl/examples/stats_nan_reductions/main.v` |
 | [is_nan](./is_nan) | NaN, infinity, and finite-value predicates on tensors and views | `v run ./vtl/examples/is_nan/main.v` |
 | [logical_reductions](./logical_reductions) | Axis-wise logical all/any reductions with keepdims | `v run ./vtl/examples/logical_reductions/main.v` |
