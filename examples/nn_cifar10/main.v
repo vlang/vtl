@@ -138,20 +138,20 @@ fn main() {
 	}
 
 	// Training DataLoader with lockstep features + labels
-	mut train_dl := datasets.new_data_loader_with_labels[f64](ds.train_features, ds.train_labels, datasets.DataLoaderConfig{
+	mut train_dl := datasets.new_data_loader_with_labels_checked[f64](ds.train_features, ds.train_labels, datasets.DataLoaderConfig{
 		batch_size: batch_size
 		shuffle:    false
 		drop_last:  true
 		seed:       42
-	})
+	}) or { panic(err) }
 
 	// Validation DataLoader (drop_last=false to use all samples)
-	val_dl := datasets.new_data_loader_with_labels[f64](ds.test_features, ds.test_labels, datasets.DataLoaderConfig{
+	val_dl := datasets.new_data_loader_with_labels_checked[f64](ds.test_features, ds.test_labels, datasets.DataLoaderConfig{
 		batch_size: 100
 		shuffle:    false
 		drop_last:  false
 		seed:       0
-	})
+	}) or { panic(err) }
 
 	println('Training for ${epochs} epoch(s) with batch size ${batch_size}')
 	println('Train batches: ${train_dl.len()} | Val batches: ${val_dl.len()}')
