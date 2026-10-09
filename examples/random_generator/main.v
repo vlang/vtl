@@ -33,6 +33,9 @@ fn main() {
 	test_statistics := validation_rng.student_t(7.0, [4])!
 	variance_ratios := validation_rng.f_distribution(5.0, 10.0, [4])!
 	waiting_durations := validation_rng.exponential(0.5, [4])!
+	extreme_value_noise := training_rng.gumbel(0.0, 1.0, [4])!
+	robust_noise := validation_rng.laplace(0.0, 0.05, [4])!
+	logistic_scores := validation_rng.logistic(0.0, 1.0, [4])!
 
 	println('Training batch shape: ${training_features.shape}')
 	println('Training feature mean: ${stats.mean(training_features)}')
@@ -56,6 +59,9 @@ fn main() {
 	println('Student t samples: ${test_statistics.to_array()}')
 	println('F-distribution ratios: ${variance_ratios.to_array()}')
 	println('Exponential waiting durations: ${waiting_durations.to_array()}')
+	println('Gumbel extreme-value noise: ${extreme_value_noise.to_array()}')
+	println('Laplace robust noise: ${robust_noise.to_array()}')
+	println('Logistic score noise: ${logistic_scores.to_array()}')
 	println('Independent augmentation noise: ${noise.to_array()}')
 	println('Seeded integer offsets: ${integer_noise.to_array()}')
 

@@ -194,6 +194,51 @@ pub fn (mut generator RandomGenerator) exponential(lambda f64, shape []int) !&Te
 	return result
 }
 
+// gumbel returns samples from a Gumbel distribution with the given location
+// and non-negative scale using this generator's independent stream.
+pub fn (mut generator RandomGenerator) gumbel(location f64, scale f64, shape []int) !&Tensor[f64] {
+	validate_location_scale(location, scale, 'gumbel')!
+	mut values := []f64{len: size_from_shape(shape), init: location}
+	if scale == 0 {
+		return from_array[f64](values, shape)
+	}
+	for i in 0 .. values.len {
+		u := open_unit_interval(generator.rng.f64_in_range(0.0, 1.0)!)
+		values[i] = sample_gumbel(location, scale, u)
+	}
+	return from_array[f64](values, shape)
+}
+
+// laplace returns samples from a Laplace distribution with the given location
+// and non-negative scale using this generator's independent stream.
+pub fn (mut generator RandomGenerator) laplace(location f64, scale f64, shape []int) !&Tensor[f64] {
+	validate_location_scale(location, scale, 'laplace')!
+	mut values := []f64{len: size_from_shape(shape), init: location}
+	if scale == 0 {
+		return from_array[f64](values, shape)
+	}
+	for i in 0 .. values.len {
+		u := open_unit_interval(generator.rng.f64_in_range(0.0, 1.0)!)
+		values[i] = sample_laplace(location, scale, u)
+	}
+	return from_array[f64](values, shape)
+}
+
+// logistic returns samples from a Logistic distribution with the given
+// location and non-negative scale using this generator's independent stream.
+pub fn (mut generator RandomGenerator) logistic(location f64, scale f64, shape []int) !&Tensor[f64] {
+	validate_location_scale(location, scale, 'logistic')!
+	mut values := []f64{len: size_from_shape(shape), init: location}
+	if scale == 0 {
+		return from_array[f64](values, shape)
+	}
+	for i in 0 .. values.len {
+		u := open_unit_interval(generator.rng.f64_in_range(0.0, 1.0)!)
+		values[i] = sample_logistic(location, scale, u)
+	}
+	return from_array[f64](values, shape)
+}
+
 // geometric returns the number of Bernoulli trials needed for the first
 // success, independently sampled from this generator. Results start at 1.
 pub fn (mut generator RandomGenerator) geometric(probability f64, shape []int) !&Tensor[int] {
@@ -643,6 +688,80 @@ pub fn exponential[T](lambda f64, shape []int, params TensorData) &Tensor[T] {
 		t.set(i, rand_value)
 	}
 	return t
+}
+
+// gumbel returns samples from a Gumbel distribution using VTL's global stream.
+pub fn gumbel(location f64, scale f64, shape []int, params TensorData) !&Tensor[f64] {
+	validate_location_scale(location, scale, 'gumbel')!
+	mut values := []f64{len: size_from_shape(shape), init: location}
+	if scale == 0 {
+		return from_array[f64](values, shape, params)
+	}
+	for i in 0 .. values.len {
+		u := open_unit_interval(rand.f64_in_range(0.0, 1.0)!)
+		values[i] = sample_gumbel(location, scale, u)
+	}
+	return from_array[f64](values, shape, params)
+}
+
+// laplace returns samples from a Laplace distribution using VTL's global stream.
+pub fn laplace(location f64, scale f64, shape []int, params TensorData) !&Tensor[f64] {
+	validate_location_scale(location, scale, 'laplace')!
+	mut values := []f64{len: size_from_shape(shape), init: location}
+	if scale == 0 {
+		return from_array[f64](values, shape, params)
+	}
+	for i in 0 .. values.len {
+		u := open_unit_interval(rand.f64_in_range(0.0, 1.0)!)
+		values[i] = sample_laplace(location, scale, u)
+	}
+	return from_array[f64](values, shape, params)
+}
+
+// logistic returns samples from a Logistic distribution using VTL's global stream.
+pub fn logistic(location f64, scale f64, shape []int, params TensorData) !&Tensor[f64] {
+	validate_location_scale(location, scale, 'logistic')!
+	mut values := []f64{len: size_from_shape(shape), init: location}
+	if scale == 0 {
+		return from_array[f64](values, shape, params)
+	}
+	for i in 0 .. values.len {
+		u := open_unit_interval(rand.f64_in_range(0.0, 1.0)!)
+		values[i] = sample_logistic(location, scale, u)
+	}
+	return from_array[f64](values, shape, params)
+}
+
+fn validate_location_scale(location f64, scale f64, distribution string) ! {
+	if math.is_nan(location) || math.is_inf(location, 0) || scale < 0 || math.is_nan(scale)
+		|| math.is_inf(scale, 0) {
+		return error('${distribution}: location must be finite and scale must be finite and non-negative')
+	}
+}
+
+fn open_unit_interval(value f64) f64 {
+	if value <= 0 {
+		return 2.220446049250313e-16
+	}
+	if value >= 1 {
+		return 0.9999999999999999
+	}
+	return value
+}
+
+fn sample_gumbel(location f64, scale f64, uniform_value f64) f64 {
+	return location - scale * math.log(-math.log(uniform_value))
+}
+
+fn sample_laplace(location f64, scale f64, uniform_value f64) f64 {
+	if uniform_value < 0.5 {
+		return location + scale * math.log(2 * uniform_value)
+	}
+	return location - scale * math.log(2 * (1 - uniform_value))
+}
+
+fn sample_logistic(location f64, scale f64, uniform_value f64) f64 {
+	return location + scale * math.log(uniform_value / (1 - uniform_value))
 }
 
 // geometric returns the number of Bernoulli trials needed for the first

@@ -14,5 +14,8 @@ Run from `~/.vmodules`:
 v run ./vtl/examples/random_generator/main.v
 ```
 
-The same seed and sequence of calls reproduce the same values for the same
-VTL/V runtime version.
+The example includes Gumbel extreme-value noise, Laplace robust noise, and
+logistic samples in addition to seeded normal, Bernoulli, Poisson, Weibull,
+Gamma, Beta, and Student distributions. Location and scale must be finite;
+scale may be zero to produce a constant tensor. The same seed and sequence of
+calls reproduce the same values for the same VTL/V runtime version.

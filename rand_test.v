@@ -129,6 +129,34 @@ fn test_global_statistical_distributions_are_seeded_and_validated() ! {
 	}
 }
 
+fn test_global_location_scale_distributions_are_seeded_and_validated() ! {
+	random_seed(9402)
+	gumbel_values := gumbel(2.0, 1.5, [128], TensorData{})!
+	laplace_values := laplace(-1.0, 0.75, [128], TensorData{})!
+	logistic_values := logistic(0.5, 2.0, [128], TensorData{})!
+	random_seed(9402)
+	assert gumbel_values.array_equal(gumbel(2.0, 1.5, [128], TensorData{})!)
+	assert laplace_values.array_equal(laplace(-1.0, 0.75, [128], TensorData{})!)
+	assert logistic_values.array_equal(logistic(0.5, 2.0, [128], TensorData{})!)
+	for values in [gumbel_values.to_array(), laplace_values.to_array(), logistic_values.to_array()] {
+		for value in values {
+			assert !math.is_nan(value) && !math.is_inf(value, 0)
+		}
+	}
+	assert gumbel(3.0, 0.0, [2], TensorData{})!.to_array() == [3.0, 3.0]
+	assert laplace(-2.0, 0.0, [2], TensorData{})!.to_array() == [-2.0, -2.0]
+	assert logistic(4.0, 0.0, [2], TensorData{})!.to_array() == [4.0, 4.0]
+	if _ := gumbel(0.0, -1.0, [1], TensorData{}) {
+		assert false, 'gumbel must reject negative scale'
+	}
+	if _ := laplace(math.inf(1), 1.0, [1], TensorData{}) {
+		assert false, 'laplace must reject non-finite location'
+	}
+	if _ := logistic(0.0, math.nan(), [1], TensorData{}) {
+		assert false, 'logistic must reject NaN scale'
+	}
+}
+
 fn sample_mean_for_test(values []f64) f64 {
 	mut total := 0.0
 	for value in values {
