@@ -32,6 +32,7 @@ neural network module.
 | Datasets and examples | [Datasets](../datasets/README.md), [Examples catalog](../examples/README.md) |
 | GPU/dev workflow | [Device memory](./DEVICE_MEMORY.md), [Lightweight development](./DEV_LIGHTWEIGHT.md) |
 | Release status | [ML Roadmap](./ML_ROADMAP.md), [Project roadmap](../ROADMAP.md) |
+| Framework parity | [NumPy and Arraymancer](./NUMPY_PARITY.md), [PyTorch](./PYTORCH_PARITY.md) |
 
 ## Learning Path
 

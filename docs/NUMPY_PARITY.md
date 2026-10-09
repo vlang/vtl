@@ -6,6 +6,9 @@ array operations that make sense in V. This is a capability roadmap, not a
 claim of current parity. Every checked item must be backed by public API,
 tests, documentation, and examples where users need them.
 
+For neural-network and framework-level gaps relative to PyTorch, see the
+[PyTorch parity tracker](./PYTORCH_PARITY.md).
+
 ## Current strengths
 
 - Generic N-dimensional tensors, slicing, broadcasting, reshape, transpose,
