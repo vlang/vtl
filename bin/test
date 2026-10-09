@@ -59,6 +59,13 @@ if [[ -n "${prod}" ]]; then
     flags+=( -prod -no-prod-options -cflags -O3 -cflags -fno-lto )
 fi
 
+# Local low-memory runs can serialize V's compiler transformations without
+# changing the hosted CI defaults. The caller should still cap the process with
+# systemd-run and set VJOBS explicitly.
+if [[ "${VTL_NO_PARALLEL:-0}" == "1" ]]; then
+    flags+=( -no-parallel )
+fi
+
 # Examples that OOM default GitHub runners at compile time (see docs/DEV_LIGHTWEIGHT.md).
 should_skip_example() {
     case "$1" in

@@ -162,7 +162,11 @@ v install vtl
 ## Testing
 
 ```sh
-systemd-run --user --scope --quiet --property=MemoryMax=768M --property=MemorySwapMax=0 --setenv=VJOBS=2 -- v test ./vtl
+# Run the full scoped suite from ~/.vmodules; compiler parallelism is disabled
+# to keep the local memory ceiling predictable.
+cd ~/.vmodules
+systemd-run --user --scope --property=MemoryMax=4G --property=MemorySwapMax=0 \
+	env VJOBS=2 VTL_NO_PARALLEL=1 ./vtl/bin/test
 ```
 
 See [DEV_LIGHTWEIGHT.md](docs/DEV_LIGHTWEIGHT.md) for memory-safe subsets in CI.
