@@ -3,6 +3,8 @@
 Use `RandomGenerator` to keep seeded data-pipeline or experiment streams
 independent from V's global random state. The example covers continuous and
 discrete distributions, sampling, and model-training noise.
+`permutation_axis` also shuffles complete slices along a chosen axis, including
+negative axis indices, while preserving the tensor shape.
 
 Run from `~/.vmodules`:
 
