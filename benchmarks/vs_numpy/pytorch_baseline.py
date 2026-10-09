@@ -13,7 +13,7 @@ except ImportError:
 
 
 def bench_autograd():
-    for batch in (64, 128):
+    for batch in (32, 64):
         model = nn.Sequential(
             nn.Linear(128, 64),
             nn.ReLU(),
@@ -31,7 +31,8 @@ def bench_autograd():
             loss = criterion(pred, y)
             loss.backward()
 
-        sec = timeit.timeit(step, number=3) / 3.0
+        step()  # warmup
+        sec = timeit.timeit(step, number=2) / 2.0
         print(f"pytorch mlp_backprop {batch}x128 | {sec * 1000:.2f} ms | -")
 
 

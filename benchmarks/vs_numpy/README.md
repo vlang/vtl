@@ -346,12 +346,23 @@ systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env V
 
 ## Autograd (3-layer MLP backprop)
 
+VTL and PyTorch use the same batch sizes (32 and 64), one warmup step, and two
+timed training steps. The VTL benchmark constructs the three `LinearLayer`
+instances directly so it measures the layer and autograd gates without the
+`Sequential` model-dispatch loop. Timings use a monotonic nanosecond clock.
+
 ```bash
-systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
 	v -prod run ./vtl/benchmarks/vs_numpy/autograd_bench.v
-systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
+systemd-run --user --scope --quiet -p MemoryMax=2G -p MemorySwapMax=0 -- env VJOBS=2 \
 	python3 ./vtl/benchmarks/vs_numpy/pytorch_baseline.py autograd
 ```
+
+Use `v -prod` for comparable performance measurements. A plain `v run` builds
+the development configuration and its timings do not represent optimized
+performance. If the local V compiler crashes while compiling this ML workload,
+run it in a production build environment with sufficient compiler memory; do
+not publish development-mode timings as optimized performance data.
 
 ## Real FFT
 
