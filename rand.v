@@ -38,6 +38,34 @@ pub fn (mut generator RandomGenerator) uniform(minimum f64, maximum f64, shape [
 	return result
 }
 
+// integers returns seeded int samples from [low, high).
+pub fn (mut generator RandomGenerator) integers(low int, high int, shape []int) !&Tensor[int] {
+	return generator.integers_with_endpoint(low, high, shape, false)
+}
+
+// integers_with_endpoint returns seeded int samples from [low, high) or
+// [low, high] when endpoint is true.
+pub fn (mut generator RandomGenerator) integers_with_endpoint(low int, high int, shape []int, endpoint bool) !&Tensor[int] {
+	mut upper := high
+	if endpoint {
+		if high == max_int {
+			return error('integers: inclusive upper bound cannot be max_int')
+		}
+		upper++
+	}
+	if upper <= low {
+		return error('integers: upper bound must be greater than lower bound')
+	}
+	if low < 0 && upper >= 0 && upper > max_int + low {
+		return error('integers: requested range is too wide for the random generator')
+	}
+	mut result := zeros[int](shape, TensorData{})
+	for i in 0 .. result.size {
+		result.set_nth(i, int(generator.rng.i64_in_range(i64(low), i64(upper))!))
+	}
+	return result
+}
+
 // normal returns f64 values from a normal distribution with the given parameters.
 pub fn (mut generator RandomGenerator) normal(shape []int, params NormalTensorData) !&Tensor[f64] {
 	if params.sigma <= 0 {
