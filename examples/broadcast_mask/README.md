@@ -1,6 +1,7 @@
 # Broadcastable tensor masks
 
-Use a one-dimensional mask to select columns and a column-shaped mask to fill whole rows of a matrix.
+Use a one-dimensional mask to select columns and a column-shaped mask to fill whole rows of a
+matrix.
 
 ## Run
 
@@ -12,4 +13,5 @@ v run ./vtl/examples/broadcast_mask/main.v
 
 ## Notes
 
-Mask dimensions follow tensor broadcasting rules; `masked_select` returns selected values in logical order and `masked_fill` returns a filled copy.
+Mask dimensions follow tensor broadcasting rules; `masked_select` returns selected values in
+logical order and `masked_fill` returns a filled copy.
