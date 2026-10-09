@@ -191,7 +191,8 @@ exponential, Poisson, Weibull, lognormal, gamma, beta, Dirichlet, chi-square,
 Student's t, and F tensors; `random_seed`; independent seeded `RandomGenerator`
 streams for f64 uniform, normal, lognormal, gamma, beta, Dirichlet, exponential,
 Poisson, Weibull, chi-square, Student's t, F, and boolean Bernoulli; integer
-binomial/geometric/multinomial/Poisson; uniform and weighted population choice;
+binomial/geometric/multinomial/Poisson; uniform and weighted population choice
+over flattened values or complete slices along a selected axis;
 and integer, first-axis, or selected-axis tensor permutations.
 
 **Remaining:** add distributions/sampling APIs and define reproducibility across

@@ -329,6 +329,44 @@ fn test_random_generator_permutation_axis_shuffles_complete_slices() ! {
 	replay.free()
 }
 
+fn test_random_generator_choice_axis_samples_complete_slices() ! {
+	mut values := []int{}
+	for i in 0 .. 2 {
+		for j in 0 .. 3 {
+			for k in 0 .. 2 {
+				values << i * 100 + j * 10 + k
+			}
+		}
+	}
+	input := from_array(values, [2, 3, 2])!
+	mut generator := new_random_generator(953)
+	sampled := generator.choice_axis[int](input, 2, -2, false)!
+	assert sampled.shape == [2, 2, 2]
+	for i in 0 .. 2 {
+		for k in 0 .. 2 {
+			mut selected_ids := []int{len: 2}
+			for j in 0 .. 2 {
+				selected_ids[j] = sampled.get([i, j, k]) / 10
+			}
+			selected_ids.sort()
+			assert selected_ids[0] != selected_ids[1]
+		}
+	}
+	mut replay := new_random_generator(953)
+	assert sampled.array_equal(replay.choice_axis[int](input, 2, 1, false)!)
+	weights := from_1d([1.0, 0.0, 0.0])!
+	weighted := generator.choice_weighted_axis[int](input, weights, 1, 1, false)!
+	assert weighted.to_array() == [0, 1, 100, 101]
+	if _ := generator.choice_axis[int](input, 4, 1, false) {
+		assert false, 'choice_axis must reject oversized samples without replacement'
+	}
+	if _ := generator.choice_weighted_axis[int](input, from_1d([1.0, 1.0])!, 1, 1, true) {
+		assert false, 'choice_weighted_axis must reject weights with the wrong length'
+	}
+	generator.free()
+	replay.free()
+}
+
 fn test_random_generator_gamma_is_seeded_and_positive() ! {
 	mut generator := new_random_generator(789)
 	values := generator.gamma(2.0, 3.0, [64])!

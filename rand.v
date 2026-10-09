@@ -385,6 +385,49 @@ pub fn (mut generator RandomGenerator) choice_weighted[T](population &Tensor[T],
 	return from_1d[T](selected)
 }
 
+// choice_axis samples complete slices along axis and replaces that axis by size.
+pub fn (mut generator RandomGenerator) choice_axis[T](population &Tensor[T], size int, axis int, replace bool) !&Tensor[T] {
+	axis_index := random_sampling_axis(population, axis, 'choice_axis')!
+	mut positions := []int{len: population.shape[axis_index]}
+	for index in 0 .. positions.len {
+		positions[index] = index
+	}
+	position_tensor := from_1d[int](positions)!
+	selected := generator.choice[int](position_tensor, size, replace)!
+	return population.take(selected.to_array(), axis_index)
+}
+
+// choice_weighted_axis samples complete slices in proportion to non-negative
+// axis weights and replaces that axis by size.
+pub fn (mut generator RandomGenerator) choice_weighted_axis[T](population &Tensor[T], weights &Tensor[f64], size int, axis int, replace bool) !&Tensor[T] {
+	axis_index := random_sampling_axis(population, axis, 'choice_weighted_axis')!
+	if weights.rank() != 1 || weights.shape[0] != population.shape[axis_index] {
+		return error('choice_weighted_axis: weights must be one-dimensional and match the selected axis')
+	}
+	mut positions := []int{len: population.shape[axis_index]}
+	for index in 0 .. positions.len {
+		positions[index] = index
+	}
+	position_tensor := from_1d[int](positions)!
+	selected := generator.choice_weighted[int](position_tensor, weights, size, replace)!
+	return population.take(selected.to_array(), axis_index)
+}
+
+fn random_sampling_axis[T](population &Tensor[T], axis int, operation string) !int {
+	rank := population.rank()
+	if rank == 0 {
+		return error('${operation}: population must have at least one dimension')
+	}
+	axis_index := if axis < 0 { axis + rank } else { axis }
+	if axis_index < 0 || axis_index >= rank {
+		return error('${operation}: axis ${axis} is out of range for rank ${rank}')
+	}
+	if population.shape[axis_index] == 0 {
+		return error('${operation}: selected axis must not be empty')
+	}
+	return axis_index
+}
+
 // permutation returns the integers in [0, size) in a seeded random order.
 pub fn (mut generator RandomGenerator) permutation(size int) !&Tensor[int] {
 	if size < 0 {
