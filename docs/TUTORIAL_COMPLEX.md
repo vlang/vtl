@@ -46,7 +46,10 @@ assert product.get_nth(0) == cmplx.complex(1.0, 1.0)
 right-hand side may be a vector or a matrix, and leading batch dimensions
 broadcast like NumPy. `vtl.la.inv_complex` applies the same solve to complex
 identity matrices and preserves leading batches. Singular systems return an
-error. See the [complex linear solve example](../examples/complex_linear_solve/README.md).
+error. `vtl.la.slogdet_complex` returns each determinant's unit-complex phase
+and log magnitude, avoiding overflow when the determinant itself is too large
+to represent. See the
+[complex linear solve example](../examples/complex_linear_solve/README.md).
 
 ```v
 import math
@@ -55,14 +58,20 @@ import vtl
 import vtl.la
 
 matrix := vtl.from_array[cmplx.Complex]([
-	cmplx.Complex{ re: 1, im: 1 }, cmplx.Complex{ re: 2 },
-	cmplx.Complex{ re: 0, im: 1 }, cmplx.Complex{ re: 3 },
+	cmplx.Complex{ re: 1, im: 1 },
+	cmplx.Complex{ re: 2 },
+	cmplx.Complex{ re: 0, im: 1 },
+	cmplx.Complex{ re: 3 },
 ], [2, 2])!
 inverse := la.inv_complex(matrix)!
 identity := la.matmul(matrix, inverse)!
 determinant := la.det_complex(matrix)!
+phase, logabsdet := la.slogdet_complex(matrix)!
+determinant_magnitude := math.hypot(determinant.get_nth(0).re, determinant.get_nth(0).im)
 assert math.abs(identity.get([0, 0]).re - 1.0) < 1e-12
 assert math.abs(determinant.get_nth(0).re - 1.0) < 1e-12
+assert math.abs(phase.get_nth(0).re - determinant.get_nth(0).re / determinant_magnitude) < 1e-12
+assert math.abs(logabsdet.get_nth(0) - math.log(determinant_magnitude)) < 1e-12
 ```
 
 The NumPy-style `real`, `imag`, `conj`, `absolute`, and `abs` operations are
