@@ -387,6 +387,28 @@ assert row_quartiles.shape == [2, 1]
 Axis single-quantile helpers take `keepdims`; multiple quantiles prepend a
 quantile dimension. Percentile counterparts accept levels from 0 through 100.
 
+Weighted quantiles use NumPy's `inverted_cdf` estimator. Global weights must
+match the input shape. Axis reductions also accept a one-dimensional weight
+vector for the reduced axis; a weight tensor matching the input shape allows
+different weights in each slice:
+
+```v
+import vtl
+import vtl.stats
+
+observations := vtl.from_1d([1.0, 2.0, 3.0, 4.0])!
+weights := vtl.from_1d([1.0, 1.0, 1.0, 7.0])!
+assert stats.quantile_weighted(observations, weights, 0.5)! == 4.0
+
+grid := vtl.from_array([10.0, 7.0, 4.0, 3.0, 2.0, 1.0], [2, 3])!
+axis_weights := vtl.from_1d([1.0, 1.0, 7.0])!
+medians := stats.quantile_weighted_axis(grid, axis_weights, 0.5, 1, false)!
+assert medians.to_array() == [4.0, 1.0]
+```
+
+Weights must be finite, non-negative, and have a positive sum in each reduced
+slice. Ordinary weighted quantiles propagate NaNs.
+
 ## NaN-aware sums and extrema
 
 `nansum`, `nanprod`, `nanmin`, and `nanmax` skip NaN values. Their axis
