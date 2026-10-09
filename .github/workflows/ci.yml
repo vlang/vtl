@@ -60,7 +60,7 @@ jobs:
         run: |
           cd ~/.vmodules
           if [[ "$RUNNER_OS" == "Linux" ]]; then
-            sudo systemd-run --scope --wait --property=MemoryMax=4G \
+            sudo systemd-run --scope --property=MemoryMax=4G \
               --property=MemorySwapMax=0 --setenv=HOME="$HOME" \
               --setenv=PATH="$PATH" --setenv=VJOBS=2 -- v doctor
           else
@@ -88,7 +88,7 @@ jobs:
         run: |
           cd ~/.vmodules
           if [[ "$RUNNER_OS" == "Linux" ]]; then
-            sudo systemd-run --scope --wait --property=MemoryMax=4G \
+            sudo systemd-run --scope --property=MemoryMax=4G \
               --property=MemorySwapMax=0 --setenv=HOME="$HOME" \
               --setenv=PATH="$PATH" --setenv=VJOBS=2 -- v fmt -verify vtl
           else
@@ -156,7 +156,7 @@ jobs:
         run: |
           cd ~/.vmodules
           if [[ "$RUNNER_OS" == "Linux" ]]; then
-            sudo systemd-run --scope --wait --property=MemoryMax=4G \
+            sudo systemd-run --scope --property=MemoryMax=4G \
               --property=MemorySwapMax=0 --setenv=HOME="$HOME" \
               --setenv=PATH="$PATH" --setenv=VJOBS=2 -- v doctor
           else
@@ -196,7 +196,7 @@ jobs:
           fi
           # Default: scoped tests + tiny_synth smoke (see bin/test, issue #109)
           if [[ "$RUNNER_OS" == "Linux" ]]; then
-            sudo systemd-run --scope --wait --property=MemoryMax=4G \
+            sudo systemd-run --scope --property=MemoryMax=4G \
               --property=MemorySwapMax=0 --setenv=HOME="$HOME" \
               --setenv=PATH="$PATH" --setenv=VJOBS=2 --setenv=TERM="$TERM" -- \
               "$HOME/.vmodules/vtl/bin/test" ${{ matrix.flags }} $backend_flag
@@ -236,7 +236,7 @@ jobs:
       - name: V doctor
         run: |
           cd ~/.vmodules
-          sudo systemd-run --scope --wait --property=MemoryMax=4G \
+          sudo systemd-run --scope --property=MemoryMax=4G \
             --property=MemorySwapMax=0 --setenv=HOME="$HOME" \
             --setenv=PATH="$PATH" --setenv=VJOBS=2 -- v doctor
 
@@ -250,7 +250,7 @@ jobs:
           VJOBS: '2'
         run: |
           cd ~/.vmodules
-          sudo systemd-run --scope --wait --property=MemoryMax=4G \
+          sudo systemd-run --scope --property=MemoryMax=4G \
             --property=MemorySwapMax=0 --setenv=HOME="$HOME" \
             --setenv=PATH="$PATH" --setenv=VJOBS=2 -- \
             v -d vcl run vtl/examples/vtl_opencl_vcl_support/main.v
@@ -292,11 +292,11 @@ jobs:
       - name: Run Vulkan activation layer tests
         run: |
           cd ~/.vmodules
-          sudo systemd-run --scope --wait --property=MemoryMax=4G \
+          sudo systemd-run --scope --property=MemoryMax=4G \
             --property=MemorySwapMax=0 \
             --setenv=HOME="$HOME" --setenv=PATH="$PATH" -- \
             env VJOBS=2 vulkaninfo --summary
-          sudo systemd-run --scope --wait --property=MemoryMax=4G \
+          sudo systemd-run --scope --property=MemoryMax=4G \
             --property=MemorySwapMax=0 \
             --setenv=HOME="$HOME" --setenv=PATH="$PATH" \
             --setenv=VTL_USE_VULKAN=1 -- \
