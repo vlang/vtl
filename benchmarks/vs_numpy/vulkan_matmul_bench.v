@@ -1,5 +1,5 @@
 // End-to-end resident-buffer Vulkan f32 GEMM benchmark.
-// Run from ~/.vmodules with `v -prod -d vulkan run ...`.
+// Compile with `-prod -d vulkan` from ~/.vmodules, then run the executable.
 module main
 
 import time

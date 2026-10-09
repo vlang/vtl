@@ -1,5 +1,5 @@
 // VTL Conv2D forward benchmark (CPU f64 path).
-// Run: v run vtl/benchmarks/vs_numpy/conv2d_bench.v
+// Compile with `-prod` from ~/.vmodules, then run the resulting executable.
 module main
 
 import time

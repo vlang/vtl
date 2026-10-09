@@ -1,5 +1,5 @@
 // VTL 3-layer MLP backprop benchmark (f64, CPU autograd).
-// Run: v run vtl/benchmarks/vs_numpy/autograd_bench.v
+// Compile with `-prod` from ~/.vmodules, then run the resulting executable.
 module main
 
 import time

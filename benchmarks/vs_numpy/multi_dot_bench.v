@@ -1,5 +1,5 @@
 // Compare optimal matrix-chain ordering with left-associated multiplication.
-// Run from ~/.vmodules with: v -prod run ./vtl/benchmarks/vs_numpy/multi_dot_bench.v
+// Compile with `-prod` from ~/.vmodules, then run the resulting executable.
 module main
 
 import time

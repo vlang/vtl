@@ -9,7 +9,8 @@ VTL benchmark uses its independent seeded generator; NumPy uses
 
 ```bash
 systemd-run --user --scope --quiet -p MemoryMax=3G -p MemorySwapMax=0 -- env VJOBS=2 \
-	v -prod run ./vtl/benchmarks/vs_numpy/hypergeometric_bench.v
+	v -prod -o /tmp/vtl-hypergeometric-bench ./vtl/benchmarks/vs_numpy/hypergeometric_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-hypergeometric-bench
 systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
 	uv run --with numpy python ./vtl/benchmarks/vs_numpy/numpy_hypergeometric_baseline.py
 ```
@@ -40,7 +41,8 @@ and average five calls. Run from `~/.vmodules` under a memory-limited scope:
 
 ```bash
 systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
-	v -prod run ./vtl/benchmarks/vs_numpy/svd_bench.v
+	v -prod -o /tmp/vtl-svd-bench ./vtl/benchmarks/vs_numpy/svd_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-svd-bench
 systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
 	OPENBLAS_NUM_THREADS=2 uv run --with numpy python \
 	./vtl/benchmarks/vs_numpy/numpy_svd_baseline.py
@@ -61,8 +63,8 @@ matched run measured:
 | 128×128 | 858.147 | 3.011 | 0.0035× |
 
 The pure-V SVD is substantially slower for these cases. This benchmark is a
-performance gap report, not evidence of parity; optimized SVD kernels remain a
-priority before making CPU performance claims.
+performance gap report, not evidence of parity; optimized SVD backend dispatch
+remains a priority before making CPU performance claims.
 
 The PR benchmark comment reports pure-V, optional LAPACKE, and NumPy timings
 for the same deterministic matrices. LAPACKE results use
@@ -82,12 +84,12 @@ same `f64` values and calls `numpy.var` with its default `ddof=0`. Run both
 from `~/.vmodules`:
 
 ```bash
-cp ./vtl/benchmarks/vs_numpy/stats_bench.v /tmp/vtl_stats_bench.v
-systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
-	v -prod run /tmp/vtl_stats_bench.v
-cp ./vtl/benchmarks/vs_numpy/variance_bench.v /tmp/vtl_variance_bench.v
-systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
-	v -prod run /tmp/vtl_variance_bench.v
+systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -prod -o /tmp/vtl-stats-bench ./vtl/benchmarks/vs_numpy/stats_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-stats-bench
+systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -prod -o /tmp/vtl-variance-bench ./vtl/benchmarks/vs_numpy/variance_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-variance-bench
 systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
 	OPENBLAS_NUM_THREADS=2 uv run --with numpy python \
 	./vtl/benchmarks/vs_numpy/numpy_stats_baseline.py
@@ -117,9 +119,12 @@ from `~/.vmodules`:
 
 ```bash
 systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
-	v -prod run ./vtl/benchmarks/vs_numpy/vector_norm_bench.v
-systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
-	OPENBLAS_NUM_THREADS=2 v -d vsl_blas_cblas -prod run ./vtl/benchmarks/vs_numpy/vector_norm_bench.v
+	v -prod -o /tmp/vtl-vector-norm-purev ./vtl/benchmarks/vs_numpy/vector_norm_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-vector-norm-purev
+systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -d vsl_blas_cblas -prod -o /tmp/vtl-vector-norm-cblas ./vtl/benchmarks/vs_numpy/vector_norm_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 \
+	OPENBLAS_NUM_THREADS=2 /tmp/vtl-vector-norm-cblas
 systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
 	OPENBLAS_NUM_THREADS=2 uv run --with numpy python \
 	./vtl/benchmarks/vs_numpy/numpy_vector_norm_baseline.py
@@ -154,7 +159,8 @@ Run from `~/.vmodules` with a memory-limited systemd scope:
 
 ```bash
 systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
-	v -cc gcc -keepc -prod run ./vtl/benchmarks/vs_numpy/multi_dot_bench.v
+	v -cc gcc -keepc -prod -o /tmp/vtl-multi-dot-bench ./vtl/benchmarks/vs_numpy/multi_dot_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-multi-dot-bench
 systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
 	OPENBLAS_NUM_THREADS=2 uv run --with numpy python \
 	./vtl/benchmarks/vs_numpy/numpy_multi_dot_baseline.py
@@ -162,7 +168,8 @@ systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env V
 
 Record CPU, V version/build, NumPy/BLAS version, and thread count with results.
 The shape-cost reduction does not imply that VTL matmul kernels are faster than
-NumPy; compare the measured times on the same machine.
+NumPy; compare the measured times on the same machine. The optimized GCC build
+is compiled first and its output binary is timed separately.
 
 On an AMD Ryzen 9 5900X, VTL used V 0.5.2 `5bd6709`, `-prod`, GCC, and the
 pure-V matmul backend. NumPy 2.5.3 used scipy-openblas 0.3.34.106.0 with
@@ -177,24 +184,24 @@ pure-V matmul backend. NumPy 2.5.3 used scipy-openblas 0.3.34.106.0 with
 
 The optimal order was 12.9× faster than the left-associated VTL chain; NumPy
 `multi_dot` was 4.5× faster than VTL for this case. This is one matrix chain
-and does not establish general NumPy performance parity. On this workstation the default V
-`-prod run` path crashes during interface type checking; the shown GCC command
-succeeds. `-keepc` retains generated C files for debugging.
+and does not establish general NumPy performance parity. In the recorded
+environment, selecting GCC explicitly avoided an interface type-check failure
+with implicit compiler selection. `-keepc` retains generated C files for
+debugging.
 
 ## Matmul
 
-For the 768 MiB workstation cap, run the f64 and f32 cases as separate
-programs. Copy each source to `/tmp` so V compiles only that benchmark module;
-all V commands still run from `~/.vmodules`:
+Run the f64 and f32 cases as separate programs so compiler memory stays
+bounded; all V commands still run from `~/.vmodules`:
 
 ```bash
 cd ~/.vmodules
-cp ./vtl/benchmarks/vs_numpy/f64/main/main.v /tmp/vtl_f64_bench.v
-systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
-	v -prod run /tmp/vtl_f64_bench.v
-cp ./vtl/benchmarks/vs_numpy/f32/main/main.v /tmp/vtl_f32_bench.v
-systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
-	v -prod run /tmp/vtl_f32_bench.v
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -prod -o /tmp/vtl-f64-bench ./vtl/benchmarks/vs_numpy/f64/main/main.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-f64-bench
+systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -prod -o /tmp/vtl-f32-bench ./vtl/benchmarks/vs_numpy/f32/main/main.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-f32-bench
 ```
 
 Both programs use the same deterministic inputs as the NumPy baselines, three
@@ -202,8 +209,9 @@ warmups, ten timed calls, and an output sanity check. The combined benchmark
 below remains useful on machines with more compiler memory.
 
 ```bash
-systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
-	v -prod run ./vtl/benchmarks/vs_numpy/matmul_bench.v
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -prod -o /tmp/vtl-matmul-bench ./vtl/benchmarks/vs_numpy/matmul_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-matmul-bench
 ```
 
 ```bash
@@ -218,8 +226,11 @@ for sizes 128, 256, and 512. With CBLAS enabled, it measures sizes through
 both allocate a fresh result on each timed call and use the same inputs:
 
 ```bash
-systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
-	OPENBLAS_NUM_THREADS=2 v -d vsl_blas_generic_cblas -prod run ./vtl/benchmarks/vs_numpy/matmul_bench.v
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -d vsl_blas_generic_cblas -prod -o /tmp/vtl-matmul-cblas \
+	./vtl/benchmarks/vs_numpy/matmul_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 \
+	OPENBLAS_NUM_THREADS=2 /tmp/vtl-matmul-cblas
 systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
 	OPENBLAS_NUM_THREADS=2 uv run --with numpy python \
 	./vtl/benchmarks/vs_numpy/numpy_matmul_baseline.py
@@ -255,9 +266,10 @@ the VTL Vulkan GEMM operation without host readback in the timed section. Run
 the NumPy reference with the same f32 inputs and a preallocated output:
 
 ```bash
-systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
-	VTL_USE_VULKAN=1 v -prod -d vulkan run \
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -prod -d vulkan -o /tmp/vtl-vulkan-matmul \
 	./vtl/benchmarks/vs_numpy/vulkan_matmul_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 VTL_USE_VULKAN=1 /tmp/vtl-vulkan-matmul
 systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
 	OPENBLAS_NUM_THREADS=2 uv run --with numpy python \
 	./vtl/benchmarks/vs_numpy/numpy_matmul_f32_baseline.py
@@ -340,8 +352,9 @@ The chart below isolates this pure-V run from the earlier CBLAS measurements.
 ## Conv2D (CPU path)
 
 ```bash
-systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
-	v -prod run ./vtl/benchmarks/vs_numpy/conv2d_bench.v
+systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -prod -o /tmp/vtl-conv2d-bench ./vtl/benchmarks/vs_numpy/conv2d_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-conv2d-bench
 ```
 
 ## Autograd (3-layer MLP backprop)
@@ -354,14 +367,14 @@ use a monotonic nanosecond clock for VTL.
 
 ```bash
 systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
-	v -prod run ./vtl/benchmarks/vs_numpy/autograd_bench.v
+	v -prod -o /tmp/vtl-autograd-bench ./vtl/benchmarks/vs_numpy/autograd_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-autograd-bench
 systemd-run --user --scope --quiet -p MemoryMax=2G -p MemorySwapMax=0 -- env VJOBS=2 \
 	python3 ./vtl/benchmarks/vs_numpy/pytorch_baseline.py autograd
 ```
 
-Use `v -prod` for comparable performance measurements. A plain `v run` builds
-the development configuration and its timings do not represent optimized
-performance. If the production compiler crashes or exceeds the configured
+Use `-prod` for comparable performance measurements. Development builds do not
+represent optimized performance. If the production compiler crashes or exceeds the configured
 memory limit, treat the benchmark as unavailable in that environment; do not
 publish development-mode timings or raise the resource limit to obtain a
 result.
@@ -371,17 +384,18 @@ when both benchmark commands produce timings.
 ## Real FFT
 
 ```bash
+systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -prod -o /tmp/vtl-fft-bench ./vtl/benchmarks/vs_numpy/fft_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-fft-bench
 systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
-	v -prod run ./vtl/benchmarks/vs_numpy/fft_bench.v
-systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
-	uv run --with numpy python ./vsl/benchmarks/fft_numpy_baseline.py
+	uv run --with numpy python ./vtl/benchmarks/vs_numpy/numpy_fft_baseline.py
 ```
 
 The FFT benchmark covers real f64 and real f32 inputs with the same sizes and
 iteration counts in VTL and NumPy. For real f32, VTL's dedicated API returns
 complex f32 output while NumPy's `np.fft.rfft` promotes to complex128. Install
 NumPy in an isolated environment if needed, for example with
-`uv run --with numpy python3 ./vsl/benchmarks/fft_numpy_baseline.py`.
+`uv run --with numpy python ./vtl/benchmarks/vs_numpy/numpy_fft_baseline.py`.
 
 ## Complex f32 FFT
 
@@ -393,8 +407,9 @@ the timings compare user-facing behavior rather than identical internal
 precision. Run both commands from `~/.vmodules`:
 
 ```bash
-systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
-	v -prod run ./vtl/benchmarks/vs_numpy/fft_complex_f32_bench.v
+systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -prod -o /tmp/vtl-fft-complex-f32-bench ./vtl/benchmarks/vs_numpy/fft_complex_f32_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-fft-complex-f32-bench
 systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
 	uv run --with numpy python ./vtl/benchmarks/vs_numpy/numpy_fft_complex_f32_baseline.py
 ```
