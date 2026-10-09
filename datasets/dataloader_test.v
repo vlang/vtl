@@ -34,11 +34,11 @@ fn test_non_contiguous_batches_copy_and_preserve_order() ! {
 fn test_batch_with_labels_uses_matching_contiguous_views() ! {
 	mut data := vtl.from_array([1.0, 2, 3, 4, 5, 6], [3, 2])!
 	mut labels := vtl.from_array([10.0, 20, 30], [3])!
-	loader := new_data_loader_with_labels[f64](data, labels, DataLoaderConfig{
+	loader := new_data_loader_with_labels_checked[f64](data, labels, DataLoaderConfig{
 		batch_size: 2
 		shuffle:    false
 		drop_last:  false
-	})
+	})!
 	mut features_batch, mut labels_batch := loader.batch_with_labels(0) or {
 		panic('expected a labeled batch')
 	}
@@ -53,11 +53,11 @@ fn test_batch_with_labels_uses_matching_contiguous_views() ! {
 fn test_batch_with_labels_gathers_shuffled_rows_as_copies() ! {
 	mut data := vtl.from_array([1.0, 2, 3, 4, 5, 6], [3, 2])!
 	mut labels := vtl.from_array([10.0, 20, 30], [3])!
-	mut loader := new_data_loader_with_labels[f64](data, labels, DataLoaderConfig{
+	mut loader := new_data_loader_with_labels_checked[f64](data, labels, DataLoaderConfig{
 		batch_size: 2
 		shuffle:    false
 		drop_last:  false
-	})
+	})!
 	loader.indices = [2, 0, 1]
 	mut features_batch, mut labels_batch := loader.batch_with_labels(0) or {
 		panic('expected a shuffled labeled batch')
@@ -68,6 +68,20 @@ fn test_batch_with_labels_gathers_shuffled_rows_as_copies() ! {
 	labels_batch.set([0], 1000)
 	assert data.get([2, 0]) == 5
 	assert labels.get_nth(2) == 30
+}
+
+fn test_checked_data_loader_rejects_mismatched_label_count() ! {
+	dataset := vtl.from_2d([[1.0, 2], [3, 4], [5, 6]])!
+	labels := vtl.from_1d([10.0, 20])!
+
+	new_data_loader_with_labels_checked[f64](dataset, labels, DataLoaderConfig{
+		batch_size: 2
+		shuffle:    false
+	}) or {
+		assert err.msg().contains('same number of samples')
+		return
+	}
+	assert false, 'mismatched sample counts must fail'
 }
 
 fn test_discontiguous_batches_preserve_column_major_logical_order() ! {

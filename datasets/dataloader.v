@@ -194,9 +194,29 @@ pub fn new_data_loader[T](dataset &vtl.Tensor[T], config DataLoaderConfig) &Data
 }
 
 // new_data_loader_with_labels creates a DataLoader with both features and labels tensors.
-// Both tensors must have the same first dimension (number of samples).
+// Both tensors must have the same first dimension (number of samples). This
+// compatibility constructor panics for invalid shapes; prefer the checked
+// variant when input dimensions are not already trusted.
 pub fn new_data_loader_with_labels[T](dataset &vtl.Tensor[T], labels &vtl.Tensor[T], config DataLoaderConfig) &DataLoader[T] {
-	n := if dataset.shape.len > 0 { dataset.shape[0] } else { 0 }
+	return new_data_loader_with_labels_checked[T](dataset, labels, config) or {
+		panic(err.msg())
+	}
+}
+
+// new_data_loader_with_labels_checked creates a labeled DataLoader and reports
+// invalid dataset or label shapes as an error instead of deferring failure
+// until a batch is read.
+pub fn new_data_loader_with_labels_checked[T](dataset &vtl.Tensor[T], labels &vtl.Tensor[T], config DataLoaderConfig) !&DataLoader[T] {
+	if dataset.shape.len == 0 {
+		return error('dataset must have a sample dimension')
+	}
+	if labels.shape.len == 0 {
+		return error('labels must have a sample dimension')
+	}
+	n := dataset.shape[0]
+	if labels.shape[0] != n {
+		return error('dataset and labels must have the same number of samples: ${n} != ${labels.shape[0]}')
+	}
 	mut indices := []int{len: n}
 	for i := 0; i < n; i++ {
 		indices[i] = i

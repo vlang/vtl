@@ -62,12 +62,12 @@ fn main() {
 	opt.build_params(model.info.layers)
 
 	// Use DataLoader for features and labels in lockstep
-	mut dl := datasets.new_data_loader_with_labels[f64](ds.train_features, ds.train_labels, datasets.DataLoaderConfig{
+	mut dl := datasets.new_data_loader_with_labels_checked[f64](ds.train_features, ds.train_labels, datasets.DataLoaderConfig{
 		batch_size: batch_size
 		shuffle:    false // deterministic for tiny run
 		drop_last:  true
 		seed:       42
-	})
+	}) or { panic(err) }
 
 	num_batches := dl.len()
 	batches := if num_batches < max_train_batches { num_batches } else { max_train_batches }
