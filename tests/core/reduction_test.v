@@ -81,6 +81,35 @@ fn test_nanarg_flattened_errors_when_no_valid_values() {
 	}
 }
 
+fn test_nanarg_axis_skips_nan_and_selects_keepdims_shape() {
+	t := vtl.from_2d[f64]([[
+		math.nan(),
+		8.0,
+		3.0,
+	], [
+		4.0,
+		math.nan(),
+		1.0,
+	]])!
+	max_rows := t.nanargmax_axis(1, false)!
+	assert max_rows.shape == [2]
+	assert max_rows.to_array() == [1, 0]
+	min_columns := t.nanargmin_axis(0, true)!
+	assert min_columns.shape == [1, 3]
+	assert min_columns.to_array() == [1, 0, 1]
+}
+
+fn test_nanarg_axis_errors_for_all_nan_slices_and_empty_axes() {
+	all_nan_slice := vtl.from_2d[f64]([[math.nan(), math.nan()], [1.0, 2.0]])!
+	if _ := all_nan_slice.nanargmax_axis(1, false) {
+		assert false, 'axis reduction must reject an all-NaN slice'
+	}
+	empty_axis := vtl.zeros[f64]([2, 0])
+	if _ := empty_axis.nanargmin_axis(1, false) {
+		assert false, 'axis reduction must reject an empty axis'
+	}
+}
+
 fn test_max_axis_1() {
 	t := vtl.from_2d([[1.0, 5.0], [3.0, 2.0]])!
 	result := t.max_axis(1)!
