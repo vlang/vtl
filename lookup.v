@@ -1,8 +1,17 @@
 module vtl
 
 // count_nonzero counts non-zero values across every tensor dimension.
+@[direct_array_access]
 pub fn count_nonzero[T](t &Tensor[T]) int {
 	mut count := 0
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		for i in 0 .. t.size {
+			if td[T](t.data.data[i]).bool() {
+				count++
+			}
+		}
+		return count
+	}
 	for flat_index in 0 .. t.size {
 		if td[T](t.get_nth[T](flat_index)).bool() {
 			count++
