@@ -1,6 +1,7 @@
 module core
 
 import vtl
+import math
 
 fn test_argmax_axis_0() {
 	t := vtl.from_2d([[1.0, 5.0], [3.0, 2.0]])!
@@ -58,6 +59,26 @@ fn test_argmin_flat() {
 	t := vtl.from_1d([4.0, 2.0, 6.0, 1.0])!
 	result := t.argmin(0)!
 	assert result.get_nth(0) == 3
+}
+
+fn test_nanarg_flattened_skips_nan_and_keeps_first_tie() {
+	t := vtl.from_1d[f64]([math.nan(), 7.0, 2.0, 7.0])!
+	assert t.nanargmax()! == 1
+	assert t.nanargmin()! == 2
+}
+
+fn test_nanarg_flattened_errors_when_no_valid_values() {
+	all_nan := vtl.from_1d[f64]([math.nan(), math.nan()])!
+	if _ := all_nan.nanargmax() {
+		assert false, 'nanargmax must reject all-NaN input'
+	}
+	if _ := all_nan.nanargmin() {
+		assert false, 'nanargmin must reject all-NaN input'
+	}
+	empty := vtl.from_1d[f64]([]f64{})!
+	if _ := empty.nanargmax() {
+		assert false, 'nanargmax must reject empty input'
+	}
 }
 
 fn test_max_axis_1() {
