@@ -143,15 +143,15 @@ fn histogram_doane_bins(values []f64, fallback int) int {
 	if values.len <= 2 {
 		return fallback
 	}
-	mut mean := 0.0
+	mut sample_mean := 0.0
 	for value in values {
-		mean += value
+		sample_mean += value
 	}
-	mean /= f64(values.len)
+	sample_mean /= f64(values.len)
 	mut second_moment := 0.0
 	mut third_moment := 0.0
 	for value in values {
-		difference := value - mean
+		difference := value - sample_mean
 		second_moment += difference * difference
 		third_moment += difference * difference * difference
 	}
@@ -187,17 +187,17 @@ fn histogram_scott_bins(values []f64, data_range f64, fallback int) int {
 	if values.len < 2 {
 		return 1
 	}
-	mut mean := 0.0
+	mut sample_mean := 0.0
 	for value in values {
-		mean += value
+		sample_mean += value
 	}
-	mean /= f64(values.len)
-	mut sum_squared_deviations := 0.0
+	sample_mean /= f64(values.len)
+	mut squared_deviation_sum := 0.0
 	for value in values {
-		difference := value - mean
-		sum_squared_deviations += difference * difference
+		difference := value - sample_mean
+		squared_deviation_sum += difference * difference
 	}
-	standard_deviation := math.sqrt(sum_squared_deviations / f64(values.len))
+	standard_deviation := math.sqrt(squared_deviation_sum / f64(values.len))
 	if standard_deviation == 0 {
 		return fallback
 	}
