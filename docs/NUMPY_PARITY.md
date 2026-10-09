@@ -166,6 +166,8 @@ inverse, and determinant are currently supported; complex least squares,
 factorizations, and eigenproblems remain future work.
 `la.slogdet` returns determinant signs and log absolute determinants for batches,
 including singular matrices and values whose determinants would overflow.
+`la.slogdet_complex` returns unit-complex phases and log magnitudes for
+complex128 matrix batches, including singular and empty matrices.
 `la.matrix_power` uses exponentiation by squaring for batched integer powers and
 partial-pivot inversion for negative exponents.
 `la.cond` computes spectral and induced-norm condition numbers for stacked
@@ -253,8 +255,9 @@ logical order, and truncate floating-point values when converting to integers.
 **Remaining:** connect promotion to mixed-dtype arithmetic, add weak scalar
 promotion and string conversion, extend complex support beyond elementwise
 operations, `matmul`, Einstein contractions, `solve_complex`, `inv_complex`,
-and `det_complex` to more general linear algebra and random generation, add
-complex32, and define integer overflow and structured-data limits.
+`det_complex`, and `slogdet_complex` to more general linear algebra and random
+generation, add complex32, and define integer overflow and structured-data
+limits.
 
 ### Masked and missing data
 
