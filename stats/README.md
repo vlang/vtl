@@ -74,6 +74,13 @@ prepend the quantile dimension. See [`stats.v`](stats.v) and
 [`quantile_methods.v`](quantile_methods.v) for edge-case behavior and the
 [reductions tutorial](../docs/TUTORIAL_REDUCTIONS.md).
 
+Weighted quantiles and percentiles use NumPy's `inverted_cdf` estimator.
+Global weights match the input shape; one-axis forms accept full-shape weights
+or a vector for the reduced axis. Multi-axis forms accept full-shape weights or
+a compact tensor whose dimensions follow the supplied axes order. The
+`nanquantile_weighted*` and `nanpercentile_weighted*` variants omit NaN values
+and their corresponding weights.
+
 `median` accepts unsorted tensors, uses linear interpolation, and returns
 `f64` for every input type. An empty tensor returns NaN.
 

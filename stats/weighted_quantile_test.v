@@ -95,3 +95,90 @@ fn test_nanweighted_quantile_axis_preserves_nan_policy_and_shapes() ! {
 		5.0,
 	]
 }
+
+fn test_weighted_quantiles_reduce_multiple_axes_with_compact_weights() ! {
+	values := vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0], [2, 2, 2])!
+	weights := vtl.from_array([1.0, 1.0, 1.0, 3.0], [2, 2])!
+	medians := quantile_weighted_axes(values, weights, 0.5, [0, -1], false)!
+	assert medians.shape == [2]
+	assert medians.to_array() == [5.0, 7.0]
+	levels := quantiles_weighted_axes(values, weights, [0.5, 0.0, 1.0], [0, 2])!
+	assert levels.shape == [3, 2]
+	assert levels.to_array() == [5.0, 7.0, 1.0, 3.0, 6.0, 8.0]
+	assert percentile_weighted_axes(values, weights, 50, [0, 2], false)!.to_array() == [
+		5.0,
+		7.0,
+	]
+	assert percentiles_weighted_axes(values, weights, [0, 50, 100], [0, 2])!.to_array() == [
+		1.0,
+		3.0,
+		5.0,
+		7.0,
+		6.0,
+		8.0,
+	]
+	kept := quantile_weighted_axes(values, vtl.ones[f64]([2, 2, 2]), 0.5, [0, 2], true)!
+	assert kept.shape == [1, 2, 1]
+	assert kept.to_array() == [2.0, 4.0]
+	if _ := quantile_weighted_axes(values, weights, 0.5, [0, 0], false) {
+		assert false, 'duplicate axes must fail'
+	}
+	ordered_values := vtl.from_array([
+		1.0,
+		2.0,
+		3.0,
+		4.0,
+		5.0,
+		6.0,
+		7.0,
+		8.0,
+		9.0,
+		10.0,
+		11.0,
+		12.0,
+		13.0,
+		14.0,
+		15.0,
+		16.0,
+		17.0,
+		18.0,
+		19.0,
+		20.0,
+		21.0,
+		22.0,
+		23.0,
+		24.0,
+	], [2, 3, 4])!
+	ordered_weights := vtl.from_array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 5.0], [4, 2])!
+	ordered_axes := quantile_weighted_axes(ordered_values, ordered_weights, 0.5, [2, 0], false)!
+	assert ordered_axes.to_array() == [14.0, 18.0, 22.0]
+}
+
+fn test_nanweighted_quantiles_reduce_multiple_axes() ! {
+	values := vtl.from_array([1.0, math.nan(), 3.0, 4.0, 5.0, 6.0, math.nan(), 8.0], [
+		2,
+		2,
+		2,
+	])!
+	weights := vtl.ones[f64]([2, 2])
+	result := nanquantile_weighted_axes(values, weights, 0.5, [0, 2], false)!
+	assert result.to_array() == [5.0, 4.0]
+	assert nanpercentile_weighted_axes(values, weights, 50, [0, 2], false)!.to_array() == [
+		5.0,
+		4.0,
+	]
+	assert nanpercentiles_weighted_axes(values, weights, [0, 50, 100], [0, 2])!.to_array() == [
+		1.0,
+		3.0,
+		5.0,
+		4.0,
+		6.0,
+		8.0,
+	]
+	all_nan := vtl.full[f64]([2, 2], math.nan())
+	assert math.is_nan(nanquantile_weighted_axes(all_nan, vtl.ones[f64]([2, 2]), 0.5, [
+		0,
+		1,
+	],
+		false)!.get_nth(0))
+}
