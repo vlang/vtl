@@ -1,6 +1,7 @@
 module datasets
 
 import vtl
+import math
 
 // DataLoader provides an iterable over a dataset with batching and shuffling.
 // Contiguous batches are zero-copy slice views. Batches whose indices are not
@@ -269,7 +270,12 @@ pub fn (dl &DataLoader[T]) for_each_with_labels(fn_each fn (features &vtl.Tensor
 }
 
 // split splits a DataLoader into train and validation DataLoaders.
-pub fn (dl &DataLoader[T]) split(val_fraction f64) (&DataLoader[T], &DataLoader[T]) {
+// val_fraction must be finite and in the inclusive range [0, 1].
+pub fn (dl &DataLoader[T]) split(val_fraction f64) !(&DataLoader[T], &DataLoader[T]) {
+	if math.is_nan(val_fraction) || math.is_inf(val_fraction, 0) || val_fraction < 0.0
+		|| val_fraction > 1.0 {
+		return error('validation fraction must be finite and between 0 and 1')
+	}
 	n := dl.indices.len
 	val_size := int(f64(n) * val_fraction)
 	train_size := n - val_size

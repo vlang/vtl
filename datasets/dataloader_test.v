@@ -1,6 +1,7 @@
 module datasets
 
 import vtl
+import math
 
 fn test_contiguous_batches_are_zero_copy_views() ! {
 	mut data := vtl.from_array([1.0, 2, 3, 4, 5, 6, 7, 8], [4, 2])!
@@ -90,5 +91,32 @@ fn test_non_positive_batch_size_is_empty_and_safe() ! {
 		assert loader.len() == 0
 		assert loader.batch(0) == none
 		assert loader.batch(-1) == none
+	}
+}
+
+fn test_split_validates_validation_fraction() ! {
+	dataset := vtl.from_1d([1.0, 2, 3, 4])!
+	loader := new_data_loader[f64](dataset, DataLoaderConfig{
+		batch_size: 2
+		shuffle:    false
+		drop_last:  false
+	})
+
+	train, validation := loader.split(0.25)!
+	assert train.total_samples() == 3
+	assert validation.total_samples() == 1
+	all_training, empty_validation := loader.split(0.0)!
+	assert all_training.total_samples() == 4
+	assert empty_validation.total_samples() == 0
+	empty_training, all_validation := loader.split(1.0)!
+	assert empty_training.total_samples() == 0
+	assert all_validation.total_samples() == 4
+
+	for fraction in [-0.1, 1.1, math.nan(), math.inf(1)] {
+		loader.split(fraction) or {
+			assert err.msg().contains('validation fraction')
+			continue
+		}
+		assert false, 'invalid validation fraction ${fraction} must fail'
 	}
 }
