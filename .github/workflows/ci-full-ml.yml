@@ -1,5 +1,8 @@
 name: CI Full ML (optional)
 
+env:
+  VJOBS: '2'
+
 # Heavy compile: full `v test vtl` + `examples/nn_cifar10/main.v`.
 # Default PRs use scoped `bin/test` in ci.yml to avoid OOM.
 
@@ -55,7 +58,5 @@ jobs:
       - name: Full test tree and examples
         run: |
           cd ~/.vmodules
-          sudo systemd-run --scope --property=MemoryMax=4G \
-            --property=MemorySwapMax=0 --setenv=HOME="$HOME" \
-            --setenv=PATH="$PATH" --setenv=VJOBS=2 --setenv=TERM="$TERM" -- \
+          env HOME="$HOME" PATH="$PATH" VJOBS=2 TERM="$TERM" \
             "$HOME/.vmodules/vtl/bin/test" --full

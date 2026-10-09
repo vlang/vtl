@@ -10,9 +10,10 @@ import time
 import vtl
 import vtl.la
 import vtl.stats
+import vsl.blas as vsl_blas
 
 fn main() {
-	println('batch,features,iterations,axis0_sum_ms,ones_matmul_ms,axis_sum_speedup')
+	println('batch,features,iterations,axis0_sum_ms,ones_matmul_ms,transposed_gemv_ms')
 	for shape in [[32, 64], [64, 64], [64, 256], [128, 128], [256, 64], [128, 256], [1024, 256],
 		[4096, 512]] {
 		batch, features := shape[0], shape[1]
@@ -26,12 +27,14 @@ fn main() {
 		for _ in 0 .. 5 {
 			_ = stats.sum_along_axis[f32](gradient, 0, true)!
 			_ = la.matmul[f32](ones, gradient)!
+			_ = timed_transposed_gemv(gradient, 1)!
 		}
 		axis_sum := timed_axis0_sum(gradient, iterations)!
 		matrix_product := timed_ones_matmul(ones, gradient, iterations)!
+		gemv_product := timed_transposed_gemv(gradient, iterations)!
 		assert axis_sum.tensor.allclose(matrix_product.tensor, rtol: 1e-5, atol: 1e-5)!
-		speedup := matrix_product.ms / axis_sum.ms
-		println('${batch},${features},${iterations},${axis_sum.ms:.4f},${matrix_product.ms:.4f},${speedup:.3f}')
+		assert axis_sum.tensor.allclose(gemv_product.tensor, rtol: 1e-5, atol: 1e-5)!
+		println('${batch},${features},${iterations},${axis_sum.ms:.4f},${matrix_product.ms:.4f},${gemv_product.ms:.4f}')
 	}
 }
 
@@ -60,6 +63,23 @@ fn timed_ones_matmul(ones &vtl.Tensor[f32], gradient &vtl.Tensor[f32], iteration
 	}
 	return TimedReduction{
 		tensor: result
+		ms:     f64(time.sys_mono_now() - started) / f64(iterations) / 1_000_000.0
+	}
+}
+
+fn timed_transposed_gemv(gradient &vtl.Tensor[f32], iterations int) !TimedReduction {
+	batch := gradient.shape[0]
+	features := gradient.size / batch
+	ones := []f32{len: batch, init: f32(1)}
+	started := time.sys_mono_now()
+	mut output := &vtl.Tensor[f32](unsafe { nil })
+	for _ in 0 .. iterations {
+		output = vtl.zeros[f32]([1, features])
+		vsl_blas.sgemv(.trans, batch, features, 1, gradient.data.data, features, ones, 1, 0,
+			mut output.data.data, 1)
+	}
+	return TimedReduction{
+		tensor: output
 		ms:     f64(time.sys_mono_now() - started) / f64(iterations) / 1_000_000.0
 	}
 }
