@@ -93,14 +93,26 @@ pub fn nanquantile_axis_with_method[T](t &vtl.Tensor[T], q f64, axis int, method
 // quantile dimension is prepended to the output shape, as in NumPy.
 pub fn quantiles_axis_with_method[T](t &vtl.Tensor[T], quantiles []f64, axis int, method QuantileMethod) !&vtl.Tensor[f64] {
 	validate_quantiles(quantiles)!
-	return quantiles_axis_method_impl[T](t, quantiles, axis, method, false)
+	return quantiles_axis_method_impl[T](t, quantiles, axis, method, false, false)
+}
+
+// quantiles_axis_with_method_keepdims retains the reduced axis as length one.
+pub fn quantiles_axis_with_method_keepdims[T](t &vtl.Tensor[T], quantiles []f64, axis int, method QuantileMethod, keepdims bool) !&vtl.Tensor[f64] {
+	validate_quantiles(quantiles)!
+	return quantiles_axis_method_impl[T](t, quantiles, axis, method, false, keepdims)
 }
 
 // nanquantiles_axis_with_method computes several NaN-ignoring quantiles per
 // axis slice, with the quantile dimension prepended to the output shape.
 pub fn nanquantiles_axis_with_method[T](t &vtl.Tensor[T], quantiles []f64, axis int, method QuantileMethod) !&vtl.Tensor[f64] {
 	validate_quantiles(quantiles)!
-	return quantiles_axis_method_impl[T](t, quantiles, axis, method, true)
+	return quantiles_axis_method_impl[T](t, quantiles, axis, method, true, false)
+}
+
+// nanquantiles_axis_with_method_keepdims retains the reduced axis as length one.
+pub fn nanquantiles_axis_with_method_keepdims[T](t &vtl.Tensor[T], quantiles []f64, axis int, method QuantileMethod, keepdims bool) !&vtl.Tensor[f64] {
+	validate_quantiles(quantiles)!
+	return quantiles_axis_method_impl[T](t, quantiles, axis, method, true, keepdims)
 }
 
 // percentile_with_method is the 0..100-scale form of quantile_with_method.
@@ -139,9 +151,21 @@ pub fn percentiles_axis_with_method[T](t &vtl.Tensor[T], percentiles []f64, axis
 	return quantiles_axis_with_method[T](t, percentiles_to_quantiles(percentiles)!, axis, method)
 }
 
+// percentiles_axis_with_method_keepdims retains the reduced axis as length one.
+pub fn percentiles_axis_with_method_keepdims[T](t &vtl.Tensor[T], percentiles []f64, axis int, method QuantileMethod, keepdims bool) !&vtl.Tensor[f64] {
+	return quantiles_axis_with_method_keepdims[T](t, percentiles_to_quantiles(percentiles)!, axis,
+		method, keepdims)
+}
+
 // nanpercentiles_axis_with_method computes several NaN-ignoring percentiles per axis slice.
 pub fn nanpercentiles_axis_with_method[T](t &vtl.Tensor[T], percentiles []f64, axis int, method QuantileMethod) !&vtl.Tensor[f64] {
 	return nanquantiles_axis_with_method[T](t, percentiles_to_quantiles(percentiles)!, axis, method)
+}
+
+// nanpercentiles_axis_with_method_keepdims retains the reduced axis as length one.
+pub fn nanpercentiles_axis_with_method_keepdims[T](t &vtl.Tensor[T], percentiles []f64, axis int, method QuantileMethod, keepdims bool) !&vtl.Tensor[f64] {
+	return nanquantiles_axis_with_method_keepdims[T](t, percentiles_to_quantiles(percentiles)!, axis,
+		method, keepdims)
 }
 
 fn validate_quantile(q f64) ! {
@@ -295,7 +319,7 @@ fn quantile_axis_method_impl[T](t &vtl.Tensor[T], q f64, axis int, method Quanti
 	return result
 }
 
-fn quantiles_axis_method_impl[T](t &vtl.Tensor[T], quantiles []f64, axis int, method QuantileMethod, ignore_nan bool) !&vtl.Tensor[f64] {
+fn quantiles_axis_method_impl[T](t &vtl.Tensor[T], quantiles []f64, axis int, method QuantileMethod, ignore_nan bool, keepdims bool) !&vtl.Tensor[f64] {
 	rank := t.rank()
 	if rank == 0 {
 		return error('quantile axis requires a tensor with at least one dimension')
@@ -310,7 +334,11 @@ fn quantiles_axis_method_impl[T](t &vtl.Tensor[T], quantiles []f64, axis int, me
 	}
 	mut output_shape := [quantiles.len]
 	for dim, size in t.shape {
-		if dim != axis_index {
+		if dim == axis_index {
+			if keepdims {
+				output_shape << 1
+			}
+		} else {
 			output_shape << size
 		}
 	}
@@ -322,7 +350,7 @@ fn quantiles_axis_method_impl[T](t &vtl.Tensor[T], quantiles []f64, axis int, me
 		}
 	}
 	mut index := []int{len: rank}
-	mut output_index := []int{len: rank}
+	mut output_index := []int{len: output_shape.len}
 	mut values := []f64{cap: axis_size}
 	for slice in 0 .. slice_count {
 		decode_nan_slice(slice, t.shape, axis_index, mut index)
@@ -345,7 +373,12 @@ fn quantiles_axis_method_impl[T](t &vtl.Tensor[T], quantiles []f64, axis int, me
 		output_index[0] = 0
 		mut output_dimension := 1
 		for dimension in 0 .. rank {
-			if dimension != axis_index {
+			if dimension == axis_index {
+				if keepdims {
+					output_index[output_dimension] = 0
+					output_dimension++
+				}
+			} else {
 				output_index[output_dimension] = index[dimension]
 				output_dimension++
 			}

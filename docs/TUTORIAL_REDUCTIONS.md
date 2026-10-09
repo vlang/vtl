@@ -410,6 +410,7 @@ the same output rules and accept levels from 0 through 100.
 For multiple quantiles, use the `*_keepdims` variants to retain each reduced
 dimension as size one after the leading quantile dimension, matching NumPy's
 `keepdims` behavior.
+This is available for both single-axis and multi-axis quantile/percentile APIs.
 
 Weighted quantiles use NumPy's `inverted_cdf` estimator. Global weights must
 match the input shape. Axis reductions also accept a one-dimensional weight
