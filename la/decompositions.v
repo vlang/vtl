@@ -16,16 +16,15 @@ pub fn solve_complex(a &vtl.Tensor[vcomplex.Complex], b &vtl.Tensor[vcomplex.Com
 	if a.shape[a.rank() - 1] != n {
 		return error('solve_complex: A matrices must be square')
 	}
-	b_is_vector := b.rank() == 1 || (a.rank() > 2 && b.rank() == a.rank() - 1)
+	// NumPy 2.0 treats B as a vector only when it is exactly one-dimensional.
+	b_is_vector := b.rank() == 1
 	b_rows := if b_is_vector { b.shape[b.rank() - 1] } else { b.shape[b.rank() - 2] }
 	nrhs := if b_is_vector { 1 } else { b.shape[b.rank() - 1] }
 	if b_rows != n {
 		return error('solve_complex: A dimension ${n} does not match B rows ${b_rows}')
 	}
 	a_batch_shape := a.shape[..a.rank() - 2]
-	b_batch_shape := if b_is_vector && b.rank() > 1 {
-		b.shape[..b.rank() - 1]
-	} else if b_is_vector {
+	b_batch_shape := if b_is_vector {
 		[]int{}
 	} else {
 		b.shape[..b.rank() - 2]
@@ -137,6 +136,23 @@ fn complex_magnitude(value vcomplex.Complex) f64 {
 	return value.abs()
 }
 
+// inv_complex computes the inverse of complex128 square matrices.
+// Leading batch dimensions are preserved; singular matrices return an error.
+pub fn inv_complex(input &vtl.Tensor[vcomplex.Complex]) !&vtl.Tensor[vcomplex.Complex] {
+	if input.rank() < 2 {
+		return error('inv_complex: input must contain at least one matrix')
+	}
+	n := input.shape[input.rank() - 1]
+	if input.shape[input.rank() - 2] != n {
+		return error('inv_complex: matrices must be square')
+	}
+	mut identity := vtl.zeros[vcomplex.Complex]([n, n])
+	for i in 0 .. n {
+		identity.set([i, i], vcomplex.Complex{ re: 1 })
+	}
+	return solve_complex(input, identity)
+}
+
 // solve solves A * X = B for stacks of square A matrices. Leading dimensions
 // broadcast like NumPy; B may be a vector or a matrix of right-hand sides.
 pub fn solve[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[f64] {
@@ -147,16 +163,16 @@ pub fn solve[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[f64] {
 	if a.shape[a.rank() - 1] != n {
 		return error('solve: A matrices must be square')
 	}
-	b_is_vector := b.rank() == 1 || (a.rank() > 2 && b.rank() == a.rank() - 1)
+	// Match NumPy 2.0: only a rank-one B is a vector; rank-two B is a matrix
+	// of right-hand sides even when A contains a batch dimension.
+	b_is_vector := b.rank() == 1
 	b_rows := if b_is_vector { b.shape[b.rank() - 1] } else { b.shape[b.rank() - 2] }
 	nrhs := if b_is_vector { 1 } else { b.shape[b.rank() - 1] }
 	if b_rows != n {
 		return error('solve: A dimension ${n} does not match B rows ${b_rows}')
 	}
 	a_batch_shape := a.shape[..a.rank() - 2]
-	b_batch_shape := if b_is_vector && b.rank() > 1 {
-		b.shape[..b.rank() - 1]
-	} else if b_is_vector {
+	b_batch_shape := if b_is_vector {
 		[]int{}
 	} else {
 		b.shape[..b.rank() - 2]

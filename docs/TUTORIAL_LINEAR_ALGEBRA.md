@@ -89,6 +89,11 @@ println(c)
 scalar tensor, matrix-vector and vector-matrix return vectors, and vector
 operands broadcast across batches of matrices. Scalar operands are rejected.
 
+`la.solve(A, B)` follows [NumPy 2.0 right-hand-side shape rules](https://numpy.org/doc/stable/reference/generated/numpy.linalg.solve.html):
+only a 1-D `B` is a vector. A 2-D `B` is a matrix of right-hand sides,
+including when `A` has leading batch dimensions. Leading batches of `A` and
+matrix `B` broadcast.
+
 ```v
 import vtl
 import vtl.la

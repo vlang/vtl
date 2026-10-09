@@ -44,8 +44,24 @@ assert product.get_nth(0) == cmplx.complex(1.0, 1.0)
 
 `vtl.la.solve_complex` solves complex128 systems with partial pivoting. The
 right-hand side may be a vector or a matrix, and leading batch dimensions
-broadcast like NumPy. Singular systems return an error. See the
-[complex linear solve example](../examples/complex_linear_solve/README.md).
+broadcast like NumPy. `vtl.la.inv_complex` applies the same solve to complex
+identity matrices and preserves leading batches. Singular systems return an
+error. See the [complex linear solve example](../examples/complex_linear_solve/README.md).
+
+```v
+import math
+import math.complex as cmplx
+import vtl
+import vtl.la
+
+matrix := vtl.from_array[cmplx.Complex]([
+	cmplx.Complex{ re: 1, im: 1 }, cmplx.Complex{ re: 2 },
+	cmplx.Complex{ re: 0, im: 1 }, cmplx.Complex{ re: 3 },
+], [2, 2])!
+inverse := la.inv_complex(matrix)!
+identity := la.matmul(matrix, inverse)!
+assert math.abs(identity.get([0, 0]).re - 1.0) < 1e-12
+```
 
 The NumPy-style `real`, `imag`, `conj`, `absolute`, and `abs` operations are
 available.

@@ -95,16 +95,16 @@ fn test_solve_handles_row_pivoting_and_multiple_rhs() {
 	assert solution.to_array() == [1.0, 2.0, 2.0, 3.0]
 }
 
-fn test_solve_broadcasts_matrix_and_vector_batches() {
+fn test_solve_broadcasts_matrix_and_vector_right_hand_sides() {
 	a := vtl.from_array([1.0, 0, 0, 1, 2, 0, 0, 2], [2, 2, 2])!
-	rhs_matrix := vtl.from_array([4.0, 6, 8, 10], [1, 2, 2])!
+	rhs_matrix := vtl.from_array([4.0, 6, 8, 10], [2, 2])!
 	matrix_solution := solve(a, rhs_matrix)!
 	assert matrix_solution.shape == [2, 2, 2]
 	assert matrix_solution.to_array() == [4.0, 6.0, 8.0, 10.0, 2.0, 3.0, 4.0, 5.0]
-	rhs_vectors := vtl.from_2d([[4.0, 8.0], [6.0, 10.0]])!
-	vector_solution := solve(a, rhs_vectors)!
+	rhs_vector := vtl.from_1d([4.0, 8.0])!
+	vector_solution := solve(a, rhs_vector)!
 	assert vector_solution.shape == [2, 2]
-	assert vector_solution.to_array() == [4.0, 8.0, 3.0, 5.0]
+	assert vector_solution.to_array() == [4.0, 8.0, 2.0, 4.0]
 }
 
 fn test_solve_rejects_singular_and_incompatible_batches() {
