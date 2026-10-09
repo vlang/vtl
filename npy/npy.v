@@ -121,7 +121,7 @@ pub fn read_bytes[T](bytes []u8) !&vtl.Tensor[T] {
 	if descriptor.endian == u8(`=`) {
 		little_endian = host_is_little_endian()
 	}
-	mut tensor := vtl.tensor[T](T(0), shape)
+	mut tensor := vtl.empty[T](shape, memory: .row_major)
 	for i in 0 .. count {
 		source_index := if fortran { fortran_index(i, shape) } else { i }
 		offset := data_offset + source_index * descriptor.width
