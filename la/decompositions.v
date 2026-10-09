@@ -2,7 +2,140 @@ module la
 
 import vsl.la as vsl_la
 import vsl.lapack as vsl_lapack
+import math.complex as vcomplex
 import vtl
+
+// solve_complex solves A * X = B for complex128 square matrix stacks.
+// Leading batch dimensions broadcast like NumPy; B may be a vector or matrix.
+// Partial pivoting is used for each system. Singular systems return an error.
+pub fn solve_complex(a &vtl.Tensor[vcomplex.Complex], b &vtl.Tensor[vcomplex.Complex]) !&vtl.Tensor[vcomplex.Complex] {
+	if a.rank() < 2 || b.rank() < 1 {
+		return error('solve_complex: A must be a matrix stack and B must have at least one dimension')
+	}
+	n := a.shape[a.rank() - 2]
+	if a.shape[a.rank() - 1] != n {
+		return error('solve_complex: A matrices must be square')
+	}
+	b_is_vector := b.rank() == 1 || (a.rank() > 2 && b.rank() == a.rank() - 1)
+	b_rows := if b_is_vector { b.shape[b.rank() - 1] } else { b.shape[b.rank() - 2] }
+	nrhs := if b_is_vector { 1 } else { b.shape[b.rank() - 1] }
+	if b_rows != n {
+		return error('solve_complex: A dimension ${n} does not match B rows ${b_rows}')
+	}
+	a_batch_shape := a.shape[..a.rank() - 2]
+	b_batch_shape := if b_is_vector && b.rank() > 1 {
+		b.shape[..b.rank() - 1]
+	} else if b_is_vector {
+		[]int{}
+	} else {
+		b.shape[..b.rank() - 2]
+	}
+	batch_shape := matmul_broadcast_shape(a_batch_shape, b_batch_shape) or {
+		return error('solve_complex: batch shapes ${a_batch_shape} and ${b_batch_shape} cannot broadcast')
+	}
+	mut batch_count := 1
+	for dimension in batch_shape {
+		batch_count *= dimension
+	}
+	mut output_shape := batch_shape.clone()
+	output_shape << n
+	if !b_is_vector {
+		output_shape << nrhs
+	}
+	mut output := vtl.empty[vcomplex.Complex](output_shape, memory: .row_major)
+	if n == 0 || nrhs == 0 {
+		return output
+	}
+	mut a_index := []int{len: a.rank()}
+	mut b_index := []int{len: b.rank()}
+	for batch in 0 .. batch_count {
+		batch_coordinates := decode_batch_coordinates(batch, batch_shape)
+		fill_broadcast_batch_index(a_batch_shape, batch_shape, batch_coordinates, mut a_index)
+		if b_batch_shape.len > 0 {
+			fill_broadcast_batch_index(b_batch_shape, batch_shape, batch_coordinates, mut b_index)
+		}
+		mut matrix := []vcomplex.Complex{len: n * n}
+		mut rhs := []vcomplex.Complex{len: n * nrhs}
+		for row in 0 .. n {
+			a_index[a.rank() - 2] = row
+			for column in 0 .. n {
+				a_index[a.rank() - 1] = column
+				matrix[row * n + column] = a.get[vcomplex.Complex](a_index)
+			}
+			if b_is_vector {
+				b_index[b.rank() - 1] = row
+				rhs[row * nrhs] = b.get[vcomplex.Complex](b_index)
+			} else {
+				b_index[b.rank() - 2] = row
+				for column in 0 .. nrhs {
+					b_index[b.rank() - 1] = column
+					rhs[row * nrhs + column] = b.get[vcomplex.Complex](b_index)
+				}
+			}
+		}
+		for pivot_column in 0 .. n {
+			mut pivot_row := pivot_column
+			mut pivot_magnitude := complex_magnitude(matrix[pivot_column * n + pivot_column])
+			for row in pivot_column + 1 .. n {
+				magnitude := complex_magnitude(matrix[row * n + pivot_column])
+				if magnitude > pivot_magnitude {
+					pivot_row = row
+					pivot_magnitude = magnitude
+				}
+			}
+			if pivot_magnitude == 0 {
+				return error('solve_complex: matrix is singular')
+			}
+			if pivot_row != pivot_column {
+				for column in 0 .. n {
+					top := pivot_column * n + column
+					bottom := pivot_row * n + column
+					matrix[top], matrix[bottom] = matrix[bottom], matrix[top]
+				}
+				for column in 0 .. nrhs {
+					top := pivot_column * nrhs + column
+					bottom := pivot_row * nrhs + column
+					rhs[top], rhs[bottom] = rhs[bottom], rhs[top]
+				}
+			}
+			pivot := matrix[pivot_column * n + pivot_column]
+			for row in pivot_column + 1 .. n {
+				row_offset := row * n
+				factor := matrix[row_offset + pivot_column] / pivot
+				matrix[row_offset + pivot_column] = vcomplex.Complex{}
+				for column in pivot_column + 1 .. n {
+					index := row_offset + column
+					matrix[index] = matrix[index].subtract(factor.multiply(matrix[pivot_column * n + column]))
+				}
+				for column in 0 .. nrhs {
+					index := row * nrhs + column
+					rhs[index] = rhs[index].subtract(factor.multiply(rhs[pivot_column * nrhs + column]))
+				}
+			}
+		}
+		for row := n - 1; row >= 0; row-- {
+			pivot := matrix[row * n + row]
+			for column in 0 .. nrhs {
+				mut value := rhs[row * nrhs + column]
+				for inner in row + 1 .. n {
+					value = value.subtract(matrix[row * n + inner].multiply(rhs[inner * nrhs + column]))
+				}
+				rhs[row * nrhs + column] = value / pivot
+			}
+		}
+		start := batch * n * nrhs
+		for row in 0 .. n {
+			for column in 0 .. nrhs {
+				output.set_nth(start + row * nrhs + column, rhs[row * nrhs + column])
+			}
+		}
+	}
+	return output
+}
+
+fn complex_magnitude(value vcomplex.Complex) f64 {
+	return value.abs()
+}
 
 // solve solves A * X = B for stacks of square A matrices. Leading dimensions
 // broadcast like NumPy; B may be a vector or a matrix of right-hand sides.

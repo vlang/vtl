@@ -42,6 +42,11 @@ assert product.rank() == 0
 assert product.get_nth(0) == cmplx.complex(1.0, 1.0)
 ```
 
+`vtl.la.solve_complex` solves complex128 systems with partial pivoting. The
+right-hand side may be a vector or a matrix, and leading batch dimensions
+broadcast like NumPy. Singular systems return an error. See the
+[complex linear solve example](../examples/complex_linear_solve/README.md).
+
 The NumPy-style `real`, `imag`, `conj`, `absolute`, and `abs` operations are
 available.
 These functions return new tensors with the input shape. Component and magnitude
