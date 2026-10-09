@@ -73,10 +73,25 @@ pub fn lstm_forward_single[T](input &vtl.Tensor[T], hidden0 &vtl.Tensor[T], w_ih
 pub fn lstm_backward_single[T](input &vtl.Tensor[T], hidden0 &vtl.Tensor[T],
 	cell0 &vtl.Tensor[T], w_ih &vtl.Tensor[T], w_hh &vtl.Tensor[T], b_ih &vtl.Tensor[T],
 	b_hh &vtl.Tensor[T], grad_output &vtl.Tensor[T]) ![]&vtl.Tensor[T] {
+	grad_final_hidden := vtl.zeros[T](hidden0.shape)
+	grad_final_cell := vtl.zeros[T](cell0.shape)
+	return lstm_backward_single_with_final_state[T](input, hidden0, cell0, w_ih, w_hh, b_ih,
+		b_hh, grad_output, grad_final_hidden, grad_final_cell)
+}
+
+// lstm_backward_single_with_final_state also propagates gradients supplied for
+// the final hidden and cell states returned by lstm_forward_single_with_cell.
+pub fn lstm_backward_single_with_final_state[T](input &vtl.Tensor[T], hidden0 &vtl.Tensor[T],
+	cell0 &vtl.Tensor[T], w_ih &vtl.Tensor[T], w_hh &vtl.Tensor[T], b_ih &vtl.Tensor[T],
+	b_hh &vtl.Tensor[T], grad_output &vtl.Tensor[T], grad_final_hidden &vtl.Tensor[T],
+	grad_final_cell &vtl.Tensor[T]) ![]&vtl.Tensor[T] {
 	output, _, _ := lstm_forward_single_with_cell[T](input, hidden0, cell0, w_ih, w_hh, b_ih,
 		b_hh)!
 	if grad_output.shape != output.shape {
 		return error('lstm_backward_single: grad_output shape must match output')
+	}
+	if grad_final_hidden.shape != hidden0.shape || grad_final_cell.shape != cell0.shape {
+		return error('lstm_backward_single: final-state gradient shapes must match initial states')
 	}
 	seq_len, batch, input_size := input.shape[0], input.shape[1], input.shape[2]
 	hidden := hidden0.shape[1]
@@ -130,6 +145,10 @@ pub fn lstm_backward_single[T](input &vtl.Tensor[T], hidden0 &vtl.Tensor[T],
 	mut d_b_hh := []f64{len: 4 * hidden}
 	mut d_h_next := []f64{len: batch * hidden}
 	mut d_c_next := []f64{len: batch * hidden}
+	for i in 0 .. batch * hidden {
+		d_h_next[i] = f64(grad_final_hidden.get_nth(i))
+		d_c_next[i] = f64(grad_final_cell.get_nth(i))
+	}
 	for rev in 0 .. seq_len {
 		t := seq_len - 1 - rev
 		mut d_h_prev := []f64{len: batch * hidden}
@@ -175,7 +194,8 @@ pub fn lstm_backward_single[T](input &vtl.Tensor[T], hidden0 &vtl.Tensor[T],
 		vtl.from_array(d_c_next.map(vtl.cast[T](it)), cell0.shape)!]
 }
 
-// lstm_forward_multi stacks independent single-layer LSTMs with zero initial states.
+// lstm_forward_multi stacks single-layer LSTMs with an explicit initial hidden
+// state for each layer and zero initial cell states.
 pub fn lstm_forward_multi[T](input &vtl.Tensor[T], h0 &vtl.Tensor[T], w_ih &vtl.Tensor[T],
 	w_hh &vtl.Tensor[T], b_ih &vtl.Tensor[T], b_hh &vtl.Tensor[T]) !(&vtl.Tensor[T], &vtl.Tensor[T]) {
 	if h0.shape.len != 3 || w_ih.shape.len != 3 || w_hh.shape.len != 3 || b_ih.shape.len != 2
@@ -192,7 +212,7 @@ pub fn lstm_forward_multi[T](input &vtl.Tensor[T], h0 &vtl.Tensor[T], w_ih &vtl.
 		lw_hh := tensor_layer_matrix[T](w_hh, layer)!
 		lb_ih := tensor_layer_vector[T](b_ih, layer)!
 		lb_hh := tensor_layer_vector[T](b_hh, layer)!
-		layer_h0 := vtl.zeros[T]([batch, hidden])
+		layer_h0 := tensor_layer_matrix[T](h0, layer)!
 		layer_c0 := vtl.zeros[T]([batch, hidden])
 		layer_output, layer_h_n, _ := lstm_forward_single_with_cell[T](layer_input, layer_h0,
 			layer_c0, lw_ih, lw_hh, lb_ih, lb_hh)!
