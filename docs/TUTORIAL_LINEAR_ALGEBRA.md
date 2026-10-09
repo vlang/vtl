@@ -89,6 +89,23 @@ println(c)
 scalar tensor, matrix-vector and vector-matrix return vectors, and vector
 operands broadcast across batches of matrices. Scalar operands are rejected.
 
+`la.multi_dot` chooses a matrix-chain parenthesization that minimizes the
+estimated scalar multiplication count. A vector may appear only at the first
+or last position; intermediate operands must be 2-D matrices. Batched matrices
+are not accepted, matching NumPy's `linalg.multi_dot` input contract.
+
+```v
+import vtl
+import vtl.la
+
+a := vtl.ones[f64]([100, 10])
+b := vtl.ones[f64]([10, 1000])
+c := vtl.ones[f64]([1000, 1])
+result := la.multi_dot[f64]([a, b, c])!
+assert result.shape == [100, 1]
+assert result.get_nth(0) == 10000.0
+```
+
 `la.solve(A, B)` follows [NumPy 2.0 right-hand-side shape rules](https://numpy.org/doc/stable/reference/generated/numpy.linalg.solve.html):
 only a 1-D `B` is a vector. A 2-D `B` is a matrix of right-hand sides,
 including when `A` has leading batch dimensions. Leading batches of `A` and

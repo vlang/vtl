@@ -172,6 +172,8 @@ including singular matrices and values whose determinants would overflow.
 complex128 matrix batches, including singular and empty matrices.
 `la.matrix_power` uses exponentiation by squaring for batched integer powers and
 partial-pivot inversion for negative exponents.
+`la.multi_dot` uses dynamic programming to minimize the estimated scalar
+multiplication count for a matrix chain, allowing vectors only at either end.
 `la.cond` computes spectral and induced-norm condition numbers for stacked
 square matrices, with singular spectral cases returning infinity or zero for
 orders `2` and `-2` respectively.
