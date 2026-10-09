@@ -150,3 +150,35 @@ fn test_multi_quantile_keepdims_shapes_and_values() ! {
 		8.0,
 	]
 }
+
+fn test_single_axis_multi_quantile_keepdims_shapes_and_values() ! {
+	values := vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [2, 3])!
+	levels := quantiles_axis_with_method_keepdims(values, [0.25, 0.75], -1, .linear, true)!
+	assert levels.shape == [2, 2, 1]
+	assert levels.to_array() == [1.5, 4.5, 2.5, 5.5]
+	assert quantiles_axis_keepdims(values, [0.25, 0.75], 1, true)!.to_array() == [1.5, 4.5, 2.5,
+		5.5]
+	assert percentiles_axis_with_method_keepdims(values, [25, 75], 1, .linear,
+		true)!.shape == [2, 2, 1]
+	assert percentiles_axis_keepdims(values, [25, 75], 1, true)!.to_array() == [1.5, 4.5, 2.5,
+		5.5]
+	nan_values := vtl.from_array([1.0, math.nan(), 3.0, 4.0, 5.0, 6.0], [2, 3])!
+	nan_levels := nanquantiles_axis_with_method_keepdims(nan_values, [0.0, 1.0], 1,
+		.linear, true)!
+	assert nan_levels.shape == [2, 2, 1]
+	assert nan_levels.to_array() == [1.0, 4.0, 3.0, 6.0]
+	assert nanquantiles_axis_keepdims(nan_values, [0.0, 1.0], -1, true)!.to_array() == [
+		1.0,
+		4.0,
+		3.0,
+		6.0,
+	]
+	assert nanpercentiles_axis_with_method_keepdims(nan_values, [0, 100], 1, .linear,
+		true)!.shape == [2, 2, 1]
+	assert nanpercentiles_axis_keepdims(nan_values, [0, 100], 1, true)!.to_array() == [
+		1.0,
+		4.0,
+		3.0,
+		6.0,
+	]
+}
