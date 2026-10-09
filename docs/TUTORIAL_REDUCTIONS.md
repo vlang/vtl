@@ -54,6 +54,20 @@ assert products.shape == [1, 2, 1]
 assert products.to_array() == [60, 672]
 ```
 
+Choose a wider accumulator when reducing lower-precision inputs. The same type
+parameter controls the result tensor for global, single-axis, and multi-axis
+sum/product APIs:
+
+```v
+import vtl
+import vtl.stats
+
+measurements := vtl.from_1d([f32(1e8), 1.0, -1e8])!
+assert stats.sum_as[f32, f64](measurements) == 1.0
+wide_rows := stats.sum_along_axis_as[f32, f64](measurements, 0, true)!
+assert wide_rows.to_array() == [1.0]
+```
+
 ## Statistical reductions along an axis
 
 `mean_along_axis`, `variance_along_axis`, and `std_along_axis` accept an

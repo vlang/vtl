@@ -14,6 +14,12 @@ Pass `true` for `keepdims` to retain that axis with length one; negative axes
 are accepted. Empty reduction axes return the corresponding identity for every
 output slice.
 
+Use `sum_as[T, U]`, `product_as[T, U]`, and the `_along_axis_as` or
+`_along_axes_as` variants to choose accumulator/output type `U` explicitly.
+For example, summing an `f32` tensor into `f64` reduces rounding error during
+accumulation. These APIs currently cover sum and product; other reductions keep
+their documented output types.
+
 `average_axis` keeps its reduced axis with length one. Use
 `average_along_axis(..., keepdims)` to choose whether to keep or remove it;
 weights may match the input or be a vector matching the selected axis.
