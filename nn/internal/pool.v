@@ -44,15 +44,55 @@ pub fn avgpool2d_forward[T](input &vtl.Tensor[T], kernel []int, padding []int, s
 }
 
 // avgpool2d_backward exposes this operation as part of the public API.
-pub fn avgpool2d_backward[T](grad_out &vtl.Tensor[T], kernel []int, padding []int, stride []int) !&vtl.Tensor[T] {
-	n := grad_out.shape[0]
-	c := grad_out.shape[1]
-	h := grad_out.shape[2]
-	w := grad_out.shape[3]
-	_ = kernel
-	_ = padding
-	_ = stride
-	mut d_input := vtl.zeros[T]([n, c, h, w])
+pub fn avgpool2d_backward[T](grad_out &vtl.Tensor[T], input &vtl.Tensor[T], kernel []int, padding []int, stride []int) !&vtl.Tensor[T] {
+	if input.rank() != 4 || grad_out.rank() != 4 {
+		return error('avgpool2d backward expects 4D input and gradient tensors')
+	}
+	if kernel.len != 2 || padding.len != 2 || stride.len != 2 {
+		return error('avgpool2d backward expects 2D kernel, padding, and stride')
+	}
+	if kernel[0] <= 0 || kernel[1] <= 0 || stride[0] <= 0 || stride[1] <= 0 || padding[0] < 0
+		|| padding[1] < 0 {
+		return error('avgpool2d backward expects positive kernel and stride and non-negative padding')
+	}
+	n := input.shape[0]
+	c := input.shape[1]
+	h := input.shape[2]
+	w := input.shape[3]
+	expected_h := (h + 2 * padding[0] - kernel[0]) / stride[0] + 1
+	expected_w := (w + 2 * padding[1] - kernel[1]) / stride[1] + 1
+	if expected_h <= 0 || expected_w <= 0 {
+		return error('avgpool2d backward pooling parameters produce an empty output')
+	}
+	if grad_out.shape != [n, c, expected_h, expected_w] {
+		return error('avgpool2d backward gradient shape does not match input and pooling parameters')
+	}
+	mut d_input := vtl.zeros_like[T](input)
+	area := f64(kernel[0] * kernel[1])
+	for batch in 0 .. n {
+		for channel in 0 .. c {
+			for out_h in 0 .. expected_h {
+				for out_w in 0 .. expected_w {
+					contribution := f64(grad_out.get([batch, channel, out_h, out_w])) / area
+					for kernel_h in 0 .. kernel[0] {
+						in_h := out_h * stride[0] - padding[0] + kernel_h
+						if in_h < 0 || in_h >= h {
+							continue
+						}
+						for kernel_w in 0 .. kernel[1] {
+							in_w := out_w * stride[1] - padding[1] + kernel_w
+							if in_w < 0 || in_w >= w {
+								continue
+							}
+							index := [batch, channel, in_h, in_w]
+							value := f64(d_input.get(index)) + contribution
+							d_input.set(index, vtl.cast[T](value))
+						}
+					}
+				}
+			}
+		}
+	}
 	return d_input
 }
 
