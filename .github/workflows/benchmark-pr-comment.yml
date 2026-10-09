@@ -8,6 +8,7 @@ on:
       - 'benchmarks/**/*.py'
       - '*.v'
       - 'nn/**/*.v'
+      - 'la/**/*.v'
       - 'stats/**/*.v'
       - 'fft/**/*.v'
       - 'storage/**/*.v'
@@ -59,6 +60,10 @@ jobs:
             sudo systemd-run --scope --property=MemoryMax=1G --property=MemorySwapMax=0 --setenv=HOME=$HOME --setenv=PATH=$PATH --setenv=VJOBS=2 --setenv=OPENBLAS_NUM_THREADS=2 -- python3 vtl/benchmarks/vs_numpy/numpy_matmul_baseline.py
             sudo systemd-run --scope --property=MemoryMax=1G --property=MemorySwapMax=0 --setenv=HOME=$HOME --setenv=PATH=$PATH --setenv=VJOBS=2 --setenv=OPENBLAS_NUM_THREADS=2 -- python3 vtl/benchmarks/vs_numpy/numpy_matmul_f32_end_to_end.py
             sudo systemd-run --scope --property=MemoryMax=2G --property=MemorySwapMax=0 --setenv=HOME=$HOME --setenv=PATH=$PATH --setenv=VJOBS=2 -- v -prod run vtl/benchmarks/vs_numpy/conv2d_bench.v
+            echo '## Reduced SVD vs NumPy'
+            sudo systemd-run --scope --property=MemoryMax=2G --property=MemorySwapMax=0 --setenv=HOME=$HOME --setenv=PATH=$PATH --setenv=VJOBS=2 --setenv=OPENBLAS_NUM_THREADS=2 -- v -prod run vtl/benchmarks/vs_numpy/svd_bench.v
+            sudo systemd-run --scope --property=MemoryMax=2G --property=MemorySwapMax=0 --setenv=HOME=$HOME --setenv=PATH=$PATH --setenv=VJOBS=2 --setenv=OPENBLAS_NUM_THREADS=2 -- v -d vsl_lapack_lapacke -prod run vtl/benchmarks/vs_numpy/svd_bench.v
+            sudo systemd-run --scope --property=MemoryMax=1G --property=MemorySwapMax=0 --setenv=HOME=$HOME --setenv=PATH=$PATH --setenv=VJOBS=2 --setenv=OPENBLAS_NUM_THREADS=2 -- python3 vtl/benchmarks/vs_numpy/numpy_svd_baseline.py
             echo '## Contiguous sum and mean'
             sudo systemd-run --scope --property=MemoryMax=2G --property=MemorySwapMax=0 --setenv=HOME=$HOME --setenv=PATH=$PATH --setenv=VJOBS=2 -- v -prod run vtl/benchmarks/vs_numpy/stats_bench.v
             sudo systemd-run --scope --property=MemoryMax=1G --property=MemorySwapMax=0 --setenv=HOME=$HOME --setenv=PATH=$PATH --setenv=VJOBS=2 -- python3 vtl/benchmarks/vs_numpy/numpy_stats_baseline.py
