@@ -96,6 +96,23 @@ fn test_reshape_tensor_with_unknow_dim() {
 	assert c.array_equal(b)
 }
 
+fn test_reshape_transposed_tensor_preserves_row_major_logical_order() ! {
+	tensor := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
+	transposed := tensor.transpose([1, 0])!
+	reshaped := transposed.reshape([6])!
+	assert reshaped.to_array() == [1, 4, 2, 5, 3, 6]
+	reshaped.set_nth(0, 99)
+	assert tensor.get([0, 0]) == 1
+}
+
+fn test_reshape_column_major_tensor_preserves_row_major_logical_order() ! {
+	tensor := vtl.from_2d([[1, 2, 3], [4, 5, 6]], memory: .col_major)!
+	reshaped := tensor.reshape([3, 2])!
+	assert reshaped.to_array() == [1, 2, 3, 4, 5, 6]
+	reshaped.set_nth(0, 99)
+	assert tensor.get([0, 0]) == 1
+}
+
 fn test_cant_reshape_tensor_with_know_dim() {
 	values := []int{len: 27, init: index}
 	a := vtl.from_array(values, [3, 3, 3])!
