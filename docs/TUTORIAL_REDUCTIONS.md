@@ -412,6 +412,22 @@ ignore NaN values and remove the corresponding weights from each slice. The
 ordinary weighted forms propagate NaNs. Weighted percentile APIs accept the
 equivalent 0..100 scale.
 
+For multiple reduced axes, pass the axes as a slice. Compact weights must have
+dimensions in that same axis order; full-shape weights can differ by element:
+
+```v
+import vtl
+import vtl.stats
+
+volume := vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0], [2, 2, 2])!
+weights := vtl.from_array([1.0, 1.0, 1.0, 3.0], [2, 2])!
+medians := stats.quantile_weighted_axes(volume, weights, 0.5, [0, -1], false)!
+assert medians.shape == [2]
+assert medians.to_array() == [5.0, 7.0]
+levels := stats.quantiles_weighted_axes(volume, weights, [0.0, 0.5, 1.0], [0, 2])!
+assert levels.shape == [3, 2]
+```
+
 ## NaN-aware sums and extrema
 
 `nansum`, `nanprod`, `nanmin`, and `nanmax` skip NaN values. Their axis
