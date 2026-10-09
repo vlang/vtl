@@ -1,7 +1,7 @@
 # Scatter updates along an axis
 
-Apply repeated-index updates with `scatter_add`, then compare them with `put_along_axis` on a
-separate tensor.
+Apply repeated-index updates with `scatter_add`, compare replacement writes
+with `put_along_axis`, and update row-major flat positions with `put`.
 
 ## Run
 
@@ -13,5 +13,6 @@ v run ./vtl/examples/scatter/main.v
 
 ## Notes
 
-`scatter_add` accumulates all updates to the same destination. `put_along_axis` uses
-last-write-wins semantics.
+`scatter_add` accumulates all updates to the same destination. Both
+`put_along_axis` and `put` use last-write-wins semantics. `put` repeats a short
+values tensor and supports NumPy-style index modes through `put_with_mode`.

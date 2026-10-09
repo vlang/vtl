@@ -156,6 +156,26 @@ for a repeated index wins. Both update operations validate all indices before
 mutating the target. Indexed writes currently operate on tensors directly and
 are not autograd operations.
 
+`put` updates row-major logical flat positions and repeats a shorter values
+tensor as needed. Negative indices count from the end in the default `.raise`
+mode. `put_with_mode` also accepts `.wrap` and `.clip`; `.clip` maps negative
+indices to the first position, matching NumPy. Invalid indices are rejected
+before any writes, including when the target is a non-contiguous view.
+
+```v
+import vtl
+
+mut values := vtl.from_2d([[10, 11, 12], [20, 21, 22]])!
+indices := vtl.from_1d([0, -1, 0])!
+updates := vtl.from_1d([90, 99])!
+values.put(indices, updates)!
+assert values.to_array() == [90, 11, 12, 20, 21, 99]
+
+mut wrapped := vtl.from_1d([0, 0, 0, 0])!
+wrapped.put_with_mode(vtl.from_1d([-1, 4])!, vtl.from_1d([7, 8])!, .wrap)!
+assert wrapped.to_array() == [8, 0, 0, 7]
+```
+
 Boolean masks passed to `masked_select` and `masked_fill` may broadcast to the
 tensor shape. `masked_select` returns selected elements as a one-dimensional
 copy; `masked_fill` returns a new tensor and leaves the input unchanged. For
