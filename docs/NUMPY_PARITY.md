@@ -107,14 +107,14 @@ mean/variance/std with explicit `keepdims` and NaN-aware forms; axis-wise
 global, axis, multi-quantile, percentile, and NaN-aware forms; axis arg
 reductions and squeezed min/max/argmin/argmax results; multi-axis min/max;
 weighted inverted-CDF quantile and multi-quantile forms globally and along one
-axis, with same-shape or one-dimensional axis weights;
+axis, with same-shape or one-dimensional axis weights, including NaN-aware
+forms that discard the weights for NaN observations;
 histograms with
 automatic and custom bins, weighted density, and multiple bin-selection rules;
 integer/weighted `bincount`.
 
-**Remaining:** add consistent NaN-aware weighted behavior and `keepdims`
-options across remaining reductions, accumulator dtype controls, and broader
-reduction families.
+**Remaining:** add `keepdims` options consistently across remaining
+reductions, accumulator dtype controls, and broader reduction families.
 
 Logical `all_axis`/`any_axis` and multi-axis `all_axes`/`any_axes` reductions
 return `bool` tensors; empty reduced dimensions return the logical identities

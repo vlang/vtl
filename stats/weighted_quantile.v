@@ -8,6 +8,13 @@ struct WeightedQuantileValue {
 	weight f64
 }
 
+struct WeightedQuantileSample {
+	pairs        []WeightedQuantileValue
+	total_weight f64
+	has_nan      bool
+	valid_count  int
+}
+
 // quantile_weighted computes NumPy's weighted inverted-CDF quantile.
 // Values and weights must have identical shapes; weights must be finite,
 // non-negative, and have a positive total.
@@ -103,9 +110,84 @@ pub fn quantiles_weighted[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], qu
 	return vtl.from_1d[f64](results)
 }
 
+// nanquantile_weighted computes a flattened weighted inverted-CDF quantile,
+// ignoring values that are NaN and their corresponding weights.
+pub fn nanquantile_weighted[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], q f64) !f64 {
+	validate_quantile(q)!
+	sample := weighted_nan_sample[T](values, weights)!
+	if sample.valid_count == 0 {
+		return math.nan()
+	}
+	sorted := weighted_sorted_sample(sample.pairs)
+	return weighted_quantile_sorted(sorted, q, sample.total_weight)
+}
+
+// nanquantiles_weighted computes multiple flattened weighted quantiles from
+// one sorted sample while ignoring NaNs and their corresponding weights.
+pub fn nanquantiles_weighted[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], quantiles []f64) !&vtl.Tensor[f64] {
+	validate_quantiles(quantiles)!
+	sample := weighted_nan_sample[T](values, weights)!
+	if sample.valid_count == 0 {
+		return vtl.from_1d[f64]([]f64{len: quantiles.len, init: math.nan()})
+	}
+	sorted := weighted_sorted_sample(sample.pairs)
+	mut results := []f64{len: quantiles.len}
+	for index, q in quantiles {
+		results[index] = weighted_quantile_sorted(sorted, q, sample.total_weight)
+	}
+	return vtl.from_1d[f64](results)
+}
+
+fn weighted_nan_sample[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64]) !WeightedQuantileSample {
+	if values.shape != weights.shape {
+		return error('weighted quantile: values and weights must have the same shape')
+	}
+	if values.size == 0 {
+		return error('weighted quantile: input must not be empty')
+	}
+	mut pairs := []WeightedQuantileValue{cap: values.size}
+	mut total_weight := 0.0
+	mut has_nan := false
+	mut valid_count := 0
+	for index in 0 .. values.size {
+		value := f64(values.get_nth(index))
+		weight := weights.get_nth(index)
+		validate_weight(weight)!
+		if math.is_nan(value) {
+			has_nan = true
+			continue
+		}
+		valid_count++
+		total_weight += weight
+		if weight > 0 {
+			pairs << WeightedQuantileValue{value, weight}
+		}
+	}
+	if valid_count > 0 {
+		validate_weight_total(total_weight)!
+	}
+	return WeightedQuantileSample{pairs, total_weight, has_nan, valid_count}
+}
+
+fn weighted_sorted_sample(pairs []WeightedQuantileValue) []WeightedQuantileValue {
+	mut sorted := pairs.clone()
+	sorted.sort_with_compare(weighted_quantile_value_compare)
+	return sorted
+}
+
 // quantile_weighted_axis reduces one axis using same-shape weights or a
 // one-dimensional weight vector matching that axis.
 pub fn quantile_weighted_axis[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], q f64, axis int, keepdims bool) !&vtl.Tensor[f64] {
+	return weighted_quantile_axis_impl[T](values, weights, q, axis, keepdims, false)
+}
+
+// nanquantile_weighted_axis reduces one axis while ignoring NaNs and their
+// corresponding weights.
+pub fn nanquantile_weighted_axis[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], q f64, axis int, keepdims bool) !&vtl.Tensor[f64] {
+	return weighted_quantile_axis_impl[T](values, weights, q, axis, keepdims, true)
+}
+
+fn weighted_quantile_axis_impl[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], q f64, axis int, keepdims bool, ignore_nan bool) !&vtl.Tensor[f64] {
 	validate_quantile(q)!
 	axis_index := validate_weighted_axis(values, weights, axis)!
 	rank := values.rank()
@@ -127,20 +209,29 @@ pub fn quantile_weighted_axis[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64]
 		mut pairs := []WeightedQuantileValue{cap: axis_size}
 		mut total_weight := 0.0
 		mut has_nan := false
+		mut valid_count := 0
 		for position in 0 .. axis_size {
 			index[axis_index] = position
 			value := f64(values.get(index))
 			weight := weighted_axis_weight(weights, index, position)
 			validate_weight(weight)!
-			total_weight += weight
 			if math.is_nan(value) {
 				has_nan = true
-			} else if weight > 0 {
-				pairs << WeightedQuantileValue{value, weight}
+				if !ignore_nan {
+					total_weight += weight
+				}
+			} else {
+				valid_count++
+				total_weight += weight
+				if weight > 0 {
+					pairs << WeightedQuantileValue{value, weight}
+				}
 			}
 		}
-		validate_weight_total(total_weight)!
-		quantile := if has_nan {
+		if !(ignore_nan && valid_count == 0) {
+			validate_weight_total(total_weight)!
+		}
+		quantile := if has_nan && !ignore_nan || (ignore_nan && valid_count == 0) {
 			math.nan()
 		} else {
 			pairs.sort_with_compare(weighted_quantile_value_compare)
@@ -164,6 +255,16 @@ pub fn quantile_weighted_axis[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64]
 // quantiles_weighted_axis computes several weighted quantiles per axis slice.
 // The quantile dimension is prepended, matching NumPy's multi-quantile shape.
 pub fn quantiles_weighted_axis[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], quantiles []f64, axis int) !&vtl.Tensor[f64] {
+	return weighted_quantiles_axis_impl[T](values, weights, quantiles, axis, false)
+}
+
+// nanquantiles_weighted_axis computes multiple weighted quantiles per axis
+// slice while ignoring NaNs and their corresponding weights.
+pub fn nanquantiles_weighted_axis[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], quantiles []f64, axis int) !&vtl.Tensor[f64] {
+	return weighted_quantiles_axis_impl[T](values, weights, quantiles, axis, true)
+}
+
+fn weighted_quantiles_axis_impl[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], quantiles []f64, axis int, ignore_nan bool) !&vtl.Tensor[f64] {
 	validate_quantiles(quantiles)!
 	axis_index := validate_weighted_axis(values, weights, axis)!
 	rank := values.rank()
@@ -183,19 +284,28 @@ pub fn quantiles_weighted_axis[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64
 		mut pairs := []WeightedQuantileValue{cap: axis_size}
 		mut total_weight := 0.0
 		mut has_nan := false
+		mut valid_count := 0
 		for position in 0 .. axis_size {
 			index[axis_index] = position
 			value := f64(values.get(index))
 			weight := weighted_axis_weight(weights, index, position)
 			validate_weight(weight)!
-			total_weight += weight
 			if math.is_nan(value) {
 				has_nan = true
-			} else if weight > 0 {
-				pairs << WeightedQuantileValue{value, weight}
+				if !ignore_nan {
+					total_weight += weight
+				}
+			} else {
+				valid_count++
+				total_weight += weight
+				if weight > 0 {
+					pairs << WeightedQuantileValue{value, weight}
+				}
 			}
 		}
-		validate_weight_total(total_weight)!
+		if !(ignore_nan && valid_count == 0) {
+			validate_weight_total(total_weight)!
+		}
 		output_index[0] = 0
 		mut output_dimension := 1
 		for dimension in 0 .. rank {
@@ -204,7 +314,7 @@ pub fn quantiles_weighted_axis[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64
 				output_dimension++
 			}
 		}
-		if has_nan {
+		if has_nan && !ignore_nan || (ignore_nan && valid_count == 0) {
 			for quantile_index in 0 .. quantiles.len {
 				output_index[0] = quantile_index
 				result.set(output_index, math.nan())
