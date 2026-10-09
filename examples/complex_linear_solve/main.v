@@ -22,5 +22,12 @@ fn main() {
 	assert math.abs(x.get_nth(0).im + 1) < 1e-12
 	assert math.abs(x.get_nth(1).re - 2) < 1e-12
 	assert math.abs(x.get_nth(1).im - 1) < 1e-12
+	inverse := la.inv_complex(a) or { panic(err) }
+	identity := la.matmul(a, inverse) or { panic(err) }
+	assert math.abs(identity.get([0, 0]).re - 1) < 1e-12
+	assert math.abs(identity.get([0, 1]).re) < 1e-12
+	assert math.abs(identity.get([1, 0]).re) < 1e-12
+	assert math.abs(identity.get([1, 1]).re - 1) < 1e-12
 	println('Solution: ${x.to_array()}')
+	println('Inverse: ${inverse.to_array()}')
 }
