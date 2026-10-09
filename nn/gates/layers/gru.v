@@ -47,7 +47,7 @@ pub fn (g &GRUGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] 
 	mut grad_final_state := vtl.zeros[T](h0.shape)
 	if g.final_state_output {
 		grad_final_state = payload.variable.grad
-		grad_output = vtl.zeros[T](g.input.value.shape[..2] + [hidden])
+		grad_output = vtl.zeros[T]([input.shape[0], input.shape[1], hidden])
 	}
 	gradients := internal.gru_backward_single_with_final_state[T](input, g.w_ih.value,
 		g.w_hh.value, g.b_ih.value, g.b_hh.value, h0, grad_output, grad_final_state)!

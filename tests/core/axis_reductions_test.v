@@ -29,21 +29,32 @@ fn test_axis_reductions_empty_reduced_dimension() ! {
 fn test_sum_axis0_contiguous_rank_three() ! {
 	values := vtl.from_array[f64]([1, 2, 3, 4, 5, 6, 7, 8], [2, 2, 2])!
 	assert vtl_stats.sum_along_axis(values, 0, false)!.shape == [2, 2]
-	assert vtl_stats.sum_along_axis(values, 0, false)!.to_array() == [6, 8, 10, 12]
+	assert vtl_stats.sum_along_axis(values, 0, false)!.to_array() == [6.0, 8, 10, 12]
 	assert vtl_stats.sum_along_axis(values, 0, true)!.shape == [1, 2, 2]
 	f32_values := vtl.from_array[f32]([1, 2, 3, 4, 5, 6], [2, 3])!
-	assert vtl_stats.sum_along_axis(f32_values, 0, false)!.to_array() == [5, 7, 9]
+	assert vtl_stats.sum_along_axis(f32_values, 0, false)!.to_array() == [f32(5), 7, 9]
 	wide_f32_values := vtl.from_array[f32]([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 		16, 17, 18, 19, 20, 21, 22], [2, 11])!
-	assert vtl_stats.sum_along_axis(wide_f32_values, 0, false)!.to_array() == [13, 15, 17, 19,
-		21, 23, 25, 27, 29, 31, 33]
+	assert vtl_stats.sum_along_axis(wide_f32_values, 0, false)!.to_array() == [
+		f32(13),
+		15,
+		17,
+		19,
+		21,
+		23,
+		25,
+		27,
+		29,
+		31,
+		33,
+	]
 }
 
 fn test_sum_axis0_noncontiguous_view_uses_strided_path() ! {
 	values := vtl.from_array[f64]([1, 2, 3, 4, 5, 6], [2, 3])!
 	transposed := values.transpose([1, 0])!
 	assert !transposed.is_row_major_contiguous()
-	assert vtl_stats.sum_along_axis(transposed, 0, false)!.to_array() == [6, 15]
+	assert vtl_stats.sum_along_axis(transposed, 0, false)!.to_array() == [6.0, 15]
 }
 
 fn test_axis_reductions_reject_invalid_axes() ! {

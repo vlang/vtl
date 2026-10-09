@@ -147,14 +147,15 @@ pub fn (l &LSTMLayer[T]) forward_with_state(input &autograd.Variable[T],
 		layer_cell0 := lstm_state_for_layer[T](cell0.value, index)!
 		hidden0_by_layer << layer_hidden0
 		cell0_by_layer << layer_cell0
-		layer_input, layer_hidden, layer_cell := internal.lstm_forward_single_with_cell[T](layer_input, layer_hidden0, layer_cell0, l.w_ih_layers[index].value,
+		layer_output, layer_hidden, layer_cell := internal.lstm_forward_single_with_cell[T](layer_input, layer_hidden0, layer_cell0, l.w_ih_layers[index].value,
 			l.w_hh_layers[index].value, l.b_ih_layers[index].value, l.b_hh_layers[index].value)!
+		layer_input = layer_output
 		final_hidden_by_layer << layer_hidden
 		final_cell_by_layer << layer_cell
 	}
 	output := layer_input.transpose([1, 0, 2])!
-	final_hidden := stack_lstm_states[T](final_hidden_by_layer)!
-	final_cell := stack_lstm_states[T](final_cell_by_layer)!
+	final_hidden := stack_lstm_layer_states[T](final_hidden_by_layer)
+	final_cell := stack_lstm_layer_states[T](final_cell_by_layer)
 	mut output_result := l.ctx.variable(output)
 	mut hidden_result := l.ctx.variable(final_hidden)
 	mut cell_result := l.ctx.variable(final_cell)
@@ -175,6 +176,20 @@ pub fn (l &LSTMLayer[T]) forward_with_state(input &autograd.Variable[T],
 		cell_gate.cache(mut cell_result)!
 	}
 	return output_result, hidden_result, cell_result
+}
+
+fn stack_lstm_layer_states[T](states []&vtl.Tensor[T]) &vtl.Tensor[T] {
+	if states.len == 0 {
+		panic('cannot stack empty LSTM states')
+	}
+	batch, hidden := states[0].shape[0], states[0].shape[1]
+	mut values := []T{len: states.len * batch * hidden}
+	for layer, state in states {
+		for i in 0 .. batch * hidden {
+			values[layer * batch * hidden + i] = state.get_nth(i)
+		}
+	}
+	return vtl.from_array(values, [states.len, batch, hidden]) or { panic(err) }
 }
 
 fn lstm_state_for_layer[T](states &vtl.Tensor[T], layer int) !&vtl.Tensor[T] {
