@@ -178,6 +178,53 @@ fn test_random_generator_supports_location_scale_distributions() ! {
 	replay.free()
 }
 
+fn test_random_generator_supports_pareto_rayleigh_and_triangular() ! {
+	mut generator := new_random_generator(9403)
+	pareto_values := generator.pareto(3.0, [4096])!
+	rayleigh_values := generator.rayleigh(2.0, [4096])!
+	triangular_values := generator.triangular(0.0, 1.0, 3.0, [4096])!
+	for value in pareto_values.to_array() {
+		assert value >= 0 && !math.is_nan(value) && !math.is_inf(value, 0)
+	}
+	for value in rayleigh_values.to_array() {
+		assert value >= 0 && !math.is_nan(value) && !math.is_inf(value, 0)
+	}
+	for value in triangular_values.to_array() {
+		assert value >= 0 && value <= 3 && !math.is_nan(value) && !math.is_inf(value, 0)
+	}
+	mut pareto_mean := 0.0
+	mut rayleigh_mean := 0.0
+	mut triangular_mean := 0.0
+	for value in pareto_values.to_array() {
+		pareto_mean += value
+	}
+	for value in rayleigh_values.to_array() {
+		rayleigh_mean += value
+	}
+	for value in triangular_values.to_array() {
+		triangular_mean += value
+	}
+	assert math.abs(pareto_mean / 4096 - 0.5) < 0.1
+	assert math.abs(rayleigh_mean / 4096 - 2.0 * math.sqrt(math.pi / 2)) < 0.08
+	assert math.abs(triangular_mean / 4096 - 4.0 / 3.0) < 0.05
+	mut replay := new_random_generator(9403)
+	assert pareto_values.array_equal(replay.pareto(3.0, [4096])!)
+	assert rayleigh_values.array_equal(replay.rayleigh(2.0, [4096])!)
+	assert triangular_values.array_equal(replay.triangular(0.0, 1.0, 3.0, [4096])!)
+	assert generator.rayleigh(0.0, [3])!.to_array() == [0.0, 0.0, 0.0]
+	if _ := generator.pareto(0.0, [1]) {
+		assert false, 'pareto must reject a non-positive shape parameter'
+	}
+	if _ := generator.rayleigh(-1.0, [1]) {
+		assert false, 'rayleigh must reject negative scale'
+	}
+	if _ := generator.triangular(0.0, 4.0, 3.0, [1]) {
+		assert false, 'triangular must reject a mode outside its endpoints'
+	}
+	generator.free()
+	replay.free()
+}
+
 fn test_random_generator_poisson_is_seeded_and_handles_rate_edges() ! {
 	mut generator := new_random_generator(146)
 	mut replay := new_random_generator(146)

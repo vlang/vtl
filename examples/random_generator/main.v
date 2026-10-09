@@ -36,6 +36,9 @@ fn main() {
 	extreme_value_noise := training_rng.gumbel(0.0, 1.0, [4])!
 	robust_noise := validation_rng.laplace(0.0, 0.05, [4])!
 	logistic_scores := validation_rng.logistic(0.0, 1.0, [4])!
+	heavy_tail_noise := training_rng.pareto(3.0, [4])!
+	wind_speeds := validation_rng.rayleigh(2.0, [4])!
+	triangular_priors := training_rng.triangular(0.0, 0.5, 1.0, [4])!
 
 	println('Training batch shape: ${training_features.shape}')
 	println('Training feature mean: ${stats.mean(training_features)}')
@@ -62,6 +65,9 @@ fn main() {
 	println('Gumbel extreme-value noise: ${extreme_value_noise.to_array()}')
 	println('Laplace robust noise: ${robust_noise.to_array()}')
 	println('Logistic score noise: ${logistic_scores.to_array()}')
+	println('Pareto heavy-tail noise: ${heavy_tail_noise.to_array()}')
+	println('Rayleigh wind speeds: ${wind_speeds.to_array()}')
+	println('Triangular prior samples: ${triangular_priors.to_array()}')
 	println('Independent augmentation noise: ${noise.to_array()}')
 	println('Seeded integer offsets: ${integer_noise.to_array()}')
 
