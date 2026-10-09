@@ -118,8 +118,12 @@ histograms with
 automatic and custom bins, weighted density, and multiple bin-selection rules;
 integer/weighted `bincount`.
 
+**Current:** explicit accumulator/output dtypes are available for global,
+single-axis, and multi-axis sum and product reductions.
+
 **Remaining:** add `keepdims` options consistently across remaining
-reductions, accumulator dtype controls, and broader reduction families.
+reductions, extend accumulator dtype controls to other reduction families, and
+broaden reduction coverage.
 
 Logical `all_axis`/`any_axis` and multi-axis `all_axes`/`any_axes` reductions
 return `bool` tensors; empty reduced dimensions return the logical identities
