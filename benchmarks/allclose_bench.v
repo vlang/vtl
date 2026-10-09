@@ -1,5 +1,5 @@
 // Compare allocation-free allclose with materializing isclose followed by all.
-// Run from ~/.vmodules with `v -prod run ./vtl/benchmarks/allclose_bench.v`.
+// Compile with `-prod` from ~/.vmodules, then run the resulting executable.
 module main
 
 import time

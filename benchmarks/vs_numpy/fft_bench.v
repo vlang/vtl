@@ -1,5 +1,5 @@
 // VTL real FFT benchmark. Run from ~/.vmodules with:
-// v -prod run ./vtl/benchmarks/vs_numpy/fft_bench.v
+// Compile with `-prod` from ~/.vmodules, then run the resulting executable.
 module main
 
 import math

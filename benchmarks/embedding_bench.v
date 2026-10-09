@@ -1,5 +1,5 @@
 // Compare contiguous embedding kernels with the coordinate-indexed reference.
-// Run from ~/.vmodules with `v -prod run ./vtl/benchmarks/embedding_bench.v`.
+// Compile with `-prod` from ~/.vmodules, then run the resulting executable.
 module main
 
 import time
