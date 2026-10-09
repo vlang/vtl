@@ -93,8 +93,8 @@ else
 		case "${relative_dir}" in
 			nn|nn/models) continue ;;
 		esac
-		if [[ "${relative_dir}" == "nn/layers" ]]; then
-			echo "Testing nn/layers one file at a time to cap compiler memory"
+		if [[ "${relative_dir}" == "nn/layers" || "${relative_dir}" == "tests/core" ]]; then
+			echo "Testing ${relative_dir} one file at a time to cap compiler memory"
 			for file in "${test_dir}"/*_test.v; do
 				if [[ -f "${file}" ]]; then
 					echo "Testing ${file#"${vtl_dir_path}"/}"
