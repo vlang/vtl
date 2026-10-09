@@ -1,5 +1,37 @@
 # VTL vs NumPy baselines
 
+## Hypergeometric sampling
+
+Both benchmarks draw 100,000 variates with `ngood=50,000`, `nbad=50,000`, and
+`nsample=50,000`, after two warmups, then report the mean of seven calls. The
+VTL benchmark uses its independent seeded generator; NumPy uses
+`default_rng(42)`. Run from `~/.vmodules`:
+
+```bash
+systemd-run --user --scope --quiet -p MemoryMax=3G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -prod run ./vtl/benchmarks/vs_numpy/hypergeometric_bench.v
+systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
+	uv run --with numpy python ./vtl/benchmarks/vs_numpy/numpy_hypergeometric_baseline.py
+```
+
+On an AMD Ryzen 9 5900X with V 0.5.2 `5bd6709` and NumPy 2.5.3, one matched
+run measured 3.686 ms for VTL `-prod` and 8.545 ms for NumPy. The VTL build
+used a 3 GiB memory cap because its optimized compile exceeded 2 GiB; both
+programs use independent PRNG algorithms and checksums are not expected to
+match. This is one distribution and workload, not evidence of overall NumPy
+performance parity.
+
+![Hypergeometric sampling benchmark](../../docs/assets/hypergeometric-performance.png)
+
+[Open the SVG version](../../docs/assets/hypergeometric-performance.svg). The
+plot script contains the measured values above; update those values after a new
+benchmark run, then regenerate both images with:
+
+```bash
+systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 --setenv=VJOBS=2 -- \
+	uv run --with matplotlib python ./vtl/benchmarks/vs_numpy/plot_hypergeometric_benchmark.py
+```
+
 ## Reduced SVD
 
 Both programs compute reduced `f64` SVDs of identical deterministic square

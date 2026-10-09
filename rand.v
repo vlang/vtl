@@ -131,6 +131,61 @@ pub fn (mut generator RandomGenerator) binomial(trials int, probability f64, sha
 	return result
 }
 
+// hypergeometric samples the number of good items in draws made without
+// replacement from a population containing ngood good and nbad bad items.
+pub fn (mut generator RandomGenerator) hypergeometric(ngood int, nbad int, nsample int, shape []int) !&Tensor[int] {
+	validate_hypergeometric_parameters(ngood, nbad, nsample)!
+	mut values := []int{len: size_from_shape(shape)}
+	total_population := ngood + nbad
+	sample_count := if nsample < total_population - nsample {
+		nsample
+	} else {
+		total_population - nsample
+	}
+	hrua_config := if sample_count > 10 && ngood > 0 && nbad > 0 {
+		hypergeometric_hrua_config(ngood, nbad, sample_count)
+	} else {
+		HypergeometricHruaConfig{}
+	}
+	for sample_index in 0 .. values.len {
+		mut selected_good := 0
+		if sample_count > 10 && ngood > 0 && nbad > 0 {
+			for {
+				x := open_unit_interval(generator.rng.f64_in_range(0.0, 1.0)!)
+				y := generator.rng.f64_in_range(0.0, 1.0)!
+				candidate, accepted := hypergeometric_hrua_candidate(hrua_config, sample_count, x,
+					y)
+				if accepted {
+					selected_good = candidate
+					break
+				}
+			}
+		} else {
+			mut remaining_good := f64(if ngood < nbad { ngood } else { nbad })
+			mut remaining := sample_count
+			d1 := total_population - sample_count
+			for remaining_good > 0 && remaining > 0 {
+				u := generator.rng.f64_in_range(0.0, 1.0)!
+				remaining_good = hypergeometric_hyp_update(remaining_good, d1, remaining, u)
+				remaining--
+			}
+			selected_good = int(f64(if ngood < nbad { ngood } else { nbad }) - remaining_good)
+			if ngood > nbad {
+				selected_good = sample_count - selected_good
+			}
+		}
+		// HRUA samples the minority of the sample and its complement. Reflect
+		// the result back to the requested sample if the complement was drawn.
+		selected_good = if sample_count == nsample {
+			selected_good
+		} else {
+			ngood - selected_good
+		}
+		values[sample_index] = selected_good
+	}
+	return from_array[int](values, shape)
+}
+
 // multinomial returns category counts for repeated samples from one
 // categorical distribution. The final output axis contains the categories.
 pub fn (mut generator RandomGenerator) multinomial(trials int, probabilities &Tensor[f64], sample_shape []int) !&Tensor[int] {
@@ -895,6 +950,149 @@ pub fn poisson(lambda f64, shape []int, params TensorData) !&Tensor[int] {
 		result.set_nth(i, sample_poisson_global(lambda)!)
 	}
 	return result
+}
+
+// hypergeometric returns the number of good items in draws made without
+// replacement from a population containing ngood good and nbad bad items.
+pub fn hypergeometric(ngood int, nbad int, nsample int, shape []int, params TensorData) !&Tensor[int] {
+	validate_hypergeometric_parameters(ngood, nbad, nsample)!
+	mut result := zeros[int](shape, params)
+	total_population := ngood + nbad
+	sample_count := if nsample < total_population - nsample {
+		nsample
+	} else {
+		total_population - nsample
+	}
+	hrua_config := if sample_count > 10 && ngood > 0 && nbad > 0 {
+		hypergeometric_hrua_config(ngood, nbad, sample_count)
+	} else {
+		HypergeometricHruaConfig{}
+	}
+	for sample_index in 0 .. result.size {
+		mut selected_good := 0
+		if sample_count > 10 && ngood > 0 && nbad > 0 {
+			for {
+				x := open_unit_interval(rand.f64_in_range(0.0, 1.0)!)
+				y := rand.f64_in_range(0.0, 1.0)!
+				candidate, accepted := hypergeometric_hrua_candidate(hrua_config, sample_count, x,
+					y)
+				if accepted {
+					selected_good = candidate
+					break
+				}
+			}
+		} else {
+			mut remaining_good := f64(if ngood < nbad { ngood } else { nbad })
+			mut remaining := sample_count
+			d1 := total_population - sample_count
+			for remaining_good > 0 && remaining > 0 {
+				u := rand.f64_in_range(0.0, 1.0)!
+				remaining_good = hypergeometric_hyp_update(remaining_good, d1, remaining, u)
+				remaining--
+			}
+			selected_good = int(f64(if ngood < nbad { ngood } else { nbad }) - remaining_good)
+			if ngood > nbad {
+				selected_good = sample_count - selected_good
+			}
+		}
+		selected_good = if sample_count == nsample {
+			selected_good
+		} else {
+			ngood - selected_good
+		}
+		result.set_nth(sample_index, selected_good)
+	}
+	return result
+}
+
+fn hypergeometric_hyp_update(remaining_good f64, d1 int, remaining_sample int, uniform_value f64) f64 {
+	return remaining_good - math.floor(uniform_value + remaining_good / f64(d1 + remaining_sample))
+}
+
+// HypergeometricHruaConfig caches constants for the HRUA rejection sampler
+// used by NumPy for larger samples; smaller samples use the inversion path.
+// Reference implementation: https://github.com/numpy/numpy/blob/main/numpy/random/src/legacy/legacy-distributions.c
+struct HypergeometricHruaConfig {
+	good_larger    bool
+	min_good       int
+	max_good       int
+	d6             f64
+	d8             f64
+	d10            f64
+	d11            f64
+	log_factorials []f64
+}
+
+fn hypergeometric_hrua_config(good int, bad int, sample int) HypergeometricHruaConfig {
+	population := good + bad
+	min_good := if good < bad { good } else { bad }
+	max_good := if good > bad { good } else { bad }
+	m := if sample < population - sample { sample } else { population - sample }
+	d4 := f64(min_good) / f64(population)
+	d5 := 1.0 - d4
+	d6 := f64(m) * d4 + 0.5
+	d7 := math.sqrt(f64(population - m) * f64(sample) * d4 * d5 / f64(population - 1) + 0.5)
+	d8 := 1.7155277699214135 * d7 + 0.8989161620588988
+	d9 := int(math.floor(f64(m + 1) * f64(min_good + 1) / (f64(population) + 2)))
+	mut log_factorials := []f64{}
+	if max_good <= 100_000 {
+		log_factorials = []f64{len: max_good + 2}
+		for i in 2 .. log_factorials.len {
+			log_factorials[i] = log_factorials[i - 1] + math.log(f64(i))
+		}
+	}
+	d10 := hypergeometric_log_factorial(d9, log_factorials) + hypergeometric_log_factorial(min_good - d9,
+		log_factorials) + hypergeometric_log_factorial(m - d9, log_factorials) + hypergeometric_log_factorial(max_good - m + d9,
+		log_factorials)
+	d11 := math.min(f64(if m < min_good { m } else { min_good }) + 1, math.floor(d6 + 16 * d7))
+	return HypergeometricHruaConfig{
+		good_larger:    good > bad
+		min_good:       min_good
+		max_good:       max_good
+		d6:             d6
+		d8:             d8
+		d10:            d10
+		d11:            d11
+		log_factorials: log_factorials
+	}
+}
+
+fn hypergeometric_hrua_candidate(hrua_config HypergeometricHruaConfig, sample int, x f64, y f64) (int, bool) {
+	w := hrua_config.d6 + hrua_config.d8 * (y - 0.5) / x
+	if w < 0 || w >= hrua_config.d11 {
+		return 0, false
+	}
+	z := int(math.floor(w))
+	t := hrua_config.d10 - (hypergeometric_log_factorial(z, hrua_config.log_factorials) + hypergeometric_log_factorial(hrua_config.min_good - z,
+		hrua_config.log_factorials) + hypergeometric_log_factorial(sample - z,
+		hrua_config.log_factorials) + hypergeometric_log_factorial(hrua_config.max_good - sample + z,
+		hrua_config.log_factorials))
+	if x * (4.0 - x) - 3.0 <= t {
+		return if hrua_config.good_larger { sample - z } else { z }, true
+	}
+	if x * (x - t) >= 1 || 2 * math.log(x) > t {
+		return 0, false
+	}
+	return if hrua_config.good_larger { sample - z } else { z }, true
+}
+
+fn hypergeometric_log_factorial(value int, log_factorials []f64) f64 {
+	if value >= 0 && value < log_factorials.len {
+		return log_factorials[value]
+	}
+	return math.log_gamma(f64(value + 1))
+}
+
+fn validate_hypergeometric_parameters(ngood int, nbad int, nsample int) ! {
+	if ngood < 0 || nbad < 0 || nsample < 0 {
+		return error('hypergeometric: population counts and sample size must be non-negative')
+	}
+	if nbad > max_int - ngood {
+		return error('hypergeometric: total population size exceeds the supported integer range')
+	}
+	if nsample > ngood + nbad {
+		return error('hypergeometric: sample size cannot exceed the population size')
+	}
 }
 
 // weibull returns samples from the unit-scale Weibull distribution using

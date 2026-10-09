@@ -50,6 +50,7 @@ positive_noise := training_rng.gamma(2.0, 0.5, [128])!
 beta_samples := training_rng.beta(2.0, 5.0, [128])!
 positive_scales := training_rng.lognormal(0.0, 0.25, [128])!
 event_counts := training_rng.binomial(12, 0.25, [128])!
+sampled_good_counts := training_rng.hypergeometric(20, 80, 10, [128])!
 arrival_counts := validation_rng.poisson(3.5, [128])!
 lifetimes := validation_rng.weibull(1.5, [128])!
 chi_square_samples := validation_rng.chi_square(5.0, [128])!
@@ -82,6 +83,11 @@ returns integer success counts, and `exponential(lambda, shape)` returns
 non-negative samples for a positive finite rate. `poisson(lambda, shape)`
 returns integer event counts for a finite, non-negative expected rate, using a
 product sampler for small rates and transformed rejection for larger rates.
+`hypergeometric(ngood, nbad, nsample, shape)` samples the number of good items
+in draws without replacement from a population split into good and bad items.
+Small draws use an inversion sampler; larger draws use HRUA rejection sampling,
+and the implementation samples the smaller of the requested draw and its
+complement.
 `weibull(shape_parameter, shape)` returns unit-scale Weibull samples;
 `chi_square(df, shape)`, `student_t(df, shape)`, and
 `f_distribution(numerator_df, denominator_df, shape)` sample the corresponding
@@ -93,8 +99,20 @@ cross-version compatibility is not guaranteed. See the complete data-pipeline
 example in [`examples/random_generator/main.v`](../examples/random_generator/main.v).
 
 VTL also provides global tensor constructors for uniform range, normal,
-Bernoulli, binomial, geometric, exponential, Poisson, Weibull, lognormal,
+Bernoulli, binomial, geometric, hypergeometric, exponential, Poisson, Weibull, lognormal,
 Gamma, Beta, Dirichlet, chi-square, Student's t, and F distributions.
+The global hypergeometric API uses the same population parameters:
+
+```v
+import vtl
+
+vtl.random_seed(7)
+counts := vtl.hypergeometric(20, 80, 10, [8], vtl.TensorData{})!
+for count in counts.to_array() {
+	assert count >= 0 && count <= 10
+}
+```
+
 `gamma(alpha, scale, shape,
 params)`, `beta(alpha, beta, shape, params)`, `chi_square(df, shape, params)`,
 `student_t(df, shape, params)`, and `f_distribution(numerator_df,
