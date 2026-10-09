@@ -58,7 +58,7 @@ model.mse_loss() // loss function
 | `lstm(input_size, hidden_size, num_layers)` | Long Short-Term Memory layer |
 | `multihead_attention(embed_dim, num_heads)` | Multi-head self-attention |
 | `positional_encoding(embed_dim, max_len)` | Sinusoidal positional encoding |
-| `dropout()` | Dropout (eval mode: no-op) |
+| `dropout(prob)` | Dropout with probability `prob` (eval mode: no-op) |
 
 `Sequential` starts in training mode. Call `model.eval()` before evaluation to
 disable dropout and make BatchNorm use its running statistics; call

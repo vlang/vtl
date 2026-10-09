@@ -69,7 +69,16 @@ pub fn (layer &BatchNorm1DLayer[T]) forward_with_mode(input &autograd.Variable[T
 	if !training {
 		output := internal.batchnorm1d_forward[T](input.value, layer.gamma.value, layer.beta.value,
 			layer.running_mean, layer.running_var, layer.eps)!
-		return input.context.variable(output)
+		mut result := input.context.variable(output,
+			requires_grad: input.requires_grad
+				|| layer.gamma.requires_grad || layer.beta.requires_grad
+		)
+		if result.requires_grad {
+			gate := batchnorm1d_gate_with_mode[T](input.value, layer.gamma.value, layer.beta.value,
+				layer.running_mean, layer.running_var, layer.eps, false)
+			gate.cache(mut result, input, layer.gamma, layer.beta)!
+		}
+		return result
 	}
 	// Training path: compute batch stats
 	output, batch_mean, batch_var := internal.batchnorm1d_training[T](input.value,
@@ -91,11 +100,14 @@ pub fn (layer &BatchNorm1DLayer[T]) forward_with_mode(input &autograd.Variable[T
 		rv.set([0, c], vtl.cast[T](new_var))
 	}
 
-	mut result := input.context.variable(output)
-	if input.requires_grad {
-		gate := batchnorm1d_gate[T](input.value, layer.gamma.value, layer.beta.value, batch_mean,
-			batch_var, layer.eps)
-		gate.cache(mut result, input)!
+	mut result := input.context.variable(output,
+		requires_grad: input.requires_grad
+			|| layer.gamma.requires_grad || layer.beta.requires_grad
+	)
+	if result.requires_grad {
+		gate := batchnorm1d_gate_with_mode[T](input.value, layer.gamma.value, layer.beta.value, batch_mean,
+			batch_var, layer.eps, true)
+		gate.cache(mut result, input, layer.gamma, layer.beta)!
 	}
 	return result
 }
@@ -123,30 +135,37 @@ fn batch_norm1_d_layer_forward_mode_dispatch[T](layer voidptr, input voidptr, tr
 
 // BatchNorm1DGate defines a public data structure for this module.
 pub struct BatchNorm1DGate[T] {
-	input &vtl.Tensor[T] = unsafe { nil }
-	gamma &vtl.Tensor[T] = unsafe { nil }
-	beta  &vtl.Tensor[T] = unsafe { nil }
-	mean  &vtl.Tensor[T] = unsafe { nil }
-	var_  &vtl.Tensor[T] = unsafe { nil }
-	eps   f64
+	input    &vtl.Tensor[T] = unsafe { nil }
+	gamma    &vtl.Tensor[T] = unsafe { nil }
+	beta     &vtl.Tensor[T] = unsafe { nil }
+	mean     &vtl.Tensor[T] = unsafe { nil }
+	var_     &vtl.Tensor[T] = unsafe { nil }
+	eps      f64
+	training bool
 }
 
 // batchnorm1d_gate exposes this operation as part of the public API.
 pub fn batchnorm1d_gate[T](input &vtl.Tensor[T], gamma &vtl.Tensor[T], beta &vtl.Tensor[T], mean &vtl.Tensor[T], var_ &vtl.Tensor[T], eps f64) &BatchNorm1DGate[T] {
+	return batchnorm1d_gate_with_mode[T](input, gamma, beta, mean, var_, eps, true)
+}
+
+// batchnorm1d_gate_with_mode creates the backward gate for train or eval mode.
+pub fn batchnorm1d_gate_with_mode[T](input &vtl.Tensor[T], gamma &vtl.Tensor[T], beta &vtl.Tensor[T], mean &vtl.Tensor[T], var_ &vtl.Tensor[T], eps f64, training bool) &BatchNorm1DGate[T] {
 	return &BatchNorm1DGate[T]{
-		input: input
-		gamma: gamma
-		beta:  beta
-		mean:  mean
-		var_:  var_
-		eps:   eps
+		input:    input
+		gamma:    gamma
+		beta:     beta
+		mean:     mean
+		var_:     var_
+		eps:      eps
+		training: training
 	}
 }
 
 // backward exposes this operation as part of the public API.
 pub fn (g &BatchNorm1DGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
-	return internal.batchnorm1d_backward[T](payload.variable.grad, g.input, g.gamma, g.beta,
-		g.mean, g.var_, g.eps)
+	return internal.batchnorm1d_backward_mode[T](payload.variable.grad, g.input, g.gamma, g.beta,
+		g.mean, g.var_, g.eps, g.training)
 }
 
 fn batch_norm1_d_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
@@ -157,14 +176,36 @@ fn batch_norm1_d_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voi
 
 // cache exposes this operation as part of the public API.
 pub fn (g &BatchNorm1DGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
-	a := args[0]
-	match a {
+	input := args[0]
+	match input {
 		autograd.Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
-			autograd.register[T]('BatchNorm1D', voidptr(g),
-				batch_norm1_d_gate_backward_dispatch[T], result, [a])!
+			gamma := args[1]
+			match gamma {
+				autograd.Variable[T] {
+					beta := args[2]
+					match beta {
+						autograd.Variable[T] {
+							result.grad = vtl.zeros_like[T](result.value)
+							result.requires_grad = true
+							autograd.register[T]('BatchNorm1D', voidptr(g),
+								batch_norm1_d_gate_backward_dispatch[T], result, [
+									input,
+									gamma,
+									beta,
+								])!
+						}
+						else {
+							return error('BatchNorm1DGate: beta must be a Variable')
+						}
+					}
+				}
+				else {
+					return error('BatchNorm1DGate: gamma must be a Variable')
+				}
+			}
 		}
-		else {}
+		else {
+			return error('BatchNorm1DGate: input must be a Variable')
+		}
 	}
 }

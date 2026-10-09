@@ -11,7 +11,7 @@ pub fn dropout[T](input &vtl.Tensor[T], mask &vtl.Tensor[T], prob f64) !&vtl.Ten
 	if prob == 0 {
 		return vtl.zeros_like[T](input)
 	}
-	return input.nmap([mask], fn [T](vals []T, i []int) T {
+	return input.nmap([mask], fn [prob] [T](vals []T, i []int) T {
 		return vals[0] * vals[1] / vtl.cast[T](prob)
 	})
 }
@@ -24,7 +24,7 @@ pub fn dropout_backwards[T](gradient &vtl.Tensor[T], mask &vtl.Tensor[T], prob f
 	if prob == 0 {
 		return vtl.zeros_like[T](gradient)
 	}
-	return gradient.nmap([mask], fn [T](vals []T, i []int) T {
+	return gradient.nmap([mask], fn [prob] [T](vals []T, i []int) T {
 		return vals[0] * vals[1] / vtl.cast[T](prob)
 	})
 }

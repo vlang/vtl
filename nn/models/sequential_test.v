@@ -95,14 +95,23 @@ fn test_sequential_batchnorm_mode_is_independent_of_input_gradients() ! {
 	input := ctx.variable(vtl.from_array([1.0, 3.0, 5.0, 7.0], [2, 2])!, requires_grad: false)
 
 	training_output := nn.forward(input)!
+	assert training_output.requires_grad
 	assert math.abs(training_output.value.get_nth(0) + 0.99999875) < 1e-6
 	assert math.abs(training_output.value.get_nth(2) - 0.99999875) < 1e-6
+	mut training_loss := training_output.sum()!
+	training_loss.backprop()!
+	batchnorm_vars := nn.info.layers[1].variables()
+	assert batchnorm_vars[1].grad.to_array() == [2.0, 2.0]
 	// The model's batch normalization layer updates running stats in training
 	// mode even when the input itself does not need gradients.
 	nn.eval()
 	eval_output := nn.forward(input)!
+	assert eval_output.requires_grad
 	assert eval_output.value.to_array() != training_output.value.to_array()
 	assert math.abs(eval_output.value.get_nth(0) - 0.6139) < 1e-3
+	mut eval_loss := eval_output.sum()!
+	eval_loss.backprop()!
+	assert batchnorm_vars[1].grad.to_array() == [4.0, 4.0]
 }
 
 fn test_conv1d_sequential_forward_backward() ! {
