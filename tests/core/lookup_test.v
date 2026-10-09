@@ -47,6 +47,7 @@ fn test_count_nonzero_globally_and_by_axis_with_keepdims() ! {
 	transposed := vtl.count_nonzero_axis[int](tensor.t()!, 1, true)!
 	assert transposed.shape == [3, 1]
 	assert transposed.to_array() == [1, 1, 1]
+	assert vtl.count_nonzero[int](tensor.t()!) == 3
 	series := vtl.from_1d([0, 2, 3])!
 	assert vtl.count_nonzero_axis[int](series, 0, false)!.get_nth[int](0) == 2
 	assert vtl.count_nonzero_axis[int](series, 0, true)!.shape == [1]
