@@ -518,10 +518,6 @@ fn nanarg_axis[T](t &Tensor[T], axis int, keepdims bool, maximum bool) !&Tensor[
 		output_shape = [1]
 	}
 	mut result := empty[int](output_shape, memory: .row_major)
-	mut strides := []int{len: rank, init: 1}
-	for dimension := rank - 2; dimension >= 0; dimension-- {
-		strides[dimension] = strides[dimension + 1] * t.shape[dimension + 1]
-	}
 	mut output_index := []int{len: output_shape.len}
 	for output_flat in 0 .. result.size {
 		mut remainder := output_flat
@@ -541,15 +537,12 @@ fn nanarg_axis[T](t &Tensor[T], axis int, keepdims bool, maximum bool) !&Tensor[
 			input_index[dimension] = output_index[output_dimension]
 			output_dimension++
 		}
-		mut base := 0
-		for dimension, coordinate in input_index {
-			base += coordinate * strides[dimension]
-		}
 		mut found := false
 		mut best_value := f64(0)
 		mut best_index := 0
 		for position in 0 .. t.shape[axis_index] {
-			value := f64(t.get_nth(base + position * strides[axis_index]))
+			input_index[axis_index] = position
+			value := f64(t.get(input_index))
 			if math.is_nan(value) {
 				continue
 			}

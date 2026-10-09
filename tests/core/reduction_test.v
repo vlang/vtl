@@ -110,6 +110,16 @@ fn test_nanarg_axis_errors_for_all_nan_slices_and_empty_axes() {
 	}
 }
 
+fn test_nanarg_axis_handles_strided_views() {
+	base := vtl.from_2d[f64]([[math.nan(), 4.0, 2.0], [7.0, math.nan(), 1.0]])!
+	transposed := base.transpose([1, 0])!
+	max_rows := transposed.nanargmax_axis(1, false)!
+	assert max_rows.to_array() == [1, 0, 0]
+	min_columns := transposed.nanargmin_axis(0, true)!
+	assert min_columns.shape == [1, 2]
+	assert min_columns.to_array() == [2, 2]
+}
+
 fn test_max_axis_1() {
 	t := vtl.from_2d([[1.0, 5.0], [3.0, 2.0]])!
 	result := t.max_axis(1)!
