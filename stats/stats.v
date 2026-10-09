@@ -83,6 +83,45 @@ pub fn sum[T](t &vtl.Tensor[T]) T {
 	})
 }
 
+// sum_accurate sums floating-point tensors with Neumaier compensation. This
+// preserves small contributions that can be lost by the faster sum reduction.
+// For non-floating types it delegates to sum without changing their semantics.
+pub fn sum_accurate[T](t &vtl.Tensor[T]) T {
+	$if T is f32 || T is f64 {
+		mut total := 0.0
+		mut correction := 0.0
+		mut has_non_finite := false
+		for index in 0 .. t.size {
+			value := f64(t.get_nth(index))
+			if !math.is_finite(value) {
+				has_non_finite = true
+				break
+			}
+			next := total + value
+			if !math.is_finite(next) {
+				has_non_finite = true
+				break
+			}
+			if math.abs(total) >= math.abs(value) {
+				correction += (total - next) + value
+			} else {
+				correction += (value - next) + total
+			}
+			if !math.is_finite(correction) {
+				has_non_finite = true
+				break
+			}
+			total = next
+		}
+		if has_non_finite {
+			return sum[T](t)
+		}
+		return T(total + correction)
+	} $else {
+		return sum[T](t)
+	}
+}
+
 fn is_flat_tensor_storage[T](t &vtl.Tensor[T]) bool {
 	return t.data.data.len == t.size && t.is_row_major_contiguous()
 }

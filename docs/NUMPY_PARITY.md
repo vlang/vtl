@@ -125,6 +125,8 @@ integer/weighted `bincount`.
 
 **Current:** explicit accumulator/output dtypes are available for global,
 single-axis, and multi-axis sum and product reductions.
+`stats.sum_accurate` provides an opt-in Neumaier-compensated global sum for
+floating-point tensors.
 
 **Remaining:** add `keepdims` options consistently across remaining
 reductions, extend accumulator dtype controls to other reduction families, and

@@ -20,6 +20,11 @@ For example, summing an `f32` tensor into `f64` reduces rounding error during
 accumulation. These APIs currently cover sum and product; other reductions keep
 their documented output types.
 
+For floating-point inputs, `sum_accurate` uses Neumaier compensation to retain
+small contributions that a faster reduction may round away. It returns the
+input floating-point type; use `sum_as` to select a wider output type. Other
+input types keep the regular `sum` behavior.
+
 `average_axis` keeps its reduced axis with length one. Use
 `average_along_axis(..., keepdims)` to choose whether to keep or remove it;
 weights may match the input or be a vector matching the selected axis.
