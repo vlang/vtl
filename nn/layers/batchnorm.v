@@ -43,8 +43,9 @@ pub fn batchnorm1d_layer[T](ctx &autograd.Context[T], num_features int, config B
 		running_mean: vtl.zeros[T]([1, num_features])
 		running_var:  vtl.ones[T]([1, num_features])
 	}
-	return types.layer[T](voidptr(layer), batch_norm1_d_layer_output_shape_dispatch[T],
-		batch_norm1_d_layer_variables_dispatch[T], batch_norm1_d_layer_forward_dispatch[T])
+	return types.layer_with_mode[T](voidptr(layer), batch_norm1_d_layer_output_shape_dispatch[T],
+		batch_norm1_d_layer_variables_dispatch[T], batch_norm1_d_layer_forward_dispatch[T],
+		batch_norm1_d_layer_forward_mode_dispatch[T])
 }
 
 // output_shape exposes this operation as part of the public API.
@@ -59,8 +60,13 @@ pub fn (layer &BatchNorm1DLayer[T]) variables() []&autograd.Variable[T] {
 
 // forward exposes this operation as part of the public API.
 pub fn (layer &BatchNorm1DLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
-	if !input.requires_grad {
-		// Inference path: use running stats
+	return layer.forward_with_mode(input, input.requires_grad)
+}
+
+// forward_with_mode uses batch statistics and updates running statistics in
+// training mode, and uses the stored running statistics in evaluation mode.
+pub fn (layer &BatchNorm1DLayer[T]) forward_with_mode(input &autograd.Variable[T], training bool) !&autograd.Variable[T] {
+	if !training {
 		output := internal.batchnorm1d_forward[T](input.value, layer.gamma.value, layer.beta.value,
 			layer.running_mean, layer.running_var, layer.eps)!
 		return input.context.variable(output)
@@ -86,9 +92,11 @@ pub fn (layer &BatchNorm1DLayer[T]) forward(input &autograd.Variable[T]) !&autog
 	}
 
 	mut result := input.context.variable(output)
-	gate := batchnorm1d_gate[T](input.value, layer.gamma.value, layer.beta.value, batch_mean,
-		batch_var, layer.eps)
-	gate.cache(mut result, input)!
+	if input.requires_grad {
+		gate := batchnorm1d_gate[T](input.value, layer.gamma.value, layer.beta.value, batch_mean,
+			batch_var, layer.eps)
+		gate.cache(mut result, input)!
+	}
 	return result
 }
 
@@ -104,6 +112,12 @@ fn batch_norm1_d_layer_variables_dispatch[T](layer voidptr) []voidptr {
 fn batch_norm1_d_layer_forward_dispatch[T](layer voidptr, input voidptr) !voidptr {
 	typed_input := unsafe { &autograd.Variable[T](input) }
 	result := unsafe { (&BatchNorm1DLayer[T](layer)).forward(typed_input)! }
+	return voidptr(result)
+}
+
+fn batch_norm1_d_layer_forward_mode_dispatch[T](layer voidptr, input voidptr, training bool) !voidptr {
+	typed_input := unsafe { &autograd.Variable[T](input) }
+	result := unsafe { (&BatchNorm1DLayer[T](layer)).forward_with_mode(typed_input, training)! }
 	return voidptr(result)
 }
 

@@ -60,6 +60,30 @@ model.mse_loss() // loss function
 | `positional_encoding(embed_dim, max_len)` | Sinusoidal positional encoding |
 | `dropout()` | Dropout (eval mode: no-op) |
 
+`Sequential` starts in training mode. Call `model.eval()` before evaluation to
+disable dropout and make BatchNorm use its running statistics; call
+`model.train()` before resuming training. These methods set module behavior and
+are independent of whether the input tensor requires gradients.
+
+```v
+import vtl
+import vtl.autograd
+import vtl.nn.layers
+import vtl.nn.models
+
+ctx := autograd.ctx[f64]()
+mut model := models.sequential_from_ctx[f64](ctx)
+model.input([32])
+model.linear(32)
+model.dropout(0.2)
+model.batchnorm1d(32, layers.BatchNorm1DConfig{})
+
+input := ctx.variable(vtl.ones[f64]([1, 32]))
+model.eval()
+prediction := model.forward(input)!
+model.train()
+```
+
 ## LSTM sequences
 
 `lstm_layer` accepts batch-first input shaped `[batch, sequence, features]`

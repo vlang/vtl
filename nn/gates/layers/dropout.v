@@ -29,8 +29,11 @@ pub fn (g &DropoutGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor
 	if gradient.shape != g.mask.shape {
 		return error('dropout backward: gradient and mask shapes must match')
 	}
-	if prob <= 0 || prob > 1 {
-		return error('dropout backward: keep probability must be in (0, 1]')
+	if prob < 0 || prob > 1 {
+		return error('dropout backward: keep probability must be in [0, 1]')
+	}
+	if prob == 0 {
+		return [vtl.zeros_like[T](gradient)]
 	}
 	mut values := gradient.to_array()
 	mask_values := g.mask.to_array()

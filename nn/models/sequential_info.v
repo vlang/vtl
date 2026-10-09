@@ -210,6 +210,15 @@ pub fn (mut ls SequentialInfo[T]) batchnorm1d(num_features int, config layers.Ba
 	})
 }
 
+// dropout adds a dropout layer using the preceding layer's output shape.
+pub fn (mut ls SequentialInfo[T]) dropout(prob f64) {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.add_layer(layers.dropout_layer[T](ls.ctx, shape, layers.DropoutLayerConfig{
+		prob: prob
+	}), 'DropoutLayer', {})
+}
+
 // avgpool2d adds a new AveragePool2D layer to the network.
 pub fn (mut ls SequentialInfo[T]) avgpool2d(kernel []int, padding []int, stride []int) {
 	layer := ls.layers[ls.layers.len - 1]

@@ -11,6 +11,7 @@ import vtl.nn.types
 // DropoutLayerConfig defines a public data structure for this module.
 @[params]
 pub struct DropoutLayerConfig {
+pub:
 	prob f64 = 0.5
 }
 
@@ -26,8 +27,9 @@ pub fn dropout_layer[T](ctx &autograd.Context[T], output_shape []int, data Dropo
 		output_shape: output_shape.clone()
 		prob:         1.0 - data.prob
 	}
-	return types.layer[T](voidptr(layer), dropout_layer_output_shape_dispatch[T],
-		dropout_layer_variables_dispatch[T], dropout_layer_forward_dispatch[T])
+	return types.layer_with_mode[T](voidptr(layer), dropout_layer_output_shape_dispatch[T],
+		dropout_layer_variables_dispatch[T], dropout_layer_forward_dispatch[T],
+		dropout_layer_forward_mode_dispatch[T])
 }
 
 // output_shape exposes this operation as part of the public API.
@@ -42,6 +44,18 @@ pub fn (_ &DropoutLayer[T]) variables() []&autograd.Variable[T] {
 
 // forward exposes this operation as part of the public API.
 pub fn (layer &DropoutLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
+	return layer.forward_with_mode(input, true)
+}
+
+// forward_with_mode applies inverted dropout during training and is an
+// identity operation during evaluation.
+pub fn (layer &DropoutLayer[T]) forward_with_mode(input &autograd.Variable[T], training bool) !&autograd.Variable[T] {
+	if !training {
+		return input
+	}
+	if layer.prob < 0 || layer.prob > 1 {
+		return error('dropout probability must be in [0, 1]')
+	}
 	mask := vtl.binomial[T](1, layer.prob, input.value.shape)!
 	output := internal.dropout[T](input.value, mask, layer.prob)!
 	mut result := input.context.variable(output)
@@ -65,5 +79,11 @@ fn dropout_layer_variables_dispatch[T](layer voidptr) []voidptr {
 fn dropout_layer_forward_dispatch[T](layer voidptr, input voidptr) !voidptr {
 	typed_input := unsafe { &autograd.Variable[T](input) }
 	result := unsafe { (&DropoutLayer[T](layer)).forward(typed_input)! }
+	return voidptr(result)
+}
+
+fn dropout_layer_forward_mode_dispatch[T](layer voidptr, input voidptr, training bool) !voidptr {
+	typed_input := unsafe { &autograd.Variable[T](input) }
+	result := unsafe { (&DropoutLayer[T](layer)).forward_with_mode(typed_input, training)! }
 	return voidptr(result)
 }
