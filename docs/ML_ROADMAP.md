@@ -46,7 +46,7 @@ GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 
 | Priority | Issue | Topic |
 |----------|-------|--------|
-| P1 | [#161](https://github.com/vlang/vtl/issues/161) | CUDA backward for LSTM, Attention, BatchNorm, LayerNorm, Embedding, pooling, and remaining Dropout training paths; runtime validation is still required |
+| P1 | [#161](https://github.com/vlang/vtl/issues/161) | CUDA backward kernels for Attention, BatchNorm, LayerNorm, Embedding, and pooling, plus runtime validation; CPU LSTM now has four-gate BPTT and finite-difference gradient coverage, while CUDA LSTM kernels remain outstanding |
 | P2 | [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support |
 | P2 | [#40](https://github.com/vlang/vtl/issues/40) | YOLO/fused autograd gates; requires benchmark evidence |
 | P2 | [#3](https://github.com/vlang/vtl/issues/3) | Evaluate compiler aliasing support without unsafe assumptions |
