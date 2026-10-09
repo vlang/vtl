@@ -25,3 +25,26 @@ fn test_equal_and_not_equal_keep_strided_view_semantics() ! {
 	assert transposed.equal(base)!.to_array() == [true, false, false, true]
 	assert transposed.not_equal(base)!.to_array() == [false, true, true, false]
 }
+
+fn test_approximate_comparisons_use_contiguous_and_broadcast_paths() ! {
+	left := vtl.from_2d([[1.0, 2.0], [3.0, 4.0]])!
+	row := vtl.from_1d([1.0, 2.0])!
+	expected := [true, true, false, false]
+
+	assert left.tolerance(row, 0.0)!.to_array() == expected
+	assert left.close(row)!.to_array() == expected
+	assert left.veryclose(row)!.to_array() == expected
+	assert left.alike(row)!.to_array() == expected
+}
+
+fn test_approximate_comparisons_support_strided_broadcast_views() ! {
+	base := vtl.from_2d([[1.0, 2.0], [3.0, 4.0]])!
+	transposed := base.transpose([1, 0])!
+	column := vtl.from_2d([[1.0], [2.0]])!
+	expected := [true, false, true, false]
+
+	assert transposed.tolerance(column, 0.0)!.to_array() == expected
+	assert transposed.close(column)!.to_array() == expected
+	assert transposed.veryclose(column)!.to_array() == expected
+	assert transposed.alike(column)!.to_array() == expected
+}

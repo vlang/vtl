@@ -346,17 +346,30 @@ pub fn (t &Tensor[T]) not_equal[T](other &Tensor[T]) !&Tensor[bool] {
 // tolerance exposes this operation as part of the public API.
 
 // tolerance exposes this operation as part of the public API.
+@[direct_array_access]
+fn map_pair_predicate[T](a &Tensor[T], b &Tensor[T], predicate fn (left T, right T) bool) !&Tensor[bool] {
+	if a.shape == b.shape && a.is_row_major_contiguous() && b.is_row_major_contiguous()
+		&& a.data.data.len == a.size && b.data.data.len == b.size {
+		mut result := empty[bool](a.shape, memory: .row_major)
+		for i in 0 .. a.size {
+			result.data.data[i] = predicate(a.data.data[i], b.data.data[i])
+		}
+		return result
+	}
+	mut iterators, shape := a.iterators[T]([b])!
+	mut result := empty[bool](shape, memory: .row_major)
+	for {
+		values, index := iterators.next() or { break }
+		result.set(index, predicate(values[0], values[1]))
+	}
+	return result
+}
+
 @[inline]
 pub fn (t &Tensor[T]) tolerance[T](other &Tensor[T], tol T) !&Tensor[bool] {
-	// TODO: Implement using nmap
-	mut iters, shape := t.iterators[T]([other])!
-	mut ret := empty[bool](shape)
-	for {
-		vals, i := iters.next() or { break }
-		val := math.tolerance(td[T](vals[0]).f64(), td[T](vals[1]).f64(), td[T](tol).f64())
-		ret.set(i, val)
-	}
-	return ret
+	return map_pair_predicate[T](t, other, fn [tol] [T](left T, right T) bool {
+		return math.tolerance(td[T](left).f64(), td[T](right).f64(), td[T](tol).f64())
+	})
 }
 
 // close compares two tensors elementwise
@@ -366,15 +379,9 @@ pub fn (t &Tensor[T]) tolerance[T](other &Tensor[T], tol T) !&Tensor[bool] {
 // close exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) close[T](other &Tensor[T]) !&Tensor[bool] {
-	// TODO: Implement using nmap
-	mut iters, shape := t.iterators[T]([other])!
-	mut ret := empty[bool](shape)
-	for {
-		vals, i := iters.next() or { break }
-		val := math.close(td[T](vals[0]).f64(), td[T](vals[1]).f64())
-		ret.set(i, val)
-	}
-	return ret
+	return map_pair_predicate[T](t, other, fn [T](left T, right T) bool {
+		return math.close(td[T](left).f64(), td[T](right).f64())
+	})
 }
 
 // veryclose compares two tensors elementwise
@@ -384,15 +391,9 @@ pub fn (t &Tensor[T]) close[T](other &Tensor[T]) !&Tensor[bool] {
 // veryclose exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) veryclose[T](other &Tensor[T]) !&Tensor[bool] {
-	// TODO: Implement using nmap
-	mut iters, shape := t.iterators[T]([other])!
-	mut ret := empty[bool](shape)
-	for {
-		vals, i := iters.next() or { break }
-		val := math.veryclose(td[T](vals[0]).f64(), td[T](vals[1]).f64())
-		ret.set(i, val)
-	}
-	return ret
+	return map_pair_predicate[T](t, other, fn [T](left T, right T) bool {
+		return math.veryclose(td[T](left).f64(), td[T](right).f64())
+	})
 }
 
 // alike compares two tensors elementwise
@@ -402,15 +403,9 @@ pub fn (t &Tensor[T]) veryclose[T](other &Tensor[T]) !&Tensor[bool] {
 // alike exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) alike[T](other &Tensor[T]) !&Tensor[bool] {
-	// TODO: Implement using nmap
-	mut iters, shape := t.iterators[T]([other])!
-	mut ret := empty[bool](shape)
-	for {
-		vals, i := iters.next() or { break }
-		val := math.alike(td[T](vals[0]).f64(), td[T](vals[1]).f64())
-		ret.set(i, val)
-	}
-	return ret
+	return map_pair_predicate[T](t, other, fn [T](left T, right T) bool {
+		return math.alike(td[T](left).f64(), td[T](right).f64())
+	})
 }
 
 // isclose compares tensors elementwise using NumPy's asymmetric tolerance rule:
