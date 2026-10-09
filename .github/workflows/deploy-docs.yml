@@ -17,25 +17,50 @@ on:
 jobs:
   deploy-docs:
     runs-on: ubuntu-latest
+    env:
+      VJOBS: '2'
     steps:
       - name: Checkout vtl
         uses: actions/checkout@v4
         with:
           path: vtl
 
+      - name: Checkout VSL
+        uses: actions/checkout@v4
+        with:
+          repository: vlang/vsl
+          path: vsl
+
       - name: Setup V
         uses: vlang/setup-v@v1.6
         with:
           check-latest: true
 
+      - name: Copy modules to V Modules
+        run: |
+          mkdir -p ~/.vmodules
+          cp -a ./vtl ~/.vmodules/vtl
+          cp -a ./vsl ~/.vmodules/vsl
+
       - name: V doctor
-        run: v doctor
+        run: |
+          cd ~/.vmodules
+          sudo systemd-run --scope --property=MemoryMax=4G \
+            --property=MemorySwapMax=0 --setenv=HOME="$HOME" \
+            --setenv=PATH="$PATH" --setenv=VJOBS=2 -- v doctor
 
       - name: Build docs
         run: |
-          pushd vtl
-          v doc -readme -m -f html .
-          popd
+          cd ~/.vmodules
+          sudo systemd-run --scope --property=MemoryMax=4G \
+            --property=MemorySwapMax=0 --setenv=HOME="$HOME" \
+            --setenv=PATH="$PATH" --setenv=VJOBS=2 -- \
+            v doc -readme -m -f html ./vtl
+
+      - name: Stage generated docs
+        run: |
+          rm -rf ./vtl/_docs
+          cp -a ~/.vmodules/vtl/_docs ./vtl/_docs
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3
