@@ -2,6 +2,7 @@ module data
 
 import rand
 import vsl.la
+import math
 
 fn test_dataloader_basic() {
 	// Create simple test data: 10 samples, 3 features
@@ -174,6 +175,14 @@ fn test_dataset_subset() {
 	train_subset, val_subset := subset.split(0.67)! // ~2 train, ~1 val
 	assert train_subset.len() == 2
 	assert val_subset.len() == 1
+
+	for ratio in [-0.1, 1.1, math.nan(), math.inf(1)] {
+		subset.split(ratio) or {
+			assert err.msg().contains('split ratio')
+			continue
+		}
+		assert false, 'invalid split ratio ${ratio} must fail'
+	}
 }
 
 fn test_tensor_dataset() {

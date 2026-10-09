@@ -49,6 +49,10 @@ pub fn (s &Subset[T]) get(i int) !(&la.Matrix[T], []T) {
 // split splits a Subset into train and validation subsets
 // train_ratio is the proportion of data to use for training
 pub fn (s &Subset[T]) split(train_ratio f64) !(&Subset[T], &Subset[T]) {
+	if math.is_nan(train_ratio) || math.is_inf(train_ratio, 0) || train_ratio < 0.0
+		|| train_ratio > 1.0 {
+		return errors.error('split ratio must be finite and between 0 and 1', .einval)
+	}
 	n := s.len()
 	n_train := int(f64(n) * train_ratio)
 	if n_train == 0 || n_train == n {
