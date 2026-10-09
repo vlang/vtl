@@ -434,6 +434,54 @@ pub fn (t &Tensor[T]) argmin[T](axis int) !&Tensor[int] {
 	return t.argmin_axis(axis)
 }
 
+// argmax_flat returns the flattened index of the first largest value. A NaN
+// value is returned immediately, matching NumPy's argmax behavior.
+pub fn (t &Tensor[T]) argmax_flat[T]() !int {
+	if t.size == 0 {
+		return error('argmax_flat: cannot reduce an empty tensor')
+	}
+	mut best_index := 0
+	mut best_value := t.get_nth(0)
+	if math.is_nan(f64(best_value)) {
+		return best_index
+	}
+	for index in 1 .. t.size {
+		value := t.get_nth(index)
+		if math.is_nan(f64(value)) {
+			return index
+		}
+		if value > best_value {
+			best_value = value
+			best_index = index
+		}
+	}
+	return best_index
+}
+
+// argmin_flat returns the flattened index of the first smallest value. A NaN
+// value is returned immediately, matching NumPy's argmin behavior.
+pub fn (t &Tensor[T]) argmin_flat[T]() !int {
+	if t.size == 0 {
+		return error('argmin_flat: cannot reduce an empty tensor')
+	}
+	mut best_index := 0
+	mut best_value := t.get_nth(0)
+	if math.is_nan(f64(best_value)) {
+		return best_index
+	}
+	for index in 1 .. t.size {
+		value := t.get_nth(index)
+		if math.is_nan(f64(value)) {
+			return index
+		}
+		if value < best_value {
+			best_value = value
+			best_index = index
+		}
+	}
+	return best_index
+}
+
 // nanargmax returns the flattened index of the largest non-NaN value. The
 // first index wins ties, matching NumPy. Empty and all-NaN tensors return an error.
 pub fn (t &Tensor[T]) nanargmax[T]() !int {

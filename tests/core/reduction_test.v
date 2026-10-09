@@ -61,6 +61,27 @@ fn test_argmin_flat() {
 	assert result.get_nth(0) == 3
 }
 
+fn test_flat_arg_extrema_return_first_index_and_handle_nan() {
+	values := vtl.from_array[f64]([3.0, 7.0, 7.0, 2.0], [2, 2])!
+	assert values.argmax_flat()! == 1
+	assert values.argmin_flat()! == 3
+	with_nan := vtl.from_1d[f64]([1.0, math.nan(), 3.0])!
+	assert with_nan.argmax_flat()! == 1
+	assert with_nan.argmin_flat()! == 1
+	large_u64 := vtl.from_1d[u64]([u64(9007199254740992), u64(9007199254740993)])!
+	assert large_u64.argmax_flat()! == 1
+}
+
+fn test_flat_arg_extrema_reject_empty_tensors() {
+	empty := vtl.from_1d[f64]([]f64{})!
+	if _ := empty.argmax_flat() {
+		assert false, 'argmax_flat must reject empty input'
+	}
+	if _ := empty.argmin_flat() {
+		assert false, 'argmin_flat must reject empty input'
+	}
+}
+
 fn test_nanarg_flattened_skips_nan_and_keeps_first_tie() {
 	t := vtl.from_1d[f64]([math.nan(), 7.0, 2.0, 7.0])!
 	assert t.nanargmax()! == 1
