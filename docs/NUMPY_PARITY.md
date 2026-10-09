@@ -106,9 +106,9 @@ mean/variance/std with explicit `keepdims` and NaN-aware forms; axis-wise
 `trapezoid`; all thirteen NumPy quantile estimators via `QuantileMethod`, with
 global, axis, multi-quantile, percentile, and NaN-aware forms; axis arg
 reductions and squeezed min/max/argmin/argmax results; multi-axis min/max;
-weighted inverted-CDF quantile and multi-quantile forms globally and along one
-axis, with same-shape or one-dimensional axis weights, including NaN-aware
-forms that discard the weights for NaN observations;
+weighted inverted-CDF quantile, multi-quantile, percentile, and multi-percentile
+forms globally and along one axis, with same-shape or one-dimensional axis
+weights, including NaN-aware forms that discard weights for NaN observations;
 histograms with
 automatic and custom bins, weighted density, and multiple bin-selection rules;
 integer/weighted `bincount`.
