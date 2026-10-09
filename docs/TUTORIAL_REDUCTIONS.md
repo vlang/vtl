@@ -364,6 +364,29 @@ assert means.to_array() == [66.0 / 14.0, 138.0 / 22.0]
 
 Empty input, incompatible shapes, or a zero sum of weights returns an error.
 
+## Quantile estimators
+
+The `*_with_method` APIs sort a copy of the input and expose NumPy's thirteen
+sample-quantile estimators. Choose the estimator explicitly when matching a
+Python analysis or statistical convention:
+
+```v
+import vtl
+import vtl.stats
+
+observations := vtl.from_1d([1.0, 2.0, 3.0, 4.0])!
+median := stats.quantile_with_method(observations, 0.5, .linear)!
+quartiles := stats.quantiles_with_method(observations, [0.25, 0.5, 0.75], .hazen)!
+row_quartiles := stats.quantiles_axis_with_method(observations, [0.25, 0.75], 0, .nearest)!
+assert median == 2.5
+assert quartiles.shape == [3]
+assert row_quartiles.shape == [2, 1]
+```
+
+`nanquantile_*_with_method` and `nanquantiles_*_with_method` skip NaNs.
+Axis single-quantile helpers take `keepdims`; multiple quantiles prepend a
+quantile dimension. Percentile counterparts accept levels from 0 through 100.
+
 ## NaN-aware sums and extrema
 
 `nansum`, `nanprod`, `nanmin`, and `nanmax` skip NaN values. Their axis
