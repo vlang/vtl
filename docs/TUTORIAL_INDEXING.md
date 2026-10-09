@@ -158,7 +158,9 @@ are not autograd operations.
 
 Boolean masks passed to `masked_select` and `masked_fill` may broadcast to the
 tensor shape. `masked_select` returns selected elements as a one-dimensional
-copy; `masked_fill` returns a new tensor and leaves the input unchanged.
+copy; `masked_fill` returns a new tensor and leaves the input unchanged. For
+NumPy-style `array[mask]`, `boolean_index` requires the mask to match the
+leading tensor dimensions and retains any trailing dimensions.
 
 ```v
 import vtl
@@ -171,6 +173,16 @@ assert selected.to_array() == [2, 3, 5, 6]
 row_mask := vtl.from_array([true, false], [2, 1])!
 filled := values.masked_fill(row_mask, -1)!
 assert filled.to_array() == [-1, -1, -1, 4, 5, 6]
+```
+
+```v
+import vtl
+
+cube := vtl.from_array([]int{len: 12, init: index}, [2, 3, 2])!
+mask := vtl.from_2d([[true, false, true], [false, true, false]])!
+selected_cube := vtl.boolean_index[int](cube, mask)!
+assert selected_cube.shape == [3, 2]
+assert selected_cube.to_array() == [0, 1, 4, 5, 8, 9]
 ```
 
 ## Mixed basic and coordinate-array indexing

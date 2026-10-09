@@ -116,6 +116,30 @@ pub fn array_index(indices &Tensor[int]) TensorIndex {
 	}
 }
 
+// boolean_index selects values where mask is true. The mask shape must match
+// the leading tensor dimensions; any remaining tensor dimensions are retained
+// after the selected-element axis. The result is an independent row-major
+// copy, matching NumPy's a[mask] behavior.
+pub fn boolean_index[T](t &Tensor[T], mask &Tensor[bool]) !&Tensor[T] {
+	if mask.rank() == 0 || mask.rank() > t.rank() {
+		return error('boolean_index: mask rank must be between 1 and tensor rank')
+	}
+	for axis, dimension in mask.shape {
+		if dimension != t.shape[axis] {
+			return error('boolean_index: mask shape ${mask.shape} must match the first ${mask.rank()} tensor dimensions ${t.shape[..mask.rank()]}')
+		}
+	}
+	coordinates := nonzero[bool](mask)!
+	mut indices := []TensorIndex{cap: t.rank()}
+	for coordinate in coordinates {
+		indices << array_index(coordinate)
+	}
+	for _ in mask.rank() .. t.rank() {
+		indices << full_index()
+	}
+	return mixed_index[T](t, indices)
+}
+
 // ellipsis_index expands to enough full axes to cover the unindexed dimensions.
 // At most one ellipsis is allowed in a mixed_index call.
 pub fn ellipsis_index() TensorIndex {

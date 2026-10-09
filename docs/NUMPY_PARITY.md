@@ -62,7 +62,8 @@ inverse, and first-index variants;
 axis `count_nonzero`; `argwhere` and per-axis `nonzero`; `take`, `take_nd`,
 `take_flat`; `take_along_axis` with broadcasting outside the selected axis;
 `put_along_axis` and `scatter_add`; lookup and DataLoader gathers; broadcastable
-`masked_select` and `masked_fill`.
+`masked_select` and `masked_fill`; leading-dimension boolean-mask indexing via
+`boolean_index`, which preserves trailing dimensions like NumPy `array[mask]`.
 
 `Variable.take_along_axis` propagates gradients by scattering them to selected
 source positions, including accumulation for repeated indices and reduction of
