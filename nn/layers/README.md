@@ -13,6 +13,12 @@ optimizers. Implementations on `main` include:
 
 The common low-level constructor returns a `types.Layer[T]`:
 
+`gru_layer(ctx, input_size, hidden_size)` returns this interface and starts
+each sequence from a zero hidden state. Use `new_gru_layer` when you need the
+typed `GRULayer[T]` API: `forward_with_state(input, h0)` returns both the full
+sequence and final hidden state, with autograd support for either output and
+the initial state.
+
 `lstm_layer` uses batch-first `[batch, sequence, features]` inputs and returns
 the output at every timestep. It supports stacked layers and full CPU BPTT for
 input and parameters, with gate matrices ordered input, forget, cell, output.

@@ -59,9 +59,22 @@ pub fn gru_forward_single[T](input &vtl.Tensor[T], w_ih &vtl.Tensor[T], w_hh &vt
 // It returns gradients for input, w_ih, w_hh, b_ih, b_hh, and h0 respectively.
 pub fn gru_backward_single[T](input &vtl.Tensor[T], w_ih &vtl.Tensor[T], w_hh &vtl.Tensor[T],
 	b_ih &vtl.Tensor[T], b_hh &vtl.Tensor[T], h0 &vtl.Tensor[T], grad_output &vtl.Tensor[T]) ![]&vtl.Tensor[T] {
+	grad_final_state := vtl.zeros[T](h0.shape)
+	return gru_backward_single_with_final_state[T](input, w_ih, w_hh, b_ih, b_hh, h0, grad_output,
+		grad_final_state)
+}
+
+// gru_backward_single_with_final_state also propagates a gradient supplied for
+// the final hidden state returned by gru_forward_single.
+pub fn gru_backward_single_with_final_state[T](input &vtl.Tensor[T], w_ih &vtl.Tensor[T],
+	w_hh &vtl.Tensor[T], b_ih &vtl.Tensor[T], b_hh &vtl.Tensor[T], h0 &vtl.Tensor[T],
+	grad_output &vtl.Tensor[T], grad_final_state &vtl.Tensor[T]) ![]&vtl.Tensor[T] {
 	output, _ := gru_forward_single[T](input, w_ih, w_hh, b_ih, b_hh, h0)!
 	if grad_output.shape != output.shape {
 		return error('gru_backward_single: grad_output shape must match output')
+	}
+	if grad_final_state.shape != h0.shape {
+		return error('gru_backward_single: grad_final_state shape must match h0')
 	}
 	seq_len, batch, input_size := input.shape[0], input.shape[1], input.shape[2]
 	hidden := h0.shape[1]
@@ -109,6 +122,9 @@ pub fn gru_backward_single[T](input &vtl.Tensor[T], w_ih &vtl.Tensor[T], w_hh &v
 	mut dbx := []f64{len: 3 * hidden}
 	mut dbh := []f64{len: 3 * hidden}
 	mut dh_next := []f64{len: batch * hidden}
+	for i in 0 .. dh_next.len {
+		dh_next[i] = f64(grad_final_state.get_nth(i))
+	}
 	for rev in 0 .. seq_len {
 		t := seq_len - 1 - rev
 		dh_future := dh_next.clone()
