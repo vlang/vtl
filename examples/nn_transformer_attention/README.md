@@ -17,10 +17,10 @@ per sequence, eight features per token, and two attention heads.
 
 ## How to run
 
-From the repository root:
+From `~/.vmodules`:
 
 ```sh
-v run vtl/examples/nn_transformer_attention/main.v
+v run ./vtl/examples/nn_transformer_attention/main.v
 ```
 
 
