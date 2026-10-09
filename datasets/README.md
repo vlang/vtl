@@ -19,6 +19,27 @@ sample order. A non-positive `batch_size` produces an empty loader.
 `load_imdb_with_config` for a smaller, class-balanced subset. Review features
 remain raw strings; labels are binary (`1` positive, `0` negative).
 
+For simple NLP pipelines, `tokenize_text` lowercases and splits on Unicode
+whitespace and ASCII punctuation while preserving UTF-8 text. `build_text_vocabulary`
+creates deterministic frequency-ranked IDs; `<pad>` is ID `0` and `<unk>` is
+ID `1`. `max_size` includes those reserved IDs, and `0` means no size limit.
+This is a small preprocessing utility; it does not replace language-specific
+tokenizers or normalization.
+
+```v
+import vtl.datasets
+
+tokens := datasets.tokenize_text('A joyful, moving review!')
+assert tokens == ['a', 'joyful', 'moving', 'review']
+
+vocabulary := datasets.build_text_vocabulary([
+	'joyful moving review',
+	'moving review',
+], 10000, 1)!
+ids := vocabulary.encode('Joyful review')
+assert vocabulary.decode(ids) == ['joyful', 'review']
+```
+
 ```v
 import vtl.datasets
 
