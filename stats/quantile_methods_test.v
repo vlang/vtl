@@ -47,3 +47,42 @@ fn test_quantile_method_keepdims_validation_and_nan_only() ! {
 		assert true
 	}
 }
+
+fn test_quantile_methods_reduce_multiple_axes_and_preserve_shapes() ! {
+	values := vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0], [2, 2, 2])!
+	medians := quantile_axes_with_method(values, 0.5, [0, -1], .linear, false)!
+	assert medians.shape == [2]
+	assert medians.to_array() == [3.5, 5.5]
+	levels := quantiles_axes_with_method(values, [0.5, 0.0, 1.0], [0, 2], .linear)!
+	assert levels.shape == [3, 2]
+	assert levels.to_array() == [3.5, 5.5, 1.0, 3.0, 6.0, 8.0]
+	percentiles := percentiles_axes_with_method(values, [0, 25, 100], [0, 2], .linear)!
+	assert percentiles.to_array() == [1.0, 3.0, 1.75, 3.75, 6.0, 8.0]
+	kept := quantile_axes_with_method(values, 0.5, [0, 2], .linear, true)!
+	assert kept.shape == [1, 2, 1]
+	assert kept.to_array() == [3.5, 5.5]
+	if _ := quantile_axes_with_method(values, 0.5, [1, 1], .linear, false) {
+		assert false, 'duplicate axes must fail'
+	}
+}
+
+fn test_nanquantile_methods_reduce_multiple_axes() ! {
+	values := vtl.from_array([1.0, math.nan(), 3.0, 4.0, 5.0, 6.0, math.nan(), 8.0], [
+		2,
+		2,
+		2,
+	])!
+	ordinary := quantile_axes_with_method(values, 0.5, [0, 2], .linear, false)!
+	assert math.is_nan(ordinary.get([0]))
+	assert math.is_nan(ordinary.get([1]))
+	ignored := nanquantile_axes_with_method(values, 0.5, [0, 2], .linear, false)!
+	assert ignored.to_array() == [5.0, 4.0]
+	assert nanpercentiles_axes_with_method(values, [0, 50, 100], [0, 2], .linear)!.to_array() == [
+		1.0,
+		3.0,
+		5.0,
+		4.0,
+		6.0,
+		8.0,
+	]
+}
