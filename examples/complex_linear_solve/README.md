@@ -13,5 +13,6 @@ systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 --setenv=V
 
 The `vtl.la.solve_complex` API also accepts matrix right-hand sides and
 broadcastable leading batch dimensions. `vtl.la.inv_complex` computes batched
-complex128 matrix inverses through the same pivoted solver. Both return errors
-for singular systems.
+complex128 matrix inverses through the same pivoted solver. `vtl.la.det_complex`
+computes batched determinants with pivoted elimination. Solve and inverse return
+errors for singular systems; determinant returns zero.

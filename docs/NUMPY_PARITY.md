@@ -160,8 +160,9 @@ backend; the default build remains dependency-free and uses the pure-V path.
 `la.solve_complex` solves complex128 vector and matrix right-hand sides with
 partial pivoting and supports broadcast batch dimensions. As in NumPy 2.0, a
 right-hand side is treated as a vector only when it has rank one. `la.inv_complex`
-uses the same solver for batched complex matrix inverses. Complex `matmul`,
-solve, and inverse are currently supported; complex determinant, least squares,
+uses the same solver for batched complex matrix inverses; `la.det_complex`
+computes complex determinants with pivoted elimination. Complex `matmul`, solve,
+inverse, and determinant are currently supported; complex least squares,
 factorizations, and eigenproblems remain future work.
 `la.slogdet` returns determinant signs and log absolute determinants for batches,
 including singular matrices and values whose determinants would overflow.
@@ -187,7 +188,7 @@ leading batch dimensions.
 rank from a relative singular-value cutoff, and returns squared residual sums
 only when NumPy does.
 
-**Remaining:** add complex determinant, least squares, factorizations,
+**Remaining:** add complex least squares, factorizations,
 complex-input general eigenproblems, and complex SVD; benchmark realistic
 shapes for both the default and LAPACKE backends.
 
@@ -251,9 +252,9 @@ logical order, and truncate floating-point values when converting to integers.
 
 **Remaining:** connect promotion to mixed-dtype arithmetic, add weak scalar
 promotion and string conversion, extend complex support beyond elementwise
-operations, `matmul`, Einstein contractions, `solve_complex`, and `inv_complex`
-to more general linear algebra and random generation, add complex32, and define
-integer overflow and structured-data limits.
+operations, `matmul`, Einstein contractions, `solve_complex`, `inv_complex`,
+and `det_complex` to more general linear algebra and random generation, add
+complex32, and define integer overflow and structured-data limits.
 
 ### Masked and missing data
 
