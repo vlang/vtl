@@ -12,21 +12,30 @@ except ImportError:
     sys.exit(0)
 
 
+class MLP(nn.Module):
+    """Three-layer MLP with direct layer calls, matching the VTL benchmark."""
+
+    def __init__(self):
+        super().__init__()
+        self.first = nn.Linear(128, 64)
+        self.second = nn.Linear(64, 64)
+        self.third = nn.Linear(64, 32)
+
+    def forward(self, x):
+        x = torch.relu(self.first(x))
+        x = torch.relu(self.second(x))
+        return self.third(x)
+
+
 def bench_autograd():
     for batch in (32, 64):
-        model = nn.Sequential(
-            nn.Linear(128, 64),
-            nn.ReLU(),
-            nn.Linear(64, 64),
-            nn.ReLU(),
-            nn.Linear(64, 32),
-        )
+        model = MLP()
         x = torch.ones(batch, 128)
         y = torch.zeros(batch, 32)
         criterion = nn.MSELoss()
 
         def step():
-            model.zero_grad(set_to_none=True)
+            model.zero_grad(set_to_none=False)
             pred = model(x)
             loss = criterion(pred, y)
             loss.backward()
