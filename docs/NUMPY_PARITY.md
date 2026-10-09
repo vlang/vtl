@@ -79,7 +79,9 @@ Axis-wise `argmax` and `argmin` retain a length-one axis for compatibility;
 `argmax_axis_squeeze` and `argmin_axis_squeeze` provide NumPy's default
 axis-removed output shape. VTL represents scalar-shaped reductions as shape
 `[1]`. `nanargmax()` and `nanargmin()` return the flattened index of the first
-non-NaN extremum and report an error for empty or all-NaN input.
+non-NaN extremum. Their `*_axis(axis, keepdims)` variants reduce one axis.
+These functions report an error for empty inputs, empty reduced axes, or
+all-NaN slices.
 
 ### Math and ufuncs
 

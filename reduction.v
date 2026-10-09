@@ -480,6 +480,93 @@ pub fn (t &Tensor[T]) nanargmin[T]() !int {
 	return best_index
 }
 
+// nanargmax_axis returns the index of the largest non-NaN value on axis.
+// Set keepdims to retain the reduced axis as a length-one dimension.
+pub fn (t &Tensor[T]) nanargmax_axis[T](axis int, keepdims bool) !&Tensor[int] {
+	return nanarg_axis[T](t, axis, keepdims, true)
+}
+
+// nanargmin_axis returns the index of the smallest non-NaN value on axis.
+// Set keepdims to retain the reduced axis as a length-one dimension.
+pub fn (t &Tensor[T]) nanargmin_axis[T](axis int, keepdims bool) !&Tensor[int] {
+	return nanarg_axis[T](t, axis, keepdims, false)
+}
+
+fn nanarg_axis[T](t &Tensor[T], axis int, keepdims bool, maximum bool) !&Tensor[int] {
+	rank := t.rank()
+	if rank == 0 {
+		return error('NaN arg reduction requires a tensor with at least one dimension')
+	}
+	axis_index := if axis < 0 { axis + rank } else { axis }
+	if axis_index < 0 || axis_index >= rank {
+		return error('NaN arg reduction axis ${axis} out of bounds for rank ${rank}')
+	}
+	if t.shape[axis_index] == 0 {
+		return error('NaN arg reduction cannot reduce an empty axis')
+	}
+	mut output_shape := []int{cap: rank}
+	for dimension, size in t.shape {
+		if dimension == axis_index {
+			if keepdims {
+				output_shape << 1
+			}
+		} else {
+			output_shape << size
+		}
+	}
+	if output_shape.len == 0 {
+		output_shape = [1]
+	}
+	mut result := empty[int](output_shape, memory: .row_major)
+	mut strides := []int{len: rank, init: 1}
+	for dimension := rank - 2; dimension >= 0; dimension-- {
+		strides[dimension] = strides[dimension + 1] * t.shape[dimension + 1]
+	}
+	mut output_index := []int{len: output_shape.len}
+	for output_flat in 0 .. result.size {
+		mut remainder := output_flat
+		for dimension := output_shape.len - 1; dimension >= 0; dimension-- {
+			output_index[dimension] = remainder % output_shape[dimension]
+			remainder /= output_shape[dimension]
+		}
+		mut input_index := []int{len: rank}
+		mut output_dimension := 0
+		for dimension in 0 .. rank {
+			if dimension == axis_index {
+				if keepdims {
+					output_dimension++
+				}
+				continue
+			}
+			input_index[dimension] = output_index[output_dimension]
+			output_dimension++
+		}
+		mut base := 0
+		for dimension, coordinate in input_index {
+			base += coordinate * strides[dimension]
+		}
+		mut found := false
+		mut best_value := f64(0)
+		mut best_index := 0
+		for position in 0 .. t.shape[axis_index] {
+			value := f64(t.get_nth(base + position * strides[axis_index]))
+			if math.is_nan(value) {
+				continue
+			}
+			if !found || (maximum && value > best_value) || (!maximum && value < best_value) {
+				found = true
+				best_value = value
+				best_index = position
+			}
+		}
+		if !found {
+			return error('NaN arg reduction found a slice with no non-NaN values')
+		}
+		result.set_nth(output_flat, best_index)
+	}
+	return result
+}
+
 // cumsum returns the cumulative sum along the given axis.
 // Only meaningful for numeric types; bool and string follow their respective + semantics.
 
