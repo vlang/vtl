@@ -3,6 +3,8 @@ module vtl
 import math
 import rand
 import rand.config
+import vsl.blas as vsl_blas
+import vsl.lapack as vsl_lapack
 
 // RandomGenerator owns an independent pseudorandom stream for reproducible
 // experiments that must not modify or depend on V's global random state.
@@ -79,6 +81,128 @@ pub fn (mut generator RandomGenerator) normal(shape []int, params NormalTensorDa
 		})!)
 	}
 	return result
+}
+
+// multivariate_normal draws samples with the requested mean and covariance.
+// sample_shape describes the leading sample dimensions; the final output axis
+// contains the variables. Positive-semidefinite covariance matrices are
+// supported, including singular matrices.
+pub fn (mut generator RandomGenerator) multivariate_normal(mean &Tensor[f64], covariance &Tensor[f64], sample_shape []int) !&Tensor[f64] {
+	n := mean.shape[0] or { return error('multivariate_normal: mean must be a non-empty vector') }
+	sample_count := validate_multivariate_normal_inputs(mean, covariance, sample_shape, n)!
+	factor := multivariate_normal_factor(covariance, n)!
+	mut standard := zeros[f64]([sample_count, n], TensorData{})
+	for i in 0 .. standard.size {
+		standard.set_nth(i, generator.rng.normal(config.NormalConfigStruct{})!)
+	}
+	return transform_multivariate_normal(mean, sample_shape, n, sample_count, factor, standard,
+		TensorData{})
+}
+
+// multivariate_normal draws samples with the requested mean and covariance
+// using VTL's global random stream.
+pub fn multivariate_normal(mean &Tensor[f64], covariance &Tensor[f64], sample_shape []int, params TensorData) !&Tensor[f64] {
+	n := mean.shape[0] or { return error('multivariate_normal: mean must be a non-empty vector') }
+	sample_count := validate_multivariate_normal_inputs(mean, covariance, sample_shape, n)!
+	factor := multivariate_normal_factor(covariance, n)!
+	mut standard := zeros[f64]([sample_count, n], params)
+	for i in 0 .. standard.size {
+		standard.set_nth(i, rand.normal(config.NormalConfigStruct{})!)
+	}
+	return transform_multivariate_normal(mean, sample_shape, n, sample_count, factor, standard,
+		params)
+}
+
+fn validate_multivariate_normal_inputs(mean &Tensor[f64], covariance &Tensor[f64], sample_shape []int, n int) !int {
+	if mean.rank() != 1 || n == 0 {
+		return error('multivariate_normal: mean must be a non-empty vector')
+	}
+	if covariance.rank() != 2 || covariance.shape[0] != n || covariance.shape[1] != n {
+		return error('multivariate_normal: covariance must be a square matrix matching the mean length')
+	}
+	if n > max_int / n {
+		return error('multivariate_normal: covariance dimensions are too large')
+	}
+	mut sample_count := 1
+	for dimension in sample_shape {
+		if dimension < 0 || (dimension > 0 && sample_count > max_int / dimension) {
+			return error('multivariate_normal: sample dimensions must be non-negative and fit in memory')
+		}
+		sample_count *= dimension
+	}
+	if sample_count > max_int / n {
+		return error('multivariate_normal: sample output is too large')
+	}
+	for i in 0 .. mean.size {
+		value := mean.get_nth(i)
+		if math.is_nan(value) || math.is_inf(value, 0) {
+			return error('multivariate_normal: mean values must be finite')
+		}
+	}
+	mut scale := 1.0
+	for row in 0 .. n {
+		for col in 0 .. n {
+			a := covariance.get_nth(row * n + col)
+			if math.is_nan(a) || math.is_inf(a, 0) {
+				return error('multivariate_normal: covariance values must be finite')
+			}
+			if math.abs(a) > scale {
+				scale = math.abs(a)
+			}
+		}
+	}
+	for row in 0 .. n {
+		for col in row + 1 .. n {
+			a := covariance.get_nth(row * n + col)
+			b := covariance.get_nth(col * n + row)
+			if math.abs(a - b) > 1e-10 * scale {
+				return error('multivariate_normal: covariance must be symmetric')
+			}
+		}
+	}
+	return sample_count
+}
+
+fn multivariate_normal_factor(covariance &Tensor[f64], n int) ![][]f64 {
+	mut matrix := [][]f64{len: n, init: []f64{len: n}}
+	mut scale := 1.0
+	for row in 0 .. n {
+		for col in 0 .. n {
+			value := 0.5 * (covariance.get_nth(row * n + col) + covariance.get_nth(col * n + row))
+			matrix[row][col] = value
+			if math.abs(value) > scale {
+				scale = math.abs(value)
+			}
+		}
+	}
+	eigenvalues := vsl_lapack.syev(mut matrix, .ev_compute, vsl_blas.Uplo.lower)!
+	mut factor := [][]f64{len: n, init: []f64{len: n}}
+	for component in 0 .. n {
+		if eigenvalues[component] < -1e-10 * scale {
+			return error('multivariate_normal: covariance must be positive semidefinite')
+		}
+		eigen_scale := math.sqrt(if eigenvalues[component] > 0 { eigenvalues[component] } else { 0 })
+		for row in 0 .. n {
+			factor[row][component] = matrix[row][component] * eigen_scale
+		}
+	}
+	return factor
+}
+
+fn transform_multivariate_normal(mean &Tensor[f64], sample_shape []int, n int, sample_count int, factor [][]f64, standard &Tensor[f64], params TensorData) !&Tensor[f64] {
+	mut output_shape := sample_shape.clone()
+	output_shape << n
+	mut values := []f64{len: sample_count * n}
+	for sample in 0 .. sample_count {
+		for row in 0 .. n {
+			mut value := mean.get_nth(row)
+			for component in 0 .. n {
+				value += factor[row][component] * standard.get_nth(sample * n + component)
+			}
+			values[sample * n + row] = value
+		}
+	}
+	return from_array[f64](values, output_shape, params)
 }
 
 // lognormal returns samples whose natural logarithm follows a normal

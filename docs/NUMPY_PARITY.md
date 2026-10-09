@@ -204,13 +204,14 @@ tensors; `random_seed`;
 independent seeded `RandomGenerator` streams for f64 uniform, normal, lognormal,
 Gumbel, Laplace, Logistic, Pareto, Rayleigh, triangular, gamma, beta,
 Dirichlet, exponential, Poisson, Weibull, chi-square, Student's t, F,
-hypergeometric, and boolean Bernoulli; integer
+hypergeometric, multivariate normal with positive-semidefinite covariance
+matrices, and boolean Bernoulli; integer
 uniform, binomial/geometric/multinomial/Poisson; uniform and weighted population choice
 over flattened values or complete slices along a selected axis;
 and integer, first-axis, or selected-axis tensor permutations.
 
-**Remaining:** add further NumPy distributions (including negative-binomial,
-multivariate normal, and other less common distributions) and
+**Remaining:** add further NumPy distributions (including negative-binomial
+and other less common distributions) and
 define reproducibility across runtime versions.
 
 ### Input and output

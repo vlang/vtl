@@ -88,6 +88,10 @@ in draws without replacement from a population split into good and bad items.
 Small draws use an inversion sampler; larger draws use HRUA rejection sampling,
 and the implementation samples the smaller of the requested draw and its
 complement.
+`multivariate_normal(mean, covariance, sample_shape)` appends the variable
+dimension to `sample_shape`; both global and seeded-generator APIs accept
+positive-semidefinite covariance matrices, including singular ones. The
+covariance must be finite, symmetric, and positive semidefinite.
 `weibull(shape_parameter, shape)` returns unit-scale Weibull samples;
 `chi_square(df, shape)`, `student_t(df, shape)`, and
 `f_distribution(numerator_df, denominator_df, shape)` sample the corresponding

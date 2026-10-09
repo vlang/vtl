@@ -34,6 +34,66 @@ fn test_random_generator_supports_normal_and_bernoulli_distributions() ! {
 	generator.free()
 }
 
+fn test_random_generator_multivariate_normal_shapes_statistics_and_singular_covariance() ! {
+	mean := from_array[f64]([2.0, -1.0], [2])!
+	covariance := from_array[f64]([4.0, 1.5, 1.5, 1.0], [2, 2])!
+	mut generator := new_random_generator(904)
+	samples := generator.multivariate_normal(mean, covariance, [4096])!
+	assert samples.shape == [4096, 2]
+	mut sum_x := 0.0
+	mut sum_y := 0.0
+	for i in 0 .. samples.shape[0] {
+		sum_x += samples.get_nth(i * 2)
+		sum_y += samples.get_nth(i * 2 + 1)
+	}
+	mean_x := sum_x / f64(samples.shape[0])
+	mean_y := sum_y / f64(samples.shape[0])
+	mut variance_x := 0.0
+	mut variance_y := 0.0
+	mut covariance_xy := 0.0
+	for i in 0 .. samples.shape[0] {
+		dx := samples.get_nth(i * 2) - mean_x
+		dy := samples.get_nth(i * 2 + 1) - mean_y
+		variance_x += dx * dx
+		variance_y += dy * dy
+		covariance_xy += dx * dy
+	}
+	assert math.abs(mean_x - 2.0) < 0.12
+	assert math.abs(mean_y + 1.0) < 0.08
+	assert math.abs(variance_x / 4096 - 4.0) < 0.2
+	assert math.abs(variance_y / 4096 - 1.0) < 0.08
+	assert math.abs(covariance_xy / 4096 - 1.5) < 0.12
+
+	mut replay := new_random_generator(904)
+	assert samples.array_equal(replay.multivariate_normal(mean, covariance, [4096])!)
+
+	singular := from_array[f64]([1.0, 1.0, 1.0, 1.0], [2, 2])!
+	mut singular_rng := new_random_generator(905)
+	singular_samples := singular_rng.multivariate_normal(mean, singular, [64])!
+	for i in 0 .. singular_samples.shape[0] {
+		assert math.abs((singular_samples.get_nth(i * 2) - 2.0) - (singular_samples.get_nth(i * 2 + 1) + 1.0)) < 1e-10
+	}
+	assert singular_rng.multivariate_normal(mean, covariance, [])!.shape == [2]
+	if _ := singular_rng.multivariate_normal(mean, covariance, [-1]) {
+		assert false, 'multivariate_normal must reject negative sample dimensions'
+	}
+	mut asymmetric_rng := new_random_generator(906)
+	asymmetric := from_array[f64]([1.0, 0.5, 0.0, 1.0], [2, 2])!
+	if _ := asymmetric_rng.multivariate_normal(mean, asymmetric, [1]) {
+		assert false, 'multivariate_normal must reject asymmetric covariance'
+	}
+	mut indefinite_rng := new_random_generator(907)
+	indefinite := from_array[f64]([1.0, 2.0, 2.0, 1.0], [2, 2])!
+	if _ := indefinite_rng.multivariate_normal(mean, indefinite, [1]) {
+		assert false, 'multivariate_normal must reject non-positive-semidefinite covariance'
+	}
+	generator.free()
+	replay.free()
+	singular_rng.free()
+	asymmetric_rng.free()
+	indefinite_rng.free()
+}
+
 fn test_random_generator_integers_are_seeded_and_obey_endpoint() ! {
 	mut generator := new_random_generator(421)
 	values := generator.integers(-3, 7, [256])!

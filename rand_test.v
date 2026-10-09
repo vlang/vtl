@@ -14,6 +14,28 @@ fn test_random_seed_repeats_random_tensor_values() {
 	assert !first.array_equal(different_seed)
 }
 
+fn test_global_multivariate_normal_supports_seeded_singular_covariance() ! {
+	mean := from_array[f64]([0.0, 3.0], [2])!
+	covariance := from_array[f64]([1.0, 1.0, 1.0, 1.0], [2, 2])!
+	random_seed(873)
+	samples := multivariate_normal(mean, covariance, [32], TensorData{})!
+	random_seed(873)
+	assert samples.array_equal(multivariate_normal(mean, covariance, [32], TensorData{})!)
+	assert samples.shape == [32, 2]
+	for i in 0 .. samples.shape[0] {
+		assert math.abs((samples.get_nth(i * 2)) - (samples.get_nth(i * 2 + 1) - 3.0)) < 1e-10
+	}
+	wrong_shape := from_array[f64]([1.0], [1, 1])!
+	if _ := multivariate_normal(mean, wrong_shape, [2], TensorData{}) {
+		assert false, 'multivariate_normal must reject covariance dimensions that do not match mean'
+	}
+	bad_mean := from_array[f64]([math.nan()], [1])!
+	bad_covariance := from_array[f64]([1.0], [1, 1])!
+	if _ := multivariate_normal(bad_mean, bad_covariance, [1], TensorData{}) {
+		assert false, 'multivariate_normal must reject non-finite means'
+	}
+}
+
 fn test_random_i32_values_stay_within_requested_range() {
 	random_seed(42)
 	values := random[i32](-20, 20, [32], TensorData{})
