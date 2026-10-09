@@ -111,6 +111,8 @@ forms globally and along one or several axes, with same-shape or reduced-shape
 weights, including NaN-aware forms that discard weights for NaN observations;
 multi-axis quantile and percentile convenience APIs default to NumPy's linear
 estimator, alongside forms that expose all thirteen estimator methods;
+multi-quantile multi-axis forms can also retain reduced dimensions with
+`keepdims`;
 histograms with
 automatic and custom bins, weighted density, and multiple bin-selection rules;
 integer/weighted `bincount`.
