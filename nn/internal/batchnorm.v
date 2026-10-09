@@ -65,34 +65,46 @@ pub fn batchnorm1d_training[T](input &vtl.Tensor[T], gamma &vtl.Tensor[T], beta 
 
 // batchnorm1d_backward computes gradients w.r.t. input, gamma, beta.
 pub fn batchnorm1d_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], gamma &vtl.Tensor[T], beta &vtl.Tensor[T], mean &vtl.Tensor[T], var_ &vtl.Tensor[T], eps f64) ![]&vtl.Tensor[T] {
+	return batchnorm1d_backward_mode[T](gradient, input, gamma, beta, mean, var_, eps, true)
+}
+
+// batchnorm1d_backward_mode computes gradients using batch or fixed running
+// statistics, depending on whether the layer is training.
+pub fn batchnorm1d_backward_mode[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], gamma &vtl.Tensor[T], _beta &vtl.Tensor[T], mean &vtl.Tensor[T], var_ &vtl.Tensor[T], eps f64, training bool) ![]&vtl.Tensor[T] {
 	batch_size := input.shape[0]
 	num_features := input.shape[1]
 
-	// dL/dx = gamma * (grad_out - mean(grad_out)) / sqrt(var+eps)
-	// First compute mean of gradient per feature
-	mut grad_mean_data := []f64{len: num_features}
-	for c in 0 .. num_features {
-		mut sum := f64(0)
-		for n in 0 .. batch_size {
-			sum += f64(gradient.get([n, c]))
-		}
-		grad_mean_data[c] = sum / f64(batch_size)
-	}
-
-	// std = sqrt(var + eps)
+	// dL/dx uses the batch-normalization Jacobian in training and a fixed
+	// affine transform in evaluation.
 	mut std_data := []f64{len: num_features}
+	mut grad_sum_data := []f64{len: num_features}
+	mut grad_norm_sum_data := []f64{len: num_features}
 	for c in 0 .. num_features {
 		std_data[c] = math.sqrt(f64(var_.get([0, c])) + eps)
+		mean_c := f64(mean.get([0, c]))
+		mut grad_sum := f64(0)
+		mut grad_norm_sum := f64(0)
+		for n in 0 .. batch_size {
+			grad := f64(gradient.get([n, c]))
+			normalized := (f64(input.get([n, c])) - mean_c) / std_data[c]
+			grad_sum += grad
+			grad_norm_sum += grad * normalized
+		}
+		grad_sum_data[c] = grad_sum
+		grad_norm_sum_data[c] = grad_norm_sum
 	}
 
 	// dL/dx per element
 	mut dx_data := []f64{len: batch_size * num_features}
 	for n in 0 .. batch_size {
 		for c in 0 .. num_features {
-			dx_data[n * num_features + c] = f64(gamma.get([0, c])) * (f64(gradient.get([
-				n,
-				c,
-			])) - grad_mean_data[c]) / std_data[c]
+			grad := f64(gradient.get([n, c]))
+			if training {
+				mean_c := f64(mean.get([0, c]))
+				normalized := (f64(input.get([n, c])) - mean_c) / std_data[c]
+				grad = (f64(batch_size) * grad - grad_sum_data[c] - normalized * grad_norm_sum_data[c]) / f64(batch_size)
+			}
+			dx_data[n * num_features + c] = f64(gamma.get([0, c])) * grad / std_data[c]
 		}
 	}
 	dx := vtl.from_array(dx_data.map(vtl.cast[T](it)), [batch_size, num_features])!
@@ -101,10 +113,9 @@ pub fn batchnorm1d_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], ga
 	mut dgamma_data := []f64{len: num_features}
 	for c in 0 .. num_features {
 		mut sum := f64(0)
-		mean_c := f64(mean.get([0, c]))
 		std_c := std_data[c]
 		for n in 0 .. batch_size {
-			normalized := (f64(input.get([n, c])) - mean_c) / std_c
+			normalized := (f64(input.get([n, c])) - f64(mean.get([0, c]))) / std_c
 			sum += f64(gradient.get([n, c])) * normalized
 		}
 		dgamma_data[c] = sum

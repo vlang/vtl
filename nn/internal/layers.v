@@ -5,14 +5,26 @@ import vtl
 
 // dropout exposes this operation as part of the public API.
 pub fn dropout[T](input &vtl.Tensor[T], mask &vtl.Tensor[T], prob f64) !&vtl.Tensor[T] {
-	return input.nmap([mask], fn [T](vals []T, i []int) T {
+	if prob < 0 || prob > 1 {
+		return error('dropout: keep probability must be in [0, 1]')
+	}
+	if prob == 0 {
+		return vtl.zeros_like[T](input)
+	}
+	return input.nmap([mask], fn [prob] [T](vals []T, i []int) T {
 		return vals[0] * vals[1] / vtl.cast[T](prob)
 	})
 }
 
 // dropout_backwards exposes this operation as part of the public API.
 pub fn dropout_backwards[T](gradient &vtl.Tensor[T], mask &vtl.Tensor[T], prob f64) !&vtl.Tensor[T] {
-	return gradient.nmap([mask], fn [T](vals []T, i []int) T {
+	if prob < 0 || prob > 1 {
+		return error('dropout backward: keep probability must be in [0, 1]')
+	}
+	if prob == 0 {
+		return vtl.zeros_like[T](gradient)
+	}
+	return gradient.nmap([mask], fn [prob] [T](vals []T, i []int) T {
 		return vals[0] * vals[1] / vtl.cast[T](prob)
 	})
 }

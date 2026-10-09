@@ -45,10 +45,12 @@ differ: LSTM is `[batch, sequence, features]`, while GRU is
 [NN tutorial](./TUTORIAL_NEURAL_NETWORKS.md).
 
 **Next:** Add bidirectional recurrent layers, stacked GRU layers, recurrent
-dropout and variable-length packed sequences. Expand initialization options,
-train/eval behavior, parameter and buffer registration, and composable
-user-defined modules. Stateful LSTM/GRU entry points are available today, but
-do not imply parity with the full `torch.nn` recurrent API or CUDA backward.
+dropout and variable-length packed sequences. `Sequential` supports
+`train()`/`eval()` behavior for Dropout and BatchNorm1D; extend mode-aware
+behavior to custom modules and the rest of the normalization API. Parameter and
+buffer registration and composable user-defined modules remain gaps. Stateful
+LSTM/GRU entry points are available today, but do not imply parity with the
+full `torch.nn` recurrent API or CUDA backward.
 
 ### Losses and optimizers
 

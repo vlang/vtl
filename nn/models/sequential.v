@@ -10,7 +10,8 @@ fn init() {}
 // Sequential defines a public data structure for this module.
 pub struct Sequential[T] {
 pub mut:
-	info &SequentialInfo[T] = unsafe { nil }
+	info     &SequentialInfo[T] = unsafe { nil }
+	training bool               = true
 }
 
 // sequential creates a new sequential network with a new context.
@@ -155,6 +156,11 @@ pub fn (mut nn Sequential[T]) batchnorm1d(num_features int, config layers.BatchN
 	nn.info.batchnorm1d(num_features, config)
 }
 
+// dropout adds a dropout layer with the given probability.
+pub fn (mut nn Sequential[T]) dropout(prob f64) {
+	nn.info.dropout(prob)
+}
+
 // avgpool2d adds a new AveragePool2D layer to the network.
 pub fn (mut nn Sequential[T]) avgpool2d(kernel []int, padding []int, stride []int) {
 	nn.info.avgpool2d(kernel, padding, stride)
@@ -249,9 +255,21 @@ pub fn (mut nn Sequential[T]) forward(train &autograd.Variable[T]) !&autograd.Va
 		requires_grad: train.requires_grad
 	}
 	for layer in nn.info.layers {
-		cur = layer.forward(cur)!
+		cur = layer.forward_with_mode(cur, nn.training)!
 	}
 	return cur
+}
+
+// train enables training behavior for mode-aware layers such as dropout and
+// batch normalization.
+pub fn (mut nn Sequential[T]) train() {
+	nn.training = true
+}
+
+// eval enables evaluation behavior for mode-aware layers such as dropout and
+// batch normalization.
+pub fn (mut nn Sequential[T]) eval() {
+	nn.training = false
 }
 
 // loss exposes this operation as part of the public API.

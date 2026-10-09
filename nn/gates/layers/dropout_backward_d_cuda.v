@@ -12,8 +12,11 @@ fn dropout_gate_backward_f64(gradient &vtl.Tensor[f64], mask &vtl.Tensor[f64], k
 	if gradient.shape != mask.shape {
 		return error('dropout backward: gradient and mask shapes must match')
 	}
-	if keep_prob <= 0 || keep_prob > 1 {
-		return error('dropout backward: keep probability must be in (0, 1]')
+	if keep_prob < 0 || keep_prob > 1 {
+		return error('dropout backward: keep probability must be in [0, 1]')
+	}
+	if keep_prob == 0 {
+		return vtl.zeros_like[f64](gradient)
 	}
 	dev := cuda.get_default_device()!
 	mut values := compute.mul_vec_cuda(dev, gradient.to_array(), mask.to_array())!

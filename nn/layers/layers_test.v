@@ -58,6 +58,35 @@ fn test_batchnorm_variables_count() {
 	assert vars.len == 2, 'batchnorm should have 2 variables (gamma + beta), got ${vars.len}'
 }
 
+fn test_batchnorm_training_backward_includes_variance_gradient() ! {
+	c := ctx[f64]()
+	layer := batchnorm1d_layer[f64](c, 1, BatchNorm1DConfig{})
+	input := variable[f64](c, [1.0, 3.0], [2, 1])!
+	output := layer.forward_with_mode(input, true)!
+	weights := c.variable(vtl.from_array([1.0, 0.0], [2, 1])!, requires_grad: false)
+	mut loss := output.multiply(weights)!.sum()!
+	loss.backprop()!
+
+	// The centered two-element batch has nearly zero input gradient when one
+	// output element receives a unit gradient. Omitting d(variance)/dx yields
+	// gradients near +0.5 and -0.5 instead.
+	assert math.abs(input.grad.get_nth(0)) < 1e-4
+	assert math.abs(input.grad.get_nth(1)) < 1e-4
+}
+
+fn test_batchnorm_eval_backward_treats_running_stats_as_constant() ! {
+	c := ctx[f64]()
+	layer := batchnorm1d_layer[f64](c, 1, BatchNorm1DConfig{})
+	input := variable[f64](c, [1.0, 3.0], [2, 1])!
+	output := layer.forward_with_mode(input, false)!
+	weights := c.variable(vtl.from_array([1.0, 0.0], [2, 1])!, requires_grad: false)
+	mut loss := output.multiply(weights)!.sum()!
+	loss.backprop()!
+
+	assert math.abs(input.grad.get_nth(0) - 1.0 / math.sqrt(1.0 + 1e-5)) < 1e-12
+	assert input.grad.get_nth(1) == 0.0
+}
+
 fn test_avgpool_backward_propagates_input_gradients() ! {
 	c := ctx[f64]()
 	input := variable[f64](c, [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0], [1, 1, 3, 3])!

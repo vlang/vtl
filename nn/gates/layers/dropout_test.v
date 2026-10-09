@@ -28,16 +28,20 @@ fn test_dropout_gate_f32_backward_remains_cpu() ! {
 	assert result[0].to_array() == [f32(4), 0, -6, 0]
 }
 
-fn test_dropout_backward_f64_rejects_invalid_inputs() ! {
+fn test_dropout_backward_f64_rejects_invalid_inputs_and_accepts_zero_keep_probability() ! {
 	gradient := vtl.from_array([1.0, 2.0], [1, 2])!
 	wrong_shape := vtl.from_array([1.0, 0.0], [2, 1])!
 	if _ := dropout_gate_backward_f64_cpu(gradient, wrong_shape, 0.5) {
 		assert false, 'expected a shape mismatch error'
 	}
 	mask := vtl.from_array([1.0, 0.0], [1, 2])!
-	if _ := dropout_gate_backward_f64_cpu(gradient, mask, 0.0) {
-		assert false, 'expected an invalid keep probability error'
+	for invalid_keep_prob in [-0.1, 1.1] {
+		if _ := dropout_gate_backward_f64_cpu(gradient, mask, invalid_keep_prob) {
+			assert false, 'expected an invalid keep probability error'
+		}
 	}
+	zero_keep_prob := dropout_gate_backward_f64_cpu(gradient, mask, 0.0)!
+	assert zero_keep_prob.to_array() == [0.0, 0.0]
 }
 
 fn test_dropout_backward_f64_cuda_matches_cpu_when_enabled() ! {
