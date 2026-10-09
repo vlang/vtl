@@ -96,6 +96,13 @@ fn test_reshape_tensor_with_unknow_dim() {
 	assert c.array_equal(b)
 }
 
+fn test_reshape_row_major_contiguous_tensor_shares_storage() ! {
+	mut tensor := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
+	mut reshaped := tensor.reshape([3, 2])!
+	reshaped.set_nth(0, 99)
+	assert tensor.get([0, 0]) == 99
+}
+
 fn test_reshape_transposed_tensor_preserves_row_major_logical_order() ! {
 	tensor := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
 	transposed := tensor.transpose([1, 0])!
