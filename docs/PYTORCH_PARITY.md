@@ -37,12 +37,18 @@ graphs where feasible.
 ### Neural-network modules
 
 **VTL today:** `Sequential`, common activations, linear, convolutional,
-recurrent, attention, and normalization layers. See the
+recurrent, attention, and normalization layers. Typed CPU LSTM layers support
+stacked hidden/cell state through `forward_with_state`; typed CPU GRU layers
+support an explicit initial and final hidden state. Their default input layouts
+differ: LSTM is `[batch, sequence, features]`, while GRU is
+`[sequence, batch, features]`. See the
 [NN tutorial](./TUTORIAL_NEURAL_NETWORKS.md).
 
-**Next:** Expand module and configuration coverage, stateful recurrent
-interfaces, initialization options, train/eval behavior, parameter and buffer
-registration, and composable user-defined modules.
+**Next:** Add bidirectional recurrent layers, stacked GRU layers, recurrent
+dropout and variable-length packed sequences. Expand initialization options,
+train/eval behavior, parameter and buffer registration, and composable
+user-defined modules. Stateful LSTM/GRU entry points are available today, but
+do not imply parity with the full `torch.nn` recurrent API or CUDA backward.
 
 ### Losses and optimizers
 
