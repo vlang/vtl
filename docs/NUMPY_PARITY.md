@@ -75,14 +75,19 @@ broadcast source dimensions.
 source and update values, including repeated destination indices.
 `Variable.put_along_axis` follows last-write-wins semantics and routes gradients
 only to the final update at each destination.
+`Variable.put` and `Variable.put_with_mode` provide the same gradient behavior
+for flat row-major indices, including repeated short updates and `raise`, `wrap`,
+and `clip` index modes. Indices are snapshotted during the forward pass, and
+repeated uses of one update value accumulate into its gradient.
 `Variable.slice` and `Variable.slice_hilo` propagate gradients through integer
 indices, range views, and positive steps.
 `Variable.sum` and `Variable.mean` reduce all elements to a one-element tensor
 and propagate gradients to every input element. Their `*_along_axis` variants
 support one-axis sum and mean, with either squeezed or retained dimensions.
 
-**Remaining:** document all bounds semantics and add flat `put` updates to
-autograd. Tensor indexed writes are currently in-place and non-differentiable.
+**Remaining:** continue expanding NumPy-compatible bounds semantics across the
+indexing APIs. Tensor indexed writes remain in-place and non-differentiable;
+use the `Variable` APIs when gradients are required.
 
 Axis-wise `argmax` and `argmin` retain a length-one axis for compatibility;
 `argmax_axis_squeeze` and `argmin_axis_squeeze` provide NumPy's default

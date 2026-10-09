@@ -91,6 +91,40 @@ fn test_put_along_axis_backward_supports_f32() ! {
 	assert updates.grad.to_array() == [f32(5.0)]
 }
 
+fn test_put_backward_repeats_values_and_tracks_last_duplicate() ! {
+	mut ctx := autograd.ctx[f64]()
+	input := ctx.variable(vtl.from_array([10.0, 20.0, 30.0, 40.0], [2, 2])!)
+	updates := ctx.variable(vtl.from_array([100.0, 200.0], [2])!)
+	mut indices := vtl.from_array[int]([1, 1, 3], [3])!
+	weights := ctx.variable(vtl.from_array([2.0, 3.0, 5.0, 7.0], [2, 2])!)
+
+	put := input.put(indices, updates)!
+	assert put.value.to_array() == [10.0, 200.0, 30.0, 100.0]
+	indices.fill(0)
+	mut objective := put.multiply(weights)!
+	objective.backprop()!
+	assert input.grad.to_array() == [2.0, 0.0, 5.0, 0.0]
+	assert updates.grad.to_array() == [7.0, 3.0]
+}
+
+fn test_put_with_mode_backward_uses_normalized_destinations() ! {
+	mut ctx := autograd.ctx[f32]()
+	input := ctx.variable(vtl.from_array([f32(1.0), 2.0, 3.0], [3])!)
+	updates := ctx.variable(vtl.from_array([f32(4.0), 5.0], [2])!)
+	indices := vtl.from_array[int]([-4, 4], [2])!
+	weights := ctx.variable(vtl.from_array([f32(2.0), 3.0, 5.0], [3])!)
+
+	put := input.put_with_mode(indices, updates, .wrap)!
+	put_values := put.value.to_array()
+	assert put_values[0] == 1.0
+	assert put_values[1] == 5.0
+	assert put_values[2] == 4.0
+	mut objective := put.multiply(weights)!
+	objective.backprop()!
+	assert input.grad.to_array() == [f32(2.0), 0.0, 0.0]
+	assert updates.grad.to_array() == [f32(5.0), 3.0]
+}
+
 fn test_slice_backward_routes_gradient_to_integer_indexed_row() ! {
 	mut ctx := autograd.ctx[f64]()
 	input := ctx.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [3, 2])!)

@@ -180,6 +180,95 @@ fn put_along_axis_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr
 	return tensor_ptrs_to_voidptrs[T](tensors)
 }
 
+// put replaces row-major flat positions and tracks gradients for the source
+// and updates. Short update tensors repeat in the same order as Tensor.put.
+pub fn (v &Variable[T]) put(indices &vtl.Tensor[int], updates &Variable[T]) !&Variable[T] {
+	return v.put_with_mode(indices, updates, .raise)
+}
+
+// put_with_mode is the differentiable counterpart of Tensor.put_with_mode.
+pub fn (v &Variable[T]) put_with_mode(indices &vtl.Tensor[int], updates &Variable[T], mode vtl.PutMode) !&Variable[T] {
+	mut value := v.value.copy(.row_major)
+	value.put_with_mode[T](indices, updates.value, mode)!
+	needs_grad := v.requires_grad || updates.requires_grad
+	mut result := variable[T](v.context, value, requires_grad: needs_grad)
+	if needs_grad {
+		mut destinations := []int{cap: indices.size}
+		for position in 0 .. indices.size {
+			destinations << normalize_flat_put_index(indices.get_nth[int](position), v.value.size, mode)!
+		}
+		gate := &PutGate[T]{
+			destinations:  destinations
+			updates_shape: updates.value.shape.clone()
+			update_size:   updates.value.size
+		}
+		result.grad = vtl.zeros_like[T](value)
+		register[T]('Put', voidptr(gate), put_backward_dispatch[T], result, [v, updates])!
+	}
+	return result
+}
+
+struct PutGate[T] {
+	destinations  []int
+	updates_shape []int
+	update_size   int
+}
+
+fn (g &PutGate[T]) backward(gradient &vtl.Tensor[T]) ![]&vtl.Tensor[T] {
+	mut input_gradient := gradient.copy(.row_major)
+	mut last_update_by_destination := map[int]int{}
+	for update_position, destination in g.destinations {
+		last_update_by_destination[destination] = update_position
+	}
+	for destination, _ in last_update_by_destination {
+		input_gradient.set_nth[T](destination, vtl.cast[T](0))
+	}
+	mut update_gradient_values := []T{len: g.update_size}
+	for update_position, destination in g.destinations {
+		if last_update_by_destination[destination] == update_position {
+			update_position_in_values := update_position % g.update_size
+			update_gradient_values[update_position_in_values] += gradient.get_nth[T](destination)
+		}
+	}
+	update_gradient := vtl.from_array[T](update_gradient_values, g.updates_shape)!
+	return [input_gradient, update_gradient]
+}
+
+fn put_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_gate := unsafe { &PutGate[T](gate) }
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := typed_gate.backward(typed_payload.variable.grad)!
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
+fn normalize_flat_put_index(selected int, size int, mode vtl.PutMode) !int {
+	if size == 0 {
+		return error('put cannot index an empty tensor')
+	}
+	return match mode {
+		.raise {
+			index := if selected < 0 { selected + size } else { selected }
+			if index < 0 || index >= size {
+				return error('put index ${selected} is out of range for flattened size ${size}')
+			}
+			index
+		}
+		.wrap {
+			remainder := selected % size
+			if remainder < 0 { remainder + size } else { remainder }
+		}
+		.clip {
+			if selected < 0 {
+				0
+			} else if selected >= size {
+				size - 1
+			} else {
+				selected
+			}
+		}
+	}
+}
+
 fn flat_index_from_coordinate(coordinate []int, shape []int) int {
 	mut flat_index := 0
 	for dimension, value in coordinate {
