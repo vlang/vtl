@@ -239,6 +239,45 @@ pub fn (mut generator RandomGenerator) logistic(location f64, scale f64, shape [
 	return from_array[f64](values, shape)
 }
 
+// pareto returns samples from the standard Pareto distribution (minimum zero)
+// with the given positive shape parameter and this generator's stream.
+pub fn (mut generator RandomGenerator) pareto(shape_parameter f64, shape []int) !&Tensor[f64] {
+	validate_pareto_shape(shape_parameter)!
+	mut values := []f64{len: size_from_shape(shape)}
+	for i in 0 .. values.len {
+		u := open_unit_interval(generator.rng.f64_in_range(0.0, 1.0)!)
+		values[i] = math.pow(1 - u, -1 / shape_parameter) - 1
+	}
+	return from_array[f64](values, shape)
+}
+
+// rayleigh returns samples from a Rayleigh distribution with non-negative
+// scale and this generator's independent stream.
+pub fn (mut generator RandomGenerator) rayleigh(scale f64, shape []int) !&Tensor[f64] {
+	validate_location_scale(0, scale, 'rayleigh')!
+	mut values := []f64{len: size_from_shape(shape)}
+	if scale == 0 {
+		return from_array[f64](values, shape)
+	}
+	for i in 0 .. values.len {
+		u := open_unit_interval(generator.rng.f64_in_range(0.0, 1.0)!)
+		values[i] = scale * math.sqrt(-2 * math.log(1 - u))
+	}
+	return from_array[f64](values, shape)
+}
+
+// triangular returns samples from a triangular distribution defined by its
+// left endpoint, mode, right endpoint, and this generator's independent stream.
+pub fn (mut generator RandomGenerator) triangular(left f64, mode f64, right f64, shape []int) !&Tensor[f64] {
+	validate_triangular_parameters(left, mode, right)!
+	mut values := []f64{len: size_from_shape(shape)}
+	for i in 0 .. values.len {
+		u := open_unit_interval(generator.rng.f64_in_range(0.0, 1.0)!)
+		values[i] = sample_triangular(left, mode, right, u)
+	}
+	return from_array[f64](values, shape)
+}
+
 // geometric returns the number of Bernoulli trials needed for the first
 // success, independently sampled from this generator. Results start at 1.
 pub fn (mut generator RandomGenerator) geometric(probability f64, shape []int) !&Tensor[int] {
@@ -732,10 +771,59 @@ pub fn logistic(location f64, scale f64, shape []int, params TensorData) !&Tenso
 	return from_array[f64](values, shape, params)
 }
 
+// pareto returns standard Pareto samples (minimum zero) using VTL's global stream.
+pub fn pareto(shape_parameter f64, shape []int, params TensorData) !&Tensor[f64] {
+	validate_pareto_shape(shape_parameter)!
+	mut values := []f64{len: size_from_shape(shape)}
+	for i in 0 .. values.len {
+		u := open_unit_interval(rand.f64_in_range(0.0, 1.0)!)
+		values[i] = math.pow(1 - u, -1 / shape_parameter) - 1
+	}
+	return from_array[f64](values, shape, params)
+}
+
+// rayleigh returns samples from a Rayleigh distribution using VTL's global stream.
+pub fn rayleigh(scale f64, shape []int, params TensorData) !&Tensor[f64] {
+	validate_location_scale(0, scale, 'rayleigh')!
+	mut values := []f64{len: size_from_shape(shape)}
+	if scale > 0 {
+		for i in 0 .. values.len {
+			u := open_unit_interval(rand.f64_in_range(0.0, 1.0)!)
+			values[i] = scale * math.sqrt(-2 * math.log(1 - u))
+		}
+	}
+	return from_array[f64](values, shape, params)
+}
+
+// triangular returns samples from a triangular distribution using VTL's global stream.
+pub fn triangular(left f64, mode f64, right f64, shape []int, params TensorData) !&Tensor[f64] {
+	validate_triangular_parameters(left, mode, right)!
+	mut values := []f64{len: size_from_shape(shape)}
+	for i in 0 .. values.len {
+		u := open_unit_interval(rand.f64_in_range(0.0, 1.0)!)
+		values[i] = sample_triangular(left, mode, right, u)
+	}
+	return from_array[f64](values, shape, params)
+}
+
 fn validate_location_scale(location f64, scale f64, distribution string) ! {
 	if math.is_nan(location) || math.is_inf(location, 0) || scale < 0 || math.is_nan(scale)
 		|| math.is_inf(scale, 0) {
 		return error('${distribution}: location must be finite and scale must be finite and non-negative')
+	}
+}
+
+fn validate_pareto_shape(shape_parameter f64) ! {
+	if shape_parameter <= 0 || math.is_nan(shape_parameter) || math.is_inf(shape_parameter, 0) {
+		return error('pareto: shape parameter must be finite and positive')
+	}
+}
+
+fn validate_triangular_parameters(left f64, mode f64, right f64) ! {
+	if math.is_nan(left) || math.is_inf(left, 0) || math.is_nan(mode) || math.is_inf(mode, 0)
+		|| math.is_nan(right) || math.is_inf(right, 0) || left >= right || mode < left
+		|| mode > right {
+		return error('triangular: parameters must be finite and satisfy left < right and left <= mode <= right')
 	}
 }
 
@@ -762,6 +850,15 @@ fn sample_laplace(location f64, scale f64, uniform_value f64) f64 {
 
 fn sample_logistic(location f64, scale f64, uniform_value f64) f64 {
 	return location + scale * math.log(uniform_value / (1 - uniform_value))
+}
+
+fn sample_triangular(left f64, mode f64, right f64, uniform_value f64) f64 {
+	interval_width := right - left
+	mode_fraction := (mode - left) / interval_width
+	if uniform_value < mode_fraction {
+		return left + math.sqrt(uniform_value * interval_width * (mode - left))
+	}
+	return right - math.sqrt((1 - uniform_value) * interval_width * (right - mode))
 }
 
 // geometric returns the number of Bernoulli trials needed for the first
