@@ -42,19 +42,19 @@ GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 
 **VSL (downstream):** [#280](https://github.com/vlang/vsl/issues/280)–[#285](https://github.com/vlang/vsl/issues/285), [#304](https://github.com/vlang/vsl/pull/304) conv2d backward GEMM, [#305](https://github.com/vlang/vsl/pull/305) Adam shaders.
 
-## Current open issues (checked 2026-10-07)
+## Current open issues (checked 2026-10-09)
 
 | Priority | Issue | Topic |
 |----------|-------|--------|
-| P1 | [#161](https://github.com/vlang/vtl/issues/161) | CUDA backward kernels for Attention, BatchNorm, LayerNorm, Embedding, and pooling, plus runtime validation; CPU LSTM now has four-gate BPTT and finite-difference gradient coverage, while CUDA LSTM kernels remain outstanding |
+| P1 | [#161](https://github.com/vlang/vtl/issues/161) | CUDA backward for LSTM, attention, norms, embeddings, and pooling; validation pending |
 | P2 | [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support |
 | P2 | [#40](https://github.com/vlang/vtl/issues/40) | YOLO/fused autograd gates; requires benchmark evidence |
 | P2 | [#3](https://github.com/vlang/vtl/issues/3) | Evaluate compiler aliasing support without unsafe assumptions |
 | Research | [#52](https://github.com/vlang/vtl/issues/52) | Compare Burn capabilities and architecture |
 
-Project #8 currently contains #3, #40, #52, and #63, but omits the open
-CUDA-backward issue #161. The project board and repository issue inventory need
-reconciliation. Issue #41 is closed and is no longer a beta gate.
+Project #8 contains all five open VTL issues: #3, #40, #52, #63, and #161.
+Issue #161 is tracked as a P1 backend correctness item in M2-GPU-Core. Issue
+#41 is closed and marked Done on the board; it is no longer a beta gate.
 
 ## Additional post-beta tracking
 
