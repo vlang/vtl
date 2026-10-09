@@ -22,6 +22,10 @@ the initial state.
 `lstm_layer` uses batch-first `[batch, sequence, features]` inputs and returns
 the output at every timestep. It supports stacked layers and full CPU BPTT for
 input and parameters, with gate matrices ordered input, forget, cell, output.
+Use `new_lstm_layer` and `forward_with_state(input, h0, c0)` to provide initial
+states and receive final hidden and cell states shaped
+`[num_layers, batch, hidden_size]`; autograd propagates gradients through each
+of the three outputs and back to the initial states.
 
 ```v ignore
 import vtl.autograd

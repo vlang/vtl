@@ -32,8 +32,14 @@ pub:
 
 // lstm_layer creates an LSTMLayer.
 pub fn lstm_layer[T](ctx &autograd.Context[T], input_size int, hidden_size int, num_layers int) types.Layer[T] {
+	return new_lstm_layer[T](ctx, input_size, hidden_size, num_layers).as_layer()
+}
+
+// new_lstm_layer creates an LSTM layer value with explicit state support.
+// Use lstm_layer when composing the layer inside Sequential.
+pub fn new_lstm_layer[T](ctx &autograd.Context[T], input_size int, hidden_size int, num_layers int) &LSTMLayer[T] {
 	if input_size <= 0 || hidden_size <= 0 || num_layers <= 0 {
-		panic('lstm_layer: input_size, hidden_size, and num_layers must be positive')
+		panic('new_lstm_layer: input_size, hidden_size, and num_layers must be positive')
 	}
 	mut w_ih_layers := []&autograd.Variable[T]{cap: num_layers}
 	mut w_hh_layers := []&autograd.Variable[T]{cap: num_layers}
@@ -60,7 +66,11 @@ pub fn lstm_layer[T](ctx &autograd.Context[T], input_size int, hidden_size int, 
 		hidden_size: hidden_size
 		num_layers:  num_layers
 	}
-	return types.layer[T](voidptr(layer), lstm_layer_output_shape_dispatch[T],
+	return layer
+}
+
+fn (l &LSTMLayer[T]) as_layer() types.Layer[T] {
+	return types.layer[T](voidptr(l), lstm_layer_output_shape_dispatch[T],
 		lstm_layer_variables_dispatch[T], lstm_layer_forward_dispatch[T])
 }
 
@@ -107,6 +117,75 @@ fn (l &LSTMLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T]
 		gate.cache(mut result)!
 	}
 	return result
+}
+
+// forward_with_state accepts initial hidden and cell states with shape
+// [num_layers, batch, hidden_size], then returns the output sequence and both
+// final states in the same stacked shape.
+pub fn (l &LSTMLayer[T]) forward_with_state(input &autograd.Variable[T],
+	hidden0 &autograd.Variable[T], cell0 &autograd.Variable[T]) !(&autograd.Variable[T], &autograd.Variable[T], &autograd.Variable[T]) {
+	if input.context != l.ctx || hidden0.context != l.ctx || cell0.context != l.ctx {
+		return error('LSTMLayer.forward_with_state: input, states, and layer must share an autograd context')
+	}
+	if input.value.shape.len != 3 || input.value.shape[2] != l.input_size {
+		return error('LSTMLayer.forward_with_state: expected [batch, sequence, ${l.input_size}] input')
+	}
+	batch := input.value.shape[0]
+	expected_state_shape := [l.num_layers, batch, l.hidden_size]
+	if hidden0.value.shape != expected_state_shape || cell0.value.shape != expected_state_shape {
+		return error('LSTMLayer.forward_with_state: initial states must have shape ${expected_state_shape}')
+	}
+	mut layer_input := input.value.transpose([1, 0, 2])!
+	mut layer_inputs := []&vtl.Tensor[T]{cap: l.num_layers}
+	mut hidden0_by_layer := []&vtl.Tensor[T]{cap: l.num_layers}
+	mut cell0_by_layer := []&vtl.Tensor[T]{cap: l.num_layers}
+	mut final_hidden_by_layer := []&vtl.Tensor[T]{cap: l.num_layers}
+	mut final_cell_by_layer := []&vtl.Tensor[T]{cap: l.num_layers}
+	for index in 0 .. l.num_layers {
+		layer_inputs << layer_input
+		layer_hidden0 := lstm_state_for_layer[T](hidden0.value, index)!
+		layer_cell0 := lstm_state_for_layer[T](cell0.value, index)!
+		hidden0_by_layer << layer_hidden0
+		cell0_by_layer << layer_cell0
+		layer_input, layer_hidden, layer_cell := internal.lstm_forward_single_with_cell[T](layer_input, layer_hidden0, layer_cell0, l.w_ih_layers[index].value,
+			l.w_hh_layers[index].value, l.b_ih_layers[index].value, l.b_hh_layers[index].value)!
+		final_hidden_by_layer << layer_hidden
+		final_cell_by_layer << layer_cell
+	}
+	output := layer_input.transpose([1, 0, 2])!
+	final_hidden := stack_lstm_states[T](final_hidden_by_layer)!
+	final_cell := stack_lstm_states[T](final_cell_by_layer)!
+	mut output_result := l.ctx.variable(output)
+	mut hidden_result := l.ctx.variable(final_hidden)
+	mut cell_result := l.ctx.variable(final_cell)
+	variables := l.variables()
+	if input.is_grad_needed() || hidden0.is_grad_needed() || cell0.is_grad_needed()
+		|| variables.any(it.is_grad_needed()) {
+		output_gate := layers.lstm_gate_with_state[T](input, layer_inputs,
+			hidden0_by_layer, cell0_by_layer, l.w_ih_layers, l.w_hh_layers, l.b_ih_layers,
+			l.b_hh_layers, hidden0, cell0, true, 0)
+		hidden_gate := layers.lstm_gate_with_state[T](input, layer_inputs, hidden0_by_layer,
+			cell0_by_layer, l.w_ih_layers, l.w_hh_layers, l.b_ih_layers, l.b_hh_layers,
+			hidden0, cell0, true, 1)
+		cell_gate := layers.lstm_gate_with_state[T](input, layer_inputs, hidden0_by_layer,
+			cell0_by_layer, l.w_ih_layers, l.w_hh_layers, l.b_ih_layers, l.b_hh_layers,
+			hidden0, cell0, true, 2)
+		output_gate.cache(mut output_result)!
+		hidden_gate.cache(mut hidden_result)!
+		cell_gate.cache(mut cell_result)!
+	}
+	return output_result, hidden_result, cell_result
+}
+
+fn lstm_state_for_layer[T](states &vtl.Tensor[T], layer int) !&vtl.Tensor[T] {
+	batch, hidden := states.shape[1], states.shape[2]
+	mut values := []T{len: batch * hidden}
+	for b in 0 .. batch {
+		for h in 0 .. hidden {
+			values[b * hidden + h] = states.get([layer, b, h])
+		}
+	}
+	return vtl.from_array(values, [batch, hidden])
 }
 
 fn lstm_layer_output_shape_dispatch[T](layer voidptr) []int {

@@ -66,7 +66,8 @@ model.mse_loss() // loss function
 and returns `[batch, sequence, hidden_size]`. It supports stacked layers and
 computes gradients for the input, each gate matrix, and each bias through
 backpropagation through time. Gate matrices use input, forget, cell, output
-order.
+order. The `lstm_layer` interface starts each layer with zero hidden and cell
+states.
 
 ```v
 import vtl
@@ -81,6 +82,28 @@ assert prediction.value.shape == [3, 5, 4]
 assert recurrent.variables().len == 8
 prediction.backprop()!
 assert sequence.grad.shape == sequence.value.shape
+```
+
+Use `new_lstm_layer` when carrying recurrent state between chunks. Initial and
+final hidden/cell tensors use `[num_layers, batch, hidden_size]`; all three
+outputs participate in autograd.
+
+```v
+import vtl
+import vtl.autograd
+import vtl.nn.layers
+
+ctx := autograd.ctx[f64]()
+layer := layers.new_lstm_layer[f64](ctx, 2, 4, 2)
+input := ctx.variable(vtl.ones[f64]([1, 3, 2]))
+hidden0 := ctx.variable(vtl.zeros[f64]([2, 1, 4]))
+cell0 := ctx.variable(vtl.zeros[f64]([2, 1, 4]))
+mut output, mut hidden_n, mut cell_n := layer.forward_with_state(input, hidden0, cell0)!
+loss := output.sum()!.add(hidden_n.sum()!)!.add(cell_n.sum()!)!
+loss.backprop()!
+println(output.value.shape) // [1, 3, 4]
+println(hidden_n.value.shape) // [2, 1, 4]
+println(cell_n.value.shape) // [2, 1, 4]
 ```
 
 `maxpool2d` saves each selected input's flat index for backpropagation. If
