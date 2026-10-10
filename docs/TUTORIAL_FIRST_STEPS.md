@@ -130,6 +130,20 @@ The promotion helper models NumPy's array-dtype rules using VTL's current
 types. VTL arithmetic operators do not yet automatically dispatch across
 different tensor types.
 
+Same-dtype tensors support elementwise arithmetic operators with broadcasting.
+For shape errors returned as `!`, use the corresponding methods such as
+`subtract` instead of operators. V requires dereferencing tensor pointers for
+binary subtraction because `-` also supports pointer subtraction.
+
+```v
+import vtl
+
+a := vtl.from_2d([[10, 20, 30], [40, 50, 60]])!
+b := vtl.from_1d([1, 2, 3])!
+difference := (*a) - (*b)
+assert difference.to_array() == [9, 18, 27, 39, 48, 57]
+```
+
 ```v
 import vtl
 
