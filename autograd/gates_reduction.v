@@ -110,6 +110,89 @@ pub fn (g &MeanGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	}
 }
 
+// CumsumGate reverses the cumulative-sum operation by accumulating output
+// gradients from the end of each axis slice toward its beginning.
+pub struct CumsumGate[T] {
+pub:
+	shape []int
+	axis  int
+}
+
+// cumsum_gate creates a cumulative-sum gradient gate.
+pub fn cumsum_gate[T](shape []int, axis int) &CumsumGate[T] {
+	return &CumsumGate[T]{
+		shape: shape
+		axis:  axis
+	}
+}
+
+// backward computes the reverse cumulative sum of the output gradient.
+pub fn (g &CumsumGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
+	mut result := vtl.zeros[T](g.shape, vtl.TensorData{})
+	if result.size == 0 {
+		return [result]
+	}
+	rank := g.shape.len
+	mut strides := []int{len: rank}
+	strides[rank - 1] = 1
+	for i := rank - 2; i >= 0; i-- {
+		strides[i] = strides[i + 1] * g.shape[i + 1]
+	}
+	axis_stride := strides[g.axis]
+	n_axis := g.shape[g.axis]
+	gradient := payload.variable.grad
+	mut outer_idx := []int{len: rank}
+	for {
+		mut base_lin := 0
+		for i := 0; i < rank; i++ {
+			base_lin += outer_idx[i] * strides[i]
+		}
+		mut acc := vtl.cast[T](0)
+		for j := n_axis - 1; j >= 0; j-- {
+			lin := base_lin + j * axis_stride
+			acc += gradient.get_nth(lin)
+			result.set_nth(lin, acc)
+		}
+		mut done := true
+		for i := rank - 1; i >= 0; i-- {
+			if i == g.axis {
+				continue
+			}
+			outer_idx[i]++
+			if outer_idx[i] < g.shape[i] {
+				done = false
+				break
+			}
+			outer_idx[i] = 0
+		}
+		if done {
+			break
+		}
+	}
+	return [result]
+}
+
+fn cumsum_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := unsafe { (&CumsumGate[T](gate)).backward(typed_payload)! }
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
+// cache registers the cumulative-sum backward rule on its input variable.
+pub fn (g &CumsumGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
+	a := args[0]
+	match a {
+		Variable[T] {
+			result.grad = vtl.zeros_like[T](result.value)
+			result.requires_grad = true
+			register[T]('Cumsum', voidptr(g), cumsum_gate_backward_dispatch[T], result, [a])!
+		}
+		else {
+			return error('CumsumGate: a must be a Variable')
+		}
+	}
+}
+
 // ReshapeGate stores the original shape for backward pass.
 // backward: grad reshaped back to original shape
 pub struct ReshapeGate[T] {

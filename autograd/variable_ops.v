@@ -46,6 +46,26 @@ pub fn (v &Variable[T]) sum_along_axis(axis int, keepdims bool) !&Variable[T] {
 	return result
 }
 
+// cumsum applies a cumulative sum along one axis and records its backward
+// rule when this variable requires gradients.
+pub fn (v &Variable[T]) cumsum(axis int) !&Variable[T] {
+	rank := v.value.rank()
+	if rank == 0 {
+		return error('Variable.cumsum: input has no dimensions')
+	}
+	na := if axis < 0 { axis + rank } else { axis }
+	if na < 0 || na >= rank {
+		return error('Variable.cumsum: axis ${axis} out of bounds for shape ${v.value.shape}')
+	}
+	value := v.value.cumsum[T](na)!
+	mut result := v.context.variable(value)
+	if v.requires_grad {
+		gate := cumsum_gate[T](v.value.shape, na)
+		gate.cache(mut result, v)!
+	}
+	return result
+}
+
 // mean_along_axis computes one-axis means. Set keepdims to retain the reduced
 // axis with length one.
 pub fn (v &Variable[T]) mean_along_axis(axis int, keepdims bool) !&Variable[T] {

@@ -27,8 +27,8 @@ coverage and test transfers, mixed precision, and device-specific behavior.
 
 ### Autograd
 
-**VTL today:** Reverse-mode differentiation for supported tensor operations and
-selected neural-network layers.
+**VTL today:** Reverse-mode differentiation for supported tensor operations,
+including cumulative sum, and selected neural-network layers.
 
 **Next:** Expand operation coverage and add gradient APIs and graph controls
 comparable to `torch.autograd`, including higher-order gradients and retained

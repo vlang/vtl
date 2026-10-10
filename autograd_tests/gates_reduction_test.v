@@ -70,6 +70,40 @@ fn test_variable_axis_sum_and_mean_forward_backward() ! {
 	assert mean_input.grad.to_array() == [0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
 }
 
+fn test_variable_cumsum_forward_backward() ! {
+	mut context := autograd.ctx[f64]()
+	input := context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [
+		2,
+		3,
+	])!)
+	mut row_cumulative := input.cumsum(-1)!
+	assert row_cumulative.value.to_array() == [1.0, 3.0, 6.0, 4.0, 9.0, 15.0]
+	row_cumulative.backprop()!
+	assert input.grad.to_array() == [3.0, 2.0, 1.0, 3.0, 2.0, 1.0]
+
+	mut column_context := autograd.ctx[f64]()
+	column_input := column_context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [
+		2,
+		3,
+	])!)
+	mut column_cumulative := column_input.cumsum(0)!
+	assert column_cumulative.value.to_array() == [1.0, 2.0, 3.0, 5.0, 7.0, 9.0]
+	column_cumulative.backprop()!
+	assert column_input.grad.to_array() == [2.0, 2.0, 2.0, 1.0, 1.0, 1.0]
+}
+
+fn test_variable_cumsum_rejects_scalar_and_invalid_axis() {
+	context := autograd.ctx[f64]()
+	scalar := context.variable(vtl.from_array([1.0], []int{})!)
+	if _ := scalar.cumsum(0) {
+		assert false, 'cumsum must reject scalar variables'
+	}
+	vector := context.variable(vtl.from_1d([1.0, 2.0])!)
+	if _ := vector.cumsum(1) {
+		assert false, 'cumsum must reject out-of-range axes'
+	}
+}
+
 fn test_reshape_forward_backward() {
 	f64_ctx := autograd.ctx[f64]()
 	x := f64_ctx.variable(vtl.from_1d([1.0, 2.0, 3.0, 4.0])!)

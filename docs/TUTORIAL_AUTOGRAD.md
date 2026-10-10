@@ -71,6 +71,20 @@ global and axis reductions. `sum_along_axis(axis, keepdims)` and
 axis. When `keepdims` is false, the backward pass restores the removed axis
 before broadcasting.
 
+`cumsum(axis)` is differentiable as well. Its backward pass accumulates each
+output gradient toward the beginning of its axis slice:
+
+```v
+import vtl
+import vtl.autograd
+
+mut ctx := autograd.ctx[f64]()
+x := ctx.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0], [2, 2])!)
+mut cumulative := x.cumsum(1)!
+cumulative.backprop()!
+assert x.grad.to_array() == [2.0, 1.0, 2.0, 1.0]
+```
+
 ## Gradient accumulation
 
 Gradients accumulate across calls.  Zero them before each training step
