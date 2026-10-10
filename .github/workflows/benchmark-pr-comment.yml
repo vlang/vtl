@@ -57,6 +57,7 @@ jobs:
         run: |
           set -euo pipefail
           cd ~/.vmodules
+          report_file="$GITHUB_WORKSPACE/vs_numpy_pr.md"
           run_v_benchmark() {
             local name="$1"
             local source="$2"
@@ -85,10 +86,10 @@ jobs:
             run_v_benchmark vtl-linear-bias-purev vtl/benchmarks/linear_bias_reduction_bench.v
             run_v_benchmark vtl-linear-bias-openblas vtl/benchmarks/linear_bias_reduction_bench.v -d vsl_blas_cblas
             env HOME="$HOME" PATH="$PATH" VJOBS=2 OPENBLAS_NUM_THREADS=2 python3 vtl/benchmarks/vs_numpy/numpy_linear_bias_reduction_baseline.py
-          } 2>&1 | tee vs_numpy_pr.md
+          } 2>&1 | tee "$report_file"
 
       - name: Post sticky PR comment
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: vtl-vs-numpy
-          path: ~/.vmodules/vs_numpy_pr.md
+          path: vs_numpy_pr.md
