@@ -7,7 +7,7 @@ optimizers. Implementations on `main` include:
 | --- | --- |
 | Core | Input, Linear, Flatten, Embedding |
 | Convolution and pooling | Conv2D, MaxPool2D, Pool2D |
-| Normalization and regularization | BatchNorm, LayerNorm, Dropout |
+| Normalization and regularization | BatchNorm, GroupNorm, LayerNorm, Dropout |
 | Recurrent and attention | GRU, LSTM, multi-head attention, positional encoding |
 | Activations | ReLU, Sigmoid, Tanh, Softmax, Leaky ReLU, ELU, GELU, Swish, Mish, Softplus, SELU, HardSwish |
 
@@ -39,3 +39,23 @@ Shapes, parameters, and supported input ranks are layer-specific; follow each
 constructor's source comments and tests. Sequential composition is described
 in the [models reference](../models/README.md). CUDA and Vulkan paths are
 conditional and experimental; see the [device notes](../../docs/DEVICE_MEMORY.md).
+
+## GroupNorm
+
+GroupNorm splits channels into `num_groups` and normalizes each group
+independently for every batch item, including trailing spatial dimensions. Its
+input layout is channel-first (`[batch, channels, ...]`). The constructor's
+`input_shape` excludes batch; with affine enabled (the default), it learns one
+scale and bias per channel.
+
+```v ignore
+import vtl.autograd
+import vtl.nn.layers
+
+ctx := autograd.ctx[f32]()
+norm := layers.group_norm_layer[f32](ctx, [8, 16, 16], 4, layers.GroupNormConfig{})
+```
+
+`num_groups` must be positive and divide the channel count. GroupNorm uses
+current input statistics in both training and evaluation, so it has no running
+statistics state.

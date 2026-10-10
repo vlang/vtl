@@ -249,6 +249,14 @@ pub fn (mut ls SequentialInfo[T]) layer_norm(normalized_shape []int, config laye
 		layer_config)
 }
 
+// group_norm adds a channel-first GroupNorm layer to the network.
+pub fn (mut ls SequentialInfo[T]) group_norm(num_groups int, config layers.GroupNormConfig) {
+	shape := ls.layers[ls.layers.len - 1].output_shape()
+	ls.add_layer(layers.group_norm_layer[T](ls.ctx, shape, num_groups, config), 'GroupNormLayer', {
+		'num_groups': num_groups
+	})
+}
+
 // embedding adds a new Embedding layer to the network.
 pub fn (mut ls SequentialInfo[T]) embedding(vocab_size int, embedding_dim int) {
 	ls.add_layer(layers.embedding_layer[T](ls.ctx, vocab_size, embedding_dim), 'EmbeddingLayer', {

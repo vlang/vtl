@@ -56,6 +56,21 @@ fn test_added_activation_layers_in_sequential() {
 	assert nn.info.layers[3].output_shape() == [3]
 }
 
+fn test_group_norm_in_sequential_forward_and_backward() ! {
+	ctx := autograd.ctx[f64]()
+	mut nn := sequential_from_ctx[f64](ctx)
+	nn.input([2, 2])
+	nn.group_norm(1, layers.GroupNormConfig{})
+	input := ctx.variable(vtl.from_array([1.0, 2.0, 4.0, 0.0], [1, 2, 2])!)
+	output := nn.forward(input)!
+	assert output.value.shape == [1, 2, 2]
+	assert nn.info.layer_types[1] == 'GroupNormLayer'
+	mut loss := output.sum()!
+	loss.backprop()!
+	assert input.grad.shape == [1, 2, 2]
+	assert nn.info.layers[1].variables().len == 2
+}
+
 fn test_sequential_dropout_is_identity_in_eval_mode() ! {
 	rand.seed([u32(42), u32(0)])
 	ctx := autograd.ctx[f64]()
