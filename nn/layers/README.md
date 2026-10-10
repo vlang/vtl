@@ -7,7 +7,7 @@ optimizers. Implementations on `main` include:
 | --- | --- |
 | Core | Input, Linear, Flatten, Embedding |
 | Convolution and pooling | Conv2D, MaxPool2D, Pool2D |
-| Normalization and regularization | BatchNorm, GroupNorm, LayerNorm, Dropout |
+| Normalization and regularization | BatchNorm, GroupNorm, LayerNorm, RMSNorm, Dropout |
 | Recurrent and attention | GRU, LSTM, multi-head attention, positional encoding |
 | Activations | ReLU, Sigmoid, Tanh, Softmax, Leaky ReLU, ELU, GELU, Swish, Mish, Softplus, SELU, HardSwish |
 
@@ -59,3 +59,21 @@ norm := layers.group_norm_layer[f32](ctx, [8, 16, 16], 4, layers.GroupNormConfig
 `num_groups` must be positive and divide the channel count. GroupNorm uses
 current input statistics in both training and evaluation, so it has no running
 statistics state.
+
+## RMSNorm
+
+RMSNorm divides each trailing `normalized_shape` block by its root mean square,
+then applies a learnable per-element weight when `elementwise_affine` is true.
+Unlike LayerNorm, it does not subtract the mean or learn a bias. If `eps` is
+omitted, VTL uses the machine epsilon for `f32` or `f64` computations, matching
+PyTorch's default for these dtypes. See the
+[PyTorch RMSNorm reference](https://docs.pytorch.org/docs/2.14/generated/torch.nn.RMSNorm.html)
+for the formula and public API.
+
+```v ignore
+import vtl.autograd
+import vtl.nn.layers
+
+ctx := autograd.ctx[f32]()
+norm := layers.rms_norm_layer[f32](ctx, [128], layers.RMSNormConfig{})
+```

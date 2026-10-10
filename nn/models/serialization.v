@@ -223,6 +223,14 @@ pub fn (nn &Sequential[T]) save_checkpoint(path string, epoch int, loss f64) ! {
 					encode_layer_var[T](mut weights, vars, 1, 'beta')!
 				}
 			}
+			'RMSNormLayer' {
+				if vars.len > 0 {
+					for j, dim in vars[0].value.shape {
+						set_config_default(mut config, 'normalized_shape_${j}', dim)
+					}
+					encode_layer_var[T](mut weights, vars, 0, 'weight')!
+				}
+			}
 			'FlattenLayer' {
 				// Flatten has no weights
 			}
@@ -376,6 +384,9 @@ pub fn (nn &Sequential[T]) load_weights(path string) ! {
 				}
 				'GroupNormLayer' {
 					if j == 0 { 'gamma' } else { 'beta' }
+				}
+				'RMSNormLayer' {
+					'weight'
 				}
 				else {
 					'var_${j}'

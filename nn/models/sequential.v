@@ -181,6 +181,11 @@ pub fn (mut nn Sequential[T]) group_norm(num_groups int, config layers.GroupNorm
 	nn.info.group_norm(num_groups, config)
 }
 
+// rms_norm adds a trailing-dimension RMSNorm layer to the network.
+pub fn (mut nn Sequential[T]) rms_norm(normalized_shape []int, config layers.RMSNormConfig) {
+	nn.info.rms_norm(normalized_shape, config)
+}
+
 // embedding adds a new Embedding layer to the network.
 pub fn (mut nn Sequential[T]) embedding(vocab_size int, embedding_dim int) {
 	nn.info.embedding(vocab_size, embedding_dim)

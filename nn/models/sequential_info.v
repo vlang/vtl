@@ -257,6 +257,16 @@ pub fn (mut ls SequentialInfo[T]) group_norm(num_groups int, config layers.Group
 	})
 }
 
+// rms_norm adds a trailing-dimension RMSNorm layer to the network.
+pub fn (mut ls SequentialInfo[T]) rms_norm(normalized_shape []int, config layers.RMSNormConfig) {
+	mut layer_config := map[string]int{}
+	for i, dim in normalized_shape {
+		layer_config['normalized_shape_${i}'] = dim
+	}
+	ls.add_layer(layers.rms_norm_layer[T](ls.ctx, normalized_shape, config), 'RMSNormLayer',
+		layer_config)
+}
+
 // embedding adds a new Embedding layer to the network.
 pub fn (mut ls SequentialInfo[T]) embedding(vocab_size int, embedding_dim int) {
 	ls.add_layer(layers.embedding_layer[T](ls.ctx, vocab_size, embedding_dim), 'EmbeddingLayer', {
