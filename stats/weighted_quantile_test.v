@@ -94,6 +94,27 @@ fn test_nanweighted_quantile_axis_preserves_nan_policy_and_shapes() ! {
 		3.0,
 		5.0,
 	]
+	kept := nanquantiles_weighted_axis_keepdims(values, weights, [0.0, 0.5, 1.0], 1, true)!
+	assert kept.shape == [3, 2, 1]
+	assert kept.to_array() == [1.0, 4.0, 1.0, 4.0, 3.0, 5.0]
+	kept_axis_zero := nanquantiles_weighted_axis_keepdims(values, weights, [0.0, 1.0], 0, true)!
+	assert kept_axis_zero.shape == [2, 1, 3]
+	assert kept_axis_zero.to_array() == [1.0, 5.0, 3.0, 4.0, 5.0, 3.0]
+	kept_percentiles := percentiles_weighted_axis_keepdims(values, weights, [0, 100], 1, true)!
+	assert kept_percentiles.shape == [2, 2, 1]
+	assert kept_percentiles.to_array().all(math.is_nan(it))
+	kept_nan_percentiles := nanpercentiles_weighted_axis_keepdims(values, weights, [0, 100], 1, true)!
+	assert kept_nan_percentiles.shape == [2, 2, 1]
+	assert kept_nan_percentiles.to_array() == [1.0, 4.0, 3.0, 5.0]
+	rank_three := vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0], [
+		2,
+		3,
+		2,
+	])!
+	rank_three_kept := quantiles_weighted_axis_keepdims(rank_three, vtl.ones[f64]([3]), [0.5], -2,
+		true)!
+	assert rank_three_kept.shape == [1, 2, 1, 2]
+	assert rank_three_kept.to_array() == [3.0, 4.0, 9.0, 10.0]
 }
 
 fn test_weighted_quantiles_reduce_multiple_axes_with_compact_weights() ! {

@@ -265,13 +265,25 @@ fn weighted_quantile_axis_impl[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64
 // quantiles_weighted_axis computes several weighted quantiles per axis slice.
 // The quantile dimension is prepended, matching NumPy's multi-quantile shape.
 pub fn quantiles_weighted_axis[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], quantiles []f64, axis int) !&vtl.Tensor[f64] {
-	return weighted_quantiles_axis_impl[T](values, weights, quantiles, axis, false)
+	return quantiles_weighted_axis_keepdims[T](values, weights, quantiles, axis, false)
+}
+
+// quantiles_weighted_axis_keepdims optionally retains the reduced axis as a
+// length-one dimension after the prepended quantile dimension.
+pub fn quantiles_weighted_axis_keepdims[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], quantiles []f64, axis int, keepdims bool) !&vtl.Tensor[f64] {
+	return weighted_quantiles_axis_impl[T](values, weights, quantiles, axis, false, keepdims)
 }
 
 // nanquantiles_weighted_axis computes multiple weighted quantiles per axis
 // slice while ignoring NaNs and their corresponding weights.
 pub fn nanquantiles_weighted_axis[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], quantiles []f64, axis int) !&vtl.Tensor[f64] {
-	return weighted_quantiles_axis_impl[T](values, weights, quantiles, axis, true)
+	return nanquantiles_weighted_axis_keepdims[T](values, weights, quantiles, axis, false)
+}
+
+// nanquantiles_weighted_axis_keepdims preserves the reduced axis as a
+// length-one dimension and ignores NaNs and their corresponding weights.
+pub fn nanquantiles_weighted_axis_keepdims[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], quantiles []f64, axis int, keepdims bool) !&vtl.Tensor[f64] {
+	return weighted_quantiles_axis_impl[T](values, weights, quantiles, axis, true, keepdims)
 }
 
 // percentiles_weighted_axis computes several weighted percentiles per slice.
@@ -280,26 +292,44 @@ pub fn percentiles_weighted_axis[T](values &vtl.Tensor[T], weights &vtl.Tensor[f
 		axis)
 }
 
+// percentiles_weighted_axis_keepdims computes weighted percentiles while
+// optionally retaining the reduced axis as a length-one dimension.
+pub fn percentiles_weighted_axis_keepdims[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], percentiles []f64, axis int, keepdims bool) !&vtl.Tensor[f64] {
+	return quantiles_weighted_axis_keepdims[T](values, weights, percentiles_to_quantiles(percentiles)!,
+		axis, keepdims)
+}
+
 // nanpercentiles_weighted_axis computes NaN-aware weighted percentiles per slice.
 pub fn nanpercentiles_weighted_axis[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], percentiles []f64, axis int) !&vtl.Tensor[f64] {
 	return nanquantiles_weighted_axis[T](values, weights, percentiles_to_quantiles(percentiles)!,
 		axis)
 }
 
-fn weighted_quantiles_axis_impl[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], quantiles []f64, axis int, ignore_nan bool) !&vtl.Tensor[f64] {
+// nanpercentiles_weighted_axis_keepdims computes NaN-aware weighted
+// percentiles while optionally retaining the reduced axis.
+pub fn nanpercentiles_weighted_axis_keepdims[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], percentiles []f64, axis int, keepdims bool) !&vtl.Tensor[f64] {
+	return nanquantiles_weighted_axis_keepdims[T](values, weights,
+		percentiles_to_quantiles(percentiles)!, axis, keepdims)
+}
+
+fn weighted_quantiles_axis_impl[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], quantiles []f64, axis int, ignore_nan bool, keepdims bool) !&vtl.Tensor[f64] {
 	validate_quantiles(quantiles)!
 	axis_index := validate_weighted_axis(values, weights, axis)!
 	rank := values.rank()
 	axis_size := values.shape[axis_index]
 	mut output_shape := [quantiles.len]
 	for dimension, size in values.shape {
-		if dimension != axis_index {
+		if dimension == axis_index {
+			if keepdims {
+				output_shape << 1
+			}
+		} else {
 			output_shape << size
 		}
 	}
 	mut result := vtl.empty[f64](output_shape, memory: .row_major)
 	mut index := []int{len: rank}
-	mut output_index := []int{len: rank}
+	mut output_index := []int{len: rank + if keepdims { 1 } else { 0 }}
 	slice_count := weighted_axis_slice_count(values.shape, axis_index)
 	for slice in 0 .. slice_count {
 		decode_nan_slice(slice, values.shape, axis_index, mut index)
@@ -328,10 +358,14 @@ fn weighted_quantiles_axis_impl[T](values &vtl.Tensor[T], weights &vtl.Tensor[f6
 		if !(ignore_nan && valid_count == 0) {
 			validate_weight_total(total_weight)!
 		}
-		output_index[0] = 0
 		mut output_dimension := 1
 		for dimension in 0 .. rank {
-			if dimension != axis_index {
+			if dimension == axis_index {
+				if keepdims {
+					output_index[output_dimension] = 0
+					output_dimension++
+				}
+			} else {
 				output_index[output_dimension] = index[dimension]
 				output_dimension++
 			}
