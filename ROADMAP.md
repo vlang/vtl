@@ -42,7 +42,13 @@
 - [ ] Issue [#63](https://github.com/vlang/vtl/issues/63) — Phase 6: ARM GPU Support (Android, iOS, Embedded)
 
 ### Phase 7+ — Performance Engineering
-- [x] Issue [#64](https://github.com/vlang/vtl/issues/64) — Phase 7+: Kernel Fusion, Mixed Precision, Computation Graph Optimization
+- [ ] Issue [#64](https://github.com/vlang/vtl/issues/64) — Phase 7+: Kernel Fusion, Mixed Precision, Computation Graph Optimization (closed on GitHub; scope remains incomplete)
+  - [x] Fused Vulkan Adam update kernel
+  - [ ] General operator fusion and computation graph optimization
+  - [ ] FP16/BF16 storage and automatic mixed-precision training
+  - [ ] Reusable GPU memory pools and asynchronous Vulkan execution
+  - [ ] Backend profiling and gradient checkpointing
+  - [ ] Quantization and multi-GPU training
 
 ---
 
