@@ -402,6 +402,31 @@ The chart below isolates this pure-V run from the earlier CBLAS measurements.
 
 ![VTL pure-V and NumPy matmul performance](../../docs/assets/matmul-pure-v-ryzen-5900x.png)
 
+## Local matched pure-V rerun (2026-10-10)
+
+A rerun on the same AMD Ryzen 9 5900X used V 0.5.2 (`407c52e`) with GCC
+16.2.1, `-prod -cflags "-march=native"`, and `VJOBS=2`. VTL was compiled to
+an executable before timing. NumPy 2.5.3 used its bundled scipy-openblas
+0.3.34.106.0 with `OPENBLAS_NUM_THREADS=2`. Both benchmarks used the same
+deterministic inputs. The f64 checksums match to six decimal places. The f32
+checksums differ by at most `3.1e-4` in absolute value, consistent with their
+different accumulation order. Higher GFLOPS is better.
+
+| dtype | size | VTL pure-V GFLOPS | NumPy GFLOPS | NumPy / VTL |
+| --- | ---: | ---: | ---: | ---: |
+| f64 | 128×128 | 17.31 | 62.40 | 3.60× |
+| f64 | 256×256 | 24.05 | 74.29 | 3.09× |
+| f64 | 512×512 | 33.26 | 127.62 | 3.84× |
+| f32 | 128×128 | 32.54 | 97.49 | 3.00× |
+| f32 | 256×256 | 67.21 | 177.59 | 2.64× |
+| f32 | 512×512 | 91.27 | 273.98 | 3.00× |
+
+This rerun confirms a remaining CPU GEMM performance gap in the default pure-V
+backend, despite `-march=native`. It is one machine and one square-matrix
+workload; it does not establish performance across other shapes or hardware.
+The optional optimized CBLAS backend is a separate configuration and is not
+represented in this table.
+
 ## Conv2D (CPU path)
 
 The VTL and NumPy runs use the same deterministic `float32` and `float64` NCHW inputs,
