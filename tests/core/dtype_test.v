@@ -164,3 +164,40 @@ fn test_promote_types_rejects_string_and_numeric_mixtures() {
 		assert true
 	}
 }
+
+fn test_promoted_integer_arithmetic_uses_numpy_dtype_and_broadcasting() ! {
+	signed := vtl.from_1d[i8]([100, -3])!
+	unsigned := vtl.from_1d[u8]([60, 4])!
+
+	sums := vtl.add_promoted[i16, i8, u8](signed, unsigned)!
+	assert sums.dtype() == .int16
+	assert sums.to_array() == [i16(160), 1]
+	assert vtl.subtract_promoted[i16, i8, u8](signed, unsigned)!.to_array() == [
+		i16(40),
+		-7,
+	]
+	assert vtl.multiply_promoted[i16, i8, u8](signed, unsigned)!.to_array() == [
+		i16(6000),
+		-12,
+	]
+
+	rows := vtl.from_array[i8]([-2, 5], [2, 1])!
+	columns := vtl.from_1d[u8]([1, 2, 3])!
+	broadcast_sum := vtl.add_promoted[i16, i8, u8](rows, columns)!
+	assert broadcast_sum.shape == [2, 3]
+	assert broadcast_sum.to_array() == [i16(-1), 0, 1, 6, 7, 8]
+}
+
+fn test_promoted_arithmetic_preserves_dtype_precision_and_rejects_wrong_dtype() ! {
+	floats := vtl.from_1d[f32]([1.5])!
+	integers := vtl.from_1d[u32]([u32(16_777_217)])!
+	result := vtl.add_promoted[f64, f32, u32](floats, integers)!
+	assert result.dtype() == .float64
+	assert result.to_array() == [16_777_218.5]
+
+	left := vtl.from_1d[i8]([2])!
+	right := vtl.from_1d[u8]([3])!
+	if _ := vtl.add_promoted[i8, i8, u8](left, right) {
+		assert false, 'promoted arithmetic must reject an incorrect output dtype'
+	}
+}

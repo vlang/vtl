@@ -127,8 +127,20 @@ assert fractional.as_int().to_array() == [1, 2]
 `dtype()` reports a tensor's element type. `promote_types` determines a
 common result type for two array dtypes and rejects string/numeric mixtures.
 The promotion helper models NumPy's array-dtype rules using VTL's current
-types. VTL arithmetic operators do not yet automatically dispatch across
-different tensor types.
+types. For mixed real numeric tensors, `add_promoted`, `subtract_promoted`,
+and `multiply_promoted` apply those rules with broadcasting; choose the output
+type explicitly and VTL checks it against the promotion result. The arithmetic
+operators still require matching tensor types.
+
+```v
+import vtl
+
+signed := vtl.from_1d[i8]([100, -3])!
+unsigned := vtl.from_1d[u8]([60, 4])!
+sum := vtl.add_promoted[i16, i8, u8](signed, unsigned)!
+assert sum.dtype() == .int16
+assert sum.to_array() == [i16(160), 1]
+```
 
 Same-dtype tensors support elementwise arithmetic operators with broadcasting.
 For shape errors returned as `!`, use the corresponding methods such as

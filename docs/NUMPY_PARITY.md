@@ -117,9 +117,13 @@ NumPy-style axis-removed output shape.
 gradients along selected axes; elementwise logical AND/OR/XOR/NOT; integer
 bitwise AND/OR/XOR/invert and scalar left/right shifts. Gradients support
 uniform spacing or monotonic non-uniform coordinates and first/second-order
-boundary differences.
+boundary differences. `add_promoted`, `subtract_promoted`, and
+`multiply_promoted` accept mixed real numeric dtypes, broadcast their inputs,
+and validate an explicitly selected output dtype against `promote_types`.
 
-**Remaining:** audit unary/binary function families and define dtype promotion.
+**Remaining:** audit unary/binary function families, add promoted arithmetic
+for the remaining operations, and infer output dtypes automatically for mixed
+tensor and weak scalar operands.
 
 ### Reductions and statistics
 
@@ -279,12 +283,12 @@ complex variance and standard deviation return real tensors and support
 `as_*` conversions cover real numeric and boolean types, preserve shape and
 logical order, and truncate floating-point values when converting to integers.
 
-**Remaining:** connect promotion to mixed-dtype arithmetic, add weak scalar
-promotion and string conversion, extend complex support beyond elementwise
-operations, `matmul`, Einstein contractions, `solve_complex`, `inv_complex`,
-`det_complex`, and `slogdet_complex` to more general linear algebra and random
-generation, add complex32, and define integer overflow and structured-data
-limits.
+**Remaining:** extend promoted arithmetic to all supported operations, add
+weak scalar promotion and string conversion, extend complex support beyond
+elementwise operations, `matmul`, Einstein contractions, `solve_complex`,
+`inv_complex`, `det_complex`, and `slogdet_complex` to more general linear
+algebra and random generation, add complex32, and define integer overflow and
+structured-data limits.
 
 ### Masked and missing data
 
