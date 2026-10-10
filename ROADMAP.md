@@ -31,9 +31,13 @@
 - [x] CIFAR-10 dataset loader (`datasets/cifar10.v`)
 - [x] `nn_cifar10` example with CUDA-aware config
 
-### Phase 4 — GPU Autograd
-- [x] Issue [#61](https://github.com/vlang/vtl/issues/61) — Phase 4: GPU Autograd
-- [x] Autograd gates compile and run on CUDA context
+### Phase 4 — GPU Autograd (partial; issue closed on GitHub)
+- [ ] Issue [#61](https://github.com/vlang/vtl/issues/61) — Phase 4: GPU Autograd
+- [x] Vulkan f32 Linear backward uses GPU GEMM
+- [x] Vulkan f32 Conv2D weight gradients use GPU GEMM; input and bias gradients retain the CPU path
+- [x] Vulkan f32 Adam updates use the fused VSL optimizer shader
+- [ ] GPU backward coverage for LSTM, attention, norms, embeddings, and pooling
+- [ ] Full device-resident backward and optimizer updates across the supported model stack
 
 ### Phase 5 — OpenCL Backend
 - [x] Issue [#62](https://github.com/vlang/vtl/issues/62) — Phase 5: OpenCL Backend (VCL unified into Compute abstraction)
