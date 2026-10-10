@@ -1,5 +1,36 @@
 # VTL vs NumPy baselines
 
+## Elementwise extrema
+
+This paired microbenchmark compares elementwise `maximum` on deterministic
+1,048,576-element `f64` inputs. Both sides perform two warmups and seven timed
+calls, allocate the result inside each timed call, and report a checksum. VTL
+uses its contiguous pairwise fast path; broadcast and strided tensors use the
+stride-aware fallback. Compile the V benchmark with `-prod` before running its
+binary, from `~/.vmodules`:
+
+```bash
+systemd-run --user --scope --quiet -p MemoryMax=3G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -no-parallel -cc gcc -prod -cflags "-march=native" \
+	-o /tmp/vtl-extrema-bench ./vtl/benchmarks/vs_numpy/extrema_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 \
+	/tmp/vtl-extrema-bench
+systemd-run --user --scope --quiet -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 \
+	uv run --offline --no-project --with numpy python \
+	./vtl/benchmarks/vs_numpy/numpy_extrema_baseline.py
+```
+
+Record the V version, C compiler, CPU, NumPy version, and thread settings when
+publishing measurements. This elementwise microbenchmark does not establish
+overall VTL/NumPy performance parity.
+
+On an AMD Ryzen 9 5900X with V 0.5.2 and GCC 16.2.1 (`-prod
+-march=native`), three interleaved process runs on 2026-10-10 measured median
+means of 2.372 ms for VTL and 0.859 ms for NumPy 2.5.3. Checksums matched at
+169131123. VTL is about 2.76× slower on this isolated contiguous f64 maximum
+workload; this result identifies a performance gap and is not a framework-wide
+comparison.
+
 ## Mixed-dtype integer remainder
 
 This paired microbenchmark computes a broadcasted remainder for 1,048,576

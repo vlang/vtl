@@ -1,6 +1,7 @@
 module vtl
 
 import math
+import math.complex as vcomplex
 
 // sign returns the elementwise sign of each value: -1, 0, or 1. Floating-point
 // NaNs remain NaN, matching NumPy's sign behavior.
@@ -580,28 +581,117 @@ pub fn (a &Tensor[T]) log_n[T](b &Tensor[T]) !&Tensor[T] {
 	})
 }
 
-// max returns the max elementwise of two tensors
-
-// max exposes this operation as part of the public API.
-
-// max exposes this operation as part of the public API.
+// max returns the elementwise maximum and propagates NaNs, like numpy.maximum.
 @[inline]
 pub fn (a &Tensor[T]) max[T](b &Tensor[T]) !&Tensor[T] {
-	return a.nmap[T]([b], fn [T](xs []T, _ []int) T {
-		return math.max(xs[0], xs[1])
+	return tensor_extreme[T](a, b, true, false)
+}
+
+// min returns the elementwise minimum and propagates NaNs, like numpy.minimum.
+@[inline]
+pub fn (a &Tensor[T]) min[T](b &Tensor[T]) !&Tensor[T] {
+	return tensor_extreme[T](a, b, false, false)
+}
+
+// fmax returns the elementwise maximum, ignoring a single NaN operand, like
+// numpy.fmax. If both operands are NaN, the left operand is returned.
+@[inline]
+pub fn (a &Tensor[T]) fmax[T](b &Tensor[T]) !&Tensor[T] {
+	return tensor_extreme[T](a, b, true, true)
+}
+
+// fmin returns the elementwise minimum, ignoring a single NaN operand, like
+// numpy.fmin. If both operands are NaN, the left operand is returned.
+@[inline]
+pub fn (a &Tensor[T]) fmin[T](b &Tensor[T]) !&Tensor[T] {
+	return tensor_extreme[T](a, b, false, true)
+}
+
+@[direct_array_access]
+fn tensor_extreme[T](a &Tensor[T], b &Tensor[T], want_max bool, ignore_nan bool) !&Tensor[T] {
+	if a.shape == b.shape && a.is_row_major_contiguous() && b.is_row_major_contiguous()
+		&& a.data.data.len == a.size && b.data.data.len == b.size {
+		mut result := empty[T](a.shape, memory: .row_major)
+		for i in 0 .. a.size {
+			result.data.data[i] = numpy_extreme[T](a.data.data[i], b.data.data[i], want_max,
+				ignore_nan)
+		}
+		return result
+	}
+	return a.nmap[T]([b], fn [want_max, ignore_nan] [T](xs []T, _ []int) T {
+		return numpy_extreme[T](xs[0], xs[1], want_max, ignore_nan)
 	})
 }
 
-// min returns the min elementwise of two tensors
-
-// min exposes this operation as part of the public API.
-
-// min exposes this operation as part of the public API.
 @[inline]
-pub fn (a &Tensor[T]) min[T](b &Tensor[T]) !&Tensor[T] {
-	return a.nmap[T]([b], fn [T](xs []T, _ []int) T {
-		return math.min(xs[0], xs[1])
-	})
+fn numpy_extreme[T](a T, b T, want_max bool, ignore_nan bool) T {
+	$if T is f32 || T is f64 {
+		a_nan := math.is_nan(f64(a))
+		b_nan := math.is_nan(f64(b))
+		if a_nan || b_nan {
+			if ignore_nan {
+				if a_nan && b_nan {
+					return a
+				}
+				return if a_nan { b } else { a }
+			}
+			return if a_nan { a } else { b }
+		}
+		if ignore_nan && a == T(0) && b == T(0) {
+			if want_max {
+				return if math.signbit(f64(a)) { b } else { a }
+			}
+			return if math.signbit(f64(a)) { a } else { b }
+		}
+		return if want_max {
+			if a > b { a } else { b }
+		} else {
+			if a < b { a } else { b }
+		}
+	} $else $if T is vcomplex.Complex {
+		a_nan := math.is_nan(a.re) || math.is_nan(a.im)
+		b_nan := math.is_nan(b.re) || math.is_nan(b.im)
+		if a_nan || b_nan {
+			if ignore_nan {
+				if a_nan && b_nan {
+					return a
+				}
+				return if a_nan { b } else { a }
+			}
+			return if a_nan { a } else { b }
+		}
+		if a.re != b.re {
+			return if want_max {
+				if a.re > b.re { a } else { b }
+			} else {
+				if a.re < b.re { a } else { b }
+			}
+		}
+		if a.im != b.im {
+			return if want_max {
+				if a.im > b.im { a } else { b }
+			} else {
+				if a.im < b.im { a } else { b }
+			}
+		}
+		return a
+	} $else $if T is bool {
+		return if want_max { a || b } else { a && b }
+	} $else $if T is $int {
+		return if want_max {
+			if a > b { a } else { b }
+		} else {
+			if a < b { a } else { b }
+		}
+	} $else $if T is string {
+		return if want_max {
+			if a > b { a } else { b }
+		} else {
+			if a < b { a } else { b }
+		}
+	} $else {
+		panic('elementwise extrema do not support ${T.name}')
+	}
 }
 
 // nextafter returns the nextafter elementwise of two tensors

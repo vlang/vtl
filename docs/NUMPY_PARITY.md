@@ -127,6 +127,10 @@ promoted input dtype is `float32`; other supported combinations return
 `remainder_promoted` performs NumPy-style integer remainder with mixed integer
 dtypes and broadcasting; nonzero remainders follow the divisor's sign, and a
 zero divisor produces zero (without NumPy's runtime warning).
+Elementwise `max`/`min` match NumPy's NaN-propagating `maximum`/`minimum`, and
+`fmax`/`fmin` ignore a single NaN operand. These operations broadcast and
+support boolean, integer, floating-point, and complex tensors; floating-point
+zero ties follow each NumPy ufunc's sign behavior.
 
 **Remaining:** audit unary/binary function families, add promoted arithmetic
 for the remaining operations, and infer output dtypes automatically for mixed

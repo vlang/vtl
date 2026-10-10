@@ -2,6 +2,7 @@ module core
 
 import vtl
 import math
+import math.complex as vcomplex
 
 fn test_abs() {
 	a := vtl.from_1d([-1, 2, -3, 4])!
@@ -393,6 +394,83 @@ fn test_min() {
 	result := a.min(b)!
 	expected := vtl.from_1d([1.0, 2.0, 3.0])!
 	assert result.array_equal(expected)
+}
+
+fn test_elementwise_extrema_follow_numpy_nan_and_zero_rules() {
+	nan := math.nan()
+	left := vtl.from_1d([nan, 1.0, nan, 0.0, -0.0])!
+	right := vtl.from_1d([2.0, nan, nan, -0.0, 0.0])!
+	maximum := left.max(right)!
+	minimum := left.min(right)!
+	fmaximum := left.fmax(right)!
+	fminimum := left.fmin(right)!
+
+	assert math.is_nan(maximum.get_nth(0))
+	assert math.is_nan(maximum.get_nth(1))
+	assert math.is_nan(maximum.get_nth(2))
+	assert math.is_nan(minimum.get_nth(0))
+	assert math.is_nan(minimum.get_nth(1))
+	assert math.is_nan(minimum.get_nth(2))
+	assert fmaximum.to_array()[0..2] == [2.0, 1.0]
+	assert fminimum.to_array()[0..2] == [2.0, 1.0]
+	assert math.is_nan(fmaximum.get_nth(2))
+	assert math.is_nan(fminimum.get_nth(2))
+	assert math.signbit(maximum.get_nth(3))
+	assert !math.signbit(maximum.get_nth(4))
+	assert math.signbit(minimum.get_nth(3))
+	assert !math.signbit(minimum.get_nth(4))
+	assert !math.signbit(fmaximum.get_nth(3))
+	assert !math.signbit(fmaximum.get_nth(4))
+	assert math.signbit(fminimum.get_nth(3))
+	assert math.signbit(fminimum.get_nth(4))
+}
+
+fn test_elementwise_extrema_broadcast_views_and_boolean_values() {
+	values := vtl.from_2d([[1, 4], [3, 2]])!
+	transposed := values.transpose([1, 0])!
+	limits := vtl.from_1d([2, 3])!
+	assert transposed.max(limits)!.to_array() == [2, 3, 4, 3]
+	assert transposed.min(limits)!.to_array() == [1, 3, 2, 2]
+
+	left := vtl.from_1d([true, false, false])!
+	right := vtl.from_1d([false, true, false])!
+	assert left.max(right)!.to_array() == [true, true, false]
+	assert left.min(right)!.to_array() == [false, false, false]
+}
+
+fn test_elementwise_extrema_follow_numpy_complex_ordering_and_nan_rules() {
+	left := vtl.from_1d([
+		vcomplex.Complex{ re: 1.0, im: 2.0 },
+		vcomplex.Complex{ re: 1.0, im: 1.0 },
+		vcomplex.Complex{ re: math.nan(), im: 1.0 },
+	])!
+	right := vtl.from_1d([
+		vcomplex.Complex{ re: 1.0, im: 1.0 },
+		vcomplex.Complex{ re: 1.0, im: 2.0 },
+		vcomplex.Complex{ re: 2.0, im: 0.0 },
+	])!
+
+	maximum := left.max(right)!
+	minimum := left.min(right)!
+	fmaximum := left.fmax(right)!
+	fminimum := left.fmin(right)!
+	assert maximum.to_array()[0..2] == [left.get_nth(0), right.get_nth(1)]
+	assert minimum.to_array()[0..2] == [right.get_nth(0), left.get_nth(1)]
+	assert math.is_nan(maximum.get_nth(2).re)
+	assert fmaximum.get_nth(2) == right.get_nth(2)
+	assert fminimum.get_nth(2) == right.get_nth(2)
+
+	zero_left := vtl.from_1d([
+		vcomplex.Complex{ re: 0.0, im: 0.0 },
+		vcomplex.Complex{ re: -0.0, im: 0.0 },
+	])!
+	zero_right := vtl.from_1d([
+		vcomplex.Complex{ re: -0.0, im: 0.0 },
+		vcomplex.Complex{ re: 0.0, im: 0.0 },
+	])!
+	zero_maximum := zero_left.max(zero_right)!
+	assert !math.signbit(zero_maximum.get_nth(0).re)
+	assert math.signbit(zero_maximum.get_nth(1).re)
 }
 
 fn test_pow() {
