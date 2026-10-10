@@ -269,6 +269,14 @@ fn test_promoted_integer_remainder_handles_zero_divisor_and_rejects_float() ! {
 	}
 }
 
+fn test_promoted_integer_remainder_handles_signed_minimum_modulo_negative_one() ! {
+	values := vtl.from_1d[i64]([i64(-9223372036854775807 - 1)])!
+	divisor := vtl.from_1d[i64]([-1])!
+	remainders := vtl.remainder_promoted[i64, i64, i64](values, divisor)!
+
+	assert remainders.to_array() == [i64(0)]
+}
+
 fn test_promoted_remainder_reads_strided_views_in_logical_order() ! {
 	values := vtl.from_2d[i8]([[-5, 4], [8, -10]])!
 	transposed := values.transpose([1, 0])!

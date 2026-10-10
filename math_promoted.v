@@ -161,6 +161,13 @@ fn is_integer_dtype(dtype DType) bool {
 @[inline]
 fn numpy_remainder[T](x T, y T) T {
 	$if T is $int {
+		$if T is i8 || T is i16 || T is i32 || T is i64 || T is int {
+			// Signed minimum % -1 overflows in machine arithmetic, although
+			// NumPy's remainder result is exactly zero for every value modulo -1.
+			if y == T(-1) {
+				return T(0)
+			}
+		}
 		mut result := x % y
 		if result != T(0) && (result < T(0)) != (y < T(0)) {
 			result += y
