@@ -71,6 +71,23 @@ fn test_group_norm_in_sequential_forward_and_backward() ! {
 	assert nn.info.layers[1].variables().len == 2
 }
 
+fn test_rms_norm_in_sequential_forward_and_backward() ! {
+	ctx := autograd.ctx[f64]()
+	mut nn := sequential_from_ctx[f64](ctx)
+	nn.input([2])
+	nn.rms_norm([2], layers.RMSNormConfig{
+		eps: 1e-5
+	})
+	input := ctx.variable(vtl.from_array([3.0, 4.0, 5.0, 12.0], [2, 2])!)
+	output := nn.forward(input)!
+	assert output.value.shape == [2, 2]
+	assert nn.info.layer_types[1] == 'RMSNormLayer'
+	mut loss := output.sum()!
+	loss.backprop()!
+	assert input.grad.shape == [2, 2]
+	assert nn.info.layers[1].variables().len == 1
+}
+
 fn test_sequential_dropout_is_identity_in_eval_mode() ! {
 	rand.seed([u32(42), u32(0)])
 	ctx := autograd.ctx[f64]()

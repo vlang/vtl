@@ -675,6 +675,27 @@ fn test_group_norm_serialization() {
 	assert 'beta' in model.layer_data[1].weights
 }
 
+fn test_rms_norm_serialization() {
+	test_dir := setup_test_dir()
+	defer {
+		cleanup_test_dir()
+	}
+	mut nn := sequential_with_layers[f64]([]types.Layer[f64]{})
+	nn.input([8])
+	nn.rms_norm([8], layers.RMSNormConfig{})
+	path := '${test_dir}/rmsnorm_test.json'
+	nn.save(path)!
+	content := os.read_file(path)!
+	model := json2.decode[ModelFile](content)!
+	assert model.layers[1].layer_type == 'RMSNormLayer'
+	assert model.layers[1].config['normalized_shape_0'] == 8
+	assert 'weight' in model.layer_data[1].weights
+	mut weight := nn.info.layers[1].variables()[0].value
+	weight.set_nth(0, 3.0)
+	nn.load_weights(path)!
+	assert nn.info.layers[1].variables()[0].value.get_nth(0) == 1.0
+}
+
 fn test_round_trip_weights_allclose_1e9() {
 	test_dir := setup_test_dir()
 	defer {
