@@ -210,6 +210,35 @@ fn test_min_max_multi_axis_reductions_match_numpy_shapes() {
 	assert empty_output.shape == [0]
 }
 
+fn test_min_max_axis_propagate_nan_and_handle_strided_views() {
+	values := vtl.from_2d[f64]([[1.0, math.nan(), 3.0], [math.nan(), 5.0, 4.0]])!
+	assert math.is_nan(values.max_axis(1)!.get_nth(0))
+	assert math.is_nan(values.min_axis(1)!.get_nth(1))
+
+	transposed := values.transpose([1, 0])!
+	maxima := transposed.max_axis(-1)!
+	minima := transposed.min_axis(1)!
+	assert maxima.shape == [3, 1]
+	assert math.is_nan(maxima.get_nth(0))
+	assert math.is_nan(maxima.get_nth(1))
+	assert maxima.get_nth(2) == 4.0
+	assert minima.to_array().len == 3
+	assert math.is_nan(minima.get_nth(0))
+	assert math.is_nan(minima.get_nth(1))
+	assert minima.get_nth(2) == 3.0
+}
+
+fn test_min_max_axis_reject_empty_reduction_axis() {
+	empty := vtl.from_array[f64]([], [2, 0])!
+	if _ := empty.max_axis(1) {
+		assert false, 'max_axis must reject an empty reduction axis'
+	}
+	if _ := empty.min_axis(-1) {
+		assert false, 'min_axis must reject an empty reduction axis'
+	}
+	assert empty.max_axis(0)!.shape == [1, 0]
+}
+
 fn test_cumsum() {
 	t := vtl.from_1d([1.0, 2.0, 3.0, 4.0])!
 	result := t.cumsum(0)!
