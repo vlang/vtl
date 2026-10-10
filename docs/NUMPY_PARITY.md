@@ -103,6 +103,10 @@ indices; standard arg reductions return the first NaN index if present.
 `nanargmax()` and `nanargmin()` skip NaNs. Their `*_axis(axis, keepdims)`
 variants reduce one axis and support strided views. NaN arg reductions report
 an error for empty inputs, empty reduced axes, or all-NaN slices.
+Value extrema through `max_axis` and `min_axis` preserve the reduced axis,
+propagate NaNs, support strided views, and report an error when the reduced
+axis is empty. Use the corresponding `*_axis_squeeze` methods for a
+NumPy-style axis-removed output shape.
 
 ### Math and ufuncs
 
