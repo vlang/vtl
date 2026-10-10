@@ -127,6 +127,9 @@ reductions and squeezed min/max/argmin/argmax results; multi-axis min/max;
 weighted inverted-CDF quantile, multi-quantile, percentile, and multi-percentile
 forms globally and along one or several axes, with same-shape or reduced-shape
 weights, including NaN-aware forms that discard weights for NaN observations;
+single-axis weighted multi-quantile and multi-percentile APIs also provide
+`*_keepdims` variants that retain the reduced axis after the leading quantile
+dimension;
 multi-axis quantile and percentile convenience APIs default to NumPy's linear
 estimator, alongside forms that expose all thirteen estimator methods;
 multi-quantile multi-axis forms can also retain reduced dimensions with
