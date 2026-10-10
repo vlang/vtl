@@ -24,18 +24,19 @@ version, compiler, CPU, NumPy version, BLAS configuration, and thread count
 with results. NumPy and VTL use different runtimes and memory layouts, so the
 measurements describe this scalar quantile workload only.
 
-On an AMD Ryzen 9 5900X on 2026-10-10, V 0.5.2 `407c52e` with GCC 16.2.1
+On an AMD Ryzen 9 5900X on 2026-10-10, V 0.5.2 `03e12f3` with GCC 16.2.1
 (`-prod -march=native`) and NumPy 2.5.3 with scipy-openblas 0.3.34.106.0 and
-`OPENBLAS_NUM_THREADS=2`, the identical deterministic inputs measured:
+`OPENBLAS_NUM_THREADS=2`, identical deterministic inputs measured sequentially:
 
-| Size | VTL selection (ms) | VTL full sort (ms) | NumPy (ms) |
-| ---: | ---: | ---: | ---: |
-| 100,000 | 1.512 | 4.191 | 0.456 |
-| 1,000,000 | 12.940 | 46.158 | 4.526 |
+| Size | VTL neighbor scan (ms) | Previous VTL selection (ms) | VTL full sort (ms) | NumPy (ms) |
+| ---: | ---: | ---: | ---: | ---: |
+| 100,000 | 0.941 | 1.347 | 3.838 | 0.429 |
+| 1,000,000 | 9.244 | 12.167 | 45.687 | 4.415 |
 
-Checksums matched. Partial selection is 2.8–3.1× faster than VTL's full-sort
-baseline, while remaining about 2.9–3.3× slower than NumPy on this workload.
-This is one scalar quantile measurement, not an overall performance claim.
+Checksums matched. Scanning for the adjacent order statistic reduces VTL time
+by 24–30% against the previous selector and is 4.1–4.9× faster than VTL's
+full-sort baseline. NumPy remains about 2.1–2.2× faster on this workload; this
+is one scalar quantile measurement, not an overall performance claim.
 
 ## PR CPU GEMM budget
 
