@@ -8,6 +8,8 @@ fn test_tensor_arithmetic_operators() {
 
 	add_result := a + b
 	assert add_result.array_equal(vtl.from_1d([f64(5), 7, 9])!)
+	subtract_result := (*b) - (*a)
+	assert subtract_result.array_equal(vtl.from_1d([f64(3), 3, 3])!)
 	multiply_result := a * b
 	assert multiply_result.array_equal(vtl.from_1d([f64(4), 10, 18])!)
 	divide_result := b / a
@@ -19,6 +21,13 @@ fn test_tensor_add_operator_broadcasts() {
 	b := vtl.from_1d([10, 20, 30])!
 	result := a + b
 	assert result.array_equal(vtl.from_2d([[11, 22, 33], [14, 25, 36]])!)
+}
+
+fn test_tensor_subtract_operator_broadcasts() {
+	a := vtl.from_2d([[10, 20, 30], [40, 50, 60]])!
+	b := vtl.from_1d([1, 2, 3])!
+	result := (*a) - (*b)
+	assert result.array_equal(vtl.from_2d([[9, 18, 27], [39, 48, 57]])!)
 }
 
 fn test_tensor_multiply_and_divide_operators_broadcast() {

@@ -106,7 +106,8 @@ an error for empty inputs, empty reduced axes, or all-NaN slices.
 
 ### Math and ufuncs
 
-**Current:** broad elementwise math and broadcasting; `clip` and fused
+**Current:** broad elementwise math and broadcasting; same-dtype tensor `+`,
+`-`, `*`, and `/` operators; `clip` and fused
 `clip_tensor`; broadcast-aware `where`; elementwise `is_nan`, `is_inf`, and
 `is_finite`; `isclose`, `allclose`, `heaviside`, `sign`, `diff`, and numerical
 gradients along selected axes; elementwise logical AND/OR/XOR/NOT; integer
