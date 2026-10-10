@@ -167,6 +167,10 @@ tensor as needed. Negative indices count from the end in the default `.raise`
 mode. `put_with_mode` also accepts `.wrap` and `.clip`; `.clip` maps negative
 indices to the first position, matching NumPy. Invalid indices are rejected
 before any writes, including when the target is a non-contiguous view.
+`putmask` updates only true positions from an exact-shape mask. Values cycle by
+the destination's row-major flat position, matching NumPy: `values[n]` is used
+for each true `mask[n]`. It validates the mask and value availability before
+writing.
 
 ```v
 import vtl
@@ -180,6 +184,11 @@ assert values.to_array() == [90, 11, 12, 20, 21, 99]
 mut wrapped := vtl.from_1d([0, 0, 0, 0])!
 wrapped.put_with_mode(vtl.from_1d([-1, 4])!, vtl.from_1d([7, 8])!, .wrap)!
 assert wrapped.to_array() == [8, 0, 0, 7]
+
+mut masked := vtl.from_1d([1, 2, 3, 4, 5, 6])!
+mask := vtl.from_1d([false, true, false, true, true, false])!
+masked.putmask(mask, vtl.from_1d([8, 9])!)!
+assert masked.to_array() == [1, 9, 3, 9, 8, 6]
 ```
 
 Boolean masks passed to `masked_select` and `masked_fill` may broadcast to the

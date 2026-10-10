@@ -58,6 +58,43 @@ pub fn (mut t Tensor[T]) put[T](indices &Tensor[int], values &Tensor[T]) ! {
 	t.put_with_mode[T](indices, values, .raise)!
 }
 
+// putmask replaces values where mask is true, in row-major logical order.
+// Update values repeat cyclically by row-major flat position, matching NumPy's
+// putmask semantics. The mask must match the tensor shape exactly.
+pub fn (mut t Tensor[T]) putmask[T](mask &Tensor[bool], values &Tensor[T]) ! {
+	if mask.shape != t.shape {
+		return error('putmask: mask shape ${mask.shape} must match tensor shape ${t.shape}')
+	}
+	mut selected := []bool{len: t.size}
+	mut selected_count := 0
+	for flat_index in 0 .. t.size {
+		selected[flat_index] = mask.get_nth[bool](flat_index)
+		if selected[flat_index] {
+			selected_count++
+		}
+	}
+	if selected_count == 0 {
+		return
+	}
+	if values.size == 0 {
+		return error('putmask: at least one value is required for selected positions')
+	}
+	mut update_values := []T{}
+	if tensor_shares_storage[T, T](t, values) {
+		update_values = values.to_array()
+	}
+	for flat_index in 0 .. t.size {
+		if selected[flat_index] {
+			value := if update_values.len > 0 {
+				update_values[flat_index % values.size]
+			} else {
+				values.get_nth[T](flat_index % values.size)
+			}
+			t.set_nth[T](flat_index, value)
+		}
+	}
+}
+
 // put_with_mode replaces values at row-major logical flat indices, using mode
 // to handle indices outside the flattened tensor's range. Repeated indices
 // follow row-major write order, so the last value wins. All indices are
@@ -105,7 +142,11 @@ pub fn (mut t Tensor[T]) put_with_mode[T](indices &Tensor[int], values &Tensor[T
 }
 
 fn tensor_shares_storage[T, U](a &Tensor[T], b &Tensor[U]) bool {
-	return unsafe { voidptr(a.data) == voidptr(b.data) }
+	a_start := unsafe { usize(a.data.data.data) }
+	a_end := a_start + usize(a.data.data.len) * usize(sizeof(T))
+	b_start := unsafe { usize(b.data.data.data) }
+	b_end := b_start + usize(b.data.data.len) * usize(sizeof(U))
+	return a_start < b_end && b_start < a_end
 }
 
 fn normalize_put_index(selected int, size int, mode PutMode) !int {
