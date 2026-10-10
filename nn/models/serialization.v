@@ -217,6 +217,12 @@ pub fn (nn &Sequential[T]) save_checkpoint(path string, epoch int, loss f64) ! {
 					encode_layer_var[T](mut weights, vars, 1, 'beta')!
 				}
 			}
+			'GroupNormLayer' {
+				if vars.len > 0 {
+					encode_layer_var[T](mut weights, vars, 0, 'gamma')!
+					encode_layer_var[T](mut weights, vars, 1, 'beta')!
+				}
+			}
 			'FlattenLayer' {
 				// Flatten has no weights
 			}
@@ -366,6 +372,9 @@ pub fn (nn &Sequential[T]) load_weights(path string) ! {
 					}
 				}
 				'LayerNormLayer' {
+					if j == 0 { 'gamma' } else { 'beta' }
+				}
+				'GroupNormLayer' {
 					if j == 0 { 'gamma' } else { 'beta' }
 				}
 				else {

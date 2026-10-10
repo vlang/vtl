@@ -44,6 +44,11 @@ differ: LSTM is `[batch, sequence, features]`, while GRU is
 `[sequence, batch, features]`. See the
 [NN tutorial](./TUTORIAL_NEURAL_NETWORKS.md).
 
+GroupNorm supports channel-first `[batch, channels, ...]` inputs, per-channel
+affine parameters, and CPU input/parameter gradients. It is available as a
+layer and in `Sequential`; device-specific kernels and broader module parity
+remain separate work.
+
 **Next:** Add bidirectional recurrent layers, stacked GRU layers, recurrent
 dropout and variable-length packed sequences. `Sequential` supports
 `train()`/`eval()` behavior for Dropout and BatchNorm1D; extend mode-aware

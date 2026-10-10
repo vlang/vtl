@@ -657,6 +657,24 @@ fn test_layer_norm_serialization() {
 	assert 'beta' in model.layer_data[1].weights
 }
 
+fn test_group_norm_serialization() {
+	test_dir := setup_test_dir()
+	defer {
+		cleanup_test_dir()
+	}
+	mut nn := sequential_with_layers[f64]([]types.Layer[f64]{})
+	nn.input([4, 8, 8])
+	nn.group_norm(2, layers.GroupNormConfig{})
+	path := '${test_dir}/groupnorm_test.json'
+	nn.save(path)!
+	content := os.read_file(path)!
+	model := json2.decode[ModelFile](content)!
+	assert model.layers[1].layer_type == 'GroupNormLayer'
+	assert model.layers[1].config['num_groups'] == 2
+	assert 'gamma' in model.layer_data[1].weights
+	assert 'beta' in model.layer_data[1].weights
+}
+
 fn test_round_trip_weights_allclose_1e9() {
 	test_dir := setup_test_dir()
 	defer {

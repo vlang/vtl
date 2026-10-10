@@ -95,6 +95,7 @@ CIFAR examples for CI-safe checks.
 | [nn_autoencoder_simple](./nn_autoencoder_simple) | Simple autoencoder | CPU |
 | [nn_conv1d](./nn_conv1d) | Conv1D sequence forward and backward | CPU |
 | [nn_gru](./nn_gru) | GRU sequence forward and autograd backward | CPU |
+| [nn_group_norm](./nn_group_norm) | Channel-first GroupNorm in Sequential with affine parameters | CPU |
 | [nn_mnist](./nn_mnist) | MNIST training path | Dataset download/cache |
 
 ## CIFAR-10 release examples

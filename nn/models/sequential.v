@@ -176,6 +176,11 @@ pub fn (mut nn Sequential[T]) layer_norm(normalized_shape []int, config layers.L
 	nn.info.layer_norm(normalized_shape, config)
 }
 
+// group_norm adds a channel-first GroupNorm layer to the network.
+pub fn (mut nn Sequential[T]) group_norm(num_groups int, config layers.GroupNormConfig) {
+	nn.info.group_norm(num_groups, config)
+}
+
 // embedding adds a new Embedding layer to the network.
 pub fn (mut nn Sequential[T]) embedding(vocab_size int, embedding_dim int) {
 	nn.info.embedding(vocab_size, embedding_dim)
