@@ -70,7 +70,9 @@ single-axis, and multiple-axis `count_nonzero`; `argwhere` and per-axis `nonzero
 `boolean_index`, which preserves trailing dimensions like NumPy `array[mask]`.
 `Tensor.put` and `put_with_mode` update row-major logical flat indices with
 NumPy's `raise`, `wrap`, and `clip` modes; short value tensors repeat, and
-validation completes before mutation.
+validation completes before mutation. `Tensor.putmask` performs in-place
+row-major masked updates with an exact-shape mask and cycles values by each
+destination flat index, matching NumPy.
 
 `Variable.take_along_axis` propagates gradients by scattering them to selected
 source positions, including accumulation for repeated indices and reduction of

@@ -65,12 +65,53 @@ fn test_put_flat_indices_repeat_values_and_preserve_logical_view_order() ! {
 	assert matrix.to_array() == [1, 2, 3, 99, 5, 6]
 }
 
+fn test_putmask_repeats_values_in_row_major_order() ! {
+	mut target := vtl.from_array([1, 2, 3, 4, 5, 6], [2, 3])!
+	mask := vtl.from_array([false, true, false, true, true, false], [2, 3])!
+	target.putmask(mask, vtl.from_1d([8, 9])!)!
+	assert target.to_array() == [1, 9, 3, 9, 8, 6]
+}
+
+fn test_putmask_updates_noncontiguous_views_in_logical_order() ! {
+	mut base := vtl.from_array([1, 2, 3, 4, 5, 6], [2, 3])!
+	mut transposed := base.transpose([1, 0])!
+	mask := vtl.from_array([false, true, false, true, true, false], [3, 2])!
+	transposed.putmask(mask, vtl.from_1d([8, 9])!)!
+	assert base.to_array() == [1, 2, 8, 9, 9, 6]
+}
+
+fn test_putmask_snapshots_aliased_update_values() ! {
+	mut target := vtl.from_1d([10, 20, 30, 40])!
+	values := target.slice([1, 3])!
+	target.putmask(vtl.from_1d([true, true, true, true])!, values)!
+	assert target.to_array() == [20, 30, 20, 30]
+}
+
+fn test_putmask_validates_before_mutating() ! {
+	mut target := vtl.from_1d([1, 2, 3])!
+	if _ := target.putmask(vtl.from_1d([true])!, vtl.from_1d([9])!) {
+		assert false, 'putmask must reject a mask with a different shape'
+	}
+	assert target.to_array() == [1, 2, 3]
+	if _ := target.putmask(vtl.from_1d([true, false, true])!, vtl.from_1d[int]([])!) {
+		assert false, 'putmask must reject empty values for selected positions'
+	}
+	assert target.to_array() == [1, 2, 3]
+	target.putmask(vtl.from_1d([false, false, false])!, vtl.from_1d[int]([])!)!
+	assert target.to_array() == [1, 2, 3]
+}
+
 fn test_put_flat_indices_snapshot_aliased_indices() ! {
 	mut target := vtl.from_1d([1, 0, 2])!
 	indices := target.view()
 	updates := vtl.from_1d([7, 3, 0])!
 	target.put(indices, updates)!
 	assert target.to_array() == [3, 7, 0]
+
+	mut offset_target := vtl.from_1d([1, 2, 0, 0])!
+	offset_indices := offset_target.slice([0, 2])!
+	offset_target.put(offset_indices, vtl.from_1d([9, 8])!)!
+	assert offset_target.to_array() == [1, 9, 8, 0]
 }
 
 fn test_put_flat_indices_snapshot_aliased_values() ! {
@@ -79,6 +120,11 @@ fn test_put_flat_indices_snapshot_aliased_values() ! {
 	values := target.view()
 	target.put(indices, values)!
 	assert target.to_array() == [4, 3, 2, 1]
+
+	mut offset_target := vtl.from_1d([10, 20, 30, 40])!
+	offset_values := offset_target.slice([1, 3])!
+	offset_target.put(vtl.from_1d([0, 1, 2, 3])!, offset_values)!
+	assert offset_target.to_array() == [20, 30, 20, 30]
 }
 
 fn test_put_flat_indices_support_wrap_and_clip_modes() ! {
