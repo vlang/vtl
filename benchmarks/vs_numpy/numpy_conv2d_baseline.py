@@ -15,12 +15,12 @@ WARMUPS = 3
 ITERATIONS = 20
 
 
-def inputs() -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def inputs(dtype: type[np.floating]) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     input_indices = np.arange(BATCH * IN_CHANNELS * HEIGHT * WIDTH, dtype=np.int64)
     weight_indices = np.arange(OUT_CHANNELS * IN_CHANNELS * KERNEL * KERNEL, dtype=np.int64)
-    x = ((input_indices * 13) % 101 - 50).astype(np.float64) / 101.0
-    weights = ((weight_indices * 7) % 37 - 18).astype(np.float64) / 37.0
-    bias = np.arange(1, OUT_CHANNELS + 1, dtype=np.float64) / 10.0
+    x = ((input_indices * 13) % 101 - 50).astype(dtype) / 101.0
+    weights = ((weight_indices * 7) % 37 - 18).astype(dtype) / 37.0
+    bias = np.arange(1, OUT_CHANNELS + 1, dtype=dtype) / 10.0
     return (
         x.reshape(BATCH, IN_CHANNELS, HEIGHT, WIDTH),
         weights.reshape(OUT_CHANNELS, IN_CHANNELS, KERNEL, KERNEL),
@@ -35,8 +35,8 @@ def conv2d(x: np.ndarray, weights: np.ndarray, bias: np.ndarray) -> np.ndarray:
     return result + bias.reshape(1, OUT_CHANNELS, 1, 1)
 
 
-def main() -> None:
-    x, weights, bias = inputs()
+def benchmark(dtype: type[np.floating]) -> None:
+    x, weights, bias = inputs(dtype)
     for _ in range(WARMUPS):
         output = conv2d(x, weights, bias)
 
@@ -47,12 +47,17 @@ def main() -> None:
         samples_ns.append(time.perf_counter_ns() - started)
 
     mean_ms = float(np.mean(samples_ns)) / 1_000_000.0
-    print(f"NumPy {np.__version__}; float64; warmups={WARMUPS}; iterations={ITERATIONS}")
-    print("Benchmark | Size | Avg (ms) | Checksum")
+    checksum = float(np.sum(output, dtype=np.float64))
+    print(f"NumPy {np.__version__}; {np.dtype(dtype)}; warmups={WARMUPS}; iterations={ITERATIONS}")
     print(
-        f"conv2d | 1x4x32x32, 8x4x3x3 | {mean_ms:.6f} | "
-        f"{float(np.sum(output, dtype=np.float64)):.12f}"
+        f"conv2d {np.dtype(dtype)} | 1x4x32x32, 8x4x3x3 | {mean_ms:.6f} | {checksum:.12f}"
     )
+
+
+def main() -> None:
+    print("Benchmark | Size | Avg (ms) | Checksum")
+    benchmark(np.float64)
+    benchmark(np.float32)
 
 
 if __name__ == "__main__":

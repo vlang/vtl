@@ -9,7 +9,7 @@ pub fn conv2d_forward_cpu_f64(input &vtl.Tensor[f64],
 	bias &vtl.Tensor[f64],
 	kernel_size []int,
 	config Conv2DConfig) !&vtl.Tensor[f64] {
-	validate_conv2d_f64(input, weight, bias, kernel_size, config)!
+	validate_conv2d(input, weight, bias, kernel_size, config)!
 	if input.is_row_major_contiguous() && input.data.data.len == input.size
 		&& weight.is_row_major_contiguous() && weight.data.data.len == weight.size
 		&& bias.is_row_major_contiguous() && bias.data.data.len == bias.size {
@@ -18,7 +18,7 @@ pub fn conv2d_forward_cpu_f64(input &vtl.Tensor[f64],
 	return conv2d_forward_cpu_f64_reference(input, weight, bias, kernel_size, config)
 }
 
-fn validate_conv2d_tensor_f64(tensor &vtl.Tensor[f64], name string) ! {
+fn validate_conv2d_tensor[T](tensor &vtl.Tensor[T], name string) ! {
 	if tensor.shape.len != tensor.strides.len {
 		return error('${name} shape and strides must have the same rank')
 	}
@@ -68,11 +68,11 @@ fn validate_conv2d_tensor_f64(tensor &vtl.Tensor[f64], name string) ! {
 	}
 }
 
-fn validate_conv2d_f64(input &vtl.Tensor[f64], weight &vtl.Tensor[f64], bias &vtl.Tensor[f64],
+fn validate_conv2d[T](input &vtl.Tensor[T], weight &vtl.Tensor[T], bias &vtl.Tensor[T],
 	kernel_size []int, config Conv2DConfig) ! {
-	validate_conv2d_tensor_f64(input, 'input')!
-	validate_conv2d_tensor_f64(weight, 'weight')!
-	validate_conv2d_tensor_f64(bias, 'bias')!
+	validate_conv2d_tensor[T](input, 'input')!
+	validate_conv2d_tensor[T](weight, 'weight')!
+	validate_conv2d_tensor[T](bias, 'bias')!
 	if input.shape.len != 4 || weight.shape.len != 4 || bias.shape.len != 2 {
 		return error('Conv2D expects input and weight rank 4 and bias rank 2')
 	}

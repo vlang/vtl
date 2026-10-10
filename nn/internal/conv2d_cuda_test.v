@@ -45,6 +45,42 @@ fn test_conv2d_forward_cpu_f64_contiguous_fast_path_matches_reference() ! {
 	}
 }
 
+fn test_conv2d_forward_cpu_f32_contiguous_fast_path_matches_reference() ! {
+	mut input_values := []f32{len: 2 * 4 * 5 * 6}
+	for i in 0 .. input_values.len {
+		input_values[i] = f32(i % 29 - 14) / 13.0
+	}
+	mut weight_values := []f32{len: 6 * 2 * 2 * 3}
+	for i in 0 .. weight_values.len {
+		weight_values[i] = f32(i % 17 - 8) / 11.0
+	}
+	input := vtl.from_array(input_values, [2, 4, 5, 6])!
+	weight := vtl.from_array(weight_values, [6, 2, 2, 3])!
+	bias := vtl.from_array([f32(0.1), 0.2, 0.3, 0.4, 0.5, 0.6], [1, 6])!
+	config := Conv2DConfig{
+		padding:  [1, 1]
+		stride:   [2, 2]
+		dilation: [2, 1]
+		groups:   2
+	}
+	kernel_size := [2, 3]
+	optimized := conv2d_forward_cpu_f32(input, weight, bias, kernel_size, config)!
+	reference := conv2d_forward_cpu_f32_reference(input, weight, bias, kernel_size, config)!
+	assert optimized.shape == reference.shape
+	for i in 0 .. optimized.size {
+		assert math.abs(f64(optimized.get_nth(i) - reference.get_nth(i))) < 1e-5
+	}
+}
+
+fn test_conv2d_forward_cpu_f32_supports_reversed_input_view() ! {
+	mut input := vtl.from_array([f32(1.0), 2.0], [1, 1, 1, 2])!
+	input.strides[3] = -1
+	weight := vtl.from_array([f32(1.0)], [1, 1, 1, 1])!
+	bias := vtl.from_array([f32(0.0)], [1, 1])!
+	output := conv2d_forward_cpu_f32(input, weight, bias, [1, 1], Conv2DConfig{})!
+	assert output.to_array() == [f32(2.0), 1.0]
+}
+
 fn test_conv2d_forward_cpu_f64_rejects_invalid_tensor_metadata() {
 	mut input := vtl.from_array([f64(1.0)], [1, 1, 1, 1]) or { panic(err) }
 	input.shape = [1, 1]

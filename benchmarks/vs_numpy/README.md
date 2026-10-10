@@ -404,13 +404,13 @@ The chart below isolates this pure-V run from the earlier CBLAS measurements.
 
 ## Conv2D (CPU path)
 
-The VTL and NumPy runs use the same deterministic `float64` NCHW input,
+The VTL and NumPy runs use the same deterministic `float32` and `float64` NCHW inputs,
 OIHW weights, bias, zero padding, and `[1, 4, 32, 32]` / `[8, 4, 3, 3]`
 shapes. Both warm up three times and report the mean of 20 forward calls.
-VTL times `internal.conv2d_forward_f64`; NumPy uses a sliding-window view and
+VTL times the f32 and f64 CPU paths; NumPy uses a sliding-window view and
 optimized `einsum`, including padding and output allocation in the timed call.
-The VTL output checksum makes it possible to compare numerical results across
-the two programs. Run both from `~/.vmodules`:
+The checksums expose dtype-specific accumulation differences. Run both from
+`~/.vmodules`:
 
 ```bash
 systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
@@ -423,19 +423,21 @@ systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env V
 ```
 
 On an AMD Ryzen 9 5900X, V 0.5.2 `407c52e` built with GCC 16.2.1,
-`-no-parallel -prod -march=native`, and NumPy 2.5.3 linked to scipy-openblas 0.3.34.106.0
-with `OPENBLAS_NUM_THREADS=2`, three independent runs after the input-validation
-guard was added produced these medians:
+`-no-parallel -prod -march=native`, and NumPy 2.5.3 linked to scipy-openblas
+0.3.34.106.0 with `OPENBLAS_NUM_THREADS=2`, three independent runs produced
+these medians:
 
-| Implementation | Median (ms) | Checksum |
-| --- | ---: | ---: |
-| VTL CPU f64 | 0.242 | 3689.694086165343 |
-| NumPy float64 | 0.291 | 3689.694086165374 |
+| Dtype | VTL CPU (ms) | NumPy (ms) | Faster implementation | VTL checksum | NumPy checksum |
+| --- | ---: | ---: | --- | ---: | ---: |
+| float64 | 0.228 | 0.291 | VTL, 1.28× | 3689.694086165343 | 3689.694086165374 |
+| float32 | 0.220 | 0.106 | NumPy, 2.08× | 3689.694132942707 | 3689.694126147777 |
 
-VTL was 1.21× faster for this small single-batch shape; the checksums differ by
-about `3.1e-11`. This measurement includes NumPy padding/window setup and output
-allocation. It is one workload and does not establish general Conv2D parity or
-performance superiority.
+For f64 the checksums differ by about `3.1e-11`; f32 differs by about
+`6.8e-6` due to accumulation order. NumPy remains about 2.08× faster for this
+f32 shape, so the direct-index path has not closed that performance gap. These
+measurements include NumPy padding/window setup and output allocation. They are
+one workload and do not establish general Conv2D parity or performance
+superiority.
 
 ## Autograd (3-layer MLP backprop)
 
