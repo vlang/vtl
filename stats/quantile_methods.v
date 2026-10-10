@@ -198,11 +198,18 @@ fn quantile_method_values(mut values []f64, q f64, method QuantileMethod, sort_v
 	lower_index, upper_index, weight := quantile_order_indices(q, values.len, method)
 	if sort_values {
 		select_quantile_index(mut values, lower_index, 0, values.len - 1)
-		if upper_index > lower_index {
-			select_quantile_index(mut values, upper_index, lower_index + 1, values.len - 1)
+	}
+	lower_value := values[lower_index]
+	mut upper_value := lower_value
+	if upper_index > lower_index {
+		upper_value = values[lower_index + 1]
+		for i in lower_index + 2 .. values.len {
+			if values[i] < upper_value {
+				upper_value = values[i]
+			}
 		}
 	}
-	return values[lower_index] * (1 - weight) + values[upper_index] * weight
+	return lower_value * (1 - weight) + upper_value * weight
 }
 
 fn quantile_method_sorted(values []f64, q f64, method QuantileMethod) f64 {
