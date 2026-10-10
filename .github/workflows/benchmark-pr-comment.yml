@@ -71,7 +71,9 @@ jobs:
             run_v_benchmark vtl-matmul vtl/benchmarks/vs_numpy/matmul_bench.v -d vsl_blas_cblas
             env HOME="$HOME" PATH="$PATH" VJOBS=2 OPENBLAS_NUM_THREADS=2 python3 vtl/benchmarks/vs_numpy/numpy_matmul_baseline.py
             env HOME="$HOME" PATH="$PATH" VJOBS=2 OPENBLAS_NUM_THREADS=2 python3 vtl/benchmarks/vs_numpy/numpy_matmul_f32_end_to_end.py
+            echo '## Conv2D CPU vs NumPy'
             run_v_benchmark vtl-conv2d vtl/benchmarks/vs_numpy/conv2d_bench.v
+            env HOME="$HOME" PATH="$PATH" VJOBS=2 OPENBLAS_NUM_THREADS=2 python3 vtl/benchmarks/vs_numpy/numpy_conv2d_baseline.py
             echo '## Reduced SVD vs NumPy'
             run_v_benchmark vtl-svd-purev vtl/benchmarks/vs_numpy/svd_bench.v
             run_v_benchmark vtl-svd-lapacke vtl/benchmarks/vs_numpy/svd_bench.v -d vsl_lapack_lapacke
