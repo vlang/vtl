@@ -5,7 +5,9 @@
 This paired microbenchmark computes a broadcasted remainder for 1,048,576
 deterministic `i8` inputs and a scalar `i16` divisor. Both versions run two
 warmups and seven timed calls, allocate the result inside each timed call, and
-report a checksum. Run the V program from `~/.vmodules` after compiling it:
+report a checksum. VTL has a fast path for contiguous input with a scalar
+divisor and retains its stride-aware path for other layouts. Run the V program
+from `~/.vmodules` after compiling it:
 
 ```bash
 systemd-run --user --scope --quiet -p MemoryMax=3G -p MemorySwapMax=0 -- env VJOBS=2 \
@@ -18,9 +20,12 @@ systemd-run --user --scope --quiet -p MemoryMax=1G -p MemorySwapMax=0 -- env VJO
 	./vtl/benchmarks/vs_numpy/numpy_promoted_remainder_baseline.py
 ```
 
-Exploratory local samples on 2026-10-10 measured VTL at 3.5–4.6 ms and NumPy
-at 1.4–2.0 ms, with matching checksums. This identifies a performance gap for
-this operation; it is not evidence of overall VTL/NumPy parity.
+On an AMD Ryzen 9 5900X with V 0.5.2 and GCC `-prod -march=native`, three
+interleaved process runs on 2026-10-10 measured VTL at 1.617–1.629 ms
+(median 1.623 ms) and NumPy 2.5.3 at 1.431–1.990 ms (median 1.488 ms). All
+checksums matched. The fast path reduced VTL's previous 4.3 ms sample to about
+1.6 ms; in this workload VTL is still about 1.09× slower by median. This does
+not establish overall VTL/NumPy performance parity.
 
 ## Contiguous `putmask`
 
