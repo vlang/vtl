@@ -73,20 +73,33 @@ fn binary_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation PromotedBinary
 		left := a.broadcast_to(shape)!
 		right := b.broadcast_to(shape)!
 		mut result := empty[R](shape, memory: .row_major)
+		left_is_singleton := a.size == 1
+		right_is_singleton := b.size == 1
 		left_is_flat := left.size == result.size && left.is_row_major_contiguous()
 		right_is_flat := right.size == result.size && right.is_row_major_contiguous()
 		if operation == .remainder {
+			if left_is_flat && right_is_singleton {
+				divisor := cast_promoted_value[U, R](b.data.data[0])
+				if divisor == R(0) {
+					return result
+				}
+				for index in 0 .. result.size {
+					value := cast_promoted_value[T, R](left.data.data[index])
+					result.data.data[index] = numpy_remainder(value, divisor)
+				}
+				return result
+			}
 			for index in 0 .. result.size {
 				left_offset := if left_is_flat {
 					index
-				} else if left.size == 1 {
+				} else if left_is_singleton {
 					0
 				} else {
 					broadcast_tensor_offset(index, shape, left.strides)
 				}
 				right_offset := if right_is_flat {
 					index
-				} else if right.size == 1 {
+				} else if right_is_singleton {
 					0
 				} else {
 					broadcast_tensor_offset(index, shape, right.strides)
@@ -100,14 +113,14 @@ fn binary_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation PromotedBinary
 		for index in 0 .. result.size {
 			left_offset := if left_is_flat {
 				index
-			} else if left.size == 1 {
+			} else if left_is_singleton {
 				0
 			} else {
 				broadcast_tensor_offset(index, shape, left.strides)
 			}
 			right_offset := if right_is_flat {
 				index
-			} else if right.size == 1 {
+			} else if right_is_singleton {
 				0
 			} else {
 				broadcast_tensor_offset(index, shape, right.strides)

@@ -268,3 +268,13 @@ fn test_promoted_integer_remainder_handles_zero_divisor_and_rejects_float() ! {
 		assert false, 'promoted remainder only supports integer tensors'
 	}
 }
+
+fn test_promoted_remainder_reads_strided_views_in_logical_order() ! {
+	values := vtl.from_2d[i8]([[-5, 4], [8, -10]])!
+	transposed := values.transpose([1, 0])!
+	divisor := vtl.from_1d[i16]([3])!
+	remainders := vtl.remainder_promoted[i16, i8, i16](transposed, divisor)!
+
+	assert remainders.shape == [2, 2]
+	assert remainders.to_array() == [1, 2, 1, 2]
+}
