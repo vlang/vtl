@@ -456,13 +456,20 @@ grid := vtl.from_array([10.0, 7.0, 4.0, 3.0, 2.0, 1.0], [2, 3])!
 axis_weights := vtl.from_1d([1.0, 1.0, 7.0])!
 medians := stats.quantile_weighted_axis(grid, axis_weights, 0.5, 1, false)!
 assert medians.to_array() == [4.0, 1.0]
+
+levels := stats.quantiles_weighted_axis_keepdims(grid, axis_weights, [0.0, 0.5, 1.0], 1,
+	true)!
+assert levels.shape == [3, 2, 1]
+assert levels.to_array() == [4.0, 1.0, 4.0, 1.0, 10.0, 3.0]
 ```
 
 Weights must be finite, non-negative, and have a positive sum in each reduced
 slice. `nanquantile_weighted`, `nanquantiles_weighted`, and their axis forms
 ignore NaN values and remove the corresponding weights from each slice. The
 ordinary weighted forms propagate NaNs. Weighted percentile APIs accept the
-equivalent 0..100 scale.
+equivalent 0..100 scale. The multi-quantile and multi-percentile single-axis
+APIs have `*_keepdims` variants; these retain the reduced axis after the
+leading quantile dimension, as shown above.
 
 For multiple reduced axes, pass the axes as a slice. Compact weights must have
 dimensions in that same axis order; full-shape weights can differ by element:
