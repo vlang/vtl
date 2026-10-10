@@ -18,6 +18,43 @@ fn test_quantile_methods_match_numpy_estimator_examples() ! {
 	assert quantile_with_method(values, 0.5, .nearest)! == 2.0
 }
 
+fn test_scalar_quantile_selection_matches_full_sort_for_every_estimator() ! {
+	methods := [QuantileMethod.inverted_cdf, .averaged_inverted_cdf, .closest_observation,
+		.interpolated_inverted_cdf, .hazen, .weibull, .linear, .median_unbiased, .normal_unbiased,
+		.lower, .higher, .midpoint, .nearest]
+	for size in [1, 2, 3, 17, 257, 4096] {
+		mut values := []f64{len: size}
+		for i in 0 .. size {
+			values[i] = f64((i * 73 + size / 2) % size)
+		}
+		mut sorted := values.clone()
+		sorted.sort()
+		for q in [0.0, 0.01, 0.25, 0.5, 0.75, 0.99, 1.0] {
+			for method in methods {
+				mut selected := values.clone()
+				actual := quantile_method_values(mut selected, q, method, true)
+				expected := quantile_method_sorted(sorted, q, method)
+				assert math.abs(actual - expected) < 1e-12, 'n=${size}, q=${q}, method=${method}: ${actual} != ${expected}'
+			}
+		}
+	}
+}
+
+fn test_scalar_quantile_selection_scales_with_many_duplicate_values() ! {
+	mut values := []f64{len: 100_000}
+	for i in 0 .. values.len {
+		values[i] = f64((i * 7919 + 17) % 1009) / 1009.0
+	}
+	mut sorted := values.clone()
+	sorted.sort()
+	mut selected := values.clone()
+	actual := quantile_method_values(mut selected, 0.5, .linear, true)
+	expected := quantile_method_sorted(sorted, 0.5, .linear)
+	assert actual == expected
+	tensor := vtl.from_array(values, [values.len])!
+	assert quantile_with_method(tensor, 0.5, .linear)! == expected
+}
+
 fn test_quantile_methods_nan_axis_and_percentile_apis() ! {
 	values := vtl.from_array([1.0, math.nan(), 3.0, 5.0, 7.0, 9.0], [2, 3])!
 	ordinary := quantile_axis_with_method(values, 0.5, 1, .linear, false)!

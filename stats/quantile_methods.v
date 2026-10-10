@@ -192,10 +192,17 @@ fn quantile_method_values(mut values []f64, q f64, method QuantileMethod, sort_v
 	if values.any(math.is_nan(it)) {
 		return math.nan()
 	}
-	if sort_values {
-		values.sort()
+	if values.len == 0 {
+		return math.nan()
 	}
-	return quantile_method_sorted(values, q, method)
+	lower_index, upper_index, weight := quantile_order_indices(q, values.len, method)
+	if sort_values {
+		select_quantile_index(mut values, lower_index, 0, values.len - 1)
+		if upper_index > lower_index {
+			select_quantile_index(mut values, upper_index, lower_index + 1, values.len - 1)
+		}
+	}
+	return values[lower_index] * (1 - weight) + values[upper_index] * weight
 }
 
 fn quantile_method_sorted(values []f64, q f64, method QuantileMethod) f64 {
@@ -203,6 +210,11 @@ fn quantile_method_sorted(values []f64, q f64, method QuantileMethod) f64 {
 	if n == 0 {
 		return math.nan()
 	}
+	lower_index, upper_index, weight := quantile_order_indices(q, n, method)
+	return values[lower_index] * (1 - weight) + values[upper_index] * weight
+}
+
+fn quantile_order_indices(q f64, n int, method QuantileMethod) (int, int, f64) {
 	mut position := q * f64(n - 1)
 	match method {
 		.inverted_cdf, .averaged_inverted_cdf, .closest_observation {
@@ -252,7 +264,60 @@ fn quantile_method_sorted(values []f64, q f64, method QuantileMethod) f64 {
 	lower_index := int(math.floor(position))
 	upper_index := math.min(lower_index + 1, n - 1)
 	weight := position - f64(lower_index)
-	return values[lower_index] * (1 - weight) + values[upper_index] * weight
+	return lower_index, upper_index, weight
+}
+
+// select_quantile_index partially orders values so the requested order
+// statistic is available without sorting the entire input.
+fn select_quantile_index(mut values []f64, target int, left int, right int) {
+	mut low := left
+	mut high := right
+	mut depth := 2 * int(math.log2(f64(right - left + 1))) + 1
+	for low < high {
+		if depth == 0 {
+			// Bound worst-case selection cost with the canonical in-place sort.
+			values.sort()
+			return
+		}
+		depth--
+		middle := low + (high - low) / 2
+		pivot := quantile_median_of_three(values[low], values[middle], values[high])
+		mut less := low
+		mut current := low
+		mut greater := high
+		for current <= greater {
+			if values[current] < pivot {
+				values[less], values[current] = values[current], values[less]
+				less++
+				current++
+			} else if values[current] > pivot {
+				values[current], values[greater] = values[greater], values[current]
+				greater--
+			} else {
+				current++
+			}
+		}
+		if target < less {
+			high = less - 1
+		} else if target > greater {
+			low = greater + 1
+		} else {
+			return
+		}
+	}
+}
+
+fn quantile_median_of_three(a f64, b f64, c f64) f64 {
+	if a < b {
+		if b < c {
+			return b
+		}
+		return if a < c { c } else { a }
+	}
+	if a < c {
+		return a
+	}
+	return if b < c { c } else { b }
 }
 
 fn quantile_axis_method_impl[T](t &vtl.Tensor[T], q f64, axis int, method QuantileMethod, ignore_nan bool, keepdims bool) !&vtl.Tensor[f64] {
