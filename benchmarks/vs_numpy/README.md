@@ -1,5 +1,37 @@
 # VTL vs NumPy baselines
 
+## Contiguous `putmask`
+
+The paired microbenchmark updates a contiguous one-million-element `f64`
+tensor with a 50% Boolean mask and three repeating values. Input construction
+and target copies are outside the timed region; both implementations perform
+the in-place update and checksum the resulting target. Each runs two warmups
+and averages seven measurements. Run from `~/.vmodules`:
+
+```bash
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -no-parallel -cc gcc -prod -cflags "-march=native" \
+	-o /tmp/vtl-putmask-bench ./vtl/benchmarks/vs_numpy/putmask_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 \
+	/tmp/vtl-putmask-bench
+systemd-run --user --scope --quiet -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 \
+	OPENBLAS_NUM_THREADS=2 uv run --offline --no-project --with numpy python \
+	./vtl/benchmarks/vs_numpy/numpy_putmask_baseline.py
+```
+
+Compile the V benchmark before running its binary. `-prod` enables V's
+production optimization flags; `-march=native` specializes the binary for the
+build CPU and should be removed for portable builds. Record the V version,
+compiler, CPU, NumPy version, BLAS configuration, and thread count with new
+results.
+
+On an AMD Ryzen 9 5900X on 2026-10-10, V 0.5.2 `03e12f3` with GCC 16.2.1
+(`-prod -march=native`) measured median process means of 0.850 ms for VTL and
+0.662 ms for NumPy 2.5.3 with `OPENBLAS_NUM_THREADS=2`, across three paired
+runs; each process mean averages seven timed calls. Checksums matched. NumPy
+was about 1.3× faster for this workload. This microbenchmark does not establish
+overall performance parity.
+
 ## Scalar quantile selection
 
 The scalar quantile path partially orders one input copy to obtain its one or
