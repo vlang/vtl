@@ -120,6 +120,10 @@ uniform spacing or monotonic non-uniform coordinates and first/second-order
 boundary differences. `add_promoted`, `subtract_promoted`, and
 `multiply_promoted` accept mixed real numeric dtypes, broadcast their inputs,
 and validate an explicitly selected output dtype against `promote_types`.
+`divide_promoted` performs NumPy-style true division for mixed real numeric and
+boolean tensors, broadcasts inputs, and returns `float32` only when the
+promoted input dtype is `float32`; other supported combinations return
+`float64`.
 
 **Remaining:** audit unary/binary function families, add promoted arithmetic
 for the remaining operations, and infer output dtypes automatically for mixed

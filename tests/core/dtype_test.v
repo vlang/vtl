@@ -201,3 +201,47 @@ fn test_promoted_arithmetic_preserves_dtype_precision_and_rejects_wrong_dtype() 
 		assert false, 'promoted arithmetic must reject an incorrect output dtype'
 	}
 }
+
+fn test_promoted_division_uses_numpy_true_divide_dtypes() ! {
+	integers := vtl.from_2d[i8]([[1, 2], [3, 4]])!
+	unsigned := vtl.from_1d[u8]([2, 4])!
+	integer_quotients := vtl.divide_promoted[f64, i8, u8](integers, unsigned)!
+	assert integer_quotients.shape == [2, 2]
+	assert integer_quotients.dtype() == .float64
+	assert integer_quotients.to_array() == [0.5, 0.5, 1.5, 1.0]
+
+	floats := vtl.from_2d[f32]([[8, 6], [4, 2]])!
+	divisors := vtl.from_1d[f32]([2, 3])!
+	float_quotients := vtl.divide_promoted[f32, f32, f32](floats, divisors)!
+	assert float_quotients.dtype() == .float32
+	float_values := float_quotients.to_array()
+	float_expected := [4.0, 2.0, 2.0, 2.0 / 3]
+	for i, expected in float_expected {
+		assert math.abs(float_values[i] - expected) < 1e-6
+	}
+
+	f32_values := vtl.from_1d[f32]([2, 4])!
+	i16_values := vtl.from_1d[i16]([2])!
+	mixed_quotients := vtl.divide_promoted[f32, f32, i16](f32_values, i16_values)!
+	assert mixed_quotients.dtype() == .float32
+	for i, expected in [1.0, 2.0] {
+		assert math.abs(mixed_quotients.to_array()[i] - expected) < 1e-6
+	}
+
+	truth := vtl.from_1d[bool]([true, false])!
+	boolean_divisors := vtl.from_1d[bool]([true, true])!
+	boolean_quotients := vtl.divide_promoted[f64, bool, bool](truth, boolean_divisors)!
+	assert boolean_quotients.dtype() == .float64
+	assert boolean_quotients.to_array() == [1.0, 0.0]
+}
+
+fn test_promoted_division_rejects_wrong_output_dtype() ! {
+	left := vtl.from_1d[i16]([5])!
+	right := vtl.from_1d[i16]([2])!
+	if _ := vtl.divide_promoted[i16, i16, i16](left, right) {
+		assert false, 'true division must reject an integer output dtype'
+	}
+	if _ := vtl.divide_promoted[f32, i16, i16](left, right) {
+		assert false, 'integer true division must use float64 output'
+	}
+}
