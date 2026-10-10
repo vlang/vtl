@@ -1,4 +1,4 @@
-// Run from ~/.vmodules with `v -prod run`.
+// Compile with -prod from ~/.vmodules, then run the binary; see benchmarks/README.md.
 module main
 
 import time
