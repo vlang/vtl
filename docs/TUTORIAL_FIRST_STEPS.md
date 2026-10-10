@@ -163,6 +163,22 @@ For shape errors returned as `!`, use the corresponding methods such as
 `subtract` instead of operators. V requires dereferencing tensor pointers for
 binary subtraction because `-` also supports pointer subtraction.
 
+For elementwise extrema, `max` and `min` propagate NaNs like NumPy's
+`maximum` and `minimum`; `fmax` and `fmin` ignore a single NaN value. All four
+methods broadcast their inputs and preserve the tensor dtype.
+
+```v
+import math
+import vtl
+
+left := vtl.from_1d([math.nan(), 4.0, -0.0])!
+right := vtl.from_1d([2.0, math.nan(), 0.0])!
+assert left.max(right)!.to_array()[2] == 0.0
+assert math.signbit(left.max(right)!.get_nth(2))
+assert left.fmax(right)!.to_array()[0] == 2.0
+assert left.fmin(right)!.to_array()[1] == 4.0
+```
+
 ```v
 import vtl
 
