@@ -1,5 +1,42 @@
 # VTL vs NumPy baselines
 
+## Scalar quantile selection
+
+The scalar quantile path partially orders one input copy to obtain its one or
+two required order statistics. This benchmark compares that path with a V
+full-sort baseline and NumPy's `quantile(method="linear")` for identical
+deterministic `f64` inputs. It times seven calls after two warmups and reports
+the mean and checksum. Run from `~/.vmodules`:
+
+```bash
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -no-parallel -cc gcc -prod -cflags "-march=native" -o /tmp/vtl-quantile-select-bench \
+	./vtl/benchmarks/vs_numpy/quantile_select_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 \
+	/tmp/vtl-quantile-select-bench
+systemd-run --user --scope --quiet -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 \
+	OPENBLAS_NUM_THREADS=2 uv run --offline --no-project --with numpy python \
+	./vtl/benchmarks/vs_numpy/numpy_quantile_baseline.py
+```
+
+Compile the V program with `-prod` before executing its binary. Record the V
+version, compiler, CPU, NumPy version, BLAS configuration, and thread count
+with results. NumPy and VTL use different runtimes and memory layouts, so the
+measurements describe this scalar quantile workload only.
+
+On an AMD Ryzen 9 5900X on 2026-10-10, V 0.5.2 `407c52e` with GCC 16.2.1
+(`-prod -march=native`) and NumPy 2.5.3 with scipy-openblas 0.3.34.106.0 and
+`OPENBLAS_NUM_THREADS=2`, the identical deterministic inputs measured:
+
+| Size | VTL selection (ms) | VTL full sort (ms) | NumPy (ms) |
+| ---: | ---: | ---: | ---: |
+| 100,000 | 1.512 | 4.191 | 0.456 |
+| 1,000,000 | 12.940 | 46.158 | 4.526 |
+
+Checksums matched. Partial selection is 2.8–3.1× faster than VTL's full-sort
+baseline, while remaining about 2.9–3.3× slower than NumPy on this workload.
+This is one scalar quantile measurement, not an overall performance claim.
+
 ## PR CPU GEMM budget
 
 The path-filtered PR workflow compares the optimized VSL CBLAS f64 and f32

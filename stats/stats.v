@@ -943,6 +943,16 @@ fn median_of_three(a f64, b f64, c f64) f64 {
 
 fn tensor_float64_values[T](t &vtl.Tensor[T], ignore_nan bool) []f64 {
 	mut values := []f64{cap: t.size}
+	if t.is_row_major_contiguous() {
+		for value in t.data.data[..t.size] {
+			numeric := vtl.cast[f64](value)
+			if ignore_nan && math.is_nan(numeric) {
+				continue
+			}
+			values << numeric
+		}
+		return values
+	}
 	mut iter := t.iterator[T]()
 	for {
 		value, _ := iter.next() or { break }
