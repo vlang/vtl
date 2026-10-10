@@ -85,6 +85,19 @@ cumulative.backprop()!
 assert x.grad.to_array() == [2.0, 1.0, 2.0, 1.0]
 ```
 
+`cumprod(axis)` also supports backpropagation, including inputs with zeros:
+
+```v
+import vtl
+import vtl.autograd
+
+mut ctx := autograd.ctx[f64]()
+x := ctx.variable(vtl.from_1d([2.0, 0.0, 3.0])!)
+mut cumulative := x.cumprod(0)!
+cumulative.backprop()!
+assert x.grad.to_array() == [1.0, 8.0, 0.0]
+```
+
 ## Gradient accumulation
 
 Gradients accumulate across calls.  Zero them before each training step

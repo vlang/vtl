@@ -104,6 +104,22 @@ fn test_variable_cumsum_rejects_scalar_and_invalid_axis() {
 	}
 }
 
+fn test_variable_cumprod_forward_backward_with_zero_inputs() ! {
+	mut context := autograd.ctx[f64]()
+	input := context.variable(vtl.from_1d([2.0, 0.0, 3.0])!)
+	mut cumulative := input.cumprod(-1)!
+	assert cumulative.value.to_array() == [2.0, 0.0, 0.0]
+	cumulative.backprop()!
+	assert input.grad.to_array() == [1.0, 8.0, 0.0]
+
+	mut matrix_context := autograd.ctx[f64]()
+	matrix_input := matrix_context.variable(vtl.from_array([2.0, 3.0, 4.0, 5.0], [2, 2])!)
+	mut row_products := matrix_input.cumprod(1)!
+	assert row_products.value.to_array() == [2.0, 6.0, 4.0, 20.0]
+	row_products.backprop()!
+	assert matrix_input.grad.to_array() == [4.0, 2.0, 6.0, 4.0]
+}
+
 fn test_reshape_forward_backward() {
 	f64_ctx := autograd.ctx[f64]()
 	x := f64_ctx.variable(vtl.from_1d([1.0, 2.0, 3.0, 4.0])!)

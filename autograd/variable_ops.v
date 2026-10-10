@@ -66,6 +66,26 @@ pub fn (v &Variable[T]) cumsum(axis int) !&Variable[T] {
 	return result
 }
 
+// cumprod applies a cumulative product along one axis and records its backward
+// rule when this variable requires gradients.
+pub fn (v &Variable[T]) cumprod(axis int) !&Variable[T] {
+	rank := v.value.rank()
+	if rank == 0 {
+		return error('Variable.cumprod: input has no dimensions')
+	}
+	na := if axis < 0 { axis + rank } else { axis }
+	if na < 0 || na >= rank {
+		return error('Variable.cumprod: axis ${axis} out of bounds for shape ${v.value.shape}')
+	}
+	value := v.value.cumprod[T](na)!
+	mut result := v.context.variable(value)
+	if v.requires_grad {
+		gate := cumprod_gate[T](v.value, na)
+		gate.cache(mut result, v)!
+	}
+	return result
+}
+
 // mean_along_axis computes one-axis means. Set keepdims to retain the reduced
 // axis with length one.
 pub fn (v &Variable[T]) mean_along_axis(axis int, keepdims bool) !&Variable[T] {
