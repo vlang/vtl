@@ -130,7 +130,9 @@ The promotion helper models NumPy's array-dtype rules using VTL's current
 types. For mixed real numeric tensors, `add_promoted`, `subtract_promoted`,
 and `multiply_promoted` apply those rules with broadcasting; choose the output
 type explicitly and VTL checks it against the promotion result. The arithmetic
-operators still require matching tensor types.
+operators still require matching tensor types. `divide_promoted` follows
+NumPy's true-division output types: integer inputs produce `f64`, while inputs
+whose promoted dtype is `f32` produce `f32`.
 
 ```v
 import vtl
