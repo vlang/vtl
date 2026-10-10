@@ -171,15 +171,26 @@ _ = la.matmul(a, b)!
 ```
 
 ### CI Integration
-- GH Actions workflow runs `benchmarks/*.v` on every PR
-- Posts comment with: VTL time, NumPy time, speedup ratio
-- Fails PR if VTL is >3x slower than NumPy for equivalent ops (with justification for known gaps)
+- The path-filtered `.github/workflows/benchmark-pr-comment.yml` workflow
+  compiles its V benchmarks with `-prod`, runs them separately from compilation,
+  and posts a report with VTL and NumPy timings.
+- The report currently includes CPU matmul, Conv2D, reduced SVD, statistics,
+  and linear bias-gradient reduction. These results are diagnostic except for
+  the optimized CPU GEMM budget below.
+- CI fails when either f32 or f64 optimized CBLAS GEMM at 512×512 is more than
+  3× slower than NumPy. The report is posted before this gate runs. A
+  `performance-exempt` label bypasses the threshold while leaving the measured
+  ratios visible.
+- The gate does not establish pure-V, CUDA, Conv2D, autograd, or end-to-end
+  training performance parity. Add explicit, equivalent baselines and budgets
+  before treating those workloads as CI performance requirements.
 
-### Priority Benchmarks
-1. **Matmul** — `f64[1024, 1024]` · CPU and CUDA
-2. **Conv2D** — `f64[64, 3, 32, 32]` kernel `f64[3, 3, 3, 64]` · CPU and CUDA
-3. **Autograd backprop** — MLP 3-layer, 256 hidden units
-4. **Training step** — full forward + loss + backprop + optimizer update
+### Planned Benchmark Coverage
+1. **Matmul** — add larger shapes and CUDA comparisons with matching backends.
+2. **Conv2D** — add an optimized backend comparison for
+   `f64[64, 3, 32, 32]` and kernel `f64[3, 3, 3, 64]`.
+3. **Autograd backprop** — three-layer MLP with 256 hidden units.
+4. **Training step** — full forward, loss, backpropagation, and optimizer update.
 
 ---
 
