@@ -404,11 +404,38 @@ The chart below isolates this pure-V run from the earlier CBLAS measurements.
 
 ## Conv2D (CPU path)
 
+The VTL and NumPy runs use the same deterministic `float64` NCHW input,
+OIHW weights, bias, zero padding, and `[1, 4, 32, 32]` / `[8, 4, 3, 3]`
+shapes. Both warm up three times and report the mean of 20 forward calls.
+VTL times `internal.conv2d_forward_f64`; NumPy uses a sliding-window view and
+optimized `einsum`, including padding and output allocation in the timed call.
+The VTL output checksum makes it possible to compare numerical results across
+the two programs. Run both from `~/.vmodules`:
+
 ```bash
 systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
-	v -prod -o /tmp/vtl-conv2d-bench ./vtl/benchmarks/vs_numpy/conv2d_bench.v
+	v -no-parallel -cc gcc -prod -cflags "-march=native" -o /tmp/vtl-conv2d-bench \
+	./vtl/benchmarks/vs_numpy/conv2d_bench.v
 systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-conv2d-bench
+systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
+	OPENBLAS_NUM_THREADS=2 uv run --offline --no-project --with numpy python \
+	./vtl/benchmarks/vs_numpy/numpy_conv2d_baseline.py
 ```
+
+On an AMD Ryzen 9 5900X, V 0.5.2 `407c52e` built with GCC 16.2.1,
+`-no-parallel -prod -march=native`, and NumPy 2.5.3 linked to scipy-openblas 0.3.34.106.0
+with `OPENBLAS_NUM_THREADS=2`, three independent runs after the input-validation
+guard was added produced these medians:
+
+| Implementation | Median (ms) | Checksum |
+| --- | ---: | ---: |
+| VTL CPU f64 | 0.242 | 3689.694086165343 |
+| NumPy float64 | 0.291 | 3689.694086165374 |
+
+VTL was 1.21× faster for this small single-batch shape; the checksums differ by
+about `3.1e-11`. This measurement includes NumPy padding/window setup and output
+allocation. It is one workload and does not establish general Conv2D parity or
+performance superiority.
 
 ## Autograd (3-layer MLP backprop)
 

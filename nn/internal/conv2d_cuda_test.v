@@ -18,6 +18,79 @@ fn test_conv2d_forward_cpu_f64() ! {
 	assert out.shape == [1, 1, 3, 3]
 }
 
+fn test_conv2d_forward_cpu_f64_contiguous_fast_path_matches_reference() ! {
+	mut input_values := []f64{len: 2 * 4 * 5 * 6}
+	for i in 0 .. input_values.len {
+		input_values[i] = f64(i % 29 - 14) / 13.0
+	}
+	mut weight_values := []f64{len: 6 * 2 * 2 * 3}
+	for i in 0 .. weight_values.len {
+		weight_values[i] = f64(i % 17 - 8) / 11.0
+	}
+	input := vtl.from_array(input_values, [2, 4, 5, 6])!
+	weight := vtl.from_array(weight_values, [6, 2, 2, 3])!
+	bias := vtl.from_array([f64(0.1), 0.2, 0.3, 0.4, 0.5, 0.6], [1, 6])!
+	config := Conv2DConfig{
+		padding:  [1, 1]
+		stride:   [2, 2]
+		dilation: [2, 1]
+		groups:   2
+	}
+	kernel_size := [2, 3]
+	optimized := conv2d_forward_cpu_f64(input, weight, bias, kernel_size, config)!
+	reference := conv2d_forward_cpu_f64_reference(input, weight, bias, kernel_size, config)!
+	assert optimized.shape == reference.shape
+	for i in 0 .. optimized.size {
+		assert math.abs(optimized.get_nth(i) - reference.get_nth(i)) < 1e-12
+	}
+}
+
+fn test_conv2d_forward_cpu_f64_rejects_invalid_tensor_metadata() {
+	mut input := vtl.from_array([f64(1.0)], [1, 1, 1, 1]) or { panic(err) }
+	input.shape = [1, 1]
+	weight := vtl.from_array([f64(1.0)], [1, 1, 1, 1]) or { panic(err) }
+	bias := vtl.from_array([f64(0.0)], [1, 1]) or { panic(err) }
+	config := Conv2DConfig{}
+	if _ := conv2d_forward_cpu_f64(input, weight, bias, [1, 1], config) {
+		assert false, 'expected invalid input rank to be rejected'
+	} else {
+		assert err.msg().contains('input shape and strides')
+	}
+}
+
+fn test_conv2d_forward_cpu_f64_rejects_out_of_bounds_strides() {
+	mut input := vtl.from_array([f64(1.0), 2.0], [1, 1, 1, 2]) or { panic(err) }
+	input.strides[3] = 3
+	weight := vtl.from_array([f64(1.0)], [1, 1, 1, 1]) or { panic(err) }
+	bias := vtl.from_array([f64(0.0)], [1, 1]) or { panic(err) }
+	if _ := conv2d_forward_cpu_f64(input, weight, bias, [1, 1], Conv2DConfig{}) {
+		assert false, 'expected out-of-bounds strides to be rejected'
+	} else {
+		assert err.msg().contains('storage is smaller')
+	}
+}
+
+fn test_conv2d_forward_cpu_f64_supports_reversed_input_view() ! {
+	mut input := vtl.from_array([f64(1.0), 2.0], [1, 1, 1, 2])!
+	input.strides[3] = -1
+	weight := vtl.from_array([f64(1.0)], [1, 1, 1, 1])!
+	bias := vtl.from_array([f64(0.0)], [1, 1])!
+	output := conv2d_forward_cpu_f64(input, weight, bias, [1, 1], Conv2DConfig{})!
+	assert output.to_array() == [2.0, 1.0]
+}
+
+fn test_conv2d_forward_cpu_f64_rejects_overflowing_negative_stride() {
+	mut input := vtl.from_array([f64(1.0), 2.0, 3.0], [1, 1, 1, 3]) or { panic(err) }
+	input.strides[3] = -max_int
+	weight := vtl.from_array([f64(1.0)], [1, 1, 1, 1]) or { panic(err) }
+	bias := vtl.from_array([f64(0.0)], [1, 1]) or { panic(err) }
+	if _ := conv2d_forward_cpu_f64(input, weight, bias, [1, 1], Conv2DConfig{}) {
+		assert false, 'expected overflowing stride to be rejected'
+	} else {
+		assert err.msg().contains('strides are invalid or too large')
+	}
+}
+
 fn test_conv2d_cuda_eligible_same_padding() {
 	cfg := Conv2DConfig{
 		padding:  [1, 1]
