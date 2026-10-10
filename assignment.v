@@ -61,36 +61,89 @@ pub fn (mut t Tensor[T]) put[T](indices &Tensor[int], values &Tensor[T]) ! {
 // putmask replaces values where mask is true, in row-major logical order.
 // Update values repeat cyclically by row-major flat position, matching NumPy's
 // putmask semantics. The mask must match the tensor shape exactly.
+@[direct_array_access]
 pub fn (mut t Tensor[T]) putmask[T](mask &Tensor[bool], values &Tensor[T]) ! {
 	if mask.shape != t.shape {
 		return error('putmask: mask shape ${mask.shape} must match tensor shape ${t.shape}')
 	}
-	mut selected := []bool{len: t.size}
-	mut selected_count := 0
-	for flat_index in 0 .. t.size {
-		selected[flat_index] = mask.get_nth[bool](flat_index)
-		if selected[flat_index] {
-			selected_count++
+	mask_aliases_target := tensor_shares_storage[T, bool](t, mask)
+	mut selected := []bool{}
+	if mask_aliases_target {
+		selected = []bool{len: t.size}
+	}
+	mask_is_flat := mask.is_row_major_contiguous() && mask.data.data.len == mask.size
+	if mask_aliases_target || values.size == 0 {
+		mut has_selected := false
+		for flat_index in 0 .. t.size {
+			is_selected := if mask_is_flat {
+				mask.data.data[flat_index]
+			} else {
+				mask.get_nth[bool](flat_index)
+			}
+			if mask_aliases_target {
+				selected[flat_index] = is_selected
+			}
+			if is_selected {
+				has_selected = true
+			}
 		}
-	}
-	if selected_count == 0 {
-		return
-	}
-	if values.size == 0 {
-		return error('putmask: at least one value is required for selected positions')
+		if values.size == 0 {
+			if has_selected {
+				return error('putmask: at least one value is required for selected positions')
+			}
+			return
+		}
 	}
 	mut update_values := []T{}
 	if tensor_shares_storage[T, T](t, values) {
 		update_values = values.to_array()
 	}
-	for flat_index in 0 .. t.size {
-		if selected[flat_index] {
-			value := if update_values.len > 0 {
-				update_values[flat_index % values.size]
+	values_are_flat := values.is_row_major_contiguous() && values.data.data.len == values.size
+	if t.is_row_major_contiguous() && t.data.data.len == t.size && mask_is_flat {
+		mut target_data := t.data.data
+		mask_data := mask.data.data
+		mut value_index := 0
+		for flat_index in 0 .. t.size {
+			is_selected := if mask_aliases_target {
+				selected[flat_index]
 			} else {
-				values.get_nth[T](flat_index % values.size)
+				mask_data[flat_index]
+			}
+			if is_selected {
+				value := if update_values.len > 0 {
+					update_values[value_index]
+				} else if values_are_flat {
+					values.data.data[value_index]
+				} else {
+					values.get_nth[T](value_index)
+				}
+				target_data[flat_index] = value
+			}
+			value_index++
+			if value_index == values.size {
+				value_index = 0
+			}
+		}
+		return
+	}
+	mut value_index := 0
+	for flat_index in 0 .. t.size {
+		is_selected := if mask_aliases_target {
+			selected[flat_index]
+		} else {
+			mask.get_nth[bool](flat_index)
+		}
+		if is_selected {
+			value := if update_values.len > 0 {
+				update_values[value_index]
+			} else {
+				values.get_nth[T](value_index)
 			}
 			t.set_nth[T](flat_index, value)
+		}
+		value_index++
+		if value_index == values.size {
+			value_index = 0
 		}
 	}
 }

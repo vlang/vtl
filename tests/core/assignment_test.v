@@ -80,11 +80,26 @@ fn test_putmask_updates_noncontiguous_views_in_logical_order() ! {
 	assert base.to_array() == [1, 2, 8, 9, 9, 6]
 }
 
+fn test_putmask_updates_offset_contiguous_view() ! {
+	mut base := vtl.from_1d([90, 1, 2, 3, 80])!
+	mut target := base.slice([1, 4])!
+	target.putmask(vtl.from_1d([true, false, true])!, vtl.from_1d([8])!)!
+	assert base.to_array() == [90, 8, 2, 8, 80]
+}
+
 fn test_putmask_snapshots_aliased_update_values() ! {
 	mut target := vtl.from_1d([10, 20, 30, 40])!
 	values := target.slice([1, 3])!
 	target.putmask(vtl.from_1d([true, true, true, true])!, values)!
 	assert target.to_array() == [20, 30, 20, 30]
+}
+
+fn test_putmask_snapshots_overlapping_mask_view() ! {
+	mut base := vtl.from_1d([true, true, true, false, false])!
+	mut target := base.slice([1, 5])!
+	mask := base.slice([0, 4])!
+	target.putmask(mask, vtl.from_1d([false])!)!
+	assert base.to_array() == [true, false, false, false, false]
 }
 
 fn test_putmask_validates_before_mutating() ! {
