@@ -1,5 +1,27 @@
 # VTL vs NumPy baselines
 
+## Mixed-dtype integer remainder
+
+This paired microbenchmark computes a broadcasted remainder for 1,048,576
+deterministic `i8` inputs and a scalar `i16` divisor. Both versions run two
+warmups and seven timed calls, allocate the result inside each timed call, and
+report a checksum. Run the V program from `~/.vmodules` after compiling it:
+
+```bash
+systemd-run --user --scope --quiet -p MemoryMax=3G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -no-parallel -cc gcc -prod -cflags "-march=native" \
+	-o /tmp/vtl-promoted-remainder ./vtl/benchmarks/vs_numpy/promoted_remainder_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 \
+	/tmp/vtl-promoted-remainder
+systemd-run --user --scope --quiet -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 \
+	uv run --offline --no-project --with numpy python \
+	./vtl/benchmarks/vs_numpy/numpy_promoted_remainder_baseline.py
+```
+
+Exploratory local samples on 2026-10-10 measured VTL at 3.5–4.6 ms and NumPy
+at 1.4–2.0 ms, with matching checksums. This identifies a performance gap for
+this operation; it is not evidence of overall VTL/NumPy parity.
+
 ## Contiguous `putmask`
 
 The paired microbenchmark updates a contiguous one-million-element `f64`

@@ -124,6 +124,9 @@ and validate an explicitly selected output dtype against `promote_types`.
 boolean tensors, broadcasts inputs, and returns `float32` only when the
 promoted input dtype is `float32`; other supported combinations return
 `float64`.
+`remainder_promoted` performs NumPy-style integer remainder with mixed integer
+dtypes and broadcasting; nonzero remainders follow the divisor's sign, and a
+zero divisor produces zero (without NumPy's runtime warning).
 
 **Remaining:** audit unary/binary function families, add promoted arithmetic
 for the remaining operations, and infer output dtypes automatically for mixed
