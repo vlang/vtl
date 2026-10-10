@@ -162,7 +162,9 @@ automatic and custom bins, weighted density, and multiple bin-selection rules;
 integer/weighted `bincount`.
 
 **Current:** explicit accumulator/output dtypes are available for global,
-single-axis, and multi-axis sum and product reductions.
+single-axis, and multi-axis sum and product reductions. Cumulative sum and
+product along one axis also provide explicit output dtype selection through
+`cumsum_as` and `cumprod_as`.
 `stats.sum_accurate` provides an opt-in Neumaier-compensated global sum for
 floating-point tensors.
 

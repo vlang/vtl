@@ -256,3 +256,23 @@ fn test_cumprod() {
 	assert result.get_nth(2) == f64(6)
 	assert result.get_nth(3) == f64(24)
 }
+
+fn test_cumulative_operations_support_wider_output_types() ! {
+	values := vtl.from_1d([f32(1e8), 1, -1e8])!
+	widened_sum := values.cumsum_as[f64](0)!
+	assert widened_sum.to_array() == [1e8, 1e8 + 1.0, 1.0]
+
+	integers := vtl.from_array([i8(100), 4, 100, 4], [2, 2])!
+	widened_product := integers.cumprod_as[i64](-1)!
+	assert widened_product.shape == [2, 2]
+	assert widened_product.to_array() == [100, 400, 100, 400]
+	assert integers.cumsum_as[i64](0)!.to_array() == [100, 4, 200, 8]
+	assert integers.cumprod_as[i64](0)!.to_array() == [100, 4, 10000, 16]
+	empty := vtl.zeros[i8]([0, 3], vtl.TensorData{})
+	assert empty.cumsum_as[i64](1)!.shape == [0, 3]
+	assert empty.cumprod_as[i64](1)!.shape == [0, 3]
+
+	if _ := integers.cumsum_as[i64](2) {
+		assert false, 'out-of-range cumulative axis must return an error'
+	}
+}

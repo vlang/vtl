@@ -716,3 +716,112 @@ pub fn (t &Tensor[T]) cumprod[T](axis int) !&Tensor[T] {
 	}
 	return result
 }
+
+// cumsum_as computes a cumulative sum using an explicitly selected output
+// accumulator type. This is useful when the input type has insufficient
+// precision or range for the running total.
+pub fn (t &Tensor[T]) cumsum_as[U](axis int) !&Tensor[U] {
+	shape := t.shape
+	rank := shape.len
+	if rank == 0 {
+		return error('cumsum_as: tensor has no dimensions')
+	}
+	na := if axis < 0 { axis + rank } else { axis }
+	if na < 0 || na >= rank {
+		return error('cumsum_as: axis ${axis} out of bounds for shape ${shape}')
+	}
+	mut strides := []int{len: rank}
+	strides[rank - 1] = 1
+	for i := rank - 2; i >= 0; i-- {
+		strides[i] = strides[i + 1] * shape[i + 1]
+	}
+	axis_stride := strides[na]
+	n_axis := shape[na]
+	mut result := zeros[U](shape)
+	if result.size == 0 {
+		return result
+	}
+	mut outer_idx := []int{len: rank}
+	for {
+		mut base_lin := 0
+		for i := 0; i < rank; i++ {
+			base_lin += outer_idx[i] * strides[i]
+		}
+		mut acc := cast[U](0)
+		for j := 0; j < n_axis; j++ {
+			lin := base_lin + j * axis_stride
+			acc += cast[U](t.get_nth(lin))
+			result.set_nth(lin, acc)
+		}
+		mut done := true
+		for i := rank - 1; i >= 0; i-- {
+			if i == na {
+				continue
+			}
+			outer_idx[i]++
+			if outer_idx[i] < shape[i] {
+				done = false
+				break
+			}
+			outer_idx[i] = 0
+		}
+		if done {
+			break
+		}
+	}
+	return result
+}
+
+// cumprod_as computes a cumulative product using an explicitly selected
+// output accumulator type.
+pub fn (t &Tensor[T]) cumprod_as[U](axis int) !&Tensor[U] {
+	shape := t.shape
+	rank := shape.len
+	if rank == 0 {
+		return error('cumprod_as: tensor has no dimensions')
+	}
+	na := if axis < 0 { axis + rank } else { axis }
+	if na < 0 || na >= rank {
+		return error('cumprod_as: axis ${axis} out of bounds for shape ${shape}')
+	}
+	mut strides := []int{len: rank}
+	strides[rank - 1] = 1
+	for i := rank - 2; i >= 0; i-- {
+		strides[i] = strides[i + 1] * shape[i + 1]
+	}
+	axis_stride := strides[na]
+	n_axis := shape[na]
+	mut result := zeros[U](shape)
+	if result.size == 0 {
+		return result
+	}
+	mut outer_idx := []int{len: rank}
+	for {
+		mut base_lin := 0
+		for i := 0; i < rank; i++ {
+			base_lin += outer_idx[i] * strides[i]
+		}
+		mut acc := cast[U](1)
+		for j := 0; j < n_axis; j++ {
+			lin := base_lin + j * axis_stride
+			acc *= cast[U](t.get_nth(lin))
+			result.set_nth(lin, acc)
+		}
+		mut done := true
+		for i := rank - 1; i >= 0; i-- {
+			if i == na {
+				continue
+			}
+			outer_idx[i]++
+			if outer_idx[i] < shape[i] {
+				done = false
+				break
+			}
+			outer_idx[i] = 0
+		}
+		if done {
+			break
+		}
+	}
+	return result
+}
