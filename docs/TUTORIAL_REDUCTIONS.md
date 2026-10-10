@@ -249,6 +249,17 @@ t2.cumsum[f64](0)!
 //    [5, 7,  9]]   — cumulative sum along columns (axis=0)
 ```
 
+Use `cumsum_as[U]` and `cumprod_as[U]` to choose a wider output type when the
+input dtype could lose precision or overflow during accumulation:
+
+```v
+import vtl
+
+measurements := vtl.from_1d([f32(1e8), 1, -1e8])!
+wide_running_sum := measurements.cumsum_as[f64](0)!
+assert wide_running_sum.to_array() == [1e8, 1e8 + 1.0, 1.0]
+```
+
 ## Autograd support
 
 All reduction operations above are differentiable when called through a
