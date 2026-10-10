@@ -1,5 +1,14 @@
 # VTL vs NumPy baselines
 
+## PR CPU GEMM budget
+
+The path-filtered PR workflow compares the optimized VSL CBLAS f64 and f32
+512×512 GEMM results with NumPy. It posts the benchmark report, then fails if
+either NumPy/VTL slowdown exceeds 3×. A maintainer can apply the
+`performance-exempt` label with a rationale to bypass this budget. This gate
+covers optimized CPU GEMM only; it does not claim pure-V or framework-wide
+performance parity.
+
 ## Linear bias gradient reduction
 
 The VTL and NumPy microbenchmarks reduce contiguous `f32` matrices along axis 0

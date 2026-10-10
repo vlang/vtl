@@ -5,12 +5,16 @@ env:
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, labeled]
     branches: [main]
     paths:
       - 'benchmarks/**/*.v'
       - 'benchmarks/**/*.py'
       - '*.v'
       - 'nn/**/*.v'
+      - 'autograd/**/*.v'
+      - 'datasets/**/*.v'
+      - 'ml/**/*.v'
       - 'la/**/*.v'
       - 'stats/**/*.v'
       - 'fft/**/*.v'
@@ -20,6 +24,7 @@ on:
       - '.github/workflows/benchmark-pr-comment.yml'
 
 permissions:
+  contents: read
   pull-requests: write
 
 jobs:
@@ -46,6 +51,9 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -qq -y libopenblas-dev liblapacke-dev gfortran python3 python3-numpy
+
+      - name: Test matmul performance budget parser
+        run: python3 -m unittest discover -s vtl/benchmarks/vs_numpy -p test_check_matmul_perf.py
 
       - name: Install module
         run: |
@@ -88,8 +96,19 @@ jobs:
             env HOME="$HOME" PATH="$PATH" VJOBS=2 OPENBLAS_NUM_THREADS=2 python3 vtl/benchmarks/vs_numpy/numpy_linear_bias_reduction_baseline.py
           } 2>&1 | tee "$report_file"
 
+      - name: Add matmul ratios to benchmark report
+        run: python3 vtl/benchmarks/vs_numpy/check_matmul_perf.py --annotate vs_numpy_pr.md
+
       - name: Post sticky PR comment
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: vtl-vs-numpy
           path: vs_numpy_pr.md
+
+      - name: Enforce 3x CPU matmul slowdown budget
+        if: ${{ !contains(github.event.pull_request.labels.*.name, 'performance-exempt') }}
+        run: python3 vtl/benchmarks/vs_numpy/check_matmul_perf.py vs_numpy_pr.md
+
+      - name: Record performance exception
+        if: ${{ contains(github.event.pull_request.labels.*.name, 'performance-exempt') }}
+        run: echo 'Matmul slowdown budget bypassed by the performance-exempt label.' >> "$GITHUB_STEP_SUMMARY"
