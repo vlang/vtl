@@ -1,4 +1,4 @@
-// Low-memory VTL f64 GEMM benchmark. Run from ~/.vmodules with `v -prod run`.
+// Low-memory VTL f64 GEMM benchmark. Compile with -prod from ~/.vmodules, then run the binary.
 module main
 
 import math

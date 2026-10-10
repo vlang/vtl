@@ -1,4 +1,4 @@
-// End-to-end VTL matmul benchmark. Run from ~/.vmodules with `v -prod run`.
+// End-to-end VTL matmul benchmark. Compile with -prod from ~/.vmodules, then run the binary.
 module main
 
 import time

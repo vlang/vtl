@@ -1,4 +1,4 @@
-// VTL population-variance benchmark. Run from ~/.vmodules with `v -prod run`.
+// VTL population-variance benchmark. Compile with -prod from ~/.vmodules, then run the binary.
 module main
 
 import time
