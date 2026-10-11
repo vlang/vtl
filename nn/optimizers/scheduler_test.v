@@ -109,6 +109,42 @@ fn test_linear_lr_interpolates_and_saturates() {
 	assert scheduler.next_lr(0.8, -1) == 0.2
 }
 
+fn test_cosine_annealing_warm_restarts_equal_cycles() {
+	scheduler := cosine_annealing_warm_restarts[f64](CosineAnnealingWarmRestartsConfig{
+		t_0:     4
+		eta_min: 0.0
+	}) or { panic(err) }
+	assert math.abs(scheduler.next_lr(1.0, 0) - 1.0) < 1e-12
+	assert math.abs(scheduler.next_lr(1.0, 2) - 0.5) < 1e-12
+	assert math.abs(scheduler.next_lr(1.0, 3) - 0.1464466094) < 1e-9
+	assert math.abs(scheduler.next_lr(1.0, 4) - 1.0) < 1e-12
+	assert scheduler.next_lr(1.0, -1) == scheduler.next_lr(1.0, 0)
+}
+
+fn test_cosine_annealing_warm_restarts_grows_cycle_lengths() {
+	scheduler := cosine_annealing_warm_restarts[f64](CosineAnnealingWarmRestartsConfig{
+		t_0:    2
+		t_mult: 2
+	}) or { panic(err) }
+	assert math.abs(scheduler.next_lr(1.0, 1) - 0.5) < 1e-12
+	assert math.abs(scheduler.next_lr(1.0, 2) - 1.0) < 1e-12
+	assert math.abs(scheduler.next_lr(1.0, 4) - 0.5) < 1e-12
+	assert math.abs(scheduler.next_lr(1.0, 6) - 1.0) < 1e-12
+}
+
+fn test_cosine_annealing_warm_restarts_rejects_invalid_config() {
+	assert cosine_restarts_error_for_zero_period()
+}
+
+fn cosine_restarts_error_for_zero_period() bool {
+	_ := cosine_annealing_warm_restarts[f64](CosineAnnealingWarmRestartsConfig{
+		t_0: 0
+	}) or {
+		return err.msg() == 't_0 must be positive, t_mult must be at least 1, and eta_min cannot be negative'
+	}
+	return false
+}
+
 fn test_linear_lr_zero_or_negative_duration_uses_end_factor() {
 	assert math.abs(linear_lr[f64](0.25, 0.75, 0).next_lr(0.8, 0) - 0.6) < 1e-12
 	assert math.abs(linear_lr[f64](0.25, 0.75, -2).next_lr(0.8, 0) - 0.6) < 1e-12

@@ -178,6 +178,53 @@ pub fn (s &CosineAnnealingLR[T]) next_lr(current_lr f64, step int) f64 {
 	return s.lrd + (current_lr - s.lrd) * (1.0 + math.cos(math.pi * f64(step) / f64(s.t_max))) / 2.0
 }
 
+// CosineAnnealingWarmRestartsConfig defines a cosine schedule with periodic restarts.
+@[params]
+pub struct CosineAnnealingWarmRestartsConfig {
+pub:
+	t_0     int
+	t_mult  int = 1
+	eta_min f64
+}
+
+// CosineAnnealingWarmRestarts restarts the learning rate at the start of each
+// cycle and can increase cycle lengths geometrically with t_mult.
+pub struct CosineAnnealingWarmRestarts[T] {
+	t_0     int
+	t_mult  int
+	eta_min f64
+}
+
+// cosine_annealing_warm_restarts creates the scheduler. `eta_min` should not
+// exceed the base learning rate passed to next_lr.
+pub fn cosine_annealing_warm_restarts[T](config CosineAnnealingWarmRestartsConfig) !&CosineAnnealingWarmRestarts[T] {
+	if config.t_0 <= 0 || config.t_mult < 1 || config.eta_min < 0.0 {
+		return error('t_0 must be positive, t_mult must be at least 1, and eta_min cannot be negative')
+	}
+	return &CosineAnnealingWarmRestarts[T]{
+		t_0:     config.t_0
+		t_mult:  config.t_mult
+		eta_min: config.eta_min
+	}
+}
+
+// next_lr returns the rate for a zero-based step, with each cycle beginning at
+// the base rate and annealing toward eta_min.
+pub fn (s &CosineAnnealingWarmRestarts[T]) next_lr(base_lr f64, step int) f64 {
+	clamped_step := if step < 0 { 0 } else { step }
+	mut t_cur := f64(clamped_step)
+	mut t_i := f64(s.t_0)
+	if s.t_mult == 1 {
+		t_cur = f64(clamped_step % s.t_0)
+	} else {
+		for t_cur >= t_i {
+			t_cur -= t_i
+			t_i *= f64(s.t_mult)
+		}
+	}
+	return s.eta_min + (base_lr - s.eta_min) * (1.0 + math.cos(math.pi * t_cur / t_i)) / 2.0
+}
+
 // LinearLR scales the base learning rate linearly between two factors.
 pub struct LinearLR[T] {
 	start_factor f64
