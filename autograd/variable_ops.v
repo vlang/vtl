@@ -420,6 +420,18 @@ pub fn (v &Variable[T]) rot90_axes(k int, axes []int) !&Variable[T] {
 	return result
 }
 
+// flip reverses selected axes (all axes by default) and routes gradients
+// through the same flip, which is its own inverse.
+pub fn (v &Variable[T]) flip(axes ...int) !&Variable[T] {
+	value := v.value.flip[T](...axes)!
+	mut result := v.context.variable(value)
+	if v.requires_grad {
+		gate := flip_gate[T](axes)
+		gate.cache(mut result, v)!
+	}
+	return result
+}
+
 // roll circularly shifts values, flattening by default like NumPy. Optional
 // axes apply the same shift to each selected axis and preserve autograd.
 pub fn (v &Variable[T]) roll(shift int, axes ...int) !&Variable[T] {

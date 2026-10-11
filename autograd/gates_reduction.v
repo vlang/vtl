@@ -538,6 +538,44 @@ pub fn (g &Rot90Gate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	}
 }
 
+// FlipGate records the axes to reverse during the backward pass. Flipping is
+// its own inverse, so the same axes map output gradients back to the input.
+pub struct FlipGate[T] {
+pub:
+	axes []int
+}
+
+// flip_gate creates a gradient gate for the selected axes.
+pub fn flip_gate[T](axes []int) &FlipGate[T] {
+	return &FlipGate[T]{
+		axes: axes.clone()
+	}
+}
+
+// backward flips the output gradient over the same axes as the forward pass.
+pub fn (g &FlipGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
+	return [payload.variable.grad.flip[T](...g.axes)!]
+}
+
+fn flip_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := unsafe { (&FlipGate[T](gate)).backward(typed_payload)! }
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
+// cache registers the input variable for flip backpropagation.
+pub fn (g &FlipGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
+	a := args[0]
+	match a {
+		Variable[T] {
+			register[T]('Flip', voidptr(g), flip_gate_backward_dispatch[T], result, [a])!
+		}
+		else {
+			return error('FlipGate: a must be a Variable')
+		}
+	}
+}
+
 // ConcatGate concatenates multiple tensors along an axis.
 // backward: split gradient back into original inputs
 pub struct ConcatGate[T] {

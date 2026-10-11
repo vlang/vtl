@@ -104,7 +104,8 @@ prefix.
 indices, range views, and positive steps. `Variable.roll` and
 `Variable.roll_shifts` support flattened and axis-wise circular shifts and
 apply the inverse shifts during backward. `Variable.rot90`, `rot90_k`, and
-`rot90_axes` propagate gradients through the inverse rotation.
+`rot90_axes` propagate gradients through the inverse rotation. `Variable.flip`
+propagates gradients by flipping them over the same axes.
 `Variable.sum` and `Variable.mean` reduce all elements to a one-element tensor
 and propagate gradients to every input element. Their `*_along_axis` variants
 support one-axis sum and mean, with either squeezed or retained dimensions.

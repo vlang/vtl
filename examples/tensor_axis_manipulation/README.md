@@ -4,8 +4,8 @@ This example moves tensor axes without copying their underlying data, reverses
 values along a selected axis with `Tensor.flip`, circularly shifts values with
 `vtl.roll`, repeats values with `vtl.repeat_axis`, and repeats full blocks with
 `vtl.tile`. It also shows how `Variable.roll` routes gradients using the
-inverse shift, and how `Variable.rot90` routes gradients through the inverse
-quarter-turn.
+inverse shift, how `Variable.rot90` routes gradients through the inverse
+quarter-turn, and how `Variable.flip` routes gradients through the same flip.
 
 Run from `~/.vmodules`:
 
