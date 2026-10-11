@@ -10,6 +10,8 @@ fn test_masked_quantile_and_median_ignore_masked_payloads() ! {
 	assert data.quantile(0.0)!.value == 1.0
 	assert data.quantile(0.5)!.value == 3.0
 	assert data.quantile(1.0)!.value == 5.0
+	assert data.percentile(25)!.value == 2.0
+	assert data.percentile(75)!.value == 4.0
 	assert data.median().value == 3.0
 	assert !data.median().is_masked
 
@@ -31,6 +33,9 @@ fn test_masked_quantiles_reduce_axis_and_preserve_empty_slices() ! {
 	assert rows.values.to_array()[0] == 2.0
 	assert rows.mask.to_array() == [false, true]
 	assert math.is_nan(rows.values.to_array()[1])
+	percentile_rows := data.percentile_along_axis(1, 25, false)!
+	assert percentile_rows.values.to_array()[0] == 1.5
+	assert percentile_rows.mask.to_array() == [false, true]
 
 	squeezed := data.median_along_axis(1, false)!
 	assert squeezed.values.shape == [2]
@@ -49,6 +54,9 @@ fn test_masked_quantiles_reduce_multiple_axes_and_empty_axis_list() ! {
 	assert result.values.shape == [1, 2, 1]
 	assert result.values.to_array() == [1.0, 5.5]
 	assert result.mask.to_array() == [false, false]
+	percentile_result := data.percentile_along_axes([0, -1], 50, true)!
+	assert percentile_result.values.to_array() == result.values.to_array()
+	assert percentile_result.mask.to_array() == result.mask.to_array()
 	all_axes := data.quantile_along_axes([0, 1, 2], 0.5, false)!
 	assert all_axes.values.shape == []
 	assert all_axes.values.to_array() == [3.0]
@@ -71,6 +79,11 @@ fn test_masked_quantile_validates_q_axes_and_propagates_unmasked_nan() ! {
 	for q in [-0.1, 1.1, math.nan(), math.inf(1)] {
 		if _ := data.quantile(q) {
 			assert false, 'quantile must reject q outside [0, 1] and non-finite q'
+		}
+	}
+	for percentile in [-1, 101, math.nan(), math.inf(1)] {
+		if _ := data.percentile(percentile) {
+			assert false, 'percentile must reject values outside [0, 100] and non-finite inputs'
 		}
 	}
 	if _ := data.median_along_axis(2, false) {

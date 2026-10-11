@@ -51,8 +51,10 @@ all_values_sum := data.sum_along_axes([0, 1], false)!
 all_values_product := data.prod_along_axes([0, 1], false)!
 all_values_variance := data.variance_along_axes([0, 1], 1, false)!
 median := data.median()
+lower_quartile := data.percentile(25)!
 row_medians := data.median_along_axis(1, true)!
 quantiles := data.quantile_along_axes([0, 1], 0.25, false)!
+row_percentiles := data.percentile_along_axis(1, 25, false)!
 ```
 
 Global `sum` and `mean` return `MaskedValue`, whose `is_masked` field is true
@@ -68,16 +70,17 @@ be ignored.
 `variance` and `std` use Welford's online algorithm; `ddof=0` computes
 population statistics and `ddof=1` computes sample statistics. Global or
 per-slice results with `count <= ddof` are masked and carry a NaN payload.
-`quantile` and `median` use NumPy's default linear interpolation over valid
-values. Axis and multi-axis quantiles return `MaskedArray[f64]`; slices with no
-valid values are marked in the output mask and carry NaN. Unmasked NaNs remain
-data and propagate to the corresponding quantile result.
+`quantile`, `percentile`, and `median` use NumPy's default linear interpolation
+over valid values. Axis and multi-axis quantiles and percentiles return
+`MaskedArray[f64]`; slices with no valid values are marked in the output mask
+and carry NaN. Unmasked NaNs remain data and propagate to the corresponding
+result.
 The `*_along_axes` variants reduce a list of axes in one operation; negative
 axes are supported and duplicates are rejected. An empty axes list preserves
 values and masks elementwise (the mean variant converts values to `f64`).
 
 This API currently covers filling, compression, counting, and sum/product/
-minimum/maximum/mean/variance/standard deviation/quantile/median. It does not
+minimum/maximum/mean/variance/standard deviation/quantile/percentile/median. It does not
 yet implement masked elementwise operations or the full NumPy masked-array
 statistics surface. NaN values are not implicitly treated as missing; use an
 explicit boolean mask when that is desired.

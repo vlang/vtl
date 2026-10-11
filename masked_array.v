@@ -407,10 +407,21 @@ pub fn (array &MaskedArray[T]) median[T]() MaskedValue[f64] {
 	}
 }
 
+// percentile computes a linearly interpolated percentile over unmasked values.
+pub fn (array &MaskedArray[T]) percentile[T](percentile f64) !MaskedValue[f64] {
+	validate_masked_percentile(percentile)!
+	return array.quantile[T](percentile / 100)
+}
+
 // quantile_along_axis computes one quantile per slice, optionally retaining
 // the reduced axis with length one.
 pub fn (array &MaskedArray[T]) quantile_along_axis[T](axis int, q f64, keepdims bool) !MaskedArray[f64] {
 	return array.quantile_along_axes[T]([axis], q, keepdims)
+}
+
+// percentile_along_axis computes one percentile per axis slice.
+pub fn (array &MaskedArray[T]) percentile_along_axis[T](axis int, percentile f64, keepdims bool) !MaskedArray[f64] {
+	return array.percentile_along_axes[T]([axis], percentile, keepdims)
 }
 
 // quantile_along_axes computes one quantile per slice over several axes.
@@ -483,6 +494,12 @@ pub fn (array &MaskedArray[T]) quantile_along_axes[T](axes []int, q f64, keepdim
 	}
 }
 
+// percentile_along_axes computes one percentile per slice over several axes.
+pub fn (array &MaskedArray[T]) percentile_along_axes[T](axes []int, percentile f64, keepdims bool) !MaskedArray[f64] {
+	validate_masked_percentile(percentile)!
+	return array.quantile_along_axes[T](axes, percentile / 100, keepdims)
+}
+
 // median_along_axis computes the median of each unmasked axis slice.
 pub fn (array &MaskedArray[T]) median_along_axis[T](axis int, keepdims bool) !MaskedArray[f64] {
 	return array.quantile_along_axis[T](axis, 0.5, keepdims)
@@ -496,6 +513,12 @@ pub fn (array &MaskedArray[T]) median_along_axes[T](axes []int, keepdims bool) !
 fn validate_masked_quantile(q f64) ! {
 	if math.is_nan(q) || math.is_inf(q, 0) || q < 0 || q > 1 {
 		return error('quantile must be between 0 and 1')
+	}
+}
+
+fn validate_masked_percentile(percentile f64) ! {
+	if math.is_nan(percentile) || math.is_inf(percentile, 0) || percentile < 0 || percentile > 100 {
+		return error('percentile must be between 0 and 100')
 	}
 }
 
