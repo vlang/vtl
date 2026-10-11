@@ -141,6 +141,11 @@ promoted input dtype is `float32`; other supported combinations return
 `remainder_promoted` performs NumPy-style integer remainder with mixed integer
 dtypes and broadcasting; nonzero remainders follow the divisor's sign, and a
 zero divisor produces zero (without NumPy's runtime warning).
+`round_decimals` rounds real floating-point tensors to positive or negative
+decimal places using ties-to-even, matching NumPy `round` for the supported
+same-dtype inputs; integer tensors are copied unchanged. VTL preserves finite
+inputs rather than overflowing when an extreme positive decimal position
+would overflow its intermediate scale.
 Elementwise `max`/`min` match NumPy's NaN-propagating `maximum`/`minimum`, and
 `fmax`/`fmin` ignore a single NaN operand. These operations broadcast and
 support boolean, integer, floating-point, and complex tensors; floating-point
