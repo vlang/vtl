@@ -63,6 +63,13 @@ cross-validated integrated squared error over candidate counts up to
 `max(100, floor(sqrt(n)))`. Degenerate estimates fall back to Sturges.
 For constant input, the Stone rule returns one bin over the expanded range.
 
+`histogram2d(x, y, bins_x, bins_y)` counts paired one-dimensional samples in a
+grid indexed as `[x_bin, y_bin]`, matching NumPy's `histogram2d` orientation.
+Use `histogram2d_edges` for explicit edges on each axis. The density variants
+normalize the in-range samples so density times bin area sums to one;
+`histogram2d_weighted` and `histogram2d_weighted_edges` also support numeric
+weights and weighted density.
+
 `bincount(input, minlength)` counts non-negative integer labels in a vector;
 `bincount_weighted(input, weights, minlength)` sums numeric weights for each
 label. Both return vectors sized to at least `minlength`.

@@ -29,6 +29,7 @@ CUDA, and Vulkan compute paths from one V-native API.
 [vlang.io](https://vlang.io) |
 [Docs](https://vlang.github.io/vtl) |
 [Tutorials](docs/TUTORIAL.md) |
+[Histograms](docs/TUTORIAL_HISTOGRAMS.md) |
 [PyTorch parity](docs/PYTORCH_PARITY.md) |
 [Burn comparison](docs/BURN_PARITY.md) |
 [ML Roadmap](docs/ML_ROADMAP.md) |
