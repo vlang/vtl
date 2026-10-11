@@ -74,10 +74,11 @@ framework-wide performance claim.
 
 On an AMD Ryzen 9 5900X with V 0.5.2 `a60fb58`, GCC 16.2.1, and NumPy 2.5.3,
 ten interleaved `-prod -march=native` process runs on 2026-10-11 measured median
-means of 2.097 ms for VTL and 0.647 ms for NumPy. Checksums matched at
-169131123. NumPy was 3.24× faster in this isolated contiguous f64 maximum
-workload. This identifies a VTL performance gap and is not a framework-wide
-comparison.
+means of 2.549 ms for the previous VTL path, 1.564 ms for the uninitialized
+output path, and 0.618 ms for NumPy. The allocation change improved VTL by
+1.63× (39%); NumPy remained 2.53× faster. Checksums matched at 169131123.
+These results apply only to this isolated contiguous f64 maximum workload and
+do not establish framework-wide performance parity.
 
 ## Mixed-dtype integer remainder
 

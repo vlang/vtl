@@ -425,6 +425,14 @@ fn test_elementwise_extrema_follow_numpy_nan_and_zero_rules() {
 	assert math.signbit(fminimum.get_nth(4))
 }
 
+fn test_maximum_f64_handles_empty_contiguous_inputs() {
+	left := vtl.from_array[f64]([], [0])!
+	right := vtl.from_array[f64]([], [0])!
+	result := left.max(right)!
+	assert result.shape == [0]
+	assert result.size == 0
+}
+
 fn test_elementwise_extrema_broadcast_views_and_boolean_values() {
 	values := vtl.from_2d([[1, 4], [3, 2]])!
 	transposed := values.transpose([1, 0])!
