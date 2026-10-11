@@ -256,8 +256,21 @@ fn test_nll_loss_backward_uses_log_probability_derivative() ! {
 	target := tensor[f64]([1.0, 0.0], [1, 2])!
 	mut result := nll_loss[f64](unsafe { nil }).loss(pred, target)!
 	result.backprop()!
-	assert math.abs(pred.grad.get_nth(0) + 0.5) < 1e-12
+	assert math.abs(pred.grad.get_nth(0) + 1.0) < 1e-12
 	assert math.abs(pred.grad.get_nth(1)) < 1e-12
+}
+
+fn test_nll_loss_supports_class_index_targets() ! {
+	c := ctx[f64]()
+	pred := variable[f64](c, [-2.0, -0.5, -0.3, -1.2], [2, 2])!
+	target := tensor[f64]([1.0, 0.0], [2])!
+	mut result := nll_loss[f64](unsafe { nil }).loss(pred, target)!
+	assert math.abs(result.value.get_nth(0) - 0.4) < 1e-12
+	result.backprop()!
+	assert math.abs(pred.grad.get_nth(0)) < 1e-12
+	assert math.abs(pred.grad.get_nth(1) + 0.5) < 1e-12
+	assert math.abs(pred.grad.get_nth(2) + 0.5) < 1e-12
+	assert math.abs(pred.grad.get_nth(3)) < 1e-12
 }
 
 fn test_kl_div_loss_backward_is_negative_target_mean() ! {
