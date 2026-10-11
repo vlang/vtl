@@ -61,11 +61,12 @@ full `torch.nn` recurrent API or CUDA backward.
 ### Losses and optimizers
 
 **VTL today:** Common classification and regression losses and optimizers, with
-CPU training and experimental GPU paths.
+CPU training and experimental GPU paths. Learning-rate schedulers include
+`StepLR`, `ExponentialLR`, `CosineAnnealingLR`, and `ReduceLROnPlateau`.
 
-**Next:** Audit formulas, defaults, reduction modes, parameter groups, scheduler
-support, sparse gradients, and numerical behavior against `torch.nn` and
-`torch.optim`.
+**Next:** Audit formulas, defaults, reduction modes, parameter groups, sparse
+gradients, and numerical behavior against `torch.nn` and `torch.optim`. Broader
+scheduler parity, including warmup, cyclic, and one-cycle policies, remains open.
 
 ### Data pipeline
 
