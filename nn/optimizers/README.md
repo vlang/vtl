@@ -32,6 +32,15 @@ Set `decoupled_weight_decay: true` to apply decay directly to parameter values,
 without adding it to the gradient or moment estimates. NAdam additionally accepts
 `momentum_decay` (default `0.004`).
 
+## Learning-rate schedulers
+
+`StepLR`, `ExponentialLR`, and `CosineAnnealingLR` update a learning rate by
+step. `ReduceLROnPlateau` also accepts a metric delta: a negative delta beyond
+`threshold` is an improvement; zero or a positive delta counts toward
+`patience`. It reduces the rate only after the configured patience is exceeded,
+then ignores bad epochs during `cooldown`. Reductions smaller than `epsilon`
+and NaN deltas leave the rate unchanged.
+
 ## NAdam
 
 NAdam incorporates Nesterov momentum into Adam. It uses the scheduled momentum
@@ -66,8 +75,12 @@ Run commands from the V module workspace, outside this repository:
 
 ```sh
 cd ~/.vmodules
-systemd-run --user --scope --quiet --property=MemoryMax=768M --property=MemorySwapMax=0 --setenv=VJOBS=2 -- v test ./vtl/nn/optimizers
-systemd-run --user --scope --quiet --property=MemoryMax=768M --property=MemorySwapMax=0 --setenv=VJOBS=2 -- v -prod test ./vtl/nn/optimizers
+systemd-run --user --scope --quiet --property=MemoryMax=768M \
+  --property=MemorySwapMax=0 --setenv=VJOBS=2 -- \
+  v test ./vtl/nn/optimizers
+systemd-run --user --scope --quiet --property=MemoryMax=768M \
+  --property=MemorySwapMax=0 --setenv=VJOBS=2 -- \
+  v -prod test ./vtl/nn/optimizers
 ```
 
 In constrained environments, run each command under a systemd scope with an

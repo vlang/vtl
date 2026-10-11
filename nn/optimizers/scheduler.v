@@ -78,6 +78,8 @@ pub struct ReduceLROnPlateau[T] {
 	threshold f64
 	epsilon   f64
 	cooldown  int
+mut:
+	cooldown_remaining int
 pub mut:
 	wait       int
 	current_lr f64
@@ -98,31 +100,46 @@ pub:
 
 // reduce_lr_on_plateau creates a ReduceLROnPlateau scheduler.
 // Reduces LR by `factor` when the monitored metric stops improving for `patience` steps.
-// Pass `metric_delta` to `next_lr` each step: negative = improvement.
+// Pass `metric_delta` to `next_lr` each step: a negative delta below
+// `-threshold` means improvement; other finite deltas count toward patience.
 pub fn reduce_lr_on_plateau[T](config ReduceLROnPlateauConfig) &ReduceLROnPlateau[T] {
 	return &ReduceLROnPlateau[T]{
-		factor:    config.factor
-		patience:  config.patience
-		threshold: config.threshold
-		epsilon:   config.epsilon
-		cooldown:  config.cooldown
-		wait:      0
+		factor:             config.factor
+		patience:           config.patience
+		threshold:          config.threshold
+		epsilon:            config.epsilon
+		cooldown:           config.cooldown
+		wait:               0
+		cooldown_remaining: 0
 	}
 }
 
 // next_lr exposes this operation as part of the public API.
-pub fn (mut s ReduceLROnPlateau[T]) next_lr(current_lr f64, step int, metric_delta f64) f64 {
+pub fn (mut s ReduceLROnPlateau[T]) next_lr(current_lr f64, _ int, metric_delta f64) f64 {
 	s.current_lr = current_lr
-	if s.wait > 0 {
-		s.wait--
+	if math.is_nan(metric_delta) {
 		return current_lr
 	}
-	if metric_delta > s.threshold {
-		s.wait = s.patience
+	if s.cooldown_remaining > 0 {
+		s.cooldown_remaining--
+		s.wait = 0
 		return current_lr
 	}
-	// Metric improved or within epsilon → reduce LR
+	// A sufficiently negative delta means the monitored metric improved.
+	if metric_delta < -s.threshold {
+		s.wait = 0
+		return current_lr
+	}
+	// Deltas near zero or above indicate no significant improvement.
+	s.wait++
+	if s.wait <= s.patience {
+		return current_lr
+	}
+	s.wait = 0
 	new_lr := current_lr * s.factor
-	s.wait = s.patience
+	if current_lr - new_lr <= s.epsilon {
+		return current_lr
+	}
+	s.cooldown_remaining = s.cooldown
 	return new_lr
 }
