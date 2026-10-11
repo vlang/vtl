@@ -661,9 +661,10 @@ superiority.
 VTL and PyTorch use the same batch sizes (32 and 64), f64 dtype, five warmup
 steps, and ten timed forward/backward steps. Both call three linear layers
 directly, apply ReLU after the first two layers, clear parameter gradients
-before each backward pass, and compute mean squared error. No optimizer update
-is included. PyTorch is pinned to two CPU threads and reports the CPU math
-backends enabled by its build. VTL's backend is selected at compile time, so
+before each backward pass, and use their native mean squared error loss
+operation. No optimizer update is included. PyTorch is pinned to two CPU
+threads and reports the CPU math backends enabled by its build. VTL's backend
+is selected at compile time, so
 keep the exact compile flags with each result. Compare the best available VTL
 CPU backend with PyTorch on the same host; only compare CUDA/GPU runs when both
 frameworks execute this complete workload on the same device. The pure-V run
