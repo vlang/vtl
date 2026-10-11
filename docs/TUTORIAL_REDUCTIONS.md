@@ -331,7 +331,9 @@ median_percentile := stats.percentile_linear(values, 50)! // 15.0
 quartiles := stats.percentiles_linear(values, [25, 50, 75])!
 integer_median := stats.median(vtl.from_1d([1, 2])!) // 1.5
 rows := vtl.from_array([1.0, 3.0, 5.0, 7.0], [2, 2])!
-row_medians := stats.quantile_axis(rows, 0.5, 1)! // shape [2, 1]
+row_medians := stats.median_axis(rows, 1)! // shape [2, 1], values [2.0, 6.0]
+row_medians_flat := stats.median_axis_squeeze(rows, 1)! // shape [2]
+row_quantiles := stats.quantile_axis(rows, 0.5, 1)! // shape [2, 1]
 row_percentiles := stats.percentile_axis(rows, 50, 1)! // shape [2, 1]
 row_quartiles := stats.percentiles_axis(rows, [25, 50, 75], 1)! // shape [3, 2]
 
@@ -432,6 +434,9 @@ import vtl.stats
 volume := vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0], [2, 2, 2])!
 medians := stats.quantile_axes_with_method(volume, 0.5, [0, -1], .linear, false)!
 assert medians.to_array() == [3.5, 5.5]
+kept_medians := stats.median_axes(volume, [0, -1], true)!
+assert kept_medians.shape == [1, 2, 1]
+assert kept_medians.to_array() == [3.5, 5.5]
 levels := stats.quantiles_axes_with_method(volume, [0.0, 0.5, 1.0], [0, 2], .linear)!
 assert levels.shape == [3, 2]
 ```
