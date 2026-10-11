@@ -112,7 +112,8 @@ reductions, per-sample `none` reduction, and `ignore_index` for class-index
 targets. Weighted class-index means divide by the sum of non-ignored target
 weights. `nll_loss_indices` accepts `Tensor[int]` targets; the regular generic
 loss also accepts same-type integer-valued target tensors. Both APIs require
-rank-two inputs, so PyTorch's spatial NLL input shapes remain a gap.
+batched inputs with class axis 1 and support spatial dimensions after the class
+axis. Unbatched `[C]` inputs remain a gap.
 
 **Next:** Audit formulas, defaults, reduction modes, parameter groups, sparse
 gradients, and numerical behavior against `torch.nn` and `torch.optim`. Add

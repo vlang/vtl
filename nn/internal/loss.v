@@ -229,23 +229,25 @@ pub fn huber_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], target &
 	return ret
 }
 
-// nll computes Negative Log Likelihood from log-probabilities. Targets can be
-// class indices `[batch]` or one-hot/soft labels `[batch, classes]`.
+// nll computes Negative Log Likelihood from log-probabilities. Class-index
+// targets omit the class axis; one-hot/soft targets match the input shape.
 pub fn nll[T](input &vtl.Tensor[T], target &vtl.Tensor[T], weight &vtl.Tensor[T], ignore_index int, reduction string) !&vtl.Tensor[T] {
-	if input.shape.len != 2 || input.shape[0] == 0 || input.shape[1] == 0 {
-		return error('NLL loss requires non-empty rank-two log-probabilities')
+	if input.shape.len < 2 || input.shape[0] == 0 || input.shape[1] == 0 || input.size() == 0 {
+		return error('NLL loss requires non-empty rank-two or higher log-probabilities')
 	}
-	batch_size := input.shape[0]
 	n_classes := input.shape[1]
+	mut index_shape := [input.shape[0]]
+	index_shape << input.shape[2..]
+	sample_count := nll_sample_count(input.shape)
 	if reduction !in ['none', 'mean', 'sum'] {
 		return error('NLL reduction must be none, mean, or sum')
 	}
 	if !isnil(weight) && (weight.shape.len != 1 || weight.shape[0] != n_classes) {
 		return error('NLL class weights must have shape [n_classes]')
 	}
-	class_indices := target.shape.len == 1 && target.shape[0] == batch_size
+	class_indices := target.shape == index_shape
 	if !class_indices && target.shape != input.shape {
-		return error('NLL targets must match log-probabilities or have shape [batch]')
+		return error('NLL target shape must omit the class axis or match log-probabilities')
 	}
 	if !class_indices && ignore_index != -1 {
 		return error('NLL ignore_index is supported only for class-index targets')
@@ -253,8 +255,8 @@ pub fn nll[T](input &vtl.Tensor[T], target &vtl.Tensor[T], weight &vtl.Tensor[T]
 	mut total := 0.0
 	mut weight_total := 0.0
 	mut valid_targets := 0
-	mut per_sample := []f64{len: batch_size}
-	for i in 0 .. batch_size {
+	mut per_sample := []f64{len: sample_count}
+	for i in 0 .. sample_count {
 		if class_indices {
 			raw_class := f64(target.get_nth(i))
 			if !math.is_finite(raw_class) || raw_class != math.floor(raw_class) {
@@ -265,23 +267,30 @@ pub fn nll[T](input &vtl.Tensor[T], target &vtl.Tensor[T], weight &vtl.Tensor[T]
 			}
 			class_index := nll_class_index[T](target, i, n_classes)!
 			class_weight := if isnil(weight) { 1.0 } else { f64(weight.get_nth(class_index)) }
-			per_sample[i] = -class_weight * f64(input.get([i, class_index]))
+			coords := if input.shape.len == 2 {
+				[i, class_index]
+			} else {
+				nll_sample_coordinates(input.shape, i, class_index)
+			}
+			per_sample[i] = -class_weight * f64(input.get(coords))
 			total += per_sample[i]
 			weight_total += class_weight
 			valid_targets++
 		} else {
 			for c in 0 .. n_classes {
 				class_weight := if isnil(weight) { 1.0 } else { f64(weight.get_nth(c)) }
-				per_sample[i] -= f64(target.get([i, c])) * class_weight * f64(input.get([
-					i,
-					c,
-				]))
+				coords := if input.shape.len == 2 {
+					[i, c]
+				} else {
+					nll_sample_coordinates(input.shape, i, c)
+				}
+				per_sample[i] -= f64(target.get(coords)) * class_weight * f64(input.get(coords))
 			}
 			total += per_sample[i]
 		}
 	}
 	if reduction == 'none' {
-		return vtl.from_array(per_sample.map(vtl.cast[T](it)), [batch_size])
+		return vtl.from_array(per_sample.map(vtl.cast[T](it)), index_shape)
 	}
 	denominator := if reduction == 'sum' {
 		1.0
@@ -290,7 +299,7 @@ pub fn nll[T](input &vtl.Tensor[T], target &vtl.Tensor[T], weight &vtl.Tensor[T]
 	} else if class_indices {
 		f64(valid_targets)
 	} else {
-		f64(batch_size)
+		f64(sample_count)
 	}
 	if denominator == 0.0 {
 		if valid_targets == 0 && class_indices {
@@ -303,28 +312,30 @@ pub fn nll[T](input &vtl.Tensor[T], target &vtl.Tensor[T], weight &vtl.Tensor[T]
 
 // nll_backward computes the gradient of NLL w.r.t. input (log-probabilities).
 pub fn nll_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], target &vtl.Tensor[T], weight &vtl.Tensor[T], ignore_index int, reduction string) !&vtl.Tensor[T] {
-	if input.shape.len != 2 || input.shape[0] == 0 || input.shape[1] == 0 {
-		return error('NLL loss requires non-empty rank-two log-probabilities')
+	if input.shape.len < 2 || input.shape[0] == 0 || input.shape[1] == 0 || input.size() == 0 {
+		return error('NLL loss requires non-empty rank-two or higher log-probabilities')
 	}
-	batch_size := input.shape[0]
 	n_classes := input.shape[1]
+	mut index_shape := [input.shape[0]]
+	index_shape << input.shape[2..]
+	sample_count := nll_sample_count(input.shape)
 	if reduction !in ['none', 'mean', 'sum'] {
 		return error('NLL reduction must be none, mean, or sum')
 	}
 	if !isnil(weight) && (weight.shape.len != 1 || weight.shape[0] != n_classes) {
 		return error('NLL class weights must have shape [n_classes]')
 	}
-	class_indices := target.shape.len == 1 && target.shape[0] == batch_size
+	class_indices := target.shape == index_shape
 	if !class_indices && target.shape != input.shape {
-		return error('NLL targets must match log-probabilities or have shape [batch]')
+		return error('NLL target shape must omit the class axis or match log-probabilities')
 	}
 	if !class_indices && ignore_index != -1 {
 		return error('NLL ignore_index is supported only for class-index targets')
 	}
-	mut denominator := if reduction in ['none', 'sum'] { 1.0 } else { f64(batch_size) }
+	mut denominator := if reduction in ['none', 'sum'] { 1.0 } else { f64(sample_count) }
 	if reduction == 'mean' && class_indices {
 		denominator = 0.0
-		for i in 0 .. batch_size {
+		for i in 0 .. sample_count {
 			raw_class := f64(target.get_nth(i))
 			if !math.is_finite(raw_class) || raw_class != math.floor(raw_class) {
 				return error('NLL class indices must be finite integers')
@@ -336,8 +347,8 @@ pub fn nll_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], target &vt
 			denominator += if isnil(weight) { 1.0 } else { f64(weight.get_nth(class_index)) }
 		}
 	}
-	mut ret_data := []f64{len: batch_size * n_classes}
-	for i in 0 .. batch_size {
+	mut ret_data := []f64{len: input.size()}
+	for i in 0 .. sample_count {
 		mut class_index := -1
 		if class_indices {
 			raw_class := f64(target.get_nth(i))
@@ -350,10 +361,15 @@ pub fn nll_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], target &vt
 			class_index = nll_class_index[T](target, i, n_classes)!
 		}
 		for c in 0 .. n_classes {
+			coords := if input.shape.len == 2 {
+				[i, c]
+			} else {
+				nll_sample_coordinates(input.shape, i, c)
+			}
 			tgt := if class_indices {
 				if c == class_index { 1.0 } else { 0.0 }
 			} else {
-				f64(target.get([i, c]))
+				f64(target.get(coords))
 			}
 			class_weight := if isnil(weight) { 1.0 } else { f64(weight.get_nth(c)) }
 			upstream := if reduction == 'none' {
@@ -361,11 +377,43 @@ pub fn nll_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], target &vt
 			} else {
 				f64(gradient.get_nth(0))
 			}
-			ret_data[i * n_classes + c] = upstream * -tgt * class_weight / denominator
+			ret_data[nll_sample_flat_index(input.shape, i, c)] = upstream * -tgt * class_weight / denominator
 		}
 	}
 	ret := vtl.from_array(ret_data.map(vtl.cast[T](it)), input.shape.clone())!
 	return ret
+}
+
+fn nll_sample_count(input_shape []int) int {
+	mut count := input_shape[0]
+	for axis in 2 .. input_shape.len {
+		count *= input_shape[axis]
+	}
+	return count
+}
+
+fn nll_sample_coordinates(input_shape []int, sample_index int, class_index int) []int {
+	spatial_size := nll_sample_count(input_shape) / input_shape[0]
+	mut coords := []int{len: input_shape.len}
+	coords[0] = sample_index / spatial_size
+	coords[1] = class_index
+	mut position := sample_index % spatial_size
+	for axis in 2 .. input_shape.len {
+		mut stride := 1
+		for trailing_axis in axis + 1 .. input_shape.len {
+			stride *= input_shape[trailing_axis]
+		}
+		coords[axis] = position / stride
+		position %= stride
+	}
+	return coords
+}
+
+fn nll_sample_flat_index(input_shape []int, sample_index int, class_index int) int {
+	spatial_size := nll_sample_count(input_shape) / input_shape[0]
+	batch_index := sample_index / spatial_size
+	position := sample_index % spatial_size
+	return (batch_index * input_shape[1] + class_index) * spatial_size + position
 }
 
 fn nll_class_index[T](target &vtl.Tensor[T], row int, n_classes int) !int {

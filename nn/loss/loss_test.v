@@ -361,6 +361,19 @@ fn test_nll_loss_indices_accepts_integer_targets() ! {
 	assert math.abs(pred.grad.get_nth(2)) < 1e-12
 }
 
+fn test_nll_loss_accepts_spatial_log_probabilities() ! {
+	c := ctx[f64]()
+	pred := variable[f64](c, [-2.0, -0.5, -0.3, -1.2], [1, 2, 1, 2])!
+	target := tensor[int]([1, 0], [1, 1, 2])!
+	mut result := nll_loss_indices[f64](unsafe { nil }, NLLLossOptions{}).loss(pred, target)!
+	assert math.abs(result.value.get_nth(0) - 0.4) < 1e-12
+	result.backprop()!
+	assert math.abs(pred.grad.get_nth(0)) < 1e-12
+	assert math.abs(pred.grad.get_nth(1) + 0.5) < 1e-12
+	assert math.abs(pred.grad.get_nth(2) + 0.5) < 1e-12
+	assert math.abs(pred.grad.get_nth(3)) < 1e-12
+}
+
 fn test_kl_div_loss_backward_is_negative_target_mean() ! {
 	c := ctx[f64]()
 	pred := variable[f64](c, [-2.0, -0.5], [2])!
