@@ -18,6 +18,121 @@ fn test_contiguous_batches_are_zero_copy_views() ! {
 	assert data.get([2, 0]) == 50
 }
 
+fn test_collated_batch_defaults_to_features_and_labels() ! {
+	dataset := vtl.from_1d([1.0, 2, 3])!
+	labels := vtl.from_1d([10.0, 20, 30])!
+	loader := new_data_loader_with_labels_checked[f64](dataset, labels, DataLoaderConfig{
+		batch_size: 2
+		shuffle:    false
+		drop_last:  false
+	})!
+	batch := loader.collated_batch(1)!
+	assert batch.features.to_array() == [3.0]
+	assert batch.labels.to_array() == [30.0]
+}
+
+fn test_custom_collate_fn_transforms_and_reorders_samples() ! {
+	dataset := vtl.from_1d([1.0, 2, 3])!
+	labels := vtl.from_1d([10.0, 20, 30])!
+	mut loader := new_data_loader_with_labels_checked[f64](dataset, labels, DataLoaderConfig{
+		batch_size: 2
+		shuffle:    false
+		drop_last:  false
+	})!
+	loader.indices = [2, 0, 1]
+	factor := 10.0
+	loader.set_collate_fn(fn [factor] (dataset &vtl.Tensor[f64], labels &vtl.Tensor[f64], indices []int) !CollatedBatch[f64] {
+		mut features := vtl.zeros[f64]([indices.len])
+		mut batch_labels := vtl.zeros[f64]([indices.len])
+		for i, sample_index in indices {
+			features.set_nth(i, dataset.get_nth(sample_index) * factor)
+			batch_labels.set_nth(i, labels.get_nth(sample_index))
+		}
+		return CollatedBatch[f64]{
+			features: features
+			labels:   batch_labels
+		}
+	})
+	batch := loader.collated_batch(0)!
+	assert batch.features.to_array() == [30.0, 10]
+	assert batch.labels.to_array() == [30.0, 10]
+	assert loader.indices == [2, 0, 1]
+}
+
+fn test_custom_collate_fn_handles_unlabeled_data_and_survives_split() ! {
+	dataset := vtl.from_1d([1.0, 2, 3])!
+	mut loader := new_data_loader[f64](dataset, DataLoaderConfig{
+		batch_size: 2
+		shuffle:    false
+		drop_last:  false
+	})
+	loader.indices = [2, 0, 1]
+	loader.set_collate_fn(scale_feature_only_collate)
+	train, validation := loader.split(0.5)!
+	train_batch := train.collated_batch(0)!
+	validation_batch := validation.collated_batch(0)!
+	assert train_batch.features.to_array() == [30.0, 10]
+	assert train_batch.labels == unsafe { nil }
+	assert validation_batch.features.to_array() == [20.0]
+}
+
+fn test_for_each_collated_applies_callback_and_propagates_errors() ! {
+	dataset := vtl.from_1d([1.0, 2, 3])!
+	mut loader := new_data_loader[f64](dataset, DataLoaderConfig{
+		batch_size: 2
+		shuffle:    false
+		drop_last:  false
+	})
+	loader.set_collate_fn(scale_feature_only_collate)
+	count := loader.for_each_collated(fn (batch CollatedBatch[f64]) bool {
+		return batch.features.size > 0
+	})!
+	assert count == 2
+	loader.set_collate_fn(failing_collate)
+	loader.for_each_collated(fn (_ CollatedBatch[f64]) bool {
+		return true
+	}) or {
+		assert err.msg() == 'collation failed'
+		return
+	}
+	assert false, 'collation errors must propagate through for_each_collated'
+}
+
+fn test_collated_batch_reports_invalid_index_and_callback_errors() ! {
+	dataset := vtl.from_1d([1.0, 2])!
+	mut loader := new_data_loader[f64](dataset, DataLoaderConfig{
+		shuffle:   false
+		drop_last: false
+	})
+	loader.collated_batch(1) or {
+		assert err.msg().contains('out of range')
+		loader.set_collate_fn(failing_collate)
+		loader.collated_batch(0) or {
+			assert err.msg() == 'collation failed'
+			return
+		}
+		assert false, 'collator errors must be returned'
+	}
+	assert false, 'invalid batch index must return an error'
+}
+
+fn scale_feature_only_collate(dataset &vtl.Tensor[f64], labels &vtl.Tensor[f64], indices []int) !CollatedBatch[f64] {
+	if labels != unsafe { nil } {
+		return error('expected a feature-only loader')
+	}
+	mut features := vtl.zeros[f64]([indices.len])
+	for i, sample_index in indices {
+		features.set_nth(i, dataset.get_nth(sample_index) * 10.0)
+	}
+	return CollatedBatch[f64]{
+		features: features
+	}
+}
+
+fn failing_collate(_ &vtl.Tensor[f64], _ &vtl.Tensor[f64], _ []int) !CollatedBatch[f64] {
+	return error('collation failed')
+}
+
 fn test_non_contiguous_batches_copy_and_preserve_order() ! {
 	mut data := vtl.from_array([1.0, 2, 3, 4, 5, 6, 7, 8], [4, 2])!
 	mut loader := new_data_loader[f64](data, DataLoaderConfig{

@@ -29,6 +29,16 @@ choose batch boundaries and `drop_last` explicitly. Call `reset_checked()`
 between epochs when using a sampler; it reports errors from custom sampler
 implementations.
 
+For custom batch construction, install a `CollateFn[T]` with
+`DataLoader.set_collate_fn` and call `collated_batch(i)` or
+`for_each_collated(...)`. The callback receives
+the source feature tensor, an optional labels tensor, and a copy of the sample
+indices selected for that batch. It returns a `CollatedBatch[T]` containing
+the output features and optional labels. This supports dense tensor collation
+such as transforms, padding, filtering, and reordering; it does not model
+arbitrary Python objects or nested sample structures. See the
+[custom collation example](../examples/datasets_custom_collate/main.v).
+
 `load_imdb()` returns the full 25,000 review training and test splits. Use
 `load_imdb_with_config` for a smaller, class-balanced subset. Review features
 remain raw strings; labels are binary (`1` positive, `0` negative).
