@@ -40,7 +40,15 @@
 - [ ] Full device-resident backward and optimizer updates across the supported model stack
 
 ### Phase 5 — OpenCL Backend
-- [x] Issue [#62](https://github.com/vlang/vtl/issues/62) — Phase 5: OpenCL Backend (VCL unified into Compute abstraction)
+- [x] Issue [#162](https://github.com/vlang/vtl/issues/162) — runnable OpenCL/VCL transfer and `add_scalar` smoke example
+- [ ] Issue [#62](https://github.com/vlang/vtl/issues/62) — full VTL OpenCL compute integration (closed on GitHub; implementation remains incomplete)
+  - [x] VTL tensor transfer to and from VCL storage
+  - [x] VCL broadcast view metadata
+  - [x] OpenCL/VCL smoke for tensor round-trip and `add_scalar`
+  - [ ] VTL `matmul`/GEMM and GEMV dispatch on VCL tensors
+  - [ ] VTL elementwise, reduction, softmax, LayerNorm, and Conv2D kernels
+  - [ ] Device-resident VCL tensor operations and NN-layer dispatch
+  - [ ] VCL parity and correctness tests across VTL tensor, LA, and NN APIs
 
 ### Phase 6 — ARM GPU Support
 - [ ] Issue [#63](https://github.com/vlang/vtl/issues/63) — Phase 6: ARM GPU Support (Android, iOS, Embedded)
@@ -144,7 +152,7 @@ used as a source for this roadmap.
 | VSL LA ops (matmul, conv2d, solve, etc.) | [vlang/vsl](https://github.com/vlang/vsl) | ✅ Done |
 | VSL CUDA (`vsl/cuda`, cuBLAS/cuDNN) | [vlang/vsl](https://github.com/vlang/vsl) | ✅ #280 |
 | VSL Vulkan compute | [vlang/vsl](https://github.com/vlang/vsl) | ✅ #283–#284 |
-| VSL OpenCL (VCL) | [vlang/vsl](https://github.com/vlang/vsl) | ✅ Integrated |
+| VSL OpenCL (VCL) | [vlang/vsl](https://github.com/vlang/vsl) | ✅ VSL transport/kernels exist; ❌ VTL compute and NN dispatch are incomplete (see #62) |
 | vs NumPy / PR benchmarks | [vlang/vtl](https://github.com/vlang/vtl) | ✅ #88, workflow |
 
 ---

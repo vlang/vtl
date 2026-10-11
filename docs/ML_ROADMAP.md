@@ -42,6 +42,17 @@ GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 
 **VSL (downstream):** [#280](https://github.com/vlang/vsl/issues/280)–[#285](https://github.com/vlang/vsl/issues/285), [#304](https://github.com/vlang/vsl/pull/304) conv2d backward GEMM, [#305](https://github.com/vlang/vsl/pull/305) Adam shaders.
 
+## Closed issue status corrections
+
+Issue [#62](https://github.com/vlang/vtl/issues/62) is closed on GitHub, but
+its full VTL OpenCL backend checklist is not complete in the current tree. VTL
+can transfer tensors through VCL storage and the [#162 OpenCL/VCL smoke
+example](../examples/vtl_opencl_vcl_support/README.md) checks a round-trip and
+`add_scalar`. `VclTensor` still has no VTL GEMM/GEMV, elementwise, reduction,
+softmax, LayerNorm, Conv2D, or neural-network dispatch path. Track this as
+unfinished backend work; issue closure is not implementation evidence. The
+itemized status is in the [main roadmap](../ROADMAP.md#phase-5--opencl-backend).
+
 ## Current open issues (checked 2026-10-11)
 
 | Priority | Issue | Topic |
