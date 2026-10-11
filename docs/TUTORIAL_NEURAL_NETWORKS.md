@@ -261,9 +261,10 @@ println(final_state.value.shape) // [1, 4]
 println(h0.grad.shape) // [1, 4]
 ```
 
-`Sequential.gru` continues to initialize the hidden state to zero and returns
-the output sequence. Use `new_gru_layer` when the caller needs to provide or
-carry the hidden state between batches.
+`Sequential.gru` initializes each layer's hidden state to zero and returns the
+output sequence. Repeated calls can stack GRU layers by passing each layer's
+`hidden_size` as the next layer's `input_size`. Use `new_gru_layer` when the
+caller needs to provide or carry a hidden state between batches.
 
 ```v
 import vtl
@@ -274,6 +275,7 @@ ctx := autograd.ctx[f64]()
 mut model := models.sequential_from_ctx[f64](ctx)
 model.input([3, 1, 2])
 model.gru(2, 4)
+model.gru(4, 4) // stack a second GRU layer
 sequence := vtl.from_array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6], [3, 1, 2])!
 mut input := ctx.variable(sequence)
 mut output := model.forward(input)!
