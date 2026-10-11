@@ -187,6 +187,41 @@ fn test_flip_forward_backward_uses_same_axes() ! {
 	assert input.grad.to_array() == [3.0, 2.0, 1.0, 6.0, 5.0, 4.0]
 }
 
+fn test_repeat_forward_backward_sums_repeated_gradients() ! {
+	mut context := autograd.ctx[f64]()
+	input := context.variable(vtl.from_1d([1.0, 2.0, 3.0])!)
+	weights := context.variable(vtl.from_1d([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])!)
+	repeated := input.repeat(2)!
+	assert repeated.value.to_array() == [1.0, 1.0, 2.0, 2.0, 3.0, 3.0]
+	mut loss := repeated.multiply(weights)!.sum()!
+	loss.backprop()!
+	assert input.grad.to_array() == [3.0, 7.0, 11.0]
+}
+
+fn test_repeat_axis_forward_backward_sums_repeated_gradients() ! {
+	mut context := autograd.ctx[f64]()
+	input := context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [2, 3])!)
+	weights := context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0,
+		11.0, 12.0], [2, 6])!)
+	repeated := input.repeat_axis(2, -1)!
+	assert repeated.value.shape == [2, 6]
+	assert repeated.value.to_array() == [1.0, 1.0, 2.0, 2.0, 3.0, 3.0, 4.0, 4.0, 5.0, 5.0, 6.0,
+		6.0]
+	mut loss := repeated.multiply(weights)!.sum()!
+	loss.backprop()!
+	assert input.grad.to_array() == [3.0, 7.0, 11.0, 15.0, 19.0, 23.0]
+}
+
+fn test_repeat_with_zero_copies_produces_zero_input_gradient() ! {
+	mut context := autograd.ctx[f64]()
+	input := context.variable(vtl.from_1d([1.0, 2.0])!)
+	repeated := input.repeat(0)!
+	assert repeated.value.shape == [0]
+	mut loss := repeated.sum()!
+	loss.backprop()!
+	assert input.grad.to_array() == [0.0, 0.0]
+}
+
 fn test_roll_flat_backward_handles_extreme_shift() ! {
 	mut context := autograd.ctx[f64]()
 	input := context.variable(vtl.from_1d([1.0, 2.0, 3.0])!)
