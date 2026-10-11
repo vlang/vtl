@@ -90,6 +90,8 @@ only to the final update at each destination.
 for flat row-major indices, including repeated short updates and `raise`, `wrap`,
 and `clip` index modes. Indices are snapshotted during the forward pass, and
 repeated uses of one update value accumulate into its gradient.
+`Variable.putmask` returns an updated copy and routes gradients to unmasked input
+positions and to update values selected by each true destination's flat index.
 `Variable.slice` and `Variable.slice_hilo` propagate gradients through integer
 indices, range views, and positive steps.
 `Variable.sum` and `Variable.mean` reduce all elements to a one-element tensor

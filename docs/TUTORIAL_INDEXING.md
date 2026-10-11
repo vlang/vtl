@@ -181,9 +181,9 @@ assert values.to_array() == [1, 20, 3, 40, 5, 6]
 ```
 
 `put_along_axis` applies repeated writes in row-major order, so the last value
-for a repeated index wins. Both update operations validate all indices before
-mutating the target. Indexed writes currently operate on tensors directly and
-are not autograd operations.
+for a repeated index wins. Both tensor update operations validate all indices
+before mutating the target. `Variable.put_along_axis`, `Variable.put`, and
+`Variable.putmask` instead return updated copies and track gradients.
 
 `put` updates row-major logical flat positions and repeats a shorter values
 tensor as needed. Negative indices count from the end in the default `.raise`
@@ -212,6 +212,28 @@ mut masked := vtl.from_1d([1, 2, 3, 4, 5, 6])!
 mask := vtl.from_1d([false, true, false, true, true, false])!
 masked.putmask(mask, vtl.from_1d([8, 9])!)!
 assert masked.to_array() == [1, 9, 3, 9, 8, 6]
+```
+
+`Variable.putmask` keeps gradients for unchanged input positions and accumulates
+gradients into repeated update values using each destination's row-major flat
+index, matching NumPy's value selection rule:
+
+```v
+import vtl
+import vtl.autograd
+
+mut ctx := autograd.ctx[f64]()
+input := ctx.variable(vtl.from_1d([10.0, 20.0, 30.0, 40.0, 50.0])!)
+updates := ctx.variable(vtl.from_1d([100.0, 200.0])!)
+mask := vtl.from_1d([false, true, true, true, false])!
+weights := ctx.variable(vtl.from_1d([1.0, 2.0, 3.0, 4.0, 5.0])!)
+
+result := input.putmask(mask, updates)!
+assert result.value.to_array() == [10.0, 200.0, 100.0, 200.0, 50.0]
+mut objective := result.multiply(weights)!
+objective.backprop()!
+assert input.grad.to_array() == [1.0, 0.0, 0.0, 0.0, 5.0]
+assert updates.grad.to_array() == [3.0, 6.0]
 ```
 
 Boolean masks passed to `masked_select` and `masked_fill` may broadcast to the
