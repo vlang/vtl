@@ -27,8 +27,25 @@ pub fn clip_grad_norm_with_type[T](mut parameters []&autograd.Variable[T], max_n
 	if max_norm < 0.0 || !math.is_finite(max_norm) {
 		return error('clip_grad_norm: max_norm must be finite and non-negative')
 	}
+	norm := get_total_grad_norm_with_type[T](parameters, norm_type)!
+	clip_grads_with_norm[T](mut parameters, max_norm, norm)!
+	return norm
+}
+
+// get_total_grad_norm computes the L2 norm of all trainable gradients without
+// changing them.
+pub fn get_total_grad_norm[T](parameters []&autograd.Variable[T]) !f64 {
+	return get_total_grad_norm_with_type[T](parameters, 2.0)
+}
+
+// get_total_grad_norm_with_type computes a global p-norm without changing
+// gradients; positive infinity selects the infinity norm.
+pub fn get_total_grad_norm_with_type[T](parameters []&autograd.Variable[T], norm_type f64) !f64 {
+	if !is_float_gradient[T]() {
+		return error('get_total_grad_norm: gradients must use f32 or f64 elements')
+	}
 	if norm_type < 0.0 || (norm_type != math.inf(1) && !math.is_finite(norm_type)) {
-		return error('clip_grad_norm: norm_type must be finite and non-negative, or positive infinity')
+		return error('get_total_grad_norm: norm_type must be finite and non-negative, or positive infinity')
 	}
 
 	mut norm_scale := 0.0
@@ -41,7 +58,7 @@ pub fn clip_grad_norm_with_type[T](mut parameters []&autograd.Variable[T], max_n
 		for i in 0 .. parameter.grad.size {
 			gradient := math.abs(f64(parameter.grad.get_nth(i)))
 			if !math.is_finite(gradient) {
-				return error('clip_grad_norm: gradient norm must be finite')
+				return error('get_total_grad_norm: gradient norm must be finite')
 			}
 			if gradient == 0.0 {
 				continue
@@ -80,13 +97,27 @@ pub fn clip_grad_norm_with_type[T](mut parameters []&autograd.Variable[T], max_n
 		norm *= math.pow(scaled_powers, 1.0 / norm_type)
 	}
 	if !math.is_finite(norm) {
-		return error('clip_grad_norm: gradient norm must be finite')
+		return error('get_total_grad_norm: gradient norm must be finite')
 	}
-	if norm <= max_norm || norm == 0.0 {
-		return norm
-	}
+	return norm
+}
 
-	scale := max_norm / norm
+// clip_grads_with_norm scales trainable gradients in place using a previously
+// computed total norm.
+pub fn clip_grads_with_norm[T](mut parameters []&autograd.Variable[T], max_norm f64, total_norm f64) ! {
+	if !is_float_gradient[T]() {
+		return error('clip_grads_with_norm: gradients must use f32 or f64 elements')
+	}
+	if max_norm < 0.0 || !math.is_finite(max_norm) {
+		return error('clip_grads_with_norm: max_norm must be finite and non-negative')
+	}
+	if total_norm < 0.0 || !math.is_finite(total_norm) {
+		return error('clip_grads_with_norm: total_norm must be finite and non-negative')
+	}
+	if total_norm <= max_norm || total_norm == 0.0 {
+		return
+	}
+	scale := max_norm / total_norm
 	for mut parameter in parameters {
 		if !parameter.requires_grad {
 			continue
@@ -95,7 +126,6 @@ pub fn clip_grad_norm_with_type[T](mut parameters []&autograd.Variable[T], max_n
 			return vtl.cast[T](f64(value) * scale)
 		})
 	}
-	return norm
 }
 
 // clip_grad_value clamps every trainable gradient element to [-max_value, max_value].

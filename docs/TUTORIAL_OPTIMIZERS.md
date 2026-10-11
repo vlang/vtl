@@ -414,6 +414,10 @@ l1_norm := optimizers.clip_grad_norm_with_type[f64](mut parameters, 1.0, 1.0)!
 optimizers.clip_grad_value[f64](mut parameters, 0.5)!
 ```
 
+To inspect a norm without changing gradients, use `get_total_grad_norm` (or
+`get_total_grad_norm_with_type`). If the norm is already available, pass it to
+`clip_grads_with_norm` to apply clipping without calculating it again.
+
 The norm limit must be finite and non-negative; the value limit must be finite
 and positive. Norm clipping rejects non-finite gradient norms instead of
 changing gradients to NaN.
