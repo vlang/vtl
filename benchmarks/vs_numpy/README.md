@@ -655,15 +655,43 @@ VTL and PyTorch use the same batch sizes (32 and 64), f64 dtype, five warmup
 steps, and ten timed forward/backward steps. Both call three linear layers
 directly, apply ReLU after the first two layers, clear parameter gradients
 before each backward pass, and compute mean squared error. No optimizer update
-is included. PyTorch is pinned to two CPU threads; timings use a monotonic
-nanosecond clock for VTL. This VTL command measures the default pure-V backend;
-it does not claim parity with an optimized CBLAS build.
+is included. PyTorch is pinned to two CPU threads and reports the CPU math
+backends enabled by its build. VTL's backend is selected at compile time, so
+keep the exact compile flags with each result. Compare the best available VTL
+CPU backend with PyTorch on the same host; only compare CUDA/GPU runs when both
+frameworks execute this complete workload on the same device. The pure-V run
+is useful as a portable baseline, not as VTL's best-backend result when an
+optimized BLAS is available.
 
 ```bash
 systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
 	v -no-parallel -cc gcc -prod \
 	-cflags "-march=native" -o /tmp/vtl-autograd-bench ./vtl/benchmarks/vs_numpy/autograd_bench.v
 systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-autograd-bench
+```
+
+For system CBLAS on hosts that provide `libcblas`, compile with
+`-d vsl_blas_generic_cblas`. To compare optimized OpenBLAS, use
+`-d vsl_blas_cblas` when OpenBLAS is installed and run with
+`OPENBLAS_NUM_THREADS=2`. Keep each binary's flags with its result. Do not
+call a generic system CBLAS build "OpenBLAS" or treat an unoptimized system
+BLAS as VTL's best available CPU backend.
+
+```bash
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -no-parallel -cc gcc -prod -cflags "-march=native" -d vsl_blas_cblas \
+	-o /tmp/vtl-autograd-openblas ./vtl/benchmarks/vs_numpy/autograd_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 OPENBLAS_NUM_THREADS=2 \
+	/tmp/vtl-autograd-openblas
+```
+
+For system CBLAS on a host that provides `libcblas`, replace the compile flag
+with `-d vsl_blas_generic_cblas` and use a different output binary. Label that
+result as system CBLAS, not OpenBLAS.
+
+Compare with PyTorch CPU:
+
+```bash
 systemd-run --user --scope --quiet -p MemoryMax=2G -p MemorySwapMax=0 -- env VJOBS=2 \
 	OMP_NUM_THREADS=2 MKL_NUM_THREADS=2 uv run --with torch python ./vtl/benchmarks/vs_numpy/pytorch_baseline.py autograd
 ```
