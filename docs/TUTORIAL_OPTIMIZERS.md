@@ -219,6 +219,15 @@ mut scheduler2 := optimizers.exponential_lr[f32](0.95)
 // CosineAnnealingLR: cosine decay from initial_lr to lrd
 mut scheduler3 := optimizers.cosine_annealing_lr[f32](100, 1e-5)
 
+// CosineAnnealingWarmRestarts: restart after 10 steps, then double each cycle
+mut scheduler_cosine_restarts := optimizers.cosine_annealing_warm_restarts[f32](
+	optimizers.CosineAnnealingWarmRestartsConfig{
+		t_0:     10
+		t_mult:  2
+		eta_min: 1e-5
+	}
+) or { panic(err) }
+
 // LinearLR: linear warmup from 10% to 100% of the base learning rate
 mut scheduler4 := optimizers.linear_lr[f32](0.1, 1.0, 10)
 
@@ -279,6 +288,11 @@ decays on that epoch. `PolynomialLR` follows
 step. `ConstantLR` applies `factor` before `total_iters`, then returns the
 original base rate. These schedulers calculate each value from the base rate
 and step supplied by the caller.
+
+`CosineAnnealingWarmRestarts` starts each cycle at the base rate and anneals to
+`eta_min`. `t_0` sets the first cycle length; `t_mult` multiplies the length
+after each restart. The step can count minibatches or epochs, depending on your
+training loop.
 
 ```v ignore
 mut one_cycle := optimizers.one_cycle_lr[f32](optimizers.OneCycleLRConfig{
