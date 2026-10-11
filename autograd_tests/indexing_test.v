@@ -21,6 +21,41 @@ fn test_take_with_mode_backward_clips_negative_indices() ! {
 	assert input.grad.to_array() == [1.0, 0.0, 1.0]
 }
 
+fn test_take_nd_backward_accumulates_repeated_multidimensional_indices() ! {
+	mut ctx := autograd.ctx[f64]()
+	input := ctx.variable(vtl.from_array([10.0, 20.0, 30.0, 40.0, 50.0, 60.0], [2, 3])!)
+	indices := vtl.from_array([2, 0, 1, 1], [2, 2])!
+	mut selected := input.take_nd(indices, 1)!
+	assert selected.value.shape == [2, 2, 2]
+	assert selected.value.to_array() == [30.0, 10.0, 20.0, 20.0, 60.0, 40.0, 50.0, 50.0]
+	selected.backprop()!
+	assert input.grad.to_array() == [1.0, 2.0, 1.0, 1.0, 2.0, 1.0]
+}
+
+fn test_take_nd_with_mode_backward_clips_indices() ! {
+	mut ctx := autograd.ctx[f64]()
+	input := ctx.variable(vtl.from_array([10.0, 20.0, 30.0], [1, 3])!)
+	indices := vtl.from_array([-1, 3], [1, 2])!
+	mut selected := input.take_nd_with_mode(indices, 1, .clip)!
+	assert selected.value.to_array() == [10.0, 30.0]
+	selected.backprop()!
+	assert input.grad.to_array() == [1.0, 0.0, 1.0]
+}
+
+fn test_take_nd_backward_maps_axes_after_selected_axis() ! {
+	mut ctx := autograd.ctx[f64]()
+	input := ctx.variable(vtl.from_array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0,
+		11.0],
+		[2, 3, 2])!)
+	indices := vtl.from_array([2, 0, 1, 1], [2, 2])!
+	mut selected := input.take_nd(indices, 1)!
+	assert selected.value.shape == [2, 2, 2, 2]
+	assert selected.value.to_array() == [4.0, 5.0, 0.0, 1.0, 2.0, 3.0, 2.0, 3.0, 10.0, 11.0, 6.0,
+		7.0, 8.0, 9.0, 8.0, 9.0]
+	selected.backprop()!
+	assert input.grad.to_array() == [1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0]
+}
+
 fn test_take_along_axis_backward_accumulates_repeated_indices() ! {
 	mut ctx := autograd.ctx[f64]()
 	input := ctx.variable(vtl.from_array([10.0, 20.0, 30.0, 40.0, 50.0, 60.0], [2, 3])!)
