@@ -257,6 +257,16 @@ fn test_cumprod() {
 	assert result.get_nth(3) == f64(24)
 }
 
+fn test_cumulative_operations_handle_views_and_empty_tensors() ! {
+	transposed := vtl.from_array([1, 2, 3, 4, 5, 6], [2, 3])!.transpose([1, 0])!
+	assert transposed.cumsum(1)!.to_array() == [1, 5, 2, 7, 3, 9]
+	assert transposed.cumprod(1)!.to_array() == [1, 4, 2, 10, 3, 18]
+
+	empty := vtl.zeros[f64]([0, 3], vtl.TensorData{})
+	assert empty.cumsum(1)!.shape == [0, 3]
+	assert empty.cumprod(1)!.shape == [0, 3]
+}
+
 fn test_cumulative_operations_support_wider_output_types() ! {
 	values := vtl.from_1d([f32(1e8), 1, -1e8])!
 	widened_sum := values.cumsum_as[f64](0)!

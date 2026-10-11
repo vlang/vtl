@@ -24,6 +24,33 @@ Record the V version, C compiler, CPU, NumPy version, and thread settings when
 publishing measurements. This elementwise microbenchmark does not establish
 overall VTL/NumPy performance parity.
 
+## Cumulative sum and product
+
+This paired benchmark compares one-dimensional `cumsum` and `cumprod` for
+1,048,576 deterministic `f64` values. Both implementations run two warmups and
+seven timed calls, allocate a fresh output inside each timed call, and report
+the sum of the output as a checksum. The product input stays close to one to
+avoid underflow obscuring throughput. Compile the V benchmark first, then run
+the generated binary, from `~/.vmodules`:
+
+```bash
+systemd-run --user --scope -p MemoryMax=512M -p MemorySwapMax=0 -- env VJOBS=2 \
+	mkdir -p "$HOME/.cache/vtl-bench-tmp" "$HOME/.cache/vtl-bench-vtmp"
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	TMPDIR="$HOME/.cache/vtl-bench-tmp" VTMP="$HOME/.cache/vtl-bench-vtmp" \
+	v -no-parallel -cc gcc -prod -cflags "-march=native" \
+	-o "$HOME/.cache/vtl-cumulative-bench" ./vtl/benchmarks/vs_numpy/cumulative_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 \
+	"$HOME/.cache/vtl-cumulative-bench"
+systemd-run --user --scope --quiet -p MemoryMax=2G -p MemorySwapMax=0 -- env VJOBS=2 \
+	OPENBLAS_NUM_THREADS=2 uv run --offline --no-project --with numpy python \
+	./vtl/benchmarks/vs_numpy/numpy_cumulative_baseline.py
+```
+
+Record the V version, compiler, CPU, NumPy version, and thread settings with
+results. This microbenchmark compares these two one-dimensional operations and
+does not establish overall VTL/NumPy performance parity.
+
 On an AMD Ryzen 9 5900X with V 0.5.2 and GCC 16.2.1 (`-prod
 -march=native`), three interleaved process runs on 2026-10-10 measured median
 means of 2.372 ms for VTL and 0.859 ms for NumPy 2.5.3. Checksums matched at
