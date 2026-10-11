@@ -405,6 +405,32 @@ improved this VTL workload by about 4.1x over pure V; NumPy remained about
 2.45x faster than the system CBLAS route. This is a single-host, single-kernel
 comparison, not an overall performance claim.
 
+### f32 vector p=2 norm
+
+This paired benchmark uses the same 500,000-element deterministic `f32` input,
+three warmups, and seven timed calls per process. Compile VTL with `-prod`
+before running the binary. The pure-V path uses VSL's SIMD `snrm2`; the
+generic system CBLAS backend currently does not provide an `f32` norm kernel.
+Run from `~/.vmodules`:
+
+```bash
+systemd-run --user --scope -p MemoryMax=3G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -no-parallel -cc gcc -prod -cflags "-march=native" \
+	-o /tmp/vtl-vector-norm-f32 ./vtl/benchmarks/vs_numpy/vector_norm_f32_bench.v
+systemd-run --user --scope -p MemoryMax=512M -p MemorySwapMax=0 -- env VJOBS=2 \
+	/tmp/vtl-vector-norm-f32
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 \
+	OPENBLAS_NUM_THREADS=2 uv run --no-project --with numpy python \
+	./vtl/benchmarks/vs_numpy/numpy_vector_norm_f32_baseline.py
+```
+
+On the same AMD Ryzen 9 5900X with V 0.5.2 `a60fb58`, GCC 16.2.1, and NumPy
+2.5.3 with SciPy OpenBLAS 0.3.34.106.0, three interleaved process runs measured
+median means of 0.288 ms for VTL pure V and 0.119 ms for NumPy. Checksums agree
+within 3.1e-7 relative error for the reported norm sums. NumPy was about 2.42x
+faster for this input; this is a single-host, single-kernel result, not an
+overall performance claim.
+
 ## Matrix-chain ordering
 
 This benchmark compares VTL and NumPy optimal matrix-chain ordering with a
