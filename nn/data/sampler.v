@@ -1,6 +1,7 @@
 module data
 
 import rand
+import math
 
 // Sampler produces sample indices for a dataset of the provided size.
 pub interface Sampler {
@@ -63,4 +64,98 @@ pub fn (s &SubsetRandomSampler) sample_indices(dataset_size int) ![]int {
 		indices[i], indices[j] = indices[j], indices[i]
 	}
 	return indices
+}
+
+// WeightedRandomSampler draws indices in proportion to non-negative weights.
+pub struct WeightedRandomSampler {
+	weights     []f64
+	num_samples int
+	replacement bool
+}
+
+// WeightedRandomSampler.new snapshots weights and validates the draw count.
+pub fn WeightedRandomSampler.new(weights []f64, num_samples int, replacement bool) !&WeightedRandomSampler {
+	if num_samples < 0 {
+		return error('num_samples must be non-negative')
+	}
+	if weights.len == 0 {
+		return error('weights must not be empty')
+	}
+	mut positive_count := 0
+	for weight in weights {
+		if weight < 0 || math.is_nan(weight) || math.is_inf(weight, 0) {
+			return error('weights must be finite and non-negative')
+		}
+		if weight > 0 {
+			positive_count++
+		}
+	}
+	if num_samples > 0 && positive_count == 0 {
+		return error('weights must contain a positive value when num_samples is positive')
+	}
+	if !replacement && num_samples > positive_count {
+		return error('num_samples exceeds the number of positive weights without replacement')
+	}
+	return &WeightedRandomSampler{
+		weights:     weights.clone()
+		num_samples: num_samples
+		replacement: replacement
+	}
+}
+
+// sample_indices draws the configured number of weighted dataset indices.
+pub fn (s &WeightedRandomSampler) sample_indices(dataset_size int) ![]int {
+	if dataset_size < 0 {
+		return error('dataset_size must be non-negative')
+	}
+	if s.weights.len != dataset_size {
+		return error('weights length ${s.weights.len} must match dataset size ${dataset_size}')
+	}
+	if s.num_samples == 0 {
+		return []int{}
+	}
+	mut scaled_weights := s.weights.clone()
+	mut max_weight := 0.0
+	for weight in scaled_weights {
+		max_weight = math.max(max_weight, weight)
+	}
+	if max_weight <= 0 {
+		return error('weights must contain a positive value when num_samples is positive')
+	}
+	for i in 0 .. scaled_weights.len {
+		scaled_weights[i] /= max_weight
+	}
+	mut total_weight := 0.0
+	for weight in scaled_weights {
+		total_weight += weight
+	}
+	mut result := []int{cap: s.num_samples}
+	for _ in 0 .. s.num_samples {
+		target := rand.f64_in_range(0.0, total_weight)!
+		mut cumulative := 0.0
+		mut selected_index := -1
+		for index, weight in scaled_weights {
+			if weight <= 0 {
+				continue
+			}
+			cumulative += weight
+			if target < cumulative {
+				selected_index = index
+				break
+			}
+		}
+		if selected_index < 0 {
+			for index, weight in scaled_weights {
+				if weight > 0 {
+					selected_index = index
+				}
+			}
+		}
+		result << selected_index
+		if !s.replacement {
+			total_weight -= scaled_weights[selected_index]
+			scaled_weights[selected_index] = 0.0
+		}
+	}
+	return result
 }
