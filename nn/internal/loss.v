@@ -229,14 +229,17 @@ pub fn huber_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], target &
 	return ret
 }
 
-// nll computes mean Negative Log Likelihood from log-probabilities. Targets can
-// be class indices `[batch]` or one-hot/soft labels `[batch, classes]`.
-pub fn nll[T](input &vtl.Tensor[T], target &vtl.Tensor[T], weight &vtl.Tensor[T]) !&vtl.Tensor[T] {
+// nll computes Negative Log Likelihood from log-probabilities. Targets can be
+// class indices `[batch]` or one-hot/soft labels `[batch, classes]`.
+pub fn nll[T](input &vtl.Tensor[T], target &vtl.Tensor[T], weight &vtl.Tensor[T], ignore_index int, reduction string) !&vtl.Tensor[T] {
 	if input.shape.len != 2 || input.shape[0] == 0 || input.shape[1] == 0 {
 		return error('NLL loss requires non-empty rank-two log-probabilities')
 	}
 	batch_size := input.shape[0]
 	n_classes := input.shape[1]
+	if reduction !in ['mean', 'sum'] {
+		return error('NLL reduction must be mean or sum')
+	}
 	if !isnil(weight) && (weight.shape.len != 1 || weight.shape[0] != n_classes) {
 		return error('NLL class weights must have shape [n_classes]')
 	}
@@ -244,14 +247,26 @@ pub fn nll[T](input &vtl.Tensor[T], target &vtl.Tensor[T], weight &vtl.Tensor[T]
 	if !class_indices && target.shape != input.shape {
 		return error('NLL targets must match log-probabilities or have shape [batch]')
 	}
+	if !class_indices && ignore_index != -1 {
+		return error('NLL ignore_index is supported only for class-index targets')
+	}
 	mut total := 0.0
 	mut weight_total := 0.0
+	mut valid_targets := 0
 	for i in 0 .. batch_size {
 		if class_indices {
+			raw_class := f64(target.get_nth(i))
+			if !math.is_finite(raw_class) || raw_class != math.floor(raw_class) {
+				return error('NLL class indices must be finite integers')
+			}
+			if raw_class == f64(ignore_index) {
+				continue
+			}
 			class_index := nll_class_index[T](target, i, n_classes)!
 			class_weight := if isnil(weight) { 1.0 } else { f64(weight.get_nth(class_index)) }
 			total -= class_weight * f64(input.get([i, class_index]))
 			weight_total += class_weight
+			valid_targets++
 		} else {
 			for c in 0 .. n_classes {
 				class_weight := if isnil(weight) { 1.0 } else { f64(weight.get_nth(c)) }
@@ -259,20 +274,34 @@ pub fn nll[T](input &vtl.Tensor[T], target &vtl.Tensor[T], weight &vtl.Tensor[T]
 			}
 		}
 	}
-	denominator := if class_indices && !isnil(weight) { weight_total } else { f64(batch_size) }
+	denominator := if reduction == 'sum' {
+		1.0
+	} else if class_indices && !isnil(weight) {
+		weight_total
+	} else if class_indices {
+		f64(valid_targets)
+	} else {
+		f64(batch_size)
+	}
 	if denominator == 0.0 {
+		if valid_targets == 0 && class_indices {
+			return vtl.from_1d([vtl.cast[T](0)])
+		}
 		return error('NLL mean reduction requires non-zero total target weight')
 	}
 	return vtl.from_1d([vtl.cast[T](total / denominator)])
 }
 
-// nll_backward computes gradient of NLL w.r.t. input (log-probs)
-pub fn nll_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], target &vtl.Tensor[T], weight &vtl.Tensor[T]) !&vtl.Tensor[T] {
+// nll_backward computes the gradient of NLL w.r.t. input (log-probabilities).
+pub fn nll_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], target &vtl.Tensor[T], weight &vtl.Tensor[T], ignore_index int, reduction string) !&vtl.Tensor[T] {
 	if input.shape.len != 2 || input.shape[0] == 0 || input.shape[1] == 0 {
 		return error('NLL loss requires non-empty rank-two log-probabilities')
 	}
 	batch_size := input.shape[0]
 	n_classes := input.shape[1]
+	if reduction !in ['mean', 'sum'] {
+		return error('NLL reduction must be mean or sum')
+	}
 	if !isnil(weight) && (weight.shape.len != 1 || weight.shape[0] != n_classes) {
 		return error('NLL class weights must have shape [n_classes]')
 	}
@@ -280,22 +309,36 @@ pub fn nll_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], target &vt
 	if !class_indices && target.shape != input.shape {
 		return error('NLL targets must match log-probabilities or have shape [batch]')
 	}
+	if !class_indices && ignore_index != -1 {
+		return error('NLL ignore_index is supported only for class-index targets')
+	}
 	upstream := f64(gradient.get([0]))
-	mut denominator := f64(batch_size)
-	if class_indices && !isnil(weight) {
+	mut denominator := if reduction == 'sum' { 1.0 } else { f64(batch_size) }
+	if reduction == 'mean' && class_indices {
 		denominator = 0.0
 		for i in 0 .. batch_size {
+			raw_class := f64(target.get_nth(i))
+			if !math.is_finite(raw_class) || raw_class != math.floor(raw_class) {
+				return error('NLL class indices must be finite integers')
+			}
+			if raw_class == f64(ignore_index) {
+				continue
+			}
 			class_index := nll_class_index[T](target, i, n_classes)!
-			denominator += f64(weight.get_nth(class_index))
-		}
-		if denominator == 0.0 {
-			return error('NLL mean reduction requires non-zero total target weight')
+			denominator += if isnil(weight) { 1.0 } else { f64(weight.get_nth(class_index)) }
 		}
 	}
 	mut ret_data := []f64{len: batch_size * n_classes}
 	for i in 0 .. batch_size {
 		mut class_index := -1
 		if class_indices {
+			raw_class := f64(target.get_nth(i))
+			if !math.is_finite(raw_class) || raw_class != math.floor(raw_class) {
+				return error('NLL class indices must be finite integers')
+			}
+			if raw_class == f64(ignore_index) {
+				continue
+			}
 			class_index = nll_class_index[T](target, i, n_classes)!
 		}
 		for c in 0 .. n_classes {
@@ -317,11 +360,10 @@ fn nll_class_index[T](target &vtl.Tensor[T], row int, n_classes int) !int {
 	if !math.is_finite(raw_class) {
 		return error('NLL class indices must be finite integers')
 	}
-	class_index := int(raw_class)
-	if raw_class != f64(class_index) || class_index < 0 || class_index >= n_classes {
+	if raw_class != math.floor(raw_class) || raw_class < 0.0 || raw_class >= f64(n_classes) {
 		return error('NLL class index is out of range or not an integer')
 	}
-	return class_index
+	return int(raw_class)
 }
 
 // kl_div computes KL Divergence loss D_KL(P || Q) = sum(P * log(P/Q))

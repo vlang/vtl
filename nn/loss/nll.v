@@ -15,8 +15,8 @@ import vtl.nn.internal
 //
 // Fields:
 //   - `weight`       — optional per-class weight tensor (`nil` = uniform weights)
-//   - `ignore_index` — class index to ignore in the loss computation (default: -1 = none)
-//   - `reduction`    — `'mean'` | `'sum'` | `'none'` (default: `'mean'`)
+//   - `ignore_index` — class index to ignore in class-index targets (default: -1 = none)
+//   - `reduction`    — `'mean'` | `'sum'` (default: `'mean'`)
 //
 // Example:
 // ```v
@@ -32,24 +32,40 @@ pub:
 	reduction    string         = 'mean'
 }
 
+// NLLLossOptions configures ignored class indices and scalar reduction.
+@[params]
+pub struct NLLLossOptions {
+pub:
+	ignore_index int    = -1
+	reduction    string = 'mean'
+}
+
 // nll_loss creates a new NLLLoss instance.
 //
 // `weight` — optional per-class weight tensor; pass `unsafe { nil }` for uniform weights.
 pub fn nll_loss[T](weight &vtl.Tensor[T]) types.Loss[T] {
+	return nll_loss_with_options[T](weight, NLLLossOptions{})
+}
+
+// nll_loss_with_options creates an NLLLoss with a configurable ignore index and
+// scalar reduction (`mean` or `sum`). `ignore_index` applies to class-index targets.
+pub fn nll_loss_with_options[T](weight &vtl.Tensor[T], options NLLLossOptions) types.Loss[T] {
 	concrete := &NLLLoss[T]{
-		weight:    weight
-		reduction: 'mean'
+		weight:       weight
+		ignore_index: options.ignore_index
+		reduction:    options.reduction
 	}
 	return types.loss[T](voidptr(concrete), nll_loss_loss_dispatch[T])
 }
 
 // loss exposes this operation as part of the public API.
 pub fn (l &NLLLoss[T]) loss(input &autograd.Variable[T], target &vtl.Tensor[T]) !&autograd.Variable[T] {
-	output := internal.nll[T](input.value, target, l.weight)!
+	output := internal.nll[T](input.value, target, l.weight, l.ignore_index, l.reduction)!
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {
-		gate := loss_gates.nll_loss_weighted_gate[T](input.value, target, l.weight)
+		gate := loss_gates.nll_loss_weighted_gate_with_options[T](input.value, target, l.weight,
+			l.ignore_index, l.reduction)
 		gate.cache(mut result, input)!
 	}
 	return result
