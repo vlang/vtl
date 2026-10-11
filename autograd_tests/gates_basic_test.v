@@ -75,3 +75,32 @@ fn test_backprop_accumulates_branch_gradients_in_existing_buffer() {
 	assert x.grad.array_equal(expected_grad)
 	assert voidptr(x.grad) == voidptr(initial_grad)
 }
+
+fn test_register_reuses_fresh_zero_gradient_buffer() {
+	ctx := autograd.ctx[f64]()
+	left := ctx.variable(vtl.from_1d([1.0])!)
+	right := ctx.variable(vtl.from_1d([2.0])!)
+	mut result := ctx.variable(vtl.from_1d([3.0])!)
+	initial_grad := result.grad
+	gate := autograd.add_gate[f64]()
+
+	gate.cache(mut result, left, right)!
+
+	assert voidptr(result.grad) == voidptr(initial_grad)
+	assert result.grad.get_nth(0) == f64(0.0)
+}
+
+fn test_register_allocates_gradient_for_untracked_result() {
+	ctx := autograd.ctx[f64]()
+	left := ctx.variable(vtl.from_1d([1.0])!)
+	right := ctx.variable(vtl.from_1d([2.0])!)
+	value := vtl.from_1d([3.0])!
+	mut result := ctx.variable(value, requires_grad: false)
+	gate := autograd.add_gate[f64]()
+
+	gate.cache(mut result, left, right)!
+
+	assert result.requires_grad
+	assert voidptr(result.grad) != voidptr(value)
+	assert result.grad.get_nth(0) == f64(0.0)
+}

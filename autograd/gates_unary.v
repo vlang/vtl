@@ -34,8 +34,6 @@ pub fn (g &LogGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {
 		Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
 			register[T]('Log', voidptr(g), log_gate_backward_dispatch[T], result, [a])!
 		}
 		else {
@@ -82,8 +80,6 @@ pub fn (g &AbsGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {
 		Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
 			register[T]('Abs', voidptr(g), abs_gate_backward_dispatch[T], result, [a])!
 		}
 		else {
@@ -127,8 +123,6 @@ pub fn (g &SqrtGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {
 		Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
 			register[T]('Sqrt', voidptr(g), sqrt_gate_backward_dispatch[T], result, [
 				a,
 			])!
@@ -173,8 +167,6 @@ pub fn (g &TanhGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {
 		Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
 			register[T]('Tanh', voidptr(g), tanh_gate_backward_dispatch[T], result, [
 				a,
 			])!
@@ -229,8 +221,6 @@ pub fn (g &ClampGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {
 		Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
 			register[T]('Clamp', voidptr(g), clamp_gate_backward_dispatch[T], result, [
 				a,
 			])!

@@ -29,9 +29,6 @@ pub fn (g &InputGate[T]) cache(mut result autograd.Variable[T], args ...autograd
 
 	match a {
 		autograd.Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
-
 			autograd.register[T]('Input', voidptr(g), input_gate_backward_dispatch[T], result, [
 				a,
 			])!

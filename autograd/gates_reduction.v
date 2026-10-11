@@ -50,8 +50,6 @@ pub fn (g &SumGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {
 		Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
 			register[T]('Sum', voidptr(g), sum_gate_backward_dispatch[T], result, [a])!
 		}
 		else {
@@ -98,8 +96,6 @@ pub fn (g &MeanGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {
 		Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
 			register[T]('Mean', voidptr(g), mean_gate_backward_dispatch[T], result, [
 				a,
 			])!
@@ -183,8 +179,6 @@ pub fn (g &CumsumGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {
 		Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
 			register[T]('Cumsum', voidptr(g), cumsum_gate_backward_dispatch[T], result, [a])!
 		}
 		else {
@@ -280,8 +274,6 @@ pub fn (g &CumprodGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {
 		Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
 			register[T]('Cumprod', voidptr(g), cumprod_gate_backward_dispatch[T], result, [a])!
 		}
 		else {
@@ -322,8 +314,6 @@ pub fn (g &ReshapeGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	a := args[0]
 	match a {
 		Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
 			register[T]('Reshape', voidptr(g), reshape_gate_backward_dispatch[T], result, [
 				a,
 			])!
@@ -374,8 +364,6 @@ pub fn (g &TransposeGate[T]) cache(mut result Variable[T], args ...CacheParam) !
 	a := args[0]
 	match a {
 		Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
 			register[T]('Transpose', voidptr(g), transpose_gate_backward_dispatch[T], result, [
 				a,
 			])!
@@ -435,8 +423,6 @@ fn concat_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
 
 // cache exposes this operation as part of the public API.
 pub fn (g &ConcatGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
-	result.grad = vtl.zeros_like[T](result.value)
-	result.requires_grad = true
 	mut vars := []&Variable[T]{}
 	for arg in args {
 		match arg {

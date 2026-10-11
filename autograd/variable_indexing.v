@@ -16,7 +16,6 @@ pub fn (v &Variable[T]) take_along_axis(indices &vtl.Tensor[int], axis int) !&Va
 			input_shape: v.value.shape.clone()
 			axis:        axis_index
 		}
-		result.grad = vtl.zeros_like[T](value)
 		register[T]('TakeAlongAxis', voidptr(gate), take_along_axis_backward_dispatch[T], result,
 			[v])!
 	}
@@ -78,7 +77,6 @@ pub fn (v &Variable[T]) scatter_add(indices &vtl.Tensor[int], updates &Variable[
 			indices: indices.copy(.row_major)
 			axis:    axis_index
 		}
-		result.grad = vtl.zeros_like[T](value)
 		register[T]('ScatterAdd', voidptr(gate), scatter_add_backward_dispatch[T], result, [
 			v,
 			updates,
@@ -117,7 +115,6 @@ pub fn (v &Variable[T]) put_along_axis(indices &vtl.Tensor[int], updates &Variab
 			input_shape: v.value.shape.clone()
 			axis:        axis_index
 		}
-		result.grad = vtl.zeros_like[T](value)
 		register[T]('PutAlongAxis', voidptr(gate), put_along_axis_backward_dispatch[T], result,
 			[v, updates])!
 	}
@@ -202,7 +199,6 @@ pub fn (v &Variable[T]) put_with_mode(indices &vtl.Tensor[int], updates &Variabl
 			updates_shape: updates.value.shape.clone()
 			update_size:   updates.value.size
 		}
-		result.grad = vtl.zeros_like[T](value)
 		register[T]('Put', voidptr(gate), put_backward_dispatch[T], result, [v, updates])!
 	}
 	return result
@@ -288,7 +284,6 @@ fn variable_slice_result[T](parent &Variable[T], value &vtl.Tensor[T], mapping S
 	mut result := variable[T](parent.context, value, requires_grad: parent.requires_grad)
 	if parent.requires_grad {
 		gate := &SliceGate[T]{ mapping: mapping }
-		result.grad = vtl.zeros_like[T](value)
 		register[T]('Slice', voidptr(gate), slice_backward_dispatch[T], result, [parent])!
 	}
 	return result

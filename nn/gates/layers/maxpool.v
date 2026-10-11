@@ -46,9 +46,6 @@ pub fn (g &MaxPool2DGate[T]) cache(mut result autograd.Variable[T], args ...auto
 
 	match a {
 		autograd.Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
-
 			autograd.register[T]('MaxPool2D', voidptr(g), max_pool2_d_gate_backward_dispatch[T],
 				result, [a])!
 		}

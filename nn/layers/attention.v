@@ -310,8 +310,6 @@ pub fn (g &AttentionGate[T]) cache(mut result autograd.Variable[T], args ...auto
 	a := args[0]
 	match a {
 		autograd.Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
 			mut parents := []&autograd.Variable[T]{cap: args.len}
 			for arg in args {
 				match arg {

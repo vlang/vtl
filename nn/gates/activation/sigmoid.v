@@ -36,9 +36,6 @@ pub fn (g &SigmoidGate[T]) cache(mut result autograd.Variable[T], args ...autogr
 
 	match a {
 		autograd.Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
-
 			autograd.register[T]('Sigmoid', voidptr(g), sigmoid_gate_backward_dispatch[T], result, [
 				a,
 			])!

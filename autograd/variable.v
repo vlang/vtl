@@ -34,6 +34,9 @@ pub mut:
 	requires_grad bool
 	// Phase 2: optional forward-only GPU activation (`&vtl.CudaTensor[f64]` when `-d cuda`).
 	gpu_activation voidptr = unsafe { nil }
+mut:
+	// True until an operation consumes the fresh zero gradient buffer.
+	grad_buffer_fresh bool
 }
 
 // VariableData defines a public data structure for this module.
@@ -48,11 +51,23 @@ pub struct VariableData {
 pub fn variable[T](context &Context[T], value &vtl.Tensor[T], data VariableData) &Variable[T] {
 	grad := if data.requires_grad { vtl.zeros_like[T](value) } else { value }
 	return &Variable[T]{
-		context:       context
-		value:         value
-		grad:          grad
-		requires_grad: data.requires_grad
+		context:           context
+		value:             value
+		grad:              grad
+		requires_grad:     data.requires_grad
+		grad_buffer_fresh: data.requires_grad
 	}
+}
+
+// prepare_result_gradient reuses the zero gradient buffer from variable() when
+// a gate registers a newly created result. Untracked results receive a separate
+// zero buffer before they enter the graph.
+fn prepare_result_gradient[T](mut result Variable[T]) {
+	if !result.grad_buffer_fresh {
+		result.grad = vtl.zeros_like[T](result.value)
+	}
+	result.requires_grad = true
+	result.grad_buffer_fresh = false
 }
 
 // slice exposes this operation as part of the public API.
@@ -93,6 +108,7 @@ pub fn (v &Variable[T]) str() string {
 // Context
 pub fn (mut v Variable[T]) backprop() ! {
 	v.grad = vtl.ones_like[T](v.value)
+	v.grad_buffer_fresh = false
 	for v.context.len() > 0 && v.context.last()!.payload.variable != v {
 		node := v.context.pop()!
 		$if debug {
@@ -110,6 +126,7 @@ pub fn (mut v Variable[T]) backprop() ! {
 			mut parent_i := cur_node.parents[i]
 			if parent_i.requires_grad {
 				parent_i.grad = accumulate_gradient[T](parent_i.grad, diff)!
+				parent_i.grad_buffer_fresh = false
 			}
 		}
 	}

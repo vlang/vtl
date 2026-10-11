@@ -43,8 +43,6 @@ pub fn (g &AdditionalLossGate[T]) cache(mut result autograd.Variable[T], args ..
 	a := args[0]
 	match a {
 		autograd.Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
 			autograd.register[T]('AdditionalLoss:${g.kind}', voidptr(g), additional_loss_gate_backward_dispatch[T], result, [a])!
 		}
 		else { return error('AdditionalLoss: cache: invalid argument') }

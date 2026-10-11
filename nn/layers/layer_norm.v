@@ -178,8 +178,6 @@ pub fn (g &LayerNormGate[T]) cache(mut result autograd.Variable[T], args ...auto
 			}
 		}
 	}
-	result.grad = vtl.zeros_like[T](result.value)
-	result.requires_grad = true
 	autograd.register[T]('LayerNorm', voidptr(g), layer_norm_gate_backward_dispatch[T], result,
 		parents)!
 }

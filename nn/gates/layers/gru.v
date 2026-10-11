@@ -65,8 +65,6 @@ fn gru_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
 
 // cache registers the GRU operation in its input's context.
 pub fn (g &GRUGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
-	result.grad = vtl.zeros_like[T](result.value)
-	result.requires_grad = true
 	if g.h0 == unsafe { nil } {
 		autograd.register[T]('GRU', voidptr(g), gru_gate_backward_dispatch[T], result,
 			[g.input, g.w_ih, g.w_hh, g.b_ih, g.b_hh])!

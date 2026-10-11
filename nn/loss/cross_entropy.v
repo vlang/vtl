@@ -74,8 +74,6 @@ pub fn (g &CrossEntropyLossGate[T]) cache(mut result autograd.Variable[T], args 
 	a := args[0]
 	match a {
 		autograd.Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
 			autograd.register[T]('CrossEntropy', voidptr(g),
 				cross_entropy_loss_gate_backward_dispatch[T], result, [a])!
 		}

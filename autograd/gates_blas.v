@@ -70,9 +70,6 @@ pub fn (g &MatMulGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 		Variable[T] {
 			match b {
 				Variable[T] {
-					result.grad = vtl.zeros_like[T](result.value)
-					result.requires_grad = true
-
 					register[T]('MatMul', voidptr(g), mat_mul_gate_backward_dispatch[T], result, [
 						a,
 						b,

@@ -100,6 +100,8 @@ pub fn register[T](name string, gate voidptr, backward BackwardFn, result &Varia
 		return error(@FN + ': it is needed to specify at least one parent')
 	}
 
+	mut operation_result := result
+	prepare_result_gradient[T](mut operation_result)
 	new_payload := payload[T](result)
 	new_node := node[T](gate, backward, parents, new_payload, name)
 	mut graph_ctx := parents[0].context

@@ -34,9 +34,6 @@ pub fn (g &SinGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 
 	match a {
 		Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
-
 			register[T]('Sin', voidptr(g), sin_gate_backward_dispatch[T], result, [a])!
 		}
 		else {
@@ -77,9 +74,6 @@ pub fn (g &CosGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 
 	match a {
 		Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
-
 			register[T]('Cos', voidptr(g), cos_gate_backward_dispatch[T], result, [a])!
 		}
 		else {
@@ -121,9 +115,6 @@ pub fn (g &TanGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 
 	match a {
 		Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
-
 			register[T]('Tan', voidptr(g), tan_gate_backward_dispatch[T], result, [a])!
 		}
 		else {

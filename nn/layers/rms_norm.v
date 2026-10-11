@@ -141,8 +141,6 @@ pub fn (gate &RMSNormGate[T]) cache(mut result autograd.Variable[T], args ...aut
 			else { return error('RMSNormGate.cache: argument ${index} must be a Variable') }
 		}
 	}
-	result.grad = vtl.zeros_like[T](result.value)
-	result.requires_grad = true
 	autograd.register[T]('RMSNorm', voidptr(gate), rms_norm_gate_backward_dispatch[T], result,
 		parents)!
 }
