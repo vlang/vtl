@@ -29,8 +29,6 @@ pub fn (g &SoftplusGate[T]) cache(mut result autograd.Variable[T], args ...autog
 	a := args[0]
 	match a {
 		autograd.Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
 			autograd.register[T]('Softplus', voidptr(g), softplus_gate_backward_dispatch[T], result, [a])!
 		}
 		else {

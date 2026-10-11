@@ -38,9 +38,6 @@ pub fn (g &EluGate[T]) cache(mut result autograd.Variable[T], args ...autograd.C
 
 	match a {
 		autograd.Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
-
 			autograd.register[T]('Elu', voidptr(g), elu_gate_backward_dispatch[T], result, [
 				a,
 			])!

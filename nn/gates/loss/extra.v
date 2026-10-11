@@ -37,8 +37,6 @@ pub fn (g &BCEGate[T]) cache(mut result autograd.Variable[T], args ...autograd.C
 	a := args[0]
 	match a {
 		autograd.Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
 			autograd.register[T]('BCE', voidptr(g), bce_gate_backward_dispatch[T], result, [
 				a,
 			])!
@@ -82,8 +80,6 @@ pub fn (g &HuberLossGate[T]) cache(mut result autograd.Variable[T], args ...auto
 	a := args[0]
 	match a {
 		autograd.Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
 			autograd.register[T]('Huber', voidptr(g), huber_loss_gate_backward_dispatch[T], result, [
 				a,
 			])!
@@ -125,8 +121,6 @@ pub fn (g &NLLLossGate[T]) cache(mut result autograd.Variable[T], args ...autogr
 	a := args[0]
 	match a {
 		autograd.Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
 			autograd.register[T]('NLL', voidptr(g), nll_loss_gate_backward_dispatch[T], result, [
 				a,
 			])!
@@ -168,8 +162,6 @@ pub fn (g &KLDivLossGate[T]) cache(mut result autograd.Variable[T], args ...auto
 	a := args[0]
 	match a {
 		autograd.Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
 			autograd.register[T]('KLDiv', voidptr(g), kl_div_loss_gate_backward_dispatch[T],
 				result, [a])!
 		}

@@ -147,8 +147,6 @@ pub fn (g &LSTMGate[T]) cache(mut result autograd.Variable[T], _ ...autograd.Cac
 	if (g.initial_hidden == unsafe { nil }) != (g.initial_cell == unsafe { nil }) {
 		return error('LSTMGate.cache: initial hidden and cell variables must be supplied together')
 	}
-	result.grad = vtl.zeros_like[T](result.value)
-	result.requires_grad = true
 	mut parents := [g.input]
 	for layer in 0 .. g.layer_inputs.len {
 		parents << g.w_ih[layer]

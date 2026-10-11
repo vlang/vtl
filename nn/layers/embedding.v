@@ -98,8 +98,6 @@ pub fn (g &EmbeddingGate[T]) cache(mut result autograd.Variable[T], args ...auto
 	a := args[0]
 	match a {
 		autograd.Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
 			autograd.register[T]('Embedding', voidptr(g), embedding_gate_backward_dispatch[T],
 				result, [a])!
 		}

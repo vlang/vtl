@@ -38,9 +38,6 @@ pub fn (g &FlattenGate[T]) cache(mut result autograd.Variable[T], args ...autogr
 
 	match a {
 		autograd.Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
-
 			autograd.register[T]('Flatten', voidptr(g), flatten_gate_backward_dispatch[T], result, [
 				a,
 			])!

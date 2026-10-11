@@ -34,9 +34,6 @@ pub fn (g &ExpGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 
 	match a {
 		Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
-
 			register[T]('Exp', voidptr(g), exp_gate_backward_dispatch[T], result, [a])!
 		}
 		else {

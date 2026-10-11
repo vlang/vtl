@@ -31,9 +31,6 @@ pub fn (g &AddGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 		Variable[T] {
 			match b {
 				Variable[T] {
-					result.grad = vtl.zeros_like[T](result.value)
-					result.requires_grad = true
-
 					register[T]('Add', voidptr(g), add_gate_backward_dispatch[T], result, [
 						a,
 						b,
@@ -80,9 +77,6 @@ pub fn (g &SubtractGate[T]) cache(mut result Variable[T], args ...CacheParam) ! 
 		Variable[T] {
 			match b {
 				Variable[T] {
-					result.grad = vtl.zeros_like[T](result.value)
-					result.requires_grad = true
-
 					register[T]('Sub', voidptr(g), subtract_gate_backward_dispatch[T], result, [
 						a,
 						b,
@@ -137,9 +131,6 @@ pub fn (g &MultiplyGate[T]) cache(mut result Variable[T], args ...CacheParam) ! 
 		Variable[T] {
 			match b {
 				Variable[T] {
-					result.grad = vtl.zeros_like[T](result.value)
-					result.requires_grad = true
-
 					register[T]('Multiply', voidptr(g), multiply_gate_backward_dispatch[T], result, [
 						a,
 						b,
@@ -197,9 +188,6 @@ pub fn (g &DivideGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 		Variable[T] {
 			match b {
 				Variable[T] {
-					result.grad = vtl.zeros_like[T](result.value)
-					result.requires_grad = true
-
 					register[T]('Divide', voidptr(g), divide_gate_backward_dispatch[T], result, [
 						a,
 						b,

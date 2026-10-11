@@ -114,8 +114,6 @@ pub fn (g &AvgPool2DGate[T]) cache(mut result autograd.Variable[T], args ...auto
 	a := args[0]
 	match a {
 		autograd.Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
 			autograd.register[T]('AvgPool2D', voidptr(g), avg_pool2_d_gate_backward_dispatch[T],
 				result, [a])!
 		}
@@ -202,8 +200,6 @@ pub fn (g &GlobalAvgPool2DGate[T]) cache(mut result autograd.Variable[T], args .
 	a := args[0]
 	match a {
 		autograd.Variable[T] {
-			result.grad = vtl.zeros_like[T](result.value)
-			result.requires_grad = true
 			autograd.register[T]('GlobalAvgPool2D', voidptr(g),
 				global_avg_pool2_d_gate_backward_dispatch[T], result, [a])!
 		}

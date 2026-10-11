@@ -185,8 +185,6 @@ pub fn (g &BatchNorm1DGate[T]) cache(mut result autograd.Variable[T], args ...au
 					beta := args[2]
 					match beta {
 						autograd.Variable[T] {
-							result.grad = vtl.zeros_like[T](result.value)
-							result.requires_grad = true
 							autograd.register[T]('BatchNorm1D', voidptr(g),
 								batch_norm1_d_gate_backward_dispatch[T], result, [
 									input,

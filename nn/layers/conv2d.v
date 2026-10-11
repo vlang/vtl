@@ -171,8 +171,6 @@ pub fn (g &Conv2DGate[T]) cache(mut result autograd.Variable[T], args ...autogra
 				autograd.Variable[T] {
 					match bias {
 						autograd.Variable[T] {
-							result.grad = vtl.zeros_like[T](result.value)
-							result.requires_grad = true
 							autograd.register[T]('Conv2D', voidptr(g),
 								conv2_d_gate_backward_dispatch[T], result, [input, weight, bias])!
 						}
