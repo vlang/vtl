@@ -184,8 +184,8 @@ estimator, alongside forms that expose all thirteen estimator methods;
 multi-quantile multi-axis forms can also retain reduced dimensions with
 `keepdims`; single-axis multi-quantile forms provide the same retained-shape
 behavior;
-histograms with
-automatic and custom bins, weighted density, and multiple bin-selection rules;
+one- and two-dimensional histograms with automatic and custom bins, weighted
+counts and densities, and multiple one-dimensional bin-selection rules;
 integer/weighted `bincount`.
 
 **Current:** explicit accumulator/output dtypes are available for global,

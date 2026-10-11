@@ -12,18 +12,19 @@ builds toward autograd, neural networks, optimizers, and GPU-backed examples.
 5. [Map and Reduce](./TUTORIAL_MAP_REDUCE.md) — element-wise transforms and reductions.
 6. [Reductions](./TUTORIAL_REDUCTIONS.md) — argmax, argmin, cumulative operations.
 7. [Random numbers](./TUTORIAL_RANDOM.md) — random tensors and reproducible seeds.
+8. [Histograms](./TUTORIAL_HISTOGRAMS.md) — one- and two-dimensional binning and density.
 
 ## Linear algebra
 
-8. [Matrix and Vector operations](./TUTORIAL_LINEAR_ALGEBRA.md) — VSL-backed LA.
-9. [Advanced Linear Algebra](./TUTORIAL_ADVANCED_LA.md) — QR, LU, Cholesky, pinv.
-10. [Fourier transforms](./TUTORIAL_FFT.md) — one-dimensional real FFTs.
+9. [Matrix and Vector operations](./TUTORIAL_LINEAR_ALGEBRA.md) — VSL-backed LA.
+10. [Advanced Linear Algebra](./TUTORIAL_ADVANCED_LA.md) — QR, LU, Cholesky, pinv.
+11. [Fourier transforms](./TUTORIAL_FFT.md) — one-dimensional real FFTs.
 
 ## Machine learning
 
-11. [Automatic Differentiation](./TUTORIAL_AUTOGRAD.md) — `Variable`, gates, backprop.
-12. [Neural Networks](./TUTORIAL_NEURAL_NETWORKS.md) — layers, losses, `Sequential`.
-13. [Optimizers](./TUTORIAL_OPTIMIZERS.md) — SGD, Adam, AdamW, schedulers.
+12. [Automatic Differentiation](./TUTORIAL_AUTOGRAD.md) — `Variable`, gates, backprop.
+13. [Neural Networks](./TUTORIAL_NEURAL_NETWORKS.md) — layers, losses, `Sequential`.
+14. [Optimizers](./TUTORIAL_OPTIMIZERS.md) — SGD, Adam, AdamW, schedulers.
 
 ## Next
 

@@ -24,6 +24,7 @@ neural network module.
 | Gather and indexed updates | [Indexing and scatter](./TUTORIAL_INDEXING.md) |
 | Broadcasting, maps, reductions | [Broadcasting](./TUTORIAL_BROADCASTING.md), [Map/reduce](./TUTORIAL_MAP_REDUCE.md), [Reductions](./TUTORIAL_REDUCTIONS.md) |
 | Random tensors and reproducibility | [Random numbers](./TUTORIAL_RANDOM.md) |
+| Histograms and binning | [Histograms](./TUTORIAL_HISTOGRAMS.md) |
 | Fourier transforms | [FFT and normalization modes](./TUTORIAL_FFT.md) |
 | NumPy file interchange | [`.npy` input/output](./TUTORIAL_NUMPY_IO.md) |
 | Linear algebra and norms | [Linear algebra](./TUTORIAL_LINEAR_ALGEBRA.md), [Advanced LA](./TUTORIAL_ADVANCED_LA.md) |

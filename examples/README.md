@@ -77,6 +77,7 @@ CIFAR examples for CI-safe checks.
 | [fft_axis](./fft_axis) | Transform real or complex tensors along one selected axis | `v run ./vtl/examples/fft_axis/main.v` |
 | [covariance_correlation](./covariance_correlation) | Sample covariance and Pearson correlation | `v run ./vtl/examples/covariance_correlation/main.v` |
 | [histogram](./histogram) | Count samples and compute weighted density with custom bin edges | `v run ./vtl/examples/histogram/main.v` |
+| [histogram2d](./histogram2d) | Bin paired samples into NumPy-oriented 2D counts and density grids | `v run ./vtl/examples/histogram2d/main.v` |
 | [bincount](./bincount) | Count integer labels and sum per-label weights | `v run ./vtl/examples/bincount/main.v` |
 | [weighted_average](./weighted_average) | Compute weighted means globally and along an axis | `v run ./vtl/examples/weighted_average/main.v` |
 | [unique](./unique) | Find sorted unique values and count occurrences | `v run ./vtl/examples/unique/main.v` |
