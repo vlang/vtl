@@ -44,12 +44,12 @@ pub fn nll_loss[T](weight &vtl.Tensor[T]) types.Loss[T] {
 }
 
 // loss exposes this operation as part of the public API.
-pub fn (_ &NLLLoss[T]) loss(input &autograd.Variable[T], target &vtl.Tensor[T]) !&autograd.Variable[T] {
-	output := internal.nll[T](input.value, target)!
+pub fn (l &NLLLoss[T]) loss(input &autograd.Variable[T], target &vtl.Tensor[T]) !&autograd.Variable[T] {
+	output := internal.nll[T](input.value, target, l.weight)!
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {
-		gate := loss_gates.nll_loss_gate[T](input.value, target)
+		gate := loss_gates.nll_loss_weighted_gate[T](input.value, target, l.weight)
 		gate.cache(mut result, input)!
 	}
 	return result
