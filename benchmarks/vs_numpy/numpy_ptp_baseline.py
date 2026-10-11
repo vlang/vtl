@@ -1,10 +1,13 @@
+import os
 import time
 
 import numpy as np
 
 
 def main() -> None:
-    size = 1_048_576
+    size = int(os.environ.get("VTL_PTP_BENCH_SIZE", "1048576"))
+    if size <= 0:
+        raise SystemExit("VTL_PTP_BENCH_SIZE must be a positive integer")
     iterations = 7
     indices = np.arange(size, dtype=np.int64)
     values = (indices % 2001).astype(np.float64) - 1000.0

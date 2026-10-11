@@ -1,16 +1,22 @@
 // Compile with -prod from ~/.vmodules, then run the binary.
 module main
 
+import os
 import time
 import vtl
 import vtl.stats
 
-const ptp_size = 1_048_576
 const ptp_iterations = 7
 
 fn main() {
-	mut values := []f64{len: ptp_size}
-	for i in 0 .. ptp_size {
+	requested_size := os.getenv('VTL_PTP_BENCH_SIZE')
+	size := if requested_size == '' { 1_048_576 } else { requested_size.int() }
+	if size <= 0 {
+		eprintln('VTL_PTP_BENCH_SIZE must be a positive integer')
+		exit(2)
+	}
+	mut values := []f64{len: size}
+	for i in 0 .. size {
 		values[i] = f64(i % 2001) - 1000.0
 	}
 	tensor := vtl.from_1d[f64](values)!
@@ -28,6 +34,6 @@ fn main() {
 	for sample in samples {
 		total += sample
 	}
-	println('vtl ptp ${ptp_size} f64 | ${total / ptp_iterations:.3} ms')
+	println('vtl ptp ${size} f64 | ${total / ptp_iterations:.3} ms')
 	println('checksum: ${result:.1}')
 }

@@ -2,19 +2,25 @@
 
 ## Peak-to-peak range
 
-This paired benchmark reduces 1,048,576 deterministic `f64` values to their
-peak-to-peak range. Each side runs two warmups and seven timed calls, reports
-the mean, and prints the same scalar checksum. Compile the V benchmark with
-`-prod` before executing its binary, from `~/.vmodules`:
+This paired benchmark reduces deterministic `f64` values to their peak-to-peak
+range. Each side runs two warmups and seven timed calls, reports the mean, and
+prints the same scalar checksum. Set `VTL_PTP_BENCH_SIZE` to compare different
+working-set sizes. Compile the V benchmark with `-prod` before executing its
+binary, from `~/.vmodules`:
 
 ```bash
 systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
 	v -no-parallel -cc gcc -prod -cflags "-march=native" \
 	-o /tmp/vtl-ptp-bench ./vtl/benchmarks/vs_numpy/ptp_bench.v
 systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 \
-	/tmp/vtl-ptp-bench
+	VTL_PTP_BENCH_SIZE=1048576 /tmp/vtl-ptp-bench
 systemd-run --user --scope --quiet -p MemoryMax=2G -p MemorySwapMax=0 -- env VJOBS=2 \
-	uv run --offline --no-project --with numpy python \
+	VTL_PTP_BENCH_SIZE=1048576 uv run --offline --no-project --with numpy python \
+	./vtl/benchmarks/vs_numpy/numpy_ptp_baseline.py
+systemd-run --user --scope -p MemoryMax=3G -p MemorySwapMax=0 -- env VJOBS=2 \
+	VTL_PTP_BENCH_SIZE=67108864 /tmp/vtl-ptp-bench
+systemd-run --user --scope -p MemoryMax=3G -p MemorySwapMax=0 -- env VJOBS=2 \
+	VTL_PTP_BENCH_SIZE=67108864 uv run --offline --no-project --with numpy python \
 	./vtl/benchmarks/vs_numpy/numpy_ptp_baseline.py
 ```
 
@@ -22,10 +28,14 @@ Record the V version, compiler, CPU, NumPy version, and thread settings with
 measurements. This contiguous one-dimensional microbenchmark does not establish
 overall NumPy performance parity.
 On an AMD Ryzen 9 5900X with V 0.5.2 `81be246`, GCC 16.2.1, and NumPy 2.5.4,
-the `-prod -march=native` VTL binary averaged 0.216 ms and NumPy averaged
-0.190 ms on 2026-10-11. Both reported checksum `2000`; VTL was 1.14× slower
-for this workload. These local timings apply only to this contiguous f64
-reduction.
+five independent process runs at 1,048,576 values measured median per-process
+means of 0.208 ms for VTL and 0.213 ms for NumPy; both reported checksum
+`2000`. A separate `-O3 -march=native` build measured 0.200 ms median and did
+not improve consistently on `-prod -march=native`. For 67,108,864 values
+(512 MiB), four independent process runs measured median means of 31.0 ms for
+VTL and 62.2 ms for NumPy, with the same checksum (about 2.00× faster for VTL).
+The larger comparison uses a 3 GiB memory cap. These local timings apply only
+to contiguous `f64` reductions on this machine.
 
 ## Two-dimensional histograms
 
