@@ -14,6 +14,12 @@ fn test_ptp_global_and_axis_shapes() {
 	rows := ptp_along_axis[f64](values, -1, true)!
 	assert rows.shape == [2, 1]
 	assert rows.to_array() == [6, 6]
+	all := ptp_along_axes[f64](values, [0, -1], true)!
+	assert all.shape == [1, 1]
+	assert all.to_array() == [8]
+	groups := vtl.from_array[f64]([1, 2, 3, 4, 5, 6, 7, 20], [2, 2, 2])!
+	group_ranges := ptp_along_axes[f64](groups, [1, 2], false)!
+	assert group_ranges.to_array() == [3, 15]
 
 	f32_values := vtl.from_1d[f32]([-12, 1, 2, 3, 4, 5, 6, 7, 30])!
 	assert ptp[f32](f32_values)! == 42
@@ -40,9 +46,36 @@ fn test_ptp_multiple_axes_empty_axes_and_integer_dtype() {
 	unchanged := ptp_along_axes[i32](values, [], false)!
 	assert unchanged.shape == values.shape
 	assert unchanged.to_array() == [0, 0, 0, 0, 0, 0, 0, 0]
+	with_nan := vtl.from_1d[f64]([math.nan(), 3])!
+	unchanged_nan := ptp_along_axes[f64](with_nan, [], false)!
+	assert math.is_nan(unchanged_nan.get_nth(0))
+	assert unchanged_nan.get_nth(1) == 0
 
 	overflow := vtl.from_1d[i8]([i8(-128), i8(127)])!
 	assert ptp[i8](overflow)! == i8(-1)
+}
+
+fn test_ptp_multiple_axes_nan_keepdims_and_strided_views() ! {
+	values := vtl.from_array[f64]([math.nan(), 2, 3, 4, 5, math.nan(), 7, 8], [2, 2, 2])!
+	spread := ptp_along_axes[f64](values, [0, 2], false)!
+	assert spread.shape == [2]
+	assert math.is_nan(spread.get_nth(0))
+	assert spread.get_nth(1) == 5
+
+	kept := ptp_along_axes[f64](values, [0, 2], true)!
+	assert kept.shape == [1, 2, 1]
+	assert math.is_nan(kept.get_nth(0))
+	assert kept.get_nth(1) == 5
+
+	base := vtl.from_array[f64]([1, 2, 3, 4, 5, 6], [2, 3])!
+	transposed := base.transpose([1, 0])!
+	strided := ptp_along_axes[f64](transposed, [1], false)!
+	assert strided.shape == [3]
+	assert strided.to_array() == [3, 3, 3]
+
+	empty_output := vtl.zeros[f64]([0, 2])
+	empty_spread := ptp_along_axes[f64](empty_output, [1], false)!
+	assert empty_spread.shape == [0]
 }
 
 fn test_ptp_propagates_nan_and_rejects_empty_or_invalid_reductions() {

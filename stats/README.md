@@ -11,7 +11,9 @@ floating-point tensors. `ptp_along_axis` reduces one axis, while
 `ptp_along_axes` reduces several axes with optional `keepdims`. Negative axes
 are supported; duplicate axes, empty reduced dimensions, and empty global
 inputs return errors. An empty axes list returns zeros elementwise. Results
-preserve the input element type, including integer overflow behavior.
+preserve the input element type, including integer overflow behavior. Multi-axis
+reductions fuse minimum and maximum in one pass; contiguous trailing `f32` and
+`f64` reductions use portable SIMD blocks.
 
 `prod` follows the multiplicative identity convention: an empty input reduces
 to `1`, while an empty sum reduces to `0`.
