@@ -34,9 +34,16 @@ without adding it to the gradient or moment estimates. NAdam additionally accept
 
 ## Learning-rate schedulers
 
-`StepLR`, `ExponentialLR`, `CosineAnnealingLR`, and `LinearLR` update a
-learning rate by step. `LinearLR` interpolates from a start factor to an end
-factor over a fixed number of steps. `ReduceLROnPlateau` accepts a metric
+`StepLR`, `ExponentialLR`, `CosineAnnealingLR`, `LinearLR`, and `OneCycleLR`
+update a learning rate by step. `LinearLR` interpolates from a start factor to
+an end factor over a fixed number of steps. `OneCycleLR` uses minibatch steps
+to ramp from `max_lr / div_factor` to `max_lr`, then anneal to
+`max_lr / (div_factor * final_div_factor)`. It supports cosine or linear
+annealing and an optional three-phase curve. It computes learning rates only;
+cycling optimizer momentum and parameter groups are not implemented. Its
+constructor returns an error for negative `max_lr`, nonpositive `total_steps`
+or division factors, and `pct_start` outside `(0, 1)`.
+`ReduceLROnPlateau` accepts a metric
 delta: a negative delta beyond `threshold` is an improvement; zero or a
 positive delta counts toward
 `patience`. It reduces the rate only after the configured patience is exceeded,
