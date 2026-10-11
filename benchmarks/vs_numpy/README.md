@@ -39,28 +39,36 @@ to contiguous `f64` reductions on this machine.
 
 ## Multi-axis peak-to-peak range
 
-This paired benchmark reduces the trailing two axes of a `[groups, 256, 512]`
-contiguous `f64` tensor. It uses two warmups and five timed calls per process,
-then prints the mean and checksum. Set `VTL_PTP_AXES_BENCH_GROUPS` to change the
-number of leading groups. Compile first and execute the binary separately from
-`~/.vmodules`:
+This paired benchmark reduces a `[groups, 256, 512]` contiguous `f64` tensor
+over either trailing axes `(1, 2)` or interleaved axes `(0, 2)`. It uses two
+warmups and five timed calls per process, then prints the mean and checksum.
+Set `VTL_PTP_AXES_BENCH_GROUPS` to change the number of leading groups and
+`VTL_PTP_AXES_BENCH_CASE` to select the axes. Compile first and execute the
+binary separately from `~/.vmodules`:
 
 ```bash
 systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
 	v -no-parallel -cc gcc -prod -cflags "-march=native" \
 	-o /tmp/vtl-ptp-axes-bench ./vtl/benchmarks/vs_numpy/ptp_axes_bench.v
 systemd-run --user --scope -p MemoryMax=2G -p MemorySwapMax=0 -- env VJOBS=2 \
-	VTL_PTP_AXES_BENCH_GROUPS=128 /tmp/vtl-ptp-axes-bench
+	VTL_PTP_AXES_BENCH_CASE=trailing VTL_PTP_AXES_BENCH_GROUPS=128 /tmp/vtl-ptp-axes-bench
 systemd-run --user --scope -p MemoryMax=2G -p MemorySwapMax=0 -- env VJOBS=2 \
-	VTL_PTP_AXES_BENCH_GROUPS=128 uv run --offline --no-project --with numpy python \
+	VTL_PTP_AXES_BENCH_CASE=trailing VTL_PTP_AXES_BENCH_GROUPS=128 uv run --offline --no-project --with numpy python \
+	./vtl/benchmarks/vs_numpy/numpy_ptp_axes_baseline.py
+systemd-run --user --scope -p MemoryMax=2G -p MemorySwapMax=0 -- env VJOBS=2 \
+	VTL_PTP_AXES_BENCH_CASE=interleaved VTL_PTP_AXES_BENCH_GROUPS=128 /tmp/vtl-ptp-axes-bench
+systemd-run --user --scope -p MemoryMax=2G -p MemorySwapMax=0 -- env VJOBS=2 \
+	VTL_PTP_AXES_BENCH_CASE=interleaved VTL_PTP_AXES_BENCH_GROUPS=128 uv run --offline --no-project --with numpy python \
 	./vtl/benchmarks/vs_numpy/numpy_ptp_axes_baseline.py
 ```
 
 On the same Ryzen 9 5900X / V 0.5.2 / GCC 16.2.1 / NumPy 2.5.4 setup, five
 independent processes per side at 16,777,216 values (128 MiB) measured median
-per-process means of 7.09 ms for VTL and 13.20 ms for NumPy. Both checksums
-were `1152000`, about 1.86× faster for VTL in this contiguous trailing-axis
-case. Measurements are specific to this shape, CPU, and backend.
+per-process means of 6.90 ms for VTL and 12.82 ms for NumPy for trailing axes
+`(1, 2)`, with checksum `1152000`. Interleaved axes `(0, 2)` measured 7.11 ms
+for VTL and 14.59 ms for NumPy, with checksum `3931832`. These are about
+1.86× and 2.05× faster for VTL in these workloads. Timings are specific to
+these shapes, CPU, and backend.
 
 ## Two-dimensional histograms
 

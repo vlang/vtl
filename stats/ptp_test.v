@@ -29,12 +29,14 @@ fn test_ptp_global_and_axis_shapes() {
 	f64_block_values[20] = 70
 	f64_block_tensor := vtl.from_1d[f64](f64_block_values)!
 	assert ptp[f64](f64_block_tensor)! == 90
+	assert ptp_along_axis[f64](f64_block_tensor, 0, false)!.get_nth(0) == 90
 
 	mut f32_block_values := []f32{len: 41}
 	f32_block_values[19] = -35
 	f32_block_values[40] = 80
 	f32_block_tensor := vtl.from_1d[f32](f32_block_values)!
 	assert ptp[f32](f32_block_tensor)! == 115
+	assert ptp_along_axis[f32](f32_block_tensor, 0, false)!.get_nth(0) == 115
 }
 
 fn test_ptp_multiple_axes_empty_axes_and_integer_dtype() {
