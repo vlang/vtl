@@ -418,8 +418,8 @@ To inspect a norm without changing gradients, use `get_total_grad_norm` (or
 `get_total_grad_norm_with_type`). If the norm is already available, pass it to
 `clip_grads_with_norm` to apply clipping without calculating it again.
 
-The norm limit must be finite and non-negative; the value limit must be finite
-and positive. Norm clipping rejects non-finite gradient norms instead of
+The norm and value limits must be finite and non-negative. Norm clipping rejects
+non-finite gradient norms instead of
 changing gradients to NaN.
 
 The autograd `Variable.clamp(min, max)` operation also supports element-wise

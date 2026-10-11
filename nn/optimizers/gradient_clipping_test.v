@@ -209,15 +209,28 @@ fn test_clip_grad_value_clamps_trainable_elements() ! {
 	assert parameter.grad.get_nth(2) == 1.0
 }
 
+fn test_clip_grad_value_accepts_zero_limit() ! {
+	context := autograd.ctx[f64]()
+	parameter := context.variable(vtl.from_1d([2.0, -3.0])!)
+	parameter.grad.set_nth(0, 2.0)
+	parameter.grad.set_nth(1, -3.0)
+	mut parameters := [parameter]
+
+	clip_grad_value[f64](mut parameters, 0.0)!
+
+	assert parameter.grad.get_nth(0) == 0.0
+	assert parameter.grad.get_nth(1) == 0.0
+}
+
 fn test_clip_grad_value_rejects_invalid_limit() {
 	context := autograd.ctx[f64]()
 	parameter := context.variable(vtl.from_1d([0.0])!)
 	mut parameters := [parameter]
-	clip_grad_value[f64](mut parameters, 0.0) or {
-		assert err.msg().contains('max_value must be finite and greater than zero')
+	clip_grad_value[f64](mut parameters, -1.0) or {
+		assert err.msg().contains('max_value must be finite and non-negative')
 		return
 	}
-	assert false, 'expected clip_grad_value to reject a zero limit'
+	assert false, 'expected clip_grad_value to reject a negative limit'
 }
 
 fn test_clip_grad_norm_rejects_non_finite_gradients() {
