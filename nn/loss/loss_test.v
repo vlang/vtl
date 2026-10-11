@@ -329,6 +329,23 @@ fn test_nll_loss_mean_ignores_target_in_denominator_and_gradient() ! {
 	assert math.abs(pred.grad.get_nth(3)) < 1e-12
 }
 
+fn test_nll_loss_none_reduction_returns_per_sample_losses_and_gradients() ! {
+	c := ctx[f64]()
+	pred := variable[f64](c, [-2.0, -0.5, -0.3, -1.2], [2, 2])!
+	target := tensor[f64]([1.0, -100.0], [2])!
+	weights := tensor[f64]([2.0, 4.0], [2])!
+	mut result := nll_loss_with_options[f64](weights, ignore_index: -100, reduction: 'none').loss(pred,
+		target)!
+	assert result.value.shape == [2]
+	assert math.abs(result.value.get_nth(0) - 2.0) < 1e-12
+	assert math.abs(result.value.get_nth(1)) < 1e-12
+	result.backprop()!
+	assert math.abs(pred.grad.get_nth(0)) < 1e-12
+	assert math.abs(pred.grad.get_nth(1) + 4.0) < 1e-12
+	assert math.abs(pred.grad.get_nth(2)) < 1e-12
+	assert math.abs(pred.grad.get_nth(3)) < 1e-12
+}
+
 fn test_kl_div_loss_backward_is_negative_target_mean() ! {
 	c := ctx[f64]()
 	pred := variable[f64](c, [-2.0, -0.5], [2])!

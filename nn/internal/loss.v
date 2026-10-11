@@ -237,8 +237,8 @@ pub fn nll[T](input &vtl.Tensor[T], target &vtl.Tensor[T], weight &vtl.Tensor[T]
 	}
 	batch_size := input.shape[0]
 	n_classes := input.shape[1]
-	if reduction !in ['mean', 'sum'] {
-		return error('NLL reduction must be mean or sum')
+	if reduction !in ['none', 'mean', 'sum'] {
+		return error('NLL reduction must be none, mean, or sum')
 	}
 	if !isnil(weight) && (weight.shape.len != 1 || weight.shape[0] != n_classes) {
 		return error('NLL class weights must have shape [n_classes]')
@@ -253,6 +253,7 @@ pub fn nll[T](input &vtl.Tensor[T], target &vtl.Tensor[T], weight &vtl.Tensor[T]
 	mut total := 0.0
 	mut weight_total := 0.0
 	mut valid_targets := 0
+	mut per_sample := []f64{len: batch_size}
 	for i in 0 .. batch_size {
 		if class_indices {
 			raw_class := f64(target.get_nth(i))
@@ -264,15 +265,23 @@ pub fn nll[T](input &vtl.Tensor[T], target &vtl.Tensor[T], weight &vtl.Tensor[T]
 			}
 			class_index := nll_class_index[T](target, i, n_classes)!
 			class_weight := if isnil(weight) { 1.0 } else { f64(weight.get_nth(class_index)) }
-			total -= class_weight * f64(input.get([i, class_index]))
+			per_sample[i] = -class_weight * f64(input.get([i, class_index]))
+			total += per_sample[i]
 			weight_total += class_weight
 			valid_targets++
 		} else {
 			for c in 0 .. n_classes {
 				class_weight := if isnil(weight) { 1.0 } else { f64(weight.get_nth(c)) }
-				total -= f64(target.get([i, c])) * class_weight * f64(input.get([i, c]))
+				per_sample[i] -= f64(target.get([i, c])) * class_weight * f64(input.get([
+					i,
+					c,
+				]))
 			}
+			total += per_sample[i]
 		}
+	}
+	if reduction == 'none' {
+		return vtl.from_array(per_sample.map(vtl.cast[T](it)), [batch_size])
 	}
 	denominator := if reduction == 'sum' {
 		1.0
@@ -299,8 +308,8 @@ pub fn nll_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], target &vt
 	}
 	batch_size := input.shape[0]
 	n_classes := input.shape[1]
-	if reduction !in ['mean', 'sum'] {
-		return error('NLL reduction must be mean or sum')
+	if reduction !in ['none', 'mean', 'sum'] {
+		return error('NLL reduction must be none, mean, or sum')
 	}
 	if !isnil(weight) && (weight.shape.len != 1 || weight.shape[0] != n_classes) {
 		return error('NLL class weights must have shape [n_classes]')
@@ -312,8 +321,7 @@ pub fn nll_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], target &vt
 	if !class_indices && ignore_index != -1 {
 		return error('NLL ignore_index is supported only for class-index targets')
 	}
-	upstream := f64(gradient.get([0]))
-	mut denominator := if reduction == 'sum' { 1.0 } else { f64(batch_size) }
+	mut denominator := if reduction in ['none', 'sum'] { 1.0 } else { f64(batch_size) }
 	if reduction == 'mean' && class_indices {
 		denominator = 0.0
 		for i in 0 .. batch_size {
@@ -348,6 +356,11 @@ pub fn nll_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], target &vt
 				f64(target.get([i, c]))
 			}
 			class_weight := if isnil(weight) { 1.0 } else { f64(weight.get_nth(c)) }
+			upstream := if reduction == 'none' {
+				f64(gradient.get_nth(i))
+			} else {
+				f64(gradient.get_nth(0))
+			}
 			ret_data[i * n_classes + c] = upstream * -tgt * class_weight / denominator
 		}
 	}
