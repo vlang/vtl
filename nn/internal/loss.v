@@ -70,19 +70,41 @@ pub fn softmax_cross_entropy_backward[T](gradient &vtl.Tensor[T], cache &vtl.Ten
 // bce exposes this operation as part of the public API.
 
 // bce exposes this operation as part of the public API.
-@[inline]
+@[direct_array_access; inline]
 pub fn bce[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	one := vtl.cast[T](1)
 	epsilon := vtl.cast[T](1e-7)
-	clamped := input.map(fn [one, epsilon] [T](val T, i []int) T {
-		if val <= epsilon { return epsilon }
-		if val >= one - epsilon { return one - epsilon }
-		return val
-	})
-	sum := clamped.nreduce([target], vtl.cast[T](0), fn [one] [T](acc T, vals []T, i []int) T {
+	if input.shape == target.shape && input.is_row_major_contiguous()
+		&& target.is_row_major_contiguous() && input.data.data.len == input.size()
+		&& target.data.data.len == target.size() {
+		mut sum := vtl.cast[T](0)
+		for i in 0 .. input.size() {
+			probability := input.data.data[i]
+			clamped := if probability <= epsilon {
+				epsilon
+			} else if probability >= one - epsilon {
+				one - epsilon
+			} else {
+				probability
+			}
+			y := target.data.data[i]
+			sum += -y * vtl.cast[T](math.log(vtl.cast[f64](clamped))) -
+				(one - y) * vtl.cast[T](math.log(vtl.cast[f64](one - clamped)))
+		}
+		return vtl.from_1d([sum / vtl.cast[T](input.size())])
+	}
+	sum := input.nreduce([target], vtl.cast[T](0), fn [one, epsilon] [T](acc T, vals []T, i []int) T {
+		probability := vals[0]
+		clamped := if probability <= epsilon {
+			epsilon
+		} else if probability >= one - epsilon {
+			one - epsilon
+		} else {
+			probability
+		}
 		y := vals[1]
-		return acc + (-y * vtl.cast[T](math.log(vtl.cast[f64](vals[0]))) -
-			(one - y) * vtl.cast[T](math.log(vtl.cast[f64](one - vals[0]))))
+		return acc + (-y * vtl.cast[T](math.log(vtl.cast[f64](clamped))) -
+			(one - y) * vtl.cast[T](math.log(vtl.cast[f64](one - clamped))))
 	})!
 	size := input.size()
 	return vtl.from_1d([sum / vtl.cast[T](size)])

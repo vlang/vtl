@@ -939,6 +939,38 @@ systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env V
 This benchmark reports measurements but does not claim a speedup before a
 matched run on the target machine.
 
+## Binary cross-entropy
+
+This paired benchmark compares contiguous `f64` binary cross-entropy on
+524,288 probabilities and binary targets. VTL uses the fused direct-array
+kernel; a second VTL measurement is a two-pass clamp-then-reduce reference that
+keeps the intermediate allocation but avoids iterator overhead. NumPy uses
+`clip`, `log`, and `mean`. Each process runs one warmup and takes the median of
+three timed calls. Build VTL with `-prod` first, then run the binary separately
+from `~/.vmodules`:
+
+```bash
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -no-parallel -cc gcc -prod -cflags "-march=native" \
+	-o /tmp/vtl-bce-bench ./vtl/benchmarks/vs_numpy/bce_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 \
+	VTL_BCE_BENCH_SIZE=524288 /tmp/vtl-bce-bench
+systemd-run --user --scope --quiet -p MemoryMax=2G -p MemorySwapMax=0 -- env VJOBS=2 \
+	VTL_BCE_BENCH_SIZE=524288 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 \
+	uv run --offline --no-project --with numpy python \
+	./vtl/benchmarks/vs_numpy/numpy_bce_baseline.py
+```
+
+On an AMD Ryzen 9 5900X with V 0.5.2 `81be246`, GCC 16.2.1, and NumPy 2.5.4,
+three independent processes per implementation measured median per-process
+times of 12.396 ms for the fused VTL path, 15.684 ms for the two-pass VTL
+reference, and 11.886 ms for NumPy. All checksums were `0.985803403800`. In
+this workload the fused path was about 1.27× faster than the two-pass reference
+and about 4% slower than NumPy; this single CPU workload does not establish
+general performance parity. The two-pass reference is a loop-level model of
+the previous clamp allocation followed by reduction, not a timing of the old
+iterator-based implementation.
+
 ## Notes
 
 - Use the same matrix sizes when comparing manually.

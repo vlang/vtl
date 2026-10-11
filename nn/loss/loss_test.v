@@ -64,6 +64,25 @@ fn test_bce_loss_forward() ! {
 	assert v < 0.5, 'BCE loss for near-correct prediction should be small, got ${v}'
 }
 
+fn test_bce_loss_clamps_probability_bounds_in_reduction() ! {
+	c := ctx[f64]()
+	pred := variable[f64](c, [0.0, 1.0], [2])!
+	target := tensor[f64]([1.0, 0.0], [2])!
+	result := bce_loss[f64](from_logits: false).loss(pred, target)!
+	assert math.abs(result.value.get_nth(0) + math.log(1e-7)) < 1e-9
+}
+
+fn test_bce_loss_strided_inputs_use_broadcast_fallback() ! {
+	c := ctx[f64]()
+	input_base := tensor[f64]([0.1, 0.2, 0.7, 0.8], [2, 2])!
+	target_base := tensor[f64]([0.0, 1.0, 1.0, 0.0], [2, 2])!
+	pred := c.variable(input_base.transpose([1, 0])!)
+	target := target_base.transpose([1, 0])!
+	result := bce_loss[f64](from_logits: false).loss(pred, target)!
+	expected := (-math.log(0.9) - math.log(0.7) - math.log(0.2) - math.log(0.2)) / 4.0
+	assert math.abs(result.value.get_nth(0) - expected) < 1e-12
+}
+
 // Huber loss tests
 fn test_huber_loss_forward_small_error() ! {
 	c := ctx[f64]()
