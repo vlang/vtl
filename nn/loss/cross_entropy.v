@@ -46,12 +46,14 @@ fn cross_entropy_loss_loss_dispatch[T](loss_ptr voidptr, input voidptr, target v
 // CrossEntropyLossGate defines a public data structure for this module.
 pub struct CrossEntropyLossGate[T] {
 pub:
+	input  &vtl.Tensor[T] = unsafe { nil }
 	target &vtl.Tensor[T] = unsafe { nil }
 }
 
 // cross_entropy_loss_gate exposes this operation as part of the public API.
 pub fn cross_entropy_loss_gate[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) &CrossEntropyLossGate[T] {
 	return &CrossEntropyLossGate[T]{
+		input:  input
 		target: target
 	}
 }
@@ -59,7 +61,7 @@ pub fn cross_entropy_loss_gate[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) &
 // backward exposes this operation as part of the public API.
 pub fn (g &CrossEntropyLossGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
-	r0 := internal.cross_entropy_backward[T](gradient, payload.variable.value, g.target)!
+	r0 := internal.cross_entropy_backward[T](gradient, g.input, g.target)!
 	return [r0]
 }
 
