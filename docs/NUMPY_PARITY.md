@@ -28,7 +28,8 @@ For neural-network and framework-level gaps relative to PyTorch, see the
 matrices; `arange` with start/stop/step; endpoint-aware `linspace`; configurable
 `logspace`; 2-D `meshgrid` and N-D `meshgrid_n` with `xy` and `ij` indexing;
 dense stacked coordinates through `indices` and broadcastable per-axis sparse
-coordinates through `indices_sparse`.
+coordinates through `indices_sparse`. VTL also provides `one_hot` for ML labels,
+appending a class dimension and validating class bounds.
 
 **Remaining:** validate edge cases and make dtype/device options consistent.
 

@@ -17,9 +17,10 @@ CIFAR examples for CI-safe checks.
 | [diag](./diag) | Construct and extract offset diagonals, including N-D diagonal views | `v run ./vtl/examples/diag/main.v` |
 | [kron](./kron) | Build NumPy-style Kronecker products from tensors of any rank | `v run ./vtl/examples/kron/main.v` |
 | [vander](./vander) | Build polynomial features from powers of a vector | `v run ./vtl/examples/vander/main.v` |
+| [one_hot](./one_hot) | Encode integer class labels as one-hot tensors | `v run ./vtl/examples/one_hot/main.v` |
 | [complex_tensors](./complex_tensors) | Create `complex128` tensors and use elementwise arithmetic | `v run ./vtl/examples/complex_tensors/main.v` |
 | [einsum_complex](./einsum_complex) | Contract complex tensors with Einstein summation | `v run ./vtl/examples/einsum_complex/main.v` |
-| [tensor_axis_manipulation](./tensor_axis_manipulation) | Move and roll axes, flip values, repeat entries or blocks, and rotate planes | `v run ./vtl/examples/tensor_axis_manipulation/main.v` |
+| [tensor_axis_manipulation](./tensor_axis_manipulation) | Flip, repeat, tile, and rotate tensor axes | `v run ./vtl/examples/tensor_axis_manipulation/main.v` |
 | [tensor_sorting](./tensor_sorting) | Sort, partially partition, and return local indices along tensor axes | `v run ./vtl/examples/tensor_sorting/main.v` |
 | [vtl_basic_usage](./vtl_basic_usage) | Tensor creation and basic operations | `v run ./vtl/examples/vtl_basic_usage/main.v` |
 | [vtl_vandermont](./vtl_vandermont) | Matrix construction and LA utilities | `v run ./vtl/examples/vtl_vandermont/main.v` |
@@ -35,7 +36,7 @@ CIFAR examples for CI-safe checks.
 | [npz_round_trip](./npz_round_trip) | Write and read named arrays in `.npz` archives | `v run ./vtl/examples/npz_round_trip/main.v` |
 | [NPZ fixture](./npz_read_compressed) | Compressed NumPy fixture | `v run vtl/examples/npz_read_compressed/main.v vtl/npz/testdata/numpy_compressed.npz` |
 | [stats_variance](./stats_variance) | Stable population/sample variance and standard deviation | `v run ./vtl/examples/stats_variance/main.v` |
-| [stats_weighted_quantiles](./stats_weighted_quantiles) | Weighted global and axis-wise inverted-CDF quantiles | `v run ./vtl/examples/stats_weighted_quantiles/main.v` |
+| [stats_weighted_quantiles](./stats_weighted_quantiles) | Weighted quantiles on tensor axes | `v run ./vtl/examples/stats_weighted_quantiles/main.v` |
 | [stats_nan_reductions](./stats_nan_reductions) | NaN-aware sums, products, extrema, and axis reductions | `v run ./vtl/examples/stats_nan_reductions/main.v` |
 | [is_nan](./is_nan) | NaN, infinity, and finite-value predicates on tensors and views | `v run ./vtl/examples/is_nan/main.v` |
 | [logical_reductions](./logical_reductions) | Axis-wise logical all/any reductions with keepdims | `v run ./vtl/examples/logical_reductions/main.v` |
