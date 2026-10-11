@@ -34,13 +34,15 @@ assert clipped.to_array() == [10, 40]
 
 `Variable.take`, `Variable.take_with_mode`, `Variable.take_nd`,
 `Variable.take_nd_with_mode`, `Variable.take_flat`,
-`Variable.take_flat_with_mode`, and `Variable.take_along_axis` record gathers
-in the computation graph. `take_nd` accepts an index tensor whose complete
-shape replaces the selected axis; `take_flat` gathers from row-major logical
-order. During backpropagation, gradients are scattered to selected source
-positions; repeated indices accumulate, and broadcast source dimensions sum
-their contributions. Integer indices are treated as constants and snapshotted
-when the gather is recorded, so later edits do not change the backward path.
+`Variable.take_flat_with_mode`, `Variable.take_along_axis`, and
+`Variable.boolean_index` record gathers in the computation graph. `take_nd`
+accepts an index tensor whose complete shape replaces the selected axis;
+`take_flat` gathers from row-major logical order; `boolean_index` selects
+leading dimensions and preserves trailing dimensions. During backpropagation,
+gradients are scattered to selected source positions; repeated indices
+accumulate, and broadcast source dimensions sum their contributions. Integer
+indices and masks are treated as constants and snapshotted when the gather is
+recorded, so later edits do not change the backward path.
 
 ```v
 import vtl

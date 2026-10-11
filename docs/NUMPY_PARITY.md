@@ -76,10 +76,10 @@ validation completes before mutation. `Tensor.putmask` performs in-place
 row-major masked updates with an exact-shape mask and cycles values by each
 destination flat index, matching NumPy.
 
-`Variable.take`, `Variable.take_nd`, `Variable.take_flat`, and
-`Variable.take_along_axis` propagate gradients by scattering them to selected
-source positions, including accumulation for repeated indices and reduction of
-broadcast source dimensions.
+`Variable.take`, `Variable.take_nd`, `Variable.take_flat`,
+`Variable.take_along_axis`, and `Variable.boolean_index` propagate gradients by
+scattering them to selected source positions, including accumulation for
+repeated indices and reduction of broadcast source dimensions.
 `Variable.scatter_add` returns an updated copy and propagates gradients to its
 source and update values, including repeated destination indices.
 `Variable.put_along_axis` follows last-write-wins semantics and routes gradients
