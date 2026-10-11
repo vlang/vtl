@@ -32,23 +32,26 @@ assert clipped.to_array() == [10, 40]
 
 ## Gathering with autograd
 
-`Variable.take`, `Variable.take_with_mode`, and `Variable.take_along_axis`
-record gathers in the computation graph. During backpropagation, gradients are
-scattered to selected source positions; repeated indices accumulate, and
-broadcast source dimensions sum their contributions. Integer indices are
-treated as constants and snapshotted when the gather is recorded, so later
-edits do not change the backward path.
+`Variable.take`, `Variable.take_with_mode`, `Variable.take_nd`,
+`Variable.take_nd_with_mode`, and `Variable.take_along_axis` record gathers in
+the computation graph. `take_nd` accepts an index tensor whose complete shape
+replaces the selected axis. During backpropagation, gradients are scattered to
+selected source positions; repeated indices accumulate, and broadcast source
+dimensions sum their contributions. Integer indices are treated as constants
+and snapshotted when the gather is recorded, so later edits do not change the
+backward path.
 
-```v ignore
+```v
 import vtl
 import vtl.autograd
 
 mut ctx := autograd.ctx[f64]()
-input := ctx.variable(vtl.from_array([10.0, 20.0, 30.0], [1, 3])!)
-indices := vtl.from_array[int]([1, 1, 2], [1, 3])!
-mut selected := input.take_along_axis(indices, 1)!
+input := ctx.variable(vtl.from_array([10.0, 20.0, 30.0, 40.0, 50.0, 60.0], [2, 3])!)
+indices := vtl.from_array[int]([2, 0, 1, 1], [2, 2])!
+mut selected := input.take_nd(indices, 1)!
+assert selected.value.shape == [2, 2, 2]
 selected.backprop()!
-println(input.grad.to_array()) // [0.0, 2.0, 1.0]
+assert input.grad.to_array() == [1.0, 2.0, 1.0, 1.0, 2.0, 1.0]
 ```
 
 See the runnable [autograd gather example](../examples/autograd_gather/README.md)

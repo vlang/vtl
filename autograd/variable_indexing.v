@@ -26,6 +26,95 @@ pub fn (v &Variable[T]) take_with_mode(indices []int, axis int, mode vtl.TakeMod
 	return v.take_along_axis(index_tensor, axis)
 }
 
+// take_nd gathers values along an axis using a multidimensional index tensor
+// and accumulates gradients for repeated normalized indices.
+pub fn (v &Variable[T]) take_nd(indices &vtl.Tensor[int], axis int) !&Variable[T] {
+	return v.take_nd_with_mode(indices, axis, .raise)
+}
+
+// take_nd_with_mode gathers with NumPy's raise, wrap, or clip index handling
+// and tracks the inverse scatter in backpropagation.
+pub fn (v &Variable[T]) take_nd_with_mode(indices &vtl.Tensor[int], axis int, mode vtl.TakeMode) !&Variable[T] {
+	rank := v.value.rank()
+	axis_index := if axis < 0 { axis + rank } else { axis }
+	if axis_index < 0 || axis_index >= rank {
+		return error('take_nd axis ${axis} is out of range for rank ${rank}')
+	}
+	value := v.value.take_nd_with_mode[T](indices, axis_index, mode)!
+	mut result := variable[T](v.context, value, requires_grad: v.requires_grad)
+	if v.requires_grad {
+		axis_size := v.value.shape[axis_index]
+		mut normalized_values := []int{len: indices.size}
+		for position in 0 .. indices.size {
+			selected := indices.get_nth[int](position)
+			normalized_values[position] = normalize_take_nd_index(selected, axis_size, mode)
+		}
+		normalized := vtl.from_array[int](normalized_values, indices.shape)!
+		gate := &TakeNDGate[T]{
+			indices:     normalized
+			input_shape: v.value.shape.clone()
+			axis:        axis_index
+			index_rank:  indices.rank()
+		}
+		register[T]('TakeND', voidptr(gate), take_nd_backward_dispatch[T], result, [v])!
+	}
+	return result
+}
+
+fn normalize_take_nd_index(index int, size int, mode vtl.TakeMode) int {
+	return match mode {
+		.raise {
+			if index < 0 { index + size } else { index }
+		}
+		.wrap {
+			remainder := index % size
+			if remainder < 0 { remainder + size } else { remainder }
+		}
+		.clip {
+			if index < 0 {
+				0
+			} else if index >= size {
+				size - 1
+			} else {
+				index
+			}
+		}
+	}
+}
+
+struct TakeNDGate[T] {
+	indices     &vtl.Tensor[int]
+	input_shape []int
+	axis        int
+	index_rank  int
+}
+
+fn (g &TakeNDGate[T]) backward(gradient &vtl.Tensor[T]) ![]&vtl.Tensor[T] {
+	mut input_gradient := vtl.zeros[T](g.input_shape)
+	mut input_index := []int{len: g.input_shape.len}
+	for flat_index in 0 .. gradient.size {
+		output_index := gradient.nth_index(flat_index)
+		index_index := output_index[g.axis..g.axis + g.index_rank]
+		for dimension in 0 .. g.axis {
+			input_index[dimension] = output_index[dimension]
+		}
+		input_index[g.axis] = g.indices.get(index_index)
+		for input_axis in g.axis + 1 .. g.input_shape.len {
+			output_axis := g.axis + g.index_rank + input_axis - g.axis - 1
+			input_index[input_axis] = output_index[output_axis]
+		}
+		input_gradient.set(input_index, input_gradient.get(input_index) + gradient.get(output_index))
+	}
+	return [input_gradient]
+}
+
+fn take_nd_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_gate := unsafe { &TakeNDGate[T](gate) }
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := typed_gate.backward(typed_payload.variable.grad)!
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // take_along_axis gathers values and tracks the inverse scatter in backprop.
 // Repeated indices accumulate their gradients; non-axis broadcast dimensions
 // are reduced into the corresponding source coordinates.
