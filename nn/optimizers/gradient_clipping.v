@@ -130,8 +130,8 @@ pub fn clip_grads_with_norm[T](mut parameters []&autograd.Variable[T], max_norm 
 
 // clip_grad_value clamps every trainable gradient element to [-max_value, max_value].
 pub fn clip_grad_value[T](mut parameters []&autograd.Variable[T], max_value f64) ! {
-	if max_value <= 0.0 || !math.is_finite(max_value) {
-		return error('clip_grad_value: max_value must be finite and greater than zero')
+	if max_value < 0.0 || !math.is_finite(max_value) {
+		return error('clip_grad_value: max_value must be finite and non-negative')
 	}
 	for mut parameter in parameters {
 		if !parameter.requires_grad {

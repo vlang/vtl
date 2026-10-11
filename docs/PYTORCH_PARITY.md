@@ -87,7 +87,8 @@ minibatch step, selected by `scale_mode`; cycle callbacks use the same one-based
 cycle count as PyTorch.
 Gradient clipping includes global L2 clipping and a configurable global
 p-norm entry point (including zero-count and positive-infinity norms), which
-return the pre-clipping norm, plus element-wise value clipping. Both update
+return the pre-clipping norm, plus element-wise value clipping with a
+non-negative limit. Both update
 trainable gradients in place; norm clipping supports f32/f64 gradients and
 rejects non-finite values. Optimizer integration and PyTorch's foreach/device
 behavior remain gaps.
