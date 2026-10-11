@@ -213,7 +213,15 @@ repeated-label diagonals, multi-operand expressions, ellipses, broadcasting,
 and complex128 values;
 offset diagonal construction and extraction; solve, least squares,
 QR/LU/Cholesky, pseudoinverse, trace, matrix norms,
-flattened and axis-wise p-norms, and covariance/correlation matrices.
+flattened, single-axis, and tuple-axis p-norms, and covariance/correlation
+matrices.
+
+`la.vector_norm_axes(t, ord, axes, keepdims)` reduces any non-empty tuple of
+unique axes in one operation. It accepts negative axes, preserves retained
+dimensions when requested, and supports strided views. This covers the
+multi-axis vector norm use case in NumPy's
+[`numpy.linalg.vector_norm`](https://numpy.org/doc/stable/reference/generated/numpy.linalg.vector_norm.html).
+See the [vector norm example](../examples/vector_norm/main.v).
 
 `la.matrix_norm` computes NumPy's eight standard matrix norms for each trailing
 matrix in an N-D tensor, with optional retained matrix dimensions.
