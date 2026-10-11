@@ -256,8 +256,8 @@ partial pivoting and supports broadcast batch dimensions. As in NumPy 2.0, a
 right-hand side is treated as a vector only when it has rank one. `la.inv_complex`
 uses the same solver for batched complex matrix inverses; `la.det_complex`
 computes complex determinants with pivoted elimination. Complex `matmul`, solve,
-inverse, and determinant are currently supported; complex least squares,
-factorizations, and eigenproblems remain future work.
+inverse, determinant, and least squares are currently supported. Complex
+factorizations and eigenproblems remain future work.
 `la.slogdet` returns determinant signs and log absolute determinants for batches,
 including singular matrices and values whose determinants would overflow.
 `la.slogdet_complex` returns unit-complex phases and log magnitudes for
