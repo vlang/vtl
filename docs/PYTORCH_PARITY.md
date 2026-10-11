@@ -62,14 +62,16 @@ full `torch.nn` recurrent API or CUDA backward.
 
 **VTL today:** Common classification and regression losses and optimizers, with
 CPU training and experimental GPU paths. Learning-rate schedulers include
-`StepLR`, `ExponentialLR`, `CosineAnnealingLR`, `LinearLR`, `OneCycleLR`, and
-`ReduceLROnPlateau`. `OneCycleLR` currently implements the
-learning-rate curve (cosine or linear, two or three phases); PyTorch's inverse
-momentum cycle and optimizer parameter-group integration are not implemented.
+`StepLR`, `ExponentialLR`, `CosineAnnealingLR`, `LinearLR`, `CyclicLR`,
+`OneCycleLR`, and `ReduceLROnPlateau`. `OneCycleLR` currently implements the
+learning-rate curve (cosine or linear, two or three phases). `CyclicLR` includes
+the triangular, triangular2, and exp_range policies. PyTorch's momentum cycling,
+custom scale callbacks, and optimizer parameter-group integration are not
+implemented.
 
 **Next:** Audit formulas, defaults, reduction modes, parameter groups, sparse
-gradients, and numerical behavior against `torch.nn` and `torch.optim`. Cyclic
-schedulers and the OneCycleLR momentum cycle remain open.
+gradients, and numerical behavior against `torch.nn` and `torch.optim`. Add
+momentum cycling, custom CyclicLR scale callbacks, and parameter-group support.
 
 ### Data pipeline
 
