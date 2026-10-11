@@ -32,6 +32,12 @@ The row mask broadcasts across the leading dimension. `filled` returns a copy;
 ## Reduce valid values
 
 ```v
+import vtl
+
+measurements := vtl.from_array[f64]([12.0, 15.0, 18.0, 21.0], [2, 2])!
+missing := vtl.from_array[bool]([false, true], [2])!
+data := vtl.masked_array(measurements, missing)!
+
 total := data.sum()
 average := data.mean()
 product := data.prod()
@@ -44,6 +50,9 @@ row_means := data.mean_along_axis(1, true)!
 all_values_sum := data.sum_along_axes([0, 1], false)!
 all_values_product := data.prod_along_axes([0, 1], false)!
 all_values_variance := data.variance_along_axes([0, 1], 1, false)!
+median := data.median()
+row_medians := data.median_along_axis(1, true)!
+quantiles := data.quantile_along_axes([0, 1], 0.25, false)!
 ```
 
 Global `sum` and `mean` return `MaskedValue`, whose `is_masked` field is true
@@ -59,15 +68,19 @@ be ignored.
 `variance` and `std` use Welford's online algorithm; `ddof=0` computes
 population statistics and `ddof=1` computes sample statistics. Global or
 per-slice results with `count <= ddof` are masked and carry a NaN payload.
+`quantile` and `median` use NumPy's default linear interpolation over valid
+values. Axis and multi-axis quantiles return `MaskedArray[f64]`; slices with no
+valid values are marked in the output mask and carry NaN. Unmasked NaNs remain
+data and propagate to the corresponding quantile result.
 The `*_along_axes` variants reduce a list of axes in one operation; negative
 axes are supported and duplicates are rejected. An empty axes list preserves
 values and masks elementwise (the mean variant converts values to `f64`).
 
 This API currently covers filling, compression, counting, and sum/product/
-minimum/maximum/mean/variance/standard deviation. It does not yet implement
-masked elementwise operations or other mask-aware statistics. NaN values are
-not implicitly treated as missing; use an explicit boolean mask when that is
-desired.
+minimum/maximum/mean/variance/standard deviation/quantile/median. It does not
+yet implement masked elementwise operations or the full NumPy masked-array
+statistics surface. NaN values are not implicitly treated as missing; use an
+explicit boolean mask when that is desired.
 
 See the [NumPy parity tracker](./NUMPY_PARITY.md) for remaining work.
 
@@ -89,6 +102,15 @@ is missing. They return `MaskedArray[bool]`.
 preserves their correspondence:
 
 ```v
+import vtl
+
+values := vtl.from_array[f64]([1, 2, 3, 4], [2, 2])!
+mask := vtl.from_array[bool]([false, true, false, false], [2, 2])!
+data := vtl.masked_array(values, mask)!
+indices := vtl.from_array[int]([1, 0, 0, 1], [2, 2])!
+replacement := vtl.masked_array(vtl.from_array[f64]([5, 6, 7, 8], [2, 2])!,
+	vtl.from_array[bool]([false, false, true, false], [2, 2])!)!
+
 row := data.mixed_index([vtl.integer_index(-1), vtl.full_index()])!
 gathered := data.take_along_axis(indices, 1)!
 updated := data.put_along_axis(indices, replacement, 1)!

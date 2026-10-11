@@ -1,0 +1,82 @@
+module core
+
+import math
+import vtl
+
+fn test_masked_quantile_and_median_ignore_masked_payloads() ! {
+	values := vtl.from_1d([1.0, 99, 3, 5])!
+	mask := vtl.from_1d[bool]([false, true, false, false])!
+	data := vtl.masked_array(values, mask)!
+	assert data.quantile(0.0)!.value == 1.0
+	assert data.quantile(0.5)!.value == 3.0
+	assert data.quantile(1.0)!.value == 5.0
+	assert data.median().value == 3.0
+	assert !data.median().is_masked
+
+	integer_data := vtl.masked_array(vtl.from_1d([1, 2, 3, 4])!, vtl.zeros[bool]([4]))!
+	assert integer_data.median().value == 2.5
+
+	all_masked := vtl.masked_array(values, vtl.ones[bool](values.shape))!
+	result := all_masked.quantile(0.5)!
+	assert result.is_masked
+	assert math.is_nan(result.value)
+}
+
+fn test_masked_quantiles_reduce_axis_and_preserve_empty_slices() ! {
+	values := vtl.from_array[f64]([1, 2, 3, 4, 5, 6], [2, 3])!
+	mask := vtl.from_array[bool]([false, true, false, true, true, true], [2, 3])!
+	data := vtl.masked_array(values, mask)!
+	rows := data.quantile_along_axis(1, 0.5, true)!
+	assert rows.values.shape == [2, 1]
+	assert rows.values.to_array()[0] == 2.0
+	assert rows.mask.to_array() == [false, true]
+	assert math.is_nan(rows.values.to_array()[1])
+
+	squeezed := data.median_along_axis(1, false)!
+	assert squeezed.values.shape == [2]
+	assert squeezed.mask.to_array() == [false, true]
+}
+
+fn test_masked_quantiles_reduce_multiple_axes_and_empty_axis_list() ! {
+	values := vtl.from_array[f64]([1, 2, 3, 4, 5, 6, 7, 8], [2, 2, 2])!
+	mask := vtl.from_array[bool]([false, true, false, true, true, true, true, false], [
+		2,
+		2,
+		2,
+	])!
+	data := vtl.masked_array(values, mask)!
+	result := data.quantile_along_axes([0, -1], 0.5, true)!
+	assert result.values.shape == [1, 2, 1]
+	assert result.values.to_array() == [1.0, 5.5]
+	assert result.mask.to_array() == [false, false]
+	all_axes := data.quantile_along_axes([0, 1, 2], 0.5, false)!
+	assert all_axes.values.shape == []
+	assert all_axes.values.to_array() == [3.0]
+	assert all_axes.mask.to_array() == [false]
+
+	unchanged := data.quantile_along_axes([], 0.25, false)!
+	assert unchanged.values.shape == values.shape
+	assert unchanged.values.to_array() == values.as_f64().to_array()
+	assert unchanged.mask.to_array() == mask.to_array()
+}
+
+fn test_masked_quantile_validates_q_axes_and_propagates_unmasked_nan() ! {
+	values := vtl.from_1d([1.0, math.nan(), 3.0])!
+	mask := vtl.from_1d[bool]([false, false, true])!
+	data := vtl.masked_array(values, mask)!
+	global := data.quantile(0.5)!
+	assert !global.is_masked
+	assert math.is_nan(global.value)
+
+	for q in [-0.1, 1.1, math.nan(), math.inf(1)] {
+		if _ := data.quantile(q) {
+			assert false, 'quantile must reject q outside [0, 1] and non-finite q'
+		}
+	}
+	if _ := data.median_along_axis(2, false) {
+		assert false, 'median must reject an out-of-bounds axis'
+	}
+	if _ := data.quantile_along_axes([0, -3], 0.5, false) {
+		assert false, 'quantile must reject repeated axes'
+	}
+}

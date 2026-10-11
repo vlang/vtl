@@ -375,6 +375,150 @@ pub fn (array &MaskedArray[T]) std[T](ddof int) !MaskedValue[f64] {
 	}
 }
 
+// quantile computes NumPy's default linearly interpolated quantile over all
+// unmasked values. An entirely masked or empty array returns a masked NaN.
+pub fn (array &MaskedArray[T]) quantile[T](q f64) !MaskedValue[f64] {
+	validate_masked_quantile(q)!
+	mut valid := []f64{cap: array.count()}
+	for flat_index in 0 .. array.values.size {
+		if !array.mask.get_nth(flat_index) {
+			valid << td(array.values.get_nth(flat_index)).f64()
+		}
+	}
+	if valid.len == 0 {
+		return MaskedValue[f64]{
+			value:     math.nan()
+			is_masked: true
+		}
+	}
+	return MaskedValue[f64]{
+		value:     masked_quantile_interpolate(mut valid, q)
+		is_masked: false
+	}
+}
+
+// median computes the median of all unmasked values.
+pub fn (array &MaskedArray[T]) median[T]() MaskedValue[f64] {
+	return array.quantile[T](0.5) or {
+		MaskedValue[f64]{
+			value:     math.nan()
+			is_masked: true
+		}
+	}
+}
+
+// quantile_along_axis computes one quantile per slice, optionally retaining
+// the reduced axis with length one.
+pub fn (array &MaskedArray[T]) quantile_along_axis[T](axis int, q f64, keepdims bool) !MaskedArray[f64] {
+	return array.quantile_along_axes[T]([axis], q, keepdims)
+}
+
+// quantile_along_axes computes one quantile per slice over several axes.
+// Slices with no valid values have a NaN payload and a true output mask.
+pub fn (array &MaskedArray[T]) quantile_along_axes[T](axes []int, q f64, keepdims bool) !MaskedArray[f64] {
+	validate_masked_quantile(q)!
+	if axes.len == 0 {
+		mut values := empty[f64](array.values.shape, memory: .row_major)
+		for flat_index in 0 .. array.values.size {
+			values.set_nth(flat_index, td(array.values.get_nth(flat_index)).f64())
+		}
+		return MaskedArray[f64]{
+			values: values
+			mask:   array.mask
+		}
+	}
+	reduced := normalize_masked_axes(axes, array.values.rank())!
+	output_shape := masked_reduction_shape(array.values.shape, reduced, keepdims)
+	mut values := zeros[f64](output_shape, TensorData{})
+	mut output_mask := ones[bool](output_shape, TensorData{})
+	mut counts := []int{len: values.size}
+	mut input_index := []int{len: array.values.rank()}
+	for flat_index in 0 .. array.values.size {
+		if array.mask.get_nth(flat_index) {
+			continue
+		}
+		decode_flat_coordinate(flat_index, array.values.shape, mut input_index)
+		output_flat_index := masked_axes_output_index(input_index, array.values.shape, reduced)
+		counts[output_flat_index]++
+	}
+	mut offsets := []int{len: values.size + 1}
+	for i in 0 .. values.size {
+		offsets[i + 1] = offsets[i] + counts[i]
+	}
+	mut flat_values := []f64{len: offsets[values.size]}
+	mut write_positions := offsets[..values.size].clone()
+	for flat_index in 0 .. array.values.size {
+		if array.mask.get_nth(flat_index) {
+			continue
+		}
+		decode_flat_coordinate(flat_index, array.values.shape, mut input_index)
+		output_flat_index := masked_axes_output_index(input_index, array.values.shape, reduced)
+		flat_values[write_positions[output_flat_index]] = td(array.values.get_nth(flat_index)).f64()
+		write_positions[output_flat_index]++
+	}
+	mut max_slice_size := 0
+	for count in counts {
+		if count > max_slice_size {
+			max_slice_size = count
+		}
+	}
+	mut slice_values := []f64{cap: max_slice_size}
+	for output_index in 0 .. values.size {
+		start := offsets[output_index]
+		end := offsets[output_index + 1]
+		if start == end {
+			values.set_nth(output_index, math.nan())
+			continue
+		}
+		slice_values.clear()
+		for i in start .. end {
+			slice_values << flat_values[i]
+		}
+		values.set_nth(output_index, masked_quantile_interpolate(mut slice_values, q))
+		output_mask.set_nth(output_index, false)
+	}
+	return MaskedArray[f64]{
+		values: values
+		mask:   output_mask
+	}
+}
+
+// median_along_axis computes the median of each unmasked axis slice.
+pub fn (array &MaskedArray[T]) median_along_axis[T](axis int, keepdims bool) !MaskedArray[f64] {
+	return array.quantile_along_axis[T](axis, 0.5, keepdims)
+}
+
+// median_along_axes computes medians over several axes.
+pub fn (array &MaskedArray[T]) median_along_axes[T](axes []int, keepdims bool) !MaskedArray[f64] {
+	return array.quantile_along_axes[T](axes, 0.5, keepdims)
+}
+
+fn validate_masked_quantile(q f64) ! {
+	if math.is_nan(q) || math.is_inf(q, 0) || q < 0 || q > 1 {
+		return error('quantile must be between 0 and 1')
+	}
+}
+
+fn masked_quantile_interpolate(mut values []f64, q f64) f64 {
+	for value in values {
+		if math.is_nan(value) {
+			return math.nan()
+		}
+	}
+	position := q * f64(values.len - 1)
+	lower_index := int(math.floor(position))
+	upper_index := math.min(lower_index + 1, values.len - 1)
+	select_value[f64](mut values, lower_index)
+	lower := values[lower_index]
+	if lower_index == upper_index {
+		return lower
+	}
+	select_value[f64](mut values, upper_index)
+	upper := values[upper_index]
+	weight := position - f64(lower_index)
+	return lower * (1 - weight) + upper * weight
+}
+
 // sum_along_axis reduces unmasked values along one axis. Output mask entries
 // are true for slices containing no unmasked values.
 pub fn (array &MaskedArray[T]) sum_along_axis[T](axis int, keepdims bool) !MaskedArray[T] {
