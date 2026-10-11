@@ -42,6 +42,8 @@ pub fn histogram2d_edges[X, Y](x &vtl.Tensor[X], y &vtl.Tensor[Y], x_edges []f64
 	validate_histogram_edges(y_edges)!
 	x_bins := x_edges.len - 1
 	y_bins := y_edges.len - 1
+	x_width := uniform_histogram_width(x_edges)
+	y_width := uniform_histogram_width(y_edges)
 	mut counts := []int{len: x_bins * y_bins}
 	for index in 0 .. x.size {
 		x_value := histogram_value[X](x, index)!
@@ -51,8 +53,8 @@ pub fn histogram2d_edges[X, Y](x &vtl.Tensor[X], y &vtl.Tensor[Y], x_edges []f64
 			|| y_value > y_edges[y_bins] {
 			continue
 		}
-		x_bin := histogram_bin(x_value, x_edges, x_bins)
-		y_bin := histogram_bin(y_value, y_edges, y_bins)
+		x_bin := histogram2d_find_bin(x_value, x_edges, x_bins, x_width)
+		y_bin := histogram2d_find_bin(y_value, y_edges, y_bins, y_width)
 		counts[x_bin * y_bins + y_bin]++
 	}
 	return Histogram2D{
@@ -103,6 +105,8 @@ pub fn histogram2d_weighted_edges[X, Y, W](x &vtl.Tensor[X], y &vtl.Tensor[Y], w
 	validate_histogram_edges(y_edges)!
 	x_bins := x_edges.len - 1
 	y_bins := y_edges.len - 1
+	x_width := uniform_histogram_width(x_edges)
+	y_width := uniform_histogram_width(y_edges)
 	mut counts := []f64{len: x_bins * y_bins}
 	for index in 0 .. x.size {
 		x_value := histogram_value[X](x, index)!
@@ -116,8 +120,8 @@ pub fn histogram2d_weighted_edges[X, Y, W](x &vtl.Tensor[X], y &vtl.Tensor[Y], w
 		if math.is_nan(weight) || math.is_inf(weight, 0) {
 			return error('histogram2d weights must be finite')
 		}
-		x_bin := histogram_bin(x_value, x_edges, x_bins)
-		y_bin := histogram_bin(y_value, y_edges, y_bins)
+		x_bin := histogram2d_find_bin(x_value, x_edges, x_bins, x_width)
+		y_bin := histogram2d_find_bin(y_value, y_edges, y_bins, y_width)
 		counts[x_bin * y_bins + y_bin] += weight
 	}
 	if density {
@@ -135,6 +139,35 @@ pub fn histogram2d_weighted_edges[X, Y, W](x &vtl.Tensor[X], y &vtl.Tensor[Y], w
 		x_edges: vtl.from_1d(x_edges)!
 		y_edges: vtl.from_1d(y_edges)!
 	}
+}
+
+fn histogram2d_find_bin(value f64, edges []f64, bins int, uniform_width f64) int {
+	if uniform_width <= 0 {
+		return histogram_bin(value, edges, bins)
+	}
+	if value == edges[bins] {
+		return bins - 1
+	}
+	mut bin := int((value - edges[0]) / uniform_width)
+	bin = math.max(0, math.min(bin, bins - 1))
+	for bin > 0 && value < edges[bin] {
+		bin--
+	}
+	for bin < bins - 1 && value >= edges[bin + 1] {
+		bin++
+	}
+	return bin
+}
+
+fn uniform_histogram_width(edges []f64) f64 {
+	bins := edges.len - 1
+	width := (edges[bins] - edges[0]) / f64(bins)
+	for index in 1 .. bins {
+		if edges[index] != edges[0] + f64(index) * width {
+			return 0
+		}
+	}
+	return width
 }
 
 fn validate_histogram2d_inputs[X, Y](x &vtl.Tensor[X], y &vtl.Tensor[Y]) ! {
