@@ -15,6 +15,23 @@ assert selected.shape == [2, 2]
 assert selected.to_array() == [12, 10, 22, 20]
 ```
 
+`roll` circularly shifts a copy of the logical values. Without an axis it rolls
+the flattened tensor and restores the original shape; `roll_shifts` pairs a
+shift with each axis. Axes and shifts may be negative, and repeated axes add
+their shifts.
+
+```v
+import vtl
+
+matrix := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
+assert vtl.roll(matrix, 1)!.to_array() == [6, 1, 2, 3, 4, 5]
+assert vtl.roll(matrix, 1, 1)!.to_array() == [3, 1, 2, 6, 4, 5]
+assert vtl.roll_shifts(matrix, [1, -1], [0, 1])!.to_array() == [5, 6, 4, 2, 3, 1]
+```
+
+`Variable.roll` and `Variable.roll_shifts` use the same arguments. Their
+backward passes shift gradients in the opposite direction.
+
 `take`, `take_nd`, and `take_flat` raise on out-of-range indices by default.
 Their `*_with_mode` variants also accept `.wrap` or `.clip`, matching NumPy's
 `take` modes. In `.clip` mode, negative indices clip to the first element;

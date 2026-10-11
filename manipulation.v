@@ -42,6 +42,99 @@ pub fn (t &Tensor[T]) flip[T](axes ...int) !&Tensor[T] {
 	return result
 }
 
+// roll shifts values along the flattened tensor when axes is omitted. When
+// axes are provided, the same shift is applied independently to each axis.
+// Negative axes and shifts are accepted. The result is always a copy.
+pub fn roll[T](t &Tensor[T], shift int, axes ...int) !&Tensor[T] {
+	if axes.len == 0 {
+		return roll_flat[T](t, shift)
+	}
+	return roll_axes[T](t, shift, axes)
+}
+
+// roll_flat circularly shifts the row-major logical values and preserves the
+// original shape.
+pub fn roll_flat[T](t &Tensor[T], shift int) !&Tensor[T] {
+	mut result := empty[T](t.shape, memory: t.memory)
+	if t.size == 0 {
+		return result
+	}
+	mut normalized_shift := shift % t.size
+	if normalized_shift < 0 {
+		normalized_shift += t.size
+	}
+	for source in 0 .. t.size {
+		destination := if source >= t.size - normalized_shift {
+			source - (t.size - normalized_shift)
+		} else {
+			source + normalized_shift
+		}
+		result.set_nth(destination, t.get_nth[T](source))
+	}
+	return result
+}
+
+// roll_axes applies one scalar shift to each selected axis. Repeated axes
+// accumulate their shifts, and an empty axis list leaves the tensor unchanged.
+pub fn roll_axes[T](t &Tensor[T], shift int, axes []int) !&Tensor[T] {
+	shifts := []int{len: axes.len, init: shift}
+	return roll_shifts[T](t, shifts, axes)
+}
+
+// roll_shifts applies paired shifts and axes, accumulating repeated axes.
+pub fn roll_shifts[T](t &Tensor[T], shifts []int, axes []int) !&Tensor[T] {
+	if shifts.len != axes.len {
+		return error('roll_shifts: shifts and axes must have the same length')
+	}
+	rank := t.rank()
+	mut normalized_shifts := []int{len: rank}
+	for i, axis in axes {
+		normalized_axis := if axis < 0 { axis + rank } else { axis }
+		if normalized_axis < 0 || normalized_axis >= rank {
+			return error('roll_shifts: axis ${axis} out of bounds for tensor with ${rank} dimensions')
+		}
+		dimension := t.shape[normalized_axis]
+		if dimension == 0 {
+			continue
+		}
+		mut normalized_shift := shifts[i] % dimension
+		if normalized_shift < 0 {
+			normalized_shift += dimension
+		}
+		current_shift := normalized_shifts[normalized_axis]
+		combined := current_shift + normalized_shift
+		normalized_shifts[normalized_axis] = if combined >= dimension {
+			combined - dimension
+		} else {
+			combined
+		}
+	}
+	mut result := empty[T](t.shape, memory: t.memory)
+	if t.size == 0 {
+		return result
+	}
+	mut source_index := []int{len: rank}
+	for source_flat in 0 .. t.size {
+		mut remainder := source_flat
+		for dim := rank - 1; dim >= 0; dim-- {
+			source_index[dim] = remainder % t.shape[dim]
+			remainder /= t.shape[dim]
+		}
+		mut destination_flat := 0
+		for dim in 0 .. rank {
+			destination := source_index[dim] + normalized_shifts[dim]
+			wrapped := if destination >= t.shape[dim] {
+				destination - t.shape[dim]
+			} else {
+				destination
+			}
+			destination_flat = destination_flat * t.shape[dim] + wrapped
+		}
+		result.set_nth(destination_flat, t.get(source_index))
+	}
+	return result
+}
+
 // repeat returns a copy with each value repeated the requested number of
 // times. If axis is omitted the tensor is flattened first, matching NumPy.
 pub fn repeat[T](t &Tensor[T], repeats int) !&Tensor[T] {
