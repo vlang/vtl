@@ -3,8 +3,9 @@
 This example moves tensor axes without copying their underlying data, reverses
 values along a selected axis with `Tensor.flip`, circularly shifts values with
 `vtl.roll`, repeats values with `vtl.repeat_axis`, and repeats full blocks with
-`vtl.tile`. It also shows that `Variable.roll` routes gradients using the
-inverse shift.
+`vtl.tile`. It also shows how `Variable.roll` routes gradients using the
+inverse shift, and how `Variable.rot90` routes gradients through the inverse
+quarter-turn.
 
 Run from `~/.vmodules`:
 
@@ -24,3 +25,4 @@ the tensor rank and repeats each value along the requested axis.
 `vtl.tile` repeats whole blocks and aligns repetition dimensions from the right.
 `vtl.rot90` rotates the first two dimensions; use `vtl.rot90_k` for a chosen
 number of quarter turns or `vtl.rot90_axes` to select another plane.
+The autograd API provides the same methods on `Variable`.

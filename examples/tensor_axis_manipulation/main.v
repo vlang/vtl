@@ -42,4 +42,19 @@ fn main() {
 	mut loss := rolled.multiply(weights)!.sum()!
 	loss.backprop()!
 	println('Gradient after rolling along columns: ${input.grad.to_array()}')
+
+	mut rotation_context := autograd.ctx[f64]()
+	image := rotation_context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [
+		2,
+		3,
+	])!)
+	rotation_weights := rotation_context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [
+		3,
+		2,
+	])!)
+	rotated := image.rot90()!
+	mut rotation_loss := rotated.multiply(rotation_weights)!.sum()!
+	rotation_loss.backprop()!
+	println('Rotated image [rows, columns]: ${rotated.value.to_array()}')
+	println('Gradient after rot90: ${image.grad.to_array()}')
 }
