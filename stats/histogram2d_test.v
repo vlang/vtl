@@ -13,6 +13,16 @@ fn test_histogram2d_uses_numpy_axis_order_and_includes_rightmost_edges() ! {
 	assert result.y_edges.to_array() == [0.0, 0.5, 1.0]
 }
 
+fn test_histogram2d_fast_uniform_bins_respect_internal_edges() ! {
+	x := vtl.from_1d([0.49, 0.5, 0.51])!
+	y := vtl.from_1d([0.49, 0.5, 0.51])!
+	uniform := histogram2d_edges[f64, f64](x, y, [0.0, 0.5, 1.0], [0.0, 0.5, 1.0])!
+	assert uniform.counts.to_array() == [1, 0, 0, 2]
+
+	irregular := histogram2d_edges[f64, f64](x, y, [0.0, 0.1, 0.4, 1.0], [0.0, 0.1, 0.4, 1.0])!
+	assert irregular.counts.to_array() == [0, 0, 0, 0, 0, 0, 0, 0, 3]
+}
+
 fn test_histogram2d_infers_ranges_and_handles_empty_or_constant_data() ! {
 	x := vtl.from_1d([0, 1, 2, 3])!
 	y := vtl.from_1d([0.0, 1, 0, 1])!

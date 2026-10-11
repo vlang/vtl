@@ -1,5 +1,33 @@
 # VTL vs NumPy baselines
 
+## Two-dimensional histograms
+
+This paired benchmark bins the same deterministic 262,144 `(x, y)` samples
+into a 64×64 grid with explicit uniform edges. Each implementation runs two
+warmups and seven timed calls; the reported time is the median, including the
+allocated result. The weighted checksum includes each cell's flat index,
+making accidental redistribution more detectable than a total-only checksum.
+From `~/.vmodules`, compile the V benchmark first, then execute it separately:
+
+```bash
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -no-parallel -cc gcc -prod -cflags "-march=native" \
+	-o /tmp/vtl-histogram2d-bench ./vtl/benchmarks/vs_numpy/histogram2d_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 \
+	/tmp/vtl-histogram2d-bench
+systemd-run --user --scope --quiet -p MemoryMax=2G -p MemorySwapMax=0 -- env VJOBS=2 \
+	OPENBLAS_NUM_THREADS=2 uv run --offline --no-project --with numpy python \
+	./vtl/benchmarks/vs_numpy/numpy_histogram2d_baseline.py
+```
+
+On an AMD Ryzen 9 5900X with V 0.5.2 `a60fb58`, GCC 16.2.1, and NumPy 2.5.4,
+three interleaved process runs on 2026-10-11 measured median-of-seven-call
+times of 3.473 ms for VTL and 5.061 ms for NumPy. Both reported the same
+weighted checksum, `537001984`; VTL was 1.46× faster in this specific
+workload. Per-process times ranged from 3.469–3.477 ms for VTL and
+4.993–5.108 ms for NumPy. This microbenchmark measures explicit uniform bins
+on one CPU and does not establish general NumPy performance parity.
+
 ## Elementwise extrema
 
 This paired microbenchmark compares elementwise `maximum` on deterministic
