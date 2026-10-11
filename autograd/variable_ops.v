@@ -356,6 +356,22 @@ pub fn (v &Variable[T]) clamp(min_val T, max_val T) !&Variable[T] {
 	return result
 }
 
+// nan_to_num replaces NaN and infinite values and passes gradients through
+// finite inputs only. Its forward and backward behavior follows PyTorch.
+pub fn (v &Variable[T]) nan_to_num(params vtl.NanToNumConfig) !&Variable[T] {
+	value := v.value.nan_to_num[T](params)
+	mut result := v.context.variable(value)
+	if v.requires_grad {
+		mut finite_mask := vtl.ones[bool](v.value.shape)
+		$if T is f32 || T is f64 {
+			finite_mask = v.value.is_finite[T]()
+		}
+		gate := nan_to_num_gate[T](finite_mask)
+		gate.cache(mut result, v)!
+	}
+	return result
+}
+
 // reshape returns a new variable with the same data but a different shape.
 // The total number of elements must be preserved.
 // Backward: gradient is reshaped back to the original shape.
