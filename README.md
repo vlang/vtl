@@ -205,9 +205,14 @@ Full index: [`docs/README.md`](docs/README.md).
 
 ## Contributors
 
-> Originally based on work by
-> [christopherzimmerman](https://github.com/christopherzimmerman).
-> The core was reimplemented while keeping that lineage and inspiration.
+VTL's early development was inspired by `vnum`, part of the Vlang Num group,
+and the work of [Christopher Zimmerman](https://github.com/christopherzimmerman).
+The core was reimplemented while keeping that lineage and inspiration. The
+original `vnum` work carried a BSD 3-Clause license with attribution to
+`vlang-num contributors`; the historical license text is preserved in the
+[VTL repository history](https://github.com/vlang/vtl/blob/32a9a609/LICENSE).
+This acknowledgment records that history and does not change VTL's current
+license, shown below.
 
 <a href="https://github.com/vlang/vtl/contributors">
   <img src="https://contrib.rocks/image?repo=vlang/vtl" alt="VTL contributors"/>
