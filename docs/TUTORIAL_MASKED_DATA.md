@@ -43,6 +43,8 @@ average := data.mean()
 product := data.prod()
 minimum := data.min()
 maximum := data.max()
+first_maximum_index := data.argmax()
+row_minimum_indices := data.argmin_along_axis(1, false)!
 sample_variance := data.variance(1)!
 sample_deviation := data.std(1)!
 column_sums := data.sum_along_axis(0, false)!
@@ -66,7 +68,11 @@ Global and axis-wise products use one as their identity; their output mask
 still marks slices with no valid values. `min` and `max` return the extreme
 valid values globally or across one or more axes, and mask any slice with no
 valid values. The payload of a masked min/max result is unspecified and should
-be ignored.
+be ignored. `argmin` and `argmax` return the first matching flat index among
+unmasked values. Their axis variants return the first index within each slice;
+all-masked slices are marked in the output mask and carry index zero. Valid
+NaNs take precedence and the first NaN index is returned, matching NumPy's
+arg-reduction behavior.
 `variance` and `std` use Welford's online algorithm; `ddof=0` computes
 population statistics and `ddof=1` computes sample statistics. Global or
 per-slice results with `count <= ddof` are masked and carry a NaN payload.
@@ -80,7 +86,8 @@ axes are supported and duplicates are rejected. An empty axes list preserves
 values and masks elementwise (the mean variant converts values to `f64`).
 
 This API currently covers filling, compression, counting, and sum/product/
-minimum/maximum/mean/variance/standard deviation/quantile/percentile/median. It does not
+minimum/maximum/argmin/argmax/mean/variance/standard deviation/quantile/
+percentile/median. It does not
 yet implement masked elementwise operations or the full NumPy masked-array
 statistics surface. NaN values are not implicitly treated as missing; use an
 explicit boolean mask when that is desired.

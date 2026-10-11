@@ -17,6 +17,8 @@ fn main() {
 	averages := data.mean_along_axis(0, false)!
 	median := data.median()
 	lower_quartile := data.percentile(25)!
+	largest_index := data.argmax()
+	row_largest_indices := data.argmax_along_axis(1, false)!
 	row_medians := data.median_along_axis(1, false)!
 
 	assert cleaned.to_array() == [12.0, -1.0, 15.0, 18.0, -1.0, 21.0]
@@ -29,6 +31,9 @@ fn main() {
 	assert averages.mask.to_array() == [false, true, false]
 	assert median.value == 16.5 && !median.is_masked
 	assert lower_quartile.value == 14.25 && !lower_quartile.is_masked
+	assert largest_index.value == 5 && !largest_index.is_masked
+	assert row_largest_indices.values.to_array() == [2, 2]
+	assert row_largest_indices.mask.to_array() == [false, false]
 	assert row_medians.values.to_array() == [13.5, 19.5]
 	assert row_medians.mask.to_array() == [false, false]
 	println('Observed values: ${observed.to_array()}')
@@ -36,5 +41,7 @@ fn main() {
 	println('Column means: ${averages.values.to_array()}')
 	println('Median: ${median.value}')
 	println('25th percentile: ${lower_quartile.value}')
+	println('Flat index of maximum: ${largest_index.value}')
+	println('Row maximum indices: ${row_largest_indices.values.to_array()}')
 	println('Row medians: ${row_medians.values.to_array()}')
 }

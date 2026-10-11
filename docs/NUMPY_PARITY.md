@@ -312,8 +312,10 @@ structured-data limits.
 with mask union, scalar arithmetic, filling masked entries, compression,
 valid-value counting, mixed indexing, and axis-wise gather/update that keeps
 values and masks aligned. Sum, product, min, max, mean, variance, standard
-deviation, median, and linearly interpolated quantiles and percentiles work
-globally and across one or multiple axes. Axis reductions mark empty slices in the output mask;
+deviation, median, linearly interpolated quantiles and percentiles, and
+masked-aware argmin/argmax work globally or along one axis. Arg reductions
+return the first valid matching index and mark all-masked slices in the output
+mask. Axis reductions mark empty slices in the output mask;
 global reductions expose an `is_masked` flag when every value is missing. See
 [the masked data tutorial](./TUTORIAL_MASKED_DATA.md).
 
