@@ -87,6 +87,30 @@ fn test_masked_fill_broadcasts_mask_without_changing_input() {
 	assert values.to_array() == [1, 2, 3, 4, 5, 6]
 }
 
+fn test_masked_scatter_broadcasts_mask_and_consumes_source_in_order() {
+	values := vtl.from_2d([[1, 2], [3, 4]])!
+	mask := vtl.from_array([false, true], [1, 2])!
+	source := vtl.from_1d([10, 20, 30])!
+	got := values.masked_scatter(mask, source)!
+	assert got.shape == [2, 2]
+	assert got.to_array() == [1, 10, 3, 20]
+	assert values.to_array() == [1, 2, 3, 4]
+}
+
+fn test_masked_scatter_rejects_short_source_and_invalid_mask() {
+	values := vtl.from_2d([[1, 2], [3, 4]])!
+	mask := vtl.from_array([true, true], [1, 2])!
+	short_source := vtl.from_1d([10])!
+	if _ := values.masked_scatter(mask, short_source) {
+		assert false, 'masked_scatter must reject a source shorter than selected positions'
+	}
+	bad_mask := vtl.from_1d([true, false, true])!
+	source := vtl.from_1d([10, 20])!
+	if _ := values.masked_scatter(bad_mask, source) {
+		assert false, 'masked_scatter must reject a mask that cannot broadcast to the tensor'
+	}
+}
+
 fn test_masked_operations_reject_shape_mismatch() {
 	values := vtl.from_2d([[1, 2], [3, 4]])!
 	mask := vtl.from_1d([true, false, true])!

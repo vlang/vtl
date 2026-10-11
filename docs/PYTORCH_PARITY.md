@@ -13,6 +13,9 @@ performance, or ecosystem.
 **VTL today:** Generic tensors, broadcasting, indexing, reductions, statistics,
 FFT, and VSL-backed linear algebra. See the [NumPy parity tracker](./NUMPY_PARITY.md).
 
+`Tensor.masked_scatter` and `Variable.masked_scatter` support broadcastable
+masks, sequential source consumption, and autograd for selected source values.
+
 **Next:** Audit operator coverage and semantics against `torch.Tensor`, including
 dtype promotion, scalar behavior, strides, views, in-place operations, and error
 cases.
