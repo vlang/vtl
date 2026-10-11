@@ -51,6 +51,17 @@ fn test_mse_loss_backward() ! {
 	assert g - 2.0 < 1e-6 && g - 2.0 > -1e-6, 'MSE backward grad[0] expected 2.0, got ${g}'
 }
 
+fn test_mse_loss_backward_uses_mean_reduction_and_factor_two() ! {
+	c := ctx[f64]()
+	pred := variable[f64](c, [1.0, 2.0, 3.0, 4.0], [2, 2])!
+	target := tensor[f64]([0.0, 0.0, 0.0, 0.0], [2, 2])!
+	mut result := mse_loss[f64]().loss(pred, target)!
+	result.backprop()!
+	for i, want in [0.5, 1.0, 1.5, 2.0] {
+		assert math.abs(pred.grad.get_nth(i) - want) < 1e-12
+	}
+}
+
 // BCE loss tests (from_logits=false → raw probabilities)
 fn test_bce_loss_forward() ! {
 	c := ctx[f64]()
