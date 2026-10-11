@@ -28,6 +28,42 @@ workload. Per-process times ranged from 3.469–3.477 ms for VTL and
 4.993–5.108 ms for NumPy. This microbenchmark measures explicit uniform bins
 on one CPU and does not establish general NumPy performance parity.
 
+## Two-dimensional histogram density
+
+This benchmark uses 262,144 deterministic (x, y) samples and explicit
+1024x1024 bin edges. It compares the current VTL implementation, a benchmark
+copy of the previous VTL path (including its to_array conversions), and NumPy.
+Each timed call includes binning, density normalization, and result allocation;
+each path uses two warmups and seven timed calls. The weighted checksum helps
+detect changes to bin placement or normalization.
+
+Sources: histogram2d_density_bench.v and
+numpy_histogram2d_density_baseline.py. From ~/.vmodules, compile the V
+benchmark with -prod first, then execute its binary separately:
+
+```bash
+systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -no-parallel -cc gcc -prod -cflags "-march=native" \
+	-o /tmp/vtl-histogram2d-density-bench ./vtl/benchmarks/vs_numpy/histogram2d_density_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 \
+	/tmp/vtl-histogram2d-density-bench
+systemd-run --user --scope -p MemoryMax=2G -p MemorySwapMax=0 -- env VJOBS=2 \
+	OPENBLAS_NUM_THREADS=2 \
+	uv run --offline --no-project --with numpy python \
+	./vtl/benchmarks/vs_numpy/numpy_histogram2d_density_baseline.py
+````
+
+
+On this AMD Ryzen 9 5900X workstation, with V 0.5.2 81be246, GCC 16.2.1, and
+NumPy 2.5.4 (SciPy OpenBLAS 0.3.34.106.0), three interleaved process runs on
+2026-10-11 measured median-of-seven-call times of 9.122 ms for current VTL,
+15.026 ms for the previous copy path, and 13.615 ms for NumPy. Per-process
+ranges were 9.078–9.356 ms, 14.589–15.200 ms, and 13.510–14.013 ms,
+respectively. All paths reported the weighted checksum 549,756,338,176. The
+current implementation was 1.65x faster than its previous path and 1.49x
+faster than NumPy for this workload. This single CPU microbenchmark does not
+establish general NumPy performance parity.
+
 ## Elementwise extrema
 
 This paired microbenchmark compares elementwise `maximum` on deterministic
