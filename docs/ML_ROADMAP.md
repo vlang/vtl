@@ -42,15 +42,15 @@ GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 
 **VSL (downstream):** [#280](https://github.com/vlang/vsl/issues/280)–[#285](https://github.com/vlang/vsl/issues/285), [#304](https://github.com/vlang/vsl/pull/304) conv2d backward GEMM, [#305](https://github.com/vlang/vsl/pull/305) Adam shaders.
 
-## Current open issues (checked 2026-10-09)
+## Current open issues (checked 2026-10-11)
 
 | Priority | Issue | Topic |
 |----------|-------|--------|
 | P1 | [#161](https://github.com/vlang/vtl/issues/161) | CUDA backward for LSTM, attention, norms, embeddings, and pooling; validation pending |
 | P2 | [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support |
-| P2 | [#40](https://github.com/vlang/vtl/issues/40) | YOLO/fused autograd gates; requires benchmark evidence |
+| P2 | [#40][issue40] | Gate fusion remains; fresh gradient-buffer reuse merged in [#598][pr598] |
 | P2 | [#3](https://github.com/vlang/vtl/issues/3) | Await a safe V compiler alias contract; continue benchmarking CPU kernels |
-| Research | [#52](https://github.com/vlang/vtl/issues/52) | Compare Burn capabilities and architecture |
+| Research | [#52](https://github.com/vlang/vtl/issues/52) | Burn capability comparison: [BURN_PARITY.md](./BURN_PARITY.md) |
 
 V 0.5.2 does not emit a `restrict` alias contract. `@[direct_array_access]`
 removes bounds checks only; it does not establish non-aliasing.
@@ -96,6 +96,9 @@ v run ./vtl/examples/nn_cifar10_f32_tiny_synth/main.v
 # VTL_USE_VULKAN=1 v -prod -d vulkan run vtl/examples/nn_cifar10_vulkan/main.v
 # VTL_USE_VULKAN=1 VTL_TEST_VULKAN=1 VJOBS=1 v -prod -d vulkan test vtl/nn/f32_vulkan_training_smoke_d_vulkan_test.v
 ```
+
+[issue40]: https://github.com/vlang/vtl/issues/40
+[pr598]: https://github.com/vlang/vtl/pull/598
 
 ## CI
 
