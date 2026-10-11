@@ -79,4 +79,12 @@ fn main() {
 	repeat_loss.backprop()!
 	println('Image repeated across columns: ${repeated_image.value.to_array()}')
 	println('Gradient after repeat_axis: ${image_to_repeat.grad.to_array()}')
+
+	mut tile_context := autograd.ctx[f64]()
+	image_to_tile := tile_context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0], [2, 2])!)
+	tiled_image := image_to_tile.tile([2, 1])!
+	mut tile_loss := tiled_image.sum()!
+	tile_loss.backprop()!
+	println('Image tiled by blocks: ${tiled_image.value.to_array()}')
+	println('Gradient after tile: ${image_to_tile.grad.to_array()}')
 }
