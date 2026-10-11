@@ -55,10 +55,14 @@ pub fn softmax_cross_entropy_backward[T](gradient &vtl.Tensor[T], cache &vtl.Ten
 		for c in 0 .. n_classes {
 			sum_exp += math.exp(f64(cache.get([i, c])) - max_logit)
 		}
+		mut target_sum := 0.0
+		for c in 0 .. n_classes {
+			target_sum += f64(target.get([i, c]))
+		}
 		for c in 0 .. n_classes {
 			sm := math.exp(f64(cache.get([i, c])) - max_logit) / sum_exp
 			tgt := f64(target.get([i, c]))
-			ret_data[i * n_classes + c] = upstream * (sm - tgt) / f64(batch_size)
+			ret_data[i * n_classes + c] = upstream * (sm * target_sum - tgt) / f64(batch_size)
 		}
 	}
 	ret := vtl.from_array(ret_data.map(vtl.cast[T](it)), [batch_size, n_classes])!
@@ -324,10 +328,14 @@ pub fn cross_entropy_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], 
 		for c in 0 .. n_classes {
 			sum_exp += math.exp(f64(input.get([i, c])) - max_logit)
 		}
+		mut target_sum := 0.0
+		for c in 0 .. n_classes {
+			target_sum += f64(target.get([i, c]))
+		}
 		for c in 0 .. n_classes {
 			sm := math.exp(f64(input.get([i, c])) - max_logit) / sum_exp
 			tgt := f64(target.get([i, c]))
-			ret_data[i * n_classes + c] = upstream * (sm - tgt) / f64(batch_size)
+			ret_data[i * n_classes + c] = upstream * (sm * target_sum - tgt) / f64(batch_size)
 		}
 	}
 	return vtl.from_array(ret_data.map(vtl.cast[T](it)), [batch_size, n_classes])
