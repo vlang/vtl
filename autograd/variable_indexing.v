@@ -2,6 +2,30 @@ module autograd
 
 import vtl
 
+// take gathers values along an axis and tracks the inverse scatter in
+// backprop. Negative axes and indices count from the end.
+pub fn (v &Variable[T]) take(indices []int, axis int) !&Variable[T] {
+	return v.take_with_mode(indices, axis, .raise)
+}
+
+// take_with_mode gathers values using NumPy's raise, wrap, or clip index mode
+// and tracks gradients by scattering them to the normalized source indices.
+pub fn (v &Variable[T]) take_with_mode(indices []int, axis int, mode vtl.TakeMode) !&Variable[T] {
+	rank := v.value.rank()
+	axis_index := if axis < 0 { axis + rank } else { axis }
+	if axis_index < 0 || axis_index >= rank {
+		return error('take axis ${axis} is out of range for rank ${rank}')
+	}
+	axis_size := v.value.shape[axis_index]
+	axis_coordinates := []int{len: axis_size, init: index}
+	coordinates := vtl.from_array[int](axis_coordinates, [axis_size])!
+	normalized := coordinates.take_with_mode(indices, 0, mode)!
+	mut index_shape := []int{len: rank, init: 1}
+	index_shape[axis_index] = indices.len
+	index_tensor := normalized.reshape(index_shape)!
+	return v.take_along_axis(index_tensor, axis)
+}
+
 // take_along_axis gathers values and tracks the inverse scatter in backprop.
 // Repeated indices accumulate their gradients; non-axis broadcast dimensions
 // are reduced into the corresponding source coordinates.

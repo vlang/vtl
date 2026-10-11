@@ -3,6 +3,24 @@ module autograd_tests
 import vtl
 import vtl.autograd
 
+fn test_take_with_mode_backward_accumulates_normalized_indices() ! {
+	mut ctx := autograd.ctx[f64]()
+	input := ctx.variable(vtl.from_array([10.0, 20.0, 30.0], [1, 3])!)
+	mut selected := input.take_with_mode([-1, 3, 3], 1, .wrap)!
+	assert selected.value.to_array() == [30.0, 10.0, 10.0]
+	selected.backprop()!
+	assert input.grad.to_array() == [2.0, 0.0, 1.0]
+}
+
+fn test_take_with_mode_backward_clips_negative_indices() ! {
+	mut ctx := autograd.ctx[f64]()
+	input := ctx.variable(vtl.from_array([10.0, 20.0, 30.0], [1, 3])!)
+	mut selected := input.take_with_mode([-1, 3], 1, .clip)!
+	assert selected.value.to_array() == [10.0, 30.0]
+	selected.backprop()!
+	assert input.grad.to_array() == [1.0, 0.0, 1.0]
+}
+
 fn test_take_along_axis_backward_accumulates_repeated_indices() ! {
 	mut ctx := autograd.ctx[f64]()
 	input := ctx.variable(vtl.from_array([10.0, 20.0, 30.0, 40.0, 50.0, 60.0], [2, 3])!)

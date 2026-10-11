@@ -1,5 +1,12 @@
 module vtl
 
+// TakeMode controls how indices outside a gathered axis are handled.
+pub enum TakeMode {
+	raise
+	wrap
+	clip
+}
+
 // count_nonzero counts non-zero values across every tensor dimension.
 @[direct_array_access]
 pub fn count_nonzero[T](t &Tensor[T]) int {
@@ -268,6 +275,13 @@ fn find_unique_value_index[T](values []T, target T) int {
 // along `axis`. Negative axes and negative indices count from the end.
 // The indices are a one-dimensional list; use slice for range-based views.
 pub fn (t &Tensor[T]) take[T](indices []int, axis int) !&Tensor[T] {
+	return t.take_with_mode[T](indices, axis, .raise)
+}
+
+// take_with_mode selects values along `axis`, handling out-of-range indices
+// with the requested mode. In `.clip` mode, negative values clip to zero,
+// matching NumPy's `take` behavior.
+pub fn (t &Tensor[T]) take_with_mode[T](indices []int, axis int, mode TakeMode) !&Tensor[T] {
 	rank := t.rank()
 	axis_index := if axis < 0 { axis + rank } else { axis }
 	if axis_index < 0 || axis_index >= rank {
@@ -275,11 +289,9 @@ pub fn (t &Tensor[T]) take[T](indices []int, axis int) !&Tensor[T] {
 	}
 	mut normalized_indices := []int{cap: indices.len}
 	for index in indices {
-		normalized := if index < 0 { index + t.shape[axis_index] } else { index }
-		if normalized < 0 || normalized >= t.shape[axis_index] {
-			return error('take index ${index} is out of range for axis size ${t.shape[axis_index]}')
+		normalized_indices << normalize_take_index(index, t.shape[axis_index], mode) or {
+			return error('take: ${err}')
 		}
-		normalized_indices << normalized
 	}
 
 	mut output_shape := t.shape.clone()
@@ -297,10 +309,21 @@ pub fn (t &Tensor[T]) take[T](indices []int, axis int) !&Tensor[T] {
 // take_nd gathers values along one axis using an index tensor. The index
 // tensor's dimensions replace the selected axis in the output shape.
 pub fn (t &Tensor[T]) take_nd[T](indices &Tensor[int], axis int) !&Tensor[T] {
+	return t.take_nd_with_mode[T](indices, axis, .raise)
+}
+
+// take_nd_with_mode gathers with an index tensor and applies `mode` to every
+// index. The index tensor's dimensions replace the selected axis.
+pub fn (t &Tensor[T]) take_nd_with_mode[T](indices &Tensor[int], axis int, mode TakeMode) !&Tensor[T] {
 	rank := t.rank()
 	axis_index := if axis < 0 { axis + rank } else { axis }
 	if axis_index < 0 || axis_index >= rank {
 		return error('take_nd axis ${axis} is out of range for rank ${rank}')
+	}
+	for position in 0 .. indices.size {
+		_ = normalize_take_index(indices.get_nth[int](position), t.shape[axis_index], mode) or {
+			return error('take_nd: ${err}')
+		}
 	}
 	mut output_shape := []int{cap: rank - 1 + indices.rank()}
 	output_shape << t.shape[..axis_index]
@@ -323,9 +346,8 @@ pub fn (t &Tensor[T]) take_nd[T](indices &Tensor[int], axis int) !&Tensor[T] {
 			indices_index[index_axis] = output_index[axis_index + index_axis]
 		}
 		selected := indices.get(indices_index)
-		normalized := if selected < 0 { selected + t.shape[axis_index] } else { selected }
-		if normalized < 0 || normalized >= t.shape[axis_index] {
-			return error('take_nd index ${selected} is out of range for axis size ${t.shape[axis_index]}')
+		normalized := normalize_take_index(selected, t.shape[axis_index], mode) or {
+			return error('take_nd: ${err}')
 		}
 		input_index[axis_index] = normalized
 		for input_axis in axis_index + 1 .. rank {
@@ -339,17 +361,55 @@ pub fn (t &Tensor[T]) take_nd[T](indices &Tensor[int], axis int) !&Tensor[T] {
 // take_flat gathers from the row-major logical flattening of a tensor and
 // preserves the shape of the index tensor.
 pub fn (t &Tensor[T]) take_flat[T](indices &Tensor[int]) !&Tensor[T] {
+	return t.take_flat_with_mode[T](indices, .raise)
+}
+
+// take_flat_with_mode gathers from row-major logical order and applies `mode`
+// to indices outside the flattened tensor's range.
+pub fn (t &Tensor[T]) take_flat_with_mode[T](indices &Tensor[int], mode TakeMode) !&Tensor[T] {
 	flattened := t.ravel[T]()!
+	for position in 0 .. indices.size {
+		_ = normalize_take_index(indices.get_nth[int](position), flattened.size, mode) or {
+			return error('take_flat: ${err}')
+		}
+	}
 	mut result := empty[T](indices.shape, memory: .row_major)
 	for flat_index in 0 .. indices.size {
 		selected := indices.get_nth[int](flat_index)
-		normalized := if selected < 0 { selected + flattened.size } else { selected }
-		if normalized < 0 || normalized >= flattened.size {
-			return error('take_flat index ${selected} is out of range for flattened size ${flattened.size}')
+		normalized := normalize_take_index(selected, flattened.size, mode) or {
+			return error('take_flat: ${err}')
 		}
 		result.data.data[flat_index] = flattened.get_nth(normalized)
 	}
 	return result
+}
+
+fn normalize_take_index(index int, size int, mode TakeMode) !int {
+	if size <= 0 {
+		return error('cannot select an index from an axis of size ${size}')
+	}
+	return match mode {
+		.raise {
+			normalized := if index < 0 { index + size } else { index }
+			if normalized < 0 || normalized >= size {
+				return error('index ${index} is out of range for axis size ${size}')
+			}
+			normalized
+		}
+		.wrap {
+			remainder := index % size
+			if remainder < 0 { remainder + size } else { remainder }
+		}
+		.clip {
+			if index < 0 {
+				0
+			} else if index >= size {
+				size - 1
+			} else {
+				index
+			}
+		}
+	}
 }
 
 // take_along_axis gathers values using an index tensor with the same rank as
