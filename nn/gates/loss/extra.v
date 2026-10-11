@@ -52,6 +52,7 @@ pub fn (g &BCEGate[T]) cache(mut result autograd.Variable[T], args ...autograd.C
 // HuberLossGate defines a public data structure for this module.
 pub struct HuberLossGate[T] {
 pub:
+	input  &vtl.Tensor[T] = unsafe { nil }
 	target &vtl.Tensor[T] = unsafe { nil }
 	delta  T
 }
@@ -59,6 +60,7 @@ pub:
 // huber_loss_gate exposes this operation as part of the public API.
 pub fn huber_loss_gate[T](input &vtl.Tensor[T], target &vtl.Tensor[T], delta T) &HuberLossGate[T] {
 	return &HuberLossGate[T]{
+		input:  input
 		target: target
 		delta:  delta
 	}
@@ -67,7 +69,7 @@ pub fn huber_loss_gate[T](input &vtl.Tensor[T], target &vtl.Tensor[T], delta T) 
 // backward exposes this operation as part of the public API.
 pub fn (g &HuberLossGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
-	r0 := internal.huber_backward[T](gradient, payload.variable.value, g.target, g.delta)!
+	r0 := internal.huber_backward[T](gradient, g.input, g.target, g.delta)!
 	return [r0]
 }
 
@@ -95,12 +97,14 @@ pub fn (g &HuberLossGate[T]) cache(mut result autograd.Variable[T], args ...auto
 // NLLLossGate defines a public data structure for this module.
 pub struct NLLLossGate[T] {
 pub:
+	input  &vtl.Tensor[T] = unsafe { nil }
 	target &vtl.Tensor[T] = unsafe { nil }
 }
 
 // nll_loss_gate exposes this operation as part of the public API.
 pub fn nll_loss_gate[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) &NLLLossGate[T] {
 	return &NLLLossGate[T]{
+		input:  input
 		target: target
 	}
 }
@@ -108,7 +112,7 @@ pub fn nll_loss_gate[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) &NLLLossGat
 // backward exposes this operation as part of the public API.
 pub fn (g &NLLLossGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
-	r0 := internal.nll_backward[T](gradient, payload.variable.value, g.target)!
+	r0 := internal.nll_backward[T](gradient, g.input, g.target)!
 	return [r0]
 }
 
@@ -136,12 +140,14 @@ pub fn (g &NLLLossGate[T]) cache(mut result autograd.Variable[T], args ...autogr
 // KLDivLossGate defines a public data structure for this module.
 pub struct KLDivLossGate[T] {
 pub:
+	input  &vtl.Tensor[T] = unsafe { nil }
 	target &vtl.Tensor[T] = unsafe { nil }
 }
 
 // kl_div_loss_gate exposes this operation as part of the public API.
 pub fn kl_div_loss_gate[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) &KLDivLossGate[T] {
 	return &KLDivLossGate[T]{
+		input:  input
 		target: target
 	}
 }
@@ -149,7 +155,7 @@ pub fn kl_div_loss_gate[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) &KLDivLo
 // backward exposes this operation as part of the public API.
 pub fn (g &KLDivLossGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
-	r0 := internal.kl_div_backward[T](gradient, payload.variable.value, g.target)!
+	r0 := internal.kl_div_backward[T](gradient, g.input, g.target)!
 	return [r0]
 }
 
