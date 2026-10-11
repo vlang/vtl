@@ -1,7 +1,7 @@
 # Masked array reductions
 
 Demonstrates broadcastable missing-data masks, filling, compression, and
-global or axis-wise reductions over valid values.
+global or axis-wise sum, mean, and median reductions over valid values.
 
 Run from `~/.vmodules`:
 
