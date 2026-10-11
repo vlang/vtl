@@ -68,15 +68,13 @@ pub fn histogram2d_edges[X, Y](x &vtl.Tensor[X], y &vtl.Tensor[Y], x_edges []f64
 // returned bin areas is one. Samples outside the inferred range are excluded.
 pub fn histogram2d_density[X, Y](x &vtl.Tensor[X], y &vtl.Tensor[Y], bins_x int, bins_y int) !WeightedHistogram2D {
 	histogram := histogram2d[X, Y](x, y, bins_x, bins_y)!
-	return histogram2d_density_from_counts(histogram.counts.to_array().map(f64(it)),
-		histogram.x_edges.to_array(), histogram.y_edges.to_array())
+	return histogram2d_density_from_counts(histogram)
 }
 
 // histogram2d_density_edges computes a density over explicit bin edges.
 pub fn histogram2d_density_edges[X, Y](x &vtl.Tensor[X], y &vtl.Tensor[Y], x_edges []f64, y_edges []f64) !WeightedHistogram2D {
 	histogram := histogram2d_edges[X, Y](x, y, x_edges, y_edges)!
-	return histogram2d_density_from_counts(histogram.counts.to_array().map(f64(it)),
-		histogram.x_edges.to_array(), histogram.y_edges.to_array())
+	return histogram2d_density_from_counts(histogram)
 }
 
 // histogram2d_weighted computes weighted counts or a probability density using
@@ -213,21 +211,32 @@ fn uniform_histogram_edges(bins int, minimum f64, maximum f64) ![]f64 {
 	return edges
 }
 
-fn histogram2d_density_from_counts(counts []f64, x_edges []f64, y_edges []f64) !WeightedHistogram2D {
+@[direct_array_access]
+fn histogram2d_density_from_counts(histogram Histogram2D) !WeightedHistogram2D {
+	counts := histogram.counts.data.data
+	x_edges := histogram.x_edges.data.data
+	y_edges := histogram.y_edges.data.data
+	x_bins := histogram.counts.shape[0]
+	y_bins := histogram.counts.shape[1]
 	mut total_count := 0.0
-	for count in counts {
-		total_count += count
+	for count in counts[..histogram.counts.size] {
+		total_count += f64(count)
 	}
 	if total_count == 0 || math.is_nan(total_count) || math.is_inf(total_count, 0) {
 		return error('histogram2d density requires a finite nonzero sample count')
 	}
-	density := normalize_histogram2d_density(counts, x_edges, y_edges, total_count)!
-	x_bins := x_edges.len - 1
-	y_bins := y_edges.len - 1
+	mut density := []f64{len: histogram.counts.size}
+	for x_bin in 0 .. x_bins {
+		for y_bin in 0 .. y_bins {
+			index := x_bin * y_bins + y_bin
+			area := (x_edges[x_bin + 1] - x_edges[x_bin]) * (y_edges[y_bin + 1] - y_edges[y_bin])
+			density[index] = f64(counts[index]) / (total_count * area)
+		}
+	}
 	return WeightedHistogram2D{
 		counts:  vtl.from_array[f64](density, [x_bins, y_bins])!
-		x_edges: vtl.from_1d(x_edges)!
-		y_edges: vtl.from_1d(y_edges)!
+		x_edges: histogram.x_edges
+		y_edges: histogram.y_edges
 	}
 }
 

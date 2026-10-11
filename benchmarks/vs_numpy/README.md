@@ -28,6 +28,29 @@ workload. Per-process times ranged from 3.469–3.477 ms for VTL and
 4.993–5.108 ms for NumPy. This microbenchmark measures explicit uniform bins
 on one CPU and does not establish general NumPy performance parity.
 
+## Two-dimensional histogram density
+
+This paired benchmark uses the same deterministic 262,144 (x, y) samples and
+explicit 64x64 bin edges for VTL and NumPy. Both sides include binning, density
+normalization, and result allocation inside each timed call; each uses two
+warmups and seven timed calls. The weighted checksum helps detect changes to
+bin placement or normalization.
+
+Sources: histogram2d_density_bench.v and
+numpy_histogram2d_density_baseline.py. From ~/.vmodules, compile the V
+benchmark with -prod first, then execute its binary separately. Run the NumPy
+baseline from the same directory with OPENBLAS_NUM_THREADS=2 and the offline
+NumPy environment used above.
+
+On this AMD Ryzen 9 5900X workstation, with V 0.5.2 81be246, GCC 16.2.1, and
+NumPy 2.5.4 (SciPy OpenBLAS 0.3.34.106.0), three interleaved process runs on
+2026-10-11 measured median-of-seven-call times of 3.078 ms for VTL and
+4.887 ms for NumPy. Per-process ranges were 2.976–3.136 ms and 4.732–4.967 ms.
+Both implementations reported the weighted checksum 8,390,656. VTL was 1.59x
+faster for this specific workload. This single CPU microbenchmark does not
+establish general NumPy performance parity or isolate the speedup from this
+change alone.
+
 ## Elementwise extrema
 
 This paired microbenchmark compares elementwise `maximum` on deterministic
