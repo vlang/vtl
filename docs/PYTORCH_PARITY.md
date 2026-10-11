@@ -107,6 +107,13 @@ minimum LR, and epsilon. It returns the next LR for the caller to apply;
 optimizer mutation and per-parameter-group LR support remain gaps. Optimizer
 parameter-group integration remains a gap.
 
+`nll_loss` supports weighted class-index and one-hot/soft targets, mean and sum
+reductions, and `ignore_index` for class-index targets. Weighted class-index
+means divide by the sum of non-ignored target weights. The API still accepts
+floating-point tensors for targets and requires rank-two inputs; PyTorch's
+integer target dtype, `reduction='none'`, and spatial NLL input shapes remain
+gaps.
+
 **Next:** Audit formulas, defaults, reduction modes, parameter groups, sparse
 gradients, and numerical behavior against `torch.nn` and `torch.optim`. Add
 parameter-group support, then integrate scheduler values with optimizer
