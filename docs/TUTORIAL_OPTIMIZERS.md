@@ -256,8 +256,11 @@ mut cyclic := optimizers.cyclic_lr[f32](optimizers.CyclicLRConfig{
 
 // ReduceLROnPlateau: reduce when metric stops improving
 mut scheduler6 := optimizers.reduce_lr_on_plateau[f32](optimizers.ReduceLROnPlateauConfig{
-	patience: 10
-	factor:   0.1
+	patience:       10
+	factor:         0.1
+	mode:           .min
+	threshold_mode: .rel
+	min_lr:         1e-6
 })
 
 // Inside the training loop:
@@ -293,6 +296,26 @@ and step supplied by the caller.
 `eta_min`. `t_0` sets the first cycle length; `t_mult` multiplies the length
 after each restart. The step can count minibatches or epochs, depending on your
 training loop.
+
+`ReduceLROnPlateau` consumes the observed metric and remembers the best value.
+Use `mode: .min` for losses or `.max` for scores, and choose `.rel` or `.abs`
+thresholds. Call `step(current_lr, validation_metric)` after validation; it
+returns the next rate for the caller to apply. It supports patience, cooldown,
+`min_lr`, and epsilon. Use `try_reduce_lr_on_plateau` when configuration errors
+should be returned instead of panicking. The original delta-based
+`next_lr(current_lr, step, metric_delta)` remains available for compatibility.
+
+```v ignore
+mut plateau := optimizers.reduce_lr_on_plateau[f32](optimizers.ReduceLROnPlateauConfig{
+	patience: 2
+	factor:   0.5
+	min_lr:   1e-6
+})
+mut learning_rate := 0.001
+for validation_loss in [0.8, 0.7, 0.71, 0.73, 0.74] {
+	learning_rate = plateau.step(learning_rate, validation_loss)
+}
+```
 
 ```v ignore
 mut one_cycle := optimizers.one_cycle_lr[f32](optimizers.OneCycleLRConfig{
