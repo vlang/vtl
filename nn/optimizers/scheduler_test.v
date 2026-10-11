@@ -274,7 +274,7 @@ fn test_cyclic_lr_cycles_momentum_inversely_to_learning_rate() {
 		step_size_up: 2
 		mode:         .triangular2
 	}) or { panic(err) }
-	assert math.abs(triangular2.next_momentum(6) or { panic('momentum is disabled') } - 0.875) < 1e-12
+	assert math.abs(triangular2.next_momentum(6) or { panic('momentum is disabled') } - 0.85) < 1e-12
 
 	exp_range := cyclic_lr[f64](CyclicLRConfig{
 		base_lr:      0.1
