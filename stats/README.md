@@ -70,6 +70,14 @@ normalize the in-range samples so density times bin area sums to one;
 `histogram2d_weighted` and `histogram2d_weighted_edges` also support numeric
 weights and weighted density.
 
+`histogramdd(sample, bins)` accepts a `[samples, dimensions]` tensor and a bin
+count per dimension. `histogramdd_edges` accepts explicit increasing edge
+vectors for each dimension. Weighted variants return weighted counts or, with
+`density: true`, normalize by the total in-range weight and full N-dimensional
+bin volumes. Points outside any axis range are excluded. All variants include
+the right edge of each axis's final bin, and results use row-major bin order.
+See the [N-dimensional histogram example](../examples/histogramdd).
+
 `bincount(input, minlength)` counts non-negative integer labels in a vector;
 `bincount_weighted(input, weights, minlength)` sums numeric weights for each
 label. Both return vectors sized to at least `minlength`.

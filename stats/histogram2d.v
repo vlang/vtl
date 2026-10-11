@@ -53,8 +53,8 @@ pub fn histogram2d_edges[X, Y](x &vtl.Tensor[X], y &vtl.Tensor[Y], x_edges []f64
 			|| y_value > y_edges[y_bins] {
 			continue
 		}
-		x_bin := histogram2d_find_bin(x_value, x_edges, x_bins, x_width)
-		y_bin := histogram2d_find_bin(y_value, y_edges, y_bins, y_width)
+		x_bin := histogram_bin_with_uniform_width(x_value, x_edges, x_bins, x_width)
+		y_bin := histogram_bin_with_uniform_width(y_value, y_edges, y_bins, y_width)
 		counts[x_bin * y_bins + y_bin]++
 	}
 	return Histogram2D{
@@ -118,8 +118,8 @@ pub fn histogram2d_weighted_edges[X, Y, W](x &vtl.Tensor[X], y &vtl.Tensor[Y], w
 		if math.is_nan(weight) || math.is_inf(weight, 0) {
 			return error('histogram2d weights must be finite')
 		}
-		x_bin := histogram2d_find_bin(x_value, x_edges, x_bins, x_width)
-		y_bin := histogram2d_find_bin(y_value, y_edges, y_bins, y_width)
+		x_bin := histogram_bin_with_uniform_width(x_value, x_edges, x_bins, x_width)
+		y_bin := histogram_bin_with_uniform_width(y_value, y_edges, y_bins, y_width)
 		counts[x_bin * y_bins + y_bin] += weight
 	}
 	if density {
@@ -139,7 +139,7 @@ pub fn histogram2d_weighted_edges[X, Y, W](x &vtl.Tensor[X], y &vtl.Tensor[Y], w
 	}
 }
 
-fn histogram2d_find_bin(value f64, edges []f64, bins int, uniform_width f64) int {
+fn histogram_bin_with_uniform_width(value f64, edges []f64, bins int, uniform_width f64) int {
 	if uniform_width <= 0 {
 		return histogram_bin(value, edges, bins)
 	}

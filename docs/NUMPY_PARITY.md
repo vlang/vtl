@@ -196,9 +196,14 @@ estimator, alongside forms that expose all thirteen estimator methods;
 multi-quantile multi-axis forms can also retain reduced dimensions with
 `keepdims`; single-axis multi-quantile forms provide the same retained-shape
 behavior;
-one- and two-dimensional histograms with automatic and custom bins, weighted
-counts and densities, and multiple one-dimensional bin-selection rules;
+one- through N-dimensional histograms with inferred and custom edges, weighted
+counts, densities normalized by each bin's volume, and multiple one-dimensional
+bin-selection rules;
 integer/weighted `bincount`.
+
+`histogramdd` matches sample and bin ordering and density normalization for the
+covered `(N, D)` tensor API. Unweighted VTL counts use `int` storage, while
+NumPy returns `float64`; this output-dtype difference remains explicit.
 
 **Current:** explicit accumulator/output dtypes are available for global,
 single-axis, and multi-axis sum and product reductions. Cumulative sum and
