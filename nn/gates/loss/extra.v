@@ -7,6 +7,7 @@ import vtl.nn.internal
 // BCEGate defines a public data structure for this module.
 pub struct BCEGate[T] {
 pub:
+	input       &vtl.Tensor[T] = unsafe { nil }
 	target      &vtl.Tensor[T] = unsafe { nil }
 	from_logits bool
 }
@@ -14,6 +15,7 @@ pub:
 // bce_gate exposes this operation as part of the public API.
 pub fn bce_gate[T](input &vtl.Tensor[T], target &vtl.Tensor[T], from_logits bool) &BCEGate[T] {
 	return &BCEGate[T]{
+		input:       input
 		target:      target
 		from_logits: from_logits
 	}
@@ -22,7 +24,7 @@ pub fn bce_gate[T](input &vtl.Tensor[T], target &vtl.Tensor[T], from_logits bool
 // backward exposes this operation as part of the public API.
 pub fn (g &BCEGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
-	r0 := internal.bce_backward[T](gradient, payload.variable.value, g.target, g.from_logits)!
+	r0 := internal.bce_backward[T](gradient, g.input, g.target, g.from_logits)!
 	return [r0]
 }
 

@@ -110,32 +110,29 @@ pub fn bce[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	return vtl.from_1d([sum / vtl.cast[T](size)])
 }
 
-// bce_backward computes the gradient of BCE w.r.t. the raw logits (before sigmoid).
-// If from_logits=true, the upstream gradient is multiplied by the sigmoid derivative.
+// bce_backward computes the gradient of mean BCE w.r.t. its input.
+// Logit inputs use the simplified sigmoid(logit) - target derivative; probability
+// inputs use the BCELoss derivative with PyTorch's denominator floor.
 pub fn bce_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], target &vtl.Tensor[T], from_logits bool) !&vtl.Tensor[T] {
-	batch_size := input.shape[0]
+	input_size := input.size()
 	upstream := f64(gradient.get([0]))
-
-	// Compute sigmoid of input
-	mut sigmoid_vals := []f64{len: input.size()}
-	for i in 0 .. input.size() {
+	mut ret_data := []T{len: input_size}
+	for i in 0 .. input_size {
 		x := f64(input.get_nth(i))
-		sigmoid_vals[i] = 1.0 / (1.0 + math.exp(-x))
-	}
-
-	mut ret_data := []f64{len: input.size()}
-	for i in 0 .. input.size() {
-		p := sigmoid_vals[i]
 		t := f64(target.get_nth(i))
-		mut grad := (p - t) / vtl.cast[T](batch_size)
+		mut grad := 0.0
 		if from_logits {
-			grad = grad * vtl.cast[T](p * (1.0 - p))
+			p := 1.0 / (1.0 + math.exp(-x))
+			grad = (p - t) / f64(input_size)
+		} else {
+			denominator := math.max(x * (1.0 - x), 1e-12)
+			grad = ((x - t) / denominator) / f64(input_size)
 		}
-		ret_data[i] = upstream * vtl.cast[f64](grad)
+		ret_data[i] = vtl.cast[T](upstream * grad)
 	}
 
 	ret_shape := input.shape.clone()
-	ret := vtl.from_array(ret_data.map(vtl.cast[T](it)), ret_shape)!
+	ret := vtl.from_array(ret_data, ret_shape)!
 	return ret
 }
 
