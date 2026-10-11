@@ -398,6 +398,29 @@ pub fn (v &Variable[T]) transpose_op(perm []int) !&Variable[T] {
 	return result
 }
 
+// roll circularly shifts values, flattening by default like NumPy. Optional
+// axes apply the same shift to each selected axis and preserve autograd.
+pub fn (v &Variable[T]) roll(shift int, axes ...int) !&Variable[T] {
+	value := vtl.roll[T](v.value, shift, ...axes)!
+	mut result := v.context.variable(value)
+	if v.requires_grad {
+		gate := roll_gate[T](v.value, shift, axes)!
+		gate.cache(mut result, v)!
+	}
+	return result
+}
+
+// roll_shifts applies paired shifts and axes while preserving autograd.
+pub fn (v &Variable[T]) roll_shifts(shifts []int, axes []int) !&Variable[T] {
+	value := vtl.roll_shifts[T](v.value, shifts, axes)!
+	mut result := v.context.variable(value)
+	if v.requires_grad {
+		gate := roll_shifts_gate[T](v.value, shifts, axes)!
+		gate.cache(mut result, v)!
+	}
+	return result
+}
+
 // concatenate joins variables along an existing axis and routes gradients back
 // to each input. All variables must have compatible shapes and share a context.
 pub fn concatenate[T](variables []&Variable[T], data vtl.AxisData) !&Variable[T] {

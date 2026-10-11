@@ -15,6 +15,9 @@ FFT, and VSL-backed linear algebra. See the [NumPy parity tracker](./NUMPY_PARIT
 
 `Tensor.masked_scatter` and `Variable.masked_scatter` support broadcastable
 masks, sequential source consumption, and autograd for selected source values.
+`vtl.roll` matches circular flattened and axis-wise shifts;
+`Variable.roll` and `Variable.roll_shifts` propagate gradients with inverse
+shifts.
 
 **Next:** Audit operator coverage and semantics against `torch.Tensor`, including
 dtype promotion, scalar behavior, strides, views, in-place operations, and error

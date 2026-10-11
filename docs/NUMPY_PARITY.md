@@ -37,8 +37,10 @@ appending a class dimension and validating class bounds.
 
 **Current:** reshape, transpose, squeeze/expand, move/roll axes, N-D
 `diagonal` views over two selected axes with NumPy-style offset and output
-shape, concatenate/stack/split, `ravel`, copying `flatten`, `flip`, `repeat`,
-`repeat_axis`, block `tile`, `rot90`, constant/edge/wrap/reflect/symmetric
+shape, concatenate/stack/split, `ravel`, copying `flatten`, `flip`, circular
+`roll` with NumPy's flattened default, scalar shifts over one or multiple axes,
+paired shifts per axis, `repeat`, `repeat_axis`, block `tile`, `rot90`,
+constant/edge/wrap/reflect/symmetric
 padding, and stable axis-wise `sort`/`argsort`.
 `reshape` follows row-major logical order, shares storage for row-major
 contiguous input, and copies when another layout cannot be reshaped as that
@@ -99,7 +101,9 @@ positions and to update values selected by each true destination's flat index.
 for true destinations, and routes gradients to the input and consumed source
 prefix.
 `Variable.slice` and `Variable.slice_hilo` propagate gradients through integer
-indices, range views, and positive steps.
+indices, range views, and positive steps. `Variable.roll` and
+`Variable.roll_shifts` support flattened and axis-wise circular shifts and
+apply the inverse shifts during backward.
 `Variable.sum` and `Variable.mean` reduce all elements to a one-element tensor
 and propagate gradients to every input element. Their `*_along_axis` variants
 support one-axis sum and mean, with either squeezed or retained dimensions.

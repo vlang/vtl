@@ -374,6 +374,112 @@ pub fn (g &TransposeGate[T]) cache(mut result Variable[T], args ...CacheParam) !
 	}
 }
 
+// RollGate stores the inverse permutation needed by the roll backward pass.
+pub struct RollGate[T] {
+pub:
+	flat        bool
+	flat_shift  int
+	axes        []int
+	axis_shifts []int
+}
+
+// roll_gate creates the inverse shift for a flattened or axis-wise roll.
+pub fn roll_gate[T](input &vtl.Tensor[T], shift int, axes []int) !&RollGate[T] {
+	if axes.len == 0 {
+		mut inverse_shift := 0
+		if input.size > 0 {
+			mut forward_shift := shift % input.size
+			if forward_shift < 0 {
+				forward_shift += input.size
+			}
+			if forward_shift != 0 {
+				inverse_shift = input.size - forward_shift
+			}
+		}
+		return &RollGate[T]{
+			flat:       true
+			flat_shift: inverse_shift
+		}
+	}
+	shifts := []int{len: axes.len, init: shift}
+	return roll_shifts_gate[T](input, shifts, axes)
+}
+
+// roll_shifts_gate creates inverse shifts for paired axes and shift values.
+pub fn roll_shifts_gate[T](input &vtl.Tensor[T], shifts []int, axes []int) !&RollGate[T] {
+	if shifts.len != axes.len {
+		return error('roll_shifts: shifts and axes must have the same length')
+	}
+	rank := input.rank()
+	mut forward_shifts := []int{len: rank}
+	mut selected_axes := []bool{len: rank}
+	for i, axis in axes {
+		normalized_axis := if axis < 0 { axis + rank } else { axis }
+		if normalized_axis < 0 || normalized_axis >= rank {
+			return error('roll: axis ${axis} out of bounds for tensor with ${rank} dimensions')
+		}
+		dimension := input.shape[normalized_axis]
+		if dimension == 0 {
+			selected_axes[normalized_axis] = true
+			continue
+		}
+		mut normalized_shift := shifts[i] % dimension
+		if normalized_shift < 0 {
+			normalized_shift += dimension
+		}
+		combined := forward_shifts[normalized_axis] + normalized_shift
+		forward_shifts[normalized_axis] = if combined >= dimension {
+			combined - dimension
+		} else {
+			combined
+		}
+		selected_axes[normalized_axis] = true
+	}
+	mut unique_axes := []int{cap: axes.len}
+	mut inverse_shifts := []int{cap: axes.len}
+	for axis in 0 .. rank {
+		if selected_axes[axis] {
+			unique_axes << axis
+			forward_shift := forward_shifts[axis]
+			inverse_shifts << if forward_shift == 0 { 0 } else { input.shape[axis] - forward_shift }
+		}
+	}
+	return &RollGate[T]{
+		axes:        unique_axes
+		axis_shifts: inverse_shifts
+	}
+}
+
+// backward rolls the output gradient by the inverse of the forward shift.
+pub fn (g &RollGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
+	gradient := payload.variable.grad
+	input_gradient := if g.flat {
+		vtl.roll_flat[T](gradient, g.flat_shift)!
+	} else {
+		vtl.roll_shifts[T](gradient, g.axis_shifts, g.axes)!
+	}
+	return [input_gradient]
+}
+
+fn roll_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := unsafe { (&RollGate[T](gate)).backward(typed_payload)! }
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
+// cache registers the input variable for roll backpropagation.
+pub fn (g &RollGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
+	a := args[0]
+	match a {
+		Variable[T] {
+			register[T]('Roll', voidptr(g), roll_gate_backward_dispatch[T], result, [a])!
+		}
+		else {
+			return error('RollGate: a must be a Variable')
+		}
+	}
+}
+
 // ConcatGate concatenates multiple tensors along an axis.
 // backward: split gradient back into original inputs
 pub struct ConcatGate[T] {

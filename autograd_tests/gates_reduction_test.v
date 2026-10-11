@@ -142,6 +142,39 @@ fn test_transpose_forward_backward() {
 	assert x.grad.shape == [2, 2]
 }
 
+fn test_roll_forward_backward_uses_inverse_axis_shift() ! {
+	mut context := autograd.ctx[f64]()
+	input := context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [2, 3])!)
+	weights := context.variable(vtl.from_array([0.5, 1.0, 2.0, 3.0, 4.0, 5.0], [2, 3])!)
+	rolled := input.roll(1, 1)!
+	mut loss := rolled.multiply(weights)!.sum()!
+	assert rolled.value.to_array() == [3.0, 1.0, 2.0, 6.0, 4.0, 5.0]
+	loss.backprop()!
+	assert input.grad.to_array() == [1.0, 2.0, 0.5, 4.0, 5.0, 3.0]
+}
+
+fn test_roll_flat_backward_handles_extreme_shift() ! {
+	mut context := autograd.ctx[f64]()
+	input := context.variable(vtl.from_1d([1.0, 2.0, 3.0])!)
+	weights := context.variable(vtl.from_1d([2.0, 3.0, 5.0])!)
+	rolled := input.roll(min_int)!
+	mut loss := rolled.multiply(weights)!.sum()!
+	loss.backprop()!
+	assert rolled.value.to_array() == [3.0, 1.0, 2.0]
+	assert input.grad.to_array() == [3.0, 5.0, 2.0]
+}
+
+fn test_roll_shifts_backward_matches_paired_inverse_shifts() ! {
+	mut context := autograd.ctx[f64]()
+	input := context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [2, 3])!)
+	weights := context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [2, 3])!)
+	rolled := input.roll_shifts([1, -1], [0, 1])!
+	mut loss := rolled.multiply(weights)!.sum()!
+	assert rolled.value.to_array() == [5.0, 6.0, 4.0, 2.0, 3.0, 1.0]
+	loss.backprop()!
+	assert input.grad.to_array() == [6.0, 4.0, 5.0, 3.0, 1.0, 2.0]
+}
+
 fn test_concat_gate_backward_splits_gradient() {
 	f64_ctx := autograd.ctx[f64]()
 	x := f64_ctx.variable(vtl.from_1d([1.0, 2.0])!)
