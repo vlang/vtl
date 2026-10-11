@@ -5,11 +5,13 @@ versions 1.0, 2.0, or 3.0. The reader handles C and Fortran order and converts
 big-endian data to VTL's logical row-major order.
 
 The file dtype must match the requested V type. Supported types are `bool`,
-`f32`, `f64`, signed `i8`/`i16`/`i32`/`i64`/`int`, and unsigned
-`u8`/`u16`/`u32`/`u64`. V's native `int` uses the current platform width.
-Object, string, structured, and complex dtypes are rejected.
+`f32`, `f64`, `math.complex.Complex` as NumPy `complex128`, signed
+`i8`/`i16`/`i32`/`i64`/`int`, and unsigned `u8`/`u16`/`u32`/`u64`. V's
+native `int` uses the current platform width. Object, string, and structured
+dtypes are rejected.
 
 ```v
+import math.complex as vcomplex
 import vtl
 import vtl.npy
 import os
@@ -23,6 +25,14 @@ npy.write(path, matrix)!
 loaded := npy.read[f64](path)!
 assert loaded.shape == [2, 2]
 assert loaded.to_array() == [1.0, 2.0, 3.0, 4.0]
+
+complex_values := vtl.from_1d[vcomplex.Complex]([
+	vcomplex.Complex{ re: 1.5, im: -2.25 },
+	vcomplex.Complex{ re: -3.0, im: 4.75 },
+])!
+npy.write(path, complex_values)!
+complex_loaded := npy.read[vcomplex.Complex](path)!
+assert complex_loaded.to_array() == complex_values.to_array()
 ```
 
 The `write` function emits `.npy` v1.0 with little-endian numeric data.
