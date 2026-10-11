@@ -90,6 +90,9 @@ jobs:
             echo '## Contiguous sum and mean'
             run_v_benchmark vtl-stats vtl/benchmarks/vs_numpy/stats_bench.v
             env HOME="$HOME" PATH="$PATH" VJOBS=2 OPENBLAS_NUM_THREADS=2 python3 vtl/benchmarks/vs_numpy/numpy_stats_baseline.py
+            echo '## Cumulative sum and product'
+            run_v_benchmark vtl-cumulative vtl/benchmarks/vs_numpy/cumulative_bench.v
+            env HOME="$HOME" PATH="$PATH" VJOBS=2 OPENBLAS_NUM_THREADS=2 python3 vtl/benchmarks/vs_numpy/numpy_cumulative_baseline.py
             echo '## Mixed-dtype integer remainder'
             run_v_benchmark vtl-promoted-remainder vtl/benchmarks/vs_numpy/promoted_remainder_bench.v
             env HOME="$HOME" PATH="$PATH" VJOBS=2 OPENBLAS_NUM_THREADS=2 python3 vtl/benchmarks/vs_numpy/numpy_promoted_remainder_baseline.py
