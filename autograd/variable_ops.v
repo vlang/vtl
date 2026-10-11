@@ -398,6 +398,28 @@ pub fn (v &Variable[T]) transpose_op(perm []int) !&Variable[T] {
 	return result
 }
 
+// rot90 rotates the first two dimensions counterclockwise and propagates
+// gradients through the inverse rotation.
+pub fn (v &Variable[T]) rot90() !&Variable[T] {
+	return v.rot90_axes(1, [0, 1])
+}
+
+// rot90_k rotates the first two dimensions counterclockwise by k quarter turns.
+pub fn (v &Variable[T]) rot90_k(k int) !&Variable[T] {
+	return v.rot90_axes(k, [0, 1])
+}
+
+// rot90_axes rotates in a selected plane and records its inverse for autograd.
+pub fn (v &Variable[T]) rot90_axes(k int, axes []int) !&Variable[T] {
+	value := vtl.rot90_axes[T](v.value, k, axes)!
+	mut result := v.context.variable(value)
+	if v.requires_grad {
+		gate := rot90_gate[T](v.value, k, axes)!
+		gate.cache(mut result, v)!
+	}
+	return result
+}
+
 // roll circularly shifts values, flattening by default like NumPy. Optional
 // axes apply the same shift to each selected axis and preserve autograd.
 pub fn (v &Variable[T]) roll(shift int, axes ...int) !&Variable[T] {

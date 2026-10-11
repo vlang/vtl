@@ -153,6 +153,29 @@ fn test_roll_forward_backward_uses_inverse_axis_shift() ! {
 	assert input.grad.to_array() == [1.0, 2.0, 0.5, 4.0, 5.0, 3.0]
 }
 
+fn test_rot90_forward_backward_uses_inverse_rotation() ! {
+	mut context := autograd.ctx[f64]()
+	input := context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [2, 3])!)
+	weights := context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [3, 2])!)
+	rotated := input.rot90()!
+	assert rotated.value.shape == [3, 2]
+	assert rotated.value.to_array() == [3.0, 6.0, 2.0, 5.0, 1.0, 4.0]
+	mut loss := rotated.multiply(weights)!.sum()!
+	loss.backprop()!
+	assert input.grad.to_array() == [5.0, 3.0, 1.0, 6.0, 4.0, 2.0]
+}
+
+fn test_rot90_axes_normalizes_negative_axes_and_turns() ! {
+	mut context := autograd.ctx[f64]()
+	input := context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [2, 3])!)
+	rotated := input.rot90_axes(-1, [-2, -1])!
+	assert rotated.value.shape == [3, 2]
+	assert rotated.value.to_array() == [4.0, 1.0, 5.0, 2.0, 6.0, 3.0]
+	mut loss := rotated.sum()!
+	loss.backprop()!
+	assert input.grad.to_array() == [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+}
+
 fn test_roll_flat_backward_handles_extreme_shift() ! {
 	mut context := autograd.ctx[f64]()
 	input := context.variable(vtl.from_1d([1.0, 2.0, 3.0])!)

@@ -17,7 +17,8 @@ FFT, and VSL-backed linear algebra. See the [NumPy parity tracker](./NUMPY_PARIT
 masks, sequential source consumption, and autograd for selected source values.
 `vtl.roll` matches circular flattened and axis-wise shifts;
 `Variable.roll` and `Variable.roll_shifts` propagate gradients with inverse
-shifts.
+shifts. `Variable.rot90`, `Variable.rot90_k`, and `Variable.rot90_axes` rotate
+tensor planes and propagate gradients through the inverse rotation.
 
 **Next:** Audit operator coverage and semantics against `torch.Tensor`, including
 dtype promotion, scalar behavior, strides, views, in-place operations, and error
