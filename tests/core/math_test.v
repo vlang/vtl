@@ -433,6 +433,39 @@ fn test_maximum_f64_handles_empty_contiguous_inputs() {
 	assert result.size == 0
 }
 
+fn test_elementwise_extrema_f32_preserve_nan_and_zero_rules() {
+	nan := f32(math.nan())
+	left := vtl.from_1d[f32]([nan, 1.0, nan, 0.0, -0.0])!
+	right := vtl.from_1d[f32]([2.0, nan, nan, -0.0, 0.0])!
+	maximum := left.max(right)!
+	minimum := left.min(right)!
+	fmaximum := left.fmax(right)!
+	fminimum := left.fmin(right)!
+
+	assert math.is_nan(f64(maximum.get_nth(0)))
+	assert math.is_nan(f64(maximum.get_nth(1)))
+	assert math.is_nan(f64(minimum.get_nth(2)))
+	assert fmaximum.get_nth(0) == f32(2.0)
+	assert fmaximum.get_nth(1) == f32(1.0)
+	assert fminimum.get_nth(0) == f32(2.0)
+	assert fminimum.get_nth(1) == f32(1.0)
+	assert math.is_nan(f64(fmaximum.get_nth(2)))
+	assert math.is_nan(f64(fminimum.get_nth(2)))
+	assert math.signbit(f64(maximum.get_nth(3)))
+	assert !math.signbit(f64(maximum.get_nth(4)))
+	assert math.signbit(f64(minimum.get_nth(3)))
+	assert !math.signbit(f64(minimum.get_nth(4)))
+	assert !math.signbit(f64(fmaximum.get_nth(3)))
+	assert !math.signbit(f64(fmaximum.get_nth(4)))
+	assert math.signbit(f64(fminimum.get_nth(3)))
+	assert math.signbit(f64(fminimum.get_nth(4)))
+	empty_left := vtl.from_array[f32]([], [0])!
+	empty_right := vtl.from_array[f32]([], [0])!
+	empty_maximum := empty_left.max(empty_right)!
+	assert empty_maximum.shape == [0]
+	assert empty_maximum.size == 0
+}
+
 fn test_elementwise_extrema_broadcast_views_and_boolean_values() {
 	values := vtl.from_2d([[1, 4], [3, 2]])!
 	transposed := values.transpose([1, 0])!
