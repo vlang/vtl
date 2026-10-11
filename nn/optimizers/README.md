@@ -58,8 +58,11 @@ bad epochs during `cooldown`. Reductions smaller than `epsilon` and NaN deltas
 leave the rate unchanged.
 
 `CyclicLR` provides triangular, triangular2, and exp_range amplitude policies
-with independently configurable rise and fall durations. Custom scale callbacks,
-momentum cycling, and parameter-group integration are not implemented.
+with independently configurable rise and fall durations. It also computes the
+inverse momentum curve through `next_momentum(step)` by default; set
+`cycle_momentum: false` to disable it. The returned momentum is a value for the
+caller to apply: optimizer mutation, parameter groups, and custom scale
+callbacks are not implemented.
 
 ## NAdam
 

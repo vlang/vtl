@@ -367,10 +367,14 @@ pub:
 	step_size_down int
 	mode           CyclicLRMode = .triangular
 	gamma          f64          = 1.0
+	cycle_momentum bool         = true
+	base_momentum  f64          = 0.8
+	max_momentum   f64          = 0.9
 }
 
 // CyclicLR cycles the learning rate between base_lr and max_lr. Momentum
-// cycling, parameter groups, and custom scale functions are not included.
+// can be queried as an inverse cycle with next_momentum. The scheduler does
+// not update optimizer state or support parameter groups and custom scales.
 pub struct CyclicLR[T] {
 	base_lr        f64
 	max_lr         f64
@@ -378,6 +382,9 @@ pub struct CyclicLR[T] {
 	step_size_down int
 	mode           CyclicLRMode
 	gamma          f64
+	cycle_momentum bool
+	base_momentum  f64
+	max_momentum   f64
 }
 
 // cyclic_lr creates a CyclicLR scheduler. A zero `step_size_down` uses the
@@ -392,6 +399,9 @@ pub fn cyclic_lr[T](config CyclicLRConfig) !&CyclicLR[T] {
 	if config.gamma <= 0.0 {
 		return error('gamma must be positive')
 	}
+	if config.base_momentum < 0.0 || config.max_momentum < config.base_momentum {
+		return error('momentum values must satisfy 0 <= base_momentum <= max_momentum')
+	}
 	return &CyclicLR[T]{
 		base_lr:        config.base_lr
 		max_lr:         config.max_lr
@@ -403,7 +413,34 @@ pub fn cyclic_lr[T](config CyclicLRConfig) !&CyclicLR[T] {
 		}
 		mode:           config.mode
 		gamma:          config.gamma
+		cycle_momentum: config.cycle_momentum
+		base_momentum:  config.base_momentum
+		max_momentum:   config.max_momentum
 	}
+}
+
+// next_momentum returns the inverse momentum curve for a zero-based minibatch
+// step. It returns none when momentum cycling is disabled. Apply the returned
+// value to an optimizer explicitly; this scheduler does not mutate optimizers.
+pub fn (s &CyclicLR[T]) next_momentum(step int) ?f64 {
+	if !s.cycle_momentum {
+		return none
+	}
+	clamped_step := if step < 0 { 0 } else { step }
+	period := s.step_size_up + s.step_size_down
+	cycle := clamped_step / period
+	step_in_cycle := clamped_step % period
+	pct := if step_in_cycle <= s.step_size_up {
+		f64(step_in_cycle) / f64(s.step_size_up)
+	} else {
+		1.0 - f64(step_in_cycle - s.step_size_up) / f64(s.step_size_down)
+	}
+	scale := match s.mode {
+		.triangular { 1.0 }
+		.triangular2 { math.pow(0.5, f64(cycle)) }
+		.exp_range { math.pow(s.gamma, f64(clamped_step)) }
+	}
+	return s.max_momentum - (s.max_momentum - s.base_momentum) * pct * scale
 }
 
 // next_lr returns the rate for a zero-based minibatch step. The input rate is
