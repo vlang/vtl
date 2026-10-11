@@ -230,6 +230,24 @@ fn test_put_with_mode_backward_uses_normalized_destinations() ! {
 	assert updates.grad.to_array() == [f32(5.0), 3.0]
 }
 
+fn test_putmask_backward_uses_flat_positions_and_snapshots_mask() ! {
+	mut ctx := autograd.ctx[f64]()
+	input := ctx.variable(vtl.from_1d([10.0, 20.0, 30.0, 40.0, 50.0])!)
+	updates := ctx.variable(vtl.from_1d([100.0, 200.0])!)
+	mut mask := vtl.from_1d([false, true, true, true, false])!
+	weights := ctx.variable(vtl.from_1d([1.0, 2.0, 3.0, 4.0, 5.0])!)
+
+	result := input.putmask(mask, updates)!
+	assert result.value.to_array() == [10.0, 200.0, 100.0, 200.0, 50.0]
+	assert input.value.to_array() == [10.0, 20.0, 30.0, 40.0, 50.0]
+	mask.fill(false)
+	mut objective := result.multiply(weights)!
+	objective.backprop()!
+
+	assert input.grad.to_array() == [1.0, 0.0, 0.0, 0.0, 5.0]
+	assert updates.grad.to_array() == [3.0, 6.0]
+}
+
 fn test_slice_backward_routes_gradient_to_integer_indexed_row() ! {
 	mut ctx := autograd.ctx[f64]()
 	input := ctx.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [3, 2])!)

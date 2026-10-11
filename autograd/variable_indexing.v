@@ -543,6 +543,58 @@ fn put_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
 	return tensor_ptrs_to_voidptrs[T](tensors)
 }
 
+// putmask writes values into a copy at true mask positions and propagates
+// gradients to untouched input positions and the repeated update values.
+pub fn (v &Variable[T]) putmask(mask &vtl.Tensor[bool], updates &Variable[T]) !&Variable[T] {
+	mut value := v.value.copy(.row_major)
+	value.putmask[T](mask, updates.value)!
+	needs_grad := v.requires_grad || updates.requires_grad
+	mut result := variable[T](v.context, value, requires_grad: needs_grad)
+	if needs_grad {
+		mut selected_flat_indices := []int{}
+		for flat_index in 0 .. mask.size {
+			if mask.get_nth[bool](flat_index) {
+				selected_flat_indices << flat_index
+			}
+		}
+		gate := &PutMaskGate[T]{
+			selected_flat_indices: selected_flat_indices
+			updates_shape:         updates.value.shape.clone()
+			update_size:           updates.value.size
+		}
+		register[T]('PutMask', voidptr(gate), putmask_backward_dispatch[T], result, [
+			v,
+			updates,
+		])!
+	}
+	return result
+}
+
+struct PutMaskGate[T] {
+	selected_flat_indices []int
+	updates_shape         []int
+	update_size           int
+}
+
+fn (g &PutMaskGate[T]) backward(gradient &vtl.Tensor[T]) ![]&vtl.Tensor[T] {
+	mut input_gradient := gradient.copy(.row_major)
+	mut update_gradient_values := []T{len: g.update_size}
+	for flat_index in g.selected_flat_indices {
+		input_gradient.set_nth[T](flat_index, vtl.cast[T](0))
+		update_position := flat_index % g.update_size
+		update_gradient_values[update_position] += gradient.get_nth[T](flat_index)
+	}
+	update_gradient := vtl.from_array[T](update_gradient_values, g.updates_shape)!
+	return [input_gradient, update_gradient]
+}
+
+fn putmask_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_gate := unsafe { &PutMaskGate[T](gate) }
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := typed_gate.backward(typed_payload.variable.grad)!
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 fn normalize_flat_put_index(selected int, size int, mode vtl.PutMode) !int {
 	if size == 0 {
 		return error('put cannot index an empty tensor')
