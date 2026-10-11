@@ -16,7 +16,7 @@ import vtl.nn.internal
 // Fields:
 //   - `weight`       — optional per-class weight tensor (`nil` = uniform weights)
 //   - `ignore_index` — class index to ignore in class-index targets (default: -1 = none)
-//   - `reduction`    — `'mean'` | `'sum'` (default: `'mean'`)
+//   - `reduction`    — `'none'` | `'mean'` | `'sum'` (default: `'mean'`)
 //
 // Example:
 // ```v
@@ -48,7 +48,8 @@ pub fn nll_loss[T](weight &vtl.Tensor[T]) types.Loss[T] {
 }
 
 // nll_loss_with_options creates an NLLLoss with a configurable ignore index and
-// scalar reduction (`mean` or `sum`). `ignore_index` applies to class-index targets.
+// scalar (`mean` or `sum`) or per-sample (`none`) reduction. `ignore_index`
+// applies to class-index targets.
 pub fn nll_loss_with_options[T](weight &vtl.Tensor[T], options NLLLossOptions) types.Loss[T] {
 	concrete := &NLLLoss[T]{
 		weight:       weight

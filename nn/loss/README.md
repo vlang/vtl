@@ -20,8 +20,8 @@ source files. In particular, binary cross entropy's `from_logits` setting and
 the expected representation for multiclass losses must match the model output.
 
 `nll_loss(weight)` uses mean reduction by default. Use `nll_loss_with_options`
-to select sum reduction or ignore a class-index target, while keeping the
-weight tensor optional:
+to select sum or per-sample reduction, or ignore a class-index target, while
+keeping the weight tensor optional:
 
 ```v ignore
 objective := loss.nll_loss_with_options[f32](class_weights,
@@ -30,10 +30,10 @@ objective := loss.nll_loss_with_options[f32](class_weights,
 )
 ```
 
-NLL `mean` reduction divides by the total target weight when class weights are
+NLL `none` reduction returns one loss per batch row. `mean` reduction divides
+by the total target weight when class weights are
 provided, and otherwise averages over non-ignored class-index targets. Matrix
 targets are an extra VTL extension; their weighted mean divides by batch size.
-The `none` reduction is not supported yet.
 
 ```v ignore
 import vtl.nn.loss
