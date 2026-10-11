@@ -38,9 +38,14 @@ bin placement or normalization.
 
 Sources: histogram2d_density_bench.v and
 numpy_histogram2d_density_baseline.py. From ~/.vmodules, compile the V
-benchmark with -prod first, then execute its binary separately. Run the NumPy
-baseline from the same directory with OPENBLAS_NUM_THREADS=2 and the offline
-NumPy environment used above.
+benchmark with -prod first, then execute its binary separately:
+
+```bash
+systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 v -no-parallel -cc gcc -prod -cflags "-march=native" -o /tmp/vtl-histogram2d-density-bench ./vtl/benchmarks/vs_numpy/histogram2d_density_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-histogram2d-density-bench
+systemd-run --user --scope -p MemoryMax=2G -p MemorySwapMax=0 -- env VJOBS=2 OPENBLAS_NUM_THREADS=2 uv run --offline --no-project --with numpy python ./vtl/benchmarks/vs_numpy/numpy_histogram2d_density_baseline.py
+```
+
 
 On this AMD Ryzen 9 5900X workstation, with V 0.5.2 81be246, GCC 16.2.1, and
 NumPy 2.5.4 (SciPy OpenBLAS 0.3.34.106.0), three interleaved process runs on
