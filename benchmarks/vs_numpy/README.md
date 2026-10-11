@@ -3,11 +3,11 @@
 ## Elementwise extrema
 
 This paired microbenchmark compares elementwise `maximum` on deterministic
-1,048,576-element `f64` inputs. Both sides perform two warmups and seven timed
-calls, allocate the result inside each timed call, and report a checksum. VTL
-uses its contiguous pairwise fast path; broadcast and strided tensors use the
-stride-aware fallback. Compile the V benchmark with `-prod` before running its
-binary, from `~/.vmodules`:
+1,048,576-element `f32` and `f64` inputs. Each dtype uses two warmups and seven
+timed calls per process; both sides allocate the result inside each timed call
+and report a checksum. VTL uses its contiguous pairwise path; broadcast and
+strided tensors use the stride-aware fallback. Compile the V benchmark with
+`-prod` before running its binary, from `~/.vmodules`:
 
 ```bash
 systemd-run --user --scope --quiet -p MemoryMax=3G -p MemorySwapMax=0 -- env VJOBS=2 \
@@ -79,6 +79,12 @@ output path, and 0.618 ms for NumPy. The allocation change improved VTL by
 1.63× (39%); NumPy remained 2.53× faster. Checksums matched at 169131123.
 These results apply only to this isolated contiguous f64 maximum workload and
 do not establish framework-wide performance parity.
+
+For the same host and ten interleaved `-prod -march=native` runs, median means
+for the contiguous f32 workload were 1.295 ms for the previous VTL path,
+0.837 ms for the uninitialized-output path, and 0.258 ms for NumPy. VTL improved
+by 1.55× (35%); NumPy remained 3.24× faster. Checksums matched at 169131123.
+This result applies only to the measured f32 workload.
 
 ## Mixed-dtype integer remainder
 

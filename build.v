@@ -64,22 +64,27 @@ pub fn tensor[T](init T, shape []int, params TensorData) &Tensor[T] {
 	}
 }
 
-// empty_uninitialized_f64 allocates writable f64 storage without clearing it.
+// empty_uninitialized_float allocates writable f32/f64 storage without clearing it.
 // Callers must initialize every element before exposing or reading the tensor.
-fn empty_uninitialized_f64(shape []int, params TensorData) &Tensor[f64] {
-	size := size_from_shape(shape)
-	mut values := []f64{cap: size}
-	unsafe {
-		values.len = size
-	}
-	return &Tensor[f64]{
-		shape:   shape.clone()
-		strides: strides_from_shape(shape, params.memory)
-		memory:  params.memory
-		size:    size
-		data:    &storage.CpuStorage[f64]{
-			data: values
+
+fn empty_uninitialized_float[T](shape []int, params TensorData) &Tensor[T] {
+	$if T is f32 || T is f64 {
+		size := size_from_shape(shape)
+		mut values := []T{cap: size}
+		unsafe {
+			values.len = size
 		}
+		return &Tensor[T]{
+			shape:   shape.clone()
+			strides: strides_from_shape(shape, params.memory)
+			memory:  params.memory
+			size:    size
+			data:    &storage.CpuStorage[T]{
+				data: values
+			}
+		}
+	} $else {
+		panic('empty_uninitialized_float supports only f32 and f64')
 	}
 }
 
