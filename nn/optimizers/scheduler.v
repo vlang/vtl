@@ -465,14 +465,30 @@ pub fn (s &CyclicLR[T]) next_lr(_ f64, step int) f64 {
 }
 
 // ReduceLROnPlateau reduces LR when a metric has stopped improving.
+pub enum ReduceLROnPlateauMode {
+	min
+	max
+}
+
+pub enum ReduceLROnPlateauThresholdMode {
+	rel
+	abs
+}
+
 pub struct ReduceLROnPlateau[T] {
-	factor    f64
-	patience  int
-	threshold f64
-	epsilon   f64
-	cooldown  int
+	factor         f64
+	patience       int
+	threshold      f64
+	epsilon        f64
+	cooldown       int
+	mode           ReduceLROnPlateauMode
+	threshold_mode ReduceLROnPlateauThresholdMode
+	min_lr         f64
 mut:
-	cooldown_remaining int
+	cooldown_remaining      int
+	step_cooldown_remaining int
+	step_bad_epochs         int
+	step_best               f64
 pub mut:
 	wait       int
 	current_lr f64
@@ -484,30 +500,95 @@ pub mut:
 @[params]
 pub struct ReduceLROnPlateauConfig {
 pub:
-	factor    f64 = 0.1
-	patience  int = 10
-	threshold f64 = 1e-4
-	epsilon   f64 = 1e-8
-	cooldown  int
+	factor         f64 = 0.1
+	patience       int = 10
+	threshold      f64 = 1e-4
+	threshold_mode ReduceLROnPlateauThresholdMode = .rel
+	mode           ReduceLROnPlateauMode          = .min
+	epsilon        f64 = 1e-8
+	cooldown       int
+	min_lr         f64
 }
 
 // reduce_lr_on_plateau creates a ReduceLROnPlateau scheduler.
-// Reduces LR by `factor` when the monitored metric stops improving for `patience` steps.
-// Pass `metric_delta` to `next_lr` each step: a negative delta below
-// `-threshold` means improvement; other finite deltas count toward patience.
+// Use `step` with the monitored metric for PyTorch-style behavior. `next_lr`
+// remains available for callers that already provide a per-step metric delta.
 pub fn reduce_lr_on_plateau[T](config ReduceLROnPlateauConfig) &ReduceLROnPlateau[T] {
+	return try_reduce_lr_on_plateau[T](config) or { panic(err) }
+}
+
+// try_reduce_lr_on_plateau validates the configuration and creates a scheduler.
+pub fn try_reduce_lr_on_plateau[T](config ReduceLROnPlateauConfig) !&ReduceLROnPlateau[T] {
+	if config.factor <= 0.0 || config.factor >= 1.0 {
+		return error('factor must be greater than 0 and less than 1')
+	}
+	if config.patience < 0 || config.cooldown < 0 || config.threshold < 0.0
+		|| config.epsilon < 0.0 || config.min_lr < 0.0 {
+		return error('patience, cooldown, threshold, epsilon, and min_lr cannot be negative')
+	}
 	return &ReduceLROnPlateau[T]{
-		factor:             config.factor
-		patience:           config.patience
-		threshold:          config.threshold
-		epsilon:            config.epsilon
-		cooldown:           config.cooldown
-		wait:               0
-		cooldown_remaining: 0
+		factor:                  config.factor
+		patience:                config.patience
+		threshold:               config.threshold
+		epsilon:                 config.epsilon
+		cooldown:                config.cooldown
+		mode:                    config.mode
+		threshold_mode:          config.threshold_mode
+		min_lr:                  config.min_lr
+		step_best:               if config.mode == .min { math.inf(1) } else { math.inf(-1) }
+		wait:                    0
+		step_bad_epochs:         0
+		cooldown_remaining:      0
+		step_cooldown_remaining: 0
 	}
 }
 
-// next_lr exposes this operation as part of the public API.
+// step consumes a monitored metric and returns the PyTorch-style updated rate.
+// A metric must beat the absolute or relative threshold to reset patience.
+pub fn (mut s ReduceLROnPlateau[T]) step(current_lr f64, metric f64) f64 {
+	s.current_lr = current_lr
+	if s.metric_is_better(metric) {
+		s.step_best = metric
+		s.step_bad_epochs = 0
+	} else {
+		s.step_bad_epochs++
+	}
+	if s.step_cooldown_remaining > 0 {
+		s.step_cooldown_remaining--
+		s.step_bad_epochs = 0
+	}
+	if s.step_bad_epochs <= s.patience {
+		return current_lr
+	}
+	s.step_bad_epochs = 0
+	new_lr := math.max(current_lr * s.factor, s.min_lr)
+	if current_lr - new_lr > s.epsilon {
+		s.step_cooldown_remaining = s.cooldown
+		s.current_lr = new_lr
+		return new_lr
+	}
+	return current_lr
+}
+
+fn (s &ReduceLROnPlateau[T]) metric_is_better(metric f64) bool {
+	if s.mode == .min {
+		threshold := if s.threshold_mode == .rel {
+			s.step_best * (1.0 - s.threshold)
+		} else {
+			s.step_best - s.threshold
+		}
+		return metric < threshold
+	}
+	threshold := if s.threshold_mode == .rel {
+		s.step_best * (1.0 + s.threshold)
+	} else {
+		s.step_best + s.threshold
+	}
+	return metric > threshold
+}
+
+// next_lr preserves the original delta-based API. A negative delta beyond
+// `-threshold` means improvement; other finite deltas count toward patience.
 pub fn (mut s ReduceLROnPlateau[T]) next_lr(current_lr f64, _ int, metric_delta f64) f64 {
 	s.current_lr = current_lr
 	if math.is_nan(metric_delta) {

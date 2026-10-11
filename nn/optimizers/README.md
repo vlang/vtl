@@ -51,11 +51,12 @@ annealing and an optional three-phase curve. It computes learning rates only;
 cycling optimizer momentum and parameter groups are not implemented. Its
 constructor returns an error for negative `max_lr`, nonpositive `total_steps`
 or division factors, and `pct_start` outside `(0, 1)`.
-`ReduceLROnPlateau` accepts a metric delta: a negative delta beyond `threshold`
-is an improvement; zero or a positive delta counts toward `patience`. It
-reduces the rate only after the configured patience is exceeded, then ignores
-bad epochs during `cooldown`. Reductions smaller than `epsilon` and NaN deltas
-leave the rate unchanged.
+`ReduceLROnPlateau.step(current_lr, metric)` consumes the monitored value and
+tracks the best metric, with `min` or `max` mode and absolute or relative
+thresholds. It supports `patience`, `cooldown`, `min_lr`, and `epsilon` and
+returns the rate for the caller to apply. `try_reduce_lr_on_plateau` reports
+invalid configuration; the original `next_lr(current_lr, step, metric_delta)`
+remains available for callers that already calculate metric deltas.
 
 `CyclicLR` provides triangular, triangular2, and exp_range amplitude policies
 with independently configurable rise and fall durations. It also computes the

@@ -100,6 +100,76 @@ fn test_reduce_lr_on_plateau_respects_epsilon_and_nan_delta() {
 	assert scheduler.next_lr(1e-9, 1, math.nan()) == 1e-9
 }
 
+fn test_reduce_lr_on_plateau_step_matches_min_relative_threshold() {
+	mut scheduler := reduce_lr_on_plateau[f64](ReduceLROnPlateauConfig{
+		factor:    0.5
+		patience:  0
+		threshold: 0.01
+		epsilon:   0
+	})
+	assert scheduler.step(1.0, 1.0) == 1.0
+	// A 0.9% improvement does not meet the 1% relative threshold.
+	assert scheduler.step(1.0, 0.991) == 0.5
+	// The metric beats the best value by more than the configured threshold.
+	assert scheduler.step(0.5, 0.98) == 0.5
+	assert scheduler.step(0.5, 0.98) == 0.25
+}
+
+fn test_reduce_lr_on_plateau_step_supports_max_absolute_threshold() {
+	mut scheduler := reduce_lr_on_plateau[f64](ReduceLROnPlateauConfig{
+		factor:         0.5
+		patience:       0
+		threshold:      0.05
+		threshold_mode: .abs
+		mode:           .max
+		epsilon:        0
+	})
+	assert scheduler.step(1.0, 0.5) == 1.0
+	// Equality with the absolute threshold is not an improvement.
+	assert scheduler.step(1.0, 0.55) == 0.5
+	assert scheduler.step(0.5, 0.56) == 0.5
+}
+
+fn test_reduce_lr_on_plateau_step_honors_min_lr_and_cooldown() {
+	mut scheduler := reduce_lr_on_plateau[f64](ReduceLROnPlateauConfig{
+		factor:   0.5
+		patience: 0
+		cooldown: 2
+		min_lr:   0.25
+		epsilon:  0
+	})
+	assert scheduler.step(1.0, 1.0) == 1.0
+	assert scheduler.step(1.0, 1.0) == 0.5
+	assert scheduler.step(0.5, 2.0) == 0.5
+	assert scheduler.step(0.5, 2.0) == 0.5
+	assert scheduler.step(0.5, 2.0) == 0.25
+	assert scheduler.step(0.25, 2.0) == 0.25
+}
+
+fn test_reduce_lr_on_plateau_step_uses_patience_and_counts_nan_as_bad() {
+	mut scheduler := reduce_lr_on_plateau[f64](ReduceLROnPlateauConfig{
+		factor:   0.5
+		patience: 1
+		epsilon:  0
+	})
+	assert scheduler.step(1.0, 2.0) == 1.0
+	assert scheduler.step(1.0, 2.1) == 1.0
+	assert scheduler.step(1.0, math.nan()) == 0.5
+}
+
+fn test_try_reduce_lr_on_plateau_rejects_invalid_config() {
+	assert try_reduce_lr_on_plateau_error_for_factor_one()
+}
+
+fn try_reduce_lr_on_plateau_error_for_factor_one() bool {
+	_ := try_reduce_lr_on_plateau[f64](ReduceLROnPlateauConfig{
+		factor: 1.0
+	}) or {
+		return err.msg() == 'factor must be greater than 0 and less than 1'
+	}
+	return false
+}
+
 fn test_linear_lr_interpolates_and_saturates() {
 	scheduler := linear_lr[f64](0.25, 1.0, 4)
 	assert scheduler.next_lr(0.8, 0) == 0.2
