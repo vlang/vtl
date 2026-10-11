@@ -5,7 +5,8 @@ import vtl.la
 
 // linear_forward_f64_cpu is the CPU path for f64 linear forward (no autograd_cuda import).
 fn linear_forward_f64_cpu(input &vtl.Tensor[f64], weights &vtl.Tensor[f64], bias &vtl.Tensor[f64]) !&vtl.Tensor[f64] {
-	return la.matmul[f64](input, weights.t()!)!.add[f64](bias)!
+	mut output := la.matmul[f64](input, weights.t()!)!
+	return linear_add_bias[f64](mut output, bias)
 }
 
 // linear_forward_f64 may use CUDA when enabled at runtime (`VTL_USE_CUDA=1`, `-d cuda`).
