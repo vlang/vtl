@@ -8,6 +8,11 @@ pub interface Sampler {
 	sample_indices(dataset_size int) ![]int
 }
 
+// BatchSampler produces explicit batches of sample indices.
+pub interface BatchSampler {
+	sample_batches(dataset_size int) ![][]int
+}
+
 // SequentialSampler returns every dataset index in order.
 pub struct SequentialSampler {}
 
@@ -158,4 +163,41 @@ pub fn (s &WeightedRandomSampler) sample_indices(dataset_size int) ![]int {
 		}
 	}
 	return result
+}
+
+// FixedBatchSampler groups another sampler's indices into fixed-size batches.
+pub struct FixedBatchSampler {
+	sampler    Sampler
+	batch_size int
+	drop_last  bool
+}
+
+// FixedBatchSampler.new creates a fixed-size batch sampler.
+pub fn FixedBatchSampler.new(sampler Sampler, batch_size int, drop_last bool) !&FixedBatchSampler {
+	if batch_size <= 0 {
+		return error('batch_size must be positive')
+	}
+	return &FixedBatchSampler{
+		sampler:    sampler
+		batch_size: batch_size
+		drop_last:  drop_last
+	}
+}
+
+// sample_batches asks the underlying sampler for indices and groups them.
+pub fn (s &FixedBatchSampler) sample_batches(dataset_size int) ![][]int {
+	indices := s.sampler.sample_indices(dataset_size)!
+	mut batches := [][]int{cap: if s.drop_last {
+		indices.len / s.batch_size
+	} else {
+		(indices.len + s.batch_size - 1) / s.batch_size
+	}}
+	for start := 0; start < indices.len; start += s.batch_size {
+		end := math.min(start + s.batch_size, indices.len)
+		if s.drop_last && end - start < s.batch_size {
+			break
+		}
+		batches << indices[start..end].clone()
+	}
+	return batches
 }

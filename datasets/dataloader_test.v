@@ -171,3 +171,43 @@ fn test_weighted_sampler_drives_tensor_batches() ! {
 	_, batch_labels := loader.batch_with_labels(0) or { panic('expected labeled batch') }
 	assert batch_labels.to_array() == [11.0, 11, 11, 11, 11]
 }
+
+fn test_batch_sampler_controls_batch_boundaries() ! {
+	dataset := vtl.from_2d([[0.0], [1], [2], [3]])!
+	labels := vtl.from_1d([10.0, 11, 12, 13])!
+	sequential_sampler := nn_data.Sampler(&nn_data.SequentialSampler{})
+	sampler := nn_data.FixedBatchSampler.new(sequential_sampler, 3, false)!
+	loader := new_data_loader_with_labels_and_batch_sampler_checked[f64](dataset, labels,
+		DataLoaderConfig{
+			batch_size: 99
+			shuffle:    false
+			drop_last:  false
+		}, sampler)!
+	assert loader.len() == 2
+	first_batch := loader.batch(0) or { panic('expected first explicit batch') }
+	last_batch := loader.batch(1) or { panic('expected final explicit batch') }
+	assert first_batch.shape == [3, 1]
+	assert last_batch.to_array() == [3.0]
+	_, first_batch_labels := loader.batch_with_labels(0) or {
+		panic('expected labeled explicit batch')
+	}
+	assert first_batch_labels.to_array() == [10.0, 11, 12]
+}
+
+fn test_batch_sampler_drop_last_and_validation() ! {
+	dataset := vtl.from_1d([0.0, 1, 2, 3, 4])!
+	sequential_sampler := nn_data.Sampler(&nn_data.SequentialSampler{})
+	sampler := nn_data.FixedBatchSampler.new(sequential_sampler, 2, true)!
+	loader := new_data_loader_with_batch_sampler_checked[f64](dataset, DataLoaderConfig{
+		batch_size: 1
+		shuffle:    false
+		drop_last:  false
+	}, sampler)!
+	assert loader.len() == 2
+	assert loader.total_samples() == 4
+	nn_data.FixedBatchSampler.new(sequential_sampler, 0, false) or {
+		assert err.msg().contains('batch_size')
+		return
+	}
+	assert false, 'non-positive batch size must fail'
+}
