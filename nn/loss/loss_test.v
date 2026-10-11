@@ -156,6 +156,16 @@ fn test_bce_loss_probability_backward_matches_mean_bce() ! {
 	assert math.abs(pred.grad.get_nth(1) - 2.0) < 1e-12
 }
 
+fn test_sigmoid_cross_entropy_loss_backward_matches_batch_mean() ! {
+	c := ctx[f64]()
+	pred := variable[f64](c, [0.0, math.log(3.0)], [2, 1])!
+	target := tensor[f64]([1.0, 0.0], [2])!
+	mut result := sigmoid_cross_entropy_loss[f64]().loss(pred, target)!
+	result.backprop()!
+	assert math.abs(pred.grad.get_nth(0) + 0.25) < 1e-12
+	assert math.abs(pred.grad.get_nth(1) - 0.375) < 1e-12
+}
+
 fn test_bce_loss_clamps_logarithms_at_minus_100() ! {
 	c := ctx[f64]()
 	pred := variable[f64](c, [0.0, 1.0], [2])!
