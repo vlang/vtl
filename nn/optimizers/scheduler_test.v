@@ -28,6 +28,52 @@ fn test_reduce_lr_on_plateau_waits_for_patience_and_ignores_improvements() {
 	assert scheduler.wait == 0
 }
 
+fn test_multi_step_lr_decays_at_sorted_milestones() {
+	scheduler := multi_step_lr[f64](MultiStepLRConfig{
+		milestones: [2, 4, 4]
+		gamma:      0.5
+	}) or { panic(err) }
+	assert scheduler.next_lr(1.0, 0) == 1.0
+	assert scheduler.next_lr(1.0, 2) == 0.5
+	assert scheduler.next_lr(1.0, 4) == 0.125
+}
+
+fn test_multi_step_lr_rejects_unsorted_milestones() {
+	assert multi_step_lr_error_for_unsorted_milestones()
+}
+
+fn multi_step_lr_error_for_unsorted_milestones() bool {
+	_ := multi_step_lr[f64](MultiStepLRConfig{
+		milestones: [3, 2]
+	}) or {
+		return err.msg() == 'milestones must be non-negative and increasing'
+	}
+	return false
+}
+
+fn test_polynomial_lr_decays_to_zero_and_clamps() {
+	scheduler := polynomial_lr[f64](PolynomialLRConfig{
+		total_iters: 4
+		power:       2.0
+	}) or { panic(err) }
+	assert scheduler.next_lr(0.8, 0) == 0.8
+	assert scheduler.next_lr(0.8, 2) == 0.2
+	assert scheduler.next_lr(0.8, 4) == 0.0
+	assert scheduler.next_lr(0.8, 10) == 0.0
+	assert scheduler.next_lr(0.8, -1) == 0.8
+}
+
+fn test_constant_lr_scales_until_milestone() {
+	scheduler := constant_lr[f64](ConstantLRConfig{
+		factor:      0.25
+		total_iters: 3
+	}) or { panic(err) }
+	assert scheduler.next_lr(0.8, 0) == 0.2
+	assert scheduler.next_lr(0.8, 2) == 0.2
+	assert scheduler.next_lr(0.8, 3) == 0.8
+	assert scheduler.next_lr(0.8, 8) == 0.8
+}
+
 fn test_reduce_lr_on_plateau_honors_cooldown() {
 	mut scheduler := reduce_lr_on_plateau[f64](ReduceLROnPlateauConfig{
 		factor:   0.5

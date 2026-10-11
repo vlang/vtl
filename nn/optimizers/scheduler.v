@@ -47,6 +47,113 @@ pub fn (s &ExponentialLR[T]) next_lr(current_lr f64, step int) f64 {
 	return current_lr * math.pow(s.gamma, f64(step))
 }
 
+// MultiStepLRConfig defines the epochs at which the rate is decayed.
+@[params]
+pub struct MultiStepLRConfig {
+pub:
+	milestones []int
+	gamma      f64 = 0.1
+}
+
+// MultiStepLR decays the base learning rate at each configured milestone.
+pub struct MultiStepLR[T] {
+	milestones []int
+	gamma      f64
+}
+
+// multi_step_lr creates a scheduler whose milestones must be in increasing order.
+// Repeated milestones apply repeated decay at the same step, like PyTorch.
+pub fn multi_step_lr[T](config MultiStepLRConfig) !&MultiStepLR[T] {
+	if config.gamma <= 0.0 {
+		return error('gamma must be positive')
+	}
+	for i, milestone in config.milestones {
+		if milestone < 0 || (i > 0 && milestone < config.milestones[i - 1]) {
+			return error('milestones must be non-negative and increasing')
+		}
+	}
+	return &MultiStepLR[T]{
+		milestones: config.milestones.clone()
+		gamma:      config.gamma
+	}
+}
+
+// next_lr returns the rate for a zero-based epoch, based on the base rate.
+pub fn (s &MultiStepLR[T]) next_lr(base_lr f64, step int) f64 {
+	mut decays := 0
+	for milestone in s.milestones {
+		if step >= milestone {
+			decays++
+		}
+	}
+	return base_lr * math.pow(s.gamma, f64(decays))
+}
+
+// PolynomialLRConfig defines the duration and power of a polynomial decay.
+@[params]
+pub struct PolynomialLRConfig {
+pub:
+	total_iters int = 5
+	power       f64 = 1.0
+}
+
+// PolynomialLR decays the base learning rate to zero over total_iters steps.
+pub struct PolynomialLR[T] {
+	total_iters int
+	power       f64
+}
+
+// polynomial_lr creates a polynomial decay scheduler.
+pub fn polynomial_lr[T](config PolynomialLRConfig) !&PolynomialLR[T] {
+	if config.total_iters <= 0 || config.power < 0.0 {
+		return error('total_iters must be positive and power must be non-negative')
+	}
+	return &PolynomialLR[T]{
+		total_iters: config.total_iters
+		power:       config.power
+	}
+}
+
+// next_lr returns the polynomially decayed rate for a zero-based step.
+pub fn (s &PolynomialLR[T]) next_lr(base_lr f64, step int) f64 {
+	clamped_step := math.min(math.max(step, 0), s.total_iters)
+	factor := math.pow(1.0 - f64(clamped_step) / f64(s.total_iters), s.power)
+	return base_lr * factor
+}
+
+// ConstantLRConfig defines a temporary constant scaling of the base rate.
+@[params]
+pub struct ConstantLRConfig {
+pub:
+	factor      f64 = 1.0 / 3.0
+	total_iters int = 5
+}
+
+// ConstantLR scales the base rate by factor for a fixed number of steps.
+pub struct ConstantLR[T] {
+	factor      f64
+	total_iters int
+}
+
+// constant_lr creates a temporary constant-rate scaling scheduler.
+pub fn constant_lr[T](config ConstantLRConfig) !&ConstantLR[T] {
+	if config.factor < 0.0 || config.total_iters < 0 {
+		return error('factor and total_iters must be non-negative')
+	}
+	return &ConstantLR[T]{
+		factor:      config.factor
+		total_iters: config.total_iters
+	}
+}
+
+// next_lr returns the scaled rate before total_iters and the base rate afterward.
+pub fn (s &ConstantLR[T]) next_lr(base_lr f64, step int) f64 {
+	if step < s.total_iters {
+		return base_lr * s.factor
+	}
+	return base_lr
+}
+
 // CosineAnnealingLR decays using a cosine schedule from `lrd` to 0.
 pub struct CosineAnnealingLR[T] {
 pub:

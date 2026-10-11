@@ -207,6 +207,12 @@ opt.build_params(model)
 // StepLR: reduce LR by gamma every step_size steps
 mut scheduler := optimizers.step_lr[f32](30, 0.1)
 
+// MultiStepLR: decay at selected epoch indices
+mut scheduler_multi := optimizers.multi_step_lr[f32](optimizers.MultiStepLRConfig{
+	milestones: [30, 80]
+	gamma:      0.1
+}) or { panic(err) }
+
 // ExponentialLR: multiply LR by gamma every step
 mut scheduler2 := optimizers.exponential_lr[f32](0.95)
 
@@ -215,6 +221,16 @@ mut scheduler3 := optimizers.cosine_annealing_lr[f32](100, 1e-5)
 
 // LinearLR: linear warmup from 10% to 100% of the base learning rate
 mut scheduler4 := optimizers.linear_lr[f32](0.1, 1.0, 10)
+
+// PolynomialLR and ConstantLR: polynomial decay and temporary rate scaling
+mut scheduler_poly := optimizers.polynomial_lr[f32](optimizers.PolynomialLRConfig{
+	total_iters: 100
+	power:       0.9
+}) or { panic(err) }
+mut scheduler_constant := optimizers.constant_lr[f32](optimizers.ConstantLRConfig{
+	factor:      0.25
+	total_iters: 5
+}) or { panic(err) }
 
 // OneCycleLR: minibatch schedule from max_lr/div_factor to max_lr and back
 mut scheduler5 := optimizers.one_cycle_lr[f32](optimizers.OneCycleLRConfig{
@@ -256,6 +272,13 @@ halve the amplitude after each cycle or `.exp_range` to scale it by `gamma` on
 each step. Set `step_size_down` for an asymmetric cycle; leave it at its default
 value of zero to match `step_size_up`. Custom scale callbacks and momentum
 cycling are not included.
+
+`MultiStepLR` decays once at each milestone; repeated milestones cause repeated
+decays on that epoch. `PolynomialLR` follows
+`base_lr * (1 - step / total_iters)^power` and clamps to zero after its final
+step. `ConstantLR` applies `factor` before `total_iters`, then returns the
+original base rate. These schedulers calculate each value from the base rate
+and step supplied by the caller.
 
 ```v ignore
 mut one_cycle := optimizers.one_cycle_lr[f32](optimizers.OneCycleLRConfig{

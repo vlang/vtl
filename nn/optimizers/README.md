@@ -34,9 +34,13 @@ without adding it to the gradient or moment estimates. NAdam additionally accept
 
 ## Learning-rate schedulers
 
-`StepLR`, `ExponentialLR`, `CosineAnnealingLR`, `LinearLR`, `CyclicLR`,
-`OneCycleLR`, and `ReduceLROnPlateau` update a learning rate by step. `LinearLR`
-interpolates from a start factor to an end factor over a fixed number of steps.
+`StepLR`, `MultiStepLR`, `ExponentialLR`, `CosineAnnealingLR`, `LinearLR`,
+`PolynomialLR`, `ConstantLR`, `CyclicLR`, `OneCycleLR`, and
+`ReduceLROnPlateau` update learning rates by epoch or minibatch step.
+`MultiStepLR` applies one decay for each milestone, including duplicate
+milestones. `LinearLR` interpolates between two factors, while `PolynomialLR`
+decays to zero over a fixed number of steps. `ConstantLR` scales the base rate
+for a fixed number of steps, then restores it.
 `OneCycleLR` uses minibatch steps
 to ramp from `max_lr / div_factor` to `max_lr`, then anneal to
 `max_lr / (div_factor * final_div_factor)`. It supports cosine or linear
