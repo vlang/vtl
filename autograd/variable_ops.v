@@ -432,6 +432,30 @@ pub fn (v &Variable[T]) flip(axes ...int) !&Variable[T] {
 	return result
 }
 
+// repeat flattens the input and repeats every value; backward sums gradients
+// from all copies of each source value.
+pub fn (v &Variable[T]) repeat(repeats int) !&Variable[T] {
+	value := vtl.repeat[T](v.value, repeats)!
+	mut result := v.context.variable(value)
+	if v.requires_grad {
+		gate := repeat_gate[T](v.value.shape, repeats, 0, true)
+		gate.cache(mut result, v)!
+	}
+	return result
+}
+
+// repeat_axis repeats values along one axis while preserving autograd.
+pub fn (v &Variable[T]) repeat_axis(repeats int, axis int) !&Variable[T] {
+	value := vtl.repeat_axis[T](v.value, repeats, axis)!
+	mut result := v.context.variable(value)
+	if v.requires_grad {
+		normalized_axis := if axis < 0 { axis + v.value.rank() } else { axis }
+		gate := repeat_gate[T](v.value.shape, repeats, normalized_axis, false)
+		gate.cache(mut result, v)!
+	}
+	return result
+}
+
 // roll circularly shifts values, flattening by default like NumPy. Optional
 // axes apply the same shift to each selected axis and preserve autograd.
 pub fn (v &Variable[T]) roll(shift int, axes ...int) !&Variable[T] {

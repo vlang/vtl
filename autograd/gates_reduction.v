@@ -1,6 +1,7 @@
 module autograd
 
 import vtl
+import vtl.stats as vtl_stats
 
 // SumGate implements sum reduction.
 // backward: grad broadcast back to input shape
@@ -572,6 +573,70 @@ pub fn (g &FlipGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 		}
 		else {
 			return error('FlipGate: a must be a Variable')
+		}
+	}
+}
+
+// RepeatGate stores the layout needed to sum gradients from repeated copies.
+pub struct RepeatGate[T] {
+pub:
+	shape   []int
+	repeats int
+	axis    int
+	flatten bool
+}
+
+// repeat_gate creates backward metadata for repeat or repeat_axis.
+pub fn repeat_gate[T](shape []int, repeats int, axis int, flatten bool) &RepeatGate[T] {
+	return &RepeatGate[T]{
+		shape:   shape.clone()
+		repeats: repeats
+		axis:    axis
+		flatten: flatten
+	}
+}
+
+// backward groups duplicate positions and adds their gradients.
+pub fn (g &RepeatGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
+	mut grouped_shape := []int{cap: g.shape.len + 1}
+	if g.flatten {
+		mut size := 1
+		for dim in g.shape {
+			size *= dim
+		}
+		grouped_shape = [size, g.repeats]
+	} else {
+		for axis, dim in g.shape {
+			grouped_shape << dim
+			if axis == g.axis {
+				grouped_shape << g.repeats
+			}
+		}
+	}
+	group_axis := if g.flatten { 0 } else { g.axis }
+	grouped := payload.variable.grad.reshape[T](grouped_shape)!
+	mut gradient := vtl_stats.sum_along_axis[T](grouped, group_axis + 1, false)!
+	if g.flatten {
+		gradient = gradient.reshape[T](g.shape)!
+	}
+	return [gradient]
+}
+
+fn repeat_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := unsafe { (&RepeatGate[T](gate)).backward(typed_payload)! }
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
+// cache registers the input variable for repeat backpropagation.
+pub fn (g &RepeatGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
+	a := args[0]
+	match a {
+		Variable[T] {
+			register[T]('Repeat', voidptr(g), repeat_gate_backward_dispatch[T], result, [a])!
+		}
+		else {
+			return error('RepeatGate: a must be a Variable')
 		}
 	}
 }

@@ -68,4 +68,15 @@ fn main() {
 	flip_loss.backprop()!
 	println('Flipped image across columns: ${flipped_image.value.to_array()}')
 	println('Gradient after flip: ${image_to_flip.grad.to_array()}')
+
+	mut repeat_context := autograd.ctx[f64]()
+	image_to_repeat := repeat_context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0], [
+		2,
+		2,
+	])!)
+	repeated_image := image_to_repeat.repeat_axis(2, 1)!
+	mut repeat_loss := repeated_image.sum()!
+	repeat_loss.backprop()!
+	println('Image repeated across columns: ${repeated_image.value.to_array()}')
+	println('Gradient after repeat_axis: ${image_to_repeat.grad.to_array()}')
 }
