@@ -56,6 +56,27 @@ fn test_take_nd_backward_maps_axes_after_selected_axis() ! {
 	assert input.grad.to_array() == [1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0]
 }
 
+fn test_take_flat_backward_accumulates_repeated_indices() ! {
+	mut ctx := autograd.ctx[f64]()
+	input := ctx.variable(vtl.from_array([10.0, 20.0, 30.0, 40.0, 50.0, 60.0], [2, 3])!)
+	indices := vtl.from_array([-1, 1, 1, 6], [2, 2])!
+	mut selected := input.take_flat_with_mode(indices, .wrap)!
+	assert selected.value.shape == [2, 2]
+	assert selected.value.to_array() == [60.0, 20.0, 20.0, 10.0]
+	selected.backprop()!
+	assert input.grad.to_array() == [1.0, 2.0, 0.0, 0.0, 0.0, 1.0]
+}
+
+fn test_take_flat_with_mode_backward_clips_indices() ! {
+	mut ctx := autograd.ctx[f64]()
+	input := ctx.variable(vtl.from_array([10.0, 20.0, 30.0, 40.0, 50.0, 60.0], [2, 3])!)
+	indices := vtl.from_array([-1, 6], [2])!
+	mut selected := input.take_flat_with_mode(indices, .clip)!
+	assert selected.value.to_array() == [10.0, 60.0]
+	selected.backprop()!
+	assert input.grad.to_array() == [1.0, 0.0, 0.0, 0.0, 0.0, 1.0]
+}
+
 fn test_take_along_axis_backward_accumulates_repeated_indices() ! {
 	mut ctx := autograd.ctx[f64]()
 	input := ctx.variable(vtl.from_array([10.0, 20.0, 30.0, 40.0, 50.0, 60.0], [2, 3])!)
