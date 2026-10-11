@@ -32,6 +32,8 @@ objective := loss.nll_loss_with_options[f32](class_weights,
 
 Use `nll_loss_indices` when class indices are stored in `Tensor[int]`; the
 regular `nll_loss` accepts a target tensor with the same element type as input.
+Both accept batched logits with shape `[N, C, ...]` and class-index targets
+with shape `[N, ...]`.
 
 NLL `none` reduction returns one loss per batch row. `mean` reduction divides
 by the total target weight when class weights are
