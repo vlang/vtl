@@ -8,7 +8,8 @@ import vtl.nn.internal
 // CrossEntropyLoss combines LogSoftmax + NLLLoss in one forward pass.
 // This is more numerically stable than applying softmax then log separately.
 // input: [batch_size, n_classes] raw logits
-// target: [batch_size, n_classes] one-hot targets OR [batch_size] class indices
+// target: one-hot/soft labels `[batch_size, n_classes]` or integer-valued class
+// indices `[batch_size]`.
 pub struct CrossEntropyLoss[T] {
 pub:
 	weight       &vtl.Tensor[T] = unsafe { nil }

@@ -72,6 +72,30 @@ fn test_cross_entropy_loss_backward_uses_logits_and_target_mass() ! {
 	assert math.abs(pred.grad.get_nth(1) - 0.5) < 1e-12
 }
 
+fn test_cross_entropy_loss_supports_class_index_targets() ! {
+	c := ctx[f64]()
+	pred := variable[f64](c, [0.0, math.log(3.0)], [1, 2])!
+	target := tensor[f64]([1.0], [1])!
+	mut result := cross_entropy_loss[f64]().loss(pred, target)!
+	assert math.abs(result.value.get_nth(0) - math.log(4.0 / 3.0)) < 1e-12
+	result.backprop()!
+	assert math.abs(pred.grad.get_nth(0) - 0.25) < 1e-12
+	assert math.abs(pred.grad.get_nth(1) + 0.25) < 1e-12
+}
+
+fn test_cross_entropy_loss_rejects_invalid_class_index_targets() ! {
+	c := ctx[f64]()
+	pred := variable[f64](c, [0.0, math.log(3.0)], [1, 2])!
+	for invalid_class in [1.5, 2.0, -1.0] {
+		target := tensor[f64]([invalid_class], [1])!
+		cross_entropy_loss[f64]().loss(pred, target) or {
+			assert err.msg().contains('class index')
+			continue
+		}
+		assert false, 'Cross entropy should reject invalid class index ${invalid_class}'
+	}
+}
+
 fn test_softmax_cross_entropy_loss_backward_uses_target_mass() ! {
 	c := ctx[f64]()
 	pred := variable[f64](c, [0.0, math.log(3.0)], [1, 2])!
