@@ -6,6 +6,7 @@ import time
 import vtl
 import vtl.autograd
 import vtl.nn.layers
+import vtl.nn.loss
 import vtl.nn.types
 import vtl.benchmarks.util as bu
 
@@ -30,6 +31,7 @@ fn main() {
 fn bench_mlp_backprop(batch int, config bu.BenchConfig) ! {
 	vtl.random_seed(42)
 	ctx := autograd.ctx[f64]()
+	objective := loss.mse_loss[f64]()
 	first := linear_layer(ctx, input_dim, hidden_dim)
 	second := linear_layer(ctx, hidden_dim, hidden_dim)
 	third := linear_layer(ctx, hidden_dim, output_dim)
@@ -39,16 +41,15 @@ fn bench_mlp_backprop(batch int, config bu.BenchConfig) ! {
 	x_data := vtl.ones[f64]([batch, input_dim])
 	y_data := vtl.zeros[f64]([batch, output_dim])
 	mut x := ctx.variable(x_data)
-	y := ctx.variable(y_data, requires_grad: false)
 
 	for _ in 0 .. config.warmup_runs {
-		run_step(first, second, third, relu1, relu2, x, y)!
+		run_step(first, second, third, relu1, relu2, objective, x, y_data)!
 	}
 
 	mut samples := []f64{len: config.iterations}
 	for i in 0 .. config.iterations {
 		t0 := time.sys_mono_now()
-		run_step(first, second, third, relu1, relu2, x, y)!
+		run_step(first, second, third, relu1, relu2, objective, x, y_data)!
 		samples[i] = f64(time.sys_mono_now() - t0) / 1_000_000.0
 	}
 	avg := bu.mean_time_ms(mut samples)
@@ -64,7 +65,7 @@ fn linear_layer(ctx &autograd.Context[f64], input_size int, output_size int) &la
 	}
 }
 
-fn run_step(first &layers.LinearLayer[f64], second &layers.LinearLayer[f64], third &layers.LinearLayer[f64], relu1 types.Layer[f64], relu2 types.Layer[f64], x &autograd.Variable[f64], y &autograd.Variable[f64]) ! {
+fn run_step(first &layers.LinearLayer[f64], second &layers.LinearLayer[f64], third &layers.LinearLayer[f64], relu1 types.Layer[f64], relu2 types.Layer[f64], objective types.Loss[f64], x &autograd.Variable[f64], target &vtl.Tensor[f64]) ! {
 	mut first_weights := first.weights
 	mut first_bias := first.bias
 	mut second_weights := second.weights
@@ -80,10 +81,8 @@ fn run_step(first &layers.LinearLayer[f64], second &layers.LinearLayer[f64], thi
 	hidden1 := relu1.forward(first.forward(x)!)!
 	hidden2 := relu2.forward(second.forward(hidden1)!)!
 	prediction := third.forward(hidden2)!
-	residual := prediction.subtract(y)!
-	squared_error := residual.multiply(residual)!
-	mut loss := squared_error.mean()!
-	loss.backprop()!
+	mut loss_result := objective.loss(prediction, target)!
+	loss_result.backprop()!
 }
 
 fn zero_grad(mut variable &autograd.Variable[f64]) {
