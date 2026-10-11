@@ -186,12 +186,12 @@ pub fn nll[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Tensor[T] {
 
 // nll_backward computes gradient of NLL w.r.t. input (log-probs)
 pub fn nll_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Tensor[T] {
-	batch_size := input.size()
+	input_size := input.size()
 	upstream := f64(gradient.get([0]))
-	mut ret_data := []f64{len: batch_size}
-	for i in 0 .. batch_size {
+	mut ret_data := []f64{len: input_size}
+	for i in 0 .. input_size {
 		tgt := f64(target.get_nth(i))
-		ret_data[i] = upstream * (-tgt / f64(vtl.cast[f64](input.get_nth(i)) + 1e-9))
+		ret_data[i] = upstream * -tgt / f64(input_size)
 	}
 	ret := vtl.from_array(ret_data.map(vtl.cast[T](it)), input.shape.clone())!
 	return ret
@@ -213,12 +213,12 @@ pub fn kl_div[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Tensor[T] {
 
 // kl_div_backward computes gradient of KL Divergence w.r.t. input (log-probs Q)
 pub fn kl_div_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Tensor[T] {
-	batch_size := input.size()
+	input_size := input.size()
 	upstream := f64(gradient.get([0]))
-	mut ret_data := []f64{len: batch_size}
-	for i in 0 .. batch_size {
+	mut ret_data := []f64{len: input_size}
+	for i in 0 .. input_size {
 		p := f64(target.get_nth(i))
-		ret_data[i] = upstream * (-p / f64(vtl.cast[f64](input.get_nth(i)) + 1e-9)) / f64(batch_size)
+		ret_data[i] = upstream * -p / f64(input_size)
 	}
 	ret := vtl.from_array(ret_data.map(vtl.cast[T](it)), input.shape.clone())!
 	return ret

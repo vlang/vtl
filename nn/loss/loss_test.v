@@ -128,6 +128,36 @@ fn test_huber_loss_forward_large_error() ! {
 	assert v - 2.5 < 1e-6 && v - 2.5 > -1e-6, 'Huber large-error expected 2.5, got ${v}'
 }
 
+fn test_huber_loss_backward_uses_input_and_mean_reduction() ! {
+	c := ctx[f64]()
+	pred := variable[f64](c, [1.5, 3.0], [2])!
+	target := tensor[f64]([1.0, 0.0], [2])!
+	mut result := huber_loss[f64](delta: 1.0).loss(pred, target)!
+	result.backprop()!
+	assert math.abs(pred.grad.get_nth(0) - 0.25) < 1e-12
+	assert math.abs(pred.grad.get_nth(1) - 0.5) < 1e-12
+}
+
+fn test_nll_loss_backward_uses_log_probability_derivative() ! {
+	c := ctx[f64]()
+	pred := variable[f64](c, [-2.0, -0.5], [1, 2])!
+	target := tensor[f64]([1.0, 0.0], [1, 2])!
+	mut result := nll_loss[f64](unsafe { nil }).loss(pred, target)!
+	result.backprop()!
+	assert math.abs(pred.grad.get_nth(0) + 0.5) < 1e-12
+	assert math.abs(pred.grad.get_nth(1)) < 1e-12
+}
+
+fn test_kl_div_loss_backward_is_negative_target_mean() ! {
+	c := ctx[f64]()
+	pred := variable[f64](c, [-2.0, -0.5], [2])!
+	target := tensor[f64]([0.25, 0.75], [2])!
+	mut result := kl_div_loss[f64]().loss(pred, target)!
+	result.backprop()!
+	assert math.abs(pred.grad.get_nth(0) + 0.125) < 1e-12
+	assert math.abs(pred.grad.get_nth(1) + 0.375) < 1e-12
+}
+
 fn test_l1_loss_forward_and_backward() ! {
 	c := ctx[f64]()
 	pred := variable[f64](c, [1.0, 3.0], [2])!
