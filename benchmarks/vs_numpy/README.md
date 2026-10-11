@@ -30,11 +30,12 @@ on one CPU and does not establish general NumPy performance parity.
 
 ## Two-dimensional histogram density
 
-This paired benchmark uses the same deterministic 262,144 (x, y) samples and
-explicit 64x64 bin edges for VTL and NumPy. Both sides include binning, density
-normalization, and result allocation inside each timed call; each uses two
-warmups and seven timed calls. The weighted checksum helps detect changes to
-bin placement or normalization.
+This benchmark uses 262,144 deterministic (x, y) samples and explicit
+1024x1024 bin edges. It compares the current VTL implementation, a benchmark
+copy of the previous VTL path (including its to_array conversions), and NumPy.
+Each timed call includes binning, density normalization, and result allocation;
+each path uses two warmups and seven timed calls. The weighted checksum helps
+detect changes to bin placement or normalization.
 
 Sources: histogram2d_density_bench.v and
 numpy_histogram2d_density_baseline.py. From ~/.vmodules, compile the V
@@ -55,12 +56,13 @@ systemd-run --user --scope -p MemoryMax=2G -p MemorySwapMax=0 -- env VJOBS=2 \
 
 On this AMD Ryzen 9 5900X workstation, with V 0.5.2 81be246, GCC 16.2.1, and
 NumPy 2.5.4 (SciPy OpenBLAS 0.3.34.106.0), three interleaved process runs on
-2026-10-11 measured median-of-seven-call times of 3.078 ms for VTL and
-4.887 ms for NumPy. Per-process ranges were 2.976–3.136 ms and 4.732–4.967 ms.
-Both implementations reported the weighted checksum 8,390,656. VTL was 1.59x
-faster for this specific workload. This single CPU microbenchmark does not
-establish general NumPy performance parity or isolate the speedup from this
-change alone.
+2026-10-11 measured median-of-seven-call times of 9.122 ms for current VTL,
+15.026 ms for the previous copy path, and 13.615 ms for NumPy. Per-process
+ranges were 9.078–9.356 ms, 14.589–15.200 ms, and 13.510–14.013 ms,
+respectively. All paths reported the weighted checksum 549,756,338,176. The
+current implementation was 1.65x faster than its previous path and 1.49x
+faster than NumPy for this workload. This single CPU microbenchmark does not
+establish general NumPy performance parity.
 
 ## Elementwise extrema
 
