@@ -196,6 +196,83 @@ fn (s &OneCycleLR[T]) anneal(start f64, end f64, start_step f64, end_step f64, s
 	return end + (start - end) * (1.0 + math.cos(math.pi * pct)) / 2.0
 }
 
+// CyclicLRMode selects the built-in cycle-amplitude policy.
+pub enum CyclicLRMode {
+	triangular
+	triangular2
+	exp_range
+}
+
+// CyclicLRConfig defines a minibatch-based triangular learning-rate schedule.
+@[params]
+pub struct CyclicLRConfig {
+pub:
+	base_lr        f64
+	max_lr         f64
+	step_size_up   int = 2000
+	step_size_down int
+	mode           CyclicLRMode = .triangular
+	gamma          f64          = 1.0
+}
+
+// CyclicLR cycles the learning rate between base_lr and max_lr. Momentum
+// cycling, parameter groups, and custom scale functions are not included.
+pub struct CyclicLR[T] {
+	base_lr        f64
+	max_lr         f64
+	step_size_up   int
+	step_size_down int
+	mode           CyclicLRMode
+	gamma          f64
+}
+
+// cyclic_lr creates a CyclicLR scheduler. A zero `step_size_down` uses the
+// same duration as `step_size_up`; all other durations must be positive.
+pub fn cyclic_lr[T](config CyclicLRConfig) !&CyclicLR[T] {
+	if config.base_lr < 0.0 || config.max_lr < config.base_lr {
+		return error('learning rates must satisfy 0 <= base_lr <= max_lr')
+	}
+	if config.step_size_up <= 0 || config.step_size_down < 0 {
+		return error('step_size_up must be positive and step_size_down cannot be negative')
+	}
+	if config.gamma <= 0.0 {
+		return error('gamma must be positive')
+	}
+	return &CyclicLR[T]{
+		base_lr:        config.base_lr
+		max_lr:         config.max_lr
+		step_size_up:   config.step_size_up
+		step_size_down: if config.step_size_down == 0 {
+			config.step_size_up
+		} else {
+			config.step_size_down
+		}
+		mode:           config.mode
+		gamma:          config.gamma
+	}
+}
+
+// next_lr returns the rate for a zero-based minibatch step. The input rate is
+// ignored because the schedule is defined by its base and maximum rates.
+pub fn (s &CyclicLR[T]) next_lr(_ f64, step int) f64 {
+	clamped_step := if step < 0 { 0 } else { step }
+	period := s.step_size_up + s.step_size_down
+	cycle := clamped_step / period
+	step_in_cycle := clamped_step % period
+	pct := if step_in_cycle <= s.step_size_up {
+		f64(step_in_cycle) / f64(s.step_size_up)
+	} else {
+		1.0 - f64(step_in_cycle - s.step_size_up) / f64(s.step_size_down)
+	}
+	triangle := pct
+	scale := match s.mode {
+		.triangular { 1.0 }
+		.triangular2 { math.pow(0.5, f64(cycle)) }
+		.exp_range { math.pow(s.gamma, f64(clamped_step)) }
+	}
+	return s.base_lr + (s.max_lr - s.base_lr) * triangle * scale
+}
+
 // ReduceLROnPlateau reduces LR when a metric has stopped improving.
 pub struct ReduceLROnPlateau[T] {
 	factor    f64

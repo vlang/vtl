@@ -222,6 +222,13 @@ mut scheduler5 := optimizers.one_cycle_lr[f32](optimizers.OneCycleLRConfig{
 	total_steps: 100
 }) or { panic(err) }
 
+// CyclicLR: triangular cycles between base_lr and max_lr every minibatch
+mut cyclic := optimizers.cyclic_lr[f32](optimizers.CyclicLRConfig{
+	base_lr:      0.0001
+	max_lr:       0.01
+	step_size_up: 100
+}) or { panic(err) }
+
 // ReduceLROnPlateau: reduce when metric stops improving
 mut scheduler6 := optimizers.reduce_lr_on_plateau[f32](optimizers.ReduceLROnPlateauConfig{
 	patience: 10
@@ -243,6 +250,13 @@ to the initial rate before the final decay. This scheduler returns a rate for
 the caller to apply to its optimizer; inverse momentum cycling is not included.
 The constructor returns an error for invalid cycle parameters.
 
+`CyclicLR` also advances once per minibatch. By default it uses equal rise and
+fall durations and a repeating triangular amplitude. Select `.triangular2` to
+halve the amplitude after each cycle or `.exp_range` to scale it by `gamma` on
+each step. Set `step_size_down` for an asymmetric cycle; leave it at its default
+value of zero to match `step_size_up`. Custom scale callbacks and momentum
+cycling are not included.
+
 ```v ignore
 mut one_cycle := optimizers.one_cycle_lr[f32](optimizers.OneCycleLRConfig{
 	max_lr:      0.01
@@ -251,6 +265,20 @@ mut one_cycle := optimizers.one_cycle_lr[f32](optimizers.OneCycleLRConfig{
 for step in 0 .. 100 {
 	learning_rate := one_cycle.next_lr(0.001, step)
 	// Apply `learning_rate` to the optimizer before the next batch.
+}
+```
+
+```v ignore
+mut cyclic := optimizers.cyclic_lr[f32](optimizers.CyclicLRConfig{
+	base_lr:        0.0001
+	max_lr:         0.01
+	step_size_up:   100
+	step_size_down: 200
+	mode:           .triangular2
+}) or { panic(err) }
+for step in 0 .. 300 {
+	learning_rate := cyclic.next_lr(0.001, step)
+	// Apply `learning_rate` before the next batch.
 }
 ```
 

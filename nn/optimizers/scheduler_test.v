@@ -120,3 +120,63 @@ fn one_cycle_lr_error_for_invalid_steps() bool {
 	}
 	return false
 }
+
+fn test_cyclic_lr_triangular_curve_and_default_down_duration() {
+	scheduler := cyclic_lr[f64](CyclicLRConfig{
+		base_lr:      0.1
+		max_lr:       0.5
+		step_size_up: 2
+	}) or { panic(err) }
+	assert scheduler.step_size_up == 2
+	assert scheduler.step_size_down == 2
+	assert math.abs(scheduler.next_lr(9, 0) - 0.1) < 1e-12
+	assert math.abs(scheduler.next_lr(9, 1) - 0.3) < 1e-12
+	assert math.abs(scheduler.next_lr(9, 2) - 0.5) < 1e-12
+	assert math.abs(scheduler.next_lr(9, 3) - 0.3) < 1e-12
+	assert math.abs(scheduler.next_lr(9, 4) - 0.1) < 1e-12
+	assert scheduler.next_lr(9, -1) == scheduler.next_lr(9, 0)
+}
+
+fn test_cyclic_lr_asymmetric_triangular2_and_exp_range() {
+	asymmetric := cyclic_lr[f64](CyclicLRConfig{
+		base_lr:        0.1
+		max_lr:         0.5
+		step_size_up:   2
+		step_size_down: 4
+	}) or { panic(err) }
+	assert math.abs(asymmetric.next_lr(0, 2) - 0.5) < 1e-12
+	assert math.abs(asymmetric.next_lr(0, 4) - 0.3) < 1e-12
+	assert math.abs(asymmetric.next_lr(0, 6) - 0.1) < 1e-12
+
+	triangular2 := cyclic_lr[f64](CyclicLRConfig{
+		base_lr:      0.1
+		max_lr:       0.5
+		step_size_up: 2
+		mode:         .triangular2
+	}) or { panic(err) }
+	assert math.abs(triangular2.next_lr(0, 6) - 0.3) < 1e-12
+
+	exp_range := cyclic_lr[f64](CyclicLRConfig{
+		base_lr:      0.1
+		max_lr:       0.5
+		step_size_up: 2
+		mode:         .exp_range
+		gamma:        0.5
+	}) or { panic(err) }
+	assert math.abs(exp_range.next_lr(0, 2) - 0.2) < 1e-12
+}
+
+fn test_cyclic_lr_rejects_invalid_parameters() {
+	assert cyclic_lr_error_for_invalid_up_duration()
+}
+
+fn cyclic_lr_error_for_invalid_up_duration() bool {
+	_ := cyclic_lr[f64](CyclicLRConfig{
+		base_lr:      0.1
+		max_lr:       0.5
+		step_size_up: 0
+	}) or {
+		return err.msg() == 'step_size_up must be positive and step_size_down cannot be negative'
+	}
+	return false
+}
