@@ -806,6 +806,34 @@ pub fn (t &Tensor[T]) round_to_even[T]() &Tensor[T] {
 	})
 }
 
+// round_decimals rounds real floating-point elements to a decimal position,
+// following NumPy's ties-to-even rule. Negative decimals round to tens,
+// hundreds, and larger place values. Integer tensors are copied unchanged.
+pub fn (t &Tensor[T]) round_decimals[T](decimals int) &Tensor[T] {
+	$if T is f32 || T is f64 {
+		scale := math.pow(10.0, math.abs(f64(decimals)))
+		return t.map_values(fn [decimals, scale] [T](value T) T {
+			value_f64 := f64(value)
+			if math.is_nan(value_f64) || math.is_inf(value_f64) {
+				return value
+			}
+			if math.is_inf(scale) {
+				return if decimals > 0 { value } else { cast[T](0.0) }
+			}
+			if decimals > 0 {
+				scaled := value_f64 * scale
+				if math.is_inf(scaled) {
+					return value
+				}
+				return cast[T](math.round_to_even(scaled) / scale)
+			}
+			return cast[T](math.round_to_even(value_f64 / scale) * scale)
+		})
+	} $else {
+		return t.copy(.row_major)
+	}
+}
+
 // sin returns the elementwise sin of an tensor
 
 // sin exposes this operation as part of the public API.

@@ -543,6 +543,38 @@ fn test_round() {
 	assert result.array_equal(expected)
 }
 
+fn test_round_decimals_uses_ties_to_even() {
+	values := vtl.from_1d([2.5, 3.5, -2.5, -3.5])!
+	result := values.round_decimals(0)
+	expected := vtl.from_1d([2.0, 4.0, -2.0, -4.0])!
+	assert result.array_equal(expected)
+}
+
+fn test_round_decimals_supports_positive_and_negative_places() {
+	decimal_values := vtl.from_1d([1.234, 1.235, -1.235])!
+	decimal_result := decimal_values.round_decimals(2)
+	decimal_expected := vtl.from_1d([1.23, 1.24, -1.24])!
+	assert decimal_result.allclose(decimal_expected, atol: 1e-14, rtol: 0.0)!
+	place_values := vtl.from_1d([12.5, 25.0, 125.0, 135.0])!
+	place_result := place_values.round_decimals(-1)
+	place_expected := vtl.from_1d([10.0, 20.0, 120.0, 140.0])!
+	assert place_result.array_equal(place_expected)
+}
+
+fn test_round_decimals_handles_non_finite_and_integer_values() {
+	values := vtl.from_1d([1.0, math.inf(1), math.inf(-1), math.nan()])!
+	result := values.round_decimals(2)
+	assert result.get([0]) == 1.0
+	assert result.get([1]) == math.inf(1)
+	assert result.get([2]) == math.inf(-1)
+	assert math.is_nan(result.get([3]))
+	integers := vtl.from_1d([123, -456])!
+	assert integers.round_decimals(-2).to_array() == [123, -456]
+	large := vtl.from_1d([1.7e308])!
+	assert large.round_decimals(308).to_array() == [1.7e308]
+	assert large.round_decimals(-309).to_array() == [0.0]
+}
+
 fn test_sin() {
 	a := vtl.from_1d([1.0, 2, 3])!
 	result := a.sin()
