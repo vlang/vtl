@@ -243,8 +243,11 @@ mut scheduler_constant := optimizers.constant_lr[f32](optimizers.ConstantLRConfi
 
 // OneCycleLR: minibatch schedule from max_lr/div_factor to max_lr and back
 mut scheduler5 := optimizers.one_cycle_lr[f32](optimizers.OneCycleLRConfig{
-	max_lr:      0.01
-	total_steps: 100
+	max_lr:         0.01
+	total_steps:    100
+	cycle_momentum: true
+	base_momentum:  0.85
+	max_momentum:   0.95
 }) or { panic(err) }
 
 // CyclicLR: triangular cycles between base_lr and max_lr every minibatch
@@ -277,9 +280,12 @@ for step := 0; step < 100; step++ {
 `OneCycleLR` advances once per minibatch. Its default curve ramps to `max_lr`
 and then anneals below the initial rate using cosine interpolation. Choose
 `anneal_strategy: 'linear'` for a linear curve or `three_phase: true` to return
-to the initial rate before the final decay. This scheduler returns a rate for
-the caller to apply to its optimizer; inverse momentum cycling is not included.
-The constructor returns an error for invalid cycle parameters.
+to the initial rate before the final decay. By default, momentum cycles
+inversely from `max_momentum` to `base_momentum` and back; `next_momentum(step)`
+returns the value for the caller to apply to its optimizer. Set
+`cycle_momentum: false` to disable the momentum curve. The defaults (`0.85` and
+`0.95`) match PyTorch. The constructor returns an error for invalid cycle or
+momentum bounds.
 
 `CyclicLR` also advances once per minibatch. By default it uses equal rise and
 fall durations and a repeating triangular amplitude. Select `.triangular2` to

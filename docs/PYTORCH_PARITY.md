@@ -82,8 +82,9 @@ CPU training and experimental GPU paths. Learning-rate schedulers include
 `StepLR`, `MultiStepLR`, `ExponentialLR`, `CosineAnnealingLR`,
 `CosineAnnealingWarmRestarts`, `LinearLR`, `PolynomialLR`, `ConstantLR`,
 `CyclicLR`, `OneCycleLR`, and
-`ReduceLROnPlateau`. `OneCycleLR` currently implements the
-learning-rate curve (cosine or linear, two or three phases). `CyclicLR` includes
+`ReduceLROnPlateau`. `OneCycleLR` implements the learning-rate curve (cosine or
+linear, two or three phases) and inverse momentum cycling with configurable
+bounds. `CyclicLR` includes
 the triangular, triangular2, and exp_range policies and computes the inverse
 momentum curve with configurable bounds. Unlike PyTorch, VTL returns that
 momentum value for the caller to apply; it does not mutate optimizer state.

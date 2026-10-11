@@ -253,8 +253,7 @@ pub fn (s &LinearLR[T]) next_lr(base_lr f64, step int) f64 {
 	return base_lr * factor
 }
 
-// OneCycleLRConfig defines the learning-rate portion of the one-cycle policy.
-// Momentum cycling and optimizer parameter groups are not part of this scheduler.
+// OneCycleLRConfig defines the learning-rate and momentum bounds of the one-cycle policy.
 pub enum OneCycleAnnealStrategy {
 	cosine
 	linear
@@ -270,6 +269,9 @@ pub:
 	final_div_factor f64 = 10000.0
 	three_phase      bool
 	anneal_strategy  OneCycleAnnealStrategy = .cosine
+	cycle_momentum   bool                   = true
+	base_momentum    f64                    = 0.85
+	max_momentum     f64                    = 0.95
 }
 
 // OneCycleLR raises the rate from max_lr/div_factor to max_lr, then anneals it
@@ -284,6 +286,9 @@ pub struct OneCycleLR[T] {
 	final_div_factor f64
 	three_phase      bool
 	anneal_strategy  OneCycleAnnealStrategy
+	cycle_momentum   bool
+	base_momentum    f64
+	max_momentum     f64
 }
 
 // one_cycle_lr creates a two-phase OneCycleLR by default. `anneal_strategy`
@@ -301,6 +306,9 @@ pub fn one_cycle_lr[T](config OneCycleLRConfig) !&OneCycleLR[T] {
 	if config.div_factor <= 0.0 || config.final_div_factor <= 0.0 {
 		return error('div_factor and final_div_factor must be positive')
 	}
+	if config.base_momentum < 0.0 || config.max_momentum < config.base_momentum {
+		return error('momentum values must satisfy 0 <= base_momentum <= max_momentum')
+	}
 	return &OneCycleLR[T]{
 		max_lr:           config.max_lr
 		total_steps:      config.total_steps
@@ -309,6 +317,9 @@ pub fn one_cycle_lr[T](config OneCycleLRConfig) !&OneCycleLR[T] {
 		final_div_factor: config.final_div_factor
 		three_phase:      config.three_phase
 		anneal_strategy:  config.anneal_strategy
+		cycle_momentum:   config.cycle_momentum
+		base_momentum:    config.base_momentum
+		max_momentum:     config.max_momentum
 	}
 }
 
@@ -337,6 +348,36 @@ pub fn (s &OneCycleLR[T]) next_lr(_ f64, step int) f64 {
 		return s.anneal(initial_lr, s.max_lr, 0.0, first_end, f64(step_num))
 	}
 	return s.anneal(s.max_lr, final_lr, first_end, f64(s.total_steps - 1), f64(step_num))
+}
+
+// next_momentum returns the inverse momentum curve for a zero-based minibatch
+// step. It returns none when cycling is disabled. Apply the returned value to
+// an optimizer explicitly; this scheduler does not mutate optimizer state.
+pub fn (s &OneCycleLR[T]) next_momentum(step int) ?f64 {
+	if !s.cycle_momentum {
+		return none
+	}
+	if s.total_steps <= 1 {
+		return s.max_momentum
+	}
+	step_num := math.min(math.max(step, 0), s.total_steps - 1)
+	first_end := s.pct_start * f64(s.total_steps) - 1.0
+	if s.three_phase {
+		second_end := 2.0 * s.pct_start * f64(s.total_steps) - 2.0
+		if f64(step_num) <= first_end {
+			return s.anneal(s.max_momentum, s.base_momentum, 0.0, first_end, f64(step_num))
+		}
+		if f64(step_num) <= second_end {
+			return s.anneal(s.base_momentum, s.max_momentum, first_end, second_end,
+				f64(step_num))
+		}
+		return s.max_momentum
+	}
+	if f64(step_num) <= first_end {
+		return s.anneal(s.max_momentum, s.base_momentum, 0.0, first_end, f64(step_num))
+	}
+	return s.anneal(s.base_momentum, s.max_momentum, first_end, f64(s.total_steps - 1),
+		f64(step_num))
 }
 
 fn (s &OneCycleLR[T]) anneal(start f64, end f64, start_step f64, end_step f64, step f64) f64 {
