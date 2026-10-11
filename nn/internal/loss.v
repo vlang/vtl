@@ -5,8 +5,9 @@ import vtl
 
 // mse_backward exposes this operation as part of the public API.
 pub fn mse_backward[T](gradient &vtl.Tensor[T], cache &vtl.Tensor[T], target &vtl.Tensor[T]) ![]&vtl.Tensor[T] {
-	ret := gradient.nmap([cache, target], fn [gradient] [T](vals []T, i []int) T {
-		return vals[0] * (vals[1] - vals[2]) / vtl.cast[T](gradient.size())
+	input_size := cache.size()
+	ret := gradient.nmap([cache, target], fn [input_size] [T](vals []T, i []int) T {
+		return vals[0] * vtl.cast[T](2) * (vals[1] - vals[2]) / vtl.cast[T](input_size)
 	})!
 	return [ret]
 }
