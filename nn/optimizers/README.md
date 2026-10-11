@@ -34,9 +34,11 @@ without adding it to the gradient or moment estimates. NAdam additionally accept
 
 ## Learning-rate schedulers
 
-`StepLR`, `ExponentialLR`, and `CosineAnnealingLR` update a learning rate by
-step. `ReduceLROnPlateau` also accepts a metric delta: a negative delta beyond
-`threshold` is an improvement; zero or a positive delta counts toward
+`StepLR`, `ExponentialLR`, `CosineAnnealingLR`, and `LinearLR` update a
+learning rate by step. `LinearLR` interpolates from a start factor to an end
+factor over a fixed number of steps. `ReduceLROnPlateau` accepts a metric
+delta: a negative delta beyond `threshold` is an improvement; zero or a
+positive delta counts toward
 `patience`. It reduces the rate only after the configured patience is exceeded,
 then ignores bad epochs during `cooldown`. Reductions smaller than `epsilon`
 and NaN deltas leave the rate unchanged.
