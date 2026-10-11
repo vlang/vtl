@@ -599,6 +599,10 @@ pub fn (t &Tensor[T]) cumsum[T](axis int) !&Tensor[T] {
 	axis_stride := strides[na]
 	n_axis := shape[na]
 	mut result := zeros[T](shape)
+	if result.size == 0 {
+		return result
+	}
+	input_is_contiguous := t.is_row_major_contiguous()
 	mut outer_idx := []int{len: rank}
 	for {
 		mut base_lin := 0
@@ -609,22 +613,25 @@ pub fn (t &Tensor[T]) cumsum[T](axis int) !&Tensor[T] {
 			mut acc := false
 			for j := 0; j < n_axis; j++ {
 				lin := base_lin + j * axis_stride
-				acc = acc || t.get_nth(lin)
-				result.set_nth(lin, acc)
+				value := if input_is_contiguous { t.data.data[lin] } else { t.get_nth(lin) }
+				acc = acc || value
+				result.data.data[lin] = acc
 			}
 		} $else $if T is string {
 			mut acc := ''
 			for j := 0; j < n_axis; j++ {
 				lin := base_lin + j * axis_stride
-				acc = acc + t.get_nth(lin)
-				result.set_nth(lin, acc)
+				value := if input_is_contiguous { t.data.data[lin] } else { t.get_nth(lin) }
+				acc = acc + value
+				result.data.data[lin] = acc
 			}
 		} $else {
 			mut acc := cast[T](0)
 			for j := 0; j < n_axis; j++ {
 				lin := base_lin + j * axis_stride
-				acc = acc + t.get_nth(lin)
-				result.set_nth(lin, acc)
+				value := if input_is_contiguous { t.data.data[lin] } else { t.get_nth(lin) }
+				acc = acc + value
+				result.data.data[lin] = acc
 			}
 		}
 		mut done := true
@@ -674,6 +681,10 @@ pub fn (t &Tensor[T]) cumprod[T](axis int) !&Tensor[T] {
 	axis_stride := strides[na]
 	n_axis := shape[na]
 	mut result := zeros[T](shape)
+	if result.size == 0 {
+		return result
+	}
+	input_is_contiguous := t.is_row_major_contiguous()
 	mut outer_idx := []int{len: rank}
 	for {
 		mut base_lin := 0
@@ -684,8 +695,9 @@ pub fn (t &Tensor[T]) cumprod[T](axis int) !&Tensor[T] {
 			mut acc := true
 			for j := 0; j < n_axis; j++ {
 				lin := base_lin + j * axis_stride
-				acc = acc && t.get_nth(lin)
-				result.set_nth(lin, acc)
+				value := if input_is_contiguous { t.data.data[lin] } else { t.get_nth(lin) }
+				acc = acc && value
+				result.data.data[lin] = acc
 			}
 		} $else $if T is string {
 			// cumprod on string is not meaningful; return zeros (empty strings)
@@ -694,8 +706,9 @@ pub fn (t &Tensor[T]) cumprod[T](axis int) !&Tensor[T] {
 			mut acc := cast[T](1)
 			for j := 0; j < n_axis; j++ {
 				lin := base_lin + j * axis_stride
-				acc = acc * t.get_nth(lin)
-				result.set_nth(lin, acc)
+				value := if input_is_contiguous { t.data.data[lin] } else { t.get_nth(lin) }
+				acc = acc * value
+				result.data.data[lin] = acc
 			}
 		}
 		mut done := true
@@ -741,6 +754,7 @@ pub fn (t &Tensor[T]) cumsum_as[U](axis int) !&Tensor[U] {
 	if result.size == 0 {
 		return result
 	}
+	input_is_contiguous := t.is_row_major_contiguous()
 	mut outer_idx := []int{len: rank}
 	for {
 		mut base_lin := 0
@@ -750,8 +764,9 @@ pub fn (t &Tensor[T]) cumsum_as[U](axis int) !&Tensor[U] {
 		mut acc := cast[U](0)
 		for j := 0; j < n_axis; j++ {
 			lin := base_lin + j * axis_stride
-			acc += cast[U](t.get_nth(lin))
-			result.set_nth(lin, acc)
+			value := if input_is_contiguous { t.data.data[lin] } else { t.get_nth(lin) }
+			acc += cast[U](value)
+			result.data.data[lin] = acc
 		}
 		mut done := true
 		for i := rank - 1; i >= 0; i-- {
@@ -795,6 +810,7 @@ pub fn (t &Tensor[T]) cumprod_as[U](axis int) !&Tensor[U] {
 	if result.size == 0 {
 		return result
 	}
+	input_is_contiguous := t.is_row_major_contiguous()
 	mut outer_idx := []int{len: rank}
 	for {
 		mut base_lin := 0
@@ -804,8 +820,9 @@ pub fn (t &Tensor[T]) cumprod_as[U](axis int) !&Tensor[U] {
 		mut acc := cast[U](1)
 		for j := 0; j < n_axis; j++ {
 			lin := base_lin + j * axis_stride
-			acc *= cast[U](t.get_nth(lin))
-			result.set_nth(lin, acc)
+			value := if input_is_contiguous { t.data.data[lin] } else { t.get_nth(lin) }
+			acc *= cast[U](value)
+			result.data.data[lin] = acc
 		}
 		mut done := true
 		for i := rank - 1; i >= 0; i-- {
