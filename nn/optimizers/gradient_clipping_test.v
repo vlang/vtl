@@ -21,6 +21,80 @@ fn test_clip_grad_norm_scales_global_norm() ! {
 	assert second.grad.get_nth(0) == 0.0
 }
 
+fn test_clip_grad_norm_supports_one_norm() ! {
+	context := autograd.ctx[f64]()
+	parameter := context.variable(vtl.from_1d([3.0, -4.0, 0.5])!)
+	parameter.grad.set_nth(0, 3.0)
+	parameter.grad.set_nth(1, -4.0)
+	parameter.grad.set_nth(2, 0.5)
+	mut parameters := [parameter]
+
+	original_norm := clip_grad_norm_with_type[f64](mut parameters, 1.0, 1.0)!
+
+	assert math.abs(original_norm - 7.5) < 1e-12
+	assert math.abs(parameter.grad.get_nth(0) - 0.4) < 1e-12
+	assert math.abs(parameter.grad.get_nth(1) + (4.0 / 7.5)) < 1e-12
+	assert math.abs(parameter.grad.get_nth(2) - (0.5 / 7.5)) < 1e-12
+}
+
+fn test_clip_grad_norm_supports_zero_norm() ! {
+	context := autograd.ctx[f64]()
+	parameter := context.variable(vtl.from_1d([3.0, 0.0, -4.0])!)
+	parameter.grad.set_nth(0, 3.0)
+	parameter.grad.set_nth(1, 0.0)
+	parameter.grad.set_nth(2, -4.0)
+	mut parameters := [parameter]
+
+	original_norm := clip_grad_norm_with_type[f64](mut parameters, 1.0, 0.0)!
+
+	assert original_norm == 2.0
+	assert parameter.grad.get_nth(0) == 1.5
+	assert parameter.grad.get_nth(1) == 0.0
+	assert parameter.grad.get_nth(2) == -2.0
+}
+
+fn test_clip_grad_norm_supports_general_p_norm() ! {
+	context := autograd.ctx[f64]()
+	parameter := context.variable(vtl.from_1d([3.0, -4.0])!)
+	parameter.grad.set_nth(0, 3.0)
+	parameter.grad.set_nth(1, -4.0)
+	mut parameters := [parameter]
+	norm := math.pow(3.0 * 3.0 * 3.0 + 4.0 * 4.0 * 4.0, 1.0 / 3.0)
+
+	original_norm := clip_grad_norm_with_type[f64](mut parameters, 2.0, 3.0)!
+
+	assert math.abs(original_norm - norm) < 1e-12
+	assert math.abs(parameter.grad.get_nth(0) - (3.0 * 2.0 / norm)) < 1e-12
+	assert math.abs(parameter.grad.get_nth(1) + (4.0 * 2.0 / norm)) < 1e-12
+}
+
+fn test_clip_grad_norm_supports_infinity_norm() ! {
+	context := autograd.ctx[f64]()
+	parameter := context.variable(vtl.from_1d([3.0, -4.0, 0.5])!)
+	parameter.grad.set_nth(0, 3.0)
+	parameter.grad.set_nth(1, -4.0)
+	parameter.grad.set_nth(2, 0.5)
+	mut parameters := [parameter]
+
+	original_norm := clip_grad_norm_with_type[f64](mut parameters, 2.0, math.inf(1))!
+
+	assert original_norm == 4.0
+	assert parameter.grad.get_nth(0) == 1.5
+	assert parameter.grad.get_nth(1) == -2.0
+	assert parameter.grad.get_nth(2) == 0.25
+}
+
+fn test_clip_grad_norm_rejects_invalid_norm_type() {
+	context := autograd.ctx[f64]()
+	parameter := context.variable(vtl.from_1d([3.0, 4.0])!)
+	mut parameters := [parameter]
+	_ := clip_grad_norm_with_type[f64](mut parameters, 2.0, -1.0) or {
+		assert err.msg().contains('norm_type must be finite and non-negative')
+		return
+	}
+	assert false, 'expected clip_grad_norm to reject a negative norm type'
+}
+
 fn test_clip_grad_norm_preserves_small_and_f32_gradients() ! {
 	context := autograd.ctx[f32]()
 	parameter := context.variable(vtl.from_1d([0.3, 0.4])!)
@@ -59,11 +133,25 @@ fn test_clip_grad_norm_rejects_invalid_limit() {
 	context := autograd.ctx[f64]()
 	parameter := context.variable(vtl.from_1d([0.0])!)
 	mut parameters := [parameter]
-	_ := clip_grad_norm[f64](mut parameters, 0.0) or {
-		assert err.msg().contains('max_norm must be finite and greater than zero')
+	_ := clip_grad_norm[f64](mut parameters, -1.0) or {
+		assert err.msg().contains('max_norm must be finite and non-negative')
 		return
 	}
-	assert false, 'expected clip_grad_norm to reject a zero limit'
+	assert false, 'expected clip_grad_norm to reject a negative limit'
+}
+
+fn test_clip_grad_norm_accepts_zero_limit() ! {
+	context := autograd.ctx[f64]()
+	parameter := context.variable(vtl.from_1d([3.0, -4.0])!)
+	parameter.grad.set_nth(0, 3.0)
+	parameter.grad.set_nth(1, -4.0)
+	mut parameters := [parameter]
+
+	original_norm := clip_grad_norm[f64](mut parameters, 0.0)!
+
+	assert original_norm == 5.0
+	assert parameter.grad.get_nth(0) == 0.0
+	assert parameter.grad.get_nth(1) == 0.0
 }
 
 fn test_clip_grad_value_clamps_trainable_elements() ! {

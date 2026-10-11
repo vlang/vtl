@@ -85,10 +85,12 @@ momentum value for the caller to apply; it does not mutate optimizer state.
 `CyclicLR` accepts a custom scale callback that receives the cycle number or
 minibatch step, selected by `scale_mode`; cycle callbacks use the same one-based
 cycle count as PyTorch.
-Gradient clipping includes global L2 norm clipping, which returns the
-pre-clipping norm, and element-wise value clipping. Both update trainable
-gradients in place; norm clipping supports f32/f64 gradients and rejects
-non-finite values.
+Gradient clipping includes global L2 clipping and a configurable global
+p-norm entry point (including zero-count and positive-infinity norms), which
+return the pre-clipping norm, plus element-wise value clipping. Both update
+trainable gradients in place; norm clipping supports f32/f64 gradients and
+rejects non-finite values. Optimizer integration and PyTorch's foreach/device
+behavior remain gaps.
 `ReduceLROnPlateau.step(current_lr, metric)` tracks the best metric and supports
 PyTorch-style min/max modes, relative/absolute thresholds, patience, cooldown,
 minimum LR, and epsilon. It returns the next LR for the caller to apply;
