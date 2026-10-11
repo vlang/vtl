@@ -33,7 +33,7 @@ pub fn sigmoid_cross_entropy_backward[T](gradient &vtl.Tensor[T], cache &vtl.Ten
 
 // softmax_cross_entropy_backward computes the gradient of the SCE loss w.r.t.
 // the logits. The gradient for each logit is:
-//   upstream * (softmax(logit_i) - target_i) / batch_size
+//   upstream * (sum(target) * softmax(logit_i) - target_i) / batch_size
 //
 // This is the standard gradient derived from the log-softmax formulation
 // (equivalent to Arraymancer's implementation).
@@ -284,12 +284,19 @@ pub fn kl_div_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], target 
 // cross_entropy computes CrossEntropyLoss (LogSoftmax + NLL combined).
 // This is the standard cross-entropy for multi-class classification.
 // input: [batch, n_classes] raw logits
-// target: [batch, n_classes] one-hot targets
+// target: one-hot/soft labels `[batch, n_classes]` or class indices `[batch]`.
 pub fn cross_entropy[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	// Forward: log_softmax(x) = x - log(sum(exp(x - max)))
 	//          loss = -mean(sum(target * log_softmax(x)))
+	if input.shape.len != 2 || input.shape[0] == 0 || input.shape[1] == 0 {
+		return error('Cross entropy requires non-empty rank-two logits')
+	}
 	batch_size := input.shape[0]
 	n_classes := input.shape[1]
+	class_indices := target.shape.len == 1 && target.shape[0] == batch_size
+	if !class_indices && target.shape != input.shape {
+		return error('Cross entropy targets must match logits or have shape [batch]')
+	}
 	mut total_loss := f64(0)
 	for i in 0 .. batch_size {
 		mut max_logit := f64(input.get([i, 0]))
@@ -302,20 +309,44 @@ pub fn cross_entropy[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Tenso
 			sum_exp += math.exp(f64(input.get([i, c])) - max_logit)
 		}
 		log_sum_exp := math.log(sum_exp) + max_logit
-		mut dot := f64(0)
-		for c in 0 .. n_classes {
-			dot += f64(target.get([i, c])) * (f64(input.get([i, c])) - log_sum_exp)
+		if class_indices {
+			class_index := cross_entropy_class_index[T](target, i, n_classes)!
+			total_loss += log_sum_exp - f64(input.get([i, class_index]))
+		} else {
+			mut dot := f64(0)
+			for c in 0 .. n_classes {
+				dot += f64(target.get([i, c])) * (f64(input.get([i, c])) - log_sum_exp)
+			}
+			total_loss -= dot
 		}
-		total_loss -= dot
 	}
 	return vtl.from_1d([vtl.cast[T](total_loss / f64(batch_size))])
 }
 
+fn cross_entropy_class_index[T](target &vtl.Tensor[T], row int, n_classes int) !int {
+	raw_class := f64(target.get_nth(row))
+	if !math.is_finite(raw_class) {
+		return error('Cross entropy class indices must be finite integers')
+	}
+	class_index := int(raw_class)
+	if raw_class != f64(class_index) || class_index < 0 || class_index >= n_classes {
+		return error('Cross entropy class index is out of range or not an integer')
+	}
+	return class_index
+}
+
 // cross_entropy_backward computes gradient of CrossEntropyLoss w.r.t. input logits.
-// dL/dx_i = (softmax(x)_i - target_i) / batch_size
+// dL/dx_i = (sum(target) * softmax(x)_i - target_i) / batch_size
 pub fn cross_entropy_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	if input.shape.len != 2 || input.shape[0] == 0 || input.shape[1] == 0 {
+		return error('Cross entropy requires non-empty rank-two logits')
+	}
 	batch_size := input.shape[0]
 	n_classes := input.shape[1]
+	class_indices := target.shape.len == 1 && target.shape[0] == batch_size
+	if !class_indices && target.shape != input.shape {
+		return error('Cross entropy targets must match logits or have shape [batch]')
+	}
 	upstream := f64(gradient.get([0]))
 	mut ret_data := []f64{len: batch_size * n_classes}
 	for i in 0 .. batch_size {
@@ -329,12 +360,22 @@ pub fn cross_entropy_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], 
 			sum_exp += math.exp(f64(input.get([i, c])) - max_logit)
 		}
 		mut target_sum := 0.0
-		for c in 0 .. n_classes {
-			target_sum += f64(target.get([i, c]))
+		mut class_index := -1
+		if class_indices {
+			class_index = cross_entropy_class_index[T](target, i, n_classes)!
+			target_sum = 1.0
+		} else {
+			for c in 0 .. n_classes {
+				target_sum += f64(target.get([i, c]))
+			}
 		}
 		for c in 0 .. n_classes {
 			sm := math.exp(f64(input.get([i, c])) - max_logit) / sum_exp
-			tgt := f64(target.get([i, c]))
+			tgt := if class_indices {
+				if c == class_index { 1.0 } else { 0.0 }
+			} else {
+				f64(target.get([i, c]))
+			}
 			ret_data[i * n_classes + c] = upstream * (sm * target_sum - tgt) / f64(batch_size)
 		}
 	}
