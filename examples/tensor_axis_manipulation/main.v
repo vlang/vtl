@@ -87,4 +87,12 @@ fn main() {
 	tile_loss.backprop()!
 	println('Image tiled by blocks: ${tiled_image.value.to_array()}')
 	println('Gradient after tile: ${image_to_tile.grad.to_array()}')
+
+	mut pad_context := autograd.ctx[f64]()
+	signal := pad_context.variable(vtl.from_1d([1.0, 2.0])!)
+	padded_signal := signal.pad([[1, 2]], .edge, 0.0)!
+	mut pad_loss := padded_signal.sum()!
+	pad_loss.backprop()!
+	println('Edge-padded signal: ${padded_signal.value.to_array()}')
+	println('Gradient after pad: ${signal.grad.to_array()}')
 }

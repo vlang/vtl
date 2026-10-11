@@ -468,6 +468,18 @@ pub fn (v &Variable[T]) tile(reps []int) !&Variable[T] {
 	return result
 }
 
+// pad adds values around each axis and accumulates gradients from padded
+// positions according to the selected padding mode.
+pub fn (v &Variable[T]) pad(pad_width [][]int, mode vtl.PadMode, constant_value T) !&Variable[T] {
+	value := vtl.pad[T](v.value, pad_width, mode, constant_value)!
+	mut result := v.context.variable(value)
+	if v.requires_grad {
+		gate := pad_gate[T](v.value.shape, pad_width, mode)
+		gate.cache(mut result, v)!
+	}
+	return result
+}
+
 // roll circularly shifts values, flattening by default like NumPy. Optional
 // axes apply the same shift to each selected axis and preserve autograd.
 pub fn (v &Variable[T]) roll(shift int, axes ...int) !&Variable[T] {

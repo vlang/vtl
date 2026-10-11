@@ -260,6 +260,35 @@ fn test_tile_forward_backward_sums_repeated_blocks() ! {
 	assert input.grad.to_array() == [54.0, 60.0, 90.0, 96.0]
 }
 
+fn test_pad_constant_backward_ignores_constant_values() ! {
+	mut context := autograd.ctx[f64]()
+	input := context.variable(vtl.from_1d([1.0, 2.0])!)
+	padded := input.pad([[1, 2]], .constant, -5.0)!
+	assert padded.value.to_array() == [-5.0, 1.0, 2.0, -5.0, -5.0]
+	mut loss := padded.sum()!
+	loss.backprop()!
+	assert input.grad.to_array() == [1.0, 1.0]
+}
+
+fn test_pad_nonconstant_modes_accumulate_gradients() ! {
+	for mode in [vtl.PadMode.edge, vtl.PadMode.wrap, vtl.PadMode.reflect, vtl.PadMode.symmetric] {
+		mut context := autograd.ctx[f64]()
+		input := context.variable(vtl.from_1d([1.0, 2.0])!)
+		padded := input.pad([[1, 2]], mode, 0.0)!
+		mut loss := padded.sum()!
+		loss.backprop()!
+		match mode {
+			.edge, .wrap, .reflect {
+				assert input.grad.to_array() == [2.0, 3.0]
+			}
+			.symmetric {
+				assert input.grad.to_array() == [3.0, 2.0]
+			}
+			else {}
+		}
+	}
+}
+
 fn test_roll_flat_backward_handles_extreme_shift() ! {
 	mut context := autograd.ctx[f64]()
 	input := context.variable(vtl.from_1d([1.0, 2.0, 3.0])!)
