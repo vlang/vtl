@@ -15,6 +15,12 @@ DataLoader returns a view when a batch's sample indices form a contiguous range.
 Shuffled, non-contiguous batches allocate tensors to preserve the requested
 sample order. A non-positive `batch_size` produces an empty loader.
 
+`DataLoaderConfig` defaults to `batch_size: 32`, `shuffle: true`, and
+`drop_last: true`. These differ from PyTorch's defaults (`1`, `false`, and
+`false`), so set all three explicitly when porting a training pipeline. Call
+`reset()` between epochs to advance the deterministic shuffle order from the
+configured seed.
+
 `load_imdb()` returns the full 25,000 review training and test splits. Use
 `load_imdb_with_config` for a smaller, class-balanced subset. Review features
 remain raw strings; labels are binary (`1` positive, `0` negative).
