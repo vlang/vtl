@@ -308,6 +308,105 @@ pub fn (array &MaskedArray[T]) max[T]() MaskedValue[T] {
 	return masked_extreme[T](array, true)
 }
 
+// argmin returns the flat logical index of the first smallest unmasked value.
+// An entirely masked array returns a masked result with index zero.
+pub fn (array &MaskedArray[T]) argmin[T]() MaskedValue[int] {
+	return masked_arg_extreme_flat[T](array, false)
+}
+
+// argmax returns the flat logical index of the first largest unmasked value.
+// An entirely masked array returns a masked result with index zero.
+pub fn (array &MaskedArray[T]) argmax[T]() MaskedValue[int] {
+	return masked_arg_extreme_flat[T](array, true)
+}
+
+// argmin_along_axis returns the first minimum index in each axis slice.
+// Slices with no unmasked values are marked in the output mask.
+pub fn (array &MaskedArray[T]) argmin_along_axis[T](axis int, keepdims bool) !MaskedArray[int] {
+	return masked_arg_extreme_along_axis[T](array, axis, keepdims, false)
+}
+
+// argmax_along_axis returns the first maximum index in each axis slice.
+// Slices with no unmasked values are marked in the output mask.
+pub fn (array &MaskedArray[T]) argmax_along_axis[T](axis int, keepdims bool) !MaskedArray[int] {
+	return masked_arg_extreme_along_axis[T](array, axis, keepdims, true)
+}
+
+fn masked_arg_extreme_flat[T](array &MaskedArray[T], maximum bool) MaskedValue[int] {
+	mut best_index := 0
+	mut best_value := cast[T](0)
+	mut best_is_nan := false
+	mut found := false
+	for flat_index in 0 .. array.values.size {
+		if array.mask.get_nth(flat_index) {
+			continue
+		}
+		value := array.values.get_nth(flat_index)
+		value_is_nan := masked_value_is_nan[T](value)
+		if !found || (value_is_nan && !best_is_nan)
+			|| (!value_is_nan && !best_is_nan && (if maximum {
+				value > best_value
+			} else {
+				value < best_value
+			})) {
+			best_index = flat_index
+			best_value = value
+			best_is_nan = value_is_nan
+		}
+		found = true
+	}
+	return MaskedValue[int]{
+		value:     best_index
+		is_masked: !found
+	}
+}
+
+fn masked_arg_extreme_along_axis[T](array &MaskedArray[T], axis int, keepdims bool, maximum bool) !MaskedArray[int] {
+	rank := array.values.rank()
+	reduced := normalize_masked_axes([axis], rank)!
+	axis_index := if axis < 0 { axis + rank } else { axis }
+	output_shape := masked_reduction_shape(array.values.shape, reduced, keepdims)
+	mut values := zeros[int](output_shape, TensorData{})
+	mut output_mask := ones[bool](output_shape, TensorData{})
+	mut best_values := []T{len: values.size}
+	mut found := []bool{len: values.size}
+	mut best_is_nan := []bool{len: values.size}
+	mut input_index := []int{len: rank}
+	for flat_index in 0 .. array.values.size {
+		if array.mask.get_nth(flat_index) {
+			continue
+		}
+		decode_flat_coordinate(flat_index, array.values.shape, mut input_index)
+		output_flat_index := masked_axes_output_index(input_index, array.values.shape, reduced)
+		value := array.values.get_nth(flat_index)
+		value_is_nan := masked_value_is_nan[T](value)
+		if !found[output_flat_index] || (value_is_nan && !best_is_nan[output_flat_index])
+			|| (!value_is_nan && !best_is_nan[output_flat_index]
+				&& (if maximum {
+					value > best_values[output_flat_index]
+				} else {
+					value < best_values[output_flat_index]
+				})) {
+			best_values[output_flat_index] = value
+			best_is_nan[output_flat_index] = value_is_nan
+			values.set_nth(output_flat_index, input_index[axis_index])
+			output_mask.set_nth(output_flat_index, false)
+		}
+		found[output_flat_index] = true
+	}
+	return MaskedArray[int]{
+		values: values
+		mask:   output_mask
+	}
+}
+
+fn masked_value_is_nan[T](value T) bool {
+	$if T is f32 || T is f64 {
+		return math.is_nan(f64(value))
+	}
+	return false
+}
+
 fn masked_extreme[T](array &MaskedArray[T], maximum bool) MaskedValue[T] {
 	mut result := cast[T](0)
 	mut count := 0
