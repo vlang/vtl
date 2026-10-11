@@ -941,20 +941,19 @@ matched run on the target machine.
 
 ## Binary cross-entropy
 
-This paired benchmark compares contiguous `f64` binary cross-entropy on
-524,288 probabilities and binary targets. VTL uses the fused direct-array
-kernel; a second VTL measurement is a two-pass clamp-then-reduce reference that
-keeps the intermediate allocation but avoids iterator overhead. NumPy uses
-`clip`, `log`, and `mean`. Each process runs one warmup and takes the median of
-three timed calls. Build VTL with `-prod` first, then run the binary separately
-from `~/.vmodules`:
+This paired benchmark compares stable mean binary cross-entropy from logits on
+524,288 contiguous `f64` values. VTL uses its direct-array softplus kernel;
+NumPy uses `logaddexp`. Both use logits from -10 to 10 and alternating binary
+targets. Each process runs one warmup and takes the median of three timed calls.
+We ran three independent processes per implementation. Build VTL with `-prod`
+first, then run the binary separately from `~/.vmodules`:
 
 ```bash
 systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
 	v -no-parallel -cc gcc -prod -cflags "-march=native" \
-	-o /tmp/vtl-bce-bench ./vtl/benchmarks/vs_numpy/bce_bench.v
+	-o /tmp/vtl-bce-logits-bench ./vtl/benchmarks/vs_numpy/bce_bench.v
 systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 \
-	VTL_BCE_BENCH_SIZE=524288 /tmp/vtl-bce-bench
+	VTL_BCE_BENCH_SIZE=524288 /tmp/vtl-bce-logits-bench
 systemd-run --user --scope --quiet -p MemoryMax=2G -p MemorySwapMax=0 -- env VJOBS=2 \
 	VTL_BCE_BENCH_SIZE=524288 OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 \
 	uv run --offline --no-project --with numpy python \
@@ -962,14 +961,11 @@ systemd-run --user --scope --quiet -p MemoryMax=2G -p MemorySwapMax=0 -- env VJO
 ```
 
 On an AMD Ryzen 9 5900X with V 0.5.2 `81be246`, GCC 16.2.1, and NumPy 2.5.4,
-three independent processes per implementation measured median per-process
-times of 12.396 ms for the fused VTL path, 15.684 ms for the two-pass VTL
-reference, and 11.886 ms for NumPy. All checksums were `0.985803403800`. In
-this workload the fused path was about 1.27× faster than the two-pass reference
-and about 4% slower than NumPy; this single CPU workload does not establish
-general performance parity. The two-pass reference is a loop-level model of
-the previous clamp allocation followed by reduction, not a timing of the old
-iterator-based implementation.
+the median of the three process medians was 7.188 ms for VTL and 7.684 ms for
+NumPy. Checksums were `2.583567743629` and `2.583567743628`, respectively. VTL
+was 1.07× faster in this workload; this one CPU measurement does not establish
+general performance parity. `-march=native` targets the local CPU and should not
+be used for portable binaries.
 
 ## Notes
 

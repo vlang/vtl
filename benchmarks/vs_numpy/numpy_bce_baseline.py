@@ -8,14 +8,11 @@ def main() -> None:
     size = int(os.environ.get("VTL_BCE_BENCH_SIZE", "524288"))
     if size <= 0:
         raise SystemExit("VTL_BCE_BENCH_SIZE must be a positive integer")
-    probabilities = 0.000001 + (np.arange(size, dtype=np.float64) % 999_999) * (
-        0.999998 / 999_999.0
-    )
+    logits = (np.arange(size, dtype=np.int64) % 2001).astype(np.float64) / 100.0 - 10.0
     targets = (np.arange(size) % 2 == 0).astype(np.float64)
 
     def calculate() -> np.float64:
-        clipped = np.clip(probabilities, 1e-7, 1.0 - 1e-7)
-        values = -targets * np.log(clipped) - (1.0 - targets) * np.log(1.0 - clipped)
+        values = np.logaddexp(0.0, logits) - logits * targets
         return np.mean(values)
 
     for _ in range(1):
