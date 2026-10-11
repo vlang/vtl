@@ -213,8 +213,11 @@ mut scheduler2 := optimizers.exponential_lr[f32](0.95)
 // CosineAnnealingLR: cosine decay from initial_lr to lrd
 mut scheduler3 := optimizers.cosine_annealing_lr[f32](100, 1e-5)
 
+// LinearLR: linear warmup from 10% to 100% of the base learning rate
+mut scheduler4 := optimizers.linear_lr[f32](0.1, 1.0, 10)
+
 // ReduceLROnPlateau: reduce when metric stops improving
-mut scheduler4 := optimizers.reduce_lr_on_plateau[f32](optimizers.ReduceLROnPlateauConfig{
+mut scheduler5 := optimizers.reduce_lr_on_plateau[f32](optimizers.ReduceLROnPlateauConfig{
 	patience: 10
 	factor:   0.1
 })

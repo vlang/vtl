@@ -71,6 +71,34 @@ pub fn (s &CosineAnnealingLR[T]) next_lr(current_lr f64, step int) f64 {
 	return s.lrd + (current_lr - s.lrd) * (1.0 + math.cos(math.pi * f64(step) / f64(s.t_max))) / 2.0
 }
 
+// LinearLR scales the base learning rate linearly between two factors.
+pub struct LinearLR[T] {
+	start_factor f64
+	end_factor   f64
+	total_iters  int
+}
+
+// linear_lr creates a linear learning-rate schedule. The returned value is
+// based on `base_lr` and interpolates from `start_factor` to `end_factor`.
+pub fn linear_lr[T](start_factor f64, end_factor f64, total_iters int) &LinearLR[T] {
+	return &LinearLR[T]{
+		start_factor: start_factor
+		end_factor:   end_factor
+		total_iters:  total_iters
+	}
+}
+
+// next_lr exposes this operation as part of the public API.
+pub fn (s &LinearLR[T]) next_lr(base_lr f64, step int) f64 {
+	if s.total_iters <= 0 {
+		return base_lr * s.end_factor
+	}
+	clamped_step := math.min(math.max(step, 0), s.total_iters)
+	ratio := f64(clamped_step) / f64(s.total_iters)
+	factor := s.start_factor + ratio * (s.end_factor - s.start_factor)
+	return base_lr * factor
+}
+
 // ReduceLROnPlateau reduces LR when a metric has stopped improving.
 pub struct ReduceLROnPlateau[T] {
 	factor    f64
