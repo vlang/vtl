@@ -19,6 +19,7 @@ masks, sequential source consumption, and autograd for selected source values.
 `Variable.roll` and `Variable.roll_shifts` propagate gradients with inverse
 shifts. `Variable.rot90`, `Variable.rot90_k`, and `Variable.rot90_axes` rotate
 tensor planes and propagate gradients through the inverse rotation.
+`Variable.flip` propagates gradients through the self-inverse axis reversal.
 
 **Next:** Audit operator coverage and semantics against `torch.Tensor`, including
 dtype promotion, scalar behavior, strides, views, in-place operations, and error

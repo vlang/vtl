@@ -57,4 +57,15 @@ fn main() {
 	rotation_loss.backprop()!
 	println('Rotated image [rows, columns]: ${rotated.value.to_array()}')
 	println('Gradient after rot90: ${image.grad.to_array()}')
+
+	mut flip_context := autograd.ctx[f64]()
+	image_to_flip := flip_context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [
+		2,
+		3,
+	])!)
+	flipped_image := image_to_flip.flip(1)!
+	mut flip_loss := flipped_image.sum()!
+	flip_loss.backprop()!
+	println('Flipped image across columns: ${flipped_image.value.to_array()}')
+	println('Gradient after flip: ${image_to_flip.grad.to_array()}')
 }

@@ -176,6 +176,17 @@ fn test_rot90_axes_normalizes_negative_axes_and_turns() ! {
 	assert input.grad.to_array() == [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 }
 
+fn test_flip_forward_backward_uses_same_axes() ! {
+	mut context := autograd.ctx[f64]()
+	input := context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [2, 3])!)
+	weights := context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [2, 3])!)
+	flipped := input.flip(-1)!
+	assert flipped.value.to_array() == [3.0, 2.0, 1.0, 6.0, 5.0, 4.0]
+	mut loss := flipped.multiply(weights)!.sum()!
+	loss.backprop()!
+	assert input.grad.to_array() == [3.0, 2.0, 1.0, 6.0, 5.0, 4.0]
+}
+
 fn test_roll_flat_backward_handles_extreme_shift() ! {
 	mut context := autograd.ctx[f64]()
 	input := context.variable(vtl.from_1d([1.0, 2.0, 3.0])!)
