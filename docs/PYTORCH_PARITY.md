@@ -91,6 +91,9 @@ return the pre-clipping norm, plus element-wise value clipping. Both update
 trainable gradients in place; norm clipping supports f32/f64 gradients and
 rejects non-finite values. Optimizer integration and PyTorch's foreach/device
 behavior remain gaps.
+`get_total_grad_norm` computes the norm without mutation, and
+`clip_grads_with_norm` applies a previously computed norm, matching the split
+offered by PyTorch's `get_total_norm` and `clip_grads_with_norm_` APIs.
 `ReduceLROnPlateau.step(current_lr, metric)` tracks the best metric and supports
 PyTorch-style min/max modes, relative/absolute thresholds, patience, cooldown,
 minimum LR, and epsilon. It returns the next LR for the caller to apply;

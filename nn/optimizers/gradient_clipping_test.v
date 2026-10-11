@@ -84,6 +84,47 @@ fn test_clip_grad_norm_supports_infinity_norm() ! {
 	assert parameter.grad.get_nth(2) == 0.25
 }
 
+fn test_get_total_grad_norm_is_read_only() ! {
+	context := autograd.ctx[f64]()
+	parameter := context.variable(vtl.from_1d([3.0, 4.0])!)
+	parameter.grad.set_nth(0, 3.0)
+	parameter.grad.set_nth(1, 4.0)
+	parameters := [parameter]
+
+	norm := get_total_grad_norm[f64](parameters)!
+
+	assert norm == 5.0
+	assert parameter.grad.get_nth(0) == 3.0
+	assert parameter.grad.get_nth(1) == 4.0
+}
+
+fn test_get_total_grad_norm_with_type_uses_global_norm() ! {
+	context := autograd.ctx[f64]()
+	first := context.variable(vtl.from_1d([3.0])!)
+	second := context.variable(vtl.from_1d([-4.0, 0.5])!)
+	first.grad.set_nth(0, 3.0)
+	second.grad.set_nth(0, -4.0)
+	second.grad.set_nth(1, 0.5)
+	parameters := [first, second]
+
+	norm := get_total_grad_norm_with_type[f64](parameters, 1.0)!
+
+	assert norm == 7.5
+}
+
+fn test_clip_grads_with_precomputed_norm() ! {
+	context := autograd.ctx[f64]()
+	parameter := context.variable(vtl.from_1d([3.0, 4.0])!)
+	parameter.grad.set_nth(0, 3.0)
+	parameter.grad.set_nth(1, 4.0)
+	mut parameters := [parameter]
+
+	clip_grads_with_norm[f64](mut parameters, 2.0, 5.0)!
+
+	assert math.abs(parameter.grad.get_nth(0) - 1.2) < 1e-12
+	assert math.abs(parameter.grad.get_nth(1) - 1.6) < 1e-12
+}
+
 fn test_clip_grad_norm_rejects_invalid_norm_type() {
 	context := autograd.ctx[f64]()
 	parameter := context.variable(vtl.from_1d([3.0, 4.0])!)
