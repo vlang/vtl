@@ -292,6 +292,34 @@ pub fn median[T](t &vtl.Tensor[T]) f64 {
 	return quantile_linear[T](t, 0.5) or { math.nan() }
 }
 
+// median_axis returns the linearly interpolated median per axis slice and
+// retains the reduced axis with length one.
+pub fn median_axis[T](t &vtl.Tensor[T], axis int) !&vtl.Tensor[f64] {
+	return median_axis_keepdims[T](t, axis, true)
+}
+
+// median_axis_squeeze removes the reduced axis from the median result.
+pub fn median_axis_squeeze[T](t &vtl.Tensor[T], axis int) !&vtl.Tensor[f64] {
+	return median_axis_keepdims[T](t, axis, false)
+}
+
+// median_axis_keepdims controls whether the reduced axis remains at length one.
+pub fn median_axis_keepdims[T](t &vtl.Tensor[T], axis int, keepdims bool) !&vtl.Tensor[f64] {
+	return quantile_axis_impl[T](t, 0.5, axis, false, keepdims)
+}
+
+// median_axes computes medians over multiple axes with optional retained
+// reduced dimensions. The estimator matches NumPy's default linear method.
+pub fn median_axes[T](t &vtl.Tensor[T], axes []int, keepdims bool) !&vtl.Tensor[f64] {
+	return quantile_axes_with_method[T](t, 0.5, axes, .linear, keepdims)
+}
+
+// nanmedian_axes computes NaN-ignoring medians over multiple axes with
+// optional retained reduced dimensions.
+pub fn nanmedian_axes[T](t &vtl.Tensor[T], axes []int, keepdims bool) !&vtl.Tensor[f64] {
+	return nanquantile_axes_with_method[T](t, 0.5, axes, .linear, keepdims)
+}
+
 // Measure of Central Tendency
 // Mode of the given input array
 // Based on
@@ -1078,7 +1106,12 @@ pub fn nanquantile_axis[T](t &vtl.Tensor[T], q f64, axis int) !&vtl.Tensor[f64] 
 // nanmedian_axis computes the NaN-ignoring median per axis slice and retains
 // the reduced axis with length one.
 pub fn nanmedian_axis[T](t &vtl.Tensor[T], axis int) !&vtl.Tensor[f64] {
-	return nanquantile_axis[T](t, 0.5, axis)
+	return nanmedian_axis_keepdims[T](t, axis, true)
+}
+
+// nanmedian_axis_keepdims controls whether the reduced axis remains at length one.
+pub fn nanmedian_axis_keepdims[T](t &vtl.Tensor[T], axis int, keepdims bool) !&vtl.Tensor[f64] {
+	return quantile_axis_impl[T](t, 0.5, axis, true, keepdims)
 }
 
 // nanquantile_axis_squeeze ignores NaNs and removes the reduced axis from the
@@ -1090,7 +1123,7 @@ pub fn nanquantile_axis_squeeze[T](t &vtl.Tensor[T], q f64, axis int) !&vtl.Tens
 // nanmedian_axis_squeeze computes the NaN-ignoring median per axis slice and
 // removes the reduced axis from the result shape.
 pub fn nanmedian_axis_squeeze[T](t &vtl.Tensor[T], axis int) !&vtl.Tensor[f64] {
-	return nanquantile_axis_squeeze[T](t, 0.5, axis)
+	return nanmedian_axis_keepdims[T](t, axis, false)
 }
 
 // quantiles_axis computes several linearly interpolated quantiles for each
