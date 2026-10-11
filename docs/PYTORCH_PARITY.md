@@ -82,12 +82,19 @@ scheduler values with optimizer updates.
 
 ### Data pipeline
 
-**VTL today:** Dataset and DataLoader APIs, plus MNIST, IMDB, and CIFAR-10
-loaders.
+**VTL today:** A tensor-backed `DataLoader` batches rows and optional labels,
+supports seeded shuffling and `drop_last`, and ships MNIST, IMDB, and CIFAR-10
+loaders. Its defaults are `batch_size: 32`, `shuffle: true`, and
+`drop_last: true`; PyTorch's `DataLoader` defaults are `1`, `false`, and
+`false`, respectively. VTL does not yet expose PyTorch's custom samplers,
+batch samplers, collation callbacks, iterable datasets, worker processes, or
+pinned-memory loading.
 
-**Next:** Add composable transforms, samplers, batching and collation controls,
-worker and process loading, streaming datasets, and stronger reproducibility
-controls.
+**Next:** Add composable transforms, samplers and batch samplers, collation
+controls, worker and process loading, streaming datasets, and stronger
+reproducibility controls. See the [PyTorch data loading API](https://docs.pytorch.org/docs/stable/data.html)
+when porting a pipeline; specify VTL loader options explicitly because its
+defaults differ.
 
 ### Serialization
 
