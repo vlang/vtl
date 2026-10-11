@@ -72,11 +72,13 @@ floating-point reduction order. This checksum is not an elementwise accuracy
 check. Results apply only to this contiguous f64 workload and are not a
 framework-wide performance claim.
 
-On an AMD Ryzen 9 5900X with V 0.5.2 and GCC 16.2.1 (`-prod
--march=native`), three interleaved process runs on 2026-10-10 measured median
-means of 2.372 ms for VTL and 0.859 ms for NumPy 2.5.3. Checksums matched at
-169131123. VTL is about 2.76× slower on this isolated contiguous f64 maximum
-workload; this result identifies a performance gap and is not a framework-wide
+On an AMD Ryzen 9 5900X with V 0.5.2 `a60fb58`, GCC 16.2.1, and NumPy 2.5.3,
+five interleaved `-prod -march=native` process runs on 2026-10-11 compared the
+previous VTL build, the f64 SIMD path, and NumPy. Median means were 2.123 ms,
+1.891 ms, and 0.708 ms respectively. The SIMD path improved VTL by 11% against
+the paired local baseline; NumPy was 2.67× faster than the new VTL path. All
+checksums matched at 169131123. This result applies only to this isolated
+contiguous f64 maximum workload and is not a framework-wide performance
 comparison.
 
 ## Mixed-dtype integer remainder
