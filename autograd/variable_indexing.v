@@ -170,6 +170,52 @@ fn take_flat_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
 	return tensor_ptrs_to_voidptrs[T](tensors)
 }
 
+// boolean_index selects values under a leading-dimension mask and propagates
+// gradients back to the selected source coordinates.
+pub fn (v &Variable[T]) boolean_index(mask &vtl.Tensor[bool]) !&Variable[T] {
+	value := vtl.boolean_index[T](v.value, mask)!
+	mut result := variable[T](v.context, value, requires_grad: v.requires_grad)
+	if v.requires_grad {
+		gate := &BooleanIndexGate[T]{
+			coordinates: vtl.nonzero[bool](mask)!
+			input_shape: v.value.shape.clone()
+			mask_rank:   mask.rank()
+		}
+		register[T]('BooleanIndex', voidptr(gate), boolean_index_backward_dispatch[T], result, [v])!
+	}
+	return result
+}
+
+struct BooleanIndexGate[T] {
+	coordinates []&vtl.Tensor[int]
+	input_shape []int
+	mask_rank   int
+}
+
+fn (g &BooleanIndexGate[T]) backward(gradient &vtl.Tensor[T]) ![]&vtl.Tensor[T] {
+	mut input_gradient := vtl.zeros[T](g.input_shape)
+	mut input_index := []int{len: g.input_shape.len}
+	for flat_index in 0 .. gradient.size {
+		output_index := gradient.nth_index(flat_index)
+		selected_position := output_index[0]
+		for axis in 0 .. g.mask_rank {
+			input_index[axis] = g.coordinates[axis].get_nth(selected_position)
+		}
+		for input_axis in g.mask_rank .. g.input_shape.len {
+			input_index[input_axis] = output_index[input_axis - g.mask_rank + 1]
+		}
+		input_gradient.set(input_index, input_gradient.get(input_index) + gradient.get(output_index))
+	}
+	return [input_gradient]
+}
+
+fn boolean_index_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_gate := unsafe { &BooleanIndexGate[T](gate) }
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := typed_gate.backward(typed_payload.variable.grad)!
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // take_along_axis gathers values and tracks the inverse scatter in backprop.
 // Repeated indices accumulate their gradients; non-axis broadcast dimensions
 // are reduced into the corresponding source coordinates.

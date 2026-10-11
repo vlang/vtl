@@ -77,6 +77,17 @@ fn test_take_flat_with_mode_backward_clips_indices() ! {
 	assert input.grad.to_array() == [1.0, 0.0, 0.0, 0.0, 0.0, 1.0]
 }
 
+fn test_boolean_index_backward_scatter_adds_selected_prefix_gradients() ! {
+	mut ctx := autograd.ctx[f64]()
+	input := ctx.variable(vtl.from_array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0], [2, 2, 2])!)
+	mask := vtl.from_array([true, false, true, true], [2, 2])!
+	mut selected := input.boolean_index(mask)!
+	assert selected.value.shape == [3, 2]
+	assert selected.value.to_array() == [0.0, 1.0, 4.0, 5.0, 6.0, 7.0]
+	selected.backprop()!
+	assert input.grad.to_array() == [1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0]
+}
+
 fn test_take_along_axis_backward_accumulates_repeated_indices() ! {
 	mut ctx := autograd.ctx[f64]()
 	input := ctx.variable(vtl.from_array([10.0, 20.0, 30.0, 40.0, 50.0, 60.0], [2, 3])!)
