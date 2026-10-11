@@ -99,20 +99,27 @@ pub struct NLLLossGate[T] {
 pub:
 	input  &vtl.Tensor[T] = unsafe { nil }
 	target &vtl.Tensor[T] = unsafe { nil }
+	weight &vtl.Tensor[T] = unsafe { nil }
 }
 
 // nll_loss_gate exposes this operation as part of the public API.
 pub fn nll_loss_gate[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) &NLLLossGate[T] {
+	return nll_loss_weighted_gate[T](input, target, unsafe { nil })
+}
+
+// nll_loss_weighted_gate creates an NLL gate with per-class weights.
+pub fn nll_loss_weighted_gate[T](input &vtl.Tensor[T], target &vtl.Tensor[T], weight &vtl.Tensor[T]) &NLLLossGate[T] {
 	return &NLLLossGate[T]{
 		input:  input
 		target: target
+		weight: weight
 	}
 }
 
 // backward exposes this operation as part of the public API.
 pub fn (g &NLLLossGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
-	r0 := internal.nll_backward[T](gradient, g.input, g.target)!
+	r0 := internal.nll_backward[T](gradient, g.input, g.target, g.weight)!
 	return [r0]
 }
 

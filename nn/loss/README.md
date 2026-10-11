@@ -11,7 +11,7 @@ This module currently provides:
 | `sigmoid_cross_entropy_loss` | Binary cross entropy from logits, using a sigmoid internally. |
 | `cross_entropy_loss` | `-sum(y * log_softmax(logits))`; raw logits with one-hot targets or class indices. |
 | `softmax_cross_entropy_loss` | Multiclass cross entropy with softmax over logits and one-hot targets. |
-| `nll_loss` | Negative log likelihood from log probabilities after log-softmax; target is one-hot. |
+| `nll_loss` | Negative log likelihood from log probabilities after log-softmax; accepts class indices or one-hot/soft targets and optional per-class weights. |
 | `kl_div_loss` | `sum(P * log(P / Q))`; input is `log(Q)` and target is probability distribution `P`. |
 | `huber_loss` | `0.5 d^2` when `|d| <= delta`, otherwise `delta (|d| - 0.5 delta)`, averaged. |
 
