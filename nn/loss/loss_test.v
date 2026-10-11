@@ -112,15 +112,34 @@ fn test_bce_loss_probability_backward_matches_mean_bce() ! {
 	assert math.abs(pred.grad.get_nth(1) - 2.0) < 1e-12
 }
 
-fn test_bce_loss_clamps_probability_bounds_in_reduction() ! {
+fn test_bce_loss_clamps_logarithms_at_minus_100() ! {
 	c := ctx[f64]()
 	pred := variable[f64](c, [0.0, 1.0], [2])!
 	target := tensor[f64]([1.0, 0.0], [2])!
 	result := bce_loss[f64](from_logits: false).loss(pred, target)!
-	assert math.abs(result.value.get_nth(0) + math.log(1e-7)) < 1e-9
+	assert math.abs(result.value.get_nth(0) - 100.0) < 1e-12
 }
 
-fn test_bce_loss_strided_inputs_use_broadcast_fallback() ! {
+fn test_bce_loss_probability_correct_boundaries_have_zero_loss() ! {
+	c := ctx[f64]()
+	pred := variable[f64](c, [0.0, 1.0], [2])!
+	target := tensor[f64]([0.0, 1.0], [2])!
+	result := bce_loss[f64](from_logits: false).loss(pred, target)!
+	assert result.value.get_nth(0) == 0.0
+}
+
+fn test_bce_loss_probability_rejects_values_outside_unit_interval() ! {
+	c := ctx[f64]()
+	pred := variable[f64](c, [-0.1], [1])!
+	target := tensor[f64]([1.0], [1])!
+	bce_loss[f64](from_logits: false).loss(pred, target) or {
+		assert err.msg().contains('probabilities must be in [0, 1]')
+		return
+	}
+	assert false, 'BCE loss should reject probabilities outside [0, 1]'
+}
+
+fn test_bce_loss_strided_inputs_use_strided_path() ! {
 	c := ctx[f64]()
 	input_base := tensor[f64]([0.1, 0.2, 0.7, 0.8], [2, 2])!
 	target_base := tensor[f64]([0.0, 1.0, 1.0, 0.0], [2, 2])!
@@ -129,6 +148,17 @@ fn test_bce_loss_strided_inputs_use_broadcast_fallback() ! {
 	result := bce_loss[f64](from_logits: false).loss(pred, target)!
 	expected := (-math.log(0.9) - math.log(0.7) - math.log(0.2) - math.log(0.2)) / 4.0
 	assert math.abs(result.value.get_nth(0) - expected) < 1e-12
+}
+
+fn test_bce_loss_rejects_broadcast_shapes() ! {
+	c := ctx[f64]()
+	pred := variable[f64](c, [0.2, 0.8], [2])!
+	target := tensor[f64]([1.0], [1])!
+	bce_loss[f64]().loss(pred, target) or {
+		assert err.msg().contains('identical shapes')
+		return
+	}
+	assert false, 'BCE loss should reject mismatched input and target shapes'
 }
 
 // Huber loss tests

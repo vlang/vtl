@@ -69,6 +69,9 @@ pub fn softmax_cross_entropy_backward[T](gradient &vtl.Tensor[T], cache &vtl.Ten
 // the stable softplus form: max(x, 0) - x*y + log(1 + exp(-abs(x))).
 @[direct_array_access; inline]
 pub fn bce_with_logits[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	if input.shape != target.shape {
+		return error('BCE loss requires input and target with identical shapes')
+	}
 	if input.shape == target.shape && input.is_row_major_contiguous()
 		&& target.is_row_major_contiguous() && input.data.data.len == input.size()
 		&& target.data.data.len == target.size() {
@@ -76,64 +79,88 @@ pub fn bce_with_logits[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Ten
 		for i in 0 .. input.size() {
 			x := f64(input.data.data[i])
 			y := f64(target.data.data[i])
+			if !math.is_finite(y) || y < 0.0 || y > 1.0 {
+				return error('BCE loss targets must be in [0, 1]')
+			}
 			value := math.max(x, 0.0) - x * y + math.log(1.0 + math.exp(-math.abs(x)))
 			sum += vtl.cast[T](value)
 		}
 		return vtl.from_1d([sum / vtl.cast[T](input.size())])
 	}
-	sum := input.nreduce([target], vtl.cast[T](0), fn [T](acc T, vals []T, i []int) T {
-		x := f64(vals[0])
-		y := f64(vals[1])
+	mut sum := vtl.cast[T](0)
+	for i in 0 .. input.size() {
+		x := f64(input.get_nth(i))
+		y := f64(target.get_nth(i))
+		if !math.is_finite(y) || y < 0.0 || y > 1.0 {
+			return error('BCE loss targets must be in [0, 1]')
+		}
 		value := math.max(x, 0.0) - x * y + math.log(1.0 + math.exp(-math.abs(x)))
-		return acc + vtl.cast[T](value)
-	})!
+		sum += vtl.cast[T](value)
+	}
 	return vtl.from_1d([sum / vtl.cast[T](input.size())])
 }
 
-// bce computes binary cross entropy between probabilities and target.
-// input values should be in (0,1) — caller is responsible for clamping/sigmoid.
+// bce computes mean binary cross entropy from probabilities in [0, 1]. Log
+// outputs are floored at -100 to keep boundary cases finite.
 
 // bce exposes this operation as part of the public API.
 
 // bce exposes this operation as part of the public API.
 @[direct_array_access; inline]
 pub fn bce[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Tensor[T] {
-	one := vtl.cast[T](1)
-	epsilon := vtl.cast[T](1e-7)
-	if input.shape == target.shape && input.is_row_major_contiguous()
+	if input.shape != target.shape {
+		return error('BCE loss requires input and target with identical shapes')
+	}
+	if input.is_row_major_contiguous()
 		&& target.is_row_major_contiguous() && input.data.data.len == input.size()
 		&& target.data.data.len == target.size() {
 		mut sum := vtl.cast[T](0)
 		for i in 0 .. input.size() {
-			probability := input.data.data[i]
-			clamped := if probability <= epsilon {
-				epsilon
-			} else if probability >= one - epsilon {
-				one - epsilon
-			} else {
-				probability
+			probability := f64(input.data.data[i])
+			y := f64(target.data.data[i])
+			if !math.is_finite(probability) || probability < 0.0 || probability > 1.0 {
+				return error('BCE loss probabilities must be in [0, 1]')
 			}
-			y := target.data.data[i]
-			sum += -y * vtl.cast[T](math.log(vtl.cast[f64](clamped))) -
-				(one - y) * vtl.cast[T](math.log(vtl.cast[f64](one - clamped)))
+			if !math.is_finite(y) || y < 0.0 || y > 1.0 {
+				return error('BCE loss targets must be in [0, 1]')
+			}
+			log_probability := if probability == 0.0 {
+				-100.0
+			} else {
+				math.max(math.log(probability), -100.0)
+			}
+			log_one_minus_probability := if probability == 1.0 {
+				-100.0
+			} else {
+				math.max(math.log(1.0 - probability), -100.0)
+			}
+			sum += vtl.cast[T](-y * log_probability - (1.0 - y) * log_one_minus_probability)
 		}
 		return vtl.from_1d([sum / vtl.cast[T](input.size())])
 	}
-	sum := input.nreduce([target], vtl.cast[T](0), fn [one, epsilon] [T](acc T, vals []T, i []int) T {
-		probability := vals[0]
-		clamped := if probability <= epsilon {
-			epsilon
-		} else if probability >= one - epsilon {
-			one - epsilon
-		} else {
-			probability
+	mut sum := vtl.cast[T](0)
+	for i in 0 .. input.size() {
+		probability := f64(input.get_nth(i))
+		y := f64(target.get_nth(i))
+		if !math.is_finite(probability) || probability < 0.0 || probability > 1.0 {
+			return error('BCE loss probabilities must be in [0, 1]')
 		}
-		y := vals[1]
-		return acc + (-y * vtl.cast[T](math.log(vtl.cast[f64](clamped))) -
-			(one - y) * vtl.cast[T](math.log(vtl.cast[f64](one - clamped))))
-	})!
-	size := input.size()
-	return vtl.from_1d([sum / vtl.cast[T](size)])
+		if !math.is_finite(y) || y < 0.0 || y > 1.0 {
+			return error('BCE loss targets must be in [0, 1]')
+		}
+		log_probability := if probability == 0.0 {
+			-100.0
+		} else {
+			math.max(math.log(probability), -100.0)
+		}
+		log_one_minus_probability := if probability == 1.0 {
+			-100.0
+		} else {
+			math.max(math.log(1.0 - probability), -100.0)
+		}
+		sum += vtl.cast[T](-y * log_probability - (1.0 - y) * log_one_minus_probability)
+	}
+	return vtl.from_1d([sum / vtl.cast[T](input.size())])
 }
 
 // bce_backward computes the gradient of mean BCE w.r.t. its input.
