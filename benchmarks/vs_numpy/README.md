@@ -73,12 +73,10 @@ check. Results apply only to this contiguous f64 workload and are not a
 framework-wide performance claim.
 
 On an AMD Ryzen 9 5900X with V 0.5.2 `a60fb58`, GCC 16.2.1, and NumPy 2.5.3,
-five interleaved `-prod -march=native` process runs on 2026-10-11 compared the
-previous VTL build, the f64 SIMD path, and NumPy. Median means were 2.123 ms,
-1.891 ms, and 0.708 ms respectively. The SIMD path improved VTL by 11% against
-the paired local baseline; NumPy was 2.67× faster than the new VTL path. All
-checksums matched at 169131123. This result applies only to this isolated
-contiguous f64 maximum workload and is not a framework-wide performance
+ten interleaved `-prod -march=native` process runs on 2026-10-11 measured median
+means of 2.097 ms for VTL and 0.647 ms for NumPy. Checksums matched at
+169131123. NumPy was 3.24× faster in this isolated contiguous f64 maximum
+workload. This identifies a VTL performance gap and is not a framework-wide
 comparison.
 
 ## Mixed-dtype integer remainder

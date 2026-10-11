@@ -2,7 +2,6 @@ module vtl
 
 import math
 import math.complex as vcomplex
-import simd
 
 // sign returns the elementwise sign of each value: -1, 0, or 1. Floating-point
 // NaNs remain NaN, matching NumPy's sign behavior.
@@ -610,12 +609,6 @@ pub fn (a &Tensor[T]) fmin[T](b &Tensor[T]) !&Tensor[T] {
 
 @[direct_array_access]
 fn tensor_extreme[T](a &Tensor[T], b &Tensor[T], want_max bool, ignore_nan bool) !&Tensor[T] {
-	$if T is f64 {
-		if want_max && !ignore_nan && a.shape == b.shape && a.is_row_major_contiguous()
-			&& b.is_row_major_contiguous() && a.data.data.len == a.size && b.data.data.len == b.size {
-			return tensor_maximum_f64_contiguous(a, b)
-		}
-	}
 	if a.shape == b.shape && a.is_row_major_contiguous() && b.is_row_major_contiguous()
 		&& a.data.data.len == a.size && b.data.data.len == b.size {
 		mut result := empty[T](a.shape, memory: .row_major)
@@ -628,26 +621,6 @@ fn tensor_extreme[T](a &Tensor[T], b &Tensor[T], want_max bool, ignore_nan bool)
 	return a.nmap[T]([b], fn [want_max, ignore_nan] [T](xs []T, _ []int) T {
 		return numpy_extreme[T](xs[0], xs[1], want_max, ignore_nan)
 	})
-}
-
-@[direct_array_access]
-fn tensor_maximum_f64_contiguous(a &Tensor[f64], b &Tensor[f64]) &Tensor[f64] {
-	mut result := empty[f64](a.shape, memory: .row_major)
-	mut i := 0
-	for ; i + 4 <= a.size; i += 4 {
-		left := simd.load_f64x4_at(a.data.data, i)
-		right := simd.load_f64x4_at(b.data.data, i)
-		left_nan := left.ne(left)
-		right_nan := right.ne(right)
-		maximum := simd.select_f64x4(left.gt(right), left, right)
-		propagated_nan := simd.select_f64x4(left_nan, left, right)
-		value := simd.select_f64x4(left_nan.or(right_nan), propagated_nan, maximum)
-		value.store_at(mut result.data.data, i)
-	}
-	for ; i < a.size; i++ {
-		result.data.data[i] = numpy_extreme[f64](a.data.data[i], b.data.data[i], true, false)
-	}
-	return result
 }
 
 @[inline]

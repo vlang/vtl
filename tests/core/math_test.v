@@ -425,20 +425,6 @@ fn test_elementwise_extrema_follow_numpy_nan_and_zero_rules() {
 	assert math.signbit(fminimum.get_nth(4))
 }
 
-fn test_maximum_f64_simd_chunks_and_tail_preserve_numpy_rules() {
-	nan := math.nan()
-	left := vtl.from_1d([1.0, nan, 3.0, 4.0, -0.0, 6.0, 7.0, 8.0, 9.0])!
-	right := vtl.from_1d([0.0, 2.0, nan, 5.0, 0.0, 5.0, 8.0, 7.0, 10.0])!
-	maximum := left.max(right)!
-
-	assert maximum.get_nth(0) == 1.0
-	assert math.is_nan(maximum.get_nth(1))
-	assert math.is_nan(maximum.get_nth(2))
-	assert maximum.get_nth(3) == 5.0
-	assert !math.signbit(maximum.get_nth(4))
-	assert maximum.to_array()[5..] == [6.0, 8.0, 8.0, 10.0]
-}
-
 fn test_elementwise_extrema_broadcast_views_and_boolean_values() {
 	values := vtl.from_2d([[1, 4], [3, 2]])!
 	transposed := values.transpose([1, 0])!
