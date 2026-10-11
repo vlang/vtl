@@ -18,6 +18,8 @@ fn main() {
 		batch, batch_labels := loader.batch_with_labels(i) or { continue }
 		println('sample=${int(batch_labels.get_nth(0))}, features=${batch.to_array()}')
 	}
+	collated := loader.collated_batch(0)!
+	println('collated features=${collated.features.to_array()}')
 	weighted_sampler := nn_data.WeightedRandomSampler.new([0.0, 1.0, 0.0, 3.0], 4, true)!
 	weighted_loader := datasets.new_data_loader_with_labels_and_sampler_checked[f64](features,
 		labels, datasets.DataLoaderConfig{

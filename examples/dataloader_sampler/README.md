@@ -5,7 +5,8 @@ evaluate on a selected subset without copying the source tensor.
 `SubsetRandomSampler` shuffles the requested row indices at each epoch.
 `WeightedRandomSampler` draws rows in proportion to their weights, with
 optional replacement. `FixedBatchSampler` wraps a sampler to set batch
-boundaries and `drop_last`. The loader keeps feature rows and labels aligned.
+boundaries and `drop_last`. The loader keeps feature rows and labels aligned,
+and `collated_batch` exposes the default or custom-collated feature/label pair.
 
 ## Run
 

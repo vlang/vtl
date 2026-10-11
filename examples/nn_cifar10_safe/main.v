@@ -3,7 +3,6 @@ module main
 import vtl
 import vtl.autograd
 import vtl.datasets
-import vtl.nn.layers
 import vtl.nn.models
 import vtl.nn.optimizers
 
@@ -15,17 +14,11 @@ const train_count = 2000
 const test_count = 500
 const max_train_batches = 80
 
-fn create_cnn_cifar10[T](ctx &autograd.Context[T]) &models.Sequential[T] {
+fn create_cifar10_classifier[T](ctx &autograd.Context[T]) &models.Sequential[T] {
 	mut model := models.sequential_from_ctx[T](ctx)
 	model.input([3, 32, 32])
-	model.conv2d(3, 32, [3, 3], layers.Conv2DConfig{ padding: [1, 1] })
-	model.relu()
-	model.maxpool2d([2, 2], [0, 0], [2, 2])
-	model.conv2d(32, 64, [3, 3], layers.Conv2DConfig{ padding: [1, 1] })
-	model.relu()
-	model.maxpool2d([2, 2], [0, 0], [2, 2])
 	model.flatten()
-	model.linear(128)
+	model.linear(32)
 	model.relu()
 	model.linear(10)
 	model.softmax()
@@ -72,7 +65,7 @@ fn main() {
 
 	println('Train samples: ${ds.train_features.shape[0]} | Test samples: ${ds.test_features.shape[0]}')
 
-	mut model := create_cnn_cifar10[f64](ctx)
+	mut model := create_cifar10_classifier[f64](ctx)
 	model.cross_entropy_loss()
 
 	mut optimizer := optimizers.adam_optimizer[f64](optimizers.AdamOptimizerConfig{
