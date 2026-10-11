@@ -480,6 +480,64 @@ pub fn (g &RollGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	}
 }
 
+// Rot90Gate stores the plane and turn count needed to invert a 90-degree
+// rotation during backpropagation.
+pub struct Rot90Gate[T] {
+pub:
+	k    int
+	axes []int
+}
+
+// rot90_gate validates and normalizes the axes using the input tensor shape.
+pub fn rot90_gate[T](input &vtl.Tensor[T], k int, axes []int) !&Rot90Gate[T] {
+	if input.rank() < 2 {
+		return error('rot90: tensor must have at least two dimensions')
+	}
+	if axes.len != 2 {
+		return error('rot90: exactly two axes are required')
+	}
+	mut normalized_axes := axes.clone()
+	for i, axis in normalized_axes {
+		if axis < 0 {
+			normalized_axes[i] += input.rank()
+		}
+		if normalized_axes[i] < 0 || normalized_axes[i] >= input.rank() {
+			return error('rot90: axes ${axes} out of bounds for tensor with ${input.rank()} dimensions')
+		}
+	}
+	if normalized_axes[0] == normalized_axes[1] {
+		return error('rot90: axes must be different')
+	}
+	return &Rot90Gate[T]{
+		k:    ((k % 4) + 4) % 4
+		axes: normalized_axes
+	}
+}
+
+// backward applies the inverse rotation to the output gradient.
+pub fn (g &Rot90Gate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
+	return [vtl.rot90_axes[T](payload.variable.grad, -g.k, g.axes)!]
+}
+
+fn rot90_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := unsafe { (&Rot90Gate[T](gate)).backward(typed_payload)! }
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
+// cache registers the input variable for rot90 backpropagation.
+pub fn (g &Rot90Gate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
+	a := args[0]
+	match a {
+		Variable[T] {
+			register[T]('Rot90', voidptr(g), rot90_gate_backward_dispatch[T], result, [a])!
+		}
+		else {
+			return error('Rot90Gate: a must be a Variable')
+		}
+	}
+}
+
 // ConcatGate concatenates multiple tensors along an axis.
 // backward: split gradient back into original inputs
 pub struct ConcatGate[T] {
