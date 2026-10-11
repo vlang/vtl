@@ -16,7 +16,10 @@ For neural-network and framework-level gaps relative to PyTorch, see the
 - Elementwise math, reductions, mapping, stacking, splitting, random values,
   statistics, and linear algebra through VSL.
 - Reverse-mode autograd, neural-network layers and losses, optimizers,
-  datasets, and CPU/CUDA/Vulkan/OpenCL paths.
+  datasets, CPU support, and selected CUDA/Vulkan operations. OpenCL/VCL
+  currently covers tensor transfer and an `add_scalar` smoke example; VTL
+  OpenCL compute and neural-network dispatch remain incomplete (see the
+  [backend roadmap](../ROADMAP.md#phase-5--opencl-backend)).
 - Tutorials and runnable examples for tensors, linear algebra, autograd,
   training, and GPU backends.
 
