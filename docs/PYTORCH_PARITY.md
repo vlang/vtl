@@ -70,13 +70,15 @@ CPU training and experimental GPU paths. Learning-rate schedulers include
 `CyclicLR`, `OneCycleLR`, and
 `ReduceLROnPlateau`. `OneCycleLR` currently implements the
 learning-rate curve (cosine or linear, two or three phases). `CyclicLR` includes
-the triangular, triangular2, and exp_range policies. PyTorch's momentum cycling,
-custom scale callbacks, and optimizer parameter-group integration are not
-implemented.
+the triangular, triangular2, and exp_range policies and computes the inverse
+momentum curve with configurable bounds. Unlike PyTorch, VTL returns that
+momentum value for the caller to apply; it does not mutate optimizer state.
+Custom scale callbacks and optimizer parameter-group integration remain gaps.
 
 **Next:** Audit formulas, defaults, reduction modes, parameter groups, sparse
 gradients, and numerical behavior against `torch.nn` and `torch.optim`. Add
-momentum cycling, custom CyclicLR scale callbacks, and parameter-group support.
+custom CyclicLR scale callbacks and parameter-group support, then integrate
+scheduler values with optimizer updates.
 
 ### Data pipeline
 

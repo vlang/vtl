@@ -248,8 +248,66 @@ fn test_cyclic_lr_asymmetric_triangular2_and_exp_range() {
 	assert math.abs(exp_range.next_lr(0, 2) - 0.2) < 1e-12
 }
 
+fn test_cyclic_lr_cycles_momentum_inversely_to_learning_rate() {
+	scheduler := cyclic_lr[f64](CyclicLRConfig{
+		base_lr:      0.1
+		max_lr:       0.5
+		step_size_up: 2
+	}) or { panic(err) }
+	assert math.abs(scheduler.next_momentum(0) or { panic('momentum is disabled') } - 0.9) < 1e-12
+	assert math.abs(scheduler.next_momentum(1) or { panic('momentum is disabled') } - 0.85) < 1e-12
+	assert math.abs(scheduler.next_momentum(2) or { panic('momentum is disabled') } - 0.8) < 1e-12
+	assert math.abs(scheduler.next_momentum(4) or { panic('momentum is disabled') } - 0.9) < 1e-12
+	assert math.abs(scheduler.next_momentum(-1) or { panic('momentum is disabled') } - 0.9) < 1e-12
+
+	asymmetric := cyclic_lr[f64](CyclicLRConfig{
+		base_lr:        0.1
+		max_lr:         0.5
+		step_size_up:   2
+		step_size_down: 4
+	}) or { panic(err) }
+	assert math.abs(asymmetric.next_momentum(4) or { panic('momentum is disabled') } - 0.85) < 1e-12
+
+	triangular2 := cyclic_lr[f64](CyclicLRConfig{
+		base_lr:      0.1
+		max_lr:       0.5
+		step_size_up: 2
+		mode:         .triangular2
+	}) or { panic(err) }
+	assert math.abs(triangular2.next_momentum(6) or { panic('momentum is disabled') } - 0.875) < 1e-12
+
+	exp_range := cyclic_lr[f64](CyclicLRConfig{
+		base_lr:      0.1
+		max_lr:       0.5
+		step_size_up: 2
+		mode:         .exp_range
+		gamma:        0.5
+	}) or { panic(err) }
+	assert math.abs(exp_range.next_momentum(2) or { panic('momentum is disabled') } - 0.875) < 1e-12
+}
+
+fn test_cyclic_lr_momentum_can_be_disabled_and_configured() {
+	disabled := cyclic_lr[f64](CyclicLRConfig{
+		base_lr:        0.1
+		max_lr:         0.5
+		step_size_up:   2
+		cycle_momentum: false
+	}) or { panic(err) }
+	assert disabled.next_momentum(0) == none
+
+	configured := cyclic_lr[f64](CyclicLRConfig{
+		base_lr:       0.1
+		max_lr:        0.5
+		step_size_up:  2
+		base_momentum: 0.7
+		max_momentum:  0.95
+	}) or { panic(err) }
+	assert math.abs(configured.next_momentum(2) or { panic('momentum is disabled') } - 0.7) < 1e-12
+}
+
 fn test_cyclic_lr_rejects_invalid_parameters() {
 	assert cyclic_lr_error_for_invalid_up_duration()
+	assert cyclic_lr_error_for_invalid_momentum_bounds()
 }
 
 fn cyclic_lr_error_for_invalid_up_duration() bool {
@@ -259,6 +317,19 @@ fn cyclic_lr_error_for_invalid_up_duration() bool {
 		step_size_up: 0
 	}) or {
 		return err.msg() == 'step_size_up must be positive and step_size_down cannot be negative'
+	}
+	return false
+}
+
+fn cyclic_lr_error_for_invalid_momentum_bounds() bool {
+	_ := cyclic_lr[f64](CyclicLRConfig{
+		base_lr:       0.1
+		max_lr:        0.5
+		step_size_up:  2
+		base_momentum: 0.95
+		max_momentum:  0.9
+	}) or {
+		return err.msg() == 'momentum values must satisfy 0 <= base_momentum <= max_momentum'
 	}
 	return false
 }
