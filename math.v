@@ -609,6 +609,17 @@ pub fn (a &Tensor[T]) fmin[T](b &Tensor[T]) !&Tensor[T] {
 
 @[direct_array_access]
 fn tensor_extreme[T](a &Tensor[T], b &Tensor[T], want_max bool, ignore_nan bool) !&Tensor[T] {
+	$if T is f64 {
+		if want_max && !ignore_nan && a.shape == b.shape && a.is_row_major_contiguous()
+			&& b.is_row_major_contiguous() && a.data.data.len == a.size && b.data.data.len == b.size {
+			mut result := empty_uninitialized_f64(a.shape, memory: .row_major)
+			for i in 0 .. a.size {
+				result.data.data[i] = numpy_extreme[f64](a.data.data[i], b.data.data[i], true,
+					false)
+			}
+			return result
+		}
+	}
 	if a.shape == b.shape && a.is_row_major_contiguous() && b.is_row_major_contiguous()
 		&& a.data.data.len == a.size && b.data.data.len == b.size {
 		mut result := empty[T](a.shape, memory: .row_major)

@@ -64,6 +64,25 @@ pub fn tensor[T](init T, shape []int, params TensorData) &Tensor[T] {
 	}
 }
 
+// empty_uninitialized_f64 allocates writable f64 storage without clearing it.
+// Callers must initialize every element before exposing or reading the tensor.
+fn empty_uninitialized_f64(shape []int, params TensorData) &Tensor[f64] {
+	size := size_from_shape(shape)
+	mut values := []f64{cap: size}
+	unsafe {
+		values.len = size
+	}
+	return &Tensor[f64]{
+		shape:   shape.clone()
+		strides: strides_from_shape(shape, params.memory)
+		memory:  params.memory
+		size:    size
+		data:    &storage.CpuStorage[f64]{
+			data: values
+		}
+	}
+}
+
 // tensor_like returns a new tensor created with similar storage properties
 // as the Tensor t
 pub fn tensor_like[T](t &Tensor[T]) &Tensor[T] {
