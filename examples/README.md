@@ -111,7 +111,7 @@ CIFAR examples for CI-safe checks.
 |---------|---------|-----------------|
 | [nn_cifar10_tiny_synth](./nn_cifar10_tiny_synth) | Synthetic f64 CIFAR-shaped smoke | CI/default |
 | [nn_cifar10_f32_tiny_synth](./nn_cifar10_f32_tiny_synth) | Synthetic f32 training smoke | CI/default |
-| [nn_cifar10_safe](./nn_cifar10_safe) | Compact dense classifier trained on real CIFAR-10 data | Local |
+| [nn_cifar10_safe](./nn_cifar10_safe) | Safer real-data config | Local |
 | [nn_cifar10_tiny](./nn_cifar10_tiny) | Tiny real CIFAR subset | Local |
 | [nn_cifar10](./nn_cifar10) | Full CIFAR path with checkpoints | Local/high RAM |
 
