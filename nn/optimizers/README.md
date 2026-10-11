@@ -62,8 +62,26 @@ remains available for callers that already calculate metric deltas.
 with independently configurable rise and fall durations. It also computes the
 inverse momentum curve through `next_momentum(step)` by default; set
 `cycle_momentum: false` to disable it. The returned momentum is a value for the
-caller to apply: optimizer mutation, parameter groups, and custom scale
-callbacks are not implemented.
+caller to apply. Supply `scale_fn` to define a custom cycle amplitude and set
+`scale_mode` to `.cycle` (the default) or `.iterations` to choose whether the
+callback receives a one-based cycle number or the zero-based minibatch step,
+respectively. Optimizer mutation and parameter groups are not implemented.
+
+```v ignore
+import vtl.nn.optimizers
+
+fn decay_by_cycle(cycle int) f64 {
+	return 1.0 / f64(cycle + 1)
+}
+
+scheduler := optimizers.cyclic_lr[f64](optimizers.CyclicLRConfig{
+	base_lr:      0.001
+	max_lr:       0.01
+	step_size_up: 100
+	scale_fn:     decay_by_cycle
+})!
+lr := scheduler.next_lr(0.001, 150)
+```
 
 ## NAdam
 

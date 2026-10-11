@@ -82,17 +82,19 @@ learning-rate curve (cosine or linear, two or three phases). `CyclicLR` includes
 the triangular, triangular2, and exp_range policies and computes the inverse
 momentum curve with configurable bounds. Unlike PyTorch, VTL returns that
 momentum value for the caller to apply; it does not mutate optimizer state.
+`CyclicLR` accepts a custom scale callback that receives the cycle number or
+minibatch step, selected by `scale_mode`; cycle callbacks use the same one-based
+cycle count as PyTorch.
 `ReduceLROnPlateau.step(current_lr, metric)` tracks the best metric and supports
 PyTorch-style min/max modes, relative/absolute thresholds, patience, cooldown,
 minimum LR, and epsilon. It returns the next LR for the caller to apply;
-optimizer mutation and per-parameter-group LR support remain gaps. Custom
-`CyclicLR` scale callbacks and optimizer parameter-group integration remain
-gaps.
+optimizer mutation and per-parameter-group LR support remain gaps. Optimizer
+parameter-group integration remains a gap.
 
 **Next:** Audit formulas, defaults, reduction modes, parameter groups, sparse
 gradients, and numerical behavior against `torch.nn` and `torch.optim`. Add
-custom CyclicLR scale callbacks and parameter-group support, then integrate
-scheduler values with optimizer updates.
+parameter-group support, then integrate scheduler values with optimizer
+updates.
 
 ### Data pipeline
 
