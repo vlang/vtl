@@ -10,8 +10,8 @@ import vtl.nn.internal
 //
 // Intended to be used after a log-softmax layer for multi-class classification.
 //
-// Input shape:  `[batch, n_classes]` — log-probabilities (log-softmax output)
-// Target shape: `[batch, n_classes]` — one-hot class labels
+// Input shape: `[batch, n_classes]` — log-probabilities (log-softmax output).
+// Target shape: `[batch]` class indices or `[batch, n_classes]` one-hot/soft labels.
 //
 // Fields:
 //   - `weight`       — optional per-class weight tensor (`nil` = uniform weights)
