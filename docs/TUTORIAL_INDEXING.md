@@ -15,14 +15,29 @@ assert selected.shape == [2, 2]
 assert selected.to_array() == [12, 10, 22, 20]
 ```
 
+`take`, `take_nd`, and `take_flat` raise on out-of-range indices by default.
+Their `*_with_mode` variants also accept `.wrap` or `.clip`, matching NumPy's
+`take` modes. In `.clip` mode, negative indices clip to the first element;
+they do not count from the end.
+
+```v
+import vtl
+
+values := vtl.from_1d([10, 20, 30, 40])!
+wrapped := values.take_with_mode([-1, 4], 0, .wrap)!
+clipped := values.take_with_mode([-1, 4], 0, .clip)!
+assert wrapped.to_array() == [40, 10]
+assert clipped.to_array() == [10, 40]
+```
+
 ## Gathering with autograd
 
-`Variable.take_along_axis` records the gather in the computation graph. During
-backpropagation, gradients are scattered to the selected source positions;
-repeated indices accumulate, and broadcast source dimensions sum their
-contributions. Integer indices are treated as constants and snapshotted when
-the gather is recorded, so later edits to the index tensor do not change the
-backward path.
+`Variable.take`, `Variable.take_with_mode`, and `Variable.take_along_axis`
+record gathers in the computation graph. During backpropagation, gradients are
+scattered to selected source positions; repeated indices accumulate, and
+broadcast source dimensions sum their contributions. Integer indices are
+treated as constants and snapshotted when the gather is recorded, so later
+edits do not change the backward path.
 
 ```v ignore
 import vtl

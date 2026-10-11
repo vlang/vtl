@@ -260,6 +260,35 @@ fn test_take_rejects_invalid_axes_and_indices() {
 	}
 }
 
+fn test_take_with_mode_matches_raise_wrap_and_clip_semantics() ! {
+	tensor := vtl.from_1d([10, 20, 30, 40])!
+	assert tensor.take_with_mode([-1, 0], 0, .raise)!.to_array() == [40, 10]
+	assert tensor.take_with_mode([-5, -1, 4, 6], 0, .wrap)!.to_array() == [40, 40, 10, 30]
+	assert tensor.take_with_mode([-5, -1, 4, 6], 0, .clip)!.to_array() == [10, 10, 40, 40]
+	if _ := tensor.take_with_mode([5], 0, .raise) {
+		assert false, 'raise mode must reject an out-of-range index'
+	}
+
+	if _ := vtl.zeros[int]([0]).take_with_mode([0], 0, .wrap) {
+		assert false, 'wrap mode must reject indexing an empty axis'
+	}
+}
+
+fn test_take_nd_and_take_flat_with_mode() ! {
+	tensor := vtl.from_2d([[10, 20, 30, 40], [50, 60, 70, 80]])!
+	indices := vtl.from_1d([-1, 4])!
+	wrapped := tensor.take_nd_with_mode(indices, 1, .wrap)!
+	assert wrapped.shape == [2, 2]
+	assert wrapped.to_array() == [40, 10, 80, 50]
+
+	flat_indices := vtl.from_1d([-1, 8, 10])!
+	clipped := tensor.take_flat_with_mode(flat_indices, .clip)!
+	assert clipped.to_array() == [10, 80, 80]
+	if _ := tensor.take_flat_with_mode(flat_indices, .raise) {
+		assert false, 'flat raise mode must reject an out-of-range index'
+	}
+}
+
 fn test_take_nd_replaces_axis_with_multidimensional_indices() {
 	tensor := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
 	indices := vtl.from_array([0, 2, 1, 0], [2, 2])!

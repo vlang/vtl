@@ -10,4 +10,9 @@ fn main() {
 	println('selected values: ${selected.to_array()}')
 	flat := values.take_flat(indices)!
 	println('flat gather: ${flat.to_array()}')
+	mode_indices := vtl.from_1d([-1, 3])!
+	wrapped := values.take_nd_with_mode(mode_indices, 1, .wrap)!
+	println('wrapped axis gather: ${wrapped.to_array()}')
+	clipped := values.take_flat_with_mode(vtl.from_1d([-1, 6])!, .clip)!
+	println('clipped flat gather: ${clipped.to_array()}')
 }
