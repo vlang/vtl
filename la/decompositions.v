@@ -339,6 +339,10 @@ fn fill_broadcast_batch_index(source_shape []int, output_shape []int, output_coo
 // lstsq solves the linear least-squares problem min ||Ax - B||_2.
 // Returns (x, residuals, rank, singular_values).
 pub fn lstsq[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !(&vtl.Tensor[f64], &vtl.Tensor[f64], int, &vtl.Tensor[f64]) {
+	return lstsq_with_rcond[T](a, b, -1)
+}
+
+fn lstsq_with_rcond[T](a &vtl.Tensor[T], b &vtl.Tensor[T], rcond f64) !(&vtl.Tensor[f64], &vtl.Tensor[f64], int, &vtl.Tensor[f64]) {
 	if a.rank() != 2 {
 		return error('lstsq: A must be a 2D matrix')
 	}
@@ -371,7 +375,7 @@ pub fn lstsq[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !(&vtl.Tensor[f64], &vtl.Ten
 		}
 	}
 
-	x, residuals, rnk, s := vsl_la.lstsq(a_mat, b_mat)
+	x, residuals, rnk, s := vsl_la.lstsq_with_rcond(a_mat, b_mat, rcond)
 
 	// Convert x back to vtl tensor
 	x_t := if b_is_vector {
@@ -387,6 +391,86 @@ pub fn lstsq[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !(&vtl.Tensor[f64], &vtl.Ten
 	s_t := vtl.from_1d(s)!
 
 	return x_t, res_t, rnk, s_t
+}
+
+// lstsq_complex solves the complex linear least-squares problem min ||Ax - B||_2.
+// It accepts a 2D A and vector or matrix B, and returns the solution, squared
+// residual sums, numerical rank, and singular values. The current implementation
+// embeds the problem in real arithmetic, so its temporary matrices are twice as
+// large along each matrix dimension.
+pub fn lstsq_complex(a &vtl.Tensor[vcomplex.Complex], b &vtl.Tensor[vcomplex.Complex]) !(&vtl.Tensor[vcomplex.Complex], &vtl.Tensor[f64], int, &vtl.Tensor[f64]) {
+	if a.rank() != 2 {
+		return error('lstsq_complex: A must be a 2D matrix')
+	}
+	if b.rank() < 1 || b.rank() > 2 {
+		return error('lstsq_complex: B must be 1D or 2D')
+	}
+	m := a.shape[0]
+	n := a.shape[1]
+	if b.shape[0] != m {
+		return error('lstsq_complex: A rows (${m}) must match B rows (${b.shape[0]})')
+	}
+	b_is_vector := b.rank() == 1
+	nrhs := if b_is_vector { 1 } else { b.shape[1] }
+	if m == 0 || n == 0 {
+		output_shape := if b_is_vector { [n] } else { [n, nrhs] }
+		return vtl.zeros[vcomplex.Complex](output_shape), vtl.from_1d[f64]([])!, 0, vtl.from_1d[f64]([])!
+	}
+
+	// A = Ar + iAi maps to [[Ar, -Ai], [Ai, Ar]] over real values. The same
+	// embedding maps each right-hand side to [Br; Bi].
+	mut real_a := vtl.zeros[f64]([2 * m, 2 * n])
+	for row in 0 .. m {
+		for column in 0 .. n {
+			value := a.get([row, column])
+			real_a.set([row, column], value.re)
+			real_a.set([row, column + n], -value.im)
+			real_a.set([row + m, column], value.im)
+			real_a.set([row + m, column + n], value.re)
+		}
+	}
+	mut real_b := vtl.zeros[f64]([2 * m, nrhs])
+	for row in 0 .. m {
+		for column in 0 .. nrhs {
+			value := if b_is_vector { b.get([row]) } else { b.get([row, column]) }
+			real_b.set([row, column], value.re)
+			real_b.set([row + m, column], value.im)
+		}
+	}
+	default_rcond := f64(int_max(m, n)) * 2.220446049250313e-16
+	real_solution, residuals, real_rank, real_singular_values := lstsq_with_rcond[f64](real_a,
+		real_b, default_rcond)!
+
+	mut solution_values := []vcomplex.Complex{len: n * nrhs}
+	for row in 0 .. n {
+		for column in 0 .. nrhs {
+			real_part := real_solution.get([row, column])
+			imaginary_part := real_solution.get([row + n, column])
+			solution_values[row * nrhs + column] = vcomplex.Complex{
+				re: real_part
+				im: imaginary_part
+			}
+		}
+	}
+	solution := if nrhs == 0 {
+		vtl.zeros[vcomplex.Complex]([n, 0])
+	} else if b_is_vector {
+		vtl.from_1d[vcomplex.Complex](solution_values)!
+	} else {
+		mut rows := [][]vcomplex.Complex{len: n, init: []vcomplex.Complex{len: nrhs}}
+		for row in 0 .. n {
+			for column in 0 .. nrhs {
+				rows[row][column] = solution_values[row * nrhs + column]
+			}
+		}
+		vtl.from_2d[vcomplex.Complex](rows)!
+	}
+
+	mut singular_values := []f64{len: int_min(m, n)}
+	for index in 0 .. singular_values.len {
+		singular_values[index] = real_singular_values.get_nth(2 * index)
+	}
+	return solution, residuals, real_rank / 2, vtl.from_1d[f64](singular_values)!
 }
 
 // qr computes QR factorization of A.

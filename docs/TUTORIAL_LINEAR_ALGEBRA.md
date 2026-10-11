@@ -388,6 +388,40 @@ product := vtl.einsum[cmplx.Complex]('ij,jk->ik', a, b)!
 assert product.get_nth(0) == cmplx.complex(1.0, 1.0)
 ```
 
+`la.lstsq_complex(A, B)` fits complex coefficients by minimizing
+`||A*x - B||₂`. Like `la.lstsq`, it accepts either a vector or matrix of
+right-hand sides and returns the solution, squared residual sums, numerical
+rank, and singular values. The current implementation maps the complex system
+to an equivalent real system, which uses more temporary memory than the real
+least-squares path.
+
+```v
+import math
+import math.complex as cmplx
+import vtl
+import vtl.la
+
+a := vtl.from_2d[cmplx.Complex]([
+	[cmplx.complex(1, 1), cmplx.complex(2, 0)],
+	[cmplx.complex(2, 0), cmplx.complex(1, -1)],
+	[cmplx.complex(1, 0), cmplx.complex(-1, 1)],
+])!
+b := vtl.from_1d[cmplx.Complex]([
+	cmplx.complex(-3, 4),
+	cmplx.complex(1.5, 5.5),
+	cmplx.complex(1.5, 0.5),
+])!
+x, residuals, rank, singular_values := la.lstsq_complex(a, b)!
+assert math.abs(x.get_nth(0).re - 1) < 1e-10
+assert math.abs(x.get_nth(0).im - 2) < 1e-10
+assert math.abs(x.get_nth(1).re + 1) < 1e-10
+assert math.abs(x.get_nth(1).im - 0.5) < 1e-10
+assert rank == 2
+assert residuals.get_nth(0) < 1e-20
+assert singular_values.size == 2
+println(x.to_array())
+```
+
 ## See also
 
 - [First Steps](./TUTORIAL_FIRST_STEPS.md) — tensor creation and shapes

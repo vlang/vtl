@@ -284,11 +284,14 @@ dtype-aware NumPy-style default tolerance; `la.matrix_rank_batch` preserves
 leading batch dimensions.
 `la.lstsq` preserves vector versus matrix solution shapes, computes numerical
 rank from a relative singular-value cutoff, and returns squared residual sums
-only when NumPy does.
+only when NumPy does. `la.lstsq_complex` accepts complex128 vector and matrix
+right-hand sides and preserves solution shapes, numerical rank, singular values,
+and residual conventions. It currently embeds the problem in real arithmetic,
+using temporary matrices twice as large along each axis.
 
-**Remaining:** add complex least squares, factorizations,
-complex-input general eigenproblems, and complex SVD; benchmark realistic
-shapes for both the default and LAPACKE backends.
+**Remaining:** add complex factorizations, complex-input general eigenproblems,
+and complex SVD; benchmark realistic shapes for both the default and LAPACKE
+backends.
 
 ### FFT
 
@@ -351,9 +354,9 @@ logical order, and truncate floating-point values when converting to integers.
 **Remaining:** extend promoted arithmetic to all supported operations, add
 weak scalar promotion and string conversion, extend complex support beyond
 elementwise operations, `matmul`, Einstein contractions, `solve_complex`,
-`inv_complex`, `det_complex`, and `slogdet_complex` to more general linear
-algebra and random generation, add complex32, and define integer overflow and
-structured-data limits.
+`inv_complex`, `det_complex`, `slogdet_complex`, and `lstsq_complex` to more
+general linear algebra and random generation, add complex32, and define integer
+overflow and structured-data limits.
 
 ### Masked and missing data
 
