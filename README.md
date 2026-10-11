@@ -63,7 +63,7 @@ t.get([1, 1])
 ## Features
 
 - **Tensors** — create, slice, indexed `take`/`take_nd`/`take_flat`/`put`, `choose`/`select`,
-  `round_decimals`, `compress`, `indices`, `pad`, set membership, reshape,
+  `round_decimals`, `nan_to_num`, `compress`, `indices`, `pad`, set membership, reshape,
   transpose, move/roll axes,
   N-D diagonal views, NumPy-style Kronecker products, broadcast, map/reduce,
   `einsum`, and `complex128` storage with elementwise and matrix products

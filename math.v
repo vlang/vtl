@@ -3,6 +3,54 @@ module vtl
 import math
 import math.complex as vcomplex
 
+// NanToNumConfig contains replacement values for non-finite floating-point
+// tensor elements. Missing infinity replacements use the type's finite limits.
+@[params]
+pub struct NanToNumConfig {
+pub:
+	nan    f64
+	posinf ?f64
+	neginf ?f64
+}
+
+// nan_to_num replaces NaN and positive or negative infinity in f32/f64 tensors.
+// Integer tensors are copied unchanged; complex tensors are not yet supported.
+pub fn (t &Tensor[T]) nan_to_num[T](params NanToNumConfig) &Tensor[T] {
+	$if T is f64 {
+		positive_infinity := params.posinf or { math.max_f64 }
+		negative_infinity := params.neginf or { -math.max_f64 }
+		return t.map_values(fn [params, positive_infinity, negative_infinity] [T](value T) T {
+			if math.is_nan(value) {
+				return T(params.nan)
+			}
+			if math.is_inf(value, 1) {
+				return T(positive_infinity)
+			}
+			if math.is_inf(value, -1) {
+				return T(negative_infinity)
+			}
+			return value
+		})
+	} $else $if T is f32 {
+		positive_infinity := params.posinf or { f64(math.max_f32) }
+		negative_infinity := params.neginf or { -f64(math.max_f32) }
+		return t.map_values(fn [params, positive_infinity, negative_infinity] [T](value T) T {
+			if math.is_nan(f64(value)) {
+				return T(params.nan)
+			}
+			if math.is_inf(f64(value), 1) {
+				return T(positive_infinity)
+			}
+			if math.is_inf(f64(value), -1) {
+				return T(negative_infinity)
+			}
+			return value
+		})
+	} $else {
+		return t.copy(.row_major)
+	}
+}
+
 // sign returns the elementwise sign of each value: -1, 0, or 1. Floating-point
 // NaNs remain NaN, matching NumPy's sign behavior.
 pub fn (t &Tensor[T]) sign[T]() &Tensor[T] {
