@@ -62,9 +62,14 @@ dimensions by their root mean square and supports optional per-element weights.
 Both are available as layers and in `Sequential`, with CPU autograd; device
 kernels and broader module parity remain separate work.
 
-**Next:** Add bidirectional recurrent layers, stacked GRU layers, recurrent
-dropout and variable-length packed sequences. `Sequential` supports
-`train()`/`eval()` behavior for Dropout and BatchNorm1D; extend mode-aware
+`Sequential.gru` can be called repeatedly to compose a stack of single-layer
+GRUs, each with a zero initial hidden state. This composes stacked forward
+passes but does not expose PyTorch's single-module `num_layers` or stacked
+hidden-state contract.
+
+**Next:** Add bidirectional recurrent layers, a PyTorch-style stacked recurrent
+state API, recurrent dropout and variable-length packed sequences. `Sequential`
+supports `train()`/`eval()` behavior for Dropout and BatchNorm1D; extend mode-aware
 behavior to custom modules and the rest of the normalization API. Parameter and
 buffer registration and composable user-defined modules remain gaps. Stateful
 LSTM/GRU entry points are available today, but do not imply parity with the
