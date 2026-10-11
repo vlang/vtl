@@ -32,6 +32,11 @@ pub:
 	reduction    string         = 'mean'
 }
 
+// NLLIndexLoss adapts integer class-index targets to the generic NLL loss API.
+pub struct NLLIndexLoss[T] {
+	inner &NLLLoss[T] = unsafe { nil }
+}
+
 // NLLLossOptions configures ignored class indices and scalar reduction.
 @[params]
 pub struct NLLLossOptions {
@@ -57,6 +62,27 @@ pub fn nll_loss_with_options[T](weight &vtl.Tensor[T], options NLLLossOptions) t
 		reduction:    options.reduction
 	}
 	return types.loss[T](voidptr(concrete), nll_loss_loss_dispatch[T])
+}
+
+// nll_loss_indices creates an NLL loss that accepts integer class-index targets.
+pub fn nll_loss_indices[T](weight &vtl.Tensor[T], options NLLLossOptions) NLLIndexLoss[T] {
+	return NLLIndexLoss[T]{
+		inner: &NLLLoss[T]{
+			weight:       weight
+			ignore_index: options.ignore_index
+			reduction:    options.reduction
+		}
+	}
+}
+
+// loss computes NLL from an integer class-index target tensor.
+pub fn (l &NLLIndexLoss[T]) loss(input &autograd.Variable[T], target &vtl.Tensor[int]) !&autograd.Variable[T] {
+	mut target_data := []T{len: target.size()}
+	for i in 0 .. target.size() {
+		target_data[i] = vtl.cast[T](target.get_nth(i))
+	}
+	typed_target := vtl.from_array(target_data, target.shape.clone())!
+	return l.inner.loss(input, typed_target)
 }
 
 // loss exposes this operation as part of the public API.

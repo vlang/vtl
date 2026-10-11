@@ -110,9 +110,9 @@ parameter-group integration remains a gap.
 `nll_loss` supports weighted class-index and one-hot/soft targets, mean and sum
 reductions, per-sample `none` reduction, and `ignore_index` for class-index
 targets. Weighted class-index means divide by the sum of non-ignored target
-weights. The API still accepts floating-point tensors for targets and requires
-rank-two inputs; PyTorch's integer target dtype and spatial NLL input shapes
-remain gaps.
+weights. `nll_loss_indices` accepts `Tensor[int]` targets; the regular generic
+loss also accepts same-type integer-valued target tensors. Both APIs require
+rank-two inputs, so PyTorch's spatial NLL input shapes remain a gap.
 
 **Next:** Audit formulas, defaults, reduction modes, parameter groups, sparse
 gradients, and numerical behavior against `torch.nn` and `torch.optim`. Add
