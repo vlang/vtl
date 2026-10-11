@@ -20,7 +20,7 @@ CIFAR examples for CI-safe checks.
 | [one_hot](./one_hot) | Encode integer class labels as one-hot tensors | `v run ./vtl/examples/one_hot/main.v` |
 | [complex_tensors](./complex_tensors) | Create `complex128` tensors and use elementwise arithmetic | `v run ./vtl/examples/complex_tensors/main.v` |
 | [einsum_complex](./einsum_complex) | Contract complex tensors with Einstein summation | `v run ./vtl/examples/einsum_complex/main.v` |
-| [tensor_axis_manipulation](./tensor_axis_manipulation) | Axis moves, circular shifts, and autograd | `v run ./vtl/examples/tensor_axis_manipulation/main.v` |
+| [tensor_axis_manipulation](./tensor_axis_manipulation) | Axes, shifts, rotations, autograd | `v run ./vtl/examples/tensor_axis_manipulation/main.v` |
 | [tensor_sorting](./tensor_sorting) | Sort, partially partition, and return local indices along tensor axes | `v run ./vtl/examples/tensor_sorting/main.v` |
 | [vtl_basic_usage](./vtl_basic_usage) | Tensor creation and basic operations | `v run ./vtl/examples/vtl_basic_usage/main.v` |
 | [vtl_vandermont](./vtl_vandermont) | Matrix construction and LA utilities | `v run ./vtl/examples/vtl_vandermont/main.v` |
