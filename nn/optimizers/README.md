@@ -47,10 +47,13 @@ with optional geometric growth of cycle lengths.
 `OneCycleLR` uses minibatch steps
 to ramp from `max_lr / div_factor` to `max_lr`, then anneal to
 `max_lr / (div_factor * final_div_factor)`. It supports cosine or linear
-annealing and an optional three-phase curve. It computes learning rates only;
-cycling optimizer momentum and parameter groups are not implemented. Its
-constructor returns an error for negative `max_lr`, nonpositive `total_steps`
-or division factors, and `pct_start` outside `(0, 1)`.
+annealing, an optional three-phase curve, and inverse momentum cycling with
+configurable bounds. `next_momentum(step)` returns the value for the caller to
+apply; set `cycle_momentum: false` to disable it. The defaults (`0.85` and
+`0.95`) match PyTorch. Optimizer mutation and parameter groups are not
+implemented. Its constructor returns an error for negative `max_lr`,
+nonpositive `total_steps` or division factors, `pct_start` outside `(0, 1)`, or
+invalid momentum bounds.
 `ReduceLROnPlateau.step(current_lr, metric)` consumes the monitored value and
 tracks the best metric, with `min` or `max` mode and absolute or relative
 thresholds. It supports `patience`, `cooldown`, `min_lr`, and `epsilon` and

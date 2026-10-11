@@ -259,8 +259,60 @@ fn test_one_cycle_lr_degenerate_cycle_uses_final_rate() {
 	assert math.abs(scheduler.next_lr(0, 0) - 0.000004) < 1e-12
 }
 
+fn test_one_cycle_lr_inverse_momentum_curve() {
+	scheduler := one_cycle_lr[f64](OneCycleLRConfig{
+		max_lr:      1.0
+		total_steps: 10
+	}) or { panic(err) }
+	assert math.abs(scheduler.next_momentum(0) or { panic('momentum is disabled') } - 0.95) < 1e-12
+	assert math.abs(scheduler.next_momentum(2) or { panic('momentum is disabled') } - 0.85) < 1e-12
+	assert math.abs(scheduler.next_momentum(3) or { panic('momentum is disabled') } - 0.854951556604879) < 1e-12
+	assert math.abs(scheduler.next_momentum(9) or { panic('momentum is disabled') } - 0.95) < 1e-12
+	assert scheduler.next_momentum(20) == scheduler.next_momentum(9)
+	assert scheduler.next_momentum(-1) == scheduler.next_momentum(0)
+}
+
+fn test_one_cycle_lr_momentum_three_phase_and_linear() {
+	three_phase := one_cycle_lr[f64](OneCycleLRConfig{
+		max_lr:      1.0
+		total_steps: 10
+		three_phase: true
+	}) or { panic(err) }
+	assert math.abs(three_phase.next_momentum(2) or { panic('momentum is disabled') } - 0.85) < 1e-12
+	assert math.abs(three_phase.next_momentum(4) or { panic('momentum is disabled') } - 0.95) < 1e-12
+	assert math.abs(three_phase.next_momentum(7) or { panic('momentum is disabled') } - 0.95) < 1e-12
+
+	linear := one_cycle_lr[f64](OneCycleLRConfig{
+		max_lr:          1.0
+		total_steps:     10
+		anneal_strategy: .linear
+		base_momentum:   0.7
+		max_momentum:    0.9
+	}) or { panic(err) }
+	assert math.abs(linear.next_momentum(1) or { panic('momentum is disabled') } - 0.8) < 1e-12
+	assert math.abs(linear.next_momentum(3) or { panic('momentum is disabled') } - 0.7285714285714285) < 1e-12
+}
+
+fn test_one_cycle_lr_momentum_can_be_disabled_or_configured() {
+	disabled := one_cycle_lr[f64](OneCycleLRConfig{
+		max_lr:         1.0
+		total_steps:    10
+		cycle_momentum: false
+	}) or { panic(err) }
+	assert disabled.next_momentum(0) == none
+
+	configured := one_cycle_lr[f64](OneCycleLRConfig{
+		max_lr:        1.0
+		total_steps:   10
+		base_momentum: 0.6
+		max_momentum:  0.8
+	}) or { panic(err) }
+	assert math.abs(configured.next_momentum(2) or { panic('momentum is disabled') } - 0.6) < 1e-12
+}
+
 fn test_one_cycle_lr_rejects_invalid_parameters() {
 	assert one_cycle_lr_error_for_invalid_steps()
+	assert one_cycle_lr_error_for_invalid_momentum_bounds()
 }
 
 fn one_cycle_lr_error_for_invalid_steps() bool {
@@ -269,6 +321,18 @@ fn one_cycle_lr_error_for_invalid_steps() bool {
 		total_steps: 0
 	}) or {
 		return err.msg() == 'total_steps must be positive'
+	}
+	return false
+}
+
+fn one_cycle_lr_error_for_invalid_momentum_bounds() bool {
+	_ := one_cycle_lr[f64](OneCycleLRConfig{
+		max_lr:        1.0
+		total_steps:   10
+		base_momentum: 0.95
+		max_momentum:  0.9
+	}) or {
+		return err.msg() == 'momentum values must satisfy 0 <= base_momentum <= max_momentum'
 	}
 	return false
 }
