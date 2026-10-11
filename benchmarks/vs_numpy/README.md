@@ -359,19 +359,22 @@ three times, then report the mean of seven timed reductions. Input allocation
 is outside the timed region. For contiguous `f64` data and `ord=2`, VTL
 dispatches to VSL BLAS `dnrm2`. The default pure-V backend uses a scaled SIMD
 accumulation with a direct-square fast path for ordinary magnitudes; builds
-with `-d vsl_blas_cblas` use the configured CBLAS implementation. Run both
-from `~/.vmodules`:
+with `-d vsl_blas_cblas` use OpenBLAS, while
+`-d vsl_blas_generic_cblas` uses the host `libcblas` for f64 `dnrm2`. Run
+the pure-V and system CBLAS builds from `~/.vmodules`:
 
 ```bash
-systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
-	v -prod -o /tmp/vtl-vector-norm-purev ./vtl/benchmarks/vs_numpy/vector_norm_bench.v
-systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-vector-norm-purev
-systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
-	v -d vsl_blas_cblas -prod -o /tmp/vtl-vector-norm-cblas ./vtl/benchmarks/vs_numpy/vector_norm_bench.v
+systemd-run --user --scope -p MemoryMax=3G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -no-parallel -cc gcc -prod -cflags "-march=native" \
+	-o /tmp/vtl-vector-norm-purev ./vtl/benchmarks/vs_numpy/vector_norm_bench.v
+systemd-run --user --scope -p MemoryMax=512M -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-vector-norm-purev
+systemd-run --user --scope -p MemoryMax=3G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -no-parallel -cc gcc -d vsl_blas_generic_cblas -prod -cflags "-march=native" \
+	-o /tmp/vtl-vector-norm-system-cblas ./vtl/benchmarks/vs_numpy/vector_norm_bench.v
+systemd-run --user --scope -p MemoryMax=512M -p MemorySwapMax=0 -- env VJOBS=2 \
+	/tmp/vtl-vector-norm-system-cblas
 systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 \
-	OPENBLAS_NUM_THREADS=2 /tmp/vtl-vector-norm-cblas
-systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
-	OPENBLAS_NUM_THREADS=2 uv run --with numpy python \
+	OPENBLAS_NUM_THREADS=2 uv run --no-project --with numpy python \
 	./vtl/benchmarks/vs_numpy/numpy_vector_norm_baseline.py
 ```
 
@@ -391,6 +394,16 @@ VTL remained 1.92x slower. This run used V 0.5.2 `b69f626`, NumPy 2.5.3, and
 `OPENBLAS_NUM_THREADS=2`. The OpenBLAS CBLAS build could not be rerun locally:
 the installed system provides `libcblas`, but not the `libopenblas` linker name
 required by `-d vsl_blas_cblas`.
+
+After VSL routed generic-CBLAS f64 `dnrm2` calls to the host backend, three
+interleaved runs on 2026-10-11 on an AMD Ryzen 9 5900X measured median process
+means of 1.467 ms for pure V, 0.357 ms for VTL with system `libcblas`, and
+0.146 ms for NumPy 2.5.3 with SciPy OpenBLAS 0.3.34.106.0 and two threads. V
+0.5.2 `a60fb58` and GCC 16.2.1 used `-prod -march=native` for both V builds.
+The checksums agreed within floating-point reduction rounding. System CBLAS
+improved this VTL workload by about 4.1x over pure V; NumPy remained about
+2.45x faster than the system CBLAS route. This is a single-host, single-kernel
+comparison, not an overall performance claim.
 
 ## Matrix-chain ordering
 
