@@ -50,14 +50,15 @@ GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 | P2 | [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support |
 | P2 | [#40][issue40] | Gate fusion remains; fresh gradient-buffer reuse merged in [#598][pr598] |
 | P2 | [#3](https://github.com/vlang/vtl/issues/3) | Await a safe V compiler alias contract; continue benchmarking CPU kernels |
-| Research | [#52](https://github.com/vlang/vtl/issues/52) | Burn capability comparison: [BURN_PARITY.md](./BURN_PARITY.md) |
 
 V 0.5.2 does not emit a `restrict` alias contract. `@[direct_array_access]`
 removes bounds checks only; it does not establish non-aliasing.
 
-Project #8 contains all five open VTL issues: #3, #40, #52, #63, and #161.
+Project #8 currently contains four open VTL issues: #3, #40, #63, and #161.
 Issue #161 is tracked as a P1 backend correctness item in M2-GPU-Core. Issue
-#41 is closed and marked Done on the board; it is no longer a beta gate.
+#52's Burn comparison is complete in [BURN_PARITY.md](./BURN_PARITY.md), and
+the issue and project item are closed/Done. Issue #41 is closed and marked
+Done on the board; it is no longer a beta gate.
 
 ## Additional post-beta tracking
 
