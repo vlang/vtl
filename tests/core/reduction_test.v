@@ -267,6 +267,18 @@ fn test_cumulative_operations_handle_views_and_empty_tensors() ! {
 	assert empty.cumprod(1)!.shape == [0, 3]
 }
 
+fn test_cumulative_operations_reject_inconsistent_tensor_storage() ! {
+	mut values := vtl.from_1d([1.0, 2.0])!
+	values.shape = [3]
+	values.size = 3
+	if _ := values.cumsum(0) {
+		assert false, 'cumsum must reject contiguous storage shorter than its shape'
+	}
+	if _ := values.cumprod(0) {
+		assert false, 'cumprod must reject contiguous storage shorter than its shape'
+	}
+}
+
 fn test_cumulative_operations_support_wider_output_types() ! {
 	values := vtl.from_1d([f32(1e8), 1, -1e8])!
 	widened_sum := values.cumsum_as[f64](0)!
