@@ -122,10 +122,12 @@ See [docs/DEVICE_MEMORY.md](docs/DEVICE_MEMORY.md).
 | [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support | 🟡 P2 | Open; requires ARM GPU hardware for device validation |
 | [#161](https://github.com/vlang/vtl/issues/161) | CUDA backward gaps | 🔴 ML | Open; LSTM, attention, norms, embeddings, and pooling remain |
 
-**Issue #3 compiler status:** Installed V 0.5.2 does not emit a `restrict`
-alias contract. `@[direct_array_access]` removes bounds checks but does not
-establish non-aliasing. Keep #3 open; benchmark safe kernel changes and revisit
-when upstream compiler support is available.
+**Issue #3 compiler status:** V 0.5.2 does not emit a `restrict` alias
+contract. The upstream [V issue #1839](https://github.com/vlang/v/issues/1839)
+is closed, but the current C generator source still does not emit a non-aliasing
+qualifier for tensor kernel pointers. `@[direct_array_access]` removes bounds
+checks but does not establish non-aliasing. Keep #3 open; benchmark safe kernel
+changes and revisit when upstream compiler support is available.
 
 The complete NumPy and Arraymancer comparison is tracked in
 [docs/NUMPY_PARITY.md](docs/NUMPY_PARITY.md). The GitHub project board is not

@@ -51,8 +51,11 @@ GPU memory: [DEVICE_MEMORY.md](DEVICE_MEMORY.md)
 | P2 | [#40][issue40] | Gate fusion remains; fresh gradient-buffer reuse merged in [#598][pr598] |
 | P2 | [#3](https://github.com/vlang/vtl/issues/3) | Await a safe V compiler alias contract; continue benchmarking CPU kernels |
 
-V 0.5.2 does not emit a `restrict` alias contract. `@[direct_array_access]`
-removes bounds checks only; it does not establish non-aliasing.
+V 0.5.2 does not emit a `restrict` alias contract. The upstream
+[V issue #1839](https://github.com/vlang/v/issues/1839) is closed, but the
+current C generator source still does not emit a non-aliasing qualifier for
+tensor kernel pointers. `@[direct_array_access]` removes bounds checks only;
+it does not establish non-aliasing.
 
 Project #8 currently contains four open VTL issues: #3, #40, #63, and #161.
 Issue #161 is tracked as a P1 backend correctness item in M2-GPU-Core. Issue
