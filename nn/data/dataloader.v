@@ -1,6 +1,5 @@
 module data
 
-import rand
 import vsl.la
 import vsl.errors
 import math
@@ -75,9 +74,11 @@ pub:
 	labels     []T           // labels [nb_samples]
 	batch_size int
 	shuffle    bool
+	sampler    Sampler
 pub mut:
-	indices  []int // current indices for shuffling
-	position int   // current position in epoch
+	indices          []int // sample order for the current epoch
+	position         int   // current position in epoch
+	resample_on_next bool
 }
 
 // DataLoader.new creates a new DataLoader
@@ -86,38 +87,83 @@ pub mut:
 pub fn DataLoader.new[T](data &la.Matrix[T], labels []T, batch_size int, shuffle bool) &DataLoader[T] {
 	n := data.m
 	indices := []int{len: n, init: index}
+	mut sampler := Sampler(&SequentialSampler{})
+	if shuffle {
+		sampler = &RandomSampler{}
+	}
+	return &DataLoader[T]{
+		data:             data
+		labels:           labels
+		batch_size:       batch_size
+		shuffle:          shuffle
+		sampler:          sampler
+		indices:          indices
+		position:         0
+		resample_on_next: shuffle
+	}
+}
+
+// new_with_sampler creates a DataLoader that obtains its sample order from a
+// custom sampler. The sampler is called once per epoch, including after reset.
+pub fn DataLoader.new_with_sampler[T](data &la.Matrix[T], labels []T, batch_size int, sampler Sampler) !&DataLoader[T] {
+	if batch_size <= 0 {
+		return error('batch_size must be positive')
+	}
+	if labels.len != data.m {
+		return error('labels length ${labels.len} must match dataset size ${data.m}')
+	}
+	indices := sampler.sample_indices(data.m)!
+	validate_sample_indices(indices, data.m)!
 	return &DataLoader[T]{
 		data:       data
 		labels:     labels
 		batch_size: batch_size
-		shuffle:    shuffle
+		shuffle:    false
+		sampler:    sampler
 		indices:    indices
 		position:   0
 	}
 }
 
+fn validate_sample_indices(indices []int, dataset_size int) ! {
+	for i, sample_index in indices {
+		if sample_index < 0 || sample_index >= dataset_size {
+			return error('sampler index ${sample_index} at position ${i} is out of bounds for dataset size ${dataset_size}')
+		}
+	}
+}
+
 // len returns the number of batches per epoch
 pub fn (dl &DataLoader[T]) len() int {
-	return int(math.ceil(f64(dl.data.m) / f64(dl.batch_size)))
+	if dl.batch_size <= 0 {
+		return 0
+	}
+	return int(math.ceil(f64(dl.indices.len) / f64(dl.batch_size)))
 }
 
 // next returns the next batch of data and labels
 // returns an error when no more batches are available
 pub fn (mut dl DataLoader[T]) next() !(&la.Matrix[T], []T) {
+	if dl.batch_size <= 0 {
+		return error('batch_size must be positive')
+	}
+	if dl.labels.len != dl.data.m {
+		return error('labels length ${dl.labels.len} must match dataset size ${dl.data.m}')
+	}
+	if dl.position == 0 && dl.resample_on_next {
+		dl.indices = dl.sampler.sample_indices(dl.data.m)!
+		validate_sample_indices(dl.indices, dl.data.m)!
+		dl.resample_on_next = false
+	}
 	// Check if we have more batches
-	if dl.position >= dl.data.m {
+	if dl.position >= dl.indices.len {
 		return errors.error('no more batches available, call reset() to start a new epoch',
 			.efailed)
 	}
 
-	// Shuffle indices at the start of first batch (or after reset)
-	if dl.position == 0 && dl.shuffle {
-		dl.shuffle_indices()
-	}
-
 	// Calculate batch bounds
 	start := dl.position
-	end := math.min(dl.position + dl.batch_size, dl.data.m)
+	end := math.min(dl.position + dl.batch_size, dl.indices.len)
 	actual_batch_size := end - start
 
 	// Get batch indices
@@ -146,14 +192,7 @@ pub fn (mut dl DataLoader[T]) next() !(&la.Matrix[T], []T) {
 // reset resets the DataLoader to start a new epoch
 pub fn (mut dl DataLoader[T]) reset() {
 	dl.position = 0
-}
-
-// shuffle_indices shuffles the indices array using Fisher-Yates
-fn (mut dl DataLoader[T]) shuffle_indices() {
-	for i := dl.indices.len - 1; i > 0; i-- {
-		j := rand.intn(i + 1) or { 0 }
-		dl.indices[i], dl.indices[j] = dl.indices[j], dl.indices[i]
-	}
+	dl.resample_on_next = true
 }
 
 // TensorDataset implements Dataset for matrix data

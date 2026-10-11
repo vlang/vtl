@@ -30,6 +30,7 @@ neural network module.
 | Autograd | [Autograd](./TUTORIAL_AUTOGRAD.md) |
 | Neural networks | [Neural networks](./TUTORIAL_NEURAL_NETWORKS.md), [Optimizers](./TUTORIAL_OPTIMIZERS.md) |
 | Datasets and examples | [Datasets](../datasets/README.md), [Examples catalog](../examples/README.md) |
+| DataLoader sampling | [Subset sampler example](../examples/dataloader_sampler/README.md), [PyTorch parity](./PYTORCH_PARITY.md#data-pipeline) |
 | GPU/dev workflow | [Device memory](./DEVICE_MEMORY.md), [Lightweight development](./DEV_LIGHTWEIGHT.md) |
 | Release status | [ML Roadmap](./ML_ROADMAP.md), [Project roadmap](../ROADMAP.md) |
 | Framework parity | [NumPy and Arraymancer](./NUMPY_PARITY.md), [PyTorch](./PYTORCH_PARITY.md), [Burn](./BURN_PARITY.md) |

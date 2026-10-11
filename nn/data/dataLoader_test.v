@@ -208,3 +208,51 @@ fn test_tensor_dataset() {
 	assert ds_x.get(0, 1) == 2.0
 	assert ds_y == [10.0]
 }
+
+fn test_sequential_sampler() {
+	sampler := &SequentialSampler{}
+	assert sampler.sample_indices(4)! == [0, 1, 2, 3]
+	assert sampler.sample_indices(0)!.len == 0
+}
+
+fn test_subset_random_sampler_dataloader() {
+	x := la.Matrix.deep2[f64]([
+		[0.0],
+		[1.0],
+		[2.0],
+		[3.0],
+		[4.0],
+	])
+	labels := [10.0, 11.0, 12.0, 13.0, 14.0]!
+	sampler := SubsetRandomSampler.new([1, 3])
+	mut dl := DataLoader.new_with_sampler[f64](x, labels, 1, sampler)!
+	assert dl.len() == 2
+	mut observed := []int{}
+	for {
+		_, batch_labels := dl.next() or { break }
+		observed << int(batch_labels[0])
+	}
+	observed.sort()
+	assert observed == [11, 13]
+	dl.reset()
+	_, first_batch := dl.next()!
+	assert first_batch.len == 1
+}
+
+fn test_sampler_validation() {
+	x := la.Matrix.deep2[f64]([[0.0], [1.0]])
+	labels := [10.0, 11.0]!
+	invalid_sampler := SubsetRandomSampler.new([2])
+	mut invalid_index_failed := false
+	DataLoader.new_with_sampler[f64](x, labels, 1, invalid_sampler) or {
+		assert err.msg().contains('out of bounds')
+		invalid_index_failed = true
+	}
+	assert invalid_index_failed, 'out-of-range sampler index must fail'
+	mut invalid_batch_size_failed := false
+	DataLoader.new_with_sampler[f64](x, labels, 0, &SequentialSampler{}) or {
+		assert err.msg().contains('batch_size')
+		invalid_batch_size_failed = true
+	}
+	assert invalid_batch_size_failed, 'non-positive batch size must fail'
+}
