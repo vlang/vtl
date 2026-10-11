@@ -1,5 +1,6 @@
 module autograd_tests
 
+import math
 import vtl.autograd
 import vtl
 
@@ -70,4 +71,32 @@ fn test_clamp_forward_backward() {
 	assert x.grad.get_nth(0) == f64(0) // clamped, no grad
 	assert x.grad.get_nth(1) == f64(1) // within bounds
 	assert x.grad.get_nth(2) == f64(0) // clamped, no grad
+}
+
+fn test_nan_to_num_forward_backward_f64() ! {
+	ctx := autograd.ctx[f64]()
+	x := ctx.variable(vtl.from_1d([2.0, math.nan(), math.inf(1), math.inf(-1)])!)
+	mut result := x.nan_to_num(nan: -3.0, posinf: 5.0, neginf: -7.0)!
+	assert result.value.array_equal(vtl.from_1d([2.0, -3.0, 5.0, -7.0])!)
+	result.backprop()!
+	assert x.grad.array_equal(vtl.from_1d([1.0, 0.0, 0.0, 0.0])!)
+}
+
+fn test_nan_to_num_backward_uses_forward_finite_mask() ! {
+	ctx := autograd.ctx[f64]()
+	mut x := ctx.variable(vtl.from_1d([1.0, math.nan()])!)
+	mut result := x.nan_to_num()!
+	x.value.set_nth(0, math.nan())
+	x.value.set_nth(1, 3.0)
+	result.backprop()!
+	assert x.grad.array_equal(vtl.from_1d([1.0, 0.0])!)
+}
+
+fn test_nan_to_num_forward_backward_f32() ! {
+	ctx := autograd.ctx[f32]()
+	x := ctx.variable(vtl.from_1d[f32]([1.5, f32(math.nan()), f32(math.inf(1)), f32(math.inf(-1))])!)
+	mut result := x.nan_to_num(nan: -2.0, posinf: 8.0, neginf: -9.0)!
+	assert result.value.array_equal(vtl.from_1d[f32]([1.5, -2.0, 8.0, -9.0])!)
+	result.backprop()!
+	assert x.grad.array_equal(vtl.from_1d[f32]([1.0, 0.0, 0.0, 0.0])!)
 }

@@ -114,6 +114,7 @@ VTL provides differentiable unary element-wise operations via `Variable` methods
 | `.sqrt_op[T]()!` | `sqrt(x)` | `grad / (2*sqrt(x))` |
 | `.tanh_op[T]()!` | `tanh(x)` | `grad * (1 - tanh²(x))` |
 | `.clamp[T](min, max)!` | `clamp(x, min, max)` | `grad` where min < x < max, else 0 |
+| `.nan_to_num[T]()!` | Replace NaN and infinities | `grad` where the input was finite, else 0 |
 
 ```v
 import vtl
@@ -134,6 +135,26 @@ mut y3 := x.clamp[f64](0.0, 1.5)!
 y3.backprop()!
 // x.grad = [1.0, 1.0, 0.0]  (gradient flows only for values in [0, 1.5])
 ```
+
+`nan_to_num()` uses finite type limits for infinities by default and accepts
+custom replacements. Its backward pass follows PyTorch: finite input values
+receive the output gradient, while NaN and infinite inputs receive zero.
+
+```v
+import math
+import vtl
+import vtl.autograd
+
+mut ctx := autograd.ctx[f64]()
+x := ctx.variable(vtl.from_1d([2.0, math.nan(), math.inf(1)])!)
+mut cleaned := x.nan_to_num(nan: 0.0, posinf: 10.0)!
+mut loss := cleaned.sum()!
+loss.backprop()!
+assert x.grad.to_array() == [1.0, 0.0, 0.0]
+```
+
+See the [nan_to_num autograd example](../examples/autograd_nan_to_num/README.md)
+for a runnable version.
 
 ## Shape gates
 

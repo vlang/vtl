@@ -230,3 +230,44 @@ pub fn (g &ClampGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 		}
 	}
 }
+
+// NanToNumGate passes gradients only through finite input values, matching
+// PyTorch's nan_to_num derivative. The mask is captured during the forward pass
+// so later mutation of the source tensor cannot change the backward result.
+pub struct NanToNumGate[T] {
+pub:
+	finite_mask &vtl.Tensor[bool] = unsafe { nil }
+}
+
+// nan_to_num_gate exposes the saved finite-value mask to the autograd API.
+pub fn nan_to_num_gate[T](finite_mask &vtl.Tensor[bool]) &NanToNumGate[T] {
+	return &NanToNumGate[T]{
+		finite_mask: finite_mask
+	}
+}
+
+// backward zeros gradients for values replaced by nan_to_num.
+pub fn (g &NanToNumGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
+	gradient := payload.variable.grad
+	zero_gradient := vtl.zeros_like[T](gradient)
+	return [vtl.where[T](g.finite_mask, gradient, zero_gradient)!]
+}
+
+fn nan_to_num_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := unsafe { (&NanToNumGate[T](gate)).backward(typed_payload)! }
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
+// cache registers the input with the graph for nan_to_num backward.
+pub fn (g &NanToNumGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
+	a := args[0]
+	match a {
+		Variable[T] {
+			register[T]('NanToNum', voidptr(g), nan_to_num_gate_backward_dispatch[T], result, [a])!
+		}
+		else {
+			return error('NanToNumGate: a must be a Variable')
+		}
+	}
+}
