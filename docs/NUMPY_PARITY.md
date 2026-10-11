@@ -109,7 +109,8 @@ propagates gradients by flipping them over the same axes. `Variable.repeat` and
 `Variable.repeat_axis` sum gradients from repeated copies back to each source
 element. `Variable.tile` sums gradients from repeated blocks. The tensor axis
 manipulation example shows rotation, flip, repeat, tile, and their
-corresponding gradient paths.
+corresponding gradient paths. `Variable.pad` routes gradients through constant,
+edge, wrap, reflect, and symmetric padding modes.
 `Variable.sum` and `Variable.mean` reduce all elements to a one-element tensor
 and propagate gradients to every input element. Their `*_along_axis` variants
 support one-axis sum and mean, with either squeezed or retained dimensions.

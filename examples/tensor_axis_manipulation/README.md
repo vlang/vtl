@@ -7,7 +7,9 @@ values along a selected axis with `Tensor.flip`, circularly shifts values with
 inverse shift, how `Variable.rot90` routes gradients through the inverse
 quarter-turn, how `Variable.flip` routes gradients through the same flip, how
 `Variable.repeat_axis` sums gradients from repeated values, and how
-`Variable.tile` reduces gradients across repeated blocks.
+`Variable.tile` reduces gradients across repeated blocks. `Variable.pad`
+accumulates gradients through the selected constant, edge, wrap, reflect, or
+symmetric padding rule.
 
 Run from `~/.vmodules`:
 

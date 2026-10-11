@@ -22,6 +22,8 @@ tensor planes and propagate gradients through the inverse rotation.
 `Variable.flip` propagates gradients through the self-inverse axis reversal.
 `Variable.repeat` and `Variable.repeat_axis` sum gradients across copies.
 `Variable.tile` reduces gradients from each repeated block to the input.
+`Variable.pad` routes gradients according to its constant, edge, wrap, reflect,
+or symmetric boundary mode.
 
 **Next:** Audit operator coverage and semantics against `torch.Tensor`, including
 dtype promotion, scalar behavior, strides, views, in-place operations, and error
