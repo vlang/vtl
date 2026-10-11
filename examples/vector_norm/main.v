@@ -11,4 +11,8 @@ fn main() {
 
 	matrix := vtl.from_2d([[3.0, 4.0], [0.0, 12.0]])!
 	println('Row L2 norms: ${la.vector_norm_axis(matrix, 2, 1)!.to_array()}')
+
+	tensor := vtl.from_array([f64(1), 2, 3, 4, 5, 6, 7, 8], [2, 2, 2])!
+	tuple_axis := la.vector_norm_axes(tensor, 2, [0, 2], false)!
+	println('L2 norms over axes [0, 2]: ${tuple_axis.to_array()}')
 }
