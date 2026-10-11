@@ -92,6 +92,25 @@ fn test_vector_norm_scales_large_finite_values() ! {
 	assert math.abs(got / 1e308 - math.sqrt(2.0)) < 1e-12
 }
 
+fn test_vector_norm_f32_contiguous_and_offset_views() ! {
+	values := vtl.from_1d([f32(3), 4])!
+	assert vector_norm(values, 2)!.get_nth(0) == 5.0
+	assert vector_norm_axes(values, 2, [0], false)!.get([]) == 5.0
+	base := vtl.from_1d([f32(100), 3, 4, 200])!
+	view := base.slice([1, 3])!
+	assert view.is_row_major_contiguous()
+	assert vector_norm(view, 2)!.get_nth(0) == 5.0
+}
+
+fn test_vector_norm_f32_contiguous_scales_extreme_values() ! {
+	large := vtl.from_1d([f32(1e30), f32(1e30)])!
+	large_norm := vector_norm(large, 2)!.get_nth(0)
+	assert math.abs(large_norm / 1e30 - math.sqrt(2.0)) < 1e-6
+	small := vtl.from_1d([f32(1e-30), f32(1e-30)])!
+	small_norm := vector_norm(small, 2)!.get_nth(0)
+	assert math.abs(small_norm / 1e-30 - math.sqrt(2.0)) < 1e-6
+}
+
 fn test_vector_norm_empty_semantics_and_invalid_order_or_axis() {
 	empty := vtl.from_1d([]f64{})!
 	assert vector_norm(empty, 2)!.get_nth(0) == 0.0

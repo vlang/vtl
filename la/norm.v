@@ -79,6 +79,12 @@ pub fn vector_norm_axes[T](t &vtl.Tensor[T], ord f64, axes []int, keepdims bool)
 			mut output_index := []int{len: output_shape.len}
 			result.set(output_index, value)
 			return result
+		} $else $if T is f32 {
+			value := vector_norm2_f32(t.data.data[..t.size])
+			mut result := vtl.empty[f64](output_shape, memory: .row_major)
+			mut output_index := []int{len: output_shape.len}
+			result.set(output_index, value)
+			return result
 		}
 	}
 	mut result := vtl.empty[f64](output_shape, memory: .row_major)
@@ -205,6 +211,10 @@ fn vector_norm2_f64(values []f64) f64 {
 	return blas.dnrm2(values.len, values, 1)
 }
 
+fn vector_norm2_f32(values []f32) f64 {
+	return f64(blas.snrm2(values.len, values, 1))
+}
+
 fn vector_norm_axis_impl[T](t &vtl.Tensor[T], ord f64, axis int, keepdims bool) !&vtl.Tensor[f64] {
 	if math.is_nan(ord) {
 		return error('vector_norm_axis order must not be NaN')
@@ -257,6 +267,8 @@ fn vector_norm_slice[T](t &vtl.Tensor[T], mut index []int, axis int, ord f64) f6
 	if ord == 2 && axis < 0 && t.is_row_major_contiguous() {
 		$if T is f64 {
 			return vector_norm2_f64(t.data.data[..t.size])
+		} $else $if T is f32 {
+			return vector_norm2_f32(t.data.data[..t.size])
 		}
 	}
 	if ord == 2 {
