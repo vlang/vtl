@@ -577,7 +577,9 @@ fn nanarg_axis[T](t &Tensor[T], axis int, keepdims bool, maximum bool) !&Tensor[
 // cumsum exposes this operation as part of the public API.
 
 // cumsum exposes this operation as part of the public API.
-@[inline]
+// Axis normalization and shape-derived loop bounds keep the direct array
+// accesses below within the input and output buffers for valid tensors.
+@[direct_array_access; inline]
 pub fn (t &Tensor[T]) cumsum[T](axis int) !&Tensor[T] {
 	shape := t.shape
 	rank := shape.len
@@ -591,6 +593,9 @@ pub fn (t &Tensor[T]) cumsum[T](axis int) !&Tensor[T] {
 	if na < 0 || na >= rank {
 		return error('cumsum: axis ${axis} out of bounds for shape ${shape}')
 	}
+	if t.strides.len != rank || t.size != size_from_shape(shape) {
+		return error('cumsum: inconsistent tensor shape, strides, or size')
+	}
 	mut strides := []int{len: rank}
 	strides[rank - 1] = 1
 	for i := rank - 2; i >= 0; i-- {
@@ -603,6 +608,9 @@ pub fn (t &Tensor[T]) cumsum[T](axis int) !&Tensor[T] {
 		return result
 	}
 	input_is_contiguous := t.is_row_major_contiguous()
+	if input_is_contiguous && t.data.data.len < t.size {
+		return error('cumsum: contiguous tensor storage is shorter than its size')
+	}
 	mut outer_idx := []int{len: rank}
 	for {
 		mut base_lin := 0
@@ -659,7 +667,9 @@ pub fn (t &Tensor[T]) cumsum[T](axis int) !&Tensor[T] {
 // cumprod exposes this operation as part of the public API.
 
 // cumprod exposes this operation as part of the public API.
-@[inline]
+// Axis normalization and shape-derived loop bounds keep the direct array
+// accesses below within the input and output buffers for valid tensors.
+@[direct_array_access; inline]
 pub fn (t &Tensor[T]) cumprod[T](axis int) !&Tensor[T] {
 	shape := t.shape
 	rank := shape.len
@@ -673,6 +683,9 @@ pub fn (t &Tensor[T]) cumprod[T](axis int) !&Tensor[T] {
 	if na < 0 || na >= rank {
 		return error('cumprod: axis ${axis} out of bounds for shape ${shape}')
 	}
+	if t.strides.len != rank || t.size != size_from_shape(shape) {
+		return error('cumprod: inconsistent tensor shape, strides, or size')
+	}
 	mut strides := []int{len: rank}
 	strides[rank - 1] = 1
 	for i := rank - 2; i >= 0; i-- {
@@ -685,6 +698,9 @@ pub fn (t &Tensor[T]) cumprod[T](axis int) !&Tensor[T] {
 		return result
 	}
 	input_is_contiguous := t.is_row_major_contiguous()
+	if input_is_contiguous && t.data.data.len < t.size {
+		return error('cumprod: contiguous tensor storage is shorter than its size')
+	}
 	mut outer_idx := []int{len: rank}
 	for {
 		mut base_lin := 0

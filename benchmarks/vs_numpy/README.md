@@ -51,6 +51,27 @@ Record the V version, compiler, CPU, NumPy version, and thread settings with
 results. This microbenchmark compares these two one-dimensional operations and
 does not establish overall VTL/NumPy performance parity.
 
+On an AMD Ryzen 9 5900X with V 0.5.2 `a60fb58`, GCC 16.2.1, NumPy 2.5.3, and
+`OPENBLAS_NUM_THREADS=2`, four rotating, interleaved `-prod -march=native`
+process runs on 2026-10-11 measured these medians (each process mean averages
+seven timed calls):
+
+| Operation | VTL before (ms) | VTL direct access (ms) | NumPy (ms) |
+| --- | ---: | ---: | ---: |
+| `cumsum` | 3.660 | 2.490 | 2.830 |
+| `cumprod` | 3.239 | 2.761 | 2.634 |
+
+The direct-array-access build was 32% faster for `cumsum` and 15% faster for
+`cumprod` than the prior VTL build in this test. It was 1.14× faster than NumPy
+for `cumsum`; NumPy was 1.05× faster for `cumprod`. Across the four runs,
+cumsum means ranged from 3.18–4.41 ms for the prior VTL build, 2.38–2.73 ms
+for the direct-array-access build, and 2.75–2.91 ms for NumPy. The `cumprod`
+checksums matched; the `cumsum` output-sum checksums differed by 0.237 at a
+magnitude of about 2.75e11 because each runtime sums the output with its own
+floating-point reduction order. This checksum is not an elementwise accuracy
+check. Results apply only to this contiguous f64 workload and are not a
+framework-wide performance claim.
+
 On an AMD Ryzen 9 5900X with V 0.5.2 and GCC 16.2.1 (`-prod
 -march=native`), three interleaved process runs on 2026-10-10 measured median
 means of 2.372 ms for VTL and 0.859 ms for NumPy 2.5.3. Checksums matched at
