@@ -591,11 +591,29 @@ The GPU result is read back only after timing to validate a checksum. Compare
 these resident-buffer timings as accelerator kernel measurements; they exclude
 CPU↔GPU transfer costs.
 
-On the Ryzen 9 5900X with an RTX 3060, the tiled 32×32 Vulkan kernel measured
-1.34 ms for 512×512, 4.39 ms for 1024×1024, and 42.95 ms for 2048×2048.
-Earlier NumPy runs on the same host with two CPU BLAS threads measured 1.0 ms,
-8.0 ms, and 62.2 ms respectively. This Vulkan kernel is about 1.8× faster at
-1024×1024 and 1.4× faster at 2048×2048, while it remains slower at 512×512.
+On an AMD Ryzen 9 5900X with an RTX 3060, V 0.5.2 (`81be246`), GCC 16.2.1,
+and `VJOBS=2`, three interleaved `-prod -d vulkan` process runs compared the
+previous 32×32-output kernel with the new 64×64-output kernel. Each process
+performed three warmups and ten timed calls with resident input/output buffers;
+checksums matched for every size. The new kernel is implemented in
+[VSL #474](https://github.com/vlang/vsl/pull/474).
+
+| Size | Previous kernel (ms) | 64×64 output tile (ms) | Change |
+| --- | ---: | ---: | ---: |
+| 128×128 | 1.000 | 0.994 | 1.01× faster |
+| 256×256 | 1.070 | 1.023 | 1.05× faster |
+| 512×512 | 1.398 | 1.363 | 1.03× faster* |
+| 1024×1024 | 4.287 | 4.395 | 1.03× slower* |
+| 2048×2048 | 42.847 | 14.049 | 3.05× faster |
+
+*The 512×512 and 1024×1024 cases use the unchanged 32×32-output K32 kernel;
+their differences are run-to-run variation. The new path improves the
+2048×2048 case, where the dispatcher selects a 64×64 output tile and K32
+reduction blocks. The separate NumPy f32 baseline measured 66.384 ms at
+2048×2048 and 0.972 ms at 512×512 with two CPU BLAS threads. These numbers use
+different execution boundaries: the Vulkan timing excludes transfers and
+NumPy includes its host operation. They are reference points, not a claim of
+end-to-end superiority.
 
 ## Local matched run (2026-10-07)
 
