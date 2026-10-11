@@ -641,6 +641,64 @@ pub fn (g &RepeatGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	}
 }
 
+// TileGate records the source shape and block repetitions needed to sum tiled
+// output gradients back into the original tensor.
+pub struct TileGate[T] {
+pub:
+	shape []int
+	reps  []int
+}
+
+// tile_gate creates backward metadata for a tiled tensor.
+pub fn tile_gate[T](shape []int, reps []int) &TileGate[T] {
+	return &TileGate[T]{
+		shape: shape.clone()
+		reps:  reps.clone()
+	}
+}
+
+// backward interleaves repeat/source dimensions, sums the repeat dimensions,
+// then restores the original shape.
+pub fn (g &TileGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
+	out_rank := if g.reps.len > g.shape.len { g.reps.len } else { g.shape.len }
+	if out_rank == 0 {
+		return [payload.variable.grad.reshape[T](g.shape)!]
+	}
+	input_padding := out_rank - g.shape.len
+	repeat_padding := out_rank - g.reps.len
+	mut grouped_shape := []int{cap: out_rank * 2}
+	for dim in 0 .. out_rank {
+		input_dim := if dim < input_padding { 1 } else { g.shape[dim - input_padding] }
+		repeat_count := if dim < repeat_padding { 1 } else { g.reps[dim - repeat_padding] }
+		grouped_shape << repeat_count
+		grouped_shape << input_dim
+	}
+	mut gradient := payload.variable.grad.reshape[T](grouped_shape)!
+	for axis := out_rank - 1; axis >= 0; axis-- {
+		gradient = vtl_stats.sum_along_axis[T](gradient, axis * 2, false)!
+	}
+	return [gradient.reshape[T](g.shape)!]
+}
+
+fn tile_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := unsafe { (&TileGate[T](gate)).backward(typed_payload)! }
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
+// cache registers the input variable for tile backpropagation.
+pub fn (g &TileGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
+	a := args[0]
+	match a {
+		Variable[T] {
+			register[T]('Tile', voidptr(g), tile_gate_backward_dispatch[T], result, [a])!
+		}
+		else {
+			return error('TileGate: a must be a Variable')
+		}
+	}
+}
+
 // ConcatGate concatenates multiple tensors along an axis.
 // backward: split gradient back into original inputs
 pub struct ConcatGate[T] {

@@ -456,6 +456,18 @@ pub fn (v &Variable[T]) repeat_axis(repeats int, axis int) !&Variable[T] {
 	return result
 }
 
+// tile repeats whole blocks according to NumPy's right-aligned repetition
+// dimensions and sums gradients from each block during backpropagation.
+pub fn (v &Variable[T]) tile(reps []int) !&Variable[T] {
+	value := vtl.tile[T](v.value, reps)!
+	mut result := v.context.variable(value)
+	if v.requires_grad {
+		gate := tile_gate[T](v.value.shape, reps)
+		gate.cache(mut result, v)!
+	}
+	return result
+}
+
 // roll circularly shifts values, flattening by default like NumPy. Optional
 // axes apply the same shift to each selected axis and preserve autograd.
 pub fn (v &Variable[T]) roll(shift int, axes ...int) !&Variable[T] {

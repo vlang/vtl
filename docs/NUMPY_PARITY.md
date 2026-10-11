@@ -107,8 +107,9 @@ apply the inverse shifts during backward. `Variable.rot90`, `rot90_k`, and
 `rot90_axes` propagate gradients through the inverse rotation. `Variable.flip`
 propagates gradients by flipping them over the same axes. `Variable.repeat` and
 `Variable.repeat_axis` sum gradients from repeated copies back to each source
-element. The tensor axis manipulation example shows rotation, flip, repeat, and
-their corresponding gradient paths.
+element. `Variable.tile` sums gradients from repeated blocks. The tensor axis
+manipulation example shows rotation, flip, repeat, tile, and their
+corresponding gradient paths.
 `Variable.sum` and `Variable.mean` reduce all elements to a one-element tensor
 and propagate gradients to every input element. Their `*_along_axis` variants
 support one-axis sum and mean, with either squeezed or retained dimensions.

@@ -222,6 +222,44 @@ fn test_repeat_with_zero_copies_produces_zero_input_gradient() ! {
 	assert input.grad.to_array() == [0.0, 0.0]
 }
 
+fn test_tile_forward_backward_sums_repeated_blocks() ! {
+	mut context := autograd.ctx[f64]()
+	input := context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0], [2, 2])!)
+	weights := context.variable(vtl.from_array([
+		1.0,
+		2.0,
+		3.0,
+		4.0,
+		5.0,
+		6.0,
+		7.0,
+		8.0,
+		9.0,
+		10.0,
+		11.0,
+		12.0,
+		13.0,
+		14.0,
+		15.0,
+		16.0,
+		17.0,
+		18.0,
+		19.0,
+		20.0,
+		21.0,
+		22.0,
+		23.0,
+		24.0,
+	], [1, 4, 6])!)
+	tiled := input.tile([1, 2, 3])!
+	assert tiled.value.shape == [1, 4, 6]
+	assert tiled.value.to_array() == [1.0, 2.0, 1.0, 2.0, 1.0, 2.0, 3.0, 4.0, 3.0, 4.0, 3.0, 4.0,
+		1.0, 2.0, 1.0, 2.0, 1.0, 2.0, 3.0, 4.0, 3.0, 4.0, 3.0, 4.0]
+	mut loss := tiled.multiply(weights)!.sum()!
+	loss.backprop()!
+	assert input.grad.to_array() == [54.0, 60.0, 90.0, 96.0]
+}
+
 fn test_roll_flat_backward_handles_extreme_shift() ! {
 	mut context := autograd.ctx[f64]()
 	input := context.variable(vtl.from_1d([1.0, 2.0, 3.0])!)
