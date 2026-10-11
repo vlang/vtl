@@ -216,6 +216,98 @@ fn boolean_index_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr 
 	return tensor_ptrs_to_voidptrs[T](tensors)
 }
 
+// masked_select selects broadcast-mask values in row-major logical order and
+// scatters gradients back to their source coordinates.
+pub fn (v &Variable[T]) masked_select(mask &vtl.Tensor[bool]) !&Variable[T] {
+	value := v.value.masked_select[T](mask)!
+	mut result := variable[T](v.context, value, requires_grad: v.requires_grad)
+	if v.requires_grad {
+		gate := &MaskedSelectGate[T]{
+			selected_flat_indices: masked_flat_indices(mask, v.value.shape)!
+			input_shape:           v.value.shape.clone()
+		}
+		register[T]('MaskedSelect', voidptr(gate), masked_select_backward_dispatch[T], result, [v])!
+	}
+	return result
+}
+
+struct MaskedSelectGate[T] {
+	selected_flat_indices []int
+	input_shape           []int
+}
+
+fn (g &MaskedSelectGate[T]) backward(gradient &vtl.Tensor[T]) ![]&vtl.Tensor[T] {
+	mut input_gradient := vtl.zeros[T](g.input_shape)
+	for selected_position, flat_index in g.selected_flat_indices {
+		input_index := take_flat_coordinate(flat_index, g.input_shape)
+		input_gradient.set(input_index, gradient.get_nth[T](selected_position))
+	}
+	return [input_gradient]
+}
+
+fn masked_select_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_gate := unsafe { &MaskedSelectGate[T](gate) }
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := typed_gate.backward(typed_payload.variable.grad)!
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
+// masked_fill replaces mask-selected values and blocks their input gradients.
+pub fn (v &Variable[T]) masked_fill(mask &vtl.Tensor[bool], value T) !&Variable[T] {
+	result_value := v.value.masked_fill[T](mask, value)!
+	mut result := variable[T](v.context, result_value, requires_grad: v.requires_grad)
+	if v.requires_grad {
+		gate := &MaskedFillGate[T]{
+			selected_flat_indices: masked_flat_indices(mask, v.value.shape)!
+			input_shape:           v.value.shape.clone()
+		}
+		register[T]('MaskedFill', voidptr(gate), masked_fill_backward_dispatch[T], result, [v])!
+	}
+	return result
+}
+
+struct MaskedFillGate[T] {
+	selected_flat_indices []int
+	input_shape           []int
+}
+
+fn (g &MaskedFillGate[T]) backward(gradient &vtl.Tensor[T]) ![]&vtl.Tensor[T] {
+	mut input_gradient := gradient.copy(.row_major)
+	for flat_index in g.selected_flat_indices {
+		input_index := take_flat_coordinate(flat_index, g.input_shape)
+		input_gradient.set(input_index, vtl.cast[T](0))
+	}
+	return [input_gradient]
+}
+
+fn masked_fill_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_gate := unsafe { &MaskedFillGate[T](gate) }
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := typed_gate.backward(typed_payload.variable.grad)!
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
+fn masked_flat_indices(mask &vtl.Tensor[bool], shape []int) ![]int {
+	broadcast_mask := mask.broadcast_to(shape)!
+	mut selected := []int{}
+	for flat_index in 0 .. broadcast_mask.size {
+		if broadcast_mask.get_nth[bool](flat_index) {
+			selected << flat_index
+		}
+	}
+	return selected
+}
+
+fn take_flat_coordinate(flat_index int, shape []int) []int {
+	mut coordinate := []int{len: shape.len}
+	mut remaining := flat_index
+	for dimension := shape.len - 1; dimension >= 0; dimension-- {
+		coordinate[dimension] = remaining % shape[dimension]
+		remaining /= shape[dimension]
+	}
+	return coordinate
+}
+
 // take_along_axis gathers values and tracks the inverse scatter in backprop.
 // Repeated indices accumulate their gradients; non-axis broadcast dimensions
 // are reduced into the corresponding source coordinates.

@@ -38,11 +38,13 @@ assert clipped.to_array() == [10, 40]
 `Variable.boolean_index` record gathers in the computation graph. `take_nd`
 accepts an index tensor whose complete shape replaces the selected axis;
 `take_flat` gathers from row-major logical order; `boolean_index` selects
-leading dimensions and preserves trailing dimensions. During backpropagation,
-gradients are scattered to selected source positions; repeated indices
-accumulate, and broadcast source dimensions sum their contributions. Integer
-indices and masks are treated as constants and snapshotted when the gather is
-recorded, so later edits do not change the backward path.
+leading dimensions and preserves trailing dimensions. `Variable.masked_select`
+selects broadcast-mask values in row-major order, while `Variable.masked_fill`
+replaces masked values and blocks their input gradients. During
+backpropagation, gradients are scattered to selected source positions; repeated
+indices accumulate, and broadcast source dimensions sum their contributions.
+Integer indices and masks are treated as constants and snapshotted when the
+operation is recorded, so later edits do not change the backward path.
 
 ```v
 import vtl
