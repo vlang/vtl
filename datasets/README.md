@@ -21,6 +21,12 @@ sample order. A non-positive `batch_size` produces an empty loader.
 `reset()` between epochs to advance the deterministic shuffle order from the
 configured seed.
 
+For custom sample order, `new_data_loader_with_sampler_checked` and
+`new_data_loader_with_labels_and_sampler_checked` accept samplers from
+`vtl.nn.data`. Built-in options include sequential, random, subset-random, and
+weighted sampling. Call `reset_checked()` between epochs when using a sampler;
+it reports errors from custom sampler implementations.
+
 `load_imdb()` returns the full 25,000 review training and test splits. Use
 `load_imdb_with_config` for a smaller, class-balanced subset. Review features
 remain raw strings; labels are binary (`1` positive, `0` negative).

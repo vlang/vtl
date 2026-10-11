@@ -1,6 +1,7 @@
 module datasets
 
 import vtl
+import vtl.nn.data as nn_data
 import math
 
 fn test_contiguous_batches_are_zero_copy_views() ! {
@@ -133,4 +134,40 @@ fn test_split_validates_validation_fraction() ! {
 		}
 		assert false, 'invalid validation fraction ${fraction} must fail'
 	}
+}
+
+fn test_sampler_drives_tensor_batches_and_labels() ! {
+	dataset := vtl.from_2d([[0.0], [1], [2], [3]])!
+	labels := vtl.from_1d([10.0, 11, 12, 13])!
+	sampler := nn_data.SubsetRandomSampler.new([1, 3])
+	mut loader := new_data_loader_with_labels_and_sampler_checked[f64](dataset, labels,
+		DataLoaderConfig{
+			batch_size: 1
+			shuffle:    false
+			drop_last:  false
+		}, sampler)!
+	assert loader.total_samples() == 2
+	mut selected_labels := []f64{}
+	for i in 0 .. loader.len() {
+		_, batch_labels := loader.batch_with_labels(i) or { panic('expected labeled batch') }
+		selected_labels << batch_labels.get_nth(0)
+	}
+	selected_labels.sort()
+	assert selected_labels == [11.0, 13.0]
+	loader.reset_checked()!
+	assert loader.total_samples() == 2
+}
+
+fn test_weighted_sampler_drives_tensor_batches() ! {
+	dataset := vtl.from_2d([[0.0], [1], [2]])!
+	labels := vtl.from_1d([10.0, 11, 12])!
+	sampler := nn_data.WeightedRandomSampler.new([0.0, 1.0, 0.0], 5, true)!
+	loader := new_data_loader_with_labels_and_sampler_checked[f64](dataset, labels,
+		DataLoaderConfig{
+			batch_size: 5
+			shuffle:    false
+			drop_last:  false
+		}, sampler)!
+	_, batch_labels := loader.batch_with_labels(0) or { panic('expected labeled batch') }
+	assert batch_labels.to_array() == [11.0, 11, 11, 11, 11]
 }

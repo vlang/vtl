@@ -256,3 +256,37 @@ fn test_sampler_validation() {
 	}
 	assert invalid_batch_size_failed, 'non-positive batch size must fail'
 }
+
+fn test_weighted_random_sampler() {
+	replacement_sampler := WeightedRandomSampler.new([0.0, 5.0, 0.0], 8, true)!
+	replacement_indices := replacement_sampler.sample_indices(3)!
+	assert replacement_indices.len == 8
+	for sample_index in replacement_indices {
+		assert sample_index == 1
+	}
+	without_replacement_sampler := WeightedRandomSampler.new([0.0, 5.0, 2.0], 2, false)!
+	mut without_replacement_indices := without_replacement_sampler.sample_indices(3)!
+	without_replacement_indices.sort()
+	assert without_replacement_indices == [1, 2]
+}
+
+fn test_weighted_random_sampler_validation() {
+	mut invalid_count_failed := false
+	WeightedRandomSampler.new([1.0, 2.0], 3, false) or {
+		assert err.msg().contains('positive weights')
+		invalid_count_failed = true
+	}
+	assert invalid_count_failed
+	mut invalid_weights_failed := false
+	WeightedRandomSampler.new([1.0, math.inf(1)], 1, true) or {
+		assert err.msg().contains('finite and non-negative')
+		invalid_weights_failed = true
+	}
+	assert invalid_weights_failed
+	mut mismatched_dataset_failed := false
+	WeightedRandomSampler.new([1.0, 2.0], 1, true)!.sample_indices(3) or {
+		assert err.msg().contains('must match dataset size')
+		mismatched_dataset_failed = true
+	}
+	assert mismatched_dataset_failed
+}

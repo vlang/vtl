@@ -1,6 +1,7 @@
 module datasets
 
 import vtl
+import vtl.nn.data as nn_data
 import math
 
 // DataLoader provides an iterable over a dataset with batching and shuffling.
@@ -29,6 +30,9 @@ pub:
 pub mut:
 	indices []int
 	epoch   int
+mut:
+	sampler      nn_data.Sampler
+	uses_sampler bool
 }
 
 // DataLoaderConfig holds configuration for creating a DataLoader.
@@ -154,10 +158,20 @@ pub fn (dl &DataLoader[T]) total_samples() int {
 
 // reset re-shuffles the indices (call between epochs). Uses seed if set.
 pub fn (mut dl DataLoader[T]) reset() {
-	dl.epoch++
-	if dl.shuffle {
+	dl.reset_checked() or { panic('DataLoader.reset failed: ${err.msg()}') }
+}
+
+// reset_checked advances the loader to a new epoch and reports sampler errors.
+pub fn (mut dl DataLoader[T]) reset_checked() ! {
+	next_epoch := dl.epoch + 1
+	if dl.uses_sampler {
+		dl.indices = dl.sampler.sample_indices(dl.dataset.shape[0])!
+		validate_sampler_indices(dl.indices, dl.dataset.shape[0])!
+	} else if dl.shuffle {
+		dl.epoch = next_epoch
 		dl.shuffle_indices()
 	}
+	dl.epoch = next_epoch
 }
 
 // shuffle_indices shuffles the index array in-place using Fisher-Yates.
@@ -184,6 +198,7 @@ pub fn new_data_loader[T](dataset &vtl.Tensor[T], config DataLoaderConfig) &Data
 		shuffle:    config.shuffle
 		drop_last:  config.drop_last
 		seed:       config.seed
+		sampler:    &nn_data.SequentialSampler{}
 		indices:    indices
 		epoch:      0
 	}
@@ -191,6 +206,27 @@ pub fn new_data_loader[T](dataset &vtl.Tensor[T], config DataLoaderConfig) &Data
 		dl.shuffle_indices()
 	}
 	return dl
+}
+
+// new_data_loader_with_sampler_checked creates a loader whose sample order is
+// supplied by sampler. The sampler is invoked again by reset_checked each epoch.
+pub fn new_data_loader_with_sampler_checked[T](dataset &vtl.Tensor[T], config DataLoaderConfig, sampler nn_data.Sampler) !&DataLoader[T] {
+	if dataset.shape.len == 0 {
+		return error('dataset must have a sample dimension')
+	}
+	n := dataset.shape[0]
+	indices := sampler.sample_indices(n)!
+	validate_sampler_indices(indices, n)!
+	return &DataLoader[T]{
+		dataset:      dataset
+		batch_size:   config.batch_size
+		shuffle:      false
+		drop_last:    config.drop_last
+		seed:         config.seed
+		sampler:      sampler
+		uses_sampler: true
+		indices:      indices
+	}
 }
 
 // new_data_loader_with_labels creates a DataLoader with both features and labels tensors.
@@ -228,6 +264,7 @@ pub fn new_data_loader_with_labels_checked[T](dataset &vtl.Tensor[T], labels &vt
 		shuffle:    config.shuffle
 		drop_last:  config.drop_last
 		seed:       config.seed
+		sampler:    &nn_data.SequentialSampler{}
 		indices:    indices
 		epoch:      0
 	}
@@ -235,6 +272,42 @@ pub fn new_data_loader_with_labels_checked[T](dataset &vtl.Tensor[T], labels &vt
 		dl.shuffle_indices()
 	}
 	return dl
+}
+
+// new_data_loader_with_labels_and_sampler_checked creates a labeled loader
+// with a custom sample order and validates the data and sampler indices.
+pub fn new_data_loader_with_labels_and_sampler_checked[T](dataset &vtl.Tensor[T], labels &vtl.Tensor[T], config DataLoaderConfig, sampler nn_data.Sampler) !&DataLoader[T] {
+	if dataset.shape.len == 0 {
+		return error('dataset must have a sample dimension')
+	}
+	if labels.shape.len == 0 {
+		return error('labels must have a sample dimension')
+	}
+	n := dataset.shape[0]
+	if labels.shape[0] != n {
+		return error('dataset and labels must have the same number of samples: ${n} != ${labels.shape[0]}')
+	}
+	indices := sampler.sample_indices(n)!
+	validate_sampler_indices(indices, n)!
+	return &DataLoader[T]{
+		dataset:      dataset
+		labels:       labels
+		batch_size:   config.batch_size
+		shuffle:      false
+		drop_last:    config.drop_last
+		seed:         config.seed
+		sampler:      sampler
+		uses_sampler: true
+		indices:      indices
+	}
+}
+
+fn validate_sampler_indices(indices []int, dataset_size int) ! {
+	for i, sample_index in indices {
+		if sample_index < 0 || sample_index >= dataset_size {
+			return error('sampler index ${sample_index} at position ${i} is out of bounds for dataset size ${dataset_size}')
+		}
+	}
 }
 
 // DataLoaderIterator provides a for-in loop interface over a DataLoader.
@@ -310,6 +383,7 @@ pub fn (dl &DataLoader[T]) split(val_fraction f64) !(&DataLoader[T], &DataLoader
 		shuffle:    false
 		drop_last:  dl.drop_last
 		seed:       dl.seed
+		sampler:    &nn_data.SequentialSampler{}
 		indices:    train_indices
 		epoch:      dl.epoch
 	}
@@ -321,6 +395,7 @@ pub fn (dl &DataLoader[T]) split(val_fraction f64) !(&DataLoader[T], &DataLoader
 		shuffle:    false
 		drop_last:  false
 		seed:       dl.seed
+		sampler:    &nn_data.SequentialSampler{}
 		indices:    val_indices
 		epoch:      0
 	}
