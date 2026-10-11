@@ -68,7 +68,7 @@ single-axis, and multiple-axis `count_nonzero`; `argwhere` and per-axis `nonzero
 `take_flat`, and their `raise`/`wrap`/`clip` mode variants;
 `take_along_axis` with broadcasting outside the selected axis;
 `put_along_axis` and `scatter_add`; lookup and DataLoader gathers; broadcastable
-`masked_select` and `masked_fill`; leading-dimension boolean-mask indexing via
+`masked_select`, `masked_fill`, and `masked_scatter`; leading-dimension boolean-mask indexing via
 `boolean_index`, which preserves trailing dimensions like NumPy `array[mask]`.
 `Tensor.put` and `put_with_mode` update row-major logical flat indices with
 NumPy's `raise`, `wrap`, and `clip` modes; short value tensors repeat, and
@@ -92,6 +92,9 @@ and `clip` index modes. Indices are snapshotted during the forward pass, and
 repeated uses of one update value accumulate into its gradient.
 `Variable.putmask` returns an updated copy and routes gradients to unmasked input
 positions and to update values selected by each true destination's flat index.
+`Variable.masked_scatter` broadcasts its mask, consumes source values in order
+for true destinations, and routes gradients to the input and consumed source
+prefix.
 `Variable.slice` and `Variable.slice_hilo` propagate gradients through integer
 indices, range views, and positive steps.
 `Variable.sum` and `Variable.mean` reduce all elements to a one-element tensor

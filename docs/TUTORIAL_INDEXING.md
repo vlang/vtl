@@ -236,11 +236,14 @@ assert input.grad.to_array() == [1.0, 0.0, 0.0, 0.0, 5.0]
 assert updates.grad.to_array() == [3.0, 6.0]
 ```
 
-Boolean masks passed to `masked_select` and `masked_fill` may broadcast to the
-tensor shape. `masked_select` returns selected elements as a one-dimensional
-copy; `masked_fill` returns a new tensor and leaves the input unchanged. For
-NumPy-style `array[mask]`, `boolean_index` requires the mask to match the
-leading tensor dimensions and retains any trailing dimensions.
+Boolean masks passed to `masked_select`, `masked_fill`, and `masked_scatter` may
+broadcast to the tensor shape. `masked_select` returns selected elements as a
+one-dimensional copy; `masked_fill` and `masked_scatter` return new tensors and
+leave the input unchanged. `masked_scatter` consumes source values sequentially
+for each true position, ignores unused trailing source values, and errors if
+the source is too short. For NumPy-style `array[mask]`, `boolean_index` requires
+the mask to match the leading tensor dimensions and retains any trailing
+dimensions.
 
 ```v
 import vtl
@@ -253,6 +256,10 @@ assert selected.to_array() == [2, 3, 5, 6]
 row_mask := vtl.from_array([true, false], [2, 1])!
 filled := values.masked_fill(row_mask, -1)!
 assert filled.to_array() == [-1, -1, -1, 4, 5, 6]
+
+source := vtl.from_1d([10, 20, 30, 40])!
+scattered := values.masked_scatter(column_mask, source)!
+assert scattered.to_array() == [1, 10, 20, 4, 30, 40]
 ```
 
 ```v

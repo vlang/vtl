@@ -87,3 +87,30 @@ pub fn (t &Tensor[T]) masked_fill[T](mask &Tensor[bool], value T) !&Tensor[T] {
 	}
 	return result
 }
+
+// masked_scatter copies source values, in row-major order, into the true
+// positions selected by a broadcastable mask. The source must contain at
+// least as many values as the mask selects; extra source values are ignored.
+pub fn (t &Tensor[T]) masked_scatter[T](mask &Tensor[bool], source &Tensor[T]) !&Tensor[T] {
+	broadcast_mask := mask.broadcast_to(t.shape) or {
+		return error('mask shape ${mask.shape} cannot broadcast to tensor shape ${t.shape}')
+	}
+	mut selected_count := 0
+	for flat_index in 0 .. broadcast_mask.size {
+		if broadcast_mask.get_nth[bool](flat_index) {
+			selected_count++
+		}
+	}
+	if source.size < selected_count {
+		return error('masked_scatter: source has ${source.size} values for ${selected_count} selected positions')
+	}
+	mut result := t.copy(.row_major)
+	mut source_position := 0
+	for flat_index in 0 .. broadcast_mask.size {
+		if broadcast_mask.get_nth[bool](flat_index) {
+			result.set_nth[T](flat_index, source.get_nth[T](source_position))
+			source_position++
+		}
+	}
+	return result
+}

@@ -108,6 +108,24 @@ fn test_masked_fill_backward_zeros_replaced_values_with_broadcast_mask() ! {
 	assert input.grad.to_array() == [1.0, 0.0, 1.0, 0.0]
 }
 
+fn test_masked_scatter_backward_routes_broadcast_mask_gradients_and_snapshots_mask() ! {
+	mut ctx := autograd.ctx[f64]()
+	input := ctx.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0], [2, 2])!)
+	source := ctx.variable(vtl.from_1d([10.0, 20.0, 30.0])!)
+	mut mask := vtl.from_array([false, true], [1, 2])!
+	weights := ctx.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0], [2, 2])!)
+
+	result := input.masked_scatter(mask, source)!
+	assert result.value.to_array() == [1.0, 10.0, 3.0, 20.0]
+	assert input.value.to_array() == [1.0, 2.0, 3.0, 4.0]
+	mask.fill(false)
+	mut objective := result.multiply(weights)!
+	objective.backprop()!
+
+	assert input.grad.to_array() == [1.0, 0.0, 3.0, 0.0]
+	assert source.grad.to_array() == [2.0, 4.0, 0.0]
+}
+
 fn test_take_along_axis_backward_accumulates_repeated_indices() ! {
 	mut ctx := autograd.ctx[f64]()
 	input := ctx.variable(vtl.from_array([10.0, 20.0, 30.0, 40.0, 50.0, 60.0], [2, 3])!)

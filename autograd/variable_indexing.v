@@ -287,6 +287,50 @@ fn masked_fill_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
 	return tensor_ptrs_to_voidptrs[T](tensors)
 }
 
+// masked_scatter copies source values to broadcast-mask positions and tracks
+// gradients for the original input and the source prefix used in the forward pass.
+pub fn (v &Variable[T]) masked_scatter(mask &vtl.Tensor[bool], source &Variable[T]) !&Variable[T] {
+	value := v.value.masked_scatter[T](mask, source.value)!
+	needs_grad := v.requires_grad || source.requires_grad
+	mut result := variable[T](v.context, value, requires_grad: needs_grad)
+	if needs_grad {
+		gate := &MaskedScatterGate[T]{
+			selected_flat_indices: masked_flat_indices(mask, v.value.shape)!
+			source_shape:          source.value.shape.clone()
+			source_size:           source.value.size
+		}
+		register[T]('MaskedScatter', voidptr(gate), masked_scatter_backward_dispatch[T], result, [
+			v,
+			source,
+		])!
+	}
+	return result
+}
+
+struct MaskedScatterGate[T] {
+	selected_flat_indices []int
+	source_shape          []int
+	source_size           int
+}
+
+fn (g &MaskedScatterGate[T]) backward(gradient &vtl.Tensor[T]) ![]&vtl.Tensor[T] {
+	mut input_gradient := gradient.copy(.row_major)
+	mut source_gradient_values := []T{len: g.source_size}
+	for source_position, flat_index in g.selected_flat_indices {
+		input_gradient.set_nth[T](flat_index, vtl.cast[T](0))
+		source_gradient_values[source_position] = gradient.get_nth[T](flat_index)
+	}
+	source_gradient := vtl.from_array[T](source_gradient_values, g.source_shape)!
+	return [input_gradient, source_gradient]
+}
+
+fn masked_scatter_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_gate := unsafe { &MaskedScatterGate[T](gate) }
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := typed_gate.backward(typed_payload.variable.grad)!
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 fn masked_flat_indices(mask &vtl.Tensor[bool], shape []int) ![]int {
 	broadcast_mask := mask.broadcast_to(shape)!
 	mut selected := []int{}
