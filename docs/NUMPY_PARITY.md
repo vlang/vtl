@@ -198,7 +198,8 @@ multi-quantile multi-axis forms can also retain reduced dimensions with
 behavior;
 one- through N-dimensional histograms with inferred and custom edges, weighted
 counts, densities normalized by each bin's volume, and multiple one-dimensional
-bin-selection rules;
+bin-selection rules; peak-to-peak range via `stats.ptp` globally and across one
+or several axes with optional `keepdims` for integer and floating-point input;
 integer/weighted `bincount`.
 
 `histogramdd` matches sample and bin ordering and density normalization for the

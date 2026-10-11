@@ -3,6 +3,9 @@
 Reduce a 3-D tensor over multiple axes for mean and variance, including `keepdims`, then ignore
 NaNs with `nanmean_along_axes`.
 
+The example also computes peak-to-peak ranges across several axes with
+`stats.ptp_along_axes`.
+
 ## Run
 
 From `~/.vmodules`:
