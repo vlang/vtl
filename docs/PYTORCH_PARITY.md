@@ -94,11 +94,12 @@ weighted draws with or without replacement, and the tensor-backed
 `vtl.datasets` API ships MNIST, IMDB, and CIFAR-10 loaders. Its defaults are
 `batch_size: 32`, `shuffle: true`, and
 `drop_last: true`; PyTorch's `DataLoader` defaults are `1`, `false`, and
-`false`, respectively. VTL does not yet expose batch samplers, collation
-callbacks, iterable datasets, worker processes, or pinned-memory loading.
+`false`, respectively. `FixedBatchSampler` supports custom batch boundaries
+and `drop_last`. VTL does not yet expose collation callbacks, iterable
+datasets, worker processes, or pinned-memory loading.
 
-**Next:** Add composable transforms, batch samplers, collation controls, worker
-and process loading, streaming datasets, generator injection, and stronger
+**Next:** Add composable transforms, collation controls, worker and process
+loading, streaming datasets, generator injection, and stronger
 reproducibility controls. See the [PyTorch data loading API](https://docs.pytorch.org/docs/stable/data.html)
 when porting a pipeline; specify VTL loader options explicitly because its
 defaults differ.

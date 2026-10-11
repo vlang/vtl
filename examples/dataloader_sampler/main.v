@@ -29,4 +29,14 @@ fn main() {
 		panic('expected a weighted labeled batch')
 	}
 	println('weighted batch labels=${weighted_labels.to_array()}')
+	sequential_sampler := nn_data.Sampler(&nn_data.SequentialSampler{})
+	batch_sampler := nn_data.FixedBatchSampler.new(sequential_sampler, 3, false)!
+	batch_loader := datasets.new_data_loader_with_batch_sampler_checked[f64](features,
+		datasets.DataLoaderConfig{
+			batch_size: 1
+			shuffle:    false
+			drop_last:  false
+		}, batch_sampler)!
+	first_explicit_batch := batch_loader.batch(0) or { panic('expected explicit batch') }
+	println('explicit first batch=${first_explicit_batch.to_array()}')
 }

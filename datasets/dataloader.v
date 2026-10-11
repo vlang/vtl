@@ -31,8 +31,11 @@ pub mut:
 	indices []int
 	epoch   int
 mut:
-	sampler      nn_data.Sampler
-	uses_sampler bool
+	sampler            nn_data.Sampler
+	uses_sampler       bool
+	batch_sampler      nn_data.BatchSampler
+	uses_batch_sampler bool
+	batches            [][]int
 }
 
 // DataLoaderConfig holds configuration for creating a DataLoader.
@@ -114,6 +117,9 @@ pub fn (dl &DataLoader[T]) batch_with_labels(i int) ?(&vtl.Tensor[T], &vtl.Tenso
 
 // len returns the number of batches (drop_last affects count).
 pub fn (dl &DataLoader[T]) len() int {
+	if dl.uses_batch_sampler {
+		return dl.batches.len
+	}
 	if dl.indices.len == 0 || dl.batch_size <= 0 {
 		return 0
 	}
@@ -126,6 +132,9 @@ pub fn (dl &DataLoader[T]) len() int {
 fn (dl &DataLoader[T]) batch_indices(i int) ?[]int {
 	if i < 0 || i >= dl.len() {
 		return none
+	}
+	if dl.uses_batch_sampler {
+		return dl.batches[i]
 	}
 	start := i * dl.batch_size
 	if start >= dl.indices.len {
@@ -164,7 +173,12 @@ pub fn (mut dl DataLoader[T]) reset() {
 // reset_checked advances the loader to a new epoch and reports sampler errors.
 pub fn (mut dl DataLoader[T]) reset_checked() ! {
 	next_epoch := dl.epoch + 1
-	if dl.uses_sampler {
+	if dl.uses_batch_sampler {
+		batches := dl.batch_sampler.sample_batches(dl.dataset.shape[0])!
+		validate_sampler_batches(batches, dl.dataset.shape[0])!
+		dl.batches = batches
+		dl.indices = flatten_sampler_batches(batches)
+	} else if dl.uses_sampler {
 		dl.indices = dl.sampler.sample_indices(dl.dataset.shape[0])!
 		validate_sampler_indices(dl.indices, dl.dataset.shape[0])!
 	} else if dl.shuffle {
@@ -172,6 +186,29 @@ pub fn (mut dl DataLoader[T]) reset_checked() ! {
 		dl.shuffle_indices()
 	}
 	dl.epoch = next_epoch
+}
+
+// new_data_loader_with_batch_sampler_checked creates a loader using explicit
+// sample batches from batch_sampler.
+pub fn new_data_loader_with_batch_sampler_checked[T](dataset &vtl.Tensor[T], config DataLoaderConfig, batch_sampler nn_data.BatchSampler) !&DataLoader[T] {
+	if dataset.shape.len == 0 {
+		return error('dataset must have a sample dimension')
+	}
+	n := dataset.shape[0]
+	batches := batch_sampler.sample_batches(n)!
+	validate_sampler_batches(batches, n)!
+	return &DataLoader[T]{
+		dataset:            dataset
+		batch_size:         config.batch_size
+		shuffle:            false
+		drop_last:          false
+		seed:               config.seed
+		sampler:            &nn_data.SequentialSampler{}
+		batch_sampler:      batch_sampler
+		uses_batch_sampler: true
+		batches:            batches
+		indices:            flatten_sampler_batches(batches)
+	}
 }
 
 // shuffle_indices shuffles the index array in-place using Fisher-Yates.
@@ -193,14 +230,15 @@ pub fn new_data_loader[T](dataset &vtl.Tensor[T], config DataLoaderConfig) &Data
 		indices[i] = i
 	}
 	mut dl := &DataLoader[T]{
-		dataset:    dataset
-		batch_size: config.batch_size
-		shuffle:    config.shuffle
-		drop_last:  config.drop_last
-		seed:       config.seed
-		sampler:    &nn_data.SequentialSampler{}
-		indices:    indices
-		epoch:      0
+		dataset:       dataset
+		batch_size:    config.batch_size
+		shuffle:       config.shuffle
+		drop_last:     config.drop_last
+		seed:          config.seed
+		sampler:       &nn_data.SequentialSampler{}
+		batch_sampler: &nn_data.FixedBatchSampler{}
+		indices:       indices
+		epoch:         0
 	}
 	if config.shuffle {
 		dl.shuffle_indices()
@@ -218,14 +256,15 @@ pub fn new_data_loader_with_sampler_checked[T](dataset &vtl.Tensor[T], config Da
 	indices := sampler.sample_indices(n)!
 	validate_sampler_indices(indices, n)!
 	return &DataLoader[T]{
-		dataset:      dataset
-		batch_size:   config.batch_size
-		shuffle:      false
-		drop_last:    config.drop_last
-		seed:         config.seed
-		sampler:      sampler
-		uses_sampler: true
-		indices:      indices
+		dataset:       dataset
+		batch_size:    config.batch_size
+		shuffle:       false
+		drop_last:     config.drop_last
+		seed:          config.seed
+		sampler:       sampler
+		batch_sampler: &nn_data.FixedBatchSampler{}
+		uses_sampler:  true
+		indices:       indices
 	}
 }
 
@@ -258,15 +297,16 @@ pub fn new_data_loader_with_labels_checked[T](dataset &vtl.Tensor[T], labels &vt
 		indices[i] = i
 	}
 	mut dl := &DataLoader[T]{
-		dataset:    dataset
-		labels:     labels
-		batch_size: config.batch_size
-		shuffle:    config.shuffle
-		drop_last:  config.drop_last
-		seed:       config.seed
-		sampler:    &nn_data.SequentialSampler{}
-		indices:    indices
-		epoch:      0
+		dataset:       dataset
+		labels:        labels
+		batch_size:    config.batch_size
+		shuffle:       config.shuffle
+		drop_last:     config.drop_last
+		seed:          config.seed
+		sampler:       &nn_data.SequentialSampler{}
+		batch_sampler: &nn_data.FixedBatchSampler{}
+		indices:       indices
+		epoch:         0
 	}
 	if config.shuffle {
 		dl.shuffle_indices()
@@ -290,15 +330,46 @@ pub fn new_data_loader_with_labels_and_sampler_checked[T](dataset &vtl.Tensor[T]
 	indices := sampler.sample_indices(n)!
 	validate_sampler_indices(indices, n)!
 	return &DataLoader[T]{
-		dataset:      dataset
-		labels:       labels
-		batch_size:   config.batch_size
-		shuffle:      false
-		drop_last:    config.drop_last
-		seed:         config.seed
-		sampler:      sampler
-		uses_sampler: true
-		indices:      indices
+		dataset:       dataset
+		labels:        labels
+		batch_size:    config.batch_size
+		shuffle:       false
+		drop_last:     config.drop_last
+		seed:          config.seed
+		sampler:       sampler
+		batch_sampler: &nn_data.FixedBatchSampler{}
+		uses_sampler:  true
+		indices:       indices
+	}
+}
+
+// new_data_loader_with_labels_and_batch_sampler_checked creates a labeled
+// loader using explicit sample batches and preserves feature-label alignment.
+pub fn new_data_loader_with_labels_and_batch_sampler_checked[T](dataset &vtl.Tensor[T], labels &vtl.Tensor[T], config DataLoaderConfig, batch_sampler nn_data.BatchSampler) !&DataLoader[T] {
+	if dataset.shape.len == 0 {
+		return error('dataset must have a sample dimension')
+	}
+	if labels.shape.len == 0 {
+		return error('labels must have a sample dimension')
+	}
+	n := dataset.shape[0]
+	if labels.shape[0] != n {
+		return error('dataset and labels must have the same number of samples: ${n} != ${labels.shape[0]}')
+	}
+	batches := batch_sampler.sample_batches(n)!
+	validate_sampler_batches(batches, n)!
+	return &DataLoader[T]{
+		dataset:            dataset
+		labels:             labels
+		batch_size:         config.batch_size
+		shuffle:            false
+		drop_last:          false
+		seed:               config.seed
+		sampler:            &nn_data.SequentialSampler{}
+		batch_sampler:      batch_sampler
+		uses_batch_sampler: true
+		batches:            batches
+		indices:            flatten_sampler_batches(batches)
 	}
 }
 
@@ -308,6 +379,23 @@ fn validate_sampler_indices(indices []int, dataset_size int) ! {
 			return error('sampler index ${sample_index} at position ${i} is out of bounds for dataset size ${dataset_size}')
 		}
 	}
+}
+
+fn validate_sampler_batches(batches [][]int, dataset_size int) ! {
+	for batch_index, batch in batches {
+		if batch.len == 0 {
+			return error('batch sampler returned an empty batch at position ${batch_index}')
+		}
+		validate_sampler_indices(batch, dataset_size)!
+	}
+}
+
+fn flatten_sampler_batches(batches [][]int) []int {
+	mut indices := []int{}
+	for batch in batches {
+		indices << batch
+	}
+	return indices
 }
 
 // DataLoaderIterator provides a for-in loop interface over a DataLoader.
@@ -377,27 +465,29 @@ pub fn (dl &DataLoader[T]) split(val_fraction f64) !(&DataLoader[T], &DataLoader
 	mut val_indices := dl.indices[train_size..].clone()
 
 	train_dl := &DataLoader[T]{
-		dataset:    dl.dataset
-		labels:     dl.labels
-		batch_size: dl.batch_size
-		shuffle:    false
-		drop_last:  dl.drop_last
-		seed:       dl.seed
-		sampler:    &nn_data.SequentialSampler{}
-		indices:    train_indices
-		epoch:      dl.epoch
+		dataset:       dl.dataset
+		labels:        dl.labels
+		batch_size:    dl.batch_size
+		shuffle:       false
+		drop_last:     dl.drop_last
+		seed:          dl.seed
+		sampler:       &nn_data.SequentialSampler{}
+		batch_sampler: &nn_data.FixedBatchSampler{}
+		indices:       train_indices
+		epoch:         dl.epoch
 	}
 
 	val_dl := &DataLoader[T]{
-		dataset:    dl.dataset
-		labels:     dl.labels
-		batch_size: dl.batch_size
-		shuffle:    false
-		drop_last:  false
-		seed:       dl.seed
-		sampler:    &nn_data.SequentialSampler{}
-		indices:    val_indices
-		epoch:      0
+		dataset:       dl.dataset
+		labels:        dl.labels
+		batch_size:    dl.batch_size
+		shuffle:       false
+		drop_last:     false
+		seed:          dl.seed
+		sampler:       &nn_data.SequentialSampler{}
+		batch_sampler: &nn_data.FixedBatchSampler{}
+		indices:       val_indices
+		epoch:         0
 	}
 
 	return train_dl, val_dl

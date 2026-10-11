@@ -4,7 +4,8 @@ Use a sampler with the tensor-backed `vtl.datasets.DataLoader` to train or
 evaluate on a selected subset without copying the source tensor.
 `SubsetRandomSampler` shuffles the requested row indices at each epoch.
 `WeightedRandomSampler` draws rows in proportion to their weights, with
-optional replacement. The loader keeps feature rows and labels aligned.
+optional replacement. `FixedBatchSampler` wraps a sampler to set batch
+boundaries and `drop_last`. The loader keeps feature rows and labels aligned.
 
 ## Run
 
