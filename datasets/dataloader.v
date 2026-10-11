@@ -36,6 +36,7 @@ mut:
 	batch_sampler      nn_data.BatchSampler
 	uses_batch_sampler bool
 	batches            [][]int
+	collate_fn         CollateFn[T] = unsafe { nil }
 }
 
 // DataLoaderConfig holds configuration for creating a DataLoader.
@@ -46,6 +47,19 @@ pub:
 	drop_last  bool = true
 	seed       u64
 }
+
+// CollatedBatch contains the tensors produced for one selected batch. Labels
+// are nil when the source loader has no labels or the collator omits them.
+pub struct CollatedBatch[T] {
+pub:
+	features &vtl.Tensor[T]
+	labels   &vtl.Tensor[T] = unsafe { nil }
+}
+
+// CollateFn builds tensors for the selected sample indices. `labels` is nil
+// for feature-only loaders. The callback owns the collation policy, including
+// output shapes and ordering.
+pub type CollateFn[T] = fn (dataset &vtl.Tensor[T], labels &vtl.Tensor[T], indices []int) !CollatedBatch[T]
 
 // batch returns a batch at index `i`. Contiguous indices return a view into the
 // dataset; other index orders return a copy. Mutating a returned view also
@@ -113,6 +127,39 @@ pub fn (dl &DataLoader[T]) batch_with_labels(i int) ?(&vtl.Tensor[T], &vtl.Tenso
 	}
 
 	return feat_result, label_result
+}
+
+// set_collate_fn installs a callback used by collated_batch. Existing batch
+// accessors keep their default tensor slicing and gathering behavior.
+pub fn (mut dl DataLoader[T]) set_collate_fn(collate_fn CollateFn[T]) {
+	dl.collate_fn = collate_fn
+}
+
+// collated_batch builds the batch selected by `i`. A custom callback receives
+// the source tensors and a copy of the selected indices, so it can implement
+// custom padding, filtering, transforms, or ordering without changing loader
+// state. Without a callback, this returns the same default tensors as batch
+// and batch_with_labels.
+pub fn (dl &DataLoader[T]) collated_batch(i int) !CollatedBatch[T] {
+	batch_indices := dl.batch_indices(i) or {
+		return error('batch index ${i} is out of range')
+	}
+	if dl.collate_fn != unsafe { nil } {
+		return dl.collate_fn(dl.dataset, dl.labels, batch_indices.clone())
+	}
+	if dl.labels == unsafe { nil } {
+		features := dl.batch(i) or { return error('unable to build batch ${i}') }
+		return CollatedBatch[T]{
+			features: features
+		}
+	}
+	features, labels := dl.batch_with_labels(i) or {
+		return error('unable to build labeled batch ${i}')
+	}
+	return CollatedBatch[T]{
+		features: features
+		labels:   labels
+	}
 }
 
 // len returns the number of batches (drop_last affects count).
@@ -450,6 +497,21 @@ pub fn (dl &DataLoader[T]) for_each_with_labels(fn_each fn (features &vtl.Tensor
 	return count
 }
 
+// for_each_collated applies the custom collation callback to every batch and
+// passes each result to `fn_each`. Callback errors stop iteration and return
+// to the caller.
+pub fn (dl &DataLoader[T]) for_each_collated(fn_each fn (batch CollatedBatch[T]) bool) !int {
+	mut count := 0
+	for i in 0 .. dl.len() {
+		batch := dl.collated_batch(i)!
+		if !fn_each(batch) {
+			break
+		}
+		count++
+	}
+	return count
+}
+
 // split splits a DataLoader into train and validation DataLoaders.
 // val_fraction must be finite and in the inclusive range [0, 1].
 pub fn (dl &DataLoader[T]) split(val_fraction f64) !(&DataLoader[T], &DataLoader[T]) {
@@ -473,6 +535,7 @@ pub fn (dl &DataLoader[T]) split(val_fraction f64) !(&DataLoader[T], &DataLoader
 		seed:          dl.seed
 		sampler:       &nn_data.SequentialSampler{}
 		batch_sampler: &nn_data.FixedBatchSampler{}
+		collate_fn:    dl.collate_fn
 		indices:       train_indices
 		epoch:         dl.epoch
 	}
@@ -486,6 +549,7 @@ pub fn (dl &DataLoader[T]) split(val_fraction f64) !(&DataLoader[T], &DataLoader
 		seed:          dl.seed
 		sampler:       &nn_data.SequentialSampler{}
 		batch_sampler: &nn_data.FixedBatchSampler{}
+		collate_fn:    dl.collate_fn
 		indices:       val_indices
 		epoch:         0
 	}

@@ -98,12 +98,17 @@ weighted draws with or without replacement, and the tensor-backed
 `batch_size: 32`, `shuffle: true`, and
 `drop_last: true`; PyTorch's `DataLoader` defaults are `1`, `false`, and
 `false`, respectively. `FixedBatchSampler` supports custom batch boundaries
-and `drop_last`. VTL does not yet expose collation callbacks, iterable
-datasets, worker processes, or pinned-memory loading.
+and `drop_last`. `DataLoader.set_collate_fn`, `collated_batch`, and
+`for_each_collated` support custom tensor collation from the selected source
+rows and optional labels.
+The dense tensor API returns feature and label tensors; it does not represent
+arbitrary Python objects or nested sample structures. Iterable datasets,
+worker processes, and pinned-memory loading remain unavailable.
 
-**Next:** Add composable transforms, collation controls, worker and process
-loading, streaming datasets, generator injection, and stronger
-reproducibility controls. See the [PyTorch data loading API](https://docs.pytorch.org/docs/stable/data.html)
+**Next:** Add composable transforms, worker and process loading, streaming
+datasets, generator injection, and stronger reproducibility controls. See the
+[custom collation example](../examples/datasets_custom_collate/main.v) and the
+[PyTorch data loading API](https://docs.pytorch.org/docs/stable/data.html)
 when porting a pipeline; specify VTL loader options explicitly because its
 defaults differ.
 
