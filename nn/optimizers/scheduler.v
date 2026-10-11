@@ -357,6 +357,13 @@ pub enum CyclicLRMode {
 	exp_range
 }
 
+// CyclicLRScaleMode selects whether a custom scale function receives the
+// one-based cycle number or the zero-based minibatch step.
+pub enum CyclicLRScaleMode {
+	cycle
+	iterations
+}
+
 // CyclicLRConfig defines a minibatch-based triangular learning-rate schedule.
 @[params]
 pub struct CyclicLRConfig {
@@ -370,11 +377,13 @@ pub:
 	cycle_momentum bool         = true
 	base_momentum  f64          = 0.8
 	max_momentum   f64          = 0.9
+	scale_fn       fn (int) f64 = unsafe { nil }
+	scale_mode     CyclicLRScaleMode
 }
 
 // CyclicLR cycles the learning rate between base_lr and max_lr. Momentum
 // can be queried as an inverse cycle with next_momentum. The scheduler does
-// not update optimizer state or support parameter groups and custom scales.
+// not update optimizer state or support parameter groups.
 pub struct CyclicLR[T] {
 	base_lr        f64
 	max_lr         f64
@@ -385,6 +394,8 @@ pub struct CyclicLR[T] {
 	cycle_momentum bool
 	base_momentum  f64
 	max_momentum   f64
+	scale_fn       fn (int) f64 = unsafe { nil }
+	scale_mode     CyclicLRScaleMode
 }
 
 // cyclic_lr creates a CyclicLR scheduler. A zero `step_size_down` uses the
@@ -416,6 +427,20 @@ pub fn cyclic_lr[T](config CyclicLRConfig) !&CyclicLR[T] {
 		cycle_momentum: config.cycle_momentum
 		base_momentum:  config.base_momentum
 		max_momentum:   config.max_momentum
+		scale_fn:       config.scale_fn
+		scale_mode:     config.scale_mode
+	}
+}
+
+fn (s &CyclicLR[T]) scale_factor(step int, cycle int) f64 {
+	if !isnil(s.scale_fn) {
+		argument := if s.scale_mode == .cycle { cycle + 1 } else { step }
+		return s.scale_fn(argument)
+	}
+	return match s.mode {
+		.triangular { 1.0 }
+		.triangular2 { math.pow(0.5, f64(cycle)) }
+		.exp_range { math.pow(s.gamma, f64(step)) }
 	}
 }
 
@@ -435,11 +460,7 @@ pub fn (s &CyclicLR[T]) next_momentum(step int) ?f64 {
 	} else {
 		1.0 - f64(step_in_cycle - s.step_size_up) / f64(s.step_size_down)
 	}
-	scale := match s.mode {
-		.triangular { 1.0 }
-		.triangular2 { math.pow(0.5, f64(cycle)) }
-		.exp_range { math.pow(s.gamma, f64(clamped_step)) }
-	}
+	scale := s.scale_factor(clamped_step, cycle)
 	return s.max_momentum - (s.max_momentum - s.base_momentum) * pct * scale
 }
 
@@ -456,11 +477,7 @@ pub fn (s &CyclicLR[T]) next_lr(_ f64, step int) f64 {
 		1.0 - f64(step_in_cycle - s.step_size_up) / f64(s.step_size_down)
 	}
 	triangle := pct
-	scale := match s.mode {
-		.triangular { 1.0 }
-		.triangular2 { math.pow(0.5, f64(cycle)) }
-		.exp_range { math.pow(s.gamma, f64(clamped_step)) }
-	}
+	scale := s.scale_factor(clamped_step, cycle)
 	return s.base_lr + (s.max_lr - s.base_lr) * triangle * scale
 }
 

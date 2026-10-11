@@ -375,6 +375,36 @@ fn test_cyclic_lr_momentum_can_be_disabled_and_configured() {
 	assert math.abs(configured.next_momentum(2) or { panic('momentum is disabled') } - 0.7) < 1e-12
 }
 
+fn test_cyclic_lr_custom_scale_function_uses_cycle_or_iteration() {
+	cycle_scaled := cyclic_lr[f64](CyclicLRConfig{
+		base_lr:      0.1
+		max_lr:       0.5
+		step_size_up: 2
+		scale_fn:     cyclic_lr_test_scale_by_cycle
+	}) or { panic(err) }
+	assert math.abs(cycle_scaled.next_lr(0, 2) - 0.5) < 1e-12
+	assert math.abs(cycle_scaled.next_lr(0, 6) - 0.3) < 1e-12
+	assert math.abs(cycle_scaled.next_momentum(6) or { panic('momentum is disabled') } - 0.85) < 1e-12
+
+	iteration_scaled := cyclic_lr[f64](CyclicLRConfig{
+		base_lr:      0.1
+		max_lr:       0.5
+		step_size_up: 2
+		scale_fn:     cyclic_lr_test_scale_by_iteration
+		scale_mode:   .iterations
+	}) or { panic(err) }
+	assert math.abs(iteration_scaled.next_lr(0, 2) - 0.18) < 1e-12
+	assert math.abs(iteration_scaled.next_momentum(2) or { panic('momentum is disabled') } - 0.88) < 1e-12
+}
+
+fn cyclic_lr_test_scale_by_cycle(cycle int) f64 {
+	return 1.0 / f64(cycle)
+}
+
+fn cyclic_lr_test_scale_by_iteration(step int) f64 {
+	return f64(step) / 10.0
+}
+
 fn test_cyclic_lr_rejects_invalid_parameters() {
 	assert cyclic_lr_error_for_invalid_up_duration()
 	assert cyclic_lr_error_for_invalid_momentum_bounds()
