@@ -115,6 +115,61 @@ fn take_nd_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
 	return tensor_ptrs_to_voidptrs[T](tensors)
 }
 
+// take_flat gathers from row-major logical flattening and accumulates gradients
+// for repeated flat indices.
+pub fn (v &Variable[T]) take_flat(indices &vtl.Tensor[int]) !&Variable[T] {
+	return v.take_flat_with_mode(indices, .raise)
+}
+
+// take_flat_with_mode gathers from logical row-major order using NumPy's
+// raise, wrap, or clip mode and tracks the inverse scatter in backpropagation.
+pub fn (v &Variable[T]) take_flat_with_mode(indices &vtl.Tensor[int], mode vtl.TakeMode) !&Variable[T] {
+	value := v.value.take_flat_with_mode[T](indices, mode)!
+	mut result := variable[T](v.context, value, requires_grad: v.requires_grad)
+	if v.requires_grad {
+		mut normalized_values := []int{len: indices.size}
+		for position in 0 .. indices.size {
+			selected := indices.get_nth[int](position)
+			normalized_values[position] = normalize_take_nd_index(selected, v.value.size, mode)
+		}
+		normalized := vtl.from_array[int](normalized_values, indices.shape)!
+		gate := &TakeFlatGate[T]{
+			indices:     normalized
+			input_shape: v.value.shape.clone()
+		}
+		register[T]('TakeFlat', voidptr(gate), take_flat_backward_dispatch[T], result, [v])!
+	}
+	return result
+}
+
+struct TakeFlatGate[T] {
+	indices     &vtl.Tensor[int]
+	input_shape []int
+}
+
+fn (g &TakeFlatGate[T]) backward(gradient &vtl.Tensor[T]) ![]&vtl.Tensor[T] {
+	mut input_gradient := vtl.zeros[T](g.input_shape)
+	mut input_index := []int{len: g.input_shape.len}
+	for flat_index in 0 .. gradient.size {
+		output_index := gradient.nth_index(flat_index)
+		selected := g.indices.get(output_index)
+		mut remaining := selected
+		for dimension := g.input_shape.len - 1; dimension >= 0; dimension-- {
+			input_index[dimension] = remaining % g.input_shape[dimension]
+			remaining /= g.input_shape[dimension]
+		}
+		input_gradient.set(input_index, input_gradient.get(input_index) + gradient.get(output_index))
+	}
+	return [input_gradient]
+}
+
+fn take_flat_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_gate := unsafe { &TakeFlatGate[T](gate) }
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := typed_gate.backward(typed_payload.variable.grad)!
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // take_along_axis gathers values and tracks the inverse scatter in backprop.
 // Repeated indices accumulate their gradients; non-axis broadcast dimensions
 // are reduced into the corresponding source coordinates.
