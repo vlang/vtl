@@ -575,6 +575,29 @@ fn test_round_decimals_handles_non_finite_and_integer_values() {
 	assert large.round_decimals(-309).to_array() == [0.0]
 }
 
+fn test_nan_to_num_uses_finite_limits_for_f64_and_f32() {
+	values := vtl.from_1d([math.nan(), math.inf(1), math.inf(-1), 2.5])!
+	result := values.nan_to_num()
+	assert result.get([0]) == 0.0
+	assert result.get([1]) == math.max_f64
+	assert result.get([2]) == -math.max_f64
+	assert result.get([3]) == 2.5
+	f32_values := vtl.from_1d([f32(math.nan()), f32(math.inf(1)), f32(math.inf(-1))])!
+	f32_result := f32_values.nan_to_num()
+	assert f32_result.get([0]) == 0.0
+	assert f32_result.get([1]) == f32(math.max_f32)
+	assert f32_result.get([2]) == f32(-math.max_f32)
+}
+
+fn test_nan_to_num_accepts_custom_replacements_and_preserves_integers() {
+	values := vtl.from_1d([math.nan(), math.inf(1), math.inf(-1), 3.0])!
+	result := values.nan_to_num(nan: -2.0, posinf: 9.0, neginf: -7.0)
+	expected := vtl.from_1d([-2.0, 9.0, -7.0, 3.0])!
+	assert result.array_equal(expected)
+	integers := vtl.from_1d([1, -2, 3])!
+	assert integers.nan_to_num().to_array() == [1, -2, 3]
+}
+
 fn test_sin() {
 	a := vtl.from_1d([1.0, 2, 3])!
 	result := a.sin()
