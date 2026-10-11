@@ -6,6 +6,13 @@ standard deviation, extrema and indices, covariance, quantiles, skewness,
 kurtosis, and lag-one autocorrelation. Axis helpers are also available for
 selected reductions.
 
+`ptp` returns the peak-to-peak range (maximum minus minimum) for integer and
+floating-point tensors. `ptp_along_axis` reduces one axis, while
+`ptp_along_axes` reduces several axes with optional `keepdims`. Negative axes
+are supported; duplicate axes, empty reduced dimensions, and empty global
+inputs return errors. An empty axes list returns zeros elementwise. Results
+preserve the input element type, including integer overflow behavior.
+
 `prod` follows the multiplicative identity convention: an empty input reduces
 to `1`, while an empty sum reduces to `0`.
 
