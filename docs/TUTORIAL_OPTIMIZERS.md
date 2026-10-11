@@ -216,8 +216,14 @@ mut scheduler3 := optimizers.cosine_annealing_lr[f32](100, 1e-5)
 // LinearLR: linear warmup from 10% to 100% of the base learning rate
 mut scheduler4 := optimizers.linear_lr[f32](0.1, 1.0, 10)
 
+// OneCycleLR: minibatch schedule from max_lr/div_factor to max_lr and back
+mut scheduler5 := optimizers.one_cycle_lr[f32](optimizers.OneCycleLRConfig{
+	max_lr:      0.01
+	total_steps: 100
+}) or { panic(err) }
+
 // ReduceLROnPlateau: reduce when metric stops improving
-mut scheduler5 := optimizers.reduce_lr_on_plateau[f32](optimizers.ReduceLROnPlateauConfig{
+mut scheduler6 := optimizers.reduce_lr_on_plateau[f32](optimizers.ReduceLROnPlateauConfig{
 	patience: 10
 	factor:   0.1
 })
@@ -227,6 +233,24 @@ for step := 0; step < 100; step++ {
 	opt.update()!
 	current_lr := scheduler.next_lr(0.001, step)
 	_ = current_lr
+}
+```
+
+`OneCycleLR` advances once per minibatch. Its default curve ramps to `max_lr`
+and then anneals below the initial rate using cosine interpolation. Choose
+`anneal_strategy: 'linear'` for a linear curve or `three_phase: true` to return
+to the initial rate before the final decay. This scheduler returns a rate for
+the caller to apply to its optimizer; inverse momentum cycling is not included.
+The constructor returns an error for invalid cycle parameters.
+
+```v ignore
+mut one_cycle := optimizers.one_cycle_lr[f32](optimizers.OneCycleLRConfig{
+	max_lr:      0.01
+	total_steps: 100
+}) or { panic(err) }
+for step in 0 .. 100 {
+	learning_rate := one_cycle.next_lr(0.001, step)
+	// Apply `learning_rate` to the optimizer before the next batch.
 }
 ```
 

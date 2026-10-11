@@ -99,6 +99,103 @@ pub fn (s &LinearLR[T]) next_lr(base_lr f64, step int) f64 {
 	return base_lr * factor
 }
 
+// OneCycleLRConfig defines the learning-rate portion of the one-cycle policy.
+// Momentum cycling and optimizer parameter groups are not part of this scheduler.
+pub enum OneCycleAnnealStrategy {
+	cosine
+	linear
+}
+
+@[params]
+pub struct OneCycleLRConfig {
+pub:
+	max_lr           f64
+	total_steps      int
+	pct_start        f64 = 0.3
+	div_factor       f64 = 25.0
+	final_div_factor f64 = 10000.0
+	three_phase      bool
+	anneal_strategy  OneCycleAnnealStrategy = .cosine
+}
+
+// OneCycleLR raises the rate from max_lr/div_factor to max_lr, then anneals it
+// to max_lr/(div_factor*final_div_factor). Steps are minibatch steps, as in
+// PyTorch's OneCycleLR. The optional three-phase policy returns to the initial
+// rate before the final annealing phase.
+pub struct OneCycleLR[T] {
+	max_lr           f64
+	total_steps      int
+	pct_start        f64
+	div_factor       f64
+	final_div_factor f64
+	three_phase      bool
+	anneal_strategy  OneCycleAnnealStrategy
+}
+
+// one_cycle_lr creates a two-phase OneCycleLR by default. `anneal_strategy`
+// selects cosine or linear interpolation. Invalid cycle parameters return an error.
+pub fn one_cycle_lr[T](config OneCycleLRConfig) !&OneCycleLR[T] {
+	if config.max_lr < 0.0 {
+		return error('max_lr must be non-negative')
+	}
+	if config.total_steps <= 0 {
+		return error('total_steps must be positive')
+	}
+	if config.pct_start <= 0.0 || config.pct_start >= 1.0 {
+		return error('pct_start must be greater than 0 and less than 1')
+	}
+	if config.div_factor <= 0.0 || config.final_div_factor <= 0.0 {
+		return error('div_factor and final_div_factor must be positive')
+	}
+	return &OneCycleLR[T]{
+		max_lr:           config.max_lr
+		total_steps:      config.total_steps
+		pct_start:        config.pct_start
+		div_factor:       config.div_factor
+		final_div_factor: config.final_div_factor
+		three_phase:      config.three_phase
+		anneal_strategy:  config.anneal_strategy
+	}
+}
+
+// next_lr returns the rate for a zero-based minibatch step. Steps outside the
+// configured cycle are clamped to its first or final rate.
+pub fn (s &OneCycleLR[T]) next_lr(_ f64, step int) f64 {
+	initial_lr := s.max_lr / s.div_factor
+	final_lr := initial_lr / s.final_div_factor
+	if s.total_steps <= 1 {
+		return final_lr
+	}
+	step_num := math.min(math.max(step, 0), s.total_steps - 1)
+	first_end := s.pct_start * f64(s.total_steps) - 1.0
+	if s.three_phase {
+		second_end := 2.0 * s.pct_start * f64(s.total_steps) - 2.0
+		if f64(step_num) <= first_end {
+			return s.anneal(initial_lr, s.max_lr, 0.0, first_end, f64(step_num))
+		}
+		if f64(step_num) <= second_end {
+			return s.anneal(s.max_lr, initial_lr, first_end, second_end, f64(step_num))
+		}
+		return s.anneal(initial_lr, final_lr, second_end, f64(s.total_steps - 1),
+			f64(step_num))
+	}
+	if f64(step_num) <= first_end {
+		return s.anneal(initial_lr, s.max_lr, 0.0, first_end, f64(step_num))
+	}
+	return s.anneal(s.max_lr, final_lr, first_end, f64(s.total_steps - 1), f64(step_num))
+}
+
+fn (s &OneCycleLR[T]) anneal(start f64, end f64, start_step f64, end_step f64, step f64) f64 {
+	if end_step <= start_step {
+		return end
+	}
+	pct := math.min(math.max((step - start_step) / (end_step - start_step), 0.0), 1.0)
+	if s.anneal_strategy == .linear {
+		return start + (end - start) * pct
+	}
+	return end + (start - end) * (1.0 + math.cos(math.pi * pct)) / 2.0
+}
+
 // ReduceLROnPlateau reduces LR when a metric has stopped improving.
 pub struct ReduceLROnPlateau[T] {
 	factor    f64

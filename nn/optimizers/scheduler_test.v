@@ -67,3 +67,56 @@ fn test_linear_lr_zero_or_negative_duration_uses_end_factor() {
 	assert math.abs(linear_lr[f64](0.25, 0.75, 0).next_lr(0.8, 0) - 0.6) < 1e-12
 	assert math.abs(linear_lr[f64](0.25, 0.75, -2).next_lr(0.8, 0) - 0.6) < 1e-12
 }
+
+fn test_one_cycle_lr_two_phase_cosine() {
+	scheduler := one_cycle_lr[f64](OneCycleLRConfig{
+		max_lr:      1.0
+		total_steps: 10
+	}) or { panic(err) }
+	assert math.abs(scheduler.next_lr(9.0, 0) - 0.04) < 1e-12
+	assert math.abs(scheduler.next_lr(9.0, 2) - 1.0) < 1e-12
+	assert math.abs(scheduler.next_lr(9.0, 3) - 0.9504846) < 1e-6
+	assert math.abs(scheduler.next_lr(9.0, 9) - 0.000004) < 1e-12
+	assert scheduler.next_lr(9.0, 20) == scheduler.next_lr(9.0, 9)
+	assert scheduler.next_lr(9.0, -1) == scheduler.next_lr(9.0, 0)
+}
+
+fn test_one_cycle_lr_linear_and_three_phase() {
+	linear := one_cycle_lr[f64](OneCycleLRConfig{
+		max_lr:          1.0
+		total_steps:     10
+		anneal_strategy: .linear
+	}) or { panic(err) }
+	assert math.abs(linear.next_lr(0, 3) - (1.0 - 0.999996 / 7.0)) < 1e-12
+
+	three_phase := one_cycle_lr[f64](OneCycleLRConfig{
+		max_lr:      1.0
+		total_steps: 10
+		three_phase: true
+	}) or { panic(err) }
+	assert math.abs(three_phase.next_lr(0, 2) - 1.0) < 1e-12
+	assert math.abs(three_phase.next_lr(0, 4) - 0.04) < 1e-12
+	assert math.abs(three_phase.next_lr(0, 9) - 0.000004) < 1e-12
+}
+
+fn test_one_cycle_lr_degenerate_cycle_uses_final_rate() {
+	scheduler := one_cycle_lr[f64](OneCycleLRConfig{
+		max_lr:      1.0
+		total_steps: 1
+	}) or { panic(err) }
+	assert math.abs(scheduler.next_lr(0, 0) - 0.000004) < 1e-12
+}
+
+fn test_one_cycle_lr_rejects_invalid_parameters() {
+	assert one_cycle_lr_error_for_invalid_steps()
+}
+
+fn one_cycle_lr_error_for_invalid_steps() bool {
+	_ := one_cycle_lr[f64](OneCycleLRConfig{
+		max_lr:      1.0
+		total_steps: 0
+	}) or {
+		return err.msg() == 'total_steps must be positive'
+	}
+	return false
+}
