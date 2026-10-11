@@ -249,9 +249,12 @@ mut scheduler5 := optimizers.one_cycle_lr[f32](optimizers.OneCycleLRConfig{
 
 // CyclicLR: triangular cycles between base_lr and max_lr every minibatch
 mut cyclic := optimizers.cyclic_lr[f32](optimizers.CyclicLRConfig{
-	base_lr:      0.0001
-	max_lr:       0.01
-	step_size_up: 100
+	base_lr:        0.0001
+	max_lr:         0.01
+	step_size_up:   100
+	cycle_momentum: true
+	base_momentum:  0.8
+	max_momentum:   0.9
 }) or { panic(err) }
 
 // ReduceLROnPlateau: reduce when metric stops improving
@@ -282,8 +285,13 @@ The constructor returns an error for invalid cycle parameters.
 fall durations and a repeating triangular amplitude. Select `.triangular2` to
 halve the amplitude after each cycle or `.exp_range` to scale it by `gamma` on
 each step. Set `step_size_down` for an asymmetric cycle; leave it at its default
-value of zero to match `step_size_up`. Custom scale callbacks and momentum
-cycling are not included.
+value of zero to match `step_size_up`. A custom `scale_fn` can define another
+amplitude policy; `scale_mode: .cycle` passes its one-based cycle number, while
+`.iterations` passes the zero-based minibatch step. By default, momentum follows
+an inverse cycle between `max_momentum` and `base_momentum`. Read it through
+`next_momentum(step)` and apply the returned option to the optimizer yourself;
+set `cycle_momentum: false` when inverse momentum cycling is not wanted. The
+scheduler computes both curves without mutating optimizer state.
 
 `MultiStepLR` decays once at each milestone; repeated milestones cause repeated
 decays on that epoch. `PolynomialLR` follows
