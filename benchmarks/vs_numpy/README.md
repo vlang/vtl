@@ -37,6 +37,31 @@ VTL and 62.2 ms for NumPy, with the same checksum (about 2.00× faster for VTL).
 The larger comparison uses a 3 GiB memory cap. These local timings apply only
 to contiguous `f64` reductions on this machine.
 
+## Multi-axis peak-to-peak range
+
+This paired benchmark reduces the trailing two axes of a `[groups, 256, 512]`
+contiguous `f64` tensor. It uses two warmups and five timed calls per process,
+then prints the mean and checksum. Set `VTL_PTP_AXES_BENCH_GROUPS` to change the
+number of leading groups. Compile first and execute the binary separately from
+`~/.vmodules`:
+
+```bash
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -no-parallel -cc gcc -prod -cflags "-march=native" \
+	-o /tmp/vtl-ptp-axes-bench ./vtl/benchmarks/vs_numpy/ptp_axes_bench.v
+systemd-run --user --scope -p MemoryMax=2G -p MemorySwapMax=0 -- env VJOBS=2 \
+	VTL_PTP_AXES_BENCH_GROUPS=128 /tmp/vtl-ptp-axes-bench
+systemd-run --user --scope -p MemoryMax=2G -p MemorySwapMax=0 -- env VJOBS=2 \
+	VTL_PTP_AXES_BENCH_GROUPS=128 uv run --offline --no-project --with numpy python \
+	./vtl/benchmarks/vs_numpy/numpy_ptp_axes_baseline.py
+```
+
+On the same Ryzen 9 5900X / V 0.5.2 / GCC 16.2.1 / NumPy 2.5.4 setup, five
+independent processes per side at 16,777,216 values (128 MiB) measured median
+per-process means of 7.09 ms for VTL and 13.20 ms for NumPy. Both checksums
+were `1152000`, about 1.86× faster for VTL in this contiguous trailing-axis
+case. Measurements are specific to this shape, CPU, and backend.
+
 ## Two-dimensional histograms
 
 This paired benchmark bins the same deterministic 262,144 `(x, y)` samples
