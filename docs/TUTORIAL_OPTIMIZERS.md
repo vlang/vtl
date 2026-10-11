@@ -384,7 +384,9 @@ for epoch := 0; epoch < 10; epoch++ {
 
 Clip the global L2 norm after backpropagation and before the optimizer update.
 The function scales trainable parameter gradients in place and returns the norm
-before clipping. Gradients below the limit are left unchanged.
+before clipping. Gradients below the limit are left unchanged. The default
+`clip_grad_norm` uses L2; `clip_grad_norm_with_type` accepts finite positive
+p-norms, the zero-count norm, and the infinity norm.
 
 ```v ignore
 import vtl
@@ -405,12 +407,16 @@ assert original_norm == 5.0
 assert math.abs(parameter.grad.get_nth(0) - 0.6) < 1e-12
 assert math.abs(parameter.grad.get_nth(1) - 0.8) < 1e-12
 
+// Use the L1 norm instead of the default L2 norm.
+l1_norm := optimizers.clip_grad_norm_with_type[f64](mut parameters, 1.0, 1.0)!
+
 // Alternatively, clip each element independently to [-0.5, 0.5].
 optimizers.clip_grad_value[f64](mut parameters, 0.5)!
 ```
 
-Both limits must be finite and positive. Norm clipping rejects non-finite
-gradient norms instead of changing gradients to NaN.
+The norm limit must be finite and non-negative; the value limit must be finite
+and positive. Norm clipping rejects non-finite gradient norms instead of
+changing gradients to NaN.
 
 The autograd `Variable.clamp(min, max)` operation also supports element-wise
 clamping in a forward graph. Its backward pass passes gradients through values
