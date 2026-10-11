@@ -69,3 +69,66 @@ fn test_where_handles_scalar_choices() {
 	expected := vtl.from_1d([7, 4])!
 	assert got.array_equal(expected)
 }
+
+fn test_select_broadcasts_masks_and_choices_with_first_match_priority() ! {
+	first_condition := vtl.from_2d([[true], [false]])!
+	second_condition := vtl.from_2d([[false, true, true]])!
+	first_choice := vtl.from_2d([[10], [20]])!
+	second_choice := vtl.from_2d([[100, 200, 300]])!
+	mut conditions := []&vtl.Tensor[bool]{cap: 2}
+	conditions << first_condition
+	conditions << second_condition
+	mut choices := []&vtl.Tensor[int]{cap: 2}
+	choices << first_choice
+	choices << second_choice
+	got := vtl.select(conditions, choices, -1)!
+	expected := vtl.from_2d([[10, 10, 10], [-1, 200, 300]])!
+	assert got.array_equal(expected)
+}
+
+fn test_select_uses_default_when_no_condition_matches() ! {
+	first_condition := vtl.from_1d([false, true, false])!
+	second_condition := vtl.from_1d([false, false, true])!
+	first_choice := vtl.from_1d([10, 20, 30])!
+	second_choice := vtl.tensor(7, [], memory: .row_major)
+	mut conditions := []&vtl.Tensor[bool]{cap: 2}
+	conditions << first_condition
+	conditions << second_condition
+	mut choices := []&vtl.Tensor[int]{cap: 2}
+	choices << first_choice
+	choices << second_choice
+	got := vtl.select(conditions, choices, -1)!
+	assert got.to_array() == [-1, 20, 7]
+}
+
+fn test_select_rejects_empty_or_mismatched_inputs() ! {
+	condition := vtl.from_1d([true, false])!
+	choice := vtl.from_1d([1, 2])!
+	no_conditions := []&vtl.Tensor[bool]{}
+	no_choices := []&vtl.Tensor[int]{}
+	if _ := vtl.select(no_conditions, no_choices, 0) {
+		assert false, 'select must reject empty conditions and choices'
+	} else {
+		assert true
+	}
+	if _ := vtl.select([condition], no_choices, 0) {
+		assert false, 'select must reject mismatched condition and choice counts'
+	} else {
+		assert true
+	}
+	if _ := vtl.select([condition], [choice, choice], 0) {
+		assert false, 'select must reject mismatched condition and choice counts'
+	} else {
+		assert true
+	}
+}
+
+fn test_select_rejects_incompatible_broadcast_shapes() ! {
+	condition := vtl.from_1d([true, false, true])!
+	choice := vtl.from_1d([1, 2])!
+	if _ := vtl.select([condition], [choice], 0) {
+		assert false, 'select must reject incompatible shapes'
+	} else {
+		assert true
+	}
+}

@@ -49,3 +49,43 @@ pub fn choose[T](indices &Tensor[int], choices []&Tensor[T]) !&Tensor[T] {
 	}
 	return result
 }
+
+// select picks the value from the first choice whose condition is true at each
+// output position. Conditions and choices broadcast to a common shape; default
+// is used where no condition is true.
+pub fn select[T](conditions []&Tensor[bool], choices []&Tensor[T], default T) !&Tensor[T] {
+	if conditions.len == 0 {
+		return error('select requires at least one condition and choice')
+	}
+	if conditions.len != choices.len {
+		return error('select requires the same number of conditions and choices')
+	}
+	mut shapes := [][]int{cap: conditions.len + choices.len}
+	for condition in conditions {
+		shapes << condition.shape
+	}
+	for choice in choices {
+		shapes << choice.shape
+	}
+	shape := broadcast_shapes(...shapes)!
+	mut broadcast_conditions := []&Tensor[bool]{cap: conditions.len}
+	for condition in conditions {
+		broadcast_conditions << condition.broadcast_to(shape)!
+	}
+	mut broadcast_choices := []&Tensor[T]{cap: choices.len}
+	for choice in choices {
+		broadcast_choices << choice.broadcast_to(shape)!
+	}
+	mut result := full[T](shape, default, memory: .row_major)
+	mut output_iter := result.iterator[T]()
+	for {
+		_, index := output_iter.next() or { break }
+		for condition_index, condition in broadcast_conditions {
+			if condition.get[bool](index) {
+				result.set(index, broadcast_choices[condition_index].get[T](index))
+				break
+			}
+		}
+	}
+	return result
+}

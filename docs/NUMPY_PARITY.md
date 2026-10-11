@@ -75,6 +75,9 @@ NumPy's `raise`, `wrap`, and `clip` modes; short value tensors repeat, and
 validation completes before mutation. `Tensor.putmask` performs in-place
 row-major masked updates with an exact-shape mask and cycles values by each
 destination flat index, matching NumPy.
+`select` applies ordered broadcastable conditions to choice tensors; the first
+true condition wins and `default` fills positions with no match, matching
+`numpy.select` when all choices and the default share one V element type.
 
 `Variable.take`, `Variable.take_nd`, `Variable.take_flat`,
 `Variable.take_along_axis`, `Variable.boolean_index`, and

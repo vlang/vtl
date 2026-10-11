@@ -69,6 +69,7 @@ CIFAR examples for CI-safe checks.
 | [broadcast_mask](./broadcast_mask) | Select and fill values with broadcastable boolean masks | `v run ./vtl/examples/broadcast_mask/main.v` |
 | [compress](./compress) | Select flattened values or tensor slices with a one-dimensional condition | `v run ./vtl/examples/compress/main.v` |
 | [array_choose](./array_choose) | Select and broadcast tensor values by integer choice indices | `v run ./vtl/examples/array_choose/main.v` |
+| [array_select](./array_select) | Select among broadcasted tensors with ordered boolean conditions | `v run ./vtl/examples/array_select/main.v` |
 | [vector_norm](./vector_norm) | Compute stable p-norms globally and along an axis | `v run ./vtl/examples/vector_norm/main.v` |
 | [fft_frequency](./fft_frequency) | Create FFT frequency bins and center a spectrum | `v run ./vtl/examples/fft_frequency/main.v` |
 | [fft_axis](./fft_axis) | Transform real or complex tensors along one selected axis | `v run ./vtl/examples/fft_axis/main.v` |
