@@ -14,5 +14,6 @@ pub fn linear_forward_f32(input &vtl.Tensor[f32], weights &vtl.Tensor[f32], bias
 }
 
 fn linear_forward_f32_cpu(input &vtl.Tensor[f32], weights &vtl.Tensor[f32], bias &vtl.Tensor[f32]) !&vtl.Tensor[f32] {
-	return la.matmul[f32](input, weights.t()!)!.add[f32](bias)!
+	mut output := la.matmul[f32](input, weights.t()!)!
+	return linear_add_bias[f32](mut output, bias)
 }

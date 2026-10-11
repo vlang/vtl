@@ -57,7 +57,8 @@ pub fn (layer &LinearLayer[T]) forward(input &autograd.Variable[T]) !&autograd.V
 			unsafe { &vtl.Tensor[f32](layer.bias.value) })!
 		output = unsafe { &vtl.Tensor[T](out_f32) }
 	} $else {
-		output = la.matmul[T](input.value, layer.weights.value.t()!)!.add[T](layer.bias.value)!
+		mut product := la.matmul[T](input.value, layer.weights.value.t()!)!
+		output = linear_add_bias[T](mut product, layer.bias.value)!
 	}
 	mut result := input.context.variable(output)
 
