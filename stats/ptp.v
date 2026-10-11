@@ -130,6 +130,121 @@ fn ptp_contiguous_f64(values []f64) f64 {
 	return maximum - minimum
 }
 
+@[direct_array_access]
+fn ptp_contiguous_minmax_f32(values []f32) (f32, f32, bool) {
+	nan := f32(math.nan())
+	if math.is_nan(values[0]) {
+		return nan, nan, true
+	}
+	mut offset := 0
+	mut min0 := simd.splat_f32x8(values[0])
+	mut min1 := min0
+	mut max0 := min0
+	mut max1 := min0
+	for ; offset + 16 <= values.len; offset += 16 {
+		block0 := simd.load_f32x8_at(values, offset)
+		block1 := simd.load_f32x8_at(values, offset + 8)
+		if block0.ne(block0).any() || block1.ne(block1).any() {
+			return nan, nan, true
+		}
+		min0 = min0.minimum(block0)
+		min1 = min1.minimum(block1)
+		max0 = max0.maximum(block0)
+		max1 = max1.maximum(block1)
+	}
+	minimum := min0.minimum(min1).min()
+	maximum := max0.maximum(max1).max()
+	mut min_value := minimum
+	mut max_value := maximum
+	for i in offset .. values.len {
+		value := values[i]
+		if math.is_nan(value) {
+			return nan, nan, true
+		}
+		if value < min_value {
+			min_value = value
+		}
+		if value > max_value {
+			max_value = value
+		}
+	}
+	return min_value, max_value, false
+}
+
+@[direct_array_access]
+fn ptp_contiguous_minmax_f64(values []f64) (f64, f64, bool) {
+	nan := math.nan()
+	if math.is_nan(values[0]) {
+		return nan, nan, true
+	}
+	mut offset := 0
+	mut min0 := simd.splat_f64x4(values[0])
+	mut min1 := min0
+	mut max0 := min0
+	mut max1 := min0
+	for ; offset + 8 <= values.len; offset += 8 {
+		block0 := simd.load_f64x4_at(values, offset)
+		block1 := simd.load_f64x4_at(values, offset + 4)
+		if block0.ne(block0).any() || block1.ne(block1).any() {
+			return nan, nan, true
+		}
+		min0 = min0.minimum(block0)
+		min1 = min1.minimum(block1)
+		max0 = max0.maximum(block0)
+		max1 = max1.maximum(block1)
+	}
+	minimum := min0.minimum(min1).min()
+	maximum := max0.maximum(max1).max()
+	mut min_value := minimum
+	mut max_value := maximum
+	for i in offset .. values.len {
+		value := values[i]
+		if math.is_nan(value) {
+			return nan, nan, true
+		}
+		if value < min_value {
+			min_value = value
+		}
+		if value > max_value {
+			max_value = value
+		}
+	}
+	return min_value, max_value, false
+}
+
+@[direct_array_access]
+fn ptp_contiguous_minmax[T](values []T) (T, T, bool) {
+	$if T is f32 {
+		minimum, maximum, contains_nan := ptp_contiguous_minmax_f32(values)
+		return T(minimum), T(maximum), contains_nan
+	} $else $if T is f64 {
+		minimum, maximum, contains_nan := ptp_contiguous_minmax_f64(values)
+		return T(minimum), T(maximum), contains_nan
+	} $else {
+		mut minimum := values[0]
+		mut maximum := minimum
+		for value in values[1..] {
+			if value < minimum {
+				minimum = value
+			}
+			if value > maximum {
+				maximum = value
+			}
+		}
+		return minimum, maximum, false
+	}
+}
+
+fn ptp_nan_value[T]() T {
+	$if T is f32 {
+		return f32(math.nan())
+	} $else $if T is f64 {
+		return math.nan()
+	} $else {
+		return T(0)
+	}
+}
+
 // ptp_along_axis returns maximum minus minimum along one axis. Set keepdims
 // to true to retain the reduced axis with length one. Negative axes are valid.
 pub fn ptp_along_axis[T](t &vtl.Tensor[T], axis int, keepdims bool) !&vtl.Tensor[T] {
@@ -222,6 +337,44 @@ fn ptp_axes_fused[T](t &vtl.Tensor[T], axes []int, keepdims bool) !&vtl.Tensor[T
 
 	mut maximums := []T{len: result.size}
 	mut initialized := []bool{len: result.size}
+	if contiguous && rank > 1 && reduced[rank - 1] {
+		last_dimension := t.shape[rank - 1]
+		row_count := t.size / last_dimension
+		for row in 0 .. row_count {
+			row_start := row * last_dimension
+			mut output_index := 0
+			for axis in 0 .. rank - 1 {
+				if !reduced[axis] {
+					coordinate := (row_start / input_strides[axis]) % t.shape[axis]
+					output_index += coordinate * output_strides[axis]
+				}
+			}
+			row_end := row_start + last_dimension
+			minimum, maximum, contains_nan := ptp_contiguous_minmax[T](t.data.data[row_start..row_end])
+			if contains_nan {
+				result.data.data[output_index] = ptp_nan_value[T]()
+				maximums[output_index] = ptp_nan_value[T]()
+				initialized[output_index] = true
+			} else if !initialized[output_index] {
+				result.data.data[output_index] = minimum
+				maximums[output_index] = maximum
+				initialized[output_index] = true
+			} else if !ptp_value_is_nan[T](result.data.data[output_index]) {
+				if minimum < result.data.data[output_index] {
+					result.data.data[output_index] = minimum
+				}
+				if maximum > maximums[output_index] {
+					maximums[output_index] = maximum
+				}
+			}
+		}
+		for output_index in 0 .. result.size {
+			if !ptp_value_is_nan[T](result.data.data[output_index]) {
+				result.data.data[output_index] = maximums[output_index] - result.data.data[output_index]
+			}
+		}
+		return result
+	}
 	for flat_index in 0 .. t.size {
 		mut output_index := 0
 		for axis in 0 .. rank {
@@ -261,23 +414,11 @@ fn ptp_axes_fused[T](t &vtl.Tensor[T], axes []int, keepdims bool) !&vtl.Tensor[T
 
 @[direct_array_access]
 fn ptp_contiguous_slice[T](values []T) T {
-	$if T is f32 {
-		return ptp_contiguous_f32(values)
-	} $else $if T is f64 {
-		return ptp_contiguous_f64(values)
-	} $else {
-		mut minimum := values[0]
-		mut maximum := minimum
-		for value in values[1..] {
-			if value < minimum {
-				minimum = value
-			}
-			if value > maximum {
-				maximum = value
-			}
-		}
-		return maximum - minimum
+	minimum, maximum, contains_nan := ptp_contiguous_minmax[T](values)
+	if contains_nan {
+		return ptp_nan_value[T]()
 	}
+	return maximum - minimum
 }
 
 fn ptp_value_is_nan[T](value T) bool {
