@@ -151,6 +151,33 @@ pub fn identity[T](n int, params TensorData) &Tensor[T] {
 	return eye[T](n, n, 0, params)
 }
 
+// one_hot encodes integer class indices as rows of a one-hot matrix. The
+// output shape is indices.shape followed by num_classes; every index must be
+// in [0, num_classes). An empty index tensor returns an empty tensor with the
+// corresponding trailing class dimension.
+pub fn one_hot(indices &Tensor[int], num_classes int) !&Tensor[int] {
+	if num_classes <= 0 {
+		return error('one_hot num_classes must be positive')
+	}
+	if indices.size > max_int / num_classes {
+		return error('one_hot output size overflows the maximum tensor size')
+	}
+	mut output_shape := indices.shape.clone()
+	output_shape << num_classes
+	for flat_index in 0 .. indices.size {
+		class_index := indices.get_nth(flat_index)
+		if class_index < 0 || class_index >= num_classes {
+			return error('one_hot class index ${class_index} is outside [0, ${num_classes})')
+		}
+	}
+	mut result := zeros[int](output_shape)
+	for flat_index in 0 .. indices.size {
+		class_index := indices.get_nth(flat_index)
+		result.set_nth(flat_index * num_classes + class_index, 1)
+	}
+	return result
+}
+
 // eye returns a 2D array with ones on the diagonal and zeros elsewhere
 pub fn eye[T](m int, n int, k int, params TensorData) &Tensor[T] {
 	mut ret := zeros[T]([m, n], params)
