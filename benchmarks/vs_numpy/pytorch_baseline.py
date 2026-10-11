@@ -31,6 +31,13 @@ class MLP(nn.Module):
 def bench_autograd():
     torch.set_num_threads(2)
     torch.set_num_interop_threads(2)
+    print(
+        f"PyTorch {torch.__version__} | device=cpu | dtype=float64 | "
+        f"threads={torch.get_num_threads()} | "
+        f"MKL={torch.backends.mkl.is_available()} | "
+        f"oneDNN={torch.backends.mkldnn.is_available() and torch.backends.mkldnn.enabled}"
+    )
+    print(torch.__config__.parallel_info().strip())
     for batch in (32, 64):
         model = MLP()
         x = torch.ones(batch, 128, dtype=torch.float64)
