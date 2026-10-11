@@ -11,10 +11,10 @@ import vtl.nn.internal
 // Formula (when `from_logits = false`):
 //   `L = -mean(y·log(p) + (1-y)·log(1-p))`
 //
-// When `from_logits = true` (default), a sigmoid is applied to `input` first,
-// which is numerically more stable than computing sigmoid outside the loss.
+// When `from_logits = true` (default), the stable logits form is used directly
+// without materializing sigmoid probabilities.
 //
-// Shape: `input` and `target` are both `[batch, ...]` with values in (0, 1) for target.
+// Shape: `input` and `target` are both `[batch, ...]`; target values are in [0, 1].
 //
 // Example:
 // ```v
@@ -50,11 +50,11 @@ pub fn bce_loss[T](config BCELossConfig) types.Loss[T] {
 
 // loss exposes this operation as part of the public API.
 pub fn (l &BCELoss[T]) loss(input &autograd.Variable[T], target &vtl.Tensor[T]) !&autograd.Variable[T] {
-	mut input_val := input.value
-	if l.from_logits {
-		input_val = internal.sigmoid[T](input_val)
+	output := if l.from_logits {
+		internal.bce_with_logits[T](input.value, target)!
+	} else {
+		internal.bce[T](input.value, target)!
 	}
-	output := internal.bce[T](input_val, target)!
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {

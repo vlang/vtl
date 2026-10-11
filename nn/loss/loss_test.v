@@ -75,6 +75,23 @@ fn test_bce_loss_forward() ! {
 	assert v < 0.5, 'BCE loss for near-correct prediction should be small, got ${v}'
 }
 
+fn test_bce_loss_logits_forward_matches_stable_reference() ! {
+	c := ctx[f64]()
+	pred := variable[f64](c, [0.0, math.log(3.0)], [1, 2])!
+	target := tensor[f64]([1.0, 0.0], [1, 2])!
+	result := bce_loss[f64]().loss(pred, target)!
+	want := (math.log(2.0) + math.log(4.0)) / 2.0
+	assert math.abs(result.value.get_nth(0) - want) < 1e-12
+}
+
+fn test_bce_loss_logits_forward_preserves_extreme_penalties() ! {
+	c := ctx[f64]()
+	pred := variable[f64](c, [1000.0, -1000.0], [2])!
+	target := tensor[f64]([0.0, 1.0], [2])!
+	result := bce_loss[f64]().loss(pred, target)!
+	assert math.abs(result.value.get_nth(0) - 1000.0) < 1e-12
+}
+
 fn test_bce_loss_logits_backward_matches_mean_bce() ! {
 	c := ctx[f64]()
 	pred := variable[f64](c, [0.0, math.log(3.0)], [1, 2])!

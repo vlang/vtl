@@ -65,7 +65,32 @@ pub fn softmax_cross_entropy_backward[T](gradient &vtl.Tensor[T], cache &vtl.Ten
 	return [ret]
 }
 
-// bce computes binary cross entropy between input and target.
+// bce_with_logits computes mean binary cross entropy directly from logits using
+// the stable softplus form: max(x, 0) - x*y + log(1 + exp(-abs(x))).
+@[direct_array_access; inline]
+pub fn bce_with_logits[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	if input.shape == target.shape && input.is_row_major_contiguous()
+		&& target.is_row_major_contiguous() && input.data.data.len == input.size()
+		&& target.data.data.len == target.size() {
+		mut sum := vtl.cast[T](0)
+		for i in 0 .. input.size() {
+			x := f64(input.data.data[i])
+			y := f64(target.data.data[i])
+			value := math.max(x, 0.0) - x * y + math.log(1.0 + math.exp(-math.abs(x)))
+			sum += vtl.cast[T](value)
+		}
+		return vtl.from_1d([sum / vtl.cast[T](input.size())])
+	}
+	sum := input.nreduce([target], vtl.cast[T](0), fn [T](acc T, vals []T, i []int) T {
+		x := f64(vals[0])
+		y := f64(vals[1])
+		value := math.max(x, 0.0) - x * y + math.log(1.0 + math.exp(-math.abs(x)))
+		return acc + vtl.cast[T](value)
+	})!
+	return vtl.from_1d([sum / vtl.cast[T](input.size())])
+}
+
+// bce computes binary cross entropy between probabilities and target.
 // input values should be in (0,1) — caller is responsible for clamping/sigmoid.
 
 // bce exposes this operation as part of the public API.
