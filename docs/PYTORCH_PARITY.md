@@ -53,7 +53,10 @@ recurrent, attention, and normalization layers. Typed CPU LSTM layers support
 stacked hidden/cell state through `forward_with_state`; typed CPU GRU layers
 support an explicit initial and final hidden state. Their default input layouts
 differ: LSTM is `[batch, sequence, features]`, while GRU is
-`[sequence, batch, features]`. See the
+`[sequence, batch, features]`. The typed GRU API also provides
+`forward_batch_first` and `forward_batch_first_with_state` for
+`[batch, sequence, features]` input; `Sequential.gru` keeps the sequence-first
+layout. See the
 [NN tutorial](./TUTORIAL_NEURAL_NETWORKS.md).
 
 GroupNorm supports channel-first `[batch, channels, ...]` inputs, per-channel
