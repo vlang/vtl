@@ -5,36 +5,76 @@ import vtl.autograd
 import vtl.nn.types
 import vtl.nn.internal
 
-// CrossEntropyLoss combines LogSoftmax + NLLLoss in one forward pass.
-// This is more numerically stable than applying softmax then log separately.
-// input: [batch_size, n_classes] raw logits
-// target: one-hot/soft labels `[batch_size, n_classes]` or integer-valued class
-// indices `[batch_size]`.
+// CrossEntropyLoss combines LogSoftmax + NLLLoss for unbatched, batched, and
+// spatial logits. Reduction, class weights, and ignored indices match PyTorch.
 pub struct CrossEntropyLoss[T] {
 pub:
 	weight       &vtl.Tensor[T] = unsafe { nil }
-	ignore_index int            = -1
+	ignore_index int            = -100
 	reduction    string         = 'mean' // 'mean' | 'sum' | 'none'
+}
+
+// CrossEntropyLossOptions configures ignored class indices and reduction.
+@[params]
+pub struct CrossEntropyLossOptions {
+pub:
+	ignore_index int    = -100
+	reduction    string = 'mean'
 }
 
 // cross_entropy_loss exposes this operation as part of the public API.
 pub fn cross_entropy_loss[T]() types.Loss[T] {
+	return cross_entropy_loss_with_options[T](unsafe { nil }, CrossEntropyLossOptions{})
+}
+
+// cross_entropy_loss_with_options creates a weighted cross-entropy objective.
+pub fn cross_entropy_loss_with_options[T](weight &vtl.Tensor[T], options CrossEntropyLossOptions) types.Loss[T] {
 	concrete := &CrossEntropyLoss[T]{
-		reduction: 'mean'
+		weight:       weight
+		ignore_index: options.ignore_index
+		reduction:    options.reduction
 	}
 	return types.loss[T](voidptr(concrete), cross_entropy_loss_loss_dispatch[T])
 }
 
+// CrossEntropyIndexLoss adapts integer class-index targets to CrossEntropyLoss.
+pub struct CrossEntropyIndexLoss[T] {
+	inner &CrossEntropyLoss[T] = unsafe { nil }
+}
+
+// cross_entropy_loss_indices creates an objective that accepts Tensor[int] targets.
+pub fn cross_entropy_loss_indices[T](weight &vtl.Tensor[T], options CrossEntropyLossOptions) CrossEntropyIndexLoss[T] {
+	return CrossEntropyIndexLoss[T]{
+		inner: &CrossEntropyLoss[T]{
+			weight:       weight
+			ignore_index: options.ignore_index
+			reduction:    options.reduction
+		}
+	}
+}
+
 // loss exposes this operation as part of the public API.
-pub fn (_ &CrossEntropyLoss[T]) loss(input &autograd.Variable[T], target &vtl.Tensor[T]) !&autograd.Variable[T] {
-	output := internal.cross_entropy[T](input.value, target)!
+pub fn (l &CrossEntropyLoss[T]) loss(input &autograd.Variable[T], target &vtl.Tensor[T]) !&autograd.Variable[T] {
+	output := internal.cross_entropy_with_options[T](input.value, target, l.weight, l.ignore_index,
+		l.reduction)!
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {
-		gate := cross_entropy_loss_gate[T](input.value, target)
+		gate := cross_entropy_loss_gate_with_options[T](input.value, target, l.weight, l.ignore_index,
+			l.reduction)
 		gate.cache(mut result, input)!
 	}
 	return result
+}
+
+// loss computes CrossEntropyLoss from integer class-index targets.
+pub fn (l &CrossEntropyIndexLoss[T]) loss(input &autograd.Variable[T], target &vtl.Tensor[int]) !&autograd.Variable[T] {
+	mut target_values := []T{len: target.size()}
+	for i in 0 .. target.size() {
+		target_values[i] = vtl.cast[T](target.get_nth(i))
+	}
+	typed_target := vtl.from_array(target_values, target.shape.clone())!
+	return l.inner.loss(input, typed_target)
 }
 
 fn cross_entropy_loss_loss_dispatch[T](loss_ptr voidptr, input voidptr, target voidptr) !voidptr {
@@ -47,22 +87,34 @@ fn cross_entropy_loss_loss_dispatch[T](loss_ptr voidptr, input voidptr, target v
 // CrossEntropyLossGate defines a public data structure for this module.
 pub struct CrossEntropyLossGate[T] {
 pub:
-	input  &vtl.Tensor[T] = unsafe { nil }
-	target &vtl.Tensor[T] = unsafe { nil }
+	input        &vtl.Tensor[T] = unsafe { nil }
+	target       &vtl.Tensor[T] = unsafe { nil }
+	weight       &vtl.Tensor[T] = unsafe { nil }
+	ignore_index int            = -100
+	reduction    string         = 'mean'
 }
 
 // cross_entropy_loss_gate exposes this operation as part of the public API.
 pub fn cross_entropy_loss_gate[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) &CrossEntropyLossGate[T] {
+	return cross_entropy_loss_gate_with_options[T](input, target, unsafe { nil }, -100, 'mean')
+}
+
+// cross_entropy_loss_gate_with_options creates the configured backward gate.
+pub fn cross_entropy_loss_gate_with_options[T](input &vtl.Tensor[T], target &vtl.Tensor[T], weight &vtl.Tensor[T], ignore_index int, reduction string) &CrossEntropyLossGate[T] {
 	return &CrossEntropyLossGate[T]{
-		input:  input
-		target: target
+		input:        input
+		target:       target
+		weight:       weight
+		ignore_index: ignore_index
+		reduction:    reduction
 	}
 }
 
 // backward exposes this operation as part of the public API.
 pub fn (g &CrossEntropyLossGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
-	r0 := internal.cross_entropy_backward[T](gradient, g.input, g.target)!
+	r0 := internal.cross_entropy_backward_with_options[T](gradient, g.input, g.target, g.weight,
+		g.ignore_index, g.reduction)!
 	return [r0]
 }
 

@@ -9,7 +9,7 @@ This module currently provides:
 | `mse_loss` | Mean squared error: `mean((x - y)^2)`. |
 | `bce_loss` | Binary cross entropy: `-mean(y log(p) + (1-y) log(1-p))`; applies sigmoid by default (`from_logits: true`). |
 | `sigmoid_cross_entropy_loss` | Binary cross entropy from logits, using a sigmoid internally. |
-| `cross_entropy_loss` | `-sum(y * log_softmax(logits))`; raw logits with one-hot targets or class indices. |
+| `cross_entropy_loss` | `-sum(y * log_softmax(logits))`; raw logits with one-hot/soft targets. |
 | `softmax_cross_entropy_loss` | Multiclass cross entropy with softmax over logits and one-hot targets. |
 | `nll_loss` | Negative log likelihood from log probabilities after log-softmax; accepts class indices or one-hot/soft targets and optional per-class weights. |
 | `kl_div_loss` | `sum(P * log(P / Q))`; input is `log(Q)` and target is probability distribution `P`. |
@@ -18,6 +18,16 @@ This module currently provides:
 Constructor signatures and reduction behavior are defined in the corresponding
 source files. In particular, binary cross entropy's `from_logits` setting and
 the expected representation for multiclass losses must match the model output.
+
+`cross_entropy_loss_with_options` supports optional class weights,
+`ignore_index`, and `none`, `mean`, or `sum` reductions. Use
+`cross_entropy_loss_indices` for `Tensor[int]` targets; it accepts a scalar
+target with logits shaped `[C]` or targets shaped `[N, ...]` with logits shaped
+`[N, C, ...]`. The generic `cross_entropy_loss` also accepts same-type
+integer-valued class-index targets and one-hot/soft targets matching the logits.
+The `label_smoothing` option from PyTorch is not implemented yet.
+For `mean`, weighted class-index targets divide by the sum of their
+non-ignored class weights; probability targets divide by the number of samples.
 
 `nll_loss(weight)` uses mean reduction by default. Use `nll_loss_with_options`
 to select sum or per-sample reduction, or ignore a class-index target, while

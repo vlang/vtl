@@ -31,6 +31,7 @@ CIFAR examples for CI-safe checks.
 | [autograd_put](./autograd_put) | Propagate gradients through indexed replacement | `v run ./vtl/examples/autograd_put/main.v` |
 | [autograd_slice](./autograd_slice) | Route gradients through slice views | `v run ./vtl/examples/autograd_slice/main.v` |
 | [autograd_scalar_loss](./autograd_scalar_loss) | Scalar sum/mean loss and backward pass | `v run ./vtl/examples/autograd_scalar_loss/main.v` |
+| [cross_entropy_unbatched](./cross_entropy_unbatched) | Unbatched `[C]` logits and scalar labels with autograd | `v run ./vtl/examples/cross_entropy_unbatched/main.v` |
 | [nll_unbatched](./nll_unbatched) | PyTorch-style `[C]` NLL input, scalar class target, weighting, and autograd | `v run ./vtl/examples/nll_unbatched/main.v` |
 | [npy_round_trip](./npy_round_trip) | Read and write NumPy `.npy` arrays | `v run ./vtl/examples/npy_round_trip/main.v` |
 | [npy_complex128](./npy_complex128) | Read and write NumPy complex128 `.npy` arrays | `v run ./vtl/examples/npy_complex128/main.v` |

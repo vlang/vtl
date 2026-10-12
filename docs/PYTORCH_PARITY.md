@@ -108,13 +108,23 @@ optimizer mutation and per-parameter-group LR support remain gaps. Optimizer
 parameter-group integration remains a gap.
 
 `nll_loss` supports weighted class-index and one-hot/soft targets, mean and sum
-reductions, per-sample `none` reduction, and `ignore_index` for class-index
+reductions, per-position `none` reduction, and `ignore_index` for class-index
 targets. Weighted class-index means divide by the sum of non-ignored target
-weights. `nll_loss_indices` accepts `Tensor[int]` targets; the regular generic
-loss also accepts same-type integer-valued target tensors. Both APIs accept
-unbatched `[C]` log-probabilities with a scalar class-index target and batched
+weights; soft-target means divide by the number of samples.
+`nll_loss_indices` accepts `Tensor[int]` targets; the regular generic loss also
+accepts same-type integer-valued target tensors. Both APIs accept unbatched
+`[C]` log-probabilities with a scalar class-index target and batched
 `[N, C, ...]` inputs with spatial dimensions after the class axis. Unbatched
 `reduction: 'none'` returns a scalar, and all reductions propagate gradients.
+
+`cross_entropy_loss_with_options` supports optional class weights,
+`ignore_index`, and `none`, `mean`, or `sum` reductions for unbatched `[C]` or
+batched/spatial `[N, C, ...]` logits. `cross_entropy_loss_indices` accepts
+`Tensor[int]` targets; the generic loss accepts same-type integer-valued targets
+or matching one-hot/soft targets. Weighted class-index means divide by the sum
+of non-ignored target weights; soft-target means divide by the number of samples.
+All paths propagate gradients. PyTorch's
+`label_smoothing` option remains a gap.
 
 **Next:** Audit formulas, defaults, reduction modes, parameter groups, sparse
 gradients, and numerical behavior against `torch.nn` and `torch.optim`. Add
@@ -197,6 +207,7 @@ export paths, community examples, and migration guidance.
 - [Tensor construction](https://docs.pytorch.org/docs/stable/generated/torch.tensor.html)
 - [Autograd](https://docs.pytorch.org/docs/stable/autograd.html)
 - [Neural-network modules](https://docs.pytorch.org/docs/stable/nn.html)
+- [CrossEntropyLoss](https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html)
 - [Optimizers](https://docs.pytorch.org/docs/stable/optim.html)
 - [Data loading](https://docs.pytorch.org/docs/stable/data.html)
 - [Serialization](https://docs.pytorch.org/docs/stable/notes/serialization.html)
