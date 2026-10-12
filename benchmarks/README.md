@@ -88,6 +88,21 @@ These are local CPU microbenchmarks against the prior coordinate-indexed VTL
 loop, not comparisons with NumPy or other libraries. Repeat on the target host
 with the same V build and settings before drawing performance conclusions.
 
+## ReLU autograd backward
+
+`relu_backward_bench.v` compares the contiguous ReLU backward path with the
+previous coordinate-indexed `nmap` implementation. It checks exact output
+equality and reports local VTL CPU microbenchmark timings. This is an internal
+kernel comparison, not a PyTorch performance claim:
+
+```bash
+cd ~/.vmodules
+systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -no-parallel -cc gcc -prod -cflags "-march=native" \
+	-o /tmp/vtl-relu-backward-bench ./vtl/benchmarks/relu_backward_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-relu-backward-bench
+```
+
 ## Linear bias gradient reduction
 
 `linear_bias_reduction_bench.v` compares summing the batch axis with the
