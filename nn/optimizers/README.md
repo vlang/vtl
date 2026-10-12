@@ -19,13 +19,18 @@ for `Sequential` models.
 
 | Constructor | Defaults | Notes |
 |-------------|----------|-------|
-| `sgd[T](learning_rate: 0.01)` | Learning rate 0.01 | Stochastic gradient descent |
+| `sgd[T](...)` | LR 0.001, momentum 0 | SGD with optional momentum, dampening, coupled weight decay, and Nesterov |
 | `adagrad[T](...)` | Learning rate 0.01 | Accumulates squared gradients |
 | `rmsprop[T](...)` | Learning rate 0.001 | Exponential squared-gradient average |
 | `adam_optimizer[T](...)` | LR 0.001, β₁ 0.9, β₂ 0.999 | Adam with bias correction; existing CUDA/Vulkan acceleration |
 | `adamw[T](...)` | LR 0.001, decay 0.01 | Adam with decoupled weight decay |
 | `nadam_optimizer[T](...)` | LR 0.002, β₁ 0.9, β₂ 0.999, momentum decay 0.004 | Dozat momentum schedule; f32/f64 CPU paths |
 | `radam_optimizer[T](...)` | LR 0.001, β₁ 0.9, β₂ 0.999 | Rectified Adam variance estimate; f32 and f64 CPU paths |
+
+`SgdOptimizerConfig` follows the SGD options `momentum`, `dampening`,
+`weight_decay`, and `nesterov`. The first momentum buffer is initialized from
+the regularized gradient, as in PyTorch; dampening applies on later updates.
+Nesterov requires positive momentum and zero dampening.
 
 NAdam and RAdam configuration structs accept `weight_decay` (default `0`).
 Set `decoupled_weight_decay: true` to apply decay directly to parameter values,

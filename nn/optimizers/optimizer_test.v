@@ -39,6 +39,53 @@ fn test_sgd_zeros_grad_after_update() ! {
 	assert g == 0.0, 'grad should be zeroed after update, got ${g}'
 }
 
+fn test_sgd_momentum_weight_decay_and_dampening() ! {
+	c := ctx[f64]()
+	mut model := models.sequential_from_ctx[f64](c)
+	model.input([1])
+	model.linear(1)
+	mut opt := sgd[f64](momentum: 0.9, dampening: 0.5, weight_decay: 0.1, learning_rate: 0.1)
+	opt.build_params(model.info.layers)
+	assert opt.params.len == 2
+	assert opt.momentum_buffers.len == opt.params.len
+	mut p := opt.params[0]
+	p.value.set_nth(0, 5.0)
+	p.grad.set_nth(0, 1.0)
+	opt.update()!
+	assert math.abs(p.value.get_nth(0) - 4.85) < 1e-12
+	p.grad.set_nth(0, 2.0)
+	opt.update()!
+	// First buffer is g + weight_decay * parameter; later updates apply dampening.
+	assert math.abs(p.value.get_nth(0) - 4.59075) < 1e-12
+	assert math.abs(opt.momentum_buffers[0].get_nth(0) - 2.5925) < 1e-12
+}
+
+fn test_sgd_nesterov_uses_first_momentum_buffer() ! {
+	c := ctx[f64]()
+	mut model := models.sequential_from_ctx[f64](c)
+	model.input([1])
+	model.linear(1)
+	mut opt := sgd[f64](learning_rate: 0.1, momentum: 0.9, nesterov: true)
+	opt.build_params(model.info.layers)
+	mut p := opt.params[0]
+	p.value.set_nth(0, 5.0)
+	p.grad.set_nth(0, 1.0)
+	opt.update()!
+	assert math.abs(p.value.get_nth(0) - 4.81) < 1e-12
+	p.grad.set_nth(0, 1.0)
+	opt.update()!
+	assert math.abs(p.value.get_nth(0) - 4.539) < 1e-12
+}
+
+fn test_sgd_rejects_invalid_nesterov_configuration() ! {
+	mut opt := sgd[f64](nesterov: true)
+	opt.update() or {
+		assert err.msg().contains('Nesterov')
+		return
+	}
+	assert false, 'Nesterov requires positive momentum'
+}
+
 fn test_adam_step_f32_cpu_moves_theta() {
 	grad := [f32(1.0), f32(2.0)]
 	mut theta := [f32(5.0), f32(5.0)]

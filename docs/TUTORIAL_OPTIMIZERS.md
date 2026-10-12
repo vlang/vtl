@@ -153,6 +153,21 @@ mut opt := optimizers.sgd[f32](optimizers.SgdOptimizerConfig{
 opt.build_params(model)
 ```
 
+SGD also supports coupled weight decay, momentum, dampening, and Nesterov
+momentum. For momentum, register parameters with `build_params` so the optimizer
+can create its per-parameter buffers. The first buffer uses the regularized
+gradient directly; `dampening` applies to subsequent updates.
+
+```v ignore
+mut opt := optimizers.sgd[f32](optimizers.SgdOptimizerConfig{
+	learning_rate: 0.01
+	momentum:      0.9
+	weight_decay:  0.0001
+	nesterov:      true
+})
+opt.build_params(model)
+```
+
 ## NAdam
 
 NAdam adds Nesterov momentum to Adam. VTL follows the momentum schedule and
