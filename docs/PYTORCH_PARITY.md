@@ -94,6 +94,8 @@ momentum value for the caller to apply; it does not mutate optimizer state.
 `CyclicLR` accepts a custom scale callback that receives the cycle number or
 minibatch step, selected by `scale_mode`; cycle callbacks use the same one-based
 cycle count as PyTorch.
+`SgdOptimizer` supports coupled weight decay, momentum, dampening, and Nesterov
+updates, including PyTorch's first-step momentum-buffer initialization.
 Gradient clipping includes global L2 clipping and a configurable global
 p-norm entry point (including zero-count and positive-infinity norms), which
 return the pre-clipping norm, plus element-wise value clipping with a
