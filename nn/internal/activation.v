@@ -74,8 +74,21 @@ pub fn relu[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 // deriv_relu exposes this operation as part of the public API.
 
 // deriv_relu exposes this operation as part of the public API.
-@[inline]
+@[direct_array_access]
 pub fn deriv_relu[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	if gradient.shape == cached.shape && gradient.is_row_major_contiguous()
+		&& cached.is_row_major_contiguous() && gradient.data.data.len == gradient.size
+		&& cached.data.data.len == cached.size {
+		mut result := vtl.tensor_like[T](gradient)
+		for i in 0 .. gradient.size {
+			result.data.data[i] = if cached.data.data[i] < 0 {
+				vtl.cast[T](0)
+			} else {
+				gradient.data.data[i]
+			}
+		}
+		return result
+	}
 	return gradient.nmap([cached], fn [T](vals []T, i []int) T {
 		// vals[0] = upstream gradient, vals[1] = cached pre-activation value
 		// Pass gradient through where pre-activation was positive; zero otherwise.
