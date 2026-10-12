@@ -31,6 +31,7 @@ CIFAR examples for CI-safe checks.
 | [autograd_put](./autograd_put) | Propagate gradients through indexed replacement | `v run ./vtl/examples/autograd_put/main.v` |
 | [autograd_slice](./autograd_slice) | Route gradients through slice views | `v run ./vtl/examples/autograd_slice/main.v` |
 | [autograd_scalar_loss](./autograd_scalar_loss) | Scalar sum/mean loss and backward pass | `v run ./vtl/examples/autograd_scalar_loss/main.v` |
+| [nll_unbatched](./nll_unbatched) | PyTorch-style `[C]` NLL input, scalar class target, weighting, and autograd | `v run ./vtl/examples/nll_unbatched/main.v` |
 | [npy_round_trip](./npy_round_trip) | Read and write NumPy `.npy` arrays | `v run ./vtl/examples/npy_round_trip/main.v` |
 | [npy_complex128](./npy_complex128) | Read and write NumPy complex128 `.npy` arrays | `v run ./vtl/examples/npy_complex128/main.v` |
 | [csv_round_trip](./csv_round_trip) | Read and write numeric CSV tensors with headers | `v run ./vtl/examples/csv_round_trip/main.v` |
@@ -64,7 +65,7 @@ CIFAR examples for CI-safe checks.
 | [symmetric_eigen](./symmetric_eigen) | Compute symmetric eigenvalues and eigenvectors for batches | `v run ./vtl/examples/symmetric_eigen/main.v` |
 | [matrix_rank](./matrix_rank) | Estimate matrix ranks with dtype-aware tolerances | `v run ./vtl/examples/matrix_rank/main.v` |
 | [batched_solve](./batched_solve) | Solve stacked linear systems with vector or matrix right-hand sides | `v run ./vtl/examples/batched_solve/main.v` |
-| [complex_least_squares](./complex_least_squares) | Fit complex coefficients and inspect residuals, rank, and singular values | `v run ./vtl/examples/complex_least_squares/main.v` |
+| [complex_least_squares](./complex_least_squares) | Fit coefficients; inspect rank | `v run ./vtl/examples/complex_least_squares/main.v` |
 | [diff](./diff) | Compute discrete differences in one-dimensional and multidimensional data | `v run ./vtl/examples/diff/main.v` |
 | [trapezoid](./trapezoid) | Integrate sampled data with the composite trapezoidal rule | `v run ./vtl/examples/trapezoid/main.v` |
 | [gradient](./gradient) | Estimate numerical derivatives along a tensor axis | `v run ./vtl/examples/gradient/main.v` |
