@@ -12,14 +12,16 @@ pub:
 	weight       &vtl.Tensor[T] = unsafe { nil }
 	ignore_index int            = -100
 	reduction    string         = 'mean' // 'mean' | 'sum' | 'none'
+	label_smoothing f64
 }
 
-// CrossEntropyLossOptions configures ignored class indices and reduction.
+// CrossEntropyLossOptions configures ignored class indices, reduction, and smoothing.
 @[params]
 pub struct CrossEntropyLossOptions {
 pub:
-	ignore_index int    = -100
-	reduction    string = 'mean'
+	ignore_index   int    = -100
+	reduction      string = 'mean'
+	label_smoothing f64
 }
 
 // cross_entropy_loss exposes this operation as part of the public API.
@@ -33,6 +35,7 @@ pub fn cross_entropy_loss_with_options[T](weight &vtl.Tensor[T], options CrossEn
 		weight:       weight
 		ignore_index: options.ignore_index
 		reduction:    options.reduction
+		label_smoothing: options.label_smoothing
 	}
 	return types.loss[T](voidptr(concrete), cross_entropy_loss_loss_dispatch[T])
 }
@@ -49,6 +52,7 @@ pub fn cross_entropy_loss_indices[T](weight &vtl.Tensor[T], options CrossEntropy
 			weight:       weight
 			ignore_index: options.ignore_index
 			reduction:    options.reduction
+			label_smoothing: options.label_smoothing
 		}
 	}
 }
@@ -56,12 +60,12 @@ pub fn cross_entropy_loss_indices[T](weight &vtl.Tensor[T], options CrossEntropy
 // loss exposes this operation as part of the public API.
 pub fn (l &CrossEntropyLoss[T]) loss(input &autograd.Variable[T], target &vtl.Tensor[T]) !&autograd.Variable[T] {
 	output := internal.cross_entropy_with_options[T](input.value, target, l.weight, l.ignore_index,
-		l.reduction)!
+		l.reduction, l.label_smoothing)!
 	mut result := input.context.variable(output)
 
 	if input.requires_grad {
 		gate := cross_entropy_loss_gate_with_options[T](input.value, target, l.weight, l.ignore_index,
-			l.reduction)
+			l.reduction, l.label_smoothing)
 		gate.cache(mut result, input)!
 	}
 	return result
@@ -92,21 +96,23 @@ pub:
 	weight       &vtl.Tensor[T] = unsafe { nil }
 	ignore_index int            = -100
 	reduction    string         = 'mean'
+	label_smoothing f64
 }
 
 // cross_entropy_loss_gate exposes this operation as part of the public API.
 pub fn cross_entropy_loss_gate[T](input &vtl.Tensor[T], target &vtl.Tensor[T]) &CrossEntropyLossGate[T] {
-	return cross_entropy_loss_gate_with_options[T](input, target, unsafe { nil }, -100, 'mean')
+	return cross_entropy_loss_gate_with_options[T](input, target, unsafe { nil }, -100, 'mean', 0)
 }
 
 // cross_entropy_loss_gate_with_options creates the configured backward gate.
-pub fn cross_entropy_loss_gate_with_options[T](input &vtl.Tensor[T], target &vtl.Tensor[T], weight &vtl.Tensor[T], ignore_index int, reduction string) &CrossEntropyLossGate[T] {
+pub fn cross_entropy_loss_gate_with_options[T](input &vtl.Tensor[T], target &vtl.Tensor[T], weight &vtl.Tensor[T], ignore_index int, reduction string, label_smoothing f64) &CrossEntropyLossGate[T] {
 	return &CrossEntropyLossGate[T]{
 		input:        input
 		target:       target
 		weight:       weight
 		ignore_index: ignore_index
 		reduction:    reduction
+		label_smoothing: label_smoothing
 	}
 }
 
@@ -114,7 +120,7 @@ pub fn cross_entropy_loss_gate_with_options[T](input &vtl.Tensor[T], target &vtl
 pub fn (g &CrossEntropyLossGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	r0 := internal.cross_entropy_backward_with_options[T](gradient, g.input, g.target, g.weight,
-		g.ignore_index, g.reduction)!
+		g.ignore_index, g.reduction, g.label_smoothing)!
 	return [r0]
 }
 

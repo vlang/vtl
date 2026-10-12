@@ -20,12 +20,11 @@ source files. In particular, binary cross entropy's `from_logits` setting and
 the expected representation for multiclass losses must match the model output.
 
 `cross_entropy_loss_with_options` supports optional class weights,
-`ignore_index`, and `none`, `mean`, or `sum` reductions. Use
+`ignore_index`, `label_smoothing` in `[0, 1]`, and `none`, `mean`, or `sum` reductions. Use
 `cross_entropy_loss_indices` for `Tensor[int]` targets; it accepts a scalar
 target with logits shaped `[C]` or targets shaped `[N, ...]` with logits shaped
 `[N, C, ...]`. The generic `cross_entropy_loss` also accepts same-type
 integer-valued class-index targets and one-hot/soft targets matching the logits.
-The `label_smoothing` option from PyTorch is not implemented yet.
 For `mean`, weighted class-index targets divide by the sum of their
 non-ignored class weights; probability targets divide by the number of samples.
 

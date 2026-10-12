@@ -56,3 +56,55 @@ fn test_cross_entropy_soft_targets_with_default_ignore_index() ! {
 	assert math.abs(prediction.grad.get_nth(0)) < 1e-12
 	assert math.abs(prediction.grad.get_nth(1)) < 1e-12
 }
+
+fn test_cross_entropy_label_smoothing_index_target_and_gradient() ! {
+	ctx := autograd.ctx[f64]()
+	prediction := ctx.variable(vtl.from_array([0.0, math.log(3.0)], [2])!)
+	target := vtl.from_array([1], [])!
+	mut result := cross_entropy_loss_indices[f64](unsafe { nil }, label_smoothing: 0.2).loss(prediction,
+		target)!
+	expected := -(0.9 * math.log(0.75) + 0.05 * (math.log(0.25) + math.log(0.75)))
+	assert math.abs(result.value.get_nth(0) - expected) < 1e-12
+	result.backprop()!
+	assert math.abs(prediction.grad.get_nth(0) - 0.15) < 1e-12
+	assert math.abs(prediction.grad.get_nth(1) + 0.15) < 1e-12
+}
+
+fn test_cross_entropy_label_smoothing_soft_target() ! {
+	ctx := autograd.ctx[f64]()
+	prediction := ctx.variable(vtl.from_array([0.0, math.log(3.0)], [2])!)
+	target := vtl.from_array([1.0, 0.0], [2])!
+	mut result := cross_entropy_loss_with_options[f64](unsafe { nil }, label_smoothing: 0.2).loss(prediction,
+		target)!
+	expected := -(0.9 * math.log(0.25) + 0.1 * math.log(0.75))
+	assert math.abs(result.value.get_nth(0) - expected) < 1e-12
+	result.backprop()!
+	assert math.abs(prediction.grad.get_nth(0) + 0.65) < 1e-12
+	assert math.abs(prediction.grad.get_nth(1) - 0.65) < 1e-12
+}
+
+fn test_cross_entropy_label_smoothing_weighted_mean_uses_target_weight() ! {
+	ctx := autograd.ctx[f64]()
+	prediction := ctx.variable(vtl.from_array([0.0, math.log(3.0)], [2])!)
+	target := vtl.from_array([1], [])!
+	weights := vtl.from_array([2.0, 4.0], [2])!
+	mut result := cross_entropy_loss_indices[f64](weights, label_smoothing: 0.2).loss(prediction,
+		target)!
+	expected := -(0.2 * math.log(0.25) + 3.6 * math.log(0.75)) / 4.0
+	assert math.abs(result.value.get_nth(0) - expected) < 1e-12
+	result.backprop()!
+	assert math.abs(prediction.grad.get_nth(0) - 0.1875) < 1e-12
+	assert math.abs(prediction.grad.get_nth(1) + 0.1875) < 1e-12
+}
+
+fn test_cross_entropy_rejects_invalid_label_smoothing() {
+	ctx := autograd.ctx[f64]()
+	prediction := ctx.variable(vtl.from_array([0.0, 1.0], [2])!)
+	target := vtl.from_array([1], [])!
+	cross_entropy_loss_indices[f64](unsafe { nil }, label_smoothing: 1.1).loss(prediction,
+		target) or {
+		assert err.msg().contains('label_smoothing')
+		return
+	}
+	assert false, 'expected invalid label_smoothing to fail'
+}
