@@ -2,6 +2,43 @@ module autograd
 
 import vtl
 
+enum BinaryGateBackwardOperation {
+	multiply
+	divide
+}
+
+// fused_binary_gate_backward calculates both input gradients in one traversal
+// for same-shaped contiguous tensors. Broadcasted and strided inputs retain the
+// general tensor-operation path below.
+@[direct_array_access]
+fn fused_binary_gate_backward[T](gradient &vtl.Tensor[T], left &vtl.Tensor[T], right &vtl.Tensor[T],
+	operation BinaryGateBackwardOperation) ?[]&vtl.Tensor[T] {
+	if gradient.shape != left.shape || gradient.shape != right.shape || !gradient.is_row_major_contiguous()
+		|| !left.is_row_major_contiguous() || !right.is_row_major_contiguous()
+		|| gradient.data.data.len != gradient.size || left.data.data.len != left.size
+		|| right.data.data.len != right.size {
+		return none
+	}
+	mut left_gradient := vtl.tensor_like[T](gradient)
+	mut right_gradient := vtl.tensor_like[T](gradient)
+	for i in 0 .. gradient.size {
+		grad := gradient.data.data[i]
+		left_value := left.data.data[i]
+		right_value := right.data.data[i]
+		match operation {
+			.multiply {
+				left_gradient.data.data[i] = grad * right_value
+				right_gradient.data.data[i] = grad * left_value
+			}
+			.divide {
+				left_gradient.data.data[i] = grad / right_value
+				right_gradient.data.data[i] = -(grad * left_value) / (right_value * right_value)
+			}
+		}
+	}
+	return [left_gradient, right_gradient]
+}
+
 // AddGate defines a public data structure for this module.
 pub struct AddGate[T] {}
 
@@ -111,6 +148,9 @@ pub fn multiply_gate[T](a &Variable[T], b &Variable[T]) &MultiplyGate[T] {
 // backward exposes this operation as part of the public API.
 pub fn (g &MultiplyGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
+	if fused := fused_binary_gate_backward[T](gradient, g.a.value, g.b.value, .multiply) {
+		return fused
+	}
 	r0 := gradient.multiply[T](g.b.value)!
 	r1 := gradient.multiply[T](g.a.value)!
 	return [r0, r1]
@@ -165,11 +205,14 @@ pub fn divide_gate[T](a &Variable[T], b &Variable[T]) &DivideGate[T] {
 // backward exposes this operation as part of the public API.
 pub fn (g &DivideGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
+	if fused := fused_binary_gate_backward[T](gradient, g.a.value, g.b.value, .divide) {
+		return fused
+	}
 	r0 := gradient.divide[T](g.b.value)!
-	bx2 := g.b.value.multiply_scalar[T](vtl.cast[T](2))!
+	b_squared := g.b.value.multiply[T](g.b.value)!
 	opposite := gradient.multiply_scalar[T](vtl.cast[T](-1))!
 	mut r1 := opposite.multiply[T](g.a.value)!
-	r1 = r1.divide[T](bx2)!
+	r1 = r1.divide[T](b_squared)!
 	return [r0, r1]
 }
 

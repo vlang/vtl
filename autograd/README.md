@@ -73,6 +73,12 @@ and mean reductions; reshape, permutation transpose, and concatenation. See
 [`variable_ops.v`](variable_ops.v) for method signatures and the
 [`gates` reference](../nn/gates/README.md) for the backward-rule adapters.
 
+Multiply and divide gates fuse both input-gradient calculations into one pass
+for same-shaped, row-major contiguous CPU tensors. Strided and broadcasted
+inputs use the general tensor-operation path. Division uses the derivative
+`d(a / b) / db = -a / b²`; see the gate backward benchmark for a focused
+comparison.
+
 The implementation is grouped by rule in `gates_basic.v` (arithmetic),
 `gates_pow.v`, `gates_exp.v`, `gates_trig.v`, `gates_unary.v`,
 `gates_blas.v`, and `gates_reduction.v`. This list describes registered
