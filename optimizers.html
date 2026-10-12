@@ -153,9 +153,9 @@ optimizer<span class="token punctuation">.</span><span class="token function">up
 <th>Notes</th></tr></thead>
 <tbody>
 <tr>
-<td><code>sgd[T](learning_rate: 0.01)</code></td>
-<td>Learning rate 0.01</td>
-<td>Stochastic gradient descent</td></tr>
+<td><code>sgd[T](...)</code></td>
+<td>LR 0.001, momentum 0</td>
+<td>SGD with optional momentum, dampening, coupled weight decay, and Nesterov</td></tr>
 <tr>
 <td><code>adagrad[T](...)</code></td>
 <td>Learning rate 0.01</td>
@@ -180,6 +180,7 @@ optimizer<span class="token punctuation">.</span><span class="token function">up
 <td><code>radam_optimizer[T](...)</code></td>
 <td>LR 0.001, β₁ 0.9, β₂ 0.999</td>
 <td>Rectified Adam variance estimate; f32 and f64 CPU paths</td></tr></tbody></table>
+<p><code>SgdOptimizerConfig</code> follows the SGD options <code>momentum</code>, <code>dampening</code>, <code>weight_decay</code>, and <code>nesterov</code>. The first momentum buffer is initialized from the regularized gradient, as in PyTorch; dampening applies on later updates. Nesterov requires positive momentum and zero dampening.</p>
 <p>NAdam and RAdam configuration structs accept <code>weight_decay</code> (default <code>0</code>). Set <code>decoupled_weight_decay: true</code> to apply decay directly to parameter values, without adding it to the gradient or moment estimates. NAdam additionally accepts <code>momentum_decay</code> (default <code>0.004</code>).</p>
 <h2 id="learning-rate-schedulers">Learning-rate schedulers</h2>
 <p><code>StepLR</code>, <code>MultiStepLR</code>, <code>ExponentialLR</code>, <code>CosineAnnealingLR</code>, <code>CosineAnnealingWarmRestarts</code>, <code>LinearLR</code>, <code>PolynomialLR</code>, <code>ConstantLR</code>, <code>CyclicLR</code>, <code>OneCycleLR</code>, and <code>ReduceLROnPlateau</code> update learning rates by epoch or minibatch step. <code>MultiStepLR</code> applies one decay for each milestone, including duplicate milestones. <code>LinearLR</code> interpolates between two factors, while <code>PolynomialLR</code> decays to zero over a fixed number of steps. <code>ConstantLR</code> scales the base rate for a fixed number of steps, then restores it. <code>CosineAnnealingWarmRestarts</code> resets to the base rate after each cosine cycle, with optional geometric growth of cycle lengths. <code>OneCycleLR</code> uses minibatch steps to ramp from <code>max_lr / div_factor</code> to <code>max_lr</code>, then anneal to <code>max_lr / (div_factor * final_div_factor)</code>. It supports cosine or linear annealing, an optional three-phase curve, and inverse momentum cycling with configurable bounds. <code>next_momentum(step)</code> returns the value for the caller to apply; set <code>cycle_momentum: false</code> to disable it. The defaults (<code>0.85</code> and <code>0.95</code>) match PyTorch. Optimizer mutation and parameter groups are not implemented. Its constructor returns an error for negative <code>max_lr</code>, nonpositive <code>total_steps</code> or division factors, <code>pct_start</code> outside <code>(0, 1)</code>, or invalid momentum bounds. <code>ReduceLROnPlateau.step(current_lr, metric)</code> consumes the monitored value and tracks the best metric, with <code>min</code> or <code>max</code> mode and absolute or relative thresholds. It supports <code>patience</code>, <code>cooldown</code>, <code>min_lr</code>, and <code>epsilon</code> and returns the rate for the caller to apply. <code>try_reduce_lr_on_plateau</code> reports invalid configuration; the original <code>next_lr(current_lr, step, metric_delta)</code> remains available for callers that already calculate metric deltas.</p>
@@ -481,7 +482,7 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 </section>
 
 		<section id="sgd" class="doc-node">
-			<div class="title"><h2>fn sgd <a href="#sgd">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/sgd.v#L30"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn sgd <a href="#sgd">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/sgd.v#L43"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> sgd<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>config SgdOptimizerConfig<span class="token punctuation">)</span> <span class="token operator">&amp;</span>SgdOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>sgd creates a new SgdOptimizer.</p>
@@ -750,7 +751,7 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 </section>
 
 		<section id="SgdOptimizer[T].build_params" class="doc-node">
-			<div class="title"><h2>fn (SgdOptimizer[T]) build_params <a href="#SgdOptimizer[T].build_params">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/sgd.v#L37"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (SgdOptimizer[T]) build_params <a href="#SgdOptimizer[T].build_params">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/sgd.v#L54"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o SgdOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">build_params</span><span class="token punctuation">(</span>layers <span class="token punctuation">[</span><span class="token punctuation">]</span>types<span class="token punctuation">.</span>Layer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
 <p>build_params registers all trainable variables from <code>layers</code>. Call once before training.</p>
@@ -758,7 +759,7 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 </section>
 
 		<section id="SgdOptimizer[T].update" class="doc-node">
-			<div class="title"><h2>fn (SgdOptimizer[T]) update <a href="#SgdOptimizer[T].update">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/sgd.v#L46"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (SgdOptimizer[T]) update <a href="#SgdOptimizer[T].update">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/sgd.v#L67"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o SgdOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">update</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
 <p>update performs one SGD parameter update and zeros all gradients.</p>
@@ -1369,20 +1370,31 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 <pre class="signature">
 <code><span class="token keyword">struct</span> SgdOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
 	learning_rate <span class="token builtin">f64</span>
+	momentum      <span class="token builtin">f64</span>
+	dampening     <span class="token builtin">f64</span>
+	weight_decay  <span class="token builtin">f64</span>
+	nesterov      <span class="token builtin">bool</span>
 <span class="token keyword">pub</span> <span class="token keyword">mut</span><span class="token punctuation">:</span>
 	params <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+<span class="token keyword">mut</span><span class="token punctuation">:</span>
+	momentum_buffers     <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+	momentum_initialized <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">bool</span>
 <span class="token punctuation">}</span></code></pre>
-<p>SgdOptimizer implements vanilla Stochastic Gradient Descent with optional momentum.</p>
+<p>SgdOptimizer implements Stochastic Gradient Descent with optional momentum and weight decay.</p>
 
 </section>
 
 		<section id="SgdOptimizerConfig" class="doc-node">
-			<div class="title"><h2>struct SgdOptimizerConfig <a href="#SgdOptimizerConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/sgd.v#L24"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>struct SgdOptimizerConfig <a href="#SgdOptimizerConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/sgd.v#L33"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <div class="attributes"><div class="attribute">@[params]</div></div>
 <pre class="signature">
 <code><span class="token keyword">struct</span> SgdOptimizerConfig <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
 	learning_rate <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">0.001</span>
+	momentum      <span class="token builtin">f64</span>
+	dampening     <span class="token builtin">f64</span>
+	weight_decay  <span class="token builtin">f64</span>
+	nesterov      <span class="token builtin">bool</span>
 <span class="token punctuation">}</span></code></pre>
 <p>SgdOptimizerConfig defines a public data structure for this module.</p>
 
@@ -1400,7 +1412,7 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 12 Oct 2026 22:21:53</div>
+						<div class="footer">Powered by vdoc. Generated on: 12 Oct 2026 23:22:13</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_optimizers">README</a></li>
 <li class="open"><a href="#adagrad">fn adagrad</a>        <ul>

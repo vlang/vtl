@@ -489,9 +489,9 @@ out <span class="token operator">:=</span> l<span class="token punctuation">.</s
 <pre class="signature">
 <code><span class="token keyword">struct</span> CrossEntropyLoss<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
-	weight       <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
-	ignore_index <span class="token builtin">int</span>            <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">100</span>
-	reduction    <span class="token builtin">string</span>         <span class="token operator">=</span> <span class="token string">'mean'</span> <span class="token comment">// 'mean' | 'sum' | 'none'</span>
+	weight          <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	ignore_index    <span class="token builtin">int</span>            <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">100</span>
+	reduction       <span class="token builtin">string</span>         <span class="token operator">=</span> <span class="token string">'mean'</span> <span class="token comment">// 'mean' | 'sum' | 'none'</span>
 	label_smoothing <span class="token builtin">f64</span>
 <span class="token punctuation">}</span></code></pre>
 <p>CrossEntropyLoss combines LogSoftmax + NLLLoss for unbatched, batched, and spatial logits. Reduction, class weights, and ignored indices match PyTorch.</p>
@@ -503,11 +503,11 @@ out <span class="token operator">:=</span> l<span class="token punctuation">.</s
 <pre class="signature">
 <code><span class="token keyword">struct</span> CrossEntropyLossGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
-	input        <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
-	target       <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
-	weight       <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
-	ignore_index <span class="token builtin">int</span>            <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">100</span>
-	reduction    <span class="token builtin">string</span>         <span class="token operator">=</span> <span class="token string">'mean'</span>
+	input           <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	target          <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	weight          <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	ignore_index    <span class="token builtin">int</span>            <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">100</span>
+	reduction       <span class="token builtin">string</span>         <span class="token operator">=</span> <span class="token string">'mean'</span>
 	label_smoothing <span class="token builtin">f64</span>
 <span class="token punctuation">}</span></code></pre>
 <p>CrossEntropyLossGate defines a public data structure for this module.</p>
@@ -520,8 +520,8 @@ out <span class="token operator">:=</span> l<span class="token punctuation">.</s
 <pre class="signature">
 <code><span class="token keyword">struct</span> CrossEntropyLossOptions <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
-	ignore_index   <span class="token builtin">int</span>    <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">100</span>
-	reduction      <span class="token builtin">string</span> <span class="token operator">=</span> <span class="token string">'mean'</span>
+	ignore_index    <span class="token builtin">int</span>    <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">100</span>
+	reduction       <span class="token builtin">string</span> <span class="token operator">=</span> <span class="token string">'mean'</span>
 	label_smoothing <span class="token builtin">f64</span>
 <span class="token punctuation">}</span></code></pre>
 <p>CrossEntropyLossOptions configures ignored class indices, reduction, and smoothing.</p>
@@ -699,7 +699,7 @@ out <span class="token operator">:=</span> l<span class="token punctuation">.</s
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 12 Oct 2026 22:21:53</div>
+						<div class="footer">Powered by vdoc. Generated on: 12 Oct 2026 23:22:13</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_loss">README</a></li>
 <li class="open"><a href="#bce_loss">fn bce_loss</a>        <ul>

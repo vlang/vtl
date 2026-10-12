@@ -4209,7 +4209,7 @@ var searchData = [
 ["optimizers","","optimizers.html#ReduceLROnPlateau[T]","type "],
 ["optimizers","step consumes a monitored metric and returns the PyTorch-style updated rate. A m","optimizers.html#ReduceLROnPlateau[T].step","fn (ReduceLROnPlateau[T])"],
 ["optimizers","next_lr preserves the original delta-based API. A negative delta beyond `-thresh","optimizers.html#ReduceLROnPlateau[T].next_lr","fn (ReduceLROnPlateau[T])"],
-["optimizers","SgdOptimizer implements vanilla Stochastic Gradient Descent with optional moment","optimizers.html#SgdOptimizer","struct "],
+["optimizers","SgdOptimizer implements Stochastic Gradient Descent with optional momentum and w","optimizers.html#SgdOptimizer","struct "],
 ["optimizers","SgdOptimizerConfig defines a public data structure for this module.","optimizers.html#SgdOptimizerConfig","struct "],
 ["optimizers","sgd creates a new SgdOptimizer.","optimizers.html#sgd","fn "],
 ["optimizers","","optimizers.html#SgdOptimizer[T]","type "],
