@@ -32,13 +32,15 @@ objective := loss.nll_loss_with_options[f32](class_weights,
 
 Use `nll_loss_indices` when class indices are stored in `Tensor[int]`; the
 regular `nll_loss` accepts a target tensor with the same element type as input.
-Both accept batched logits with shape `[N, C, ...]` and class-index targets
-with shape `[N, ...]`.
+Both accept unbatched log-probabilities with shape `[C]` and a scalar
+class-index target, or batched log-probabilities with shape `[N, C, ...]` and
+class-index targets with shape `[N, ...]`.
 
-NLL `none` reduction returns one loss per batch row. `mean` reduction divides
-by the total target weight when class weights are
-provided, and otherwise averages over non-ignored class-index targets. Matrix
-targets are an extra VTL extension; their weighted mean divides by batch size.
+NLL `none` reduction returns one loss per target position (a scalar for an
+unbatched input). `mean` reduction divides by the total target weight when
+class weights are provided, and otherwise averages over non-ignored class-index
+targets. Matrix targets are an extra VTL extension; their weighted mean divides
+by the number of target positions.
 
 ```v ignore
 import vtl.nn.loss

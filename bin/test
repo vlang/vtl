@@ -100,7 +100,8 @@ else
 		case "${relative_dir}" in
 			nn|nn/models) continue ;;
 		esac
-		if [[ "${relative_dir}" == "autograd_tests" || "${relative_dir}" == "autograd_tests/gate_iso" || "${relative_dir}" == "nn/layers" || "${relative_dir}" == "nn/optimizers" || "${relative_dir}" == "tests/core" ]]; then
+		if [[ "${relative_dir}" == "autograd_tests" || "${relative_dir}" == "autograd_tests/gate_iso" || "${relative_dir}" == "nn/layers" ||
+			"${relative_dir}" == "nn/loss" || "${relative_dir}" == "nn/optimizers" || "${relative_dir}" == "tests/core" ]]; then
 			echo "Testing ${relative_dir} one file at a time to cap compiler memory"
 			for file in "${test_dir}"/*_test.v; do
 				if [[ -f "${file}" ]]; then

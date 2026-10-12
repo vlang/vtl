@@ -111,9 +111,10 @@ parameter-group integration remains a gap.
 reductions, per-sample `none` reduction, and `ignore_index` for class-index
 targets. Weighted class-index means divide by the sum of non-ignored target
 weights. `nll_loss_indices` accepts `Tensor[int]` targets; the regular generic
-loss also accepts same-type integer-valued target tensors. Both APIs require
-batched inputs with class axis 1 and support spatial dimensions after the class
-axis. Unbatched `[C]` inputs remain a gap.
+loss also accepts same-type integer-valued target tensors. Both APIs accept
+unbatched `[C]` log-probabilities with a scalar class-index target and batched
+`[N, C, ...]` inputs with spatial dimensions after the class axis. Unbatched
+`reduction: 'none'` returns a scalar, and all reductions propagate gradients.
 
 **Next:** Audit formulas, defaults, reduction modes, parameter groups, sparse
 gradients, and numerical behavior against `torch.nn` and `torch.optim`. Add
