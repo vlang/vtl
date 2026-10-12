@@ -169,6 +169,14 @@ model.selu()
 | `nll_loss(weight)` | `NLLLoss` | Negative Log Likelihood |
 | `kl_div_loss()` | `KLDivLoss` | KL Divergence D_KL(P‖Q) |
 
+`cross_entropy_loss_with_options` supports class weights, ignored class indices,
+and `none`, `mean`, or `sum` reductions. Use
+`cross_entropy_loss_indices` for integer labels, including a scalar label with
+unbatched logits shaped `[C]`; batched or spatial logits use `[N, C, ...]` and
+targets shaped `[N, ...]`. See the
+[unbatched example](../examples/cross_entropy_unbatched/main.v). PyTorch-style
+label smoothing is not implemented yet.
+
 ### Binary focal loss with probabilities
 
 For precomputed probabilities, configure the standalone loss with `from_logits: false`.
