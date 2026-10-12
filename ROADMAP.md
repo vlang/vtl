@@ -115,7 +115,7 @@ See [docs/DEVICE_MEMORY.md](docs/DEVICE_MEMORY.md).
 | P1 | Close the remaining correctness, API, and performance gaps in [NumPy and Arraymancer parity](docs/NUMPY_PARITY.md) |
 | P2 | Improve CPU kernel performance and revisit alias/compiler optimizations when V provides a safe contract ([#3](https://github.com/vlang/vtl/issues/3)) |
 | P2 | Add ARM GPU support ([#63](https://github.com/vlang/vtl/issues/63)) |
-| P2 | Benchmark YOLO-oriented gate fusion against the current autograd path ([#40](https://github.com/vlang/vtl/issues/40)) |
+| P2 | Expand measured YOLO gate/layer fusion beyond binary multiply/divide backward kernels ([#40](https://github.com/vlang/vtl/issues/40)) |
 | Research | Assess the [Burn](https://github.com/tracel-ai/burn) feature set against VTL ([#52](https://github.com/vlang/vtl/issues/52)) |
 
 ---

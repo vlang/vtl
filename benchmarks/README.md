@@ -98,9 +98,29 @@ is faster. Run it from `~/.vmodules` under a memory-limited systemd scope:
 
 ```bash
 systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
-	v -prod -o /tmp/vtl-linear-bias-reduction-bench ./vtl/benchmarks/linear_bias_reduction_bench.v
+v -prod -o /tmp/vtl-linear-bias-reduction-bench ./vtl/benchmarks/linear_bias_reduction_bench.v
 systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-linear-bias-reduction-bench
 ```
+
+## Autograd binary gate fusion
+
+`autograd_gate_backward_bench.v` compares the separate tensor passes used by
+multiply and divide gates with the fused backward path on same-shaped,
+contiguous f64 tensors. It checks output checksums before reporting mean
+latency for 1,024, 65,536, and 1,048,576 elements. This isolates gate backward
+work; it does not establish end-to-end training or PyTorch performance parity.
+
+```bash
+cd ~/.vmodules
+systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -no-parallel -cc gcc -prod -cflags "-march=native" \
+	-o /tmp/vtl-autograd-gates ./vtl/benchmarks/autograd_gate_backward_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 \
+	/tmp/vtl-autograd-gates
+```
+
+Record CPU, V/compiler version, C compiler, production flags, and results when
+publishing measurements.
 
 ## CI
 
