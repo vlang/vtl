@@ -646,7 +646,11 @@ fn cross_entropy_smoothed_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor
 		} else {
 			f64(gradient.get_nth(0))
 		}
-		reduction_scale := if reduction == 'mean' && denominator > 0 { upstream / denominator } else { upstream }
+		reduction_scale := if reduction == 'mean' && denominator > 0 {
+			upstream / denominator
+		} else {
+			upstream
+		}
 		for class_index in 0 .. n_classes {
 			flat_index := nll_sample_flat_index(input.shape, sample, class_index)
 			target_probability := cross_entropy_smoothed_target_probability[T](target, input.shape,

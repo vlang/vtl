@@ -45,10 +45,16 @@ fn test_gru_layer_forward_with_state_returns_final_state_and_gradients() ! {
 fn test_gru_layer_batch_first_matches_sequence_first_and_backpropagates() ! {
 	ctx := autograd.ctx[f64]()
 	layer := new_gru_layer[f64](ctx, 2, 3)
-	sequence_input := ctx.variable(vtl.from_array([0.2, -0.1, 0.4, 0.3, 0.5, 0.7, -0.2,
-		0.6], [2, 2, 2])!)
-	batch_input := ctx.variable(vtl.from_array([0.2, -0.1, 0.5, 0.7, 0.4, 0.3, -0.2,
-		0.6], [2, 2, 2])!)
+	sequence_input := ctx.variable(vtl.from_array([0.2, -0.1, 0.4, 0.3, 0.5, 0.7, -0.2, 0.6], [
+		2,
+		2,
+		2,
+	])!)
+	batch_input := ctx.variable(vtl.from_array([0.2, -0.1, 0.5, 0.7, 0.4, 0.3, -0.2, 0.6], [
+		2,
+		2,
+		2,
+	])!)
 	sequence_output := layer.forward(sequence_input)!
 	mut batch_output := layer.forward_batch_first(batch_input)!
 	assert batch_output.value.shape == [2, 2, 3]
@@ -71,8 +77,11 @@ fn test_gru_layer_batch_first_matches_sequence_first_and_backpropagates() ! {
 fn test_gru_layer_batch_first_state_api_preserves_batch_shape_and_gradients() ! {
 	ctx := autograd.ctx[f64]()
 	layer := new_gru_layer[f64](ctx, 2, 3)
-	input := ctx.variable(vtl.from_array([0.2, -0.1, 0.5, 0.7, 0.4, 0.3, -0.2,
-		0.6], [2, 2, 2])!)
+	input := ctx.variable(vtl.from_array([0.2, -0.1, 0.5, 0.7, 0.4, 0.3, -0.2, 0.6], [
+		2,
+		2,
+		2,
+	])!)
 	h0 := ctx.variable(vtl.from_array([0.1, -0.2, 0.3, 0.0, 0.2, -0.1], [2, 3])!)
 	mut output, mut final_state := layer.forward_batch_first_with_state(input, h0)!
 	assert output.value.shape == [2, 2, 3]
