@@ -272,7 +272,10 @@ println(h0.grad.shape) // [1, 4]
 `Sequential.gru` initializes each layer's hidden state to zero and returns the
 output sequence. Repeated calls can stack GRU layers by passing each layer's
 `hidden_size` as the next layer's `input_size`. Use `new_gru_layer` when the
-caller needs to provide or carry a hidden state between batches.
+caller needs to provide or carry a hidden state between batches. For
+`[batch, sequence, features]` inputs, the typed layer also exposes
+`forward_batch_first` and `forward_batch_first_with_state`; both preserve
+autograd across the layout conversion.
 
 ```v
 import vtl

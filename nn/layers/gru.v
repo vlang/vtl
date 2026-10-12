@@ -106,6 +106,25 @@ pub fn (l &GRULayer[T]) forward_with_state(input &autograd.Variable[T], h0 &auto
 	return sequence_result, final_state_result
 }
 
+// forward_batch_first accepts and returns [batch, sequence, features] tensors,
+// matching the common batch-first recurrent-layer convention. The recurrent
+// kernel still operates on [sequence, batch, features]; transpose_op keeps
+// gradients connected to the caller's layout.
+pub fn (l &GRULayer[T]) forward_batch_first(input &autograd.Variable[T]) !&autograd.Variable[T] {
+	sequence_first := input.transpose_op([1, 0, 2])!
+	output := l.forward(sequence_first)!
+	return output.transpose_op([1, 0, 2])
+}
+
+// forward_batch_first_with_state is the batch-first counterpart of
+// forward_with_state. h0 and the final hidden state keep shape [batch, hidden].
+pub fn (l &GRULayer[T]) forward_batch_first_with_state(input &autograd.Variable[T],
+	h0 &autograd.Variable[T]) !(&autograd.Variable[T], &autograd.Variable[T]) {
+	sequence_first := input.transpose_op([1, 0, 2])!
+	output, final_state := l.forward_with_state(sequence_first, h0)!
+	return output.transpose_op([1, 0, 2])!, final_state
+}
+
 fn gru_layer_output_shape_dispatch[T](layer voidptr) []int {
 	return unsafe { (&GRULayer[T](layer)).output_shape() }
 }
