@@ -156,13 +156,13 @@
 <td>Binary cross entropy from logits, using a sigmoid internally.</td></tr>
 <tr>
 <td><code>cross_entropy_loss</code></td>
-<td><code>-sum(y * log_softmax(logits))</code>; raw logits with one-hot targets or class indices.</td></tr>
+<td><code>-sum(y * log_softmax(logits))</code>; raw logits with one-hot/soft targets.</td></tr>
 <tr>
 <td><code>softmax_cross_entropy_loss</code></td>
 <td>Multiclass cross entropy with softmax over logits and one-hot targets.</td></tr>
 <tr>
 <td><code>nll_loss</code></td>
-<td>Negative log likelihood from log probabilities after log-softmax; target is one-hot.</td></tr>
+<td>Negative log likelihood from log probabilities after log-softmax; accepts class indices or one-hot/soft targets and optional per-class weights.</td></tr>
 <tr>
 <td><code>kl_div_loss</code></td>
 <td><code>sum(P * log(P / Q))</code>; input is <code>log(Q)</code> and target is probability distribution <code>P</code>.</td></tr>
@@ -170,6 +170,14 @@
 <td><code>huber_loss</code></td>
 <td><code>0.5 d^2</code> when <code>|d| &lt;= delta</code>, otherwise <code>delta (|d| - 0.5 delta)</code>, averaged.</td></tr></tbody></table>
 <p>Constructor signatures and reduction behavior are defined in the corresponding source files. In particular, binary cross entropy's <code>from_logits</code> setting and the expected representation for multiclass losses must match the model output.</p>
+<p><code>cross_entropy_loss_with_options</code> supports optional class weights, <code>ignore_index</code>, <code>label_smoothing</code> in <code>[0, 1]</code>, and <code>none</code>, <code>mean</code>, or <code>sum</code> reductions. Use <code>cross_entropy_loss_indices</code> for <code>Tensor[int]</code> targets; it accepts a scalar target with logits shaped <code>[C]</code> or targets shaped <code>[N, ...]</code> with logits shaped <code>[N, C, ...]</code>. The generic <code>cross_entropy_loss</code> also accepts same-type integer-valued class-index targets and one-hot/soft targets matching the logits. For <code>mean</code>, weighted class-index targets divide by the sum of their non-ignored class weights; probability targets divide by the number of samples.</p>
+<p><code>nll_loss(weight)</code> uses mean reduction by default. Use <code>nll_loss_with_options</code> to select sum or per-sample reduction, or ignore a class-index target, while keeping the weight tensor optional:</p>
+<pre><code class="language-v">objective <span class="token operator">:=</span> loss<span class="token punctuation">.</span>nll_loss_with_options<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">(</span>class_weights<span class="token punctuation">,</span>
+    ignore_index<span class="token punctuation">:</span> <span class="token operator">-</span><span class="token number">100</span><span class="token punctuation">,</span>
+    reduction<span class="token punctuation">:</span> <span class="token string">'sum'</span><span class="token punctuation">,</span>
+<span class="token punctuation">)</span></code></pre>
+<p>Use <code>nll_loss_indices</code> when class indices are stored in <code>Tensor[int]</code>; the regular <code>nll_loss</code> accepts a target tensor with the same element type as input. Both accept unbatched log-probabilities with shape <code>[C]</code> and a scalar class-index target, or batched log-probabilities with shape <code>[N, C, ...]</code> and class-index targets with shape <code>[N, ...]</code>.</p>
+<p>NLL <code>none</code> reduction returns one loss per target position (a scalar for an unbatched input). <code>mean</code> reduction divides by the total target weight when class weights are provided, and otherwise averages over non-ignored class-index targets. Matrix targets are an extra VTL extension; their weighted mean divides by the number of target positions.</p>
 <pre><code class="language-v"><span class="token keyword">import</span> vtl<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>loss
 
 objective <span class="token operator">:=</span> loss<span class="token punctuation">.</span>mse_loss<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
@@ -188,7 +196,7 @@ loss_value<span class="token punctuation">.</span><span class="token function">b
 </section>
 
 		<section id="cross_entropy_loss" class="doc-node">
-			<div class="title"><h2>fn cross_entropy_loss <a href="#cross_entropy_loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/cross_entropy.v#L20"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn cross_entropy_loss <a href="#cross_entropy_loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/cross_entropy.v#L28"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> cross_entropy_loss<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span> types<span class="token punctuation">.</span>Loss<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>cross_entropy_loss exposes this operation as part of the public API.</p>
@@ -196,10 +204,34 @@ loss_value<span class="token punctuation">.</span><span class="token function">b
 </section>
 
 		<section id="cross_entropy_loss_gate" class="doc-node">
-			<div class="title"><h2>fn cross_entropy_loss_gate <a href="#cross_entropy_loss_gate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/cross_entropy.v#L53"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn cross_entropy_loss_gate <a href="#cross_entropy_loss_gate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/cross_entropy.v#L103"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> cross_entropy_loss_gate<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>CrossEntropyLossGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>cross_entropy_loss_gate exposes this operation as part of the public API.</p>
+
+</section>
+
+		<section id="cross_entropy_loss_gate_with_options" class="doc-node">
+			<div class="title"><h2>fn cross_entropy_loss_gate_with_options <a href="#cross_entropy_loss_gate_with_options">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/cross_entropy.v#L108"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> cross_entropy_loss_gate_with_options<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> weight <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> ignore_index <span class="token builtin">int</span><span class="token punctuation">,</span> reduction <span class="token builtin">string</span><span class="token punctuation">,</span> label_smoothing <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>CrossEntropyLossGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>cross_entropy_loss_gate_with_options creates the configured backward gate.</p>
+
+</section>
+
+		<section id="cross_entropy_loss_indices" class="doc-node">
+			<div class="title"><h2>fn cross_entropy_loss_indices <a href="#cross_entropy_loss_indices">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/cross_entropy.v#L49"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> cross_entropy_loss_indices<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>weight <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> options CrossEntropyLossOptions<span class="token punctuation">)</span> CrossEntropyIndexLoss<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>cross_entropy_loss_indices creates an objective that accepts Tensor[int] targets.</p>
+
+</section>
+
+		<section id="cross_entropy_loss_with_options" class="doc-node">
+			<div class="title"><h2>fn cross_entropy_loss_with_options <a href="#cross_entropy_loss_with_options">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/cross_entropy.v#L33"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> cross_entropy_loss_with_options<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>weight <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> options CrossEntropyLossOptions<span class="token punctuation">)</span> types<span class="token punctuation">.</span>Loss<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>cross_entropy_loss_with_options creates a weighted cross-entropy objective.</p>
 
 </section>
 
@@ -252,11 +284,27 @@ loss_value<span class="token punctuation">.</span><span class="token function">b
 </section>
 
 		<section id="nll_loss" class="doc-node">
-			<div class="title"><h2>fn nll_loss <a href="#nll_loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/nll.v#L38"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn nll_loss <a href="#nll_loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/nll.v#L52"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> nll_loss<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>weight <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> types<span class="token punctuation">.</span>Loss<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>nll_loss creates a new NLLLoss instance.</p>
 <p><code>weight</code> — optional per-class weight tensor; pass <code>unsafe { nil }</code> for uniform weights.</p>
+
+</section>
+
+		<section id="nll_loss_indices" class="doc-node">
+			<div class="title"><h2>fn nll_loss_indices <a href="#nll_loss_indices">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/nll.v#L69"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> nll_loss_indices<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>weight <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> options NLLLossOptions<span class="token punctuation">)</span> NLLIndexLoss<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>nll_loss_indices creates an NLL loss that accepts integer class-index targets.</p>
+
+</section>
+
+		<section id="nll_loss_with_options" class="doc-node">
+			<div class="title"><h2>fn nll_loss_with_options <a href="#nll_loss_with_options">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/nll.v#L59"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> nll_loss_with_options<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>weight <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> options NLLLossOptions<span class="token punctuation">)</span> types<span class="token punctuation">.</span>Loss<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>nll_loss_with_options creates an NLLLoss with a configurable ignore index and scalar (<code>mean</code> or <code>sum</code>) or per-sample (<code>none</code>) reduction. <code>ignore_index</code> applies to class-index targets.</p>
 
 </section>
 
@@ -284,8 +332,16 @@ loss_value<span class="token punctuation">.</span><span class="token function">b
 
 </section>
 
+		<section id="CrossEntropyIndexLoss[T].loss" class="doc-node">
+			<div class="title"><h2>fn (CrossEntropyIndexLoss[T]) loss <a href="#CrossEntropyIndexLoss[T].loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/cross_entropy.v#L75"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>l <span class="token operator">&amp;</span>CrossEntropyIndexLoss<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">loss</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>loss computes CrossEntropyLoss from integer class-index targets.</p>
+
+</section>
+
 		<section id="CrossEntropyLossGate[T].backward" class="doc-node">
-			<div class="title"><h2>fn (CrossEntropyLossGate[T]) backward <a href="#CrossEntropyLossGate[T].backward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/cross_entropy.v#L60"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (CrossEntropyLossGate[T]) backward <a href="#CrossEntropyLossGate[T].backward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/cross_entropy.v#L120"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&amp;</span>CrossEntropyLossGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">backward</span><span class="token punctuation">(</span>payload <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Payload<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>backward exposes this operation as part of the public API.</p>
@@ -293,7 +349,7 @@ loss_value<span class="token punctuation">.</span><span class="token function">b
 </section>
 
 		<section id="CrossEntropyLossGate[T].cache" class="doc-node">
-			<div class="title"><h2>fn (CrossEntropyLossGate[T]) cache <a href="#CrossEntropyLossGate[T].cache">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/cross_entropy.v#L73"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (CrossEntropyLossGate[T]) cache <a href="#CrossEntropyLossGate[T].cache">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/cross_entropy.v#L134"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&amp;</span>CrossEntropyLossGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">cache</span><span class="token punctuation">(</span><span class="token keyword">mut</span> result autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> args <span class="token punctuation">...</span>autograd<span class="token punctuation">.</span>CacheParam<span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
 <p>cache exposes this operation as part of the public API.</p>
@@ -301,9 +357,9 @@ loss_value<span class="token punctuation">.</span><span class="token function">b
 </section>
 
 		<section id="CrossEntropyLoss[T].loss" class="doc-node">
-			<div class="title"><h2>fn (CrossEntropyLoss[T]) loss <a href="#CrossEntropyLoss[T].loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/cross_entropy.v#L28"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (CrossEntropyLoss[T]) loss <a href="#CrossEntropyLoss[T].loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/cross_entropy.v#L61"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>_ <span class="token operator">&amp;</span>CrossEntropyLoss<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">loss</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>l <span class="token operator">&amp;</span>CrossEntropyLoss<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">loss</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>loss exposes this operation as part of the public API.</p>
 
 </section>
@@ -356,10 +412,18 @@ loss_value<span class="token punctuation">.</span><span class="token function">b
 
 </section>
 
-		<section id="NLLLoss[T].loss" class="doc-node">
-			<div class="title"><h2>fn (NLLLoss[T]) loss <a href="#NLLLoss[T].loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/nll.v#L47"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+		<section id="NLLIndexLoss[T].loss" class="doc-node">
+			<div class="title"><h2>fn (NLLIndexLoss[T]) loss <a href="#NLLIndexLoss[T].loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/nll.v#L80"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>_ <span class="token operator">&amp;</span>NLLLoss<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">loss</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>l <span class="token operator">&amp;</span>NLLIndexLoss<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">loss</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>loss computes NLL from an integer class-index target tensor.</p>
+
+</section>
+
+		<section id="NLLLoss[T].loss" class="doc-node">
+			<div class="title"><h2>fn (NLLLoss[T]) loss <a href="#NLLLoss[T].loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/nll.v#L90"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>l <span class="token operator">&amp;</span>NLLLoss<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">loss</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>loss exposes this operation as part of the public API.</p>
 
 </section>
@@ -388,8 +452,8 @@ loss_value<span class="token punctuation">.</span><span class="token function">b
 <span class="token punctuation">}</span></code></pre>
 <p>BCELoss computes Binary Cross-Entropy loss per element and returns the mean.</p>
 <p>Formula (when <code>from_logits = false</code>): <code>L = -mean(y·log(p) + (1-y)·log(1-p))</code></p>
-<p>When <code>from_logits = true</code> (default), a sigmoid is applied to <code>input</code> first, which is numerically more stable than computing sigmoid outside the loss.</p>
-<p>Shape: <code>input</code> and <code>target</code> are both <code>[batch, ...]</code> with values in (0, 1) for target.</p>
+<p>When <code>from_logits = true</code> (default), the stable logits form is used directly without materializing sigmoid probabilities.</p>
+<p>Shape: <code>input</code> and <code>target</code> are both <code>[batch, ...]</code>; target values are in [0, 1].</p>
 
 <section class="doc-node examples"><h4>Example</h4>
 <pre>
@@ -410,27 +474,57 @@ out <span class="token operator">:=</span> l<span class="token punctuation">.</s
 
 </section>
 
+		<section id="CrossEntropyIndexLoss" class="doc-node">
+			<div class="title"><h2>struct CrossEntropyIndexLoss <a href="#CrossEntropyIndexLoss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/cross_entropy.v#L44"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> CrossEntropyIndexLoss<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	inner <span class="token operator">&amp;</span>CrossEntropyLoss<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<p>CrossEntropyIndexLoss adapts integer class-index targets to CrossEntropyLoss.</p>
+
+</section>
+
 		<section id="CrossEntropyLoss" class="doc-node">
-			<div class="title"><h2>struct CrossEntropyLoss <a href="#CrossEntropyLoss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/cross_entropy.v#L12"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>struct CrossEntropyLoss <a href="#CrossEntropyLoss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/cross_entropy.v#L10"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">struct</span> CrossEntropyLoss<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
 	weight       <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
-	ignore_index <span class="token builtin">int</span>            <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span>
+	ignore_index <span class="token builtin">int</span>            <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">100</span>
 	reduction    <span class="token builtin">string</span>         <span class="token operator">=</span> <span class="token string">'mean'</span> <span class="token comment">// 'mean' | 'sum' | 'none'</span>
+	label_smoothing <span class="token builtin">f64</span>
 <span class="token punctuation">}</span></code></pre>
-<p>CrossEntropyLoss combines LogSoftmax + NLLLoss in one forward pass. This is more numerically stable than applying softmax then log separately. input: [batch_size, n_classes] raw logits target: [batch_size, n_classes] one-hot targets OR [batch_size] class indices</p>
+<p>CrossEntropyLoss combines LogSoftmax + NLLLoss for unbatched, batched, and spatial logits. Reduction, class weights, and ignored indices match PyTorch.</p>
 
 </section>
 
 		<section id="CrossEntropyLossGate" class="doc-node">
-			<div class="title"><h2>struct CrossEntropyLossGate <a href="#CrossEntropyLossGate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/cross_entropy.v#L47"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>struct CrossEntropyLossGate <a href="#CrossEntropyLossGate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/cross_entropy.v#L92"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">struct</span> CrossEntropyLossGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
-	target <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	input        <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	target       <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	weight       <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	ignore_index <span class="token builtin">int</span>            <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">100</span>
+	reduction    <span class="token builtin">string</span>         <span class="token operator">=</span> <span class="token string">'mean'</span>
+	label_smoothing <span class="token builtin">f64</span>
 <span class="token punctuation">}</span></code></pre>
 <p>CrossEntropyLossGate defines a public data structure for this module.</p>
+
+</section>
+
+		<section id="CrossEntropyLossOptions" class="doc-node">
+			<div class="title"><h2>struct CrossEntropyLossOptions <a href="#CrossEntropyLossOptions">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/cross_entropy.v#L20"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[params]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> CrossEntropyLossOptions <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	ignore_index   <span class="token builtin">int</span>    <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">100</span>
+	reduction      <span class="token builtin">string</span> <span class="token operator">=</span> <span class="token string">'mean'</span>
+	label_smoothing <span class="token builtin">f64</span>
+<span class="token punctuation">}</span></code></pre>
+<p>CrossEntropyLossOptions configures ignored class indices, reduction, and smoothing.</p>
 
 </section>
 
@@ -539,8 +633,18 @@ out  <span class="token operator">:=</span> l<span class="token punctuation">.</
 </section>
 </section>
 
+		<section id="NLLIndexLoss" class="doc-node">
+			<div class="title"><h2>struct NLLIndexLoss <a href="#NLLIndexLoss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/nll.v#L37"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> NLLIndexLoss<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	inner <span class="token operator">&amp;</span>NLLLoss<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<p>NLLIndexLoss adapts integer class-index targets to the generic NLL loss API.</p>
+
+</section>
+
 		<section id="NLLLoss" class="doc-node">
-			<div class="title"><h2>struct NLLLoss <a href="#NLLLoss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/nll.v#L28"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>struct NLLLoss <a href="#NLLLoss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/nll.v#L29"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">struct</span> NLLLoss<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
@@ -550,11 +654,11 @@ out  <span class="token operator">:=</span> l<span class="token punctuation">.</
 <span class="token punctuation">}</span></code></pre>
 <p>NLLLoss computes the Negative Log Likelihood loss.</p>
 <p>Intended to be used after a log-softmax layer for multi-class classification.</p>
-<p>Input shape:  <code>[batch, n_classes]</code> — log-probabilities (log-softmax output) Target shape: <code>[batch, n_classes]</code> — one-hot class labels</p>
+<p>Input shape: <code>[n_classes]</code> or <code>[batch, n_classes, ...]</code> — log-probabilities (log-softmax output). Unbatched class-index targets are scalar; batched targets omit the class axis or match the input shape for one-hot/soft labels.</p>
 <p>Fields:- <code>weight</code>       — optional per-class weight tensor (<code>nil</code> = uniform weights)</p>
 <ul>
-<li><code>ignore_index</code> — class index to ignore in the loss computation (default: -1 = none)</li>
-<li><code>reduction</code>    — <code>'mean'</code> | <code>'sum'</code> | <code>'none'</code> (default: <code>'mean'</code>)</li></ul>
+<li><code>ignore_index</code> — class index to ignore in class-index targets (default: -1 = none)</li>
+<li><code>reduction</code>    — <code>'none'</code> | <code>'mean'</code> | <code>'sum'</code> (default: <code>'mean'</code>)</li></ul>
 
 <section class="doc-node examples"><h4>Example</h4>
 <pre>
@@ -563,6 +667,19 @@ l <span class="token operator">:=</span> loss<span class="token punctuation">.</
 log_probs <span class="token operator">:=</span> log_softmax_output  <span class="token comment">// shape [batch, n_classes]</span>
 out <span class="token operator">:=</span> l<span class="token punctuation">.</span><span class="token function">loss</span><span class="token punctuation">(</span>log_probs<span class="token punctuation">,</span> one_hot_target<span class="token punctuation">)</span><span class="token operator">!</span></code></pre>
 </section>
+</section>
+
+		<section id="NLLLossOptions" class="doc-node">
+			<div class="title"><h2>struct NLLLossOptions <a href="#NLLLossOptions">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/nll.v#L43"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[params]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> NLLLossOptions <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	ignore_index <span class="token builtin">int</span>    <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span>
+	reduction    <span class="token builtin">string</span> <span class="token operator">=</span> <span class="token string">'mean'</span>
+<span class="token punctuation">}</span></code></pre>
+<p>NLLLossOptions configures ignored class indices and scalar reduction.</p>
+
 </section>
 
 		<section id="SigmoidCrossEntropyLoss" class="doc-node">
@@ -582,7 +699,7 @@ out <span class="token operator">:=</span> l<span class="token punctuation">.</s
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 8 Oct 2026 15:02:27</div>
+						<div class="footer">Powered by vdoc. Generated on: 12 Oct 2026 22:21:53</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_loss">README</a></li>
 <li class="open"><a href="#bce_loss">fn bce_loss</a>        <ul>
@@ -592,6 +709,15 @@ out <span class="token operator">:=</span> l<span class="token punctuation">.</s
 </ul>
 </li>
 <li class="open"><a href="#cross_entropy_loss_gate">fn cross_entropy_loss_gate</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#cross_entropy_loss_gate_with_options">fn cross_entropy_loss_gate_with_options</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#cross_entropy_loss_indices">fn cross_entropy_loss_indices</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#cross_entropy_loss_with_options">fn cross_entropy_loss_with_options</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#focal_loss">fn focal_loss</a>        <ul>
@@ -615,6 +741,12 @@ out <span class="token operator">:=</span> l<span class="token punctuation">.</s
 <li class="open"><a href="#nll_loss">fn nll_loss</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#nll_loss_indices">fn nll_loss_indices</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#nll_loss_with_options">fn nll_loss_with_options</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#sigmoid_cross_entropy_loss">fn sigmoid_cross_entropy_loss</a>        <ul>
 </ul>
 </li>
@@ -623,6 +755,10 @@ out <span class="token operator">:=</span> l<span class="token punctuation">.</s
 </li>
 <li class="open"><a href="#BCELoss[T].loss">type BCELoss[T]</a>        <ul>
 <li><a href="#BCELoss[T].loss">fn loss</a></li>
+</ul>
+</li>
+<li class="open"><a href="#CrossEntropyIndexLoss[T].loss">type CrossEntropyIndexLoss[T]</a>        <ul>
+<li><a href="#CrossEntropyIndexLoss[T].loss">fn loss</a></li>
 </ul>
 </li>
 <li class="open"><a href="#CrossEntropyLossGate[T].backward">type CrossEntropyLossGate[T]</a>        <ul>
@@ -658,6 +794,10 @@ out <span class="token operator">:=</span> l<span class="token punctuation">.</s
 <li><a href="#MSELoss[T].loss">fn loss</a></li>
 </ul>
 </li>
+<li class="open"><a href="#NLLIndexLoss[T].loss">type NLLIndexLoss[T]</a>        <ul>
+<li><a href="#NLLIndexLoss[T].loss">fn loss</a></li>
+</ul>
+</li>
 <li class="open"><a href="#NLLLoss[T].loss">type NLLLoss[T]</a>        <ul>
 <li><a href="#NLLLoss[T].loss">fn loss</a></li>
 </ul>
@@ -676,10 +816,16 @@ out <span class="token operator">:=</span> l<span class="token punctuation">.</s
 <li class="open"><a href="#BCELossConfig">struct BCELossConfig</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#CrossEntropyIndexLoss">struct CrossEntropyIndexLoss</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#CrossEntropyLoss">struct CrossEntropyLoss</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#CrossEntropyLossGate">struct CrossEntropyLossGate</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#CrossEntropyLossOptions">struct CrossEntropyLossOptions</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#FocalLoss">struct FocalLoss</a>        <ul>
@@ -706,7 +852,13 @@ out <span class="token operator">:=</span> l<span class="token punctuation">.</s
 <li class="open"><a href="#MSELoss">struct MSELoss</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#NLLIndexLoss">struct NLLIndexLoss</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#NLLLoss">struct NLLLoss</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#NLLLossOptions">struct NLLLossOptions</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#SigmoidCrossEntropyLoss">struct SigmoidCrossEntropyLoss</a>        <ul>

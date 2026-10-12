@@ -149,7 +149,7 @@
 <p>[![Mentioned in Awesome V][awesomevbadge]][awesomevurl] [![CI][workflowbadge]][workflowurl] [![Docs][docsbadge]][docsurl] [![Full ML][fullmlbadge]][fullmlurl] [![Benchmarks][benchmarksbadge]][benchmarksurl] [![License: MIT][licensebadge]][licenseurl] ![VSL Backed][vslbackedbadge] ![CUDA Optional][cudaoptionalbadge] ![Vulkan f32][vulkanbadge]</p>
 <p><strong>VTL</strong> is a pure-<a href="https://vlang.io">V</a> tensor library for numerical computing and machine learning — n-dimensional arrays, autograd, linear algebra via <a href="https://github.com/vlang/vsl">VSL</a>, and a full neural network module.</p>
 <p>Train small neural networks, experiment with autograd, and use VSL-backed CPU, CUDA, and Vulkan compute paths from one V-native API.</p>
-<p><a href="https://vlang.io">vlang.io</a> | <a href="https://vlang.github.io/vtl">Docs</a> | <a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL.md">Tutorials</a> | <a href="https://github.com/vlang/vtl/blob/master/docs/ML_ROADMAP.md">ML Roadmap</a> | <a href="https://github.com/vlang/vtl/blob/master/CONTRIBUTING.md">Contributing</a> | <a href="https://github.com/vlang/vsl">VSL</a></p></div>
+<p><a href="https://vlang.io">vlang.io</a> | <a href="https://vlang.github.io/vtl">Docs</a> | <a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL.md">Tutorials</a> | <a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_HISTOGRAMS.md">Histograms</a> | <a href="https://github.com/vlang/vtl/blob/master/docs/PYTORCH_PARITY.md">PyTorch parity</a> | <a href="https://github.com/vlang/vtl/blob/master/docs/BURN_PARITY.md">Burn comparison</a> | <a href="https://github.com/vlang/vtl/blob/master/docs/ML_ROADMAP.md">ML Roadmap</a> | <a href="https://github.com/vlang/vtl/blob/master/CONTRIBUTING.md">Contributing</a> | <a href="https://github.com/vlang/vsl">VSL</a></p></div>
 
 <p><a href="docs/README.md"> &lt;imgsrc="static/vtl-feature-banner.svg"alt="VTL tensors, autograd, numerical computing, and CPU and GPU training paths"width="100%"</p>
 <blockquote></blockquote></a>
@@ -163,11 +163,11 @@ t<span class="token punctuation">.</span><span class="token function">get</span>
 <span class="token comment">// 4.0</span></code></pre>
 <h2 id="features">Features</h2>
 <ul>
-<li><strong>Tensors</strong> — create, slice, indexed <code>take</code>/<code>take_nd</code>/<code>take_flat</code>, <code>choose</code>, <code>compress</code>, <code>indices</code>, <code>pad</code>, set membership, reshape, transpose, move/roll axes, N-D diagonal views, NumPy-style Kronecker products, broadcast, map/reduce, <code>einsum</code>, and <code>complex128</code> storage with elementwise and matrix products</li>
+<li><strong>Tensors</strong> — create, slice, indexed <code>take</code>/<code>take_nd</code>/<code>take_flat</code>/<code>put</code>, <code>choose</code>/<code>select</code>, <code>round_decimals</code>, <code>nan_to_num</code>, <code>compress</code>, <code>indices</code>, <code>pad</code>, set membership, reshape, transpose, move/roll axes, N-D diagonal views, NumPy-style Kronecker products, broadcast, map/reduce, <code>einsum</code>, and <code>complex128</code> storage with elementwise and matrix products</li>
 <li><strong>Autograd</strong> — reverse-mode AD; arbitrary computational graphs</li>
 <li><strong>Neural networks</strong> — <code>Sequential</code> API; Linear, Conv2D, LSTM, Attention, …</li>
 <li><strong>Losses &amp; optimizers</strong> — MSE, MAE, BCE, Hinge, Focal, CrossEntropy, Huber; Adam, AdamW, NAdam, RAdam, SGD, …</li>
-<li><strong>Linear algebra</strong> — VSL-backed real matmul, pure-V complex128 matmul, solve, QR, LU, Cholesky, SVD, pinv</li>
+<li><strong>Linear algebra</strong> — VSL-backed real matmul and general eigensolvers, pure-V complex128 matmul, solve, QR, LU, Cholesky, SVD, pinv</li>
 <li><strong>Hardware</strong> — zero-copy <code>Tensor.data</code> for C libs; optional CUDA and Vulkan training paths</li></ul>
 <h2 id="ml-release-highlights">ML Release Highlights</h2>
 <p>The ML beta scope is the high-level VTL API: tensors, autograd, layers, losses, optimizers, datasets, and CPU training. CUDA and Vulkan paths are available for opt-in validation and early adopters, but remain experimental backend accelerators rather than stable user contracts.</p>
@@ -317,7 +317,11 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 <p>Follow <a href="https://github.com/vlang/vsl#install-vsl-locally">VSL install instructions</a>, then:</p>
 <pre><code class="language-sh">v install vtl</code></pre>
 <h2 id="testing">Testing</h2>
-<pre><code class="language-sh">systemd<span class="token operator">-</span>run <span class="token operator">--</span>user <span class="token operator">--</span>scope <span class="token operator">--</span>quiet <span class="token operator">--</span>property<span class="token operator">=</span>MemoryMax<span class="token operator">=</span><span class="token number">768M</span> <span class="token operator">--</span>property<span class="token operator">=</span>MemorySwapMax<span class="token operator">=</span><span class="token number">0</span> <span class="token operator">--</span>setenv<span class="token operator">=</span>VJOBS<span class="token operator">=</span><span class="token number">2</span> <span class="token operator">--</span> v test <span class="token punctuation">.</span><span class="token operator">/</span>vtl</code></pre>
+<pre><code class="language-sh"><span class="token punctuation"># Run the full scoped suite from ~/.vmodules; compiler parallelism is disabled</span>
+<span class="token punctuation"># to keep the local memory ceiling predictable.</span>
+cd <span class="token operator">~</span><span class="token operator">/</span><span class="token enum_value">.</span><span class="token enum_value">vmodules</span>
+systemd<span class="token operator">-</span>run <span class="token operator">--</span>user <span class="token operator">--</span>scope <span class="token operator">--</span>property<span class="token operator">=</span>MemoryMax<span class="token operator">=</span><span class="token number">4G</span> <span class="token operator">--</span>property<span class="token operator">=</span>MemorySwapMax<span class="token operator">=</span><span class="token number">0</span> <span class="token punctuation">\</span>
+    env VJOBS<span class="token operator">=</span><span class="token number">2</span> VTL_NO_PARALLEL<span class="token operator">=</span><span class="token number">1</span> <span class="token punctuation">.</span><span class="token operator">/</span>vtl<span class="token operator">/</span>bin<span class="token operator">/</span>test</code></pre>
 <p>See <a href="https://github.com/vlang/vtl/blob/master/docs/DEV_LIGHTWEIGHT.md">DEV_LIGHTWEIGHT.md</a> for memory-safe subsets in CI.</p>
 <h2 id="documentation">Documentation</h2>
 <h3 id="start-here">Start Here</h3>
@@ -395,8 +399,7 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 <td>Slicing and views</td></tr></tbody></table>
 <p>Full index: <a href="https://github.com/vlang/vtl/blob/master/docs/README.md"><code>docs/README.md</code></a>.</p>
 <h2 id="contributors">Contributors</h2>
-<blockquote>
-<p>Originally based on work by<br /><a href="https://github.com/christopherzimmerman">christopherzimmerman</a>.<br />The core was reimplemented while keeping that lineage and inspiration.</p></blockquote>
+<p>VTL's early development was inspired by <code>vnum</code>, part of the Vlang Num group, and the work of <a href="https://github.com/christopherzimmerman">Christopher Zimmerman</a>. The core was reimplemented while keeping that lineage and inspiration. The original <code>vnum</code> work carried a BSD 3-Clause license with attribution to <code>vlang-num contributors</code>; the historical license text is preserved in the <a href="https://github.com/vlang/vtl/blob/32a9a609/LICENSE">VTL repository history</a>. This acknowledgment records that history and does not change VTL's current license, shown below.</p>
 <p><a href="https://github.com/vlang/vtl/contributors"> <img src="https://contrib.rocks/image?repo=vlang/vtl" alt="VTL contributors"/> </a></p>
 <p>Made with <a href="https://contrib.rocks">contributors-img</a>.</p>
 <h2 id="license">License</h2>
@@ -406,7 +409,7 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 8 Oct 2026 15:02:27</div>
+						<div class="footer">Powered by vdoc. Generated on: 12 Oct 2026 22:21:53</div>
 					</div>
 					
 				</div>

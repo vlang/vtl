@@ -153,7 +153,7 @@
 <td>Conv2D, MaxPool2D, Pool2D</td></tr>
 <tr>
 <td>Normalization and regularization</td>
-<td>BatchNorm, LayerNorm, Dropout</td></tr>
+<td>BatchNorm, GroupNorm, LayerNorm, RMSNorm, Dropout</td></tr>
 <tr>
 <td>Recurrent and attention</td>
 <td>GRU, LSTM, multi-head attention, positional encoding</td></tr>
@@ -161,12 +161,29 @@
 <td>Activations</td>
 <td>ReLU, Sigmoid, Tanh, Softmax, Leaky ReLU, ELU, GELU, Swish, Mish, Softplus, SELU, HardSwish</td></tr></tbody></table>
 <p>The common low-level constructor returns a <code>types.Layer[T]</code>:</p>
+<p><code>gru_layer(ctx, input_size, hidden_size)</code> returns this interface and starts each sequence from a zero hidden state. Use <code>new_gru_layer</code> when you need the typed <code>GRULayer[T]</code> API: <code>forward_with_state(input, h0)</code> returns both the full sequence and final hidden state, with autograd support for either output and the initial state. The typed layer also provides <code>forward_batch_first</code> and <code>forward_batch_first_with_state</code> for <code>[batch, sequence, features]</code> input; its hidden states keep shape <code>[batch, hidden_size]</code>.</p>
+<p><code>lstm_layer</code> uses batch-first <code>[batch, sequence, features]</code> inputs and returns the output at every timestep. It supports stacked layers and full CPU BPTT for input and parameters, with gate matrices ordered input, forget, cell, output. Use <code>new_lstm_layer</code> and <code>forward_with_state(input, h0, c0)</code> to provide initial states and receive final hidden and cell states shaped <code>[num_layers, batch, hidden_size]</code>; autograd propagates gradients through each of the three outputs and back to the initial states.</p>
 <pre><code class="language-v"><span class="token keyword">import</span> vtl<span class="token punctuation">.</span>autograd
 <span class="token keyword">import</span> vtl<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>layers
 
 ctx <span class="token operator">:=</span> autograd<span class="token punctuation">.</span>ctx<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 layer <span class="token operator">:=</span> layers<span class="token punctuation">.</span>linear_layer<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span></code></pre>
 <p>Shapes, parameters, and supported input ranks are layer-specific; follow each constructor's source comments and tests. Sequential composition is described in the <a href="https://github.com/vlang/vtl/blob/master/nn/models/README.md">models reference</a>. CUDA and Vulkan paths are conditional and experimental; see the <a href="https://github.com/vlang/vtl/blob/master/docs/DEVICE_MEMORY.md">device notes</a>.</p>
+<h2 id="groupnorm">GroupNorm</h2>
+<p>GroupNorm splits channels into <code>num_groups</code> and normalizes each group independently for every batch item, including trailing spatial dimensions. Its input layout is channel-first (<code>[batch, channels, ...]</code>). The constructor's <code>input_shape</code> excludes batch; with affine enabled (the default), it learns one scale and bias per channel.</p>
+<pre><code class="language-v"><span class="token keyword">import</span> vtl<span class="token punctuation">.</span>autograd
+<span class="token keyword">import</span> vtl<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>layers
+
+ctx <span class="token operator">:=</span> autograd<span class="token punctuation">.</span>ctx<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+norm <span class="token operator">:=</span> layers<span class="token punctuation">.</span>group_norm_layer<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">8</span><span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">,</span> <span class="token number">16</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span> layers<span class="token punctuation">.</span>GroupNormConfig<span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span></code></pre>
+<p><code>num_groups</code> must be positive and divide the channel count. GroupNorm uses current input statistics in both training and evaluation, so it has no running statistics state.</p>
+<h2 id="rmsnorm">RMSNorm</h2>
+<p>RMSNorm divides each trailing <code>normalized_shape</code> block by its root mean square, then applies a learnable per-element weight when <code>elementwise_affine</code> is true. Unlike LayerNorm, it does not subtract the mean or learn a bias. If <code>eps</code> is omitted, VTL uses the machine epsilon for <code>f32</code> or <code>f64</code> computations, matching PyTorch's default for these dtypes. See the <a href="https://docs.pytorch.org/docs/2.14/generated/torch.nn.RMSNorm.html">PyTorch RMSNorm reference</a> for the formula and public API.</p>
+<pre><code class="language-v"><span class="token keyword">import</span> vtl<span class="token punctuation">.</span>autograd
+<span class="token keyword">import</span> vtl<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>layers
+
+ctx <span class="token operator">:=</span> autograd<span class="token punctuation">.</span>ctx<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+norm <span class="token operator">:=</span> layers<span class="token punctuation">.</span>rms_norm_layer<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">128</span><span class="token punctuation">]</span><span class="token punctuation">,</span> layers<span class="token punctuation">.</span>RMSNormConfig<span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span></code></pre>
 
 </section>
 
@@ -195,10 +212,18 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="batchnorm1d_gate" class="doc-node">
-			<div class="title"><h2>fn batchnorm1d_gate <a href="#batchnorm1d_gate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/batchnorm.v#L121"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn batchnorm1d_gate <a href="#batchnorm1d_gate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/batchnorm.v#L148"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> batchnorm1d_gate<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> gamma <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> beta <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> mean <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> var_ <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> eps <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>BatchNorm1DGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>batchnorm1d_gate exposes this operation as part of the public API.</p>
+
+</section>
+
+		<section id="batchnorm1d_gate_with_mode" class="doc-node">
+			<div class="title"><h2>fn batchnorm1d_gate_with_mode <a href="#batchnorm1d_gate_with_mode">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/batchnorm.v#L153"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> batchnorm1d_gate_with_mode<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> gamma <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> beta <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> mean <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> var_ <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> eps <span class="token builtin">f64</span><span class="token punctuation">,</span> training <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>BatchNorm1DGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>batchnorm1d_gate_with_mode creates the backward gate for train or eval mode.</p>
 
 </section>
 
@@ -254,7 +279,7 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="dropout_layer" class="doc-node">
-			<div class="title"><h2>fn dropout_layer <a href="#dropout_layer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/dropout.v#L24"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn dropout_layer <a href="#dropout_layer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/dropout.v#L25"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> dropout_layer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>ctx <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Context<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> output_shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> data DropoutLayerConfig<span class="token punctuation">)</span> types<span class="token punctuation">.</span>Layer<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>dropout_layer exposes this operation as part of the public API.</p>
@@ -302,7 +327,7 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="global_avgpool2d_gate" class="doc-node">
-			<div class="title"><h2>fn global_avgpool2d_gate <a href="#global_avgpool2d_gate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/pool.v#L181"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn global_avgpool2d_gate <a href="#global_avgpool2d_gate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/pool.v#L180"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> global_avgpool2d_gate<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>GlobalAvgPool2DGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>global_avgpool2d_gate exposes this operation as part of the public API.</p>
@@ -310,10 +335,26 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="global_avgpool2d_layer" class="doc-node">
-			<div class="title"><h2>fn global_avgpool2d_layer <a href="#global_avgpool2d_layer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/pool.v#L132"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn global_avgpool2d_layer <a href="#global_avgpool2d_layer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/pool.v#L131"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> global_avgpool2d_layer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>ctx <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Context<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> types<span class="token punctuation">.</span>Layer<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>global_avgpool2d_layer creates a GlobalAvgPool2DLayer.</p>
+
+</section>
+
+		<section id="group_norm_gate" class="doc-node">
+			<div class="title"><h2>fn group_norm_gate <a href="#group_norm_gate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/group_norm.v#L122"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> group_norm_gate<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> num_groups <span class="token builtin">int</span><span class="token punctuation">,</span> gamma <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> beta <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> eps <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>GroupNormGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>group_norm_gate creates a backward gate for GroupNorm.</p>
+
+</section>
+
+		<section id="group_norm_layer" class="doc-node">
+			<div class="title"><h2>fn group_norm_layer <a href="#group_norm_layer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/group_norm.v#L29"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> group_norm_layer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>ctx <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Context<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> input_shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> num_groups <span class="token builtin">int</span><span class="token punctuation">,</span> config GroupNormConfig<span class="token punctuation">)</span> types<span class="token punctuation">.</span>Layer<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>group_norm_layer creates a GroupNorm layer. input_shape excludes batch and uses channel-first order: [channels, ...spatial dimensions].</p>
 
 </section>
 
@@ -366,10 +407,18 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="layernorm_gate" class="doc-node">
-			<div class="title"><h2>fn layernorm_gate <a href="#layernorm_gate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/layer_norm.v#L99"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn layernorm_gate <a href="#layernorm_gate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/layer_norm.v#L126"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> layernorm_gate<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> gamma <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> beta <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> eps <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>LayerNormGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>layernorm_gate exposes this operation as part of the public API.</p>
+
+</section>
+
+		<section id="layernorm_gate_with_shape" class="doc-node">
+			<div class="title"><h2>fn layernorm_gate_with_shape <a href="#layernorm_gate_with_shape">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/layer_norm.v#L138"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> layernorm_gate_with_shape<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> gamma <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> beta <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> eps <span class="token builtin">f64</span><span class="token punctuation">,</span> normalized_shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>LayerNormGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>layernorm_gate_with_shape creates a backward gate for trailing dimensions.</p>
 
 </section>
 
@@ -415,7 +464,7 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="linear_forward_f64" class="doc-node">
-			<div class="title"><h2>fn linear_forward_f64 <a href="#linear_forward_f64">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/linear_forward_f64.v#L13"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn linear_forward_f64 <a href="#linear_forward_f64">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/linear_forward_f64.v#L14"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token function">linear_forward_f64</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> weights <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> bias <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
 	input_gpu <span class="token builtin">voidptr</span><span class="token punctuation">,</span> session <span class="token builtin">voidptr</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
@@ -474,7 +523,7 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="lstm_layer" class="doc-node">
-			<div class="title"><h2>fn lstm_layer <a href="#lstm_layer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/lstm.v#L28"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn lstm_layer <a href="#lstm_layer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/lstm.v#L34"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> lstm_layer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>ctx <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Context<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> input_size <span class="token builtin">int</span><span class="token punctuation">,</span> hidden_size <span class="token builtin">int</span><span class="token punctuation">,</span> num_layers <span class="token builtin">int</span><span class="token punctuation">)</span> types<span class="token punctuation">.</span>Layer<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>lstm_layer creates an LSTMLayer.</p>
@@ -502,6 +551,22 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 <pre class="signature">
 <code><span class="token keyword">fn</span> multihead_attention_layer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>ctx <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Context<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> embed_dim <span class="token builtin">int</span><span class="token punctuation">,</span> num_heads <span class="token builtin">int</span><span class="token punctuation">)</span> types<span class="token punctuation">.</span>Layer<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>multihead_attention_layer creates a MultiHeadAttentionLayer.</p>
+
+</section>
+
+		<section id="new_gru_layer" class="doc-node">
+			<div class="title"><h2>fn new_gru_layer <a href="#new_gru_layer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/gru.v#L30"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> new_gru_layer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>ctx <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Context<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> input_size <span class="token builtin">int</span><span class="token punctuation">,</span> hidden_size <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>GRULayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>new_gru_layer creates a GRU layer value that exposes forward_with_state. Use gru_layer when composing the layer inside Sequential.</p>
+
+</section>
+
+		<section id="new_lstm_layer" class="doc-node">
+			<div class="title"><h2>fn new_lstm_layer <a href="#new_lstm_layer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/lstm.v#L40"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> new_lstm_layer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>ctx <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Context<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> input_size <span class="token builtin">int</span><span class="token punctuation">,</span> hidden_size <span class="token builtin">int</span><span class="token punctuation">,</span> num_layers <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>LSTMLayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>new_lstm_layer creates an LSTM layer value with explicit state support. Use lstm_layer when composing the layer inside Sequential.</p>
 
 </section>
 
@@ -558,6 +623,22 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 <pre class="signature">
 <code><span class="token keyword">fn</span> relu_layer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>ctx <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Context<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> output_shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> types<span class="token punctuation">.</span>Layer<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>relu_layer exposes this operation as part of the public API.</p>
+
+</section>
+
+		<section id="rms_norm_gate" class="doc-node">
+			<div class="title"><h2>fn rms_norm_gate <a href="#rms_norm_gate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/rms_norm.v#L110"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> rms_norm_gate<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> weight <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> normalized_shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> eps <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>RMSNormGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>rms_norm_gate creates an RMSNorm backward gate.</p>
+
+</section>
+
+		<section id="rms_norm_layer" class="doc-node">
+			<div class="title"><h2>fn rms_norm_layer <a href="#rms_norm_layer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/rms_norm.v#L27"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> rms_norm_layer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>ctx <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Context<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> normalized_shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> config RMSNormConfig<span class="token punctuation">)</span> types<span class="token punctuation">.</span>Layer<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>rms_norm_layer creates an RMSNorm layer. normalized_shape must match the trailing dimensions of each input handled by the layer.</p>
 
 </section>
 
@@ -748,7 +829,7 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="AvgPool2DGate[T].cache" class="doc-node">
-			<div class="title"><h2>fn (AvgPool2DGate[T]) cache <a href="#AvgPool2DGate[T].cache">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/pool.v#L112"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (AvgPool2DGate[T]) cache <a href="#AvgPool2DGate[T].cache">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/pool.v#L113"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&amp;</span>AvgPool2DGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">cache</span><span class="token punctuation">(</span><span class="token keyword">mut</span> result autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> args <span class="token punctuation">...</span>autograd<span class="token punctuation">.</span>CacheParam<span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
 <p>cache exposes this operation as part of the public API.</p>
@@ -756,7 +837,7 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="BatchNorm1DGate[T].backward" class="doc-node">
-			<div class="title"><h2>fn (BatchNorm1DGate[T]) backward <a href="#BatchNorm1DGate[T].backward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/batchnorm.v#L133"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (BatchNorm1DGate[T]) backward <a href="#BatchNorm1DGate[T].backward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/batchnorm.v#L166"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&amp;</span>BatchNorm1DGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">backward</span><span class="token punctuation">(</span>payload <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Payload<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>backward exposes this operation as part of the public API.</p>
@@ -764,7 +845,7 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="BatchNorm1DGate[T].cache" class="doc-node">
-			<div class="title"><h2>fn (BatchNorm1DGate[T]) cache <a href="#BatchNorm1DGate[T].cache">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/batchnorm.v#L145"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (BatchNorm1DGate[T]) cache <a href="#BatchNorm1DGate[T].cache">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/batchnorm.v#L178"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&amp;</span>BatchNorm1DGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">cache</span><span class="token punctuation">(</span><span class="token keyword">mut</span> result autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> args <span class="token punctuation">...</span>autograd<span class="token punctuation">.</span>CacheParam<span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
 <p>cache exposes this operation as part of the public API.</p>
@@ -772,7 +853,7 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="BatchNorm1DLayer[T].output_shape" class="doc-node">
-			<div class="title"><h2>fn (BatchNorm1DLayer[T]) output_shape <a href="#BatchNorm1DLayer[T].output_shape">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/batchnorm.v#L51"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (BatchNorm1DLayer[T]) output_shape <a href="#BatchNorm1DLayer[T].output_shape">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/batchnorm.v#L52"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span>BatchNorm1DLayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">output_shape</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span></code></pre>
 <p>output_shape exposes this operation as part of the public API.</p>
@@ -780,7 +861,7 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="BatchNorm1DLayer[T].variables" class="doc-node">
-			<div class="title"><h2>fn (BatchNorm1DLayer[T]) variables <a href="#BatchNorm1DLayer[T].variables">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/batchnorm.v#L56"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (BatchNorm1DLayer[T]) variables <a href="#BatchNorm1DLayer[T].variables">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/batchnorm.v#L57"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span>BatchNorm1DLayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">variables</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>variables exposes this operation as part of the public API.</p>
@@ -788,10 +869,18 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="BatchNorm1DLayer[T].forward" class="doc-node">
-			<div class="title"><h2>fn (BatchNorm1DLayer[T]) forward <a href="#BatchNorm1DLayer[T].forward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/batchnorm.v#L61"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (BatchNorm1DLayer[T]) forward <a href="#BatchNorm1DLayer[T].forward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/batchnorm.v#L62"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span>BatchNorm1DLayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">forward</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>forward exposes this operation as part of the public API.</p>
+
+</section>
+
+		<section id="BatchNorm1DLayer[T].forward_with_mode" class="doc-node">
+			<div class="title"><h2>fn (BatchNorm1DLayer[T]) forward_with_mode <a href="#BatchNorm1DLayer[T].forward_with_mode">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/batchnorm.v#L68"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span>BatchNorm1DLayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">forward_with_mode</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> training <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>forward_with_mode uses batch statistics and updates running statistics in training mode, and uses the stored running statistics in evaluation mode.</p>
 
 </section>
 
@@ -860,7 +949,7 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="DropoutLayer[T].output_shape" class="doc-node">
-			<div class="title"><h2>fn (DropoutLayer[T]) output_shape <a href="#DropoutLayer[T].output_shape">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/dropout.v#L34"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (DropoutLayer[T]) output_shape <a href="#DropoutLayer[T].output_shape">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/dropout.v#L36"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span>DropoutLayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">output_shape</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span></code></pre>
 <p>output_shape exposes this operation as part of the public API.</p>
@@ -868,7 +957,7 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="DropoutLayer[T].variables" class="doc-node">
-			<div class="title"><h2>fn (DropoutLayer[T]) variables <a href="#DropoutLayer[T].variables">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/dropout.v#L39"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (DropoutLayer[T]) variables <a href="#DropoutLayer[T].variables">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/dropout.v#L41"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>_ <span class="token operator">&amp;</span>DropoutLayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">variables</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>variables exposes this operation as part of the public API.</p>
@@ -876,10 +965,18 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="DropoutLayer[T].forward" class="doc-node">
-			<div class="title"><h2>fn (DropoutLayer[T]) forward <a href="#DropoutLayer[T].forward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/dropout.v#L44"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (DropoutLayer[T]) forward <a href="#DropoutLayer[T].forward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/dropout.v#L46"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span>DropoutLayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">forward</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>forward exposes this operation as part of the public API.</p>
+
+</section>
+
+		<section id="DropoutLayer[T].forward_with_mode" class="doc-node">
+			<div class="title"><h2>fn (DropoutLayer[T]) forward_with_mode <a href="#DropoutLayer[T].forward_with_mode">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/dropout.v#L52"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span>DropoutLayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">forward_with_mode</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> training <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>forward_with_mode applies inverted dropout during training and is an identity operation during evaluation.</p>
 
 </section>
 
@@ -995,8 +1092,33 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 
 </section>
 
+		<section id="GRULayer[T].forward_with_state" class="doc-node">
+			<div class="title"><h2>fn (GRULayer[T]) forward_with_state <a href="#GRULayer[T].forward_with_state">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/gru.v#L83"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>l <span class="token operator">&amp;</span>GRULayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">forward_with_state</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> h0 <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+<p>forward_with_state runs the GRU from an explicit initial hidden state and returns both the per-timestep sequence and final hidden state. Both outputs participate in autograd, including gradients propagated back into h0.</p>
+
+</section>
+
+		<section id="GRULayer[T].forward_batch_first" class="doc-node">
+			<div class="title"><h2>fn (GRULayer[T]) forward_batch_first <a href="#GRULayer[T].forward_batch_first">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/gru.v#L113"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>l <span class="token operator">&amp;</span>GRULayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">forward_batch_first</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>forward_batch_first accepts and returns [batch, sequence, features] tensors, matching the common batch-first recurrent-layer convention. The recurrent kernel still operates on [sequence, batch, features]; transpose_op keeps gradients connected to the caller's layout.</p>
+
+</section>
+
+		<section id="GRULayer[T].forward_batch_first_with_state" class="doc-node">
+			<div class="title"><h2>fn (GRULayer[T]) forward_batch_first_with_state <a href="#GRULayer[T].forward_batch_first_with_state">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/gru.v#L121"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>l <span class="token operator">&amp;</span>GRULayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">forward_batch_first_with_state</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span>
+	h0 <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+<p>forward_batch_first_with_state is the batch-first counterpart of forward_with_state. h0 and the final hidden state keep shape [batch, hidden].</p>
+
+</section>
+
 		<section id="GlobalAvgPool2DGate[T].backward" class="doc-node">
-			<div class="title"><h2>fn (GlobalAvgPool2DGate[T]) backward <a href="#GlobalAvgPool2DGate[T].backward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/pool.v#L188"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (GlobalAvgPool2DGate[T]) backward <a href="#GlobalAvgPool2DGate[T].backward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/pool.v#L187"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&amp;</span>GlobalAvgPool2DGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">backward</span><span class="token punctuation">(</span>payload <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Payload<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>backward exposes this operation as part of the public API.</p>
@@ -1004,7 +1126,7 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="GlobalAvgPool2DGate[T].cache" class="doc-node">
-			<div class="title"><h2>fn (GlobalAvgPool2DGate[T]) cache <a href="#GlobalAvgPool2DGate[T].cache">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/pool.v#L200"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (GlobalAvgPool2DGate[T]) cache <a href="#GlobalAvgPool2DGate[T].cache">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/pool.v#L199"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&amp;</span>GlobalAvgPool2DGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">cache</span><span class="token punctuation">(</span><span class="token keyword">mut</span> result autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> args <span class="token punctuation">...</span>autograd<span class="token punctuation">.</span>CacheParam<span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
 <p>cache exposes this operation as part of the public API.</p>
@@ -1012,7 +1134,7 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="GlobalAvgPool2DLayer[T].output_shape" class="doc-node">
-			<div class="title"><h2>fn (GlobalAvgPool2DLayer[T]) output_shape <a href="#GlobalAvgPool2DLayer[T].output_shape">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/pool.v#L140"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (GlobalAvgPool2DLayer[T]) output_shape <a href="#GlobalAvgPool2DLayer[T].output_shape">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/pool.v#L139"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span>GlobalAvgPool2DLayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">output_shape</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span></code></pre>
 <p>output_shape exposes this operation as part of the public API.</p>
@@ -1020,7 +1142,7 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="GlobalAvgPool2DLayer[T].variables" class="doc-node">
-			<div class="title"><h2>fn (GlobalAvgPool2DLayer[T]) variables <a href="#GlobalAvgPool2DLayer[T].variables">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/pool.v#L145"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (GlobalAvgPool2DLayer[T]) variables <a href="#GlobalAvgPool2DLayer[T].variables">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/pool.v#L144"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span>GlobalAvgPool2DLayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">variables</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>variables exposes this operation as part of the public API.</p>
@@ -1028,10 +1150,50 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="GlobalAvgPool2DLayer[T].forward" class="doc-node">
-			<div class="title"><h2>fn (GlobalAvgPool2DLayer[T]) forward <a href="#GlobalAvgPool2DLayer[T].forward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/pool.v#L150"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (GlobalAvgPool2DLayer[T]) forward <a href="#GlobalAvgPool2DLayer[T].forward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/pool.v#L149"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span>GlobalAvgPool2DLayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">forward</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>forward exposes this operation as part of the public API.</p>
+
+</section>
+
+		<section id="GroupNormGate[T].backward" class="doc-node">
+			<div class="title"><h2>fn (GroupNormGate[T]) backward <a href="#GroupNormGate[T].backward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/group_norm.v#L133"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>gate <span class="token operator">&amp;</span>GroupNormGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">backward</span><span class="token punctuation">(</span>payload <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Payload<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>backward returns input and present affine parameter gradients.</p>
+
+</section>
+
+		<section id="GroupNormGate[T].cache" class="doc-node">
+			<div class="title"><h2>fn (GroupNormGate[T]) cache <a href="#GroupNormGate[T].cache">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/group_norm.v#L145"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>gate <span class="token operator">&amp;</span>GroupNormGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">cache</span><span class="token punctuation">(</span><span class="token keyword">mut</span> result autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> args <span class="token punctuation">...</span>autograd<span class="token punctuation">.</span>CacheParam<span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<p>cache registers this gate with its input and trainable parameters.</p>
+
+</section>
+
+		<section id="GroupNormLayer[T].output_shape" class="doc-node">
+			<div class="title"><h2>fn (GroupNormLayer[T]) output_shape <a href="#GroupNormLayer[T].output_shape">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/group_norm.v#L49"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span>GroupNormLayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">output_shape</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span></code></pre>
+<p>output_shape returns the feature shape, excluding batch.</p>
+
+</section>
+
+		<section id="GroupNormLayer[T].variables" class="doc-node">
+			<div class="title"><h2>fn (GroupNormLayer[T]) variables <a href="#GroupNormLayer[T].variables">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/group_norm.v#L54"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span>GroupNormLayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">variables</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>variables returns affine trainable parameters, if enabled.</p>
+
+</section>
+
+		<section id="GroupNormLayer[T].forward" class="doc-node">
+			<div class="title"><h2>fn (GroupNormLayer[T]) forward <a href="#GroupNormLayer[T].forward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/group_norm.v#L62"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span>GroupNormLayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">forward</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>forward applies GroupNorm and records its backward operation when needed.</p>
 
 </section>
 
@@ -1083,8 +1245,17 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 
 </section>
 
+		<section id="LSTMLayer[T].forward_with_state" class="doc-node">
+			<div class="title"><h2>fn (LSTMLayer[T]) forward_with_state <a href="#LSTMLayer[T].forward_with_state">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/lstm.v#L125"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>l <span class="token operator">&amp;</span>LSTMLayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">forward_with_state</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span>
+	hidden0 <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> cell0 <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+<p>forward_with_state accepts initial hidden and cell states with shape [num_layers, batch, hidden_size], then returns the output sequence and both final states in the same stacked shape.</p>
+
+</section>
+
 		<section id="LayerNormGate[T].backward" class="doc-node">
-			<div class="title"><h2>fn (LayerNormGate[T]) backward <a href="#LayerNormGate[T].backward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/layer_norm.v#L109"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (LayerNormGate[T]) backward <a href="#LayerNormGate[T].backward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/layer_norm.v#L149"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&amp;</span>LayerNormGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">backward</span><span class="token punctuation">(</span>payload <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Payload<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>backward exposes this operation as part of the public API.</p>
@@ -1092,7 +1263,7 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="LayerNormGate[T].cache" class="doc-node">
-			<div class="title"><h2>fn (LayerNormGate[T]) cache <a href="#LayerNormGate[T].cache">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/layer_norm.v#L120"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (LayerNormGate[T]) cache <a href="#LayerNormGate[T].cache">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/layer_norm.v#L161"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>g <span class="token operator">&amp;</span>LayerNormGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">cache</span><span class="token punctuation">(</span><span class="token keyword">mut</span> result autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> args <span class="token punctuation">...</span>autograd<span class="token punctuation">.</span>CacheParam<span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
 <p>cache exposes this operation as part of the public API.</p>
@@ -1116,7 +1287,7 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="LayerNormLayer[T].forward" class="doc-node">
-			<div class="title"><h2>fn (LayerNormLayer[T]) forward <a href="#LayerNormLayer[T].forward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/layer_norm.v#L64"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (LayerNormLayer[T]) forward <a href="#LayerNormLayer[T].forward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/layer_norm.v#L68"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span>LayerNormLayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">forward</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>forward exposes this operation as part of the public API.</p>
@@ -1264,6 +1435,46 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span>PositionalEncodingLayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">forward</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>forward exposes this operation as part of the public API.</p>
+
+</section>
+
+		<section id="RMSNormGate[T].backward" class="doc-node">
+			<div class="title"><h2>fn (RMSNormGate[T]) backward <a href="#RMSNormGate[T].backward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/rms_norm.v#L120"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>gate <span class="token operator">&amp;</span>RMSNormGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">backward</span><span class="token punctuation">(</span>payload <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Payload<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>backward returns input and optional per-element weight gradients.</p>
+
+</section>
+
+		<section id="RMSNormGate[T].cache" class="doc-node">
+			<div class="title"><h2>fn (RMSNormGate[T]) cache <a href="#RMSNormGate[T].cache">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/rms_norm.v#L132"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>gate <span class="token operator">&amp;</span>RMSNormGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">cache</span><span class="token punctuation">(</span><span class="token keyword">mut</span> result autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> args <span class="token punctuation">...</span>autograd<span class="token punctuation">.</span>CacheParam<span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<p>cache registers the RMSNorm gate with its input and optional weight.</p>
+
+</section>
+
+		<section id="RMSNormLayer[T].output_shape" class="doc-node">
+			<div class="title"><h2>fn (RMSNormLayer[T]) output_shape <a href="#RMSNormLayer[T].output_shape">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/rms_norm.v#L51"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span>RMSNormLayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">output_shape</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span></code></pre>
+<p>output_shape returns the normalized feature shape.</p>
+
+</section>
+
+		<section id="RMSNormLayer[T].variables" class="doc-node">
+			<div class="title"><h2>fn (RMSNormLayer[T]) variables <a href="#RMSNormLayer[T].variables">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/rms_norm.v#L56"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span>RMSNormLayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">variables</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>variables returns the learnable weight, when elementwise_affine is enabled.</p>
+
+</section>
+
+		<section id="RMSNormLayer[T].forward" class="doc-node">
+			<div class="title"><h2>fn (RMSNormLayer[T]) forward <a href="#RMSNormLayer[T].forward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/rms_norm.v#L64"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span>RMSNormLayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">forward</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>forward normalizes trailing dimensions and records autograd when requested.</p>
 
 </section>
 
@@ -1502,15 +1713,16 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="BatchNorm1DGate" class="doc-node">
-			<div class="title"><h2>struct BatchNorm1DGate <a href="#BatchNorm1DGate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/batchnorm.v#L111"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>struct BatchNorm1DGate <a href="#BatchNorm1DGate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/batchnorm.v#L137"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">struct</span> BatchNorm1DGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
-	input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
-	gamma <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
-	beta  <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
-	mean  <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
-	var_  <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
-	eps   <span class="token builtin">f64</span>
+	input    <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	gamma    <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	beta     <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	mean     <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	var_     <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	eps      <span class="token builtin">f64</span>
+	training <span class="token builtin">bool</span>
 <span class="token punctuation">}</span></code></pre>
 <p>BatchNorm1DGate defines a public data structure for this module.</p>
 
@@ -1621,7 +1833,7 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="DropoutLayer" class="doc-node">
-			<div class="title"><h2>struct DropoutLayer <a href="#DropoutLayer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/dropout.v#L18"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>struct DropoutLayer <a href="#DropoutLayer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/dropout.v#L19"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">struct</span> DropoutLayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
 	output_shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
@@ -1636,6 +1848,7 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 <div class="attributes"><div class="attribute">@[params]</div></div>
 <pre class="signature">
 <code><span class="token keyword">struct</span> DropoutLayerConfig <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
 	prob <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">0.5</span>
 <span class="token punctuation">}</span></code></pre>
 <p>DropoutLayerConfig defines a public data structure for this module.</p>
@@ -1729,7 +1942,7 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="GlobalAvgPool2DGate" class="doc-node">
-			<div class="title"><h2>struct GlobalAvgPool2DGate <a href="#GlobalAvgPool2DGate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/pool.v#L176"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>struct GlobalAvgPool2DGate <a href="#GlobalAvgPool2DGate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/pool.v#L175"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">struct</span> GlobalAvgPool2DGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
 	input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
@@ -1739,11 +1952,54 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="GlobalAvgPool2DLayer" class="doc-node">
-			<div class="title"><h2>struct GlobalAvgPool2DLayer <a href="#GlobalAvgPool2DLayer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/pool.v#L129"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>struct GlobalAvgPool2DLayer <a href="#GlobalAvgPool2DLayer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/pool.v#L128"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">struct</span> GlobalAvgPool2DLayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span><span class="token punctuation">}</span></code></pre>
 <p>GlobalAvgPool2DLayer applies global average pooling over spatial dimensions.</p>
 <p>Input:    <code>[batch, channels, H, W]</code> Output:   <code>[batch, channels, 1, 1]</code> — one value per channel per sample</p>
+
+</section>
+
+		<section id="GroupNormConfig" class="doc-node">
+			<div class="title"><h2>struct GroupNormConfig <a href="#GroupNormConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/group_norm.v#L10"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[params]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> GroupNormConfig <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	eps    <span class="token builtin">f64</span>  <span class="token operator">=</span> <span class="token number">1e-5</span>
+	affine <span class="token builtin">bool</span> <span class="token operator">=</span> <span class="token boolean">true</span>
+<span class="token punctuation">}</span></code></pre>
+<p>GroupNormConfig controls affine parameters and numerical stability.</p>
+
+</section>
+
+		<section id="GroupNormGate" class="doc-node">
+			<div class="title"><h2>struct GroupNormGate <a href="#GroupNormGate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/group_norm.v#L113"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> GroupNormGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	input      <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	num_groups <span class="token builtin">int</span>
+	gamma      <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	beta       <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	eps        <span class="token builtin">f64</span>
+<span class="token punctuation">}</span></code></pre>
+<p>GroupNormGate stores the tensors needed to compute GroupNorm gradients.</p>
+
+</section>
+
+		<section id="GroupNormLayer" class="doc-node">
+			<div class="title"><h2>struct GroupNormLayer <a href="#GroupNormLayer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/group_norm.v#L17"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> GroupNormLayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	input_shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
+	num_groups  <span class="token builtin">int</span>
+	eps         <span class="token builtin">f64</span>
+<span class="token keyword">pub</span> <span class="token keyword">mut</span><span class="token punctuation">:</span>
+	gamma <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	beta  <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<p>GroupNormLayer normalizes channel groups independently for each sample.</p>
 
 </section>
 
@@ -1769,22 +2025,27 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="LSTMLayer" class="doc-node">
-			<div class="title"><h2>struct LSTMLayer <a href="#LSTMLayer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/lstm.v#L15"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>struct LSTMLayer <a href="#LSTMLayer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/lstm.v#L16"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">struct</span> LSTMLayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span> <span class="token keyword">mut</span><span class="token punctuation">:</span>
-	w_ih <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
-	w_hh <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
-	b_ih <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
-	b_hh <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+	w_ih        <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+	w_hh        <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+	b_ih        <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+	b_hh        <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+	w_ih_layers <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+	w_hh_layers <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+	b_ih_layers <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+	b_hh_layers <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
 	ctx         <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Context<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+	input_size  <span class="token builtin">int</span>
 	hidden_size <span class="token builtin">int</span>
 	num_layers  <span class="token builtin">int</span>
 <span class="token punctuation">}</span></code></pre>
 <p>LSTMLayer implements a Long Short-Term Memory layer.</p>
 <p>Input:  <code>[batch, seq_len, input_size]</code> Output: <code>[batch, seq_len, hidden_size]</code>  (final hidden state per timestep)</p>
-<p>Contains learnable weights <code>w_ih</code>, <code>w_hh</code>, <code>b_ih</code>, <code>b_hh</code> for the input-to-hidden and hidden-to-hidden transformations of the three gates (forget, input, cell).</p>
+<p>Contains learnable weights <code>w_ih</code>, <code>w_hh</code>, <code>b_ih</code>, <code>b_hh</code> for the input-to-hidden and hidden-to-hidden transformations of the four gates (input, forget, cell, output).</p>
 
 </section>
 
@@ -1802,13 +2063,14 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 		<section id="LayerNormGate" class="doc-node">
-			<div class="title"><h2>struct LayerNormGate <a href="#LayerNormGate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/layer_norm.v#L91"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>struct LayerNormGate <a href="#LayerNormGate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/layer_norm.v#L117"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">struct</span> LayerNormGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
-	input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
-	gamma <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
-	beta  <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
-	eps   <span class="token builtin">f64</span>
+	input            <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	gamma            <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	beta             <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	eps              <span class="token builtin">f64</span>
+	normalized_shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
 <span class="token punctuation">}</span></code></pre>
 <p>LayerNormGate defines a public data structure for this module.</p>
 
@@ -1926,6 +2188,46 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 
 </section>
 
+		<section id="RMSNormConfig" class="doc-node">
+			<div class="title"><h2>struct RMSNormConfig <a href="#RMSNormConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/rms_norm.v#L10"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[params]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> RMSNormConfig <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	eps                <span class="token operator">?</span><span class="token builtin">f64</span>
+	elementwise_affine <span class="token builtin">bool</span> <span class="token operator">=</span> <span class="token boolean">true</span>
+<span class="token punctuation">}</span></code></pre>
+<p>RMSNormConfig controls numerical stability and the per-element weight.</p>
+
+</section>
+
+		<section id="RMSNormGate" class="doc-node">
+			<div class="title"><h2>struct RMSNormGate <a href="#RMSNormGate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/rms_norm.v#L102"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> RMSNormGate<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	input            <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	weight           <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	normalized_shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
+	eps              <span class="token builtin">f64</span>
+<span class="token punctuation">}</span></code></pre>
+<p>RMSNormGate retains the input and optional weight for reverse-mode gradients.</p>
+
+</section>
+
+		<section id="RMSNormLayer" class="doc-node">
+			<div class="title"><h2>struct RMSNormLayer <a href="#RMSNormLayer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/rms_norm.v#L17"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> RMSNormLayer<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	normalized_shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
+	eps              <span class="token builtin">f64</span>
+<span class="token keyword">pub</span> <span class="token keyword">mut</span><span class="token punctuation">:</span>
+	weight <span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<p>RMSNormLayer normalizes each trailing block by its root mean square.</p>
+
+</section>
+
 		<section id="ReLULayer" class="doc-node">
 			<div class="title"><h2>struct ReLULayer <a href="#ReLULayer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/relu.v#L10"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -2017,7 +2319,7 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 8 Oct 2026 15:02:27</div>
+						<div class="footer">Powered by vdoc. Generated on: 12 Oct 2026 22:21:53</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_layers">README</a></li>
 <li class="open"><a href="#attention_gate">fn attention_gate</a>        <ul>
@@ -2030,6 +2332,9 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </ul>
 </li>
 <li class="open"><a href="#batchnorm1d_gate">fn batchnorm1d_gate</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#batchnorm1d_gate_with_mode">fn batchnorm1d_gate_with_mode</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#batchnorm1d_layer">fn batchnorm1d_layer</a>        <ul>
@@ -2074,6 +2379,12 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 <li class="open"><a href="#global_avgpool2d_layer">fn global_avgpool2d_layer</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#group_norm_gate">fn group_norm_gate</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#group_norm_layer">fn group_norm_layer</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#gru_layer">fn gru_layer</a>        <ul>
 </ul>
 </li>
@@ -2093,6 +2404,9 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </ul>
 </li>
 <li class="open"><a href="#layernorm_gate">fn layernorm_gate</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#layernorm_gate_with_shape">fn layernorm_gate_with_shape</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#leaky_relu_layer">fn leaky_relu_layer</a>        <ul>
@@ -2143,6 +2457,12 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 <li class="open"><a href="#multihead_attention_layer">fn multihead_attention_layer</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#new_gru_layer">fn new_gru_layer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#new_lstm_layer">fn new_lstm_layer</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#positional_encoding_layer">fn positional_encoding_layer</a>        <ul>
 </ul>
 </li>
@@ -2162,6 +2482,12 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </ul>
 </li>
 <li class="open"><a href="#relu_layer">fn relu_layer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#rms_norm_gate">fn rms_norm_gate</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#rms_norm_layer">fn rms_norm_layer</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#selu_forward_f32">fn selu_forward_f32</a>        <ul>
@@ -2240,6 +2566,7 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 <li><a href="#BatchNorm1DLayer[T].output_shape">fn output_shape</a></li>
 <li><a href="#BatchNorm1DLayer[T].variables">fn variables</a></li>
 <li><a href="#BatchNorm1DLayer[T].forward">fn forward</a></li>
+<li><a href="#BatchNorm1DLayer[T].forward_with_mode">fn forward_with_mode</a></li>
 </ul>
 </li>
 <li class="open"><a href="#Conv1DLayer[T].output_shape">type Conv1DLayer[T]</a>        <ul>
@@ -2263,6 +2590,7 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 <li><a href="#DropoutLayer[T].output_shape">fn output_shape</a></li>
 <li><a href="#DropoutLayer[T].variables">fn variables</a></li>
 <li><a href="#DropoutLayer[T].forward">fn forward</a></li>
+<li><a href="#DropoutLayer[T].forward_with_mode">fn forward_with_mode</a></li>
 </ul>
 </li>
 <li class="open"><a href="#EluLayer[T].output_shape">type EluLayer[T]</a>        <ul>
@@ -2294,6 +2622,12 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 <li><a href="#GELULayer[T].forward">fn forward</a></li>
 </ul>
 </li>
+<li class="open"><a href="#GRULayer[T].forward_with_state">type GRULayer[T]</a>        <ul>
+<li><a href="#GRULayer[T].forward_with_state">fn forward_with_state</a></li>
+<li><a href="#GRULayer[T].forward_batch_first">fn forward_batch_first</a></li>
+<li><a href="#GRULayer[T].forward_batch_first_with_state">fn forward_batch_first_with_state</a></li>
+</ul>
+</li>
 <li class="open"><a href="#GlobalAvgPool2DGate[T].backward">type GlobalAvgPool2DGate[T]</a>        <ul>
 <li><a href="#GlobalAvgPool2DGate[T].backward">fn backward</a></li>
 <li><a href="#GlobalAvgPool2DGate[T].cache">fn cache</a></li>
@@ -2303,6 +2637,17 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 <li><a href="#GlobalAvgPool2DLayer[T].output_shape">fn output_shape</a></li>
 <li><a href="#GlobalAvgPool2DLayer[T].variables">fn variables</a></li>
 <li><a href="#GlobalAvgPool2DLayer[T].forward">fn forward</a></li>
+</ul>
+</li>
+<li class="open"><a href="#GroupNormGate[T].backward">type GroupNormGate[T]</a>        <ul>
+<li><a href="#GroupNormGate[T].backward">fn backward</a></li>
+<li><a href="#GroupNormGate[T].cache">fn cache</a></li>
+</ul>
+</li>
+<li class="open"><a href="#GroupNormLayer[T].output_shape">type GroupNormLayer[T]</a>        <ul>
+<li><a href="#GroupNormLayer[T].output_shape">fn output_shape</a></li>
+<li><a href="#GroupNormLayer[T].variables">fn variables</a></li>
+<li><a href="#GroupNormLayer[T].forward">fn forward</a></li>
 </ul>
 </li>
 <li class="open"><a href="#HardSwishLayer[T].output_shape">type HardSwishLayer[T]</a>        <ul>
@@ -2315,6 +2660,10 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 <li><a href="#InputLayer[T].output_shape">fn output_shape</a></li>
 <li><a href="#InputLayer[T].variables">fn variables</a></li>
 <li><a href="#InputLayer[T].forward">fn forward</a></li>
+</ul>
+</li>
+<li class="open"><a href="#LSTMLayer[T].forward_with_state">type LSTMLayer[T]</a>        <ul>
+<li><a href="#LSTMLayer[T].forward_with_state">fn forward_with_state</a></li>
 </ul>
 </li>
 <li class="open"><a href="#LayerNormGate[T].backward">type LayerNormGate[T]</a>        <ul>
@@ -2362,6 +2711,17 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 <li><a href="#PositionalEncodingLayer[T].output_shape">fn output_shape</a></li>
 <li><a href="#PositionalEncodingLayer[T].variables">fn variables</a></li>
 <li><a href="#PositionalEncodingLayer[T].forward">fn forward</a></li>
+</ul>
+</li>
+<li class="open"><a href="#RMSNormGate[T].backward">type RMSNormGate[T]</a>        <ul>
+<li><a href="#RMSNormGate[T].backward">fn backward</a></li>
+<li><a href="#RMSNormGate[T].cache">fn cache</a></li>
+</ul>
+</li>
+<li class="open"><a href="#RMSNormLayer[T].output_shape">type RMSNormLayer[T]</a>        <ul>
+<li><a href="#RMSNormLayer[T].output_shape">fn output_shape</a></li>
+<li><a href="#RMSNormLayer[T].variables">fn variables</a></li>
+<li><a href="#RMSNormLayer[T].forward">fn forward</a></li>
 </ul>
 </li>
 <li class="open"><a href="#ReLULayer[T].output_shape">type ReLULayer[T]</a>        <ul>
@@ -2472,6 +2832,15 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 <li class="open"><a href="#GlobalAvgPool2DLayer">struct GlobalAvgPool2DLayer</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#GroupNormConfig">struct GroupNormConfig</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#GroupNormGate">struct GroupNormGate</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#GroupNormLayer">struct GroupNormLayer</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#HardSwishLayer">struct HardSwishLayer</a>        <ul>
 </ul>
 </li>
@@ -2509,6 +2878,15 @@ layer <span class="token operator">:=</span> layers<span class="token punctuatio
 </ul>
 </li>
 <li class="open"><a href="#PositionalEncodingLayer">struct PositionalEncodingLayer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#RMSNormConfig">struct RMSNormConfig</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#RMSNormGate">struct RMSNormGate</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#RMSNormLayer">struct RMSNormLayer</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#ReLULayer">struct ReLULayer</a>        <ul>

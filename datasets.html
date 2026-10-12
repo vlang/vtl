@@ -164,7 +164,22 @@
 <td><code>datasets.DataLoader[T]</code></td>
 <td>Batch, shuffle, and iterate tensors/labels</td></tr></tbody></table>
 <p>DataLoader returns a view when a batch's sample indices form a contiguous range. Shuffled, non-contiguous batches allocate tensors to preserve the requested sample order. A non-positive <code>batch_size</code> produces an empty loader.</p>
+<p><code>DataLoaderConfig</code> defaults to <code>batch_size: 32</code>, <code>shuffle: true</code>, and <code>drop_last: true</code>. These differ from PyTorch's defaults (<code>1</code>, <code>false</code>, and <code>false</code>), so set all three explicitly when porting a training pipeline. Call <code>reset()</code> between epochs to advance the deterministic shuffle order from the configured seed.</p>
+<p>For custom sample order, <code>new_data_loader_with_sampler_checked</code> and <code>new_data_loader_with_labels_and_sampler_checked</code> accept samplers from <code>vtl.nn.data</code>. Built-in options include sequential, random, subset-random, weighted, and fixed batch sampling. Wrap a sampler with <code>FixedBatchSampler</code> to choose batch boundaries and <code>drop_last</code> explicitly. Call <code>reset_checked()</code> between epochs when using a sampler; it reports errors from custom sampler implementations.</p>
+<p>For custom batch construction, install a <code>CollateFn[T]</code> with <code>DataLoader.set_collate_fn</code> and call <code>collated_batch(i)</code> or <code>for_each_collated(...)</code>. The callback receives the source feature tensor, an optional labels tensor, and a copy of the sample indices selected for that batch. It returns a <code>CollatedBatch[T]</code> containing the output features and optional labels. This supports dense tensor collation such as transforms, padding, filtering, and reordering; it does not model arbitrary Python objects or nested sample structures. See the <a href="https://github.com/vlang/vtl/blob/master/examples/datasets_custom_collate/main.v">custom collation example</a>.</p>
 <p><code>load_imdb()</code> returns the full 25,000 review training and test splits. Use <code>load_imdb_with_config</code> for a smaller, class-balanced subset. Review features remain raw strings; labels are binary (<code>1</code> positive, <code>0</code> negative).</p>
+<p>For simple NLP pipelines, <code>tokenize_text</code> lowercases and splits on Unicode whitespace and ASCII punctuation while preserving UTF-8 text. <code>build_text_vocabulary</code> creates deterministic frequency-ranked IDs; <code>&lt;pad&gt;</code> is ID <code>0</code> and <code>&lt;unk&gt;</code> is ID <code>1</code>. <code>max_size</code> includes those reserved IDs, and <code>0</code> means no size limit. This is a small preprocessing utility; it does not replace language-specific tokenizers or normalization.</p>
+<pre><code class="language-v"><span class="token keyword">import</span> vtl<span class="token punctuation">.</span>datasets
+
+tokens <span class="token operator">:=</span> datasets<span class="token punctuation">.</span><span class="token function">tokenize_text</span><span class="token punctuation">(</span><span class="token string">'A joyful, moving review!'</span><span class="token punctuation">)</span>
+<span class="token keyword">assert</span> tokens <span class="token operator">==</span> <span class="token punctuation">[</span><span class="token string">'a'</span><span class="token punctuation">,</span> <span class="token string">'joyful'</span><span class="token punctuation">,</span> <span class="token string">'moving'</span><span class="token punctuation">,</span> <span class="token string">'review'</span><span class="token punctuation">]</span>
+
+vocabulary <span class="token operator">:=</span> datasets<span class="token punctuation">.</span><span class="token function">build_text_vocabulary</span><span class="token punctuation">(</span><span class="token punctuation">[</span>
+    <span class="token string">'joyful moving review'</span><span class="token punctuation">,</span>
+    <span class="token string">'moving review'</span><span class="token punctuation">,</span>
+<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">10000</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token operator">!</span>
+ids <span class="token operator">:=</span> vocabulary<span class="token punctuation">.</span><span class="token function">encode</span><span class="token punctuation">(</span><span class="token string">'Joyful review'</span><span class="token punctuation">)</span>
+<span class="token keyword">assert</span> vocabulary<span class="token punctuation">.</span><span class="token function">decode</span><span class="token punctuation">(</span>ids<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token punctuation">[</span><span class="token string">'joyful'</span><span class="token punctuation">,</span> <span class="token string">'review'</span><span class="token punctuation">]</span></code></pre>
 <pre><code class="language-v"><span class="token keyword">import</span> vtl<span class="token punctuation">.</span>datasets
 
 imdb <span class="token operator">:=</span> datasets<span class="token punctuation">.</span><span class="token function">load_imdb_with_config</span><span class="token punctuation">(</span>datasets<span class="token punctuation">.</span>ImdbConfig<span class="token punctuation">{</span>
@@ -256,6 +271,28 @@ v run <span class="token punctuation">.</span><span class="token operator">/</sp
 
 </section>
 
+		<section id="" class="doc-node const">
+<pre class="signature">
+<code><span class="token keyword">const</span> text_pad_token <span class="token operator">=</span> <span class="token string">'&lt;pad&gt;'</span></code></pre>
+
+
+</section>
+
+		<section id="" class="doc-node const">
+<pre class="signature">
+<code><span class="token keyword">const</span> text_unknown_token <span class="token operator">=</span> <span class="token string">'&lt;unk&gt;'</span></code></pre>
+
+
+</section>
+
+		<section id="build_text_vocabulary" class="doc-node">
+			<div class="title"><h2>fn build_text_vocabulary <a href="#build_text_vocabulary">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/text.v#L85"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">build_text_vocabulary</span><span class="token punctuation">(</span>texts <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">string</span><span class="token punctuation">,</span> max_size <span class="token builtin">int</span><span class="token punctuation">,</span> min_frequency <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span>TextVocabulary</code></pre>
+<p>build_text_vocabulary builds a frequency-ranked vocabulary from texts. max_size includes the reserved <pad> and <unk> entries; zero means unlimited. Tokens with frequency below min_frequency are omitted. Equal-frequency tokens are ordered lexicographically to make the result deterministic.</p>
+
+</section>
+
 		<section id="class_names" class="doc-node">
 			<div class="title"><h2>fn class_names <a href="#class_names">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/cifar10.v#L32"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -305,23 +342,79 @@ v run <span class="token punctuation">.</span><span class="token operator">/</sp
 </section>
 
 		<section id="new_data_loader" class="doc-node">
-			<div class="title"><h2>fn new_data_loader <a href="#new_data_loader">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L174"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn new_data_loader <a href="#new_data_loader">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L273"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> new_data_loader<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>dataset <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> config DataLoaderConfig<span class="token punctuation">)</span> <span class="token operator">&amp;</span>DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>new_data_loader creates a DataLoader from a dataset tensor (features only).</p>
 
 </section>
 
+		<section id="new_data_loader_with_batch_sampler_checked" class="doc-node">
+			<div class="title"><h2>fn new_data_loader_with_batch_sampler_checked <a href="#new_data_loader_with_batch_sampler_checked">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L240"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> new_data_loader_with_batch_sampler_checked<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>dataset <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> config DataLoaderConfig<span class="token punctuation">,</span> batch_sampler nn_data<span class="token punctuation">.</span>BatchSampler<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>new_data_loader_with_batch_sampler_checked creates a loader using explicit sample batches from batch_sampler.</p>
+
+</section>
+
 		<section id="new_data_loader_with_labels" class="doc-node">
-			<div class="title"><h2>fn new_data_loader_with_labels <a href="#new_data_loader_with_labels">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L197"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn new_data_loader_with_labels <a href="#new_data_loader_with_labels">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L322"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> new_data_loader_with_labels<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>dataset <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> labels <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> config DataLoaderConfig<span class="token punctuation">)</span> <span class="token operator">&amp;</span>DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
-<p>new_data_loader_with_labels creates a DataLoader with both features and labels tensors. Both tensors must have the same first dimension (number of samples).</p>
+<p>new_data_loader_with_labels creates a DataLoader with both features and labels tensors. Both tensors must have the same first dimension (number of samples). This compatibility constructor panics for invalid shapes; prefer the checked variant when input dimensions are not already trusted.</p>
+
+</section>
+
+		<section id="new_data_loader_with_labels_and_batch_sampler_checked" class="doc-node">
+			<div class="title"><h2>fn new_data_loader_with_labels_and_batch_sampler_checked <a href="#new_data_loader_with_labels_and_batch_sampler_checked">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L395"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> new_data_loader_with_labels_and_batch_sampler_checked<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>dataset <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> labels <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> config DataLoaderConfig<span class="token punctuation">,</span> batch_sampler nn_data<span class="token punctuation">.</span>BatchSampler<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>new_data_loader_with_labels_and_batch_sampler_checked creates a labeled loader using explicit sample batches and preserves feature-label alignment.</p>
+
+</section>
+
+		<section id="new_data_loader_with_labels_and_sampler_checked" class="doc-node">
+			<div class="title"><h2>fn new_data_loader_with_labels_and_sampler_checked <a href="#new_data_loader_with_labels_and_sampler_checked">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L366"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> new_data_loader_with_labels_and_sampler_checked<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>dataset <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> labels <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> config DataLoaderConfig<span class="token punctuation">,</span> sampler nn_data<span class="token punctuation">.</span>Sampler<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>new_data_loader_with_labels_and_sampler_checked creates a labeled loader with a custom sample order and validates the data and sampler indices.</p>
+
+</section>
+
+		<section id="new_data_loader_with_labels_checked" class="doc-node">
+			<div class="title"><h2>fn new_data_loader_with_labels_checked <a href="#new_data_loader_with_labels_checked">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L331"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> new_data_loader_with_labels_checked<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>dataset <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> labels <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> config DataLoaderConfig<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>new_data_loader_with_labels_checked creates a labeled DataLoader and reports invalid dataset or label shapes as an error instead of deferring failure until a batch is read.</p>
+
+</section>
+
+		<section id="new_data_loader_with_sampler_checked" class="doc-node">
+			<div class="title"><h2>fn new_data_loader_with_sampler_checked <a href="#new_data_loader_with_sampler_checked">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L298"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> new_data_loader_with_sampler_checked<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>dataset <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> config DataLoaderConfig<span class="token punctuation">,</span> sampler nn_data<span class="token punctuation">.</span>Sampler<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>new_data_loader_with_sampler_checked creates a loader whose sample order is supplied by sampler. The sampler is invoked again by reset_checked each epoch.</p>
+
+</section>
+
+		<section id="tokenize_text" class="doc-node">
+			<div class="title"><h2>fn tokenize_text <a href="#tokenize_text">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/text.v#L22"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">tokenize_text</span><span class="token punctuation">(</span>text <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">string</span></code></pre>
+<p>tokenize_text lowercases text and splits on whitespace and ASCII punctuation. Non-ASCII characters are preserved so UTF-8 words remain intact.</p>
+
+</section>
+
+		<section id="CollateFn" class="doc-node">
+			<div class="title"><h2>type CollateFn <a href="#CollateFn">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L62"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">type</span> CollateFn<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>dataset <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> labels <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> indices <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span>CollatedBatch<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>CollateFn builds tensors for the selected sample indices. <code>labels</code> is nil for feature-only loaders. The callback owns the collation policy, including output shapes and ordering.</p>
 
 </section>
 
 		<section id="DataLoaderIterator[T].next" class="doc-node">
-			<div class="title"><h2>fn (DataLoaderIterator[T]) next <a href="#DataLoaderIterator[T].next">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L235"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (DataLoaderIterator[T]) next <a href="#DataLoaderIterator[T].next">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L464"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> it DataLoaderIterator<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> next<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">?</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>next returns the next batch. Returns none when exhausted.</p>
@@ -329,7 +422,7 @@ v run <span class="token punctuation">.</span><span class="token operator">/</sp
 </section>
 
 		<section id="DataLoader[T].batch" class="doc-node">
-			<div class="title"><h2>fn (DataLoader[T]) batch <a href="#DataLoader[T].batch">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L46"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (DataLoader[T]) batch <a href="#DataLoader[T].batch">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L68"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>dl <span class="token operator">&amp;</span>DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">batch</span><span class="token punctuation">(</span>i <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">?</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>batch returns a batch at index <code>i</code>. Contiguous indices return a view into the dataset; other index orders return a copy. Mutating a returned view also mutates the corresponding dataset elements. Returns none for invalid indices or a non-positive batch size.</p>
@@ -337,15 +430,31 @@ v run <span class="token punctuation">.</span><span class="token operator">/</sp
 </section>
 
 		<section id="DataLoader[T].batch_with_labels" class="doc-node">
-			<div class="title"><h2>fn (DataLoader[T]) batch_with_labels <a href="#DataLoader[T].batch_with_labels">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L70"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (DataLoader[T]) batch_with_labels <a href="#DataLoader[T].batch_with_labels">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L92"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>dl <span class="token operator">&amp;</span>DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">batch_with_labels</span><span class="token punctuation">(</span>i <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">?</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
 <p>batch_with_labels returns both features and labels for batch <code>i</code>. Both tensors are extracted using the same index set. Returns none if the index is out of range or if no labels tensor was provided.</p>
 
 </section>
 
+		<section id="DataLoader[T].set_collate_fn" class="doc-node">
+			<div class="title"><h2>fn (DataLoader[T]) set_collate_fn <a href="#DataLoader[T].set_collate_fn">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L134"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> dl DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">set_collate_fn</span><span class="token punctuation">(</span>collate_fn CollateFn<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+<p>set_collate_fn installs a callback used by collated_batch. Existing batch accessors keep their default tensor slicing and gathering behavior.</p>
+
+</section>
+
+		<section id="DataLoader[T].collated_batch" class="doc-node">
+			<div class="title"><h2>fn (DataLoader[T]) collated_batch <a href="#DataLoader[T].collated_batch">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L143"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>dl <span class="token operator">&amp;</span>DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">collated_batch</span><span class="token punctuation">(</span>i <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span>CollatedBatch<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>collated_batch builds the batch selected by <code>i</code>. A custom callback receives the source tensors and a copy of the selected indices, so it can implement custom padding, filtering, transforms, or ordering without changing loader state. Without a callback, this returns the same default tensors as batch and batch_with_labels.</p>
+
+</section>
+
 		<section id="DataLoader[T].len" class="doc-node">
-			<div class="title"><h2>fn (DataLoader[T]) len <a href="#DataLoader[T].len">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L111"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (DataLoader[T]) len <a href="#DataLoader[T].len">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L166"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>dl <span class="token operator">&amp;</span>DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">len</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">int</span></code></pre>
 <p>len returns the number of batches (drop_last affects count).</p>
@@ -353,7 +462,7 @@ v run <span class="token punctuation">.</span><span class="token operator">/</sp
 </section>
 
 		<section id="DataLoader[T].total_samples" class="doc-node">
-			<div class="title"><h2>fn (DataLoader[T]) total_samples <a href="#DataLoader[T].total_samples">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L150"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (DataLoader[T]) total_samples <a href="#DataLoader[T].total_samples">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L211"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>dl <span class="token operator">&amp;</span>DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">total_samples</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">int</span></code></pre>
 <p>total_samples returns the number of samples in the dataset.</p>
@@ -361,15 +470,23 @@ v run <span class="token punctuation">.</span><span class="token operator">/</sp
 </section>
 
 		<section id="DataLoader[T].reset" class="doc-node">
-			<div class="title"><h2>fn (DataLoader[T]) reset <a href="#DataLoader[T].reset">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L155"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (DataLoader[T]) reset <a href="#DataLoader[T].reset">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L216"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> dl DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">reset</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>reset re-shuffles the indices (call between epochs). Uses seed if set.</p>
 
 </section>
 
+		<section id="DataLoader[T].reset_checked" class="doc-node">
+			<div class="title"><h2>fn (DataLoader[T]) reset_checked <a href="#DataLoader[T].reset_checked">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L221"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> dl DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">reset_checked</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<p>reset_checked advances the loader to a new epoch and reports sampler errors.</p>
+
+</section>
+
 		<section id="DataLoader[T].iter" class="doc-node">
-			<div class="title"><h2>fn (DataLoader[T]) iter <a href="#DataLoader[T].iter">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L227"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (DataLoader[T]) iter <a href="#DataLoader[T].iter">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L456"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>dl <span class="token operator">&amp;</span>DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> iter<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span> DataLoaderIterator<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>iter returns an iterator over the DataLoader batches.</p>
@@ -377,7 +494,7 @@ v run <span class="token punctuation">.</span><span class="token operator">/</sp
 </section>
 
 		<section id="DataLoader[T].for_each" class="doc-node">
-			<div class="title"><h2>fn (DataLoader[T]) for_each <a href="#DataLoader[T].for_each">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L246"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (DataLoader[T]) for_each <a href="#DataLoader[T].for_each">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L475"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>dl <span class="token operator">&amp;</span>DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">for_each</span><span class="token punctuation">(</span>fn_each <span class="token keyword">fn</span> <span class="token punctuation">(</span>batch <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token builtin">int</span></code></pre>
 <p>for_each applies <code>fn</code> to each batch until exhaustion or <code>fn</code> returns false.</p>
@@ -385,23 +502,31 @@ v run <span class="token punctuation">.</span><span class="token operator">/</sp
 </section>
 
 		<section id="DataLoader[T].for_each_with_labels" class="doc-node">
-			<div class="title"><h2>fn (DataLoader[T]) for_each_with_labels <a href="#DataLoader[T].for_each_with_labels">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L259"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (DataLoader[T]) for_each_with_labels <a href="#DataLoader[T].for_each_with_labels">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L488"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>dl <span class="token operator">&amp;</span>DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">for_each_with_labels</span><span class="token punctuation">(</span>fn_each <span class="token keyword">fn</span> <span class="token punctuation">(</span>features <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> labels <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token builtin">int</span></code></pre>
 <p>for_each_with_labels applies <code>fn</code> to each (features, labels) batch. Only works if the DataLoader was created with labels.</p>
 
 </section>
 
-		<section id="DataLoader[T].split" class="doc-node">
-			<div class="title"><h2>fn (DataLoader[T]) split <a href="#DataLoader[T].split">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L272"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+		<section id="DataLoader[T].for_each_collated" class="doc-node">
+			<div class="title"><h2>fn (DataLoader[T]) for_each_collated <a href="#DataLoader[T].for_each_collated">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L503"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>dl <span class="token operator">&amp;</span>DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">split</span><span class="token punctuation">(</span>val_fraction <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token operator">&amp;</span>DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
-<p>split splits a DataLoader into train and validation DataLoaders.</p>
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>dl <span class="token operator">&amp;</span>DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">for_each_collated</span><span class="token punctuation">(</span>fn_each <span class="token keyword">fn</span> <span class="token punctuation">(</span>batch CollatedBatch<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token builtin">int</span></code></pre>
+<p>for_each_collated applies the custom collation callback to every batch and passes each result to <code>fn_each</code>. Callback errors stop iteration and return to the caller.</p>
+
+</section>
+
+		<section id="DataLoader[T].split" class="doc-node">
+			<div class="title"><h2>fn (DataLoader[T]) split <a href="#DataLoader[T].split">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L517"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>dl <span class="token operator">&amp;</span>DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">split</span><span class="token punctuation">(</span>val_fraction <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+<p>split splits a DataLoader into train and validation DataLoaders. val_fraction must be finite and in the inclusive range [0, 1].</p>
 
 </section>
 
 		<section id="DataLoader[T].mini_batch_count" class="doc-node">
-			<div class="title"><h2>fn (DataLoader[T]) mini_batch_count <a href="#DataLoader[T].mini_batch_count">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L306"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (DataLoader[T]) mini_batch_count <a href="#DataLoader[T].mini_batch_count">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L561"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>dl <span class="token operator">&amp;</span>DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">mini_batch_count</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">int</span></code></pre>
 <p>mini_batch_count returns the total number of batches in one epoch.</p>
@@ -438,8 +563,20 @@ v run <span class="token punctuation">.</span><span class="token operator">/</sp
 
 </section>
 
+		<section id="CollatedBatch" class="doc-node">
+			<div class="title"><h2>struct CollatedBatch <a href="#CollatedBatch">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L53"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> CollatedBatch<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	features <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+	labels   <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<p>CollatedBatch contains the tensors produced for one selected batch. Labels are nil when the source loader has no labels or the collator omits them.</p>
+
+</section>
+
 		<section id="DataLoader" class="doc-node">
-			<div class="title"><h2>struct DataLoader <a href="#DataLoader">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L20"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>struct DataLoader <a href="#DataLoader">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L22"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <div class="attributes"><div class="attribute">@[heap]</div></div>
 <pre class="signature">
 <code><span class="token keyword">struct</span> DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
@@ -453,13 +590,20 @@ v run <span class="token punctuation">.</span><span class="token operator">/</sp
 <span class="token keyword">pub</span> <span class="token keyword">mut</span><span class="token punctuation">:</span>
 	indices <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
 	epoch   <span class="token builtin">int</span>
+<span class="token keyword">mut</span><span class="token punctuation">:</span>
+	sampler            nn_data<span class="token punctuation">.</span>Sampler
+	uses_sampler       <span class="token builtin">bool</span>
+	batch_sampler      nn_data<span class="token punctuation">.</span>BatchSampler
+	uses_batch_sampler <span class="token builtin">bool</span>
+	batches            <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
+	collate_fn         CollateFn<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
 <span class="token punctuation">}</span></code></pre>
 <p>DataLoader defines a public data structure for this module.</p>
 
 </section>
 
 		<section id="DataLoaderConfig" class="doc-node">
-			<div class="title"><h2>struct DataLoaderConfig <a href="#DataLoaderConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L34"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>struct DataLoaderConfig <a href="#DataLoaderConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L43"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">struct</span> DataLoaderConfig <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
@@ -473,7 +617,7 @@ v run <span class="token punctuation">.</span><span class="token operator">/</sp
 </section>
 
 		<section id="DataLoaderIterator" class="doc-node">
-			<div class="title"><h2>struct DataLoaderIterator <a href="#DataLoaderIterator">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L220"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>struct DataLoaderIterator <a href="#DataLoaderIterator">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L449"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">struct</span> DataLoaderIterator<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
 <span class="token keyword">mut</span><span class="token punctuation">:</span>
@@ -525,11 +669,51 @@ v run <span class="token punctuation">.</span><span class="token operator">/</sp
 
 </section>
 
+		<section id="TextVocabulary" class="doc-node">
+			<div class="title"><h2>struct TextVocabulary <a href="#TextVocabulary">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/text.v#L8"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> TextVocabulary <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	tokens <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">string</span>
+<span class="token keyword">mut</span><span class="token punctuation">:</span>
+	token_to_index <span class="token builtin">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token builtin">int</span>
+<span class="token punctuation">}</span></code></pre>
+<p>TextVocabulary maps normalized text tokens to stable integer IDs. The first IDs are reserved for padding and out-of-vocabulary tokens.</p>
 
-						<div class="footer">Powered by vdoc. Generated on: 8 Oct 2026 15:02:27</div>
+</section>
+
+		<section id="TextVocabulary.index" class="doc-node">
+			<div class="title"><h2>fn (TextVocabulary) index <a href="#TextVocabulary.index">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/text.v#L131"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>v <span class="token operator">&amp;</span>TextVocabulary<span class="token punctuation">)</span> <span class="token function">index</span><span class="token punctuation">(</span>token <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token builtin">int</span></code></pre>
+<p>index returns the ID for token, or the unknown-token ID when it is absent.</p>
+
+</section>
+
+		<section id="TextVocabulary.encode" class="doc-node">
+			<div class="title"><h2>fn (TextVocabulary) encode <a href="#TextVocabulary.encode">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/text.v#L136"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>v <span class="token operator">&amp;</span>TextVocabulary<span class="token punctuation">)</span> <span class="token function">encode</span><span class="token punctuation">(</span>text <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span></code></pre>
+<p>encode tokenizes text and returns its vocabulary IDs.</p>
+
+</section>
+
+		<section id="TextVocabulary.decode" class="doc-node">
+			<div class="title"><h2>fn (TextVocabulary) decode <a href="#TextVocabulary.decode">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/text.v#L141"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>v <span class="token operator">&amp;</span>TextVocabulary<span class="token punctuation">)</span> <span class="token function">decode</span><span class="token punctuation">(</span>indices <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">string</span></code></pre>
+<p>decode converts IDs back to tokens. Invalid IDs decode as <unk>.</p>
+
+</section>
+
+
+						<div class="footer">Powered by vdoc. Generated on: 12 Oct 2026 22:21:53</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_datasets">README</a></li>
 <li class="open"><a href="#Constants">Constants</a></li>
+<li class="open"><a href="#build_text_vocabulary">fn build_text_vocabulary</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#class_names">fn class_names</a>        <ul>
 </ul>
 </li>
@@ -551,7 +735,28 @@ v run <span class="token punctuation">.</span><span class="token operator">/</sp
 <li class="open"><a href="#new_data_loader">fn new_data_loader</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#new_data_loader_with_batch_sampler_checked">fn new_data_loader_with_batch_sampler_checked</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#new_data_loader_with_labels">fn new_data_loader_with_labels</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#new_data_loader_with_labels_and_batch_sampler_checked">fn new_data_loader_with_labels_and_batch_sampler_checked</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#new_data_loader_with_labels_and_sampler_checked">fn new_data_loader_with_labels_and_sampler_checked</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#new_data_loader_with_labels_checked">fn new_data_loader_with_labels_checked</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#new_data_loader_with_sampler_checked">fn new_data_loader_with_sampler_checked</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#tokenize_text">fn tokenize_text</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#CollateFn">type CollateFn</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#DataLoaderIterator[T].next">type DataLoaderIterator[T]</a>        <ul>
@@ -561,12 +766,16 @@ v run <span class="token punctuation">.</span><span class="token operator">/</sp
 <li class="open"><a href="#DataLoader[T].batch">type DataLoader[T]</a>        <ul>
 <li><a href="#DataLoader[T].batch">fn batch</a></li>
 <li><a href="#DataLoader[T].batch_with_labels">fn batch_with_labels</a></li>
+<li><a href="#DataLoader[T].set_collate_fn">fn set_collate_fn</a></li>
+<li><a href="#DataLoader[T].collated_batch">fn collated_batch</a></li>
 <li><a href="#DataLoader[T].len">fn len</a></li>
 <li><a href="#DataLoader[T].total_samples">fn total_samples</a></li>
 <li><a href="#DataLoader[T].reset">fn reset</a></li>
+<li><a href="#DataLoader[T].reset_checked">fn reset_checked</a></li>
 <li><a href="#DataLoader[T].iter">fn iter</a></li>
 <li><a href="#DataLoader[T].for_each">fn for_each</a></li>
 <li><a href="#DataLoader[T].for_each_with_labels">fn for_each_with_labels</a></li>
+<li><a href="#DataLoader[T].for_each_collated">fn for_each_collated</a></li>
 <li><a href="#DataLoader[T].split">fn split</a></li>
 <li><a href="#DataLoader[T].mini_batch_count">fn mini_batch_count</a></li>
 </ul>
@@ -575,6 +784,9 @@ v run <span class="token punctuation">.</span><span class="token operator">/</sp
 </ul>
 </li>
 <li class="open"><a href="#Cifar10Dataset">struct Cifar10Dataset</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#CollatedBatch">struct CollatedBatch</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#DataLoader">struct DataLoader</a>        <ul>
@@ -593,6 +805,12 @@ v run <span class="token punctuation">.</span><span class="token operator">/</sp
 </ul>
 </li>
 <li class="open"><a href="#MnistDataset">struct MnistDataset</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#TextVocabulary">struct TextVocabulary</a>        <ul>
+<li><a href="#TextVocabulary.index">fn index</a></li>
+<li><a href="#TextVocabulary.encode">fn encode</a></li>
+<li><a href="#TextVocabulary.decode">fn decode</a></li>
 </ul>
 </li>
 </ul></div>

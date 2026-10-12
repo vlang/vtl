@@ -181,6 +181,22 @@ optimizer<span class="token punctuation">.</span><span class="token function">up
 <td>LR 0.001, β₁ 0.9, β₂ 0.999</td>
 <td>Rectified Adam variance estimate; f32 and f64 CPU paths</td></tr></tbody></table>
 <p>NAdam and RAdam configuration structs accept <code>weight_decay</code> (default <code>0</code>). Set <code>decoupled_weight_decay: true</code> to apply decay directly to parameter values, without adding it to the gradient or moment estimates. NAdam additionally accepts <code>momentum_decay</code> (default <code>0.004</code>).</p>
+<h2 id="learning-rate-schedulers">Learning-rate schedulers</h2>
+<p><code>StepLR</code>, <code>MultiStepLR</code>, <code>ExponentialLR</code>, <code>CosineAnnealingLR</code>, <code>CosineAnnealingWarmRestarts</code>, <code>LinearLR</code>, <code>PolynomialLR</code>, <code>ConstantLR</code>, <code>CyclicLR</code>, <code>OneCycleLR</code>, and <code>ReduceLROnPlateau</code> update learning rates by epoch or minibatch step. <code>MultiStepLR</code> applies one decay for each milestone, including duplicate milestones. <code>LinearLR</code> interpolates between two factors, while <code>PolynomialLR</code> decays to zero over a fixed number of steps. <code>ConstantLR</code> scales the base rate for a fixed number of steps, then restores it. <code>CosineAnnealingWarmRestarts</code> resets to the base rate after each cosine cycle, with optional geometric growth of cycle lengths. <code>OneCycleLR</code> uses minibatch steps to ramp from <code>max_lr / div_factor</code> to <code>max_lr</code>, then anneal to <code>max_lr / (div_factor * final_div_factor)</code>. It supports cosine or linear annealing, an optional three-phase curve, and inverse momentum cycling with configurable bounds. <code>next_momentum(step)</code> returns the value for the caller to apply; set <code>cycle_momentum: false</code> to disable it. The defaults (<code>0.85</code> and <code>0.95</code>) match PyTorch. Optimizer mutation and parameter groups are not implemented. Its constructor returns an error for negative <code>max_lr</code>, nonpositive <code>total_steps</code> or division factors, <code>pct_start</code> outside <code>(0, 1)</code>, or invalid momentum bounds. <code>ReduceLROnPlateau.step(current_lr, metric)</code> consumes the monitored value and tracks the best metric, with <code>min</code> or <code>max</code> mode and absolute or relative thresholds. It supports <code>patience</code>, <code>cooldown</code>, <code>min_lr</code>, and <code>epsilon</code> and returns the rate for the caller to apply. <code>try_reduce_lr_on_plateau</code> reports invalid configuration; the original <code>next_lr(current_lr, step, metric_delta)</code> remains available for callers that already calculate metric deltas.</p>
+<p><code>CyclicLR</code> provides triangular, triangular2, and exp_range amplitude policies with independently configurable rise and fall durations. It also computes the inverse momentum curve through <code>next_momentum(step)</code> by default; set <code>cycle_momentum: false</code> to disable it. The returned momentum is a value for the caller to apply. Supply <code>scale_fn</code> to define a custom cycle amplitude and set <code>scale_mode</code> to <code>.cycle</code> (the default) or <code>.iterations</code> to choose whether the callback receives a one-based cycle number or the zero-based minibatch step, respectively. Optimizer mutation and parameter groups are not implemented.</p>
+<pre><code class="language-v"><span class="token keyword">import</span> vtl<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>optimizers
+
+<span class="token keyword">fn</span> <span class="token function">decay_by_cycle</span><span class="token punctuation">(</span>cycle <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">f64</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token number">1.0</span> <span class="token operator">/</span> <span class="token builtin">f64</span><span class="token punctuation">(</span>cycle <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+scheduler <span class="token operator">:=</span> optimizers<span class="token punctuation">.</span>cyclic_lr<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span>optimizers<span class="token punctuation">.</span>CyclicLRConfig<span class="token punctuation">{</span>
+    base_lr<span class="token punctuation">:</span>      <span class="token number">0.001</span>
+    max_lr<span class="token punctuation">:</span>       <span class="token number">0.01</span>
+    step_size_up<span class="token punctuation">:</span> <span class="token number">100</span>
+    scale_fn<span class="token punctuation">:</span>     decay_by_cycle
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token operator">!</span>
+lr <span class="token operator">:=</span> scheduler<span class="token punctuation">.</span><span class="token function">next_lr</span><span class="token punctuation">(</span><span class="token number">0.001</span><span class="token punctuation">,</span> <span class="token number">150</span><span class="token punctuation">)</span></code></pre>
 <h2 id="nadam">NAdam</h2>
 <p>NAdam incorporates Nesterov momentum into Adam. It uses the scheduled momentum coefficient <code>μ_t = β₁(1 - 0.5 × 0.96^(t × momentum_decay))</code> and the corresponding bias-corrected look-ahead estimate. Its defaults follow PyTorch's NAdam API.</p>
 <pre><code class="language-v"><span class="token keyword">mut</span> optimizer <span class="token operator">:=</span> optimizers<span class="token punctuation">.</span>nadam_optimizer<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span>
@@ -196,9 +212,13 @@ optimizer<span class="token punctuation">.</span><span class="token function">up
 <span class="token punctuation">)</span></code></pre>
 <h2 id="validation">Validation</h2>
 <p>Run commands from the V module workspace, outside this repository:</p>
-<pre><code class="language-sh">cd <span class="token operator">~</span><span class="token operator">/</span><span class="token punctuation">.</span>vmodules
-systemd<span class="token operator">-</span>run <span class="token operator">--</span>user <span class="token operator">--</span>scope <span class="token operator">--</span>quiet <span class="token operator">--</span>property<span class="token operator">=</span>MemoryMax<span class="token operator">=</span><span class="token number">768M</span> <span class="token operator">--</span>property<span class="token operator">=</span>MemorySwapMax<span class="token operator">=</span><span class="token number">0</span> <span class="token operator">--</span>setenv<span class="token operator">=</span>VJOBS<span class="token operator">=</span><span class="token number">2</span> <span class="token operator">--</span> v test <span class="token punctuation">.</span><span class="token operator">/</span>vtl<span class="token operator">/</span>nn<span class="token operator">/</span>optimizers
-systemd<span class="token operator">-</span>run <span class="token operator">--</span>user <span class="token operator">--</span>scope <span class="token operator">--</span>quiet <span class="token operator">--</span>property<span class="token operator">=</span>MemoryMax<span class="token operator">=</span><span class="token number">768M</span> <span class="token operator">--</span>property<span class="token operator">=</span>MemorySwapMax<span class="token operator">=</span><span class="token number">0</span> <span class="token operator">--</span>setenv<span class="token operator">=</span>VJOBS<span class="token operator">=</span><span class="token number">2</span> <span class="token operator">--</span> v <span class="token operator">-</span>prod test <span class="token punctuation">.</span><span class="token operator">/</span>vtl<span class="token operator">/</span>nn<span class="token operator">/</span>optimizers</code></pre>
+<pre><code class="language-sh">cd <span class="token operator">~</span><span class="token operator">/</span><span class="token enum_value">.</span><span class="token enum_value">vmodules</span>
+systemd<span class="token operator">-</span>run <span class="token operator">--</span>user <span class="token operator">--</span>scope <span class="token operator">--</span>quiet <span class="token operator">--</span>property<span class="token operator">=</span>MemoryMax<span class="token operator">=</span><span class="token number">768M</span> <span class="token punctuation">\</span>
+  <span class="token operator">--</span>property<span class="token operator">=</span>MemorySwapMax<span class="token operator">=</span><span class="token number">0</span> <span class="token operator">--</span>setenv<span class="token operator">=</span>VJOBS<span class="token operator">=</span><span class="token number">2</span> <span class="token operator">--</span> <span class="token punctuation">\</span>
+  v test <span class="token punctuation">.</span><span class="token operator">/</span>vtl<span class="token operator">/</span>nn<span class="token operator">/</span>optimizers
+systemd<span class="token operator">-</span>run <span class="token operator">--</span>user <span class="token operator">--</span>scope <span class="token operator">--</span>quiet <span class="token operator">--</span>property<span class="token operator">=</span>MemoryMax<span class="token operator">=</span><span class="token number">768M</span> <span class="token punctuation">\</span>
+  <span class="token operator">--</span>property<span class="token operator">=</span>MemorySwapMax<span class="token operator">=</span><span class="token number">0</span> <span class="token operator">--</span>setenv<span class="token operator">=</span>VJOBS<span class="token operator">=</span><span class="token number">2</span> <span class="token operator">--</span> <span class="token punctuation">\</span>
+  v <span class="token operator">-</span>prod test <span class="token punctuation">.</span><span class="token operator">/</span>vtl<span class="token operator">/</span>nn<span class="token operator">/</span>optimizers</code></pre>
 <p>In constrained environments, run each command under a systemd scope with an appropriate <code>MemoryMax</code>.</p>
 
 </section>
@@ -284,19 +304,59 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 
 </section>
 
+		<section id="clip_grad_norm_with_type" class="doc-node">
+			<div class="title"><h2>fn clip_grad_norm_with_type <a href="#clip_grad_norm_with_type">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/gradient_clipping.v#L23"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> clip_grad_norm_with_type<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> parameters <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> max_norm <span class="token builtin">f64</span><span class="token punctuation">,</span> norm_type <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token builtin">f64</span></code></pre>
+<p>clip_grad_norm_with_type clips by a global p-norm; positive infinity selects the infinity norm. It returns the pre-clipping norm.</p>
+
+</section>
+
 		<section id="clip_grad_value" class="doc-node">
-			<div class="title"><h2>fn clip_grad_value <a href="#clip_grad_value">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/gradient_clipping.v#L70"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn clip_grad_value <a href="#clip_grad_value">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/gradient_clipping.v#L132"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> clip_grad_value<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> parameters <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> max_value <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
 <p>clip_grad_value clamps every trainable gradient element to [-max_value, max_value].</p>
 
 </section>
 
+		<section id="clip_grads_with_norm" class="doc-node">
+			<div class="title"><h2>fn clip_grads_with_norm <a href="#clip_grads_with_norm">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/gradient_clipping.v#L107"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> clip_grads_with_norm<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> parameters <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> max_norm <span class="token builtin">f64</span><span class="token punctuation">,</span> total_norm <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<p>clip_grads_with_norm scales trainable gradients in place using a previously computed total norm.</p>
+
+</section>
+
+		<section id="constant_lr" class="doc-node">
+			<div class="title"><h2>fn constant_lr <a href="#constant_lr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L139"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> constant_lr<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>config ConstantLRConfig<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>ConstantLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>constant_lr creates a temporary constant-rate scaling scheduler.</p>
+
+</section>
+
 		<section id="cosine_annealing_lr" class="doc-node">
-			<div class="title"><h2>fn cosine_annealing_lr <a href="#cosine_annealing_lr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L59"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn cosine_annealing_lr <a href="#cosine_annealing_lr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L166"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> cosine_annealing_lr<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>t_max <span class="token builtin">int</span><span class="token punctuation">,</span> lrd <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>CosineAnnealingLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>cosine_annealing_lr creates a CosineAnnealingLR scheduler: LR decays from <code>current_lr</code> to <code>lrd</code> following a cosine schedule over <code>t_max</code> steps.</p>
+
+</section>
+
+		<section id="cosine_annealing_warm_restarts" class="doc-node">
+			<div class="title"><h2>fn cosine_annealing_warm_restarts <a href="#cosine_annealing_warm_restarts">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L200"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> cosine_annealing_warm_restarts<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>config CosineAnnealingWarmRestartsConfig<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>CosineAnnealingWarmRestarts<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>cosine_annealing_warm_restarts creates the scheduler. <code>eta_min</code> should not exceed the base learning rate passed to next_lr.</p>
+
+</section>
+
+		<section id="cyclic_lr" class="doc-node">
+			<div class="title"><h2>fn cyclic_lr <a href="#cyclic_lr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L444"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> cyclic_lr<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>config CyclicLRConfig<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>CyclicLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>cyclic_lr creates a CyclicLR scheduler. A zero <code>step_size_down</code> uses the same duration as <code>step_size_up</code>; all other durations must be positive.</p>
 
 </section>
 
@@ -305,6 +365,38 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 <pre class="signature">
 <code><span class="token keyword">fn</span> exponential_lr<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>gamma <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>ExponentialLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
 <p>exponential_lr creates an ExponentialLR scheduler: LR decays by <code>gamma</code> at every step. new_lr = current_lr * gamma^step</p>
+
+</section>
+
+		<section id="get_total_grad_norm" class="doc-node">
+			<div class="title"><h2>fn get_total_grad_norm <a href="#get_total_grad_norm">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/gradient_clipping.v#L37"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> get_total_grad_norm<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>parameters <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token builtin">f64</span></code></pre>
+<p>get_total_grad_norm computes the L2 norm of all trainable gradients without changing them.</p>
+
+</section>
+
+		<section id="get_total_grad_norm_with_type" class="doc-node">
+			<div class="title"><h2>fn get_total_grad_norm_with_type <a href="#get_total_grad_norm_with_type">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/gradient_clipping.v#L43"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> get_total_grad_norm_with_type<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>parameters <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>autograd<span class="token punctuation">.</span>Variable<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> norm_type <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token builtin">f64</span></code></pre>
+<p>get_total_grad_norm_with_type computes a global p-norm without changing gradients; positive infinity selects the infinity norm.</p>
+
+</section>
+
+		<section id="linear_lr" class="doc-node">
+			<div class="title"><h2>fn linear_lr <a href="#linear_lr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L237"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> linear_lr<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>start_factor <span class="token builtin">f64</span><span class="token punctuation">,</span> end_factor <span class="token builtin">f64</span><span class="token punctuation">,</span> total_iters <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>LinearLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>linear_lr creates a linear learning-rate schedule. The returned value is based on <code>base_lr</code> and interpolates from <code>start_factor</code> to <code>end_factor</code>.</p>
+
+</section>
+
+		<section id="multi_step_lr" class="doc-node">
+			<div class="title"><h2>fn multi_step_lr <a href="#multi_step_lr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L66"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> multi_step_lr<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>config MultiStepLRConfig<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>MultiStepLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>multi_step_lr creates a scheduler whose milestones must be in increasing order. Repeated milestones apply repeated decay at the same step, like PyTorch.</p>
 
 </section>
 
@@ -329,6 +421,22 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token function">nadam_step_f64_cpu</span><span class="token punctuation">(</span>grad <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> theta <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> m <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> v <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> p NAdamStepParams<span class="token punctuation">)</span></code></pre>
 <p>nadam_step_f64_cpu applies one Dozat NAdam update in f64.</p>
+
+</section>
+
+		<section id="one_cycle_lr" class="doc-node">
+			<div class="title"><h2>fn one_cycle_lr <a href="#one_cycle_lr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L296"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> one_cycle_lr<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>config OneCycleLRConfig<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>OneCycleLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>one_cycle_lr creates a two-phase OneCycleLR by default. <code>anneal_strategy</code> selects cosine or linear interpolation. Invalid cycle parameters return an error.</p>
+
+</section>
+
+		<section id="polynomial_lr" class="doc-node">
+			<div class="title"><h2>fn polynomial_lr <a href="#polynomial_lr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L107"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> polynomial_lr<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>config PolynomialLRConfig<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>PolynomialLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>polynomial_lr creates a polynomial decay scheduler.</p>
 
 </section>
 
@@ -357,10 +465,10 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 </section>
 
 		<section id="reduce_lr_on_plateau" class="doc-node">
-			<div class="title"><h2>fn reduce_lr_on_plateau <a href="#reduce_lr_on_plateau">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L102"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn reduce_lr_on_plateau <a href="#reduce_lr_on_plateau">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L574"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> reduce_lr_on_plateau<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>config ReduceLROnPlateauConfig<span class="token punctuation">)</span> <span class="token operator">&amp;</span>ReduceLROnPlateau<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
-<p>reduce_lr_on_plateau creates a ReduceLROnPlateau scheduler. Reduces LR by <code>factor</code> when the monitored metric stops improving for <code>patience</code> steps. Pass <code>metric_delta</code> to <code>next_lr</code> each step: negative = improvement.</p>
+<p>reduce_lr_on_plateau creates a ReduceLROnPlateau scheduler. Use <code>step</code> with the monitored metric for PyTorch-style behavior. <code>next_lr</code> remains available for callers that already provide a per-step metric delta.</p>
 
 </section>
 
@@ -397,6 +505,14 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 
 </section>
 
+		<section id="try_reduce_lr_on_plateau" class="doc-node">
+			<div class="title"><h2>fn try_reduce_lr_on_plateau <a href="#try_reduce_lr_on_plateau">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L579"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> try_reduce_lr_on_plateau<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>config ReduceLROnPlateauConfig<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>ReduceLROnPlateau<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>try_reduce_lr_on_plateau validates the configuration and creates a scheduler.</p>
+
+</section>
+
 		<section id="Scheduler" class="doc-node">
 			<div class="title"><h2>interface Scheduler <a href="#Scheduler">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L8"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -423,8 +539,34 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 
 </section>
 
+		<section id="AdamOptimizer[T].checkpoint_config" class="doc-node">
+			<div class="title"><h2>fn (AdamOptimizer[T]) checkpoint_config <a href="#AdamOptimizer[T].checkpoint_config">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adam.v#L74"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>o <span class="token operator">&amp;</span>AdamOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">checkpoint_config</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token builtin">f64</span></code></pre>
+<p>checkpoint_config returns the scalar parameters needed to resume Adam.</p>
+
+</section>
+
+		<section id="AdamOptimizer[T].restore_checkpoint_state" class="doc-node">
+			<div class="title"><h2>fn (AdamOptimizer[T]) restore_checkpoint_state <a href="#AdamOptimizer[T].restore_checkpoint_state">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adam.v#L87"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o AdamOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">restore_checkpoint_state</span><span class="token punctuation">(</span>config <span class="token builtin">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span>
+	first_moments <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> second_moments <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<p>restore_checkpoint_state restores Adam's scalar parameters and moment buffers. Parameters must already be registered with build_params in the same order.</p>
+
+</section>
+
+		<section id="AdamOptimizer[T].validate_checkpoint_state" class="doc-node">
+			<div class="title"><h2>fn (AdamOptimizer[T]) validate_checkpoint_state <a href="#AdamOptimizer[T].validate_checkpoint_state">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adam.v#L102"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>o <span class="token operator">&amp;</span>AdamOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">validate_checkpoint_state</span><span class="token punctuation">(</span>config <span class="token builtin">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span>
+	first_moments <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> second_moments <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<p>validate_checkpoint_state checks Adam state without changing the optimizer.</p>
+
+</section>
+
 		<section id="AdamOptimizer[T].build_params" class="doc-node">
-			<div class="title"><h2>fn (AdamOptimizer[T]) build_params <a href="#AdamOptimizer[T].build_params">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adam.v#L75"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (AdamOptimizer[T]) build_params <a href="#AdamOptimizer[T].build_params">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adam.v#L132"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o AdamOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">build_params</span><span class="token punctuation">(</span>layers <span class="token punctuation">[</span><span class="token punctuation">]</span>types<span class="token punctuation">.</span>Layer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
 <p>build_params registers all trainable variables from <code>layers</code> into the optimizer. Call once after constructing the model, before the first <code>update()</code>.</p>
@@ -432,7 +574,7 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 </section>
 
 		<section id="AdamOptimizer[T].update" class="doc-node">
-			<div class="title"><h2>fn (AdamOptimizer[T]) update <a href="#AdamOptimizer[T].update">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adam.v#L87"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (AdamOptimizer[T]) update <a href="#AdamOptimizer[T].update">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/adam.v#L144"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o AdamOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">update</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
 <p>update performs one Adam parameter update step and zeros all gradients. Must be called after <code>loss.backward()</code>.</p>
@@ -455,11 +597,43 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 
 </section>
 
+		<section id="ConstantLR[T].next_lr" class="doc-node">
+			<div class="title"><h2>fn (ConstantLR[T]) next_lr <a href="#ConstantLR[T].next_lr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L150"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span>ConstantLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">next_lr</span><span class="token punctuation">(</span>base_lr <span class="token builtin">f64</span><span class="token punctuation">,</span> step <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">f64</span></code></pre>
+<p>next_lr returns the scaled rate before total_iters and the base rate afterward.</p>
+
+</section>
+
 		<section id="CosineAnnealingLR[T].next_lr" class="doc-node">
-			<div class="title"><h2>fn (CosineAnnealingLR[T]) next_lr <a href="#CosineAnnealingLR[T].next_lr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L67"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (CosineAnnealingLR[T]) next_lr <a href="#CosineAnnealingLR[T].next_lr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L174"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span>CosineAnnealingLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">next_lr</span><span class="token punctuation">(</span>current_lr <span class="token builtin">f64</span><span class="token punctuation">,</span> step <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">f64</span></code></pre>
 <p>next_lr exposes this operation as part of the public API.</p>
+
+</section>
+
+		<section id="CosineAnnealingWarmRestarts[T].next_lr" class="doc-node">
+			<div class="title"><h2>fn (CosineAnnealingWarmRestarts[T]) next_lr <a href="#CosineAnnealingWarmRestarts[T].next_lr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L213"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span>CosineAnnealingWarmRestarts<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">next_lr</span><span class="token punctuation">(</span>base_lr <span class="token builtin">f64</span><span class="token punctuation">,</span> step <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">f64</span></code></pre>
+<p>next_lr returns the rate for a zero-based step, with each cycle beginning at the base rate and annealing toward eta_min.</p>
+
+</section>
+
+		<section id="CyclicLR[T].next_momentum" class="doc-node">
+			<div class="title"><h2>fn (CyclicLR[T]) next_momentum <a href="#CyclicLR[T].next_momentum">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L491"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span>CyclicLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">next_momentum</span><span class="token punctuation">(</span>step <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">?</span><span class="token builtin">f64</span></code></pre>
+<p>next_momentum returns the inverse momentum curve for a zero-based minibatch step. It returns none when momentum cycling is disabled. Apply the returned value to an optimizer explicitly; this scheduler does not mutate optimizers.</p>
+
+</section>
+
+		<section id="CyclicLR[T].next_lr" class="doc-node">
+			<div class="title"><h2>fn (CyclicLR[T]) next_lr <a href="#CyclicLR[T].next_lr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L510"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span>CyclicLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">next_lr</span><span class="token punctuation">(</span>_ <span class="token builtin">f64</span><span class="token punctuation">,</span> step <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">f64</span></code></pre>
+<p>next_lr returns the rate for a zero-based minibatch step. The input rate is ignored because the schedule is defined by its base and maximum rates.</p>
 
 </section>
 
@@ -468,6 +642,22 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span>ExponentialLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">next_lr</span><span class="token punctuation">(</span>current_lr <span class="token builtin">f64</span><span class="token punctuation">,</span> step <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">f64</span></code></pre>
 <p>next_lr exposes this operation as part of the public API.</p>
+
+</section>
+
+		<section id="LinearLR[T].next_lr" class="doc-node">
+			<div class="title"><h2>fn (LinearLR[T]) next_lr <a href="#LinearLR[T].next_lr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L246"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span>LinearLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">next_lr</span><span class="token punctuation">(</span>base_lr <span class="token builtin">f64</span><span class="token punctuation">,</span> step <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">f64</span></code></pre>
+<p>next_lr exposes this operation as part of the public API.</p>
+
+</section>
+
+		<section id="MultiStepLR[T].next_lr" class="doc-node">
+			<div class="title"><h2>fn (MultiStepLR[T]) next_lr <a href="#MultiStepLR[T].next_lr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L82"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span>MultiStepLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">next_lr</span><span class="token punctuation">(</span>base_lr <span class="token builtin">f64</span><span class="token punctuation">,</span> step <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">f64</span></code></pre>
+<p>next_lr returns the rate for a zero-based epoch, based on the base rate.</p>
 
 </section>
 
@@ -484,6 +674,30 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> o NAdamOptimizer<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">update</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
 <p>update performs one NAdam parameter update and zeros gradients.</p>
+
+</section>
+
+		<section id="OneCycleLR[T].next_lr" class="doc-node">
+			<div class="title"><h2>fn (OneCycleLR[T]) next_lr <a href="#OneCycleLR[T].next_lr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L328"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span>OneCycleLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">next_lr</span><span class="token punctuation">(</span>_ <span class="token builtin">f64</span><span class="token punctuation">,</span> step <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">f64</span></code></pre>
+<p>next_lr returns the rate for a zero-based minibatch step. Steps outside the configured cycle are clamped to its first or final rate.</p>
+
+</section>
+
+		<section id="OneCycleLR[T].next_momentum" class="doc-node">
+			<div class="title"><h2>fn (OneCycleLR[T]) next_momentum <a href="#OneCycleLR[T].next_momentum">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L356"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span>OneCycleLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">next_momentum</span><span class="token punctuation">(</span>step <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">?</span><span class="token builtin">f64</span></code></pre>
+<p>next_momentum returns the inverse momentum curve for a zero-based minibatch step. It returns none when cycling is disabled. Apply the returned value to an optimizer explicitly; this scheduler does not mutate optimizer state.</p>
+
+</section>
+
+		<section id="PolynomialLR[T].next_lr" class="doc-node">
+			<div class="title"><h2>fn (PolynomialLR[T]) next_lr <a href="#PolynomialLR[T].next_lr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L118"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span>PolynomialLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">next_lr</span><span class="token punctuation">(</span>base_lr <span class="token builtin">f64</span><span class="token punctuation">,</span> step <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">f64</span></code></pre>
+<p>next_lr returns the polynomially decayed rate for a zero-based step.</p>
 
 </section>
 
@@ -519,11 +733,19 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 
 </section>
 
-		<section id="ReduceLROnPlateau[T].next_lr" class="doc-node">
-			<div class="title"><h2>fn (ReduceLROnPlateau[T]) next_lr <a href="#ReduceLROnPlateau[T].next_lr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L114"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+		<section id="ReduceLROnPlateau[T].step" class="doc-node">
+			<div class="title"><h2>fn (ReduceLROnPlateau[T]) step <a href="#ReduceLROnPlateau[T].step">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L606"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> s ReduceLROnPlateau<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">next_lr</span><span class="token punctuation">(</span>current_lr <span class="token builtin">f64</span><span class="token punctuation">,</span> step <span class="token builtin">int</span><span class="token punctuation">,</span> metric_delta <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token builtin">f64</span></code></pre>
-<p>next_lr exposes this operation as part of the public API.</p>
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> s ReduceLROnPlateau<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">step</span><span class="token punctuation">(</span>current_lr <span class="token builtin">f64</span><span class="token punctuation">,</span> metric <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token builtin">f64</span></code></pre>
+<p>step consumes a monitored metric and returns the PyTorch-style updated rate. A metric must beat the absolute or relative threshold to reset patience.</p>
+
+</section>
+
+		<section id="ReduceLROnPlateau[T].next_lr" class="doc-node">
+			<div class="title"><h2>fn (ReduceLROnPlateau[T]) next_lr <a href="#ReduceLROnPlateau[T].next_lr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L650"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> s ReduceLROnPlateau<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">next_lr</span><span class="token punctuation">(</span>current_lr <span class="token builtin">f64</span><span class="token punctuation">,</span> _ <span class="token builtin">int</span><span class="token punctuation">,</span> metric_delta <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token builtin">f64</span></code></pre>
+<p>next_lr preserves the original delta-based API. A negative delta beyond <code>-threshold</code> means improvement; other finite deltas count toward patience.</p>
 
 </section>
 
@@ -548,6 +770,62 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span>StepLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">next_lr</span><span class="token punctuation">(</span>current_lr <span class="token builtin">f64</span><span class="token punctuation">,</span> step <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">f64</span></code></pre>
 <p>next_lr exposes this operation as part of the public API.</p>
+
+</section>
+
+		<section id="CyclicLRMode" class="doc-node">
+			<div class="title"><h2>enum CyclicLRMode <a href="#CyclicLRMode">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L395"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">enum</span> CyclicLRMode <span class="token punctuation">{</span>
+	triangular
+	triangular2
+	exp_range
+<span class="token punctuation">}</span></code></pre>
+<p>CyclicLRMode selects the built-in cycle-amplitude policy.</p>
+
+</section>
+
+		<section id="CyclicLRScaleMode" class="doc-node">
+			<div class="title"><h2>enum CyclicLRScaleMode <a href="#CyclicLRScaleMode">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L403"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">enum</span> CyclicLRScaleMode <span class="token punctuation">{</span>
+	cycle
+	iterations
+<span class="token punctuation">}</span></code></pre>
+<p>CyclicLRScaleMode selects whether a custom scale function receives the one-based cycle number or the zero-based minibatch step.</p>
+
+</section>
+
+		<section id="OneCycleAnnealStrategy" class="doc-node">
+			<div class="title"><h2>enum OneCycleAnnealStrategy <a href="#OneCycleAnnealStrategy">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L257"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">enum</span> OneCycleAnnealStrategy <span class="token punctuation">{</span>
+	cosine
+	linear
+<span class="token punctuation">}</span></code></pre>
+<p>OneCycleLRConfig defines the learning-rate and momentum bounds of the one-cycle policy.</p>
+
+</section>
+
+		<section id="ReduceLROnPlateauMode" class="doc-node">
+			<div class="title"><h2>enum ReduceLROnPlateauMode <a href="#ReduceLROnPlateauMode">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L526"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">enum</span> ReduceLROnPlateauMode <span class="token punctuation">{</span>
+	min
+	max
+<span class="token punctuation">}</span></code></pre>
+<p>ReduceLROnPlateau reduces LR when a metric has stopped improving.</p>
+
+</section>
+
+		<section id="ReduceLROnPlateauThresholdMode" class="doc-node">
+			<div class="title"><h2>enum ReduceLROnPlateauThresholdMode <a href="#ReduceLROnPlateauThresholdMode">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L531"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">enum</span> ReduceLROnPlateauThresholdMode <span class="token punctuation">{</span>
+	rel
+	abs
+<span class="token punctuation">}</span></code></pre>
+
 
 </section>
 
@@ -670,8 +948,32 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 
 </section>
 
+		<section id="ConstantLR" class="doc-node">
+			<div class="title"><h2>struct ConstantLR <a href="#ConstantLR">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L133"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> ConstantLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	factor      <span class="token builtin">f64</span>
+	total_iters <span class="token builtin">int</span>
+<span class="token punctuation">}</span></code></pre>
+<p>ConstantLR scales the base rate by factor for a fixed number of steps.</p>
+
+</section>
+
+		<section id="ConstantLRConfig" class="doc-node">
+			<div class="title"><h2>struct ConstantLRConfig <a href="#ConstantLRConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L126"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[params]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> ConstantLRConfig <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	factor      <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">1.0</span> <span class="token operator">/</span> <span class="token number">3.0</span>
+	total_iters <span class="token builtin">int</span> <span class="token operator">=</span> <span class="token number">5</span>
+<span class="token punctuation">}</span></code></pre>
+<p>ConstantLRConfig defines a temporary constant scaling of the base rate.</p>
+
+</section>
+
 		<section id="CosineAnnealingLR" class="doc-node">
-			<div class="title"><h2>struct CosineAnnealingLR <a href="#CosineAnnealingLR">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L51"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>struct CosineAnnealingLR <a href="#CosineAnnealingLR">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L158"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">struct</span> CosineAnnealingLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
@@ -682,6 +984,74 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 
 </section>
 
+		<section id="CosineAnnealingWarmRestarts" class="doc-node">
+			<div class="title"><h2>struct CosineAnnealingWarmRestarts <a href="#CosineAnnealingWarmRestarts">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L192"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> CosineAnnealingWarmRestarts<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	t_0     <span class="token builtin">int</span>
+	t_mult  <span class="token builtin">int</span>
+	eta_min <span class="token builtin">f64</span>
+<span class="token punctuation">}</span></code></pre>
+<p>CosineAnnealingWarmRestarts restarts the learning rate at the start of each cycle and can increase cycle lengths geometrically with t_mult.</p>
+
+</section>
+
+		<section id="CosineAnnealingWarmRestartsConfig" class="doc-node">
+			<div class="title"><h2>struct CosineAnnealingWarmRestartsConfig <a href="#CosineAnnealingWarmRestartsConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L183"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[params]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> CosineAnnealingWarmRestartsConfig <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	t_0     <span class="token builtin">int</span>
+	t_mult  <span class="token builtin">int</span> <span class="token operator">=</span> <span class="token number">1</span>
+	eta_min <span class="token builtin">f64</span>
+<span class="token punctuation">}</span></code></pre>
+<p>CosineAnnealingWarmRestartsConfig defines a cosine schedule with periodic restarts.</p>
+
+</section>
+
+		<section id="CyclicLR" class="doc-node">
+			<div class="title"><h2>struct CyclicLR <a href="#CyclicLR">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L428"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> CyclicLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	base_lr        <span class="token builtin">f64</span>
+	max_lr         <span class="token builtin">f64</span>
+	step_size_up   <span class="token builtin">int</span>
+	step_size_down <span class="token builtin">int</span>
+	mode           CyclicLRMode
+	gamma          <span class="token builtin">f64</span>
+	cycle_momentum <span class="token builtin">bool</span>
+	base_momentum  <span class="token builtin">f64</span>
+	max_momentum   <span class="token builtin">f64</span>
+	scale_fn       <span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	scale_mode     CyclicLRScaleMode
+<span class="token punctuation">}</span></code></pre>
+<p>CyclicLR cycles the learning rate between base_lr and max_lr. Momentum can be queried as an inverse cycle with next_momentum. The scheduler does not update optimizer state or support parameter groups.</p>
+
+</section>
+
+		<section id="CyclicLRConfig" class="doc-node">
+			<div class="title"><h2>struct CyclicLRConfig <a href="#CyclicLRConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L410"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[params]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> CyclicLRConfig <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	base_lr        <span class="token builtin">f64</span>
+	max_lr         <span class="token builtin">f64</span>
+	step_size_up   <span class="token builtin">int</span> <span class="token operator">=</span> <span class="token number">2000</span>
+	step_size_down <span class="token builtin">int</span>
+	mode           CyclicLRMode <span class="token operator">=</span> <span class="token enum_value">.</span><span class="token enum_value">triangular</span>
+	gamma          <span class="token builtin">f64</span>          <span class="token operator">=</span> <span class="token number">1.0</span>
+	cycle_momentum <span class="token builtin">bool</span>         <span class="token operator">=</span> <span class="token boolean">true</span>
+	base_momentum  <span class="token builtin">f64</span>          <span class="token operator">=</span> <span class="token number">0.8</span>
+	max_momentum   <span class="token builtin">f64</span>          <span class="token operator">=</span> <span class="token number">0.9</span>
+	scale_fn       <span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	scale_mode     CyclicLRScaleMode
+<span class="token punctuation">}</span></code></pre>
+<p>CyclicLRConfig defines a minibatch-based triangular learning-rate schedule.</p>
+
+</section>
+
 		<section id="ExponentialLR" class="doc-node">
 			<div class="title"><h2>struct ExponentialLR <a href="#ExponentialLR">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L33"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -689,6 +1059,42 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 	gamma <span class="token builtin">f64</span>
 <span class="token punctuation">}</span></code></pre>
 <p>ExponentialLR decays the learning rate by <code>gamma</code> at every step.</p>
+
+</section>
+
+		<section id="LinearLR" class="doc-node">
+			<div class="title"><h2>struct LinearLR <a href="#LinearLR">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L229"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> LinearLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	start_factor <span class="token builtin">f64</span>
+	end_factor   <span class="token builtin">f64</span>
+	total_iters  <span class="token builtin">int</span>
+<span class="token punctuation">}</span></code></pre>
+<p>LinearLR scales the base learning rate linearly between two factors.</p>
+
+</section>
+
+		<section id="MultiStepLR" class="doc-node">
+			<div class="title"><h2>struct MultiStepLR <a href="#MultiStepLR">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L59"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> MultiStepLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	milestones <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
+	gamma      <span class="token builtin">f64</span>
+<span class="token punctuation">}</span></code></pre>
+<p>MultiStepLR decays the base learning rate at each configured milestone.</p>
+
+</section>
+
+		<section id="MultiStepLRConfig" class="doc-node">
+			<div class="title"><h2>struct MultiStepLRConfig <a href="#MultiStepLRConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L52"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[params]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> MultiStepLRConfig <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	milestones <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
+	gamma      <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">0.1</span>
+<span class="token punctuation">}</span></code></pre>
+<p>MultiStepLRConfig defines the epochs at which the rate is decayed.</p>
 
 </section>
 
@@ -755,6 +1161,70 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 	decoupled_decay <span class="token builtin">bool</span>
 <span class="token punctuation">}</span></code></pre>
 <p>NAdamStepParams holds one CPU NAdam update's scalar state.</p>
+
+</section>
+
+		<section id="OneCycleLR" class="doc-node">
+			<div class="title"><h2>struct OneCycleLR <a href="#OneCycleLR">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L281"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> OneCycleLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	max_lr           <span class="token builtin">f64</span>
+	total_steps      <span class="token builtin">int</span>
+	pct_start        <span class="token builtin">f64</span>
+	div_factor       <span class="token builtin">f64</span>
+	final_div_factor <span class="token builtin">f64</span>
+	three_phase      <span class="token builtin">bool</span>
+	anneal_strategy  OneCycleAnnealStrategy
+	cycle_momentum   <span class="token builtin">bool</span>
+	base_momentum    <span class="token builtin">f64</span>
+	max_momentum     <span class="token builtin">f64</span>
+<span class="token punctuation">}</span></code></pre>
+<p>OneCycleLR raises the rate from max_lr/div_factor to max_lr, then anneals it to max_lr/(div_factor*final_div_factor). Steps are minibatch steps, as in PyTorch's OneCycleLR. The optional three-phase policy returns to the initial rate before the final annealing phase.</p>
+
+</section>
+
+		<section id="OneCycleLRConfig" class="doc-node">
+			<div class="title"><h2>struct OneCycleLRConfig <a href="#OneCycleLRConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L263"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[params]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> OneCycleLRConfig <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	max_lr           <span class="token builtin">f64</span>
+	total_steps      <span class="token builtin">int</span>
+	pct_start        <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">0.3</span>
+	div_factor       <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">25.0</span>
+	final_div_factor <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">10000.0</span>
+	three_phase      <span class="token builtin">bool</span>
+	anneal_strategy  OneCycleAnnealStrategy <span class="token operator">=</span> <span class="token enum_value">.</span><span class="token enum_value">cosine</span>
+	cycle_momentum   <span class="token builtin">bool</span>                   <span class="token operator">=</span> <span class="token boolean">true</span>
+	base_momentum    <span class="token builtin">f64</span>                    <span class="token operator">=</span> <span class="token number">0.85</span>
+	max_momentum     <span class="token builtin">f64</span>                    <span class="token operator">=</span> <span class="token number">0.95</span>
+<span class="token punctuation">}</span></code></pre>
+
+
+</section>
+
+		<section id="PolynomialLR" class="doc-node">
+			<div class="title"><h2>struct PolynomialLR <a href="#PolynomialLR">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L101"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> PolynomialLR<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	total_iters <span class="token builtin">int</span>
+	power       <span class="token builtin">f64</span>
+<span class="token punctuation">}</span></code></pre>
+<p>PolynomialLR decays the base learning rate to zero over total_iters steps.</p>
+
+</section>
+
+		<section id="PolynomialLRConfig" class="doc-node">
+			<div class="title"><h2>struct PolynomialLRConfig <a href="#PolynomialLRConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L94"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[params]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> PolynomialLRConfig <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	total_iters <span class="token builtin">int</span> <span class="token operator">=</span> <span class="token number">5</span>
+	power       <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">1.0</span>
+<span class="token punctuation">}</span></code></pre>
+<p>PolynomialLRConfig defines the duration and power of a polynomial decay.</p>
 
 </section>
 
@@ -851,33 +1321,44 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 </section>
 
 		<section id="ReduceLROnPlateau" class="doc-node">
-			<div class="title"><h2>struct ReduceLROnPlateau <a href="#ReduceLROnPlateau">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L75"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>struct ReduceLROnPlateau <a href="#ReduceLROnPlateau">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L536"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">struct</span> ReduceLROnPlateau<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
-	factor    <span class="token builtin">f64</span>
-	patience  <span class="token builtin">int</span>
-	threshold <span class="token builtin">f64</span>
-	epsilon   <span class="token builtin">f64</span>
-	cooldown  <span class="token builtin">int</span>
+	factor         <span class="token builtin">f64</span>
+	patience       <span class="token builtin">int</span>
+	threshold      <span class="token builtin">f64</span>
+	epsilon        <span class="token builtin">f64</span>
+	cooldown       <span class="token builtin">int</span>
+	mode           ReduceLROnPlateauMode
+	threshold_mode ReduceLROnPlateauThresholdMode
+	min_lr         <span class="token builtin">f64</span>
+<span class="token keyword">mut</span><span class="token punctuation">:</span>
+	cooldown_remaining      <span class="token builtin">int</span>
+	step_cooldown_remaining <span class="token builtin">int</span>
+	step_bad_epochs         <span class="token builtin">int</span>
+	step_best               <span class="token builtin">f64</span>
 <span class="token keyword">pub</span> <span class="token keyword">mut</span><span class="token punctuation">:</span>
 	wait       <span class="token builtin">int</span>
 	current_lr <span class="token builtin">f64</span>
 <span class="token punctuation">}</span></code></pre>
-<p>ReduceLROnPlateau reduces LR when a metric has stopped improving.</p>
+
 
 </section>
 
 		<section id="ReduceLROnPlateauConfig" class="doc-node">
-			<div class="title"><h2>struct ReduceLROnPlateauConfig <a href="#ReduceLROnPlateauConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L90"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>struct ReduceLROnPlateauConfig <a href="#ReduceLROnPlateauConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/optimizers/scheduler.v#L559"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <div class="attributes"><div class="attribute">@[params]</div></div>
 <pre class="signature">
 <code><span class="token keyword">struct</span> ReduceLROnPlateauConfig <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
-	factor    <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">0.1</span>
-	patience  <span class="token builtin">int</span> <span class="token operator">=</span> <span class="token number">10</span>
-	threshold <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">1e-4</span>
-	epsilon   <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">1e-8</span>
-	cooldown  <span class="token builtin">int</span>
+	factor         <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">0.1</span>
+	patience       <span class="token builtin">int</span> <span class="token operator">=</span> <span class="token number">10</span>
+	threshold      <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">1e-4</span>
+	threshold_mode ReduceLROnPlateauThresholdMode <span class="token operator">=</span> <span class="token enum_value">.</span><span class="token enum_value">rel</span>
+	mode           ReduceLROnPlateauMode          <span class="token operator">=</span> <span class="token enum_value">.</span><span class="token enum_value">min</span>
+	epsilon        <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">1e-8</span>
+	cooldown       <span class="token builtin">int</span>
+	min_lr         <span class="token builtin">f64</span>
 <span class="token punctuation">}</span></code></pre>
 <p>ReduceLROnPlateauConfig defines a public data structure for this module.</p>
 
@@ -919,7 +1400,7 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 8 Oct 2026 15:02:27</div>
+						<div class="footer">Powered by vdoc. Generated on: 12 Oct 2026 22:21:53</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_optimizers">README</a></li>
 <li class="open"><a href="#adagrad">fn adagrad</a>        <ul>
@@ -949,13 +1430,40 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 <li class="open"><a href="#clip_grad_norm">fn clip_grad_norm</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#clip_grad_norm_with_type">fn clip_grad_norm_with_type</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#clip_grad_value">fn clip_grad_value</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#clip_grads_with_norm">fn clip_grads_with_norm</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#constant_lr">fn constant_lr</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#cosine_annealing_lr">fn cosine_annealing_lr</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#cosine_annealing_warm_restarts">fn cosine_annealing_warm_restarts</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#cyclic_lr">fn cyclic_lr</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#exponential_lr">fn exponential_lr</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#get_total_grad_norm">fn get_total_grad_norm</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#get_total_grad_norm_with_type">fn get_total_grad_norm_with_type</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#linear_lr">fn linear_lr</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#multi_step_lr">fn multi_step_lr</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#nadam_optimizer">fn nadam_optimizer</a>        <ul>
@@ -965,6 +1473,12 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 </ul>
 </li>
 <li class="open"><a href="#nadam_step_f64_cpu">fn nadam_step_f64_cpu</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#one_cycle_lr">fn one_cycle_lr</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#polynomial_lr">fn polynomial_lr</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#radam_optimizer">fn radam_optimizer</a>        <ul>
@@ -991,6 +1505,9 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 <li class="open"><a href="#try_adam_update_f32_vulkan">fn try_adam_update_f32_vulkan</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#try_reduce_lr_on_plateau">fn try_reduce_lr_on_plateau</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#Scheduler">interface Scheduler</a>        <ul>
 </ul>
 </li>
@@ -999,7 +1516,10 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 <li><a href="#AdaGradOptimizer[T].update">fn update</a></li>
 </ul>
 </li>
-<li class="open"><a href="#AdamOptimizer[T].build_params">type AdamOptimizer[T]</a>        <ul>
+<li class="open"><a href="#AdamOptimizer[T].checkpoint_config">type AdamOptimizer[T]</a>        <ul>
+<li><a href="#AdamOptimizer[T].checkpoint_config">fn checkpoint_config</a></li>
+<li><a href="#AdamOptimizer[T].restore_checkpoint_state">fn restore_checkpoint_state</a></li>
+<li><a href="#AdamOptimizer[T].validate_checkpoint_state">fn validate_checkpoint_state</a></li>
 <li><a href="#AdamOptimizer[T].build_params">fn build_params</a></li>
 <li><a href="#AdamOptimizer[T].update">fn update</a></li>
 </ul>
@@ -1009,17 +1529,47 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 <li><a href="#AdamWOptimizer[T].update">fn update</a></li>
 </ul>
 </li>
+<li class="open"><a href="#ConstantLR[T].next_lr">type ConstantLR[T]</a>        <ul>
+<li><a href="#ConstantLR[T].next_lr">fn next_lr</a></li>
+</ul>
+</li>
 <li class="open"><a href="#CosineAnnealingLR[T].next_lr">type CosineAnnealingLR[T]</a>        <ul>
 <li><a href="#CosineAnnealingLR[T].next_lr">fn next_lr</a></li>
+</ul>
+</li>
+<li class="open"><a href="#CosineAnnealingWarmRestarts[T].next_lr">type CosineAnnealingWarmRestarts[T]</a>        <ul>
+<li><a href="#CosineAnnealingWarmRestarts[T].next_lr">fn next_lr</a></li>
+</ul>
+</li>
+<li class="open"><a href="#CyclicLR[T].next_momentum">type CyclicLR[T]</a>        <ul>
+<li><a href="#CyclicLR[T].next_momentum">fn next_momentum</a></li>
+<li><a href="#CyclicLR[T].next_lr">fn next_lr</a></li>
 </ul>
 </li>
 <li class="open"><a href="#ExponentialLR[T].next_lr">type ExponentialLR[T]</a>        <ul>
 <li><a href="#ExponentialLR[T].next_lr">fn next_lr</a></li>
 </ul>
 </li>
+<li class="open"><a href="#LinearLR[T].next_lr">type LinearLR[T]</a>        <ul>
+<li><a href="#LinearLR[T].next_lr">fn next_lr</a></li>
+</ul>
+</li>
+<li class="open"><a href="#MultiStepLR[T].next_lr">type MultiStepLR[T]</a>        <ul>
+<li><a href="#MultiStepLR[T].next_lr">fn next_lr</a></li>
+</ul>
+</li>
 <li class="open"><a href="#NAdamOptimizer[T].build_params">type NAdamOptimizer[T]</a>        <ul>
 <li><a href="#NAdamOptimizer[T].build_params">fn build_params</a></li>
 <li><a href="#NAdamOptimizer[T].update">fn update</a></li>
+</ul>
+</li>
+<li class="open"><a href="#OneCycleLR[T].next_lr">type OneCycleLR[T]</a>        <ul>
+<li><a href="#OneCycleLR[T].next_lr">fn next_lr</a></li>
+<li><a href="#OneCycleLR[T].next_momentum">fn next_momentum</a></li>
+</ul>
+</li>
+<li class="open"><a href="#PolynomialLR[T].next_lr">type PolynomialLR[T]</a>        <ul>
+<li><a href="#PolynomialLR[T].next_lr">fn next_lr</a></li>
 </ul>
 </li>
 <li class="open"><a href="#RAdamOptimizer[T].build_params">type RAdamOptimizer[T]</a>        <ul>
@@ -1032,7 +1582,8 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 <li><a href="#RMSPropOptimizer[T].update">fn update</a></li>
 </ul>
 </li>
-<li class="open"><a href="#ReduceLROnPlateau[T].next_lr">type ReduceLROnPlateau[T]</a>        <ul>
+<li class="open"><a href="#ReduceLROnPlateau[T].step">type ReduceLROnPlateau[T]</a>        <ul>
+<li><a href="#ReduceLROnPlateau[T].step">fn step</a></li>
 <li><a href="#ReduceLROnPlateau[T].next_lr">fn next_lr</a></li>
 </ul>
 </li>
@@ -1043,6 +1594,21 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 </li>
 <li class="open"><a href="#StepLR[T].next_lr">type StepLR[T]</a>        <ul>
 <li><a href="#StepLR[T].next_lr">fn next_lr</a></li>
+</ul>
+</li>
+<li class="open"><a href="#CyclicLRMode">enum CyclicLRMode</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#CyclicLRScaleMode">enum CyclicLRScaleMode</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#OneCycleAnnealStrategy">enum OneCycleAnnealStrategy</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ReduceLROnPlateauMode">enum ReduceLROnPlateauMode</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ReduceLROnPlateauThresholdMode">enum ReduceLROnPlateauThresholdMode</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#AdaGradOptimizer">struct AdaGradOptimizer</a>        <ul>
@@ -1066,10 +1632,37 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 <li class="open"><a href="#AdamWOptimizerConfig">struct AdamWOptimizerConfig</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#ConstantLR">struct ConstantLR</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ConstantLRConfig">struct ConstantLRConfig</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#CosineAnnealingLR">struct CosineAnnealingLR</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#CosineAnnealingWarmRestarts">struct CosineAnnealingWarmRestarts</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#CosineAnnealingWarmRestartsConfig">struct CosineAnnealingWarmRestartsConfig</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#CyclicLR">struct CyclicLR</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#CyclicLRConfig">struct CyclicLRConfig</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#ExponentialLR">struct ExponentialLR</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#LinearLR">struct LinearLR</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#MultiStepLR">struct MultiStepLR</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#MultiStepLRConfig">struct MultiStepLRConfig</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#NAdamOptimizer">struct NAdamOptimizer</a>        <ul>
@@ -1079,6 +1672,18 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 </ul>
 </li>
 <li class="open"><a href="#NAdamStepParams">struct NAdamStepParams</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#OneCycleLR">struct OneCycleLR</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#OneCycleLRConfig">struct OneCycleLRConfig</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#PolynomialLR">struct PolynomialLR</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#PolynomialLRConfig">struct PolynomialLRConfig</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#RAdamOptimizer">struct RAdamOptimizer</a>        <ul>

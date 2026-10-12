@@ -139,7 +139,7 @@
 			<div class="title"><h1> la <a href="#readme_la">#</a></h1></div>
 <h1 id=""><code>vtl.la</code></h1>
 <p>Linear algebra wrappers over VSL. Functions accept VTL tensors and return VTL tensors; many decompositions currently return <code>f64</code> results even when the input has another numeric type. Check each function's signature when preserving dtype matters.</p>
-<p><code>matmul</code> supports complex128 vector, matrix, and broadcast-batch products via a pure-V kernel. Complex vector products follow NumPy's convention and do not conjugate either operand. Complex decomposition and solve routines remain unsupported.</p>
+<p><code>matmul</code> supports complex128 vector, matrix, and broadcast-batch products via a pure-V kernel. Complex vector products follow NumPy's convention and do not conjugate either operand. General <code>eig</code> accepts real matrices and can return complex eigenpairs; complex-input decomposition and solve routines remain unsupported.</p>
 <pre><code class="language-v"><span class="token keyword">import</span> vtl
 <span class="token keyword">import</span> vtl<span class="token punctuation">.</span>la
 
@@ -149,7 +149,7 @@ c <span class="token operator">:=</span> la<span class="token punctuation">.</sp
 contracted <span class="token operator">:=</span> la<span class="token punctuation">.</span>tensordot<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span>a<span class="token punctuation">,</span> b<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token operator">!</span>
 determinant <span class="token operator">:=</span> la<span class="token punctuation">.</span>det<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span class="token operator">!</span>
 main_diagonal <span class="token operator">:=</span> la<span class="token punctuation">.</span>diag<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span>a<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token operator">!</span></code></pre>
-<p>Available operations include <code>dot</code>, <code>matmul</code>, <code>tensordot</code>, <code>diag</code>, batched <code>det</code> and <code>inv</code>, <code>trace</code>, matrix <code>norm</code>, vector <code>vector_norm</code> and its axis variants, <code>outer</code>, <code>cross</code>, <code>solve</code>, <code>lstsq</code>, <code>qr</code>, <code>lu</code>, <code>cholesky</code>, <code>pinv</code>, <code>matrix_rank</code>, <code>matrix_rank_batch</code>, <code>slogdet</code>, <code>svd</code>, <code>svdvals</code>, batched <code>matrix_norm</code>, <code>matrix_power</code>, <code>cond</code>, and symmetric <code>eigh</code>/<code>eigvalsh</code>. Shape and tolerance requirements are checked by each function.</p>
+<p>Available operations include <code>dot</code>, <code>matmul</code>, <code>tensordot</code>, <code>diag</code>, batched <code>det</code> and <code>inv</code>, <code>trace</code>, matrix <code>norm</code>, vector <code>vector_norm</code> and its axis variants, <code>outer</code>, <code>cross</code>, <code>solve</code>, <code>lstsq</code>, <code>qr</code>, <code>lu</code>, <code>cholesky</code>, <code>pinv</code>, <code>matrix_rank</code>, <code>matrix_rank_batch</code>, <code>slogdet</code>, <code>svd</code>, <code>svdvals</code>, batched <code>matrix_norm</code>, <code>matrix_power</code>, <code>cond</code>, symmetric <code>eigh</code>/<code>eigvalsh</code>, and general <code>eig</code>/<code>eigvals</code>. Shape and tolerance requirements are checked by each function.</p>
 <p><code>solve(a, b)</code> accepts square matrices or stacks of square matrices. Leading batch dimensions follow NumPy broadcasting. A vector right-hand side has shape <code>[n]</code> (or <code>[..., n]</code> for vector batches); a matrix right-hand side has shape <code>[..., n, nrhs]</code>. The result keeps the broadcast batch shape and removes the last axis for vector right-hand sides. Singular systems return an error.</p>
 <p><code>lstsq(a, b)</code> accepts a vector or matrix right-hand side. It preserves vector output shape, reports the effective numerical rank, returns squared residuals for overdetermined full-column-rank systems, and an empty residual tensor for rank-deficient or underdetermined systems.</p>
 <p><code>tensordot(a, b, axes)</code> contracts the last <code>axes</code> dimensions of <code>a</code> with the first <code>axes</code> dimensions of <code>b</code>. Use <code>tensordot_axes(a, b, axes_a, axes_b)</code> to choose arbitrary axis pairs.</p>
@@ -162,7 +162,7 @@ main_diagonal <span class="token operator">:=</span> la<span class="token punctu
 </section>
 
 		<section id="cholesky" class="doc-node">
-			<div class="title"><h2>fn cholesky <a href="#cholesky">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/decompositions.v#L249"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn cholesky <a href="#cholesky">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/decompositions.v#L561"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> cholesky<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>a <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
 <p>cholesky computes Cholesky factorization of a symmetric positive-definite matrix. Returns lower-triangular L where A = L * L^T.</p>
@@ -209,6 +209,14 @@ main_diagonal <span class="token operator">:=</span> la<span class="token punctu
 
 </section>
 
+		<section id="det_complex" class="doc-node">
+			<div class="title"><h2>fn det_complex <a href="#det_complex">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/decompositions.v#L158"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">det_complex</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>vcomplex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>vcomplex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>det_complex computes determinants of complex128 square matrices. Leading batch dimensions are preserved; singular matrices have determinant 0.</p>
+
+</section>
+
 		<section id="diag" class="doc-node">
 			<div class="title"><h2>fn diag <a href="#diag">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/diag.v#L8"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -225,11 +233,27 @@ main_diagonal <span class="token operator">:=</span> la<span class="token punctu
 
 </section>
 
+		<section id="eig" class="doc-node">
+			<div class="title"><h2>fn eig <a href="#eig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/eig.v#L12"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> eig<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>vcomplex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>vcomplex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+<p>eig computes the general eigenvalues and right eigenvectors of each trailing real square matrix. Complex conjugate pairs are returned as complex values; eigenvectors are stored in columns. The outputs match NumPy shapes: [..., N] and [..., N, N].</p>
+
+</section>
+
 		<section id="eigh" class="doc-node">
 			<div class="title"><h2>fn eigh <a href="#eigh">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/eigh.v#L17"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> eigh<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> options EighOptions<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
 <p>eigh computes ascending eigenvalues and corresponding eigenvectors for each trailing real symmetric matrix. Eigenvectors are stored in columns, and the results have shapes [..., N] and [..., N, N]. Non-finite inputs and matrices that do not converge within 100 Jacobi sweeps return errors.</p>
+
+</section>
+
+		<section id="eigvals" class="doc-node">
+			<div class="title"><h2>fn eigvals <a href="#eigvals">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/eig.v#L18"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> eigvals<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>vcomplex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>eigvals returns the general eigenvalues of each trailing real square matrix without computing eigenvectors.</p>
 
 </section>
 
@@ -249,16 +273,32 @@ main_diagonal <span class="token operator">:=</span> la<span class="token punctu
 
 </section>
 
+		<section id="inv_complex" class="doc-node">
+			<div class="title"><h2>fn inv_complex <a href="#inv_complex">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/decompositions.v#L141"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">inv_complex</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>vcomplex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>vcomplex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>inv_complex computes the inverse of complex128 square matrices. Leading batch dimensions are preserved; singular matrices return an error.</p>
+
+</section>
+
 		<section id="lstsq" class="doc-node">
-			<div class="title"><h2>fn lstsq <a href="#lstsq">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/decompositions.v#L113"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn lstsq <a href="#lstsq">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/decompositions.v#L341"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> lstsq<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>a <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> b <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token builtin">int</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
 <p>lstsq solves the linear least-squares problem min ||Ax - B||_2. Returns (x, residuals, rank, singular_values).</p>
 
 </section>
 
+		<section id="lstsq_complex" class="doc-node">
+			<div class="title"><h2>fn lstsq_complex <a href="#lstsq_complex">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/decompositions.v#L401"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">lstsq_complex</span><span class="token punctuation">(</span>a <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>vcomplex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">,</span> b <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>vcomplex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>vcomplex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token builtin">int</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+<p>lstsq_complex solves the complex linear least-squares problem min ||Ax - B||_2. It accepts a 2D A and vector or matrix B, and returns the solution, squared residual sums, numerical rank, and singular values. The current implementation embeds the problem in real arithmetic, so its temporary matrices are twice as large along each matrix dimension.</p>
+
+</section>
+
 		<section id="lu" class="doc-node">
-			<div class="title"><h2>fn lu <a href="#lu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/decompositions.v#L208"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn lu <a href="#lu">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/decompositions.v#L520"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> lu<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>a <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
 <p>lu computes LU decomposition with partial pivoting: PA = LU. Returns (L, U, piv) as 2D tensors. L shape: [m, min(m,n)], U shape: [min(m,n), n]</p>
@@ -290,7 +330,7 @@ main_diagonal <span class="token operator">:=</span> la<span class="token punctu
 </section>
 
 		<section id="matrix_rank" class="doc-node">
-			<div class="title"><h2>fn matrix_rank <a href="#matrix_rank">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/decompositions.v#L316"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn matrix_rank <a href="#matrix_rank">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/decompositions.v#L628"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> matrix_rank<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>a <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> tol <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token builtin">int</span></code></pre>
 <p>matrix_rank returns the effective numerical rank of A.</p>
@@ -298,10 +338,18 @@ main_diagonal <span class="token operator">:=</span> la<span class="token punctu
 </section>
 
 		<section id="matrix_rank_batch" class="doc-node">
-			<div class="title"><h2>fn matrix_rank_batch <a href="#matrix_rank_batch">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/decompositions.v#L340"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn matrix_rank_batch <a href="#matrix_rank_batch">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/decompositions.v#L652"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> matrix_rank_batch<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> tol <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span></code></pre>
 <p>matrix_rank_batch returns the numerical rank of each trailing matrix. A positive tol is an absolute threshold; non-positive tol selects NumPy's dtype-aware default threshold.</p>
+
+</section>
+
+		<section id="multi_dot" class="doc-node">
+			<div class="title"><h2>fn multi_dot <a href="#multi_dot">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/multi_dot.v#L8"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> multi_dot<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>operands <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<p>multi_dot multiplies a sequence of matrices using the parenthesization with the lowest estimated scalar multiplication count. Vectors are allowed only as the first or last operand, matching NumPy's linalg.multi_dot contract.</p>
 
 </section>
 
@@ -322,7 +370,7 @@ main_diagonal <span class="token operator">:=</span> la<span class="token punctu
 </section>
 
 		<section id="pinv" class="doc-node">
-			<div class="title"><h2>fn pinv <a href="#pinv">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/decompositions.v#L274"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn pinv <a href="#pinv">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/decompositions.v#L586"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> pinv<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>a <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> tol <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
 <p>pinv computes the Moore-Penrose pseudoinverse of A using SVD.</p>
@@ -330,7 +378,7 @@ main_diagonal <span class="token operator">:=</span> la<span class="token punctu
 </section>
 
 		<section id="qr" class="doc-node">
-			<div class="title"><h2>fn qr <a href="#qr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/decompositions.v#L167"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn qr <a href="#qr">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/decompositions.v#L479"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> qr<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>a <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
 <p>qr computes QR factorization of A. Returns (Q, R) where Q is orthonormal and R is upper triangular. Q shape: [m, min(m,n)], R shape: [min(m,n), n]</p>
@@ -338,18 +386,34 @@ main_diagonal <span class="token operator">:=</span> la<span class="token punctu
 </section>
 
 		<section id="slogdet" class="doc-node">
-			<div class="title"><h2>fn slogdet <a href="#slogdet">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/slogdet.v#L10"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn slogdet <a href="#slogdet">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/slogdet.v#L11"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> slogdet<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
 <p>slogdet returns each matrix's determinant sign and the natural logarithm of its absolute determinant. The two results have the leading batch shape; for a single matrix they contain one value. Input matrices must be finite and square, and may be stacked across leading dimensions.</p>
 
 </section>
 
+		<section id="slogdet_complex" class="doc-node">
+			<div class="title"><h2>fn slogdet_complex <a href="#slogdet_complex">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/slogdet.v#L91"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">slogdet_complex</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>vcomplex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>vcomplex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+<p>slogdet_complex returns the unit-complex determinant phase and the natural logarithm of its magnitude for each complex128 square matrix. Leading batch dimensions are preserved. Singular matrices return a zero phase and -Inf.</p>
+
+</section>
+
 		<section id="solve" class="doc-node">
-			<div class="title"><h2>fn solve <a href="#solve">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/decompositions.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn solve <a href="#solve">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/decompositions.v#L237"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> solve<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>a <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> b <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span></code></pre>
 <p>solve solves A * X = B for stacks of square A matrices. Leading dimensions broadcast like NumPy; B may be a vector or a matrix of right-hand sides.</p>
+
+</section>
+
+		<section id="solve_complex" class="doc-node">
+			<div class="title"><h2>fn solve_complex <a href="#solve_complex">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/la/decompositions.v#L11"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">solve_complex</span><span class="token punctuation">(</span>a <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>vcomplex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">,</span> b <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>vcomplex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>vcomplex<span class="token punctuation">.</span>Complex<span class="token punctuation">]</span></code></pre>
+<p>solve_complex solves A * X = B for complex128 square matrix stacks. Leading batch dimensions broadcast like NumPy; B may be a vector or matrix. Partial pivoting is used for each system. Singular systems return an error.</p>
 
 </section>
 
@@ -495,7 +559,7 @@ main_diagonal <span class="token operator">:=</span> la<span class="token punctu
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 8 Oct 2026 15:02:27</div>
+						<div class="footer">Powered by vdoc. Generated on: 12 Oct 2026 22:21:53</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_la">README</a></li>
 <li class="open"><a href="#cholesky">fn cholesky</a>        <ul>
@@ -516,13 +580,22 @@ main_diagonal <span class="token operator">:=</span> la<span class="token punctu
 <li class="open"><a href="#det">fn det</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#det_complex">fn det_complex</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#diag">fn diag</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#dot">fn dot</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#eig">fn eig</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#eigh">fn eigh</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#eigvals">fn eigvals</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#eigvalsh">fn eigvalsh</a>        <ul>
@@ -531,7 +604,13 @@ main_diagonal <span class="token operator">:=</span> la<span class="token punctu
 <li class="open"><a href="#inv">fn inv</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#inv_complex">fn inv_complex</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#lstsq">fn lstsq</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#lstsq_complex">fn lstsq_complex</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#lu">fn lu</a>        <ul>
@@ -552,6 +631,9 @@ main_diagonal <span class="token operator">:=</span> la<span class="token punctu
 <li class="open"><a href="#matrix_rank_batch">fn matrix_rank_batch</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#multi_dot">fn multi_dot</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#norm">fn norm</a>        <ul>
 </ul>
 </li>
@@ -567,7 +649,13 @@ main_diagonal <span class="token operator">:=</span> la<span class="token punctu
 <li class="open"><a href="#slogdet">fn slogdet</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#slogdet_complex">fn slogdet_complex</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#solve">fn solve</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#solve_complex">fn solve_complex</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#svd">fn svd</a>        <ul>
