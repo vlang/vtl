@@ -70,6 +70,63 @@ pub fn adam_optimizer[T](config AdamOptimizerConfig) &AdamOptimizer[T] {
 	}
 }
 
+// checkpoint_config returns the scalar parameters needed to resume Adam.
+pub fn (o &AdamOptimizer[T]) checkpoint_config() map[string]f64 {
+	return {
+		'learning_rate': o.learning_rate
+		'beta1':         o.beta1
+		'beta2':         o.beta2
+		'beta1_t':       o.beta1_t
+		'beta2_t':       o.beta2_t
+		'epsilon':       o.epsilon
+	}
+}
+
+// restore_checkpoint_state restores Adam's scalar parameters and moment buffers.
+// Parameters must already be registered with build_params in the same order.
+pub fn (mut o AdamOptimizer[T]) restore_checkpoint_state(config map[string]f64,
+	first_moments []&vtl.Tensor[T], second_moments []&vtl.Tensor[T]) ! {
+	o.validate_checkpoint_state(config, first_moments, second_moments)!
+	o.learning_rate = config['learning_rate']
+	o.beta1 = config['beta1']
+	o.beta2 = config['beta2']
+	o.beta1_t = config['beta1_t']
+	o.beta2_t = config['beta2_t']
+	o.epsilon = config['epsilon']
+	o.first_moments = first_moments.clone()
+	o.second_moments = second_moments.clone()
+	return
+}
+
+// validate_checkpoint_state checks Adam state without changing the optimizer.
+pub fn (o &AdamOptimizer[T]) validate_checkpoint_state(config map[string]f64,
+	first_moments []&vtl.Tensor[T], second_moments []&vtl.Tensor[T]) ! {
+	for key in ['learning_rate', 'beta1', 'beta2', 'beta1_t', 'beta2_t', 'epsilon'] {
+		if key !in config || !math.is_finite(config[key]) {
+			return error('AdamOptimizer.restore_checkpoint_state: missing or non-finite ${key}')
+		}
+	}
+	lr := config['learning_rate']
+	b1 := config['beta1']
+	b2 := config['beta2']
+	b1_t := config['beta1_t']
+	b2_t := config['beta2_t']
+	eps := config['epsilon']
+	if lr < 0 || b1 < 0 || b1 >= 1 || b2 < 0 || b2 >= 1 || b1_t < 0 || b1_t >= 1
+		|| b2_t < 0 || b2_t >= 1 || eps <= 0 {
+		return error('AdamOptimizer.restore_checkpoint_state: scalar values are outside valid ranges')
+	}
+	if o.params.len != first_moments.len || o.params.len != second_moments.len {
+		return error('AdamOptimizer.restore_checkpoint_state: parameter and moment counts do not match')
+	}
+	for i, parameter in o.params {
+		if first_moments[i].shape != parameter.value.shape
+			|| second_moments[i].shape != parameter.value.shape {
+			return error('AdamOptimizer.restore_checkpoint_state: moment shape mismatch at parameter ${i}')
+		}
+	}
+}
+
 // build_params registers all trainable variables from `layers` into the optimizer.
 // Call once after constructing the model, before the first `update()`.
 pub fn (mut o AdamOptimizer[T]) build_params(layers []types.Layer[T]) {
