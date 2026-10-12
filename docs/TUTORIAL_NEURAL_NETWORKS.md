@@ -170,12 +170,12 @@ model.selu()
 | `kl_div_loss()` | `KLDivLoss` | KL Divergence D_KL(P‖Q) |
 
 `cross_entropy_loss_with_options` supports class weights, ignored class indices,
-and `none`, `mean`, or `sum` reductions. Use
+`label_smoothing` in `[0, 1]`, and `none`, `mean`, or `sum` reductions. Use
 `cross_entropy_loss_indices` for integer labels, including a scalar label with
 unbatched logits shaped `[C]`; batched or spatial logits use `[N, C, ...]` and
 targets shaped `[N, ...]`. See the
-[unbatched example](../examples/cross_entropy_unbatched/main.v). PyTorch-style
-label smoothing is not implemented yet.
+[unbatched example](../examples/cross_entropy_unbatched/main.v). Smoothing mixes
+the target distribution with a uniform distribution over classes.
 
 ### Binary focal loss with probabilities
 

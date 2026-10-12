@@ -123,8 +123,8 @@ batched/spatial `[N, C, ...]` logits. `cross_entropy_loss_indices` accepts
 `Tensor[int]` targets; the generic loss accepts same-type integer-valued targets
 or matching one-hot/soft targets. Weighted class-index means divide by the sum
 of non-ignored target weights; soft-target means divide by the number of samples.
-All paths propagate gradients. PyTorch's
-`label_smoothing` option remains a gap.
+`label_smoothing` mixes targets with the uniform class distribution. All paths
+propagate gradients.
 
 **Next:** Audit formulas, defaults, reduction modes, parameter groups, sparse
 gradients, and numerical behavior against `torch.nn` and `torch.optim`. Add
