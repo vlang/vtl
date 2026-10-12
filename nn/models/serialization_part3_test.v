@@ -2,6 +2,8 @@ module models
 
 import os
 import json2
+import vtl
+import vtl.nn.optimizers
 import vtl.nn.types
 import vtl.nn.layers
 
@@ -210,4 +212,82 @@ fn test_convolutional_network_serialization() {
 	// Conv2D should have weight and bias
 	assert 'weight' in model.layer_data[1].weights
 	assert 'bias' in model.layer_data[1].weights
+}
+
+fn test_adam_training_checkpoint_restores_model_and_optimizer_state() ! {
+	test_dir := setup_test_dir_3()
+	defer {
+		cleanup_test_dir_3()
+	}
+
+	mut model := sequential_with_layers[f64]([]types.Layer[f64]{})
+	model.input([2])
+	model.linear(1)
+	mut optimizer := optimizers.adam_optimizer[f64](learning_rate: 0.01)
+	optimizer.build_params(model.info.layers)
+	for i, mut parameter in optimizer.params {
+		parameter.grad = vtl.full[f64](parameter.value.shape, f64(i + 1))
+	}
+	optimizer.update()!
+
+	path := '${test_dir}/adam_training_checkpoint.json'
+	model.save_training_checkpoint(path, 12, 0.25, optimizer)!
+
+	mut restored := sequential_with_layers[f64]([]types.Layer[f64]{})
+	restored.input([2])
+	restored.linear(1)
+	mut restored_optimizer := optimizers.adam_optimizer[f64](learning_rate: 0.5)
+	restored_optimizer.build_params(restored.info.layers)
+	epoch, loss := restored.load_training_checkpoint(path, mut restored_optimizer)!
+	assert epoch == 12
+	assert loss == 0.25
+	config := optimizer.checkpoint_config()
+	restored_config := restored_optimizer.checkpoint_config()
+	for key in ['learning_rate', 'beta1', 'beta2', 'beta1_t', 'beta2_t', 'epsilon'] {
+		assert restored_config[key] == config[key]
+	}
+	for i, parameter in optimizer.params {
+		assert parameter.value.to_array() == restored_optimizer.params[i].value.to_array()
+		assert optimizer.first_moments[i].to_array() == restored_optimizer.first_moments[i].to_array()
+		assert optimizer.second_moments[i].to_array() == restored_optimizer.second_moments[i].to_array()
+	}
+
+	for i, mut parameter in optimizer.params {
+		parameter.grad = vtl.full[f64](parameter.value.shape, f64(i + 2))
+		mut restored_parameter := restored_optimizer.params[i]
+		restored_parameter.grad = vtl.full[f64](parameter.value.shape, f64(i + 2))
+	}
+	optimizer.update()!
+	restored_optimizer.update()!
+	for i, parameter in optimizer.params {
+		assert parameter.value.to_array() == restored_optimizer.params[i].value.to_array()
+	}
+
+	mut unrelated_model := sequential_with_layers[f64]([]types.Layer[f64]{})
+	unrelated_model.input([2])
+	unrelated_model.linear(1)
+	mut unrelated_optimizer := optimizers.adam_optimizer[f64](learning_rate: 0.01)
+	unrelated_optimizer.build_params(unrelated_model.info.layers)
+	mut mismatched_save_rejected := false
+	model.save_training_checkpoint(path, 12, 0.25, unrelated_optimizer) or {
+		mismatched_save_rejected = true
+	}
+	assert mismatched_save_rejected
+
+	mut corrupted := json2.decode[ModelFile](os.read_file(path)!)!
+	corrupted.optimizer.config['beta1'] = 1.0
+	corrupted.layer_data[1].weights['weight'] = encode_tensor[f64](vtl.full_like[f64](optimizer.params[0].value, 99.0))!
+	os.write_file(path, json2.encode(corrupted, escape_unicode: true, time_as_unix: true))!
+	mut weights_before := [][]f64{cap: restored_optimizer.params.len}
+	for parameter in restored_optimizer.params {
+		weights_before << parameter.value.to_array()
+	}
+	mut invalid_checkpoint_rejected := false
+	restored.load_training_checkpoint(path, mut restored_optimizer) or {
+		invalid_checkpoint_rejected = true
+	}
+	assert invalid_checkpoint_rejected
+	for i, parameter in restored_optimizer.params {
+		assert parameter.value.to_array() == weights_before[i]
+	}
 }

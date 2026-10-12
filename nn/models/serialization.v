@@ -4,6 +4,7 @@ import json2
 import os
 import vtl
 import vtl.autograd
+import vtl.nn.optimizers
 import vtl.nn.types
 import encoding.base64
 import math
@@ -99,6 +100,22 @@ fn encode_layer_var[T](mut weights map[string]string, vars []&autograd.Variable[
 	}
 }
 
+fn (nn &Sequential[T]) validate_adam_parameters(optimizer &optimizers.AdamOptimizer[T]) ! {
+	mut parameter_index := 0
+	for layer in nn.info.layers {
+		for parameter in layer.variables() {
+			if parameter_index >= optimizer.params.len
+				|| voidptr(parameter) != voidptr(optimizer.params[parameter_index]) {
+				return error('training checkpoint: Adam parameters must belong to this model in layer order')
+			}
+			parameter_index++
+		}
+	}
+	if parameter_index != optimizer.params.len {
+		return error('training checkpoint: Adam parameter count does not match this model')
+	}
+}
+
 // save saves a Sequential model's weights to a JSON file.
 // Does NOT save optimizer state - use save_checkpoint for full state.
 pub fn (nn &Sequential[T]) save(path string) ! {
@@ -107,6 +124,39 @@ pub fn (nn &Sequential[T]) save(path string) ! {
 
 // save_checkpoint saves a Sequential model's weights and training metadata to a JSON file.
 pub fn (nn &Sequential[T]) save_checkpoint(path string, epoch int, loss f64) ! {
+	nn.save_checkpoint_with_optimizer(path, epoch, loss, OptimizerData{})!
+}
+
+// save_training_checkpoint stores model weights and Adam state for training resume.
+pub fn (nn &Sequential[T]) save_training_checkpoint(path string, epoch int, loss f64,
+	optimizer &optimizers.AdamOptimizer[T]) ! {
+	nn.validate_adam_parameters(optimizer)!
+	if optimizer.params.len == 0 || optimizer.params.len != optimizer.first_moments.len
+		|| optimizer.params.len != optimizer.second_moments.len {
+		return error('save_training_checkpoint: build Adam parameters before saving')
+	}
+	mut moments := map[string]string{}
+	for i, parameter in optimizer.params {
+		if optimizer.first_moments[i].shape != parameter.value.shape
+			|| optimizer.second_moments[i].shape != parameter.value.shape {
+			return error('save_training_checkpoint: Adam moment shape mismatch at parameter ${i}')
+		}
+		moments['moment_${i}'] = encode_tensor[T](optimizer.first_moments[i])!
+		moments['second_moment_${i}'] = encode_tensor[T](optimizer.second_moments[i])!
+	}
+	config := optimizer.checkpoint_config()
+	optimizer.validate_checkpoint_state(config, optimizer.first_moments, optimizer.second_moments)!
+	state := OptimizerData{
+		optimizer_type: 'AdamOptimizer'
+		learning_rate:  config['learning_rate']
+		config:         config
+		moments:        moments
+	}
+	nn.save_checkpoint_with_optimizer(path, epoch, loss, state)!
+}
+
+fn (nn &Sequential[T]) save_checkpoint_with_optimizer(path string, epoch int, loss f64,
+	opt_state OptimizerData) ! {
 	mut layer_defs := []LayerDef{}
 	mut layer_data := []SerializedLayer{}
 
@@ -269,8 +319,6 @@ pub fn (nn &Sequential[T]) save_checkpoint(path string, epoch int, loss f64) ! {
 		saved_at: 'vtl_checkpoint'
 	}
 
-	opt_state := OptimizerData{}
-
 	model := ModelFile{
 		version:    model_version
 		layers:     layer_defs
@@ -280,6 +328,43 @@ pub fn (nn &Sequential[T]) save_checkpoint(path string, epoch int, loss f64) ! {
 	}
 
 	os.write_file(path, json2.encode(model, escape_unicode: true, time_as_unix: true))!
+}
+
+// load_training_checkpoint restores model weights, training metadata, and Adam state.
+// Build the optimizer with the destination model's parameters before calling this method.
+pub fn (mut nn Sequential[T]) load_training_checkpoint(path string,
+	mut optimizer &optimizers.AdamOptimizer[T]) !(int, f64) {
+	data := os.read_file(path)!
+	model := json2.decode[ModelFile](data)!
+	if model.version != model_version {
+		return error('Model version mismatch: expected ${model_version}, got ${model.version}')
+	}
+	if model.optimizer.optimizer_type != 'AdamOptimizer' {
+		return error('load_training_checkpoint: expected AdamOptimizer state, got ${model.optimizer.optimizer_type}')
+	}
+	if 'learning_rate' !in model.optimizer.config
+		|| model.optimizer.config['learning_rate'] != model.optimizer.learning_rate {
+		return error('load_training_checkpoint: Adam learning rate metadata is inconsistent')
+	}
+	if optimizer.params.len * 2 != model.optimizer.moments.len {
+		return error('load_training_checkpoint: optimizer parameter count does not match checkpoint state')
+	}
+	mut first_moments := []&vtl.Tensor[T]{cap: optimizer.params.len}
+	mut second_moments := []&vtl.Tensor[T]{cap: optimizer.params.len}
+	for i, parameter in optimizer.params {
+		first_key := 'moment_${i}'
+		second_key := 'second_moment_${i}'
+		if first_key !in model.optimizer.moments || second_key !in model.optimizer.moments {
+			return error('load_training_checkpoint: missing Adam moments for parameter ${i}')
+		}
+		first_moments << decode_tensor[T](model.optimizer.moments[first_key], parameter.value.shape)!
+		second_moments << decode_tensor[T](model.optimizer.moments[second_key], parameter.value.shape)!
+	}
+	nn.validate_adam_parameters(optimizer)!
+	optimizer.validate_checkpoint_state(model.optimizer.config, first_moments, second_moments)!
+	nn.load_weights(path)!
+	optimizer.restore_checkpoint_state(model.optimizer.config, first_moments, second_moments)!
+	return model.metadata.epoch, model.metadata.loss
 }
 
 // load_checkpoint restores a Sequential model's weights and training metadata from a JSON file.
