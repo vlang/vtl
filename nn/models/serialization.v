@@ -164,6 +164,22 @@ fn (nn &Sequential[T]) validate_rmsprop_parameters(optimizer &optimizers.RMSProp
 	}
 }
 
+fn (nn &Sequential[T]) validate_adagrad_parameters(optimizer &optimizers.AdaGradOptimizer[T]) ! {
+	mut parameter_index := 0
+	for layer in nn.info.layers {
+		for parameter in layer.variables() {
+			if parameter_index >= optimizer.params.len
+				|| voidptr(parameter) != voidptr(optimizer.params[parameter_index]) {
+				return error('training checkpoint: AdaGrad parameters must belong to this model in layer order')
+			}
+			parameter_index++
+		}
+	}
+	if parameter_index != optimizer.params.len {
+		return error('training checkpoint: AdaGrad parameter count does not match this model')
+	}
+}
+
 // save saves a Sequential model's weights to a JSON file.
 // Does NOT save optimizer state - use save_checkpoint for full state.
 pub fn (nn &Sequential[T]) save(path string) ! {
@@ -242,6 +258,29 @@ pub fn (nn &Sequential[T]) save_rmsprop_training_checkpoint(path string, epoch i
 	}
 	state := OptimizerData{
 		optimizer_type: 'RMSPropOptimizer'
+		learning_rate:  config['learning_rate']
+		config:         config
+		moments:        moments
+	}
+	nn.save_checkpoint_with_optimizer(path, epoch, loss, state)!
+}
+
+// save_adagrad_training_checkpoint stores model weights and AdaGrad state for
+// an exact training resume.
+pub fn (nn &Sequential[T]) save_adagrad_training_checkpoint(path string, epoch int, loss f64,
+	optimizer &optimizers.AdaGradOptimizer[T]) ! {
+	nn.validate_adagrad_parameters(optimizer)!
+	if optimizer.params.len == 0 || optimizer.params.len != optimizer.accumulated_sq_grads.len {
+		return error('save_adagrad_training_checkpoint: build AdaGrad parameters before saving')
+	}
+	config := optimizer.checkpoint_config()
+	optimizer.validate_checkpoint_state(config, optimizer.accumulated_sq_grads)!
+	mut moments := map[string]string{}
+	for i, accumulator in optimizer.accumulated_sq_grads {
+		moments['accumulated_sq_grad_${i}'] = encode_tensor[T](accumulator)!
+	}
+	state := OptimizerData{
+		optimizer_type: 'AdaGradOptimizer'
 		learning_rate:  config['learning_rate']
 		config:         config
 		moments:        moments
@@ -562,6 +601,40 @@ pub fn (mut nn Sequential[T]) load_rmsprop_training_checkpoint(path string,
 	optimizer.validate_checkpoint_state(model.optimizer.config, sq_avg)!
 	nn.load_weights(path)!
 	optimizer.restore_checkpoint_state(model.optimizer.config, sq_avg)!
+	return model.metadata.epoch, model.metadata.loss
+}
+
+// load_adagrad_training_checkpoint restores model weights, metadata, and AdaGrad
+// state into an optimizer already built from the destination model.
+pub fn (mut nn Sequential[T]) load_adagrad_training_checkpoint(path string,
+	mut optimizer &optimizers.AdaGradOptimizer[T]) !(int, f64) {
+	data := os.read_file(path)!
+	model := json2.decode[ModelFile](data)!
+	if model.version != model_version {
+		return error('Model version mismatch: expected ${model_version}, got ${model.version}')
+	}
+	if model.optimizer.optimizer_type != 'AdaGradOptimizer' {
+		return error('load_adagrad_training_checkpoint: expected AdaGradOptimizer state, got ${model.optimizer.optimizer_type}')
+	}
+	if 'learning_rate' !in model.optimizer.config
+		|| model.optimizer.config['learning_rate'] != model.optimizer.learning_rate {
+		return error('load_adagrad_training_checkpoint: AdaGrad learning rate metadata is inconsistent')
+	}
+	if optimizer.params.len != model.optimizer.moments.len {
+		return error('load_adagrad_training_checkpoint: optimizer parameter count does not match checkpoint state')
+	}
+	mut accumulators := []&vtl.Tensor[T]{cap: optimizer.params.len}
+	for i, parameter in optimizer.params {
+		key := 'accumulated_sq_grad_${i}'
+		if key !in model.optimizer.moments {
+			return error('load_adagrad_training_checkpoint: missing accumulated-gradient tensor for parameter ${i}')
+		}
+		accumulators << decode_tensor[T](model.optimizer.moments[key], parameter.value.shape)!
+	}
+	nn.validate_adagrad_parameters(optimizer)!
+	optimizer.validate_checkpoint_state(model.optimizer.config, accumulators)!
+	nn.load_weights(path)!
+	optimizer.restore_checkpoint_state(model.optimizer.config, accumulators)!
 	return model.metadata.epoch, model.metadata.loss
 }
 

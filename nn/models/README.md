@@ -43,7 +43,9 @@ its scalar configuration and first/second moments. For RMSProp, use
 `save_rmsprop_training_checkpoint` and `load_rmsprop_training_checkpoint`;
 these store its scalar configuration and squared-gradient buffers. Other
 optimizer types, device remapping, and cross-version migration are not
-supported by this API yet. The JSON format has version `1.0`, ordered layer
+supported by this API yet. For AdaGrad, use `save_adagrad_training_checkpoint`
+and `load_adagrad_training_checkpoint`; these store its scalar configuration
+and accumulated squared gradients. The JSON format has version `1.0`, ordered layer
 definitions, per-layer weight maps, optimizer metadata, and checkpoint
 metadata; tensor weights are base64 encoded. Loading rejects a version
 mismatch.

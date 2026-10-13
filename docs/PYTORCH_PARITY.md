@@ -168,7 +168,8 @@ metadata; Adam checkpoint helpers preserve configuration and moment buffers,
 AdamW helpers preserve configuration and moment buffers, and SGD helpers
 preserve configuration, momentum buffers, and first-step momentum
 initialization state. RMSProp helpers preserve configuration and
-squared-gradient buffers.
+squared-gradient buffers. AdaGrad helpers preserve configuration and accumulated
+squared gradients.
 
 **Next:** Extend optimizer-state support to the remaining optimizers, add
 device remapping, version migration, and safe loading behavior. PyTorch pickle

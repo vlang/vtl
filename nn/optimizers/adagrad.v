@@ -36,6 +36,49 @@ pub fn adagrad[T](config AdaGradOptimizerConfig) &AdaGradOptimizer[T] {
 	}
 }
 
+// checkpoint_config returns the scalar AdaGrad state needed to resume training.
+pub fn (o &AdaGradOptimizer[T]) checkpoint_config() map[string]f64 {
+	return {
+		'learning_rate': o.learning_rate
+		'epsilon':       o.epsilon
+		'weight_decay':  o.weight_decay
+	}
+}
+
+// restore_checkpoint_state restores AdaGrad configuration and accumulated gradients.
+pub fn (mut o AdaGradOptimizer[T]) restore_checkpoint_state(config map[string]f64,
+	accumulated_sq_grads []&vtl.Tensor[T]) ! {
+	o.validate_checkpoint_state(config, accumulated_sq_grads)!
+	o.learning_rate = config['learning_rate']
+	o.epsilon = config['epsilon']
+	o.weight_decay = config['weight_decay']
+	o.accumulated_sq_grads = accumulated_sq_grads.clone()
+}
+
+// validate_checkpoint_state checks AdaGrad scalars and accumulators without mutation.
+pub fn (o &AdaGradOptimizer[T]) validate_checkpoint_state(config map[string]f64,
+	accumulated_sq_grads []&vtl.Tensor[T]) ! {
+	for key in ['learning_rate', 'epsilon', 'weight_decay'] {
+		if key !in config || !math.is_finite(config[key]) {
+			return error('AdaGradOptimizer.restore_checkpoint_state: missing or non-finite ${key}')
+		}
+	}
+	lr := config['learning_rate']
+	epsilon := config['epsilon']
+	weight_decay := config['weight_decay']
+	if lr < 0 || epsilon <= 0 || weight_decay < 0 {
+		return error('AdaGradOptimizer.restore_checkpoint_state: scalar values are outside valid ranges')
+	}
+	if o.params.len != accumulated_sq_grads.len {
+		return error('AdaGradOptimizer.restore_checkpoint_state: parameter and accumulator counts do not match')
+	}
+	for i, parameter in o.params {
+		if accumulated_sq_grads[i].shape != parameter.value.shape {
+			return error('AdaGradOptimizer.restore_checkpoint_state: accumulator shape mismatch at parameter ${i}')
+		}
+	}
+}
+
 // build_params registers all trainable variables from `layers`. Call once before training.
 pub fn (mut o AdaGradOptimizer[T]) build_params(layers []types.Layer[T]) {
 	for layer in layers {
