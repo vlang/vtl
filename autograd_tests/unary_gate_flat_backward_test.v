@@ -66,6 +66,23 @@ fn test_abs_gate_backward_contiguous_flat_path() ! {
 	assert result[0].get_nth(3) == 8.0
 }
 
+fn test_abs_gate_backward_non_contiguous_fallback() ! {
+	ctx := autograd.ctx[f64]()
+	input := ctx.variable(vtl.from_array([-2.0, 0.0, 1e-9, 2.0], [2, 2])!.transpose([
+		1,
+		0,
+	])!)
+	gradient := vtl.from_array([2.0, 4.0, 6.0, 8.0], [2, 2])!.transpose([1, 0])!
+	mut output := ctx.variable(vtl.zeros[f64]([2, 2]))
+	output.grad = gradient
+	result := autograd.abs_gate[f64](input).backward(autograd.payload(output))!
+
+	assert result[0].get([0, 0]) == -2.0
+	assert math.abs(result[0].get([0, 1]) - 0.6) < 1e-12
+	assert result[0].get([1, 0]) == 0.0
+	assert result[0].get([1, 1]) == 8.0
+}
+
 fn test_sqrt_gate_backward_contiguous_flat_path() ! {
 	ctx := autograd.ctx[f64]()
 	input := ctx.variable(vtl.from_1d([1.0, 4.0, 9.0, 16.0, 25.0])!)
@@ -77,6 +94,20 @@ fn test_sqrt_gate_backward_contiguous_flat_path() ! {
 	assert result[0].array_equal(vtl.from_1d([1.0, 1.0, 1.0, 1.0, 1.0])!)
 }
 
+fn test_sqrt_gate_backward_broadcast_fallback() ! {
+	ctx := autograd.ctx[f64]()
+	input := ctx.variable(vtl.from_1d([1.0, 4.0])!)
+	gradient := vtl.from_array([2.0, 4.0, 6.0, 8.0], [2, 2])!
+	mut output := ctx.variable(vtl.zeros[f64]([2, 2]))
+	output.grad = gradient
+	result := autograd.sqrt_gate[f64](input).backward(autograd.payload(output))!
+
+	assert result[0].get([0, 0]) == 1.0
+	assert result[0].get([0, 1]) == 1.0
+	assert result[0].get([1, 0]) == 3.0
+	assert result[0].get([1, 1]) == 2.0
+}
+
 fn test_clamp_gate_backward_contiguous_flat_path() ! {
 	ctx := autograd.ctx[f64]()
 	input := vtl.from_1d([-2.0, -1.0, 0.0, 1.0, 2.0])!
@@ -86,6 +117,20 @@ fn test_clamp_gate_backward_contiguous_flat_path() ! {
 	result := autograd.clamp_gate[f64](-1.0, 1.0, input).backward(autograd.payload(output))!
 
 	assert result[0].array_equal(vtl.from_1d([0.0, 2.0, 3.0, 4.0, 0.0])!)
+}
+
+fn test_clamp_gate_backward_non_contiguous_fallback() ! {
+	input := vtl.from_array([-2.0, -1.0, 0.0, 2.0], [2, 2])!.transpose([1, 0])!
+	gradient := vtl.from_array([1.0, 2.0, 3.0, 4.0], [2, 2])!.transpose([1, 0])!
+	ctx := autograd.ctx[f64]()
+	mut output := ctx.variable(vtl.zeros[f64]([2, 2]))
+	output.grad = gradient
+	result := autograd.clamp_gate[f64](-1.0, 1.0, input).backward(autograd.payload(output))!
+
+	assert result[0].get([0, 0]) == 0.0
+	assert result[0].get([0, 1]) == 3.0
+	assert result[0].get([1, 0]) == 2.0
+	assert result[0].get([1, 1]) == 0.0
 }
 
 fn test_f32_unary_gate_simd_blocks_and_tails() ! {
