@@ -297,7 +297,29 @@ pub fn (g &ClampGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	if can_flat_unary_gate_backward[T](gradient, input) {
 		mut result := vtl.tensor_like[T](gradient)
 		zero := vtl.cast[T](0)
-		for i in 0 .. gradient.size {
+		mut i := 0
+		$if T is f64 {
+			minimum := simd.splat_f64x4(min_val)
+			maximum := simd.splat_f64x4(max_val)
+			zeros := simd.splat_f64x4(0)
+			for ; i + 4 <= gradient.size; i += 4 {
+				values := simd.load_f64x4_at(input.data.data, i)
+				gradients := simd.load_f64x4_at(gradient.data.data, i)
+				inside := values.ge(minimum).and(values.le(maximum))
+				simd.select_f64x4(inside, gradients, zeros).store_at(mut result.data.data, i)
+			}
+		} $else $if T is f32 {
+			minimum := simd.splat_f32x8(min_val)
+			maximum := simd.splat_f32x8(max_val)
+			zeros := simd.splat_f32x8(0)
+			for ; i + 8 <= gradient.size; i += 8 {
+				values := simd.load_f32x8_at(input.data.data, i)
+				gradients := simd.load_f32x8_at(gradient.data.data, i)
+				inside := values.ge(minimum).and(values.le(maximum))
+				simd.select_f32x8(inside, gradients, zeros).store_at(mut result.data.data, i)
+			}
+		}
+		for ; i < gradient.size; i++ {
 			value := input.data.data[i]
 			result.data.data[i] = if value >= min_val && value <= max_val {
 				gradient.data.data[i]

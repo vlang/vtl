@@ -151,6 +151,43 @@ The measured benefit depends on operation and size; the 1M-element multiply
 case improved only 1.16x. This isolated f64 gate-backward microbenchmark does
 not establish end-to-end training performance and does not close issue #40.
 
+## Autograd clamp gate
+
+`autograd_clamp_gate_backward_bench.v` compares the contiguous scalar clamp
+kernel with the SIMD `ClampGate.backward` path for f32 and f64. It verifies
+matching output checksums before timing and consumes and compares the outputs
+from the timed iterations. Each process reports the mean of nine timed
+iterations after three warmups.
+Compile with `-prod` first and run the resulting executable separately:
+
+```bash
+cd ~/.vmodules
+mkdir -p "$HOME/.cache/v/tmp_codex"
+systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	VTMP="$HOME/.cache/v/tmp_codex" TMPDIR="$HOME/.cache/v/tmp_codex" \
+	VTOOLS_CACHE_DIR="$HOME/.cache/vtools-cache-codex" \
+	v -no-parallel -cc gcc -prod -cflags "-march=native" \
+	-o "$HOME/.cache/v/tmp_codex/vtl-autograd-clamp-gates" \
+	./vtl/benchmarks/autograd_clamp_gate_backward_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 \
+	"$HOME/.cache/v/tmp_codex/vtl-autograd-clamp-gates"
+```
+
+Reference run on 2026-10-13: AMD Ryzen 9 5900X, V 0.5.2 (`37a3b74`), GCC
+16.2.1. Values below are medians of three separate process runs; times are in
+milliseconds.
+
+| Elements | f64 scalar | f64 SIMD | Speedup | f32 scalar | f32 SIMD | Speedup |
+|---------:|-----------:|---------:|--------:|-----------:|---------:|--------:|
+| 65,536 | 0.1479 | 0.0402 | 3.68x | 0.1173 | 0.0214 | 5.48x |
+| 1,048,576 | 3.1617 | 1.8852 | 1.68x | 2.3850 | 0.6481 | 3.68x |
+
+The 1,024-element timings are dominated by fixed overhead and were omitted;
+the larger sizes are more representative of kernel throughput.
+
+This microbenchmark measures clamp backward only; it does not establish
+end-to-end training performance or NumPy/PyTorch parity.
+
 Record CPU, V/compiler version, C compiler, production flags, and results when
 publishing measurements.
 
