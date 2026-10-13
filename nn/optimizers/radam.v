@@ -21,6 +21,7 @@ pub mut:
 	params         []&autograd.Variable[T]
 	first_moments  []&vtl.Tensor[T]
 	second_moments []&vtl.Tensor[T]
+	groups         []&RAdamParamGroup[T]
 }
 
 // RAdamOptimizerConfig configures RAdamOptimizer.
@@ -127,8 +128,126 @@ pub fn (mut o RAdamOptimizer[T]) build_params(layers []types.Layer[T]) {
 	}
 }
 
+// RAdamParamGroup is a set of parameters sharing one RAdam configuration,
+// mirroring PyTorch parameter groups, with its own step counter and moment
+// buffers.
+pub struct RAdamParamGroup[T] {
+pub mut:
+	params                 []&autograd.Variable[T]
+	learning_rate          f64
+	beta1                  f64
+	beta2                  f64
+	epsilon                f64
+	weight_decay           f64
+	decoupled_weight_decay bool
+mut:
+	beta1_t        f64
+	beta2_t        f64
+	step           int
+	first_moments  []&vtl.Tensor[T]
+	second_moments []&vtl.Tensor[T]
+}
+
+// add_param_group registers parameters under their own RAdam configuration
+// and returns the group index. Register each variable either flat (via
+// build_params) or in exactly one group.
+pub fn (mut o RAdamOptimizer[T]) add_param_group(params []&autograd.Variable[T], config RAdamOptimizerConfig) !int {
+	if config.learning_rate < 0 || config.beta1 < 0 || config.beta1 >= 1 || config.beta2 < 0
+		|| config.beta2 >= 1 || config.epsilon <= 0 || config.weight_decay < 0 {
+		return error('RAdam group learning rate and weight decay must be non-negative, betas must lie in [0, 1), and epsilon must be positive')
+	}
+	mut group := &RAdamParamGroup[T]{
+		learning_rate:          config.learning_rate
+		beta1:                  config.beta1
+		beta2:                  config.beta2
+		epsilon:                config.epsilon
+		weight_decay:           config.weight_decay
+		decoupled_weight_decay: config.decoupled_weight_decay
+		beta1_t:                1.0
+		beta2_t:                1.0
+	}
+	for v in params {
+		group.params << v
+		group.first_moments << vtl.zeros_like[T](v.grad)
+		group.second_moments << vtl.zeros_like[T](v.grad)
+	}
+	o.groups << group
+	return o.groups.len - 1
+}
+
+// group_count returns how many parameter groups are registered.
+pub fn (o &RAdamOptimizer[T]) group_count() int {
+	return o.groups.len
+}
+
+// group_learning_rate returns the current learning rate of one group.
+pub fn (o &RAdamOptimizer[T]) group_learning_rate(group_index int) !f64 {
+	if group_index < 0 || group_index >= o.groups.len {
+		return error('RAdam group index ${group_index} out of range for ${o.groups.len} groups')
+	}
+	return o.groups[group_index].learning_rate
+}
+
+// set_group_learning_rate applies a new learning rate to one group only;
+// this is the integration point for learning-rate schedulers.
+pub fn (mut o RAdamOptimizer[T]) set_group_learning_rate(group_index int, learning_rate f64) ! {
+	if learning_rate < 0 {
+		return error('RAdam group learning rate must be non-negative')
+	}
+	if group_index < 0 || group_index >= o.groups.len {
+		return error('RAdam group index ${group_index} out of range for ${o.groups.len} groups')
+	}
+	o.groups[group_index].learning_rate = learning_rate
+}
+
+fn (mut g RAdamParamGroup[T]) update_group() ! {
+	g.step++
+	g.beta1_t *= g.beta1
+	g.beta2_t *= g.beta2
+	step := RAdamStepParams{
+		beta1:           g.beta1
+		beta2:           g.beta2
+		beta1_t:         g.beta1_t
+		beta2_t:         g.beta2_t
+		step:            g.step
+		lr:              g.learning_rate
+		epsilon:         g.epsilon
+		weight_decay:    g.weight_decay
+		decoupled_decay: g.decoupled_weight_decay
+	}
+	for i, mut parameter in g.params {
+		if parameter.requires_grad {
+			$if sizeof(T) == 8 {
+				grad := parameter.grad.to_array()
+				mut theta := parameter.value.to_array()
+				mut m := g.first_moments[i].to_array()
+				mut v := g.second_moments[i].to_array()
+				radam_step_f64_cpu(grad, mut theta, mut m, mut v, step)
+				parameter.value = vtl.from_array(theta, parameter.value.shape) or { return err }
+				g.first_moments[i] = vtl.from_array(m, parameter.value.shape) or { return err }
+				g.second_moments[i] = vtl.from_array(v, parameter.value.shape) or { return err }
+			} $else $if sizeof(T) == 4 {
+				grad := parameter.grad.to_array()
+				mut theta := parameter.value.to_array()
+				mut m := g.first_moments[i].to_array()
+				mut v := g.second_moments[i].to_array()
+				radam_step_f32_cpu(grad, mut theta, mut m, mut v, step)
+				parameter.value = vtl.from_array(theta, parameter.value.shape) or { return err }
+				g.first_moments[i] = vtl.from_array(m, parameter.value.shape) or { return err }
+				g.second_moments[i] = vtl.from_array(v, parameter.value.shape) or { return err }
+			} $else {
+				return error('RAdamParamGroup.update: unsupported element type size ${sizeof(T)}')
+			}
+			parameter.grad = vtl.zeros_like[T](parameter.value)
+		}
+	}
+}
+
 // update performs one RAdam parameter update and zeros gradients.
 pub fn (mut o RAdamOptimizer[T]) update() ! {
+	for mut group in o.groups {
+		group.update_group()!
+	}
 	o.step++
 	o.beta1_t *= o.beta1
 	o.beta2_t *= o.beta2
