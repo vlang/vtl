@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VTL — The V Tensor Library</title>
+<meta name="description" content="VTL is a pure-V tensor library for numerical computing and machine learning: N-dimensional arrays, autograd, neural networks, and VSL-backed CPU, CUDA and Vulkan compute.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap top-in">
+    <a class="brand" href="./">VTL <span class="tag">v0.2.0-beta.1</span></a>
+    <nav class="main">
+      <a href="getting-started.html">Getting started</a>
+      <a href="#parity">Parity</a>
+      <a href="#benchmarks">Benchmarks</a>
+      <a href="api/">API reference</a>
+      <a href="https://github.com/vlang/vtl">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <div>
+      <h1>Tensors, autograd and neural networks, <span class="hl">natively in V.</span></h1>
+      <p class="lede">VTL is a pure-V tensor library for numerical computing and machine learning — N-dimensional arrays, reverse-mode autograd, and a full neural-network module, powered by VSL kernels on CPU, CUDA and Vulkan.</p>
+      <div class="btns">
+        <a class="btn primary" href="getting-started.html">Start building</a>
+        <a class="btn" href="api/">Browse the API</a>
+      </div>
+    </div>
+    <figure class="plot" aria-label="Training loss curve">
+      <svg viewBox="0 0 420 240" width="100%" role="img" aria-label="Loss decreasing over training epochs">
+        <g stroke="#dbe4ec" stroke-width="1">
+          <path d="M40 20 V210 M100 20 V210 M160 20 V210 M220 20 V210 M280 20 V210 M340 20 V210 M400 20 V210"/>
+          <path d="M40 60 H400 M40 110 H400 M40 160 H400"/>
+        </g>
+        <g stroke="#43536a" stroke-width="1.5">
+          <path d="M40 20 V210 H400" fill="none"/>
+        </g>
+        <path d="M45 45 C110 120, 160 165, 230 188 C290 205, 350 208, 395 210" fill="none" stroke="#d9481f" stroke-width="3.5" stroke-linecap="round"/>
+        <g fill="#d9481f">
+          <circle cx="45" cy="45" r="4"/><circle cx="140" cy="150" r="4"/><circle cx="230" cy="188" r="4"/><circle cx="330" cy="205" r="4"/>
+        </g>
+        <g font-family="IBM Plex Mono, monospace" font-size="10" fill="#43536a">
+          <text x="42" y="232">epoch 0</text><text x="330" y="232">epoch 40</text>
+          <text x="6" y="50">loss</text>
+        </g>
+      </svg>
+      <figcaption><span>fig. 1 — training loss, tiny CIFAR-10 synthetic run</span><span>CPU · f64</span></figcaption>
+    </figure>
+  </div>
+
+  <hr class="rule">
+  <section id="quickstart">
+    <h2>First tensor in under a minute</h2>
+    <p class="sub">Install V, add VTL, and run real tensor code. VTL uses <a href="https://github.com/vlang/vsl">VSL</a> as its numerical backend for linear algebra and scientific kernels.</p>
+<pre><span class="cm"># install both modules</span>
+v install vtl
+
+<span class="cm">// main.v — create, reshape, differentiate</span>
+import vtl
+
+fn main() {
+    t := vtl.from_array([1.0, 2, 3, 4], [2, 2])!
+    println(t.get([1, 1])) <span class="cm">// 4.0</span>
+}</pre>
+    <p><a href="getting-started.html">Follow the full getting-started guide →</a></p>
+  </section>
+
+  <hr class="rule">
+  <section id="paths">
+    <h2>Choose a path</h2>
+    <p class="sub">Start where you are: array programming, model training, or the raw numbers behind both.</p>
+    <div class="cols">
+      <article class="feature">
+        <h3>Array programming</h3>
+        <p>Generic N-dimensional tensors with slicing, broadcasting, reshape, transpose and view-preserving axis moves — the NumPy mental model, typed in V.</p>
+        <a class="more" href="https://github.com/vlang/vtl/blob/main/docs/TUTORIAL_FIRST_STEPS.md">First steps tutorial →</a>
+      </article>
+      <article class="feature">
+        <h3>Autograd &amp; training</h3>
+        <p>Reverse-mode autograd, neural-network layers and losses, optimizers, datasets and CPU training today, with selected CUDA and Vulkan paths.</p>
+        <a class="more" href="https://github.com/vlang/vtl/blob/main/docs/TUTORIAL_AUTOGRAD.md">Autograd tutorial →</a>
+      </article>
+      <article class="feature">
+        <h3>Kernels via VSL</h3>
+        <p>Linear algebra, statistics and scientific routines come from VSL, with SIMD-vectorized BLAS-style kernels and optional OpenBLAS/LAPACKE backends.</p>
+        <a class="more" href="https://vlang.github.io/vsl">VSL website →</a>
+      </article>
+    </div>
+  </section>
+
+  <hr class="rule">
+  <section id="parity">
+    <h2>Where VTL stands against NumPy and PyTorch</h2>
+    <p class="sub">An honest ledger, not a marketing claim. Every row links to the tracked parity documents, which list what is implemented, partial, and still missing.</p>
+    <table>
+      <thead><tr><th>Domain</th><th>Status</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="s">Array creation &amp; manipulation</td><td class="yes">Implemented</td><td>Creation, reshape/transpose views, stacking, padding, sorting; copy-vs-view audit ongoing.</td></tr>
+        <tr><td class="s">Indexing &amp; set operations</td><td class="yes">Implemented</td><td>Advanced/mixed indexing, unique, searchsorted, take/put families, boolean masks.</td></tr>
+        <tr><td class="s">Math, reductions &amp; statistics</td><td class="yes">Implemented</td><td>Elementwise math, axis reductions, quantiles and histogram family via VSL.</td></tr>
+        <tr><td class="s">FFT &amp; linear algebra</td><td class="yes">Implemented</td><td>FFT modules plus VSL-backed decompositions and solvers.</td></tr>
+        <tr><td class="s">Autograd</td><td class="yes">Implemented</td><td>Reverse-mode graphs with fused gate backward kernels; gradient-checked.</td></tr>
+        <tr><td class="s">Neural networks</td><td class="part">Partial</td><td>Layers, losses, optimizers and sequential models; some CUDA backward paths still land.</td></tr>
+        <tr><td class="s">GPU backends</td><td class="part">Partial</td><td>CUDA and Vulkan paths for selected ops; OpenCL compute dispatch incomplete.</td></tr>
+        <tr><td class="s">Serialization &amp; data</td><td class="yes">Implemented</td><td>NPY/NPZ, CSV, model checkpoints and DataLoader utilities.</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Full detail: <a href="https://github.com/vlang/vtl/blob/main/docs/NUMPY_PARITY.md">NumPy parity tracker</a> · <a href="https://github.com/vlang/vtl/blob/main/docs/PYTORCH_PARITY.md">PyTorch parity tracker</a>. Gaps are tracked as GitHub issues and close only with API, tests and examples in place.</p>
+  </section>
+
+  <hr class="rule">
+  <section id="benchmarks">
+    <h2>Performance, measured</h2>
+    <p class="sub">Matrix multiplication through the VSL backend on a Ryzen 9 5900X, 2 threads, against the NumPy 2.5.3 wheel. Builds differ; treat this as a GEMM sample, not a blanket speed claim.</p>
+    <div class="bench">
+      <div class="stat"><div class="big">1.43 ms</div><div class="lbl">VSL + OpenBLAS 0.3.34 — 512×512 GEMM (NumPy: 2.11 ms)</div></div>
+      <div class="stat"><div class="big">8.47 ms</div><div class="lbl">VSL + OpenBLAS 0.3.34 — 1024×1024 GEMM (NumPy: 17.38 ms)</div></div>
+      <div class="stat"><div class="big">1.9×</div><div class="lbl">SIMD vs scalar f64 unit-stride dot, 1M elements, -prod build</div></div>
+    </div>
+    <p class="note">Method: compile benchmarks with <code>-prod</code> first, then execute the binary — never <code>v run</code> for timings. Reproduce from the <a href="https://github.com/vlang/vtl/tree/main/benchmarks">benchmarks directory</a>.</p>
+  </section>
+
+  <footer>
+    <div class="cols">
+      <div>
+        <h4>VTL</h4>
+        <ul>
+          <li><a href="getting-started.html">Getting started</a></li>
+          <li><a href="api/">API reference</a></li>
+          <li><a href="https://github.com/vlang/vtl/tree/main/examples">Examples</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Project</h4>
+        <ul>
+          <li><a href="https://github.com/vlang/vtl">GitHub repository</a></li>
+          <li><a href="https://github.com/vlang/vtl/issues">Issues</a></li>
+          <li><a href="https://github.com/vlang/vtl/blob/main/docs/ML_ROADMAP.md">ML roadmap</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Family</h4>
+        <ul>
+          <li><a href="https://vlang.github.io/vsl">VSL — V Scientific Library</a></li>
+          <li><a href="https://vlang.io">V language</a></li>
+          <li><a href="https://github.com/vlang/vtl/blob/main/LICENSE">MIT License</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+</div>
+</body>
+</html>

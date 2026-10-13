@@ -14,6 +14,7 @@ on:
     paths:
       - '**.v'
       - '**.md'
+      - 'website/**'
       - '.github/workflows/deploy-docs.yml'
   workflow_dispatch:
 
@@ -56,13 +57,15 @@ jobs:
           env HOME="$HOME" PATH="$PATH" VJOBS=2 \
             v doc -readme -m -f html ./vtl
 
-      - name: Stage generated docs
+      - name: Stage website and generated API docs
         run: |
-          rm -rf ./vtl/_docs
-          cp -a ~/.vmodules/vtl/_docs ./vtl/_docs
+          rm -rf ./vtl/_site
+          mkdir -p ./vtl/_site/api
+          cp -a ./vtl/website/. ./vtl/_site/
+          cp -a ~/.vmodules/vtl/_docs/. ./vtl/_site/api/
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./vtl/_docs/
+          publish_dir: ./vtl/_site/
