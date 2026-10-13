@@ -134,3 +134,66 @@ fn test_random_generator_supports_hypergeometric_sampling() ! {
 	generator.free()
 	replay.free()
 }
+
+fn test_random_generator_cauchy_is_seeded_and_matches_quartiles() ! {
+	mut generator := new_random_generator(4242)
+	values := generator.cauchy(1.0, 2.0, [4096])!
+	assert values.shape == [4096]
+	mut below_first_quartile := 0
+	mut above_third_quartile := 0
+	mut sorted := values.to_array()
+	sorted.sort()
+	median := sorted[sorted.len / 2]
+	for value in values.to_array() {
+		assert !math.is_nan(value) && !math.is_inf(value, 0)
+		if value < -1.0 {
+			below_first_quartile++
+		}
+		if value > 3.0 {
+			above_third_quartile++
+		}
+	}
+	// Cauchy(1, 2) has median 1 and quartiles at -1 and 3
+	assert math.abs(median - 1.0) < 0.35
+	assert math.abs(f64(below_first_quartile) / 4096.0 - 0.25) < 0.045
+	assert math.abs(f64(above_third_quartile) / 4096.0 - 0.25) < 0.045
+
+	mut replay := new_random_generator(4242)
+	assert values.array_equal(replay.cauchy(1.0, 2.0, [4096])!)
+	if _ := generator.cauchy(0.0, 0.0, [4]) {
+		assert false, 'cauchy must reject a non-positive scale'
+	}
+	generator.free()
+	replay.free()
+}
+
+fn test_random_generator_wald_is_seeded_and_matches_moments() ! {
+	mut generator := new_random_generator(777)
+	values := generator.wald(2.0, 3.0, [4096])!
+	assert values.shape == [4096]
+	mut total := 0.0
+	for value in values.to_array() {
+		assert value > 0 && !math.is_nan(value) && !math.is_inf(value, 0)
+		total += value
+	}
+	mean := total / 4096.0
+	mut squared_deviations := 0.0
+	for value in values.to_array() {
+		squared_deviations += (value - mean) * (value - mean)
+	}
+	variance := squared_deviations / 4096.0
+	// Wald(2, 3) has mean 2 and variance mu^3 / lambda = 8/3
+	assert math.abs(mean - 2.0) < 0.12
+	assert math.abs(variance - 8.0 / 3.0) < 0.35
+
+	mut replay := new_random_generator(777)
+	assert values.array_equal(replay.wald(2.0, 3.0, [4096])!)
+	if _ := generator.wald(0.0, 3.0, [4]) {
+		assert false, 'wald must reject a non-positive mean'
+	}
+	if _ := generator.wald(2.0, -1.0, [4]) {
+		assert false, 'wald must reject a non-positive scale'
+	}
+	generator.free()
+	replay.free()
+}

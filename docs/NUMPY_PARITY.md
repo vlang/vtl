@@ -313,11 +313,12 @@ audit.
 
 **Current:** global uniform, normal, Bernoulli, binomial, negative-binomial,
 geometric, hypergeometric,
-exponential, Gumbel, Laplace, Logistic, Pareto, Rayleigh, triangular, Poisson,
+exponential, Gumbel, Laplace, Logistic, Cauchy, Wald (inverse Gaussian),
+Pareto, Rayleigh, triangular, Poisson,
 Weibull, lognormal, gamma, beta, Dirichlet, chi-square, Student's t, and F
 tensors; `random_seed`;
 independent seeded `RandomGenerator` streams for f64 uniform, normal, lognormal,
-Gumbel, Laplace, Logistic, Pareto, Rayleigh, triangular, gamma, beta,
+Gumbel, Laplace, Logistic, Cauchy, Wald, Pareto, Rayleigh, triangular, gamma, beta,
 Dirichlet, exponential, Poisson, Weibull, chi-square, Student's t, F,
 hypergeometric, negative-binomial, multivariate normal with positive-semidefinite
 covariance matrices, and boolean Bernoulli; integer
