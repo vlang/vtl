@@ -161,6 +161,11 @@ pub fn (mut nn Sequential[T]) batchnorm2d(num_features int, config layers.BatchN
 	nn.info.batchnorm2d(num_features, config)
 }
 
+// batchnorm3d adds a new BatchNorm3D layer to the network.
+pub fn (mut nn Sequential[T]) batchnorm3d(num_features int, config layers.BatchNorm3DConfig) {
+	nn.info.batchnorm3d(num_features, config)
+}
+
 // dropout adds a dropout layer with the given probability.
 pub fn (mut nn Sequential[T]) dropout(prob f64) {
 	nn.info.dropout(prob)

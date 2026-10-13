@@ -270,3 +270,105 @@ pub fn batchnorm1d_backward_mode[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T
 
 	return [dx, dgamma, dbeta]
 }
+
+// BatchNorm3D operates on [N, C, D, H, W] inputs. The spatial dimensions are
+// flattened into one index, so each element's channel is (idx / spatial) % C
+// in row-major order.
+
+// batchnorm3d_forward computes BatchNorm3D using running mean/var
+// (inference path); gamma, beta and running statistics are [C] vectors.
+pub fn batchnorm3d_forward[T](input &vtl.Tensor[T], gamma &vtl.Tensor[T], beta &vtl.Tensor[T], running_mean &vtl.Tensor[T], running_var &vtl.Tensor[T], eps f64) !&vtl.Tensor[T] {
+	channels := input.shape[1]
+	spatial := input.shape[2] * input.shape[3] * input.shape[4]
+	data := input.to_array()
+	mut output_data := []f64{len: data.len}
+	for c in 0 .. channels {
+		inv_std := 1.0 / math.sqrt(f64(running_var.get([c])) + eps)
+		mean_c := f64(running_mean.get([c]))
+		gamma_c := f64(gamma.get([c]))
+		beta_c := f64(beta.get([c]))
+		for idx in 0 .. data.len {
+			if (idx / spatial) % channels == c {
+				output_data[idx] = gamma_c * (f64(data[idx]) - mean_c) * inv_std + beta_c
+			}
+		}
+	}
+	return vtl.from_array(output_data.map(vtl.cast[T](it)), input.shape)!
+}
+
+// batchnorm3d_training computes BatchNorm3D using per-channel batch
+// statistics over N*D*H*W elements (training path). Returns the output plus
+// the biased batch mean and variance as [C] tensors.
+pub fn batchnorm3d_training[T](input &vtl.Tensor[T], gamma &vtl.Tensor[T], beta &vtl.Tensor[T], eps f64) !(&vtl.Tensor[T], &vtl.Tensor[T], &vtl.Tensor[T]) {
+	channels := input.shape[1]
+	spatial := input.shape[2] * input.shape[3] * input.shape[4]
+	count := f64(input.shape[0] * spatial)
+	data := input.to_array()
+
+	mut mean_data := []f64{len: channels}
+	for idx in 0 .. data.len {
+		mean_data[(idx / spatial) % channels] += f64(data[idx])
+	}
+	for c in 0 .. channels {
+		mean_data[c] /= count
+	}
+
+	mut var_data := []f64{len: channels}
+	for idx in 0 .. data.len {
+		c := (idx / spatial) % channels
+		diff := f64(data[idx]) - mean_data[c]
+		var_data[c] += diff * diff
+	}
+	for c in 0 .. channels {
+		var_data[c] /= count
+	}
+
+	mut output_data := []f64{len: data.len}
+	for idx in 0 .. data.len {
+		c := (idx / spatial) % channels
+		inv_std := 1.0 / math.sqrt(var_data[c] + eps)
+		output_data[idx] = f64(gamma.get([c])) * (f64(data[idx]) - mean_data[c]) * inv_std +
+			f64(beta.get([c]))
+	}
+	output := vtl.from_array(output_data.map(vtl.cast[T](it)), input.shape)!
+	batch_mean := vtl.from_array(mean_data.map(vtl.cast[T](it)), [channels])!
+	batch_var := vtl.from_array(var_data.map(vtl.cast[T](it)), [channels])!
+	return output, batch_mean, batch_var
+}
+
+// batchnorm3d_backward_mode computes gradients w.r.t. input, gamma and beta
+// for BatchNorm3D, using batch statistics in training mode and the fixed
+// running statistics as a constant affine transform in evaluation mode.
+pub fn batchnorm3d_backward_mode[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], gamma &vtl.Tensor[T], _beta &vtl.Tensor[T], mean &vtl.Tensor[T], var_ &vtl.Tensor[T], eps f64, training bool) ![]&vtl.Tensor[T] {
+	channels := input.shape[1]
+	spatial := input.shape[2] * input.shape[3] * input.shape[4]
+	count := f64(input.shape[0] * spatial)
+	data := input.to_array()
+	grad_data := gradient.to_array()
+
+	mut grad_sum := []f64{len: channels}
+	mut grad_norm_sum := []f64{len: channels}
+	for idx in 0 .. data.len {
+		c := (idx / spatial) % channels
+		normalized := (f64(data[idx]) - f64(mean.get([c]))) / math.sqrt(f64(var_.get([c])) + eps)
+		grad_sum[c] += f64(grad_data[idx])
+		grad_norm_sum[c] += f64(grad_data[idx]) * normalized
+	}
+
+	mut dx_data := []f64{len: data.len}
+	for idx in 0 .. data.len {
+		c := (idx / spatial) % channels
+		std_c := math.sqrt(f64(var_.get([c])) + eps)
+		grad := f64(grad_data[idx])
+		mut dx := grad
+		if training {
+			normalized := (f64(data[idx]) - f64(mean.get([c]))) / std_c
+			dx = (count * grad - grad_sum[c] - normalized * grad_norm_sum[c]) / count
+		}
+		dx_data[idx] = f64(gamma.get([c])) * dx / std_c
+	}
+	dx := vtl.from_array(dx_data.map(vtl.cast[T](it)), input.shape)!
+	dgamma := vtl.from_array(grad_norm_sum.map(vtl.cast[T](it)), [channels])!
+	dbeta := vtl.from_array(grad_sum.map(vtl.cast[T](it)), [channels])!
+	return [dx, dgamma, dbeta]
+}

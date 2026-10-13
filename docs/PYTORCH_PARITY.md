@@ -70,7 +70,9 @@ with train/eval modes, running statistics (the running variance uses the
 unbiased batch variance, as in PyTorch), optional affine parameters, and CPU
 autograd for input, gamma and beta. It is available as a layer and in
 `Sequential` via `batchnorm2d`, closing the BatchNorm2d gap next to the
-existing `BatchNorm1D`. BatchNorm3D and device kernels remain separate work.
+existing `BatchNorm1D`. `BatchNorm3D` provides the same contract for
+`[batch, channels, depth, height, width]` inputs via `batchnorm3d`.
+Device kernels for batch normalization remain separate work.
 
 `Sequential.gru` can be called repeatedly to compose a stack of single-layer
 GRUs, each with a zero initial hidden state. This composes stacked forward

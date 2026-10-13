@@ -117,3 +117,23 @@ fn test_sequential_batchnorm2d_forward_and_backward() ! {
 	eval_output := nn.forward(input)!
 	assert eval_output.value.to_array() != output.value.to_array()
 }
+
+fn test_sequential_batchnorm3d_forward_and_backward() ! {
+	ctx := autograd.ctx[f64]()
+	mut nn := sequential_from_ctx[f64](ctx)
+	nn.input([1, 1, 2, 2])
+	nn.batchnorm3d(1, layers.BatchNorm3DConfig{})
+	assert nn.info.layer_types[1] == 'BatchNorm3DLayer'
+	input := ctx.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0], [1, 1, 1, 2, 2])!)
+	output := nn.forward(input)!
+	assert output.value.shape == [1, 1, 1, 2, 2]
+	inv_std := 1.0 / math.sqrt(1.25 + 1e-5)
+	assert math.abs(output.value.get_nth(0) - (1.0 - 2.5) * inv_std) < 1e-12
+	mut loss := output.sum()!
+	loss.backprop()!
+	assert input.grad.shape == [1, 1, 1, 2, 2]
+	assert nn.info.layers[1].variables().len == 2
+	nn.eval()
+	eval_output := nn.forward(input)!
+	assert eval_output.value.to_array() != output.value.to_array()
+}
