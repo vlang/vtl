@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Getting started — VTL</title>
+<meta name="description" content="Install VTL, create your first tensor, and train a tiny model.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap top-in">
+    <a class="brand" href="./">VTL <span class="tag">getting started</span></a>
+    <nav class="main">
+      <a href="./">Home</a>
+      <a href="./#parity">Parity</a>
+      <a href="api/">API reference</a>
+      <a href="https://github.com/vlang/vtl">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <section>
+    <h2>Install</h2>
+    <p class="sub">You need a working <a href="https://vlang.io">V</a> installation. VTL depends on VSL, which <code>v install</code> resolves automatically.</p>
+<pre>v install vtl
+v ~/.vmodules/vtl/examples/vtl_basic_usage/main.v</pre>
+  </section>
+
+  <hr class="rule">
+  <section>
+    <h2>Your first tensor</h2>
+    <p class="sub">Tensors are generic over their element type, keep NumPy-style shapes, and share storage for view operations whenever the layout allows it.</p>
+<pre>import vtl
+
+fn main() {
+    a := vtl.from_array([1.0, 2, 3, 4, 5, 6], [2, 3])!
+    b := a.reshape([3, 2])!
+    println(b.get([2, 1])) <span class="cm">// 6.0</span>
+}</pre>
+    <p>Keep going with the <a href="https://github.com/vlang/vtl/blob/main/docs/TUTORIAL_FIRST_STEPS.md">first steps</a> and <a href="https://github.com/vlang/vtl/blob/main/docs/TUTORIAL_BROADCASTING.md">broadcasting</a> tutorials.</p>
+  </section>
+
+  <hr class="rule">
+  <section>
+    <h2>Train something small</h2>
+    <p class="sub">The repository ships runnable training smokes that need no datasets or GPU. Build them in prod mode for realistic speed.</p>
+<pre><span class="cm"># build first, then execute — the pattern used by all VTL benchmarks</span>
+v -prod -o /tmp/tiny examples/nn_cifar10_tiny_synth/main.v
+/tmp/tiny</pre>
+    <p>Then read the <a href="https://github.com/vlang/vtl/blob/main/docs/TUTORIAL_AUTOGRAD.md">autograd tutorial</a> and browse the <a href="api/">API reference</a> for layers, losses and optimizers.</p>
+  </section>
+
+  <footer>
+    <div class="cols">
+      <div><h4>VTL</h4><ul><li><a href="./">Home</a></li><li><a href="api/">API reference</a></li></ul></div>
+      <div><h4>Project</h4><ul><li><a href="https://github.com/vlang/vtl">GitHub repository</a></li><li><a href="https://github.com/vlang/vtl/issues">Issues</a></li></ul></div>
+      <div><h4>Family</h4><ul><li><a href="https://vlang.github.io/vsl">VSL — V Scientific Library</a></li><li><a href="https://vlang.io">V language</a></li></ul></div>
+    </div>
+  </footer>
+</div>
+</body>
+</html>
