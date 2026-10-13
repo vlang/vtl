@@ -217,6 +217,13 @@ pub fn (mut ls SequentialInfo[T]) batchnorm2d(num_features int, config layers.Ba
 	})
 }
 
+// batchnorm3d adds a new BatchNorm3D layer to the network.
+pub fn (mut ls SequentialInfo[T]) batchnorm3d(num_features int, config layers.BatchNorm3DConfig) {
+	ls.add_layer(layers.batchnorm3d_layer[T](ls.ctx, num_features, config), 'BatchNorm3DLayer', {
+		'num_features': num_features
+	})
+}
+
 // dropout adds a dropout layer using the preceding layer's output shape.
 pub fn (mut ls SequentialInfo[T]) dropout(prob f64) {
 	layer := ls.layers[ls.layers.len - 1]
