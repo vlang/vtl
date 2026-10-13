@@ -121,11 +121,14 @@ systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tm
 
 ## Autograd binary gate fusion
 
-`autograd_gate_backward_bench.v` compares the separate tensor passes used by
-multiply and divide gates with the fused backward path on same-shaped,
-contiguous f64 tensors. It checks output checksums before reporting mean
-latency for 1,024, 65,536, and 1,048,576 elements. This isolates gate backward
-work; it does not establish end-to-end training or PyTorch performance parity.
+`autograd_gate_backward_bench.v` compares `SubtractGate.backward` with
+`multiply_scalar(-1)` and compares the separate tensor passes used by multiply
+and divide gates with their fused backward paths on same-shaped, contiguous f64
+tensors. It alternates subtract timing order, compares every output element
+from the timed calls, and checks output checksums for multiply and divide
+before reporting mean latency for 1,024, 65,536, and 1,048,576 elements. This
+isolates gate backward work; it does not establish end-to-end training or
+PyTorch performance parity.
 
 ```bash
 cd ~/.vmodules
@@ -141,15 +144,29 @@ Reference run on 2026-10-13: AMD Ryzen 9 5900X, V 0.5.2 (`37a3b74`), GCC
 `-O3 -march=native`. Each table value is the median of three separate process
 runs; each process reports the mean of 10 timed iterations after 3 warmups.
 
+Subtract results from the three-process run:
+
+| Elements | Scalar (ms) | Fused (ms) | Speedup |
+|---------:|------------:|-----------:|--------:|
+| 1,024 | 0.0082 | 0.0051 | 1.61x |
+| 65,536 | 0.3225 | 0.0918 | 3.51x |
+| 1,048,576 | 5.7572 | 3.1064 | 1.85x |
+
+Earlier multiply/divide reference run:
+
 | Elements | Multiply separate (ms) | Multiply fused (ms) | Speedup | Divide separate (ms) | Divide fused (ms) | Speedup |
 |---------:|-----------------------:|-------------------:|--------:|---------------------:|-----------------:|--------:|
 | 1,024 | 0.0135 | 0.0052 | 2.60x | 0.0283 | 0.0054 | 5.24x |
 | 65,536 | 0.2915 | 0.0566 | 5.15x | 0.7586 | 0.1405 | 5.40x |
 | 1,048,576 | 5.7262 | 4.9416 | 1.16x | 15.6397 | 5.1660 | 3.03x |
 
-The measured benefit depends on operation and size; the 1M-element multiply
-case improved only 1.16x. This isolated f64 gate-backward microbenchmark does
-not establish end-to-end training performance and does not close issue #40.
+The subtract columns are medians of three processes on the same AMD Ryzen 9
+5900X, V 0.5.2, GCC 16.2.1 configuration on 2026-10-13. Timings varied between
+processes, so treat them as local reference data. The earlier multiply and
+divide values retain their original run. The measured benefit depends on
+operation and size; the earlier 1M-element multiply case improved only 1.16x.
+This isolated f64 gate-backward microbenchmark does not establish end-to-end
+training performance and does not close issue #40.
 
 ## Autograd clamp gate
 
