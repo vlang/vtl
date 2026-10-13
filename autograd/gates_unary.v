@@ -148,12 +148,27 @@ pub fn tanh_gate[T](cache &vtl.Tensor[T]) &TanhGate[T] {
 }
 
 // backward exposes this operation as part of the public API.
+@[direct_array_access]
 pub fn (g &TanhGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
+	if can_flat_unary_gate_backward[T](gradient, g.cache) {
+		mut result := vtl.tensor_like[T](gradient)
+		for i in 0 .. gradient.size {
+			value := g.cache.data.data[i]
+			result.data.data[i] = gradient.data.data[i] * (vtl.cast[T](1) - value * value)
+		}
+		return [result]
+	}
 	r0 := gradient.nmap([g.cache], fn [T](vals []T, _ []int) T {
 		return vals[0] * (vtl.cast[T](1) - vals[1] * vals[1])
 	})!
 	return [r0]
+}
+
+fn can_flat_unary_gate_backward[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) bool {
+	return gradient.shape == cached.shape && gradient.is_row_major_contiguous()
+		&& cached.is_row_major_contiguous() && gradient.data.data.len == gradient.size
+		&& cached.data.data.len == cached.size
 }
 
 fn tanh_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
