@@ -51,6 +51,16 @@ pub fn sigmoid[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 // sigmoid'(x) = sigmoid(x) * (1 - sigmoid(x))
 // The gate caches the sigmoid output, so vals[1] = sigmoid(x).
 
+@[inline]
+fn stable_sigmoid(x f64) f64 {
+	return if x >= 0 {
+		1.0 / (1.0 + math.exp(-x))
+	} else {
+		exp_x := math.exp(x)
+		exp_x / (1.0 + exp_x)
+	}
+}
+
 // deriv_sigmoid exposes this operation as part of the public API.
 
 // deriv_sigmoid exposes this operation as part of the public API.
@@ -216,18 +226,30 @@ pub fn gelu[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 // where z = sqrt(2/pi) * (x + 0.044715 * x^3)
 // and dz/dx = sqrt(2/pi) * (1 + 3 * 0.044715 * x^2)
 
+@[inline]
+fn gelu_derivative(x f64) f64 {
+	z := 0.7978845608028654 * (x + 0.044715 * x * x * x)
+	tanh_z := math.tanh(z)
+	dz_dx := 0.7978845608028654 * (1.0 + 3.0 * 0.044715 * x * x)
+	return 0.5 * (1.0 + tanh_z + x * (1.0 - tanh_z * tanh_z) * dz_dx)
+}
+
 // deriv_gelu exposes this operation as part of the public API.
 
 // deriv_gelu exposes this operation as part of the public API.
-@[inline]
+@[direct_array_access]
 pub fn deriv_gelu[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	if can_flat_activation_backward[T](gradient, cached) {
+		mut result := vtl.tensor_like[T](gradient)
+		for i in 0 .. gradient.size {
+			x := vtl.cast[f64](cached.data.data[i])
+			result.data.data[i] = gradient.data.data[i] * vtl.cast[T](gelu_derivative(x))
+		}
+		return result
+	}
 	return gradient.nmap([cached], fn [T](vals []T, i []int) T {
 		x := vtl.cast[f64](vals[1])
-		z := 0.7978845608028654 * (x + 0.044715 * x * x * x)
-		tanh_z := math.tanh(z)
-		dz_dx := 0.7978845608028654 * (1.0 + 3.0 * 0.044715 * x * x)
-		derivative := 0.5 * (1.0 + tanh_z + x * (1.0 - tanh_z * tanh_z) * dz_dx)
-		return vals[0] * vtl.cast[T](derivative)
+		return vals[0] * vtl.cast[T](gelu_derivative(x))
 	})
 }
 
@@ -257,12 +279,7 @@ pub fn swish[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 pub fn deriv_swish[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	return gradient.nmap([cached], fn [T](vals []T, i []int) T {
 		x := vtl.cast[f64](vals[1])
-		sig := if x >= 0 {
-			1.0 / (1.0 + math.exp(-x))
-		} else {
-			exp_x := math.exp(x)
-			exp_x / (1.0 + exp_x)
-		}
+		sig := stable_sigmoid(x)
 		derivative := sig * (1.0 + x * (1.0 - sig))
 		return vals[0] * vtl.cast[T](derivative)
 	})
@@ -328,17 +345,19 @@ pub fn softplus[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 }
 
 // deriv_softplus multiplies by sigmoid(x), the derivative of softplus.
-@[inline]
+@[direct_array_access]
 pub fn deriv_softplus[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	if can_flat_activation_backward[T](gradient, cached) {
+		mut result := vtl.tensor_like[T](gradient)
+		for i in 0 .. gradient.size {
+			x := vtl.cast[f64](cached.data.data[i])
+			result.data.data[i] = gradient.data.data[i] * vtl.cast[T](stable_sigmoid(x))
+		}
+		return result
+	}
 	return gradient.nmap([cached], fn [T](vals []T, _ []int) T {
 		x := vtl.cast[f64](vals[1])
-		sigmoid := if x >= 0 {
-			1.0 / (1.0 + math.exp(-x))
-		} else {
-			exp_x := math.exp(x)
-			exp_x / (1.0 + exp_x)
-		}
-		return vals[0] * vtl.cast[T](sigmoid)
+		return vals[0] * vtl.cast[T](stable_sigmoid(x))
 	})
 }
 

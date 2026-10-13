@@ -105,6 +105,41 @@ systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
 systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-relu-backward-bench
 ```
 
+## GELU and Softplus autograd backward
+
+`activation_backward_bench.v` compares the contiguous GELU and Softplus
+backward paths with their previous coordinate-indexed `nmap` implementations.
+It alternates operation order and checks every element of each final timed
+output. These are local VTL CPU microbenchmarks, not PyTorch comparisons.
+
+```bash
+cd ~/.vmodules
+systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+	v -no-parallel -cc gcc -prod -cflags "-march=native" \
+	-o /tmp/vtl-activation-backward-bench ./vtl/benchmarks/activation_backward_bench.v
+systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 \
+	/tmp/vtl-activation-backward-bench
+```
+
+Three-process medians on an AMD Ryzen 9 5900X with V 0.5.2 and GCC 16.2.1:
+
+| Elements | GELU nmap (ms) | GELU contiguous (ms) | Speedup |
+|---------:|---------------:|--------------------:|--------:|
+| 1,024 | 3.3896 | 0.0154 | 220.1x |
+| 4,096 | 50.0460 | 0.0724 | 691.2x |
+| 16,384 | 795.7903 | 0.2800 | 2,842.1x |
+
+| Elements | Softplus nmap (ms) | Softplus contiguous (ms) | Speedup |
+|---------:|------------------:|-----------------------:|--------:|
+| 1,024 | 3.3954 | 0.0167 | 203.3x |
+| 4,096 | 50.7017 | 0.0686 | 739.8x |
+| 16,384 | 794.4893 | 0.2341 | 3,394.7x |
+
+Each process used one warmup and five alternating timed calls. The comparison
+is against VTL's coordinate-indexed `nmap` loop, whose per-element index work
+dominates at larger sizes; these numbers are not comparisons with NumPy or
+PyTorch and should be remeasured on other systems.
+
 ## Linear bias gradient reduction
 
 `linear_bias_reduction_bench.v` compares summing the batch axis with the
@@ -124,8 +159,8 @@ systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tm
 `autograd_gate_backward_bench.v` compares `SubtractGate.backward` with
 `multiply_scalar(-1)` and compares the separate tensor passes used by multiply
 and divide gates with their fused backward paths on same-shaped, contiguous f64
-tensors. It alternates subtract timing order, compares every output element
-from the timed calls, and checks output checksums for multiply and divide
+tensors. It alternates subtract timing order, compares every element of the
+final timed subtract outputs, and checks output checksums for multiply and divide
 before reporting mean latency for 1,024, 65,536, and 1,048,576 elements. This
 isolates gate backward work; it does not establish end-to-end training or
 PyTorch performance parity.
