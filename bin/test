@@ -146,6 +146,13 @@ if [[ -n "${prod}" ]]; then
 fi
 
 echo "Compiling Examples with flags ${flags[*]}"
+# The parallel V type checker crashes while resolving generic interfaces in
+# autograd examples on the current compiler. Examples are already built one at
+# a time, so serialize their compiler phases until the upstream crash is fixed.
+example_flags=()
+if [[ "${VTL_NO_PARALLEL:-0}" != "1" ]]; then
+	example_flags+=( -no-parallel )
+fi
 while IFS= read -r -d '' file; do
     if [[ "${file}" == *"not_ci"* ]]; then
         echo "Skipping ${file} (not_ci)"
@@ -160,13 +167,13 @@ while IFS= read -r -d '' file; do
         continue
     fi
     echo "Compiling ${file}"
-    v "${flags[@]}" -o "${file}.bin" "${file}"
+	v "${flags[@]}" "${example_flags[@]}" -o "${file}.bin" "${file}"
     rm -f "${file}.bin"
 done < <(find "${vtl_dir_path}" -wholename '*/examples/*/main.v' -print0 | sort -z)
 
 if [[ -z "${full}" ]]; then
     echo "Running nn_cifar10_tiny_synth smoke (f64)"
-    v "${flags[@]}" run "${vtl_dir_path}/examples/nn_cifar10_tiny_synth/main.v"
+    v "${flags[@]}" "${example_flags[@]}" run "${vtl_dir_path}/examples/nn_cifar10_tiny_synth/main.v"
     echo "Running nn_cifar10_f32_tiny_synth smoke (f32)"
-    v "${flags[@]}" run "${vtl_dir_path}/examples/nn_cifar10_f32_tiny_synth/main.v"
+    v "${flags[@]}" "${example_flags[@]}" run "${vtl_dir_path}/examples/nn_cifar10_f32_tiny_synth/main.v"
 fi
