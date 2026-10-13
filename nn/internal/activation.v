@@ -18,8 +18,16 @@ pub fn tanh[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 // deriv_tanh exposes this operation as part of the public API.
 
 // deriv_tanh exposes this operation as part of the public API.
-@[inline]
+@[direct_array_access]
 pub fn deriv_tanh[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	if can_flat_activation_backward[T](gradient, cached) {
+		mut result := vtl.tensor_like[T](gradient)
+		for i in 0 .. gradient.size {
+			value := cached.data.data[i]
+			result.data.data[i] = gradient.data.data[i] * (vtl.cast[T](1) - value * value)
+		}
+		return result
+	}
 	return gradient.nmap([cached], fn [T](vals []T, i []int) T {
 		// vals[0] = upstream gradient, vals[1] = cached tanh output
 		return vals[0] * (vtl.cast[T](1) - vals[1] * vals[1])
@@ -46,12 +54,26 @@ pub fn sigmoid[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 // deriv_sigmoid exposes this operation as part of the public API.
 
 // deriv_sigmoid exposes this operation as part of the public API.
-@[inline]
+@[direct_array_access]
 pub fn deriv_sigmoid[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	if can_flat_activation_backward[T](gradient, cached) {
+		mut result := vtl.tensor_like[T](gradient)
+		for i in 0 .. gradient.size {
+			value := cached.data.data[i]
+			result.data.data[i] = gradient.data.data[i] * value * (vtl.cast[T](1) - value)
+		}
+		return result
+	}
 	return gradient.nmap([cached], fn [T](vals []T, i []int) T {
 		// vals[0] = upstream gradient, vals[1] = cached sigmoid(x) output
 		return vals[0] * vals[1] * (vtl.cast[T](1) - vals[1])
 	})
+}
+
+fn can_flat_activation_backward[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) bool {
+	return gradient.shape == cached.shape && gradient.is_row_major_contiguous()
+		&& cached.is_row_major_contiguous() && gradient.data.data.len == gradient.size
+		&& cached.data.data.len == cached.size
 }
 
 // relu activation function
@@ -76,9 +98,7 @@ pub fn relu[T](x &vtl.Tensor[T]) &vtl.Tensor[T] {
 // deriv_relu exposes this operation as part of the public API.
 @[direct_array_access]
 pub fn deriv_relu[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T]) !&vtl.Tensor[T] {
-	if gradient.shape == cached.shape && gradient.is_row_major_contiguous()
-		&& cached.is_row_major_contiguous() && gradient.data.data.len == gradient.size
-		&& cached.data.data.len == cached.size {
+	if can_flat_activation_backward[T](gradient, cached) {
 		mut result := vtl.tensor_like[T](gradient)
 		for i in 0 .. gradient.size {
 			result.data.data[i] = if cached.data.data[i] < 0 {
@@ -119,8 +139,19 @@ pub fn leaky_relu[T](x &vtl.Tensor[T], alpha T) &vtl.Tensor[T] {
 // deriv_leaky_relu exposes this operation as part of the public API.
 
 // deriv_leaky_relu exposes this operation as part of the public API.
-@[inline]
+@[direct_array_access]
 pub fn deriv_leaky_relu[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T], alpha T) !&vtl.Tensor[T] {
+	if can_flat_activation_backward[T](gradient, cached) {
+		mut result := vtl.tensor_like[T](gradient)
+		for i in 0 .. gradient.size {
+			result.data.data[i] = if cached.data.data[i] < 0 {
+				alpha * gradient.data.data[i]
+			} else {
+				gradient.data.data[i]
+			}
+		}
+		return result
+	}
 	return gradient.nmap([cached], fn [alpha] [T](vals []T, i []int) T {
 		// vals[0] = upstream gradient, vals[1] = cached pre-activation value
 		// B6 fix: compare cached (vals[1]), scale upstream grad (vals[0])
