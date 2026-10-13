@@ -136,6 +136,21 @@ systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 \
 	/tmp/vtl-autograd-gates
 ```
 
+Reference run on 2026-10-13: AMD Ryzen 9 5900X, V 0.5.2 (`37a3b74`), GCC
+16.2.1, compiled with `-no-parallel -cc gcc -prod` and C flags
+`-O3 -march=native`. Each table value is the median of three separate process
+runs; each process reports the mean of 10 timed iterations after 3 warmups.
+
+| Elements | Multiply separate (ms) | Multiply fused (ms) | Speedup | Divide separate (ms) | Divide fused (ms) | Speedup |
+|---------:|-----------------------:|-------------------:|--------:|---------------------:|-----------------:|--------:|
+| 1,024 | 0.0135 | 0.0052 | 2.60x | 0.0283 | 0.0054 | 5.24x |
+| 65,536 | 0.2915 | 0.0566 | 5.15x | 0.7586 | 0.1405 | 5.40x |
+| 1,048,576 | 5.7262 | 4.9416 | 1.16x | 15.6397 | 5.1660 | 3.03x |
+
+The measured benefit depends on operation and size; the 1M-element multiply
+case improved only 1.16x. This isolated f64 gate-backward microbenchmark does
+not establish end-to-end training performance and does not close issue #40.
+
 Record CPU, V/compiler version, C compiler, production flags, and results when
 publishing measurements.
 
