@@ -28,10 +28,10 @@ v run vtl/examples/autograd_backprop/main.v
 ## Expected output
 
 ```
-Variable(value: [3.0], grad: [0.0])
-Variable(value: [2.0], grad: [0.0])
-Variable(value: [9.0], grad: [0.0])
-[6.0]
+&[3.0]
+&[2.0]
+&[9.0]
+&[6.0]
 ```
 
 The gradient `6.0` matches the analytical derivative `d(3^2)/dx = 2*3 = 6`.
