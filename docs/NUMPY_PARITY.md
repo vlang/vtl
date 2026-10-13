@@ -152,9 +152,11 @@ and validate an explicitly selected output dtype against `promote_types`.
 boolean tensors, broadcasts inputs, and returns `float32` only when the
 promoted input dtype is `float32`; other supported combinations return
 `float64`.
-`remainder_promoted` performs NumPy-style integer remainder with mixed integer
-dtypes and broadcasting; nonzero remainders follow the divisor's sign, and a
-zero divisor produces zero (without NumPy's runtime warning).
+`remainder_promoted` performs NumPy-style remainder with mixed integer and
+floating-point dtypes and broadcasting. Nonzero results follow the divisor's
+sign; signed zero follows the divisor; integer zero divisors produce zero and
+floating-point zero divisors produce NaN. Floating-point remainder is a tensor
+operation and does not yet propagate gradients through `Variable`.
 `round_decimals` rounds real floating-point tensors to positive or negative
 decimal places using ties-to-even, matching NumPy `round` for the supported
 same-dtype inputs; integer tensors are copied unchanged. VTL preserves finite

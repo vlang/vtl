@@ -256,17 +256,11 @@ fn test_promoted_integer_remainder_matches_numpy_sign_and_broadcasting() ! {
 	assert remainders.to_array() == [1, -1, 1, -1]
 }
 
-fn test_promoted_integer_remainder_handles_zero_divisor_and_rejects_float() ! {
+fn test_promoted_integer_remainder_keeps_zero_divisor_behavior() ! {
 	integers := vtl.from_1d[i8]([5, -5])!
 	zero_divisors := vtl.from_1d[i16]([2, 0])!
 	remainders := vtl.remainder_promoted[i16, i8, i16](integers, zero_divisors)!
 	assert remainders.to_array() == [1, 0]
-
-	floats := vtl.from_1d[f32]([5.0])!
-	float_divisor := vtl.from_1d[f32]([2.0])!
-	if _ := vtl.remainder_promoted[f32, f32, f32](floats, float_divisor) {
-		assert false, 'promoted remainder only supports integer tensors'
-	}
 }
 
 fn test_promoted_integer_remainder_handles_signed_minimum_modulo_negative_one() ! {

@@ -1,5 +1,7 @@
 module vtl
 
+import math
+
 enum PromotedBinaryOperation {
 	add
 	subtract
@@ -36,8 +38,9 @@ pub fn divide_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
 	return binary_promoted[R, T, U](a, b, .divide)
 }
 
-// remainder_promoted returns the element-wise NumPy remainder of integer
-// tensors, after dtype promotion and broadcasting. A zero divisor produces 0.
+// remainder_promoted returns the element-wise NumPy remainder of real numeric
+// tensors after dtype promotion and broadcasting. Integer zero divisors produce
+// zero; floating-point zero divisors produce NaN.
 pub fn remainder_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
 	return binary_promoted[R, T, U](a, b, .remainder)
 }
@@ -53,9 +56,6 @@ fn binary_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation PromotedBinary
 			|| (operation == .divide && right_dtype == .boolean)
 		if !left_supported || !right_supported {
 			return error('promoted arithmetic supports only real numeric tensors and division of booleans')
-		}
-		if operation == .remainder && (!is_integer_dtype(left_dtype) || !is_integer_dtype(right_dtype)) {
-			return error('promoted remainder supports only integer tensors')
 		}
 		promoted_dtype := promote_types(left_dtype, right_dtype)!
 		expected := if operation == .divide {
@@ -80,7 +80,7 @@ fn binary_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation PromotedBinary
 		if operation == .remainder {
 			if left_is_flat && right_is_singleton {
 				divisor := cast_promoted_value[U, R](b.data.data[0])
-				if divisor == R(0) {
+				if divisor == R(0) && is_integer_dtype(dtype_of[R]()) {
 					return result
 				}
 				for index in 0 .. result.size {
@@ -106,7 +106,11 @@ fn binary_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation PromotedBinary
 				}
 				x := cast_promoted_value[T, R](left.data.data[left_offset])
 				y := cast_promoted_value[U, R](right.data.data[right_offset])
-				result.data.data[index] = if y == R(0) { R(0) } else { numpy_remainder(x, y) }
+				result.data.data[index] = if y == R(0) && is_integer_dtype(dtype_of[R]()) {
+					R(0)
+				} else {
+					numpy_remainder(x, y)
+				}
 			}
 			return result
 		}
@@ -173,8 +177,18 @@ fn numpy_remainder[T](x T, y T) T {
 			result += y
 		}
 		return result
+	} $else $if T is $float {
+		x_f64 := f64(x)
+		y_f64 := f64(y)
+		mut result := math.fmod(x_f64, y_f64)
+		if result == 0.0 {
+			result = math.copysign(0.0, y_f64)
+		} else if math.signbit(result) != math.signbit(y_f64) {
+			result += y_f64
+		}
+		return T(result)
 	} $else {
-		panic('promoted remainder requires an integer dtype')
+		panic('promoted remainder requires an integer or floating-point dtype')
 	}
 }
 
