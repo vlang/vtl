@@ -37,9 +37,11 @@ restore into a compatible model and a built Adam optimizer with
 configuration and first/second moments alongside model weights and metadata.
 For SGD with momentum, use `save_sgd_training_checkpoint` and
 `load_sgd_training_checkpoint`; these store the scalar configuration, momentum
-buffers, and first-step initialization state. Other optimizer types, device
-remapping, and cross-version migration are not supported by this API yet. The
-JSON format has version `1.0`, ordered layer
+buffers, and first-step initialization state. For AdamW, use
+`save_adamw_training_checkpoint` and `load_adamw_training_checkpoint` to store
+its scalar configuration and first/second moments. Other optimizer types,
+device remapping, and cross-version migration are not supported by this API
+yet. The JSON format has version `1.0`, ordered layer
 definitions, per-layer weight maps, optimizer metadata, and checkpoint
 metadata; tensor weights are base64 encoded. Loading rejects a version
 mismatch.
