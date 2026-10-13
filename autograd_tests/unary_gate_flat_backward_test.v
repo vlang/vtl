@@ -162,3 +162,55 @@ fn test_f32_unary_gate_simd_blocks_and_tails() ! {
 	assert clamp_result[0].array_equal(vtl.from_1d[f32]([0.0, 2.0, 0.0, 4.0, 0.0, 0.0, 7.0, 0.0,
 		9.0])!)
 }
+
+fn test_exp_gate_backward_contiguous_flat_path() ! {
+	ctx := autograd.ctx[f64]()
+	input := ctx.variable(vtl.from_1d([0.0, 1.0, -1.0, 2.0])!)
+	mut output := ctx.variable(vtl.zeros[f64]([4]))
+	output.grad = vtl.from_1d([1.0, 2.0, 3.0, 4.0])!
+	result := autograd.exp_gate[f64](input).backward(autograd.payload(output))!
+
+	assert result[0].array_equal(vtl.from_1d([1.0, 2.0 * math.exp(1.0), 3.0 * math.exp(-1.0),
+		4.0 * math.exp(2.0)])!)
+}
+
+fn test_log_gate_backward_contiguous_flat_path() ! {
+	ctx := autograd.ctx[f64]()
+	input := ctx.variable(vtl.from_1d([1.0, 2.0, 4.0, 0.5])!)
+	mut output := ctx.variable(vtl.zeros[f64]([4]))
+	output.grad = vtl.from_1d([2.0, 2.0, 8.0, 3.0])!
+	result := autograd.log_gate[f64](input).backward(autograd.payload(output))!
+
+	assert result[0].array_equal(vtl.from_1d([2.0, 1.0, 2.0, 6.0])!)
+}
+
+fn test_trig_gates_backward_contiguous_flat_path() ! {
+	ctx := autograd.ctx[f64]()
+	input := ctx.variable(vtl.from_1d([0.0, 1.0, -0.5])!)
+	mut output := ctx.variable(vtl.zeros[f64]([3]))
+	output.grad = vtl.from_1d([1.0, 2.0, 3.0])!
+
+	sin_result := autograd.sin_gate[f64](input).backward(autograd.payload(output))!
+	assert sin_result[0].array_equal(vtl.from_1d([1.0, 2.0 * math.cos(1.0), 3.0 * math.cos(-0.5)])!)
+
+	cos_result := autograd.cos_gate[f64](input).backward(autograd.payload(output))!
+	assert cos_result[0].array_equal(vtl.from_1d([0.0, -2.0 * math.sin(1.0), -3.0 * math.sin(-0.5)])!)
+
+	tan_result := autograd.tan_gate[f64](input).backward(autograd.payload(output))!
+	assert tan_result[0].array_equal(vtl.from_1d([1.0, 2.0 / (math.cos(1.0) * math.cos(1.0)),
+		3.0 / (math.cos(-0.5) * math.cos(-0.5))])!)
+}
+
+fn test_exp_gate_backward_non_contiguous_fallback() ! {
+	ctx := autograd.ctx[f64]()
+	input := ctx.variable(vtl.from_array([0.0, 1.0, -1.0, 2.0], [2, 2])!.transpose([1, 0])!)
+	mut output := ctx.variable(vtl.zeros[f64]([2, 2]))
+	output.grad = vtl.from_array([1.0, 2.0, 3.0, 4.0], [2, 2])!.transpose([1, 0])!
+	result := autograd.exp_gate[f64](input).backward(autograd.payload(output))!
+
+	// input transposed is [[0, -1], [1, 2]]; gradient transposed is [[1, 3], [2, 4]]
+	assert result[0].get([0, 0]) == 1.0
+	assert result[0].get([0, 1]) == 3.0 * math.exp(-1.0)
+	assert result[0].get([1, 0]) == 2.0 * math.exp(1.0)
+	assert result[0].get([1, 1]) == 4.0 * math.exp(2.0)
+}
