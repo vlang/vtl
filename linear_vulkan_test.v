@@ -1,6 +1,7 @@
 // vtest build: false // requires a Vulkan SDK and device
 module main
 
+import math
 import vtl
 import vtl.nn.layers
 
@@ -36,41 +37,37 @@ fn test_linear_forward_vulkan() {
 	b.set([3], 0.4)
 
 	// Test Vulkan path
-	result := nn.layers.linear_forward_vulkan(x, w, b)!
+	result := layers.linear_forward_vulkan(x, w, b)!
 	println('Linear forward result: ${result}')
 
-	// Expected: x * W^T + b
-	// x * W^T = [[1*0.1+2*0.4+3*0.7, 1*0.2+2*0.5+3*0.8, 1*0.3+2*0.6+3*0.9, 1*0.4+2*0.7+3*1.0],
-	//            [4*0.1+5*0.4+6*0.7, 4*0.2+5*0.5+6*0.8, 4*0.3+5*0.6+6*0.9, 4*0.4+5*0.7+6*1.0]]
-	//          = [[3.0, 3.6, 4.2, 4.8], [6.6, 8.1, 9.6, 11.1]]
-	// + b = [[3.1, 3.8, 4.3, 4.9], [6.7, 8.3, 9.8, 11.5]]
+	// Expected: y = x * W^T + b with W as [out_features, in_features]
+	// (PyTorch nn.Linear semantics):
+	// row 0: [1*.1+2*.2+3*.3, 1*.4+2*.5+3*.6, 1*.7+2*.8+3*.9, 1*1+2*1.1+3*1.2] + b
+	//      = [1.4, 3.2, 5.0, 6.8] + [0.1, 0.2, 0.3, 0.4] = [1.5, 3.4, 5.3, 7.2]
+	// row 1: [4*.1+5*.2+6*.3, 4*.4+5*.5+6*.6, 4*.7+5*.8+6*.9, 4*1+5*1.1+6*1.2] + b
+	//      = [3.2, 7.7, 12.2, 16.7] + b = [3.3, 7.9, 12.5, 17.1]
 
 	expected := vtl.zeros[f32]([2, 4])
-	expected.set([0, 0], 3.1)
-	expected.set([0, 1], 3.8)
-	expected.set([0, 2], 4.3)
-	expected.set([0, 3], 4.9)
-	expected.set([1, 0], 6.7)
-	expected.set([1, 1], 8.3)
-	expected.set([1, 2], 9.8)
-	expected.set([1, 3], 11.5)
+	expected.set([0, 0], 1.5)
+	expected.set([0, 1], 3.4)
+	expected.set([0, 2], 5.3)
+	expected.set([0, 3], 7.2)
+	expected.set([1, 0], 3.3)
+	expected.set([1, 1], 7.9)
+	expected.set([1, 2], 12.5)
+	expected.set([1, 3], 17.1)
 
 	// Check if close enough (allowing for small floating point differences)
 	res_arr := result.to_array()
 	exp_arr := expected.to_array()
 	assert res_arr.len == exp_arr.len
 	for i in 0 .. res_arr.len {
-		diff := (res_arr[i] - exp_arr[i]).abs()
-		assert diff < 1e-5, 'Mismatch at index $i: got ${res_arr[i]}, expected ${exp_arr[i]}'
+		diff := math.abs(f64(res_arr[i] - exp_arr[i]))
+		assert diff < 1e-5, 'Mismatch at index ${i}: got ${res_arr[i]}, expected ${exp_arr[i]}'
 	}
 
 	println('✓ Linear forward test passed')
 
-	// Cleanup
-	x.release()
-	w.release()
-	b.release()
-	result.release()
 }
 
 // Test ReLU activation
@@ -80,7 +77,7 @@ fn test_relu_forward_vulkan() {
 	x.set([1], -0.5)
 	x.set([2], 1.0)
 	x.set([3], 2.0)
-	result := nn.layers.relu_forward_vulkan(x)!
+	result := layers.relu_forward_vulkan(x)!
 	println('ReLU result: ${result}')
 
 	expected := vtl.zeros[f32]([4])
@@ -93,14 +90,12 @@ fn test_relu_forward_vulkan() {
 	exp_arr := expected.to_array()
 	assert res_arr.len == exp_arr.len
 	for i in 0 .. res_arr.len {
-		diff := (res_arr[i] - exp_arr[i]).abs()
+		diff := math.abs(f64(res_arr[i] - exp_arr[i]))
 		assert diff < 1e-5
 	}
 
 	println('✓ ReLU forward test passed')
 
-	x.release()
-	result.release()
 }
 
 // Test Sigmoid activation
@@ -108,7 +103,7 @@ fn test_sigmoid_forward_vulkan() {
 	mut x := vtl.zeros[f32]([2])
 	x.set([0], 0.0)
 	x.set([1], 1.0)
-	result := nn.layers.sigmoid_forward_vulkan(x)!
+	result := layers.sigmoid_forward_vulkan(x)!
 	println('Sigmoid result: ${result}')
 
 	// sigmoid(0) = 0.5, sigmoid(1) ≈ 0.731
@@ -120,14 +115,12 @@ fn test_sigmoid_forward_vulkan() {
 	exp_arr := expected.to_array()
 	assert res_arr.len == exp_arr.len
 	for i in 0 .. res_arr.len {
-		diff := (res_arr[i] - exp_arr[i]).abs()
+		diff := math.abs(f64(res_arr[i] - exp_arr[i]))
 		assert diff < 1e-2 // Looser tolerance for sigmoid
 	}
 
 	println('✓ Sigmoid forward test passed')
 
-	x.release()
-	result.release()
 }
 
 fn main() {
