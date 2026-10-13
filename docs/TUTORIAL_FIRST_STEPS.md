@@ -133,9 +133,10 @@ type explicitly and VTL checks it against the promotion result. The arithmetic
 operators still require matching tensor types. `divide_promoted` follows
 NumPy's true-division output types: integer inputs produce `f64`, while inputs
 whose promoted dtype is `f32` produce `f32`.
-`remainder_promoted` adds mixed integer remainder with broadcasting and
-NumPy's rule that a nonzero result has the sign of the divisor; a zero divisor
-produces zero.
+`remainder_promoted` supports mixed integer and floating-point tensors with
+broadcasting and NumPy's remainder semantics. Nonzero results have the
+divisor's sign; integer division by zero produces zero, while floating-point
+division by zero produces NaN.
 
 ```v
 import vtl
@@ -156,6 +157,11 @@ remainder_left := vtl.from_1d[i8]([-5, 5])!
 remainder_right := vtl.from_1d[i16]([3, -3])!
 remainders := vtl.remainder_promoted[i16, i8, i16](remainder_left, remainder_right)!
 assert remainders.to_array() == [1, -1]
+
+float_left := vtl.from_1d[f32]([-5.0, 5.0])!
+float_right := vtl.from_1d[f64]([3.0, -3.0])!
+float_remainders := vtl.remainder_promoted[f64, f32, f64](float_left, float_right)!
+assert float_remainders.to_array() == [1.0, -1.0]
 ```
 
 Same-dtype tensors support elementwise arithmetic operators with broadcasting.
