@@ -37,6 +37,16 @@ VTL and 62.2 ms for NumPy, with the same checksum (about 2.00× faster for VTL).
 The larger comparison uses a 3 GiB memory cap. These local timings apply only
 to contiguous `f64` reductions on this machine.
 
+A fresh comparison on 2026-10-12 used V 0.5.2 (`02cf4bd`), GCC 16.2.1,
+NumPy 2.5.4, an AMD Ryzen 9 5900X, `-prod -march=native`, and
+`OPENBLAS_NUM_THREADS=2`. Three interleaved processes per side at 1,048,576
+values measured median per-process means of 0.190 ms for VTL and 0.157 ms for
+NumPy; at 67,108,864 values they measured 28.921 ms for VTL and 57.450 ms for
+NumPy. All runs reported checksum `2000`. NumPy was 1.21× faster at the smaller
+size, while VTL was 1.99× faster at 512 MiB. The 512 MiB runs used separate
+3 GiB memory-limited scopes. These single-operation results are specific to
+this CPU and contiguous `f64` workload.
+
 ## Multi-axis peak-to-peak range
 
 This paired benchmark reduces a `[groups, 256, 512]` contiguous `f64` tensor
