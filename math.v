@@ -192,6 +192,23 @@ pub fn (t &Tensor[T]) abs[T]() &Tensor[T] {
 // acos exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) acos[T]() &Tensor[T] {
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		mut ret := tensor_like[T](t)
+		$if T is f64 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = math.acos(t.data.data[i])
+			}
+		} $else $if T is f32 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = f32(math.acos(f64(t.data.data[i])))
+			}
+		} $else {
+			for i in 0 .. t.size {
+				ret.data.data[i] = cast[T](math.acos(td(t.data.data[i]).f64()))
+			}
+		}
+		return ret
+	}
 	return t.map_values(fn [T](x T) T {
 		return cast[T](math.acos(td(x).f64()))
 	})
@@ -204,6 +221,23 @@ pub fn (t &Tensor[T]) acos[T]() &Tensor[T] {
 // acosh exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) acosh[T]() &Tensor[T] {
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		mut ret := tensor_like[T](t)
+		$if T is f64 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = math.acosh(t.data.data[i])
+			}
+		} $else $if T is f32 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = f32(math.acosh(f64(t.data.data[i])))
+			}
+		} $else {
+			for i in 0 .. t.size {
+				ret.data.data[i] = cast[T](math.acosh(td(t.data.data[i]).f64()))
+			}
+		}
+		return ret
+	}
 	return t.map_values(fn [T](x T) T {
 		return cast[T](math.acosh(td(x).f64()))
 	})
@@ -216,6 +250,23 @@ pub fn (t &Tensor[T]) acosh[T]() &Tensor[T] {
 // asin exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) asin[T]() &Tensor[T] {
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		mut ret := tensor_like[T](t)
+		$if T is f64 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = math.asin(t.data.data[i])
+			}
+		} $else $if T is f32 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = f32(math.asin(f64(t.data.data[i])))
+			}
+		} $else {
+			for i in 0 .. t.size {
+				ret.data.data[i] = cast[T](math.asin(td(t.data.data[i]).f64()))
+			}
+		}
+		return ret
+	}
 	return t.map_values(fn [T](x T) T {
 		return cast[T](math.asin(td(x).f64()))
 	})
@@ -228,6 +279,23 @@ pub fn (t &Tensor[T]) asin[T]() &Tensor[T] {
 // asinh exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) asinh[T]() &Tensor[T] {
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		mut ret := tensor_like[T](t)
+		$if T is f64 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = math.asinh(t.data.data[i])
+			}
+		} $else $if T is f32 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = f32(math.asinh(f64(t.data.data[i])))
+			}
+		} $else {
+			for i in 0 .. t.size {
+				ret.data.data[i] = cast[T](math.asinh(td(t.data.data[i]).f64()))
+			}
+		}
+		return ret
+	}
 	return t.map_values(fn [T](x T) T {
 		return cast[T](math.asinh(td(x).f64()))
 	})
@@ -240,6 +308,23 @@ pub fn (t &Tensor[T]) asinh[T]() &Tensor[T] {
 // atan exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) atan[T]() &Tensor[T] {
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		mut ret := tensor_like[T](t)
+		$if T is f64 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = math.atan(t.data.data[i])
+			}
+		} $else $if T is f32 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = f32(math.atan(f64(t.data.data[i])))
+			}
+		} $else {
+			for i in 0 .. t.size {
+				ret.data.data[i] = cast[T](math.atan(td(t.data.data[i]).f64()))
+			}
+		}
+		return ret
+	}
 	return t.map_values(fn [T](x T) T {
 		return cast[T](math.atan(td(x).f64()))
 	})
@@ -266,6 +351,23 @@ pub fn (a &Tensor[T]) atan2[T](b &Tensor[T]) !&Tensor[T] {
 // atanh exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) atanh[T]() &Tensor[T] {
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		mut ret := tensor_like[T](t)
+		$if T is f64 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = math.atanh(t.data.data[i])
+			}
+		} $else $if T is f32 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = f32(math.atanh(f64(t.data.data[i])))
+			}
+		} $else {
+			for i in 0 .. t.size {
+				ret.data.data[i] = cast[T](math.atanh(td(t.data.data[i]).f64()))
+			}
+		}
+		return ret
+	}
 	return t.map_values(fn [T](x T) T {
 		return cast[T](math.atanh(td(x).f64()))
 	})
@@ -278,6 +380,23 @@ pub fn (t &Tensor[T]) atanh[T]() &Tensor[T] {
 // cbrt exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) cbrt[T]() &Tensor[T] {
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		mut ret := tensor_like[T](t)
+		$if T is f64 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = math.cbrt(t.data.data[i])
+			}
+		} $else $if T is f32 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = f32(math.cbrt(f64(t.data.data[i])))
+			}
+		} $else {
+			for i in 0 .. t.size {
+				ret.data.data[i] = cast[T](math.cbrt(td(t.data.data[i]).f64()))
+			}
+		}
+		return ret
+	}
 	return t.map_values(fn [T](x T) T {
 		return cast[T](math.cbrt(td(x).f64()))
 	})
@@ -302,6 +421,23 @@ pub fn (t &Tensor[T]) ceil[T]() &Tensor[T] {
 // cos exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) cos[T]() &Tensor[T] {
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		mut ret := tensor_like[T](t)
+		$if T is f64 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = math.cos(t.data.data[i])
+			}
+		} $else $if T is f32 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = f32(math.cos(f64(t.data.data[i])))
+			}
+		} $else {
+			for i in 0 .. t.size {
+				ret.data.data[i] = cast[T](math.cos(td(t.data.data[i]).f64()))
+			}
+		}
+		return ret
+	}
 	return t.map_values(fn [T](x T) T {
 		return cast[T](math.cos(td(x).f64()))
 	})
@@ -314,6 +450,23 @@ pub fn (t &Tensor[T]) cos[T]() &Tensor[T] {
 // cosh exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) cosh[T]() &Tensor[T] {
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		mut ret := tensor_like[T](t)
+		$if T is f64 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = math.cosh(t.data.data[i])
+			}
+		} $else $if T is f32 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = f32(math.cosh(f64(t.data.data[i])))
+			}
+		} $else {
+			for i in 0 .. t.size {
+				ret.data.data[i] = cast[T](math.cosh(td(t.data.data[i]).f64()))
+			}
+		}
+		return ret
+	}
 	return t.map_values(fn [T](x T) T {
 		return cast[T](math.cosh(td(x).f64()))
 	})
@@ -350,6 +503,23 @@ pub fn (t &Tensor[T]) degrees[T]() &Tensor[T] {
 // erf exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) erf[T]() &Tensor[T] {
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		mut ret := tensor_like[T](t)
+		$if T is f64 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = math.erf(t.data.data[i])
+			}
+		} $else $if T is f32 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = f32(math.erf(f64(t.data.data[i])))
+			}
+		} $else {
+			for i in 0 .. t.size {
+				ret.data.data[i] = cast[T](math.erf(td(t.data.data[i]).f64()))
+			}
+		}
+		return ret
+	}
 	return t.map_values(fn [T](x T) T {
 		return cast[T](math.erf(td(x).f64()))
 	})
@@ -362,6 +532,23 @@ pub fn (t &Tensor[T]) erf[T]() &Tensor[T] {
 // erfc exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) erfc[T]() &Tensor[T] {
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		mut ret := tensor_like[T](t)
+		$if T is f64 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = math.erfc(t.data.data[i])
+			}
+		} $else $if T is f32 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = f32(math.erfc(f64(t.data.data[i])))
+			}
+		} $else {
+			for i in 0 .. t.size {
+				ret.data.data[i] = cast[T](math.erfc(td(t.data.data[i]).f64()))
+			}
+		}
+		return ret
+	}
 	return t.map_values(fn [T](x T) T {
 		return cast[T](math.erfc(td(x).f64()))
 	})
@@ -374,6 +561,23 @@ pub fn (t &Tensor[T]) erfc[T]() &Tensor[T] {
 // exp exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) exp[T]() &Tensor[T] {
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		mut ret := tensor_like[T](t)
+		$if T is f64 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = math.exp(t.data.data[i])
+			}
+		} $else $if T is f32 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = f32(math.exp(f64(t.data.data[i])))
+			}
+		} $else {
+			for i in 0 .. t.size {
+				ret.data.data[i] = cast[T](math.exp(td(t.data.data[i]).f64()))
+			}
+		}
+		return ret
+	}
 	return t.map_values(fn [T](x T) T {
 		return cast[T](math.exp(td(x).f64()))
 	})
@@ -386,6 +590,23 @@ pub fn (t &Tensor[T]) exp[T]() &Tensor[T] {
 // exp2 exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) exp2[T]() &Tensor[T] {
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		mut ret := tensor_like[T](t)
+		$if T is f64 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = math.exp2(t.data.data[i])
+			}
+		} $else $if T is f32 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = f32(math.exp2(f64(t.data.data[i])))
+			}
+		} $else {
+			for i in 0 .. t.size {
+				ret.data.data[i] = cast[T](math.exp2(td(t.data.data[i]).f64()))
+			}
+		}
+		return ret
+	}
 	return t.map_values(fn [T](x T) T {
 		return cast[T](math.exp2(td(x).f64()))
 	})
@@ -398,6 +619,23 @@ pub fn (t &Tensor[T]) exp2[T]() &Tensor[T] {
 // expm1 exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) expm1[T]() &Tensor[T] {
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		mut ret := tensor_like[T](t)
+		$if T is f64 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = math.expm1(t.data.data[i])
+			}
+		} $else $if T is f32 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = f32(math.expm1(f64(t.data.data[i])))
+			}
+		} $else {
+			for i in 0 .. t.size {
+				ret.data.data[i] = cast[T](math.expm1(td(t.data.data[i]).f64()))
+			}
+		}
+		return ret
+	}
 	return t.map_values(fn [T](x T) T {
 		return cast[T](math.expm1(td(x).f64()))
 	})
@@ -550,6 +788,23 @@ pub fn (a &Tensor[T]) lcm[T](b &Tensor[T]) !&Tensor[T] {
 // log exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) log[T]() &Tensor[T] {
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		mut ret := tensor_like[T](t)
+		$if T is f64 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = math.log(t.data.data[i])
+			}
+		} $else $if T is f32 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = f32(math.log(f64(t.data.data[i])))
+			}
+		} $else {
+			for i in 0 .. t.size {
+				ret.data.data[i] = cast[T](math.log(td(t.data.data[i]).f64()))
+			}
+		}
+		return ret
+	}
 	return t.map_values(fn [T](x T) T {
 		return cast[T](math.log(td(x).f64()))
 	})
@@ -562,6 +817,23 @@ pub fn (t &Tensor[T]) log[T]() &Tensor[T] {
 // log10 exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) log10[T]() &Tensor[T] {
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		mut ret := tensor_like[T](t)
+		$if T is f64 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = math.log10(t.data.data[i])
+			}
+		} $else $if T is f32 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = f32(math.log10(f64(t.data.data[i])))
+			}
+		} $else {
+			for i in 0 .. t.size {
+				ret.data.data[i] = cast[T](math.log10(td(t.data.data[i]).f64()))
+			}
+		}
+		return ret
+	}
 	return t.map_values(fn [T](x T) T {
 		return cast[T](math.log10(td(x).f64()))
 	})
@@ -574,6 +846,23 @@ pub fn (t &Tensor[T]) log10[T]() &Tensor[T] {
 // log1p exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) log1p[T]() &Tensor[T] {
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		mut ret := tensor_like[T](t)
+		$if T is f64 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = math.log1p(t.data.data[i])
+			}
+		} $else $if T is f32 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = f32(math.log1p(f64(t.data.data[i])))
+			}
+		} $else {
+			for i in 0 .. t.size {
+				ret.data.data[i] = cast[T](math.log1p(td(t.data.data[i]).f64()))
+			}
+		}
+		return ret
+	}
 	return t.map_values(fn [T](x T) T {
 		return cast[T](math.log1p(td(x).f64()))
 	})
@@ -586,6 +875,23 @@ pub fn (t &Tensor[T]) log1p[T]() &Tensor[T] {
 // log2 exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) log2[T]() &Tensor[T] {
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		mut ret := tensor_like[T](t)
+		$if T is f64 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = math.log2(t.data.data[i])
+			}
+		} $else $if T is f32 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = f32(math.log2(f64(t.data.data[i])))
+			}
+		} $else {
+			for i in 0 .. t.size {
+				ret.data.data[i] = cast[T](math.log2(td(t.data.data[i]).f64()))
+			}
+		}
+		return ret
+	}
 	return t.map_values(fn [T](x T) T {
 		return cast[T](math.log2(td(x).f64()))
 	})
@@ -889,6 +1195,23 @@ pub fn (t &Tensor[T]) round_decimals[T](decimals int) &Tensor[T] {
 // sin exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) sin[T]() &Tensor[T] {
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		mut ret := tensor_like[T](t)
+		$if T is f64 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = math.sin(t.data.data[i])
+			}
+		} $else $if T is f32 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = f32(math.sin(f64(t.data.data[i])))
+			}
+		} $else {
+			for i in 0 .. t.size {
+				ret.data.data[i] = cast[T](math.sin(td(t.data.data[i]).f64()))
+			}
+		}
+		return ret
+	}
 	return t.map_values(fn [T](x T) T {
 		return cast[T](math.sin(td(x).f64()))
 	})
@@ -901,6 +1224,23 @@ pub fn (t &Tensor[T]) sin[T]() &Tensor[T] {
 // sinh exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) sinh[T]() &Tensor[T] {
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		mut ret := tensor_like[T](t)
+		$if T is f64 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = math.sinh(t.data.data[i])
+			}
+		} $else $if T is f32 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = f32(math.sinh(f64(t.data.data[i])))
+			}
+		} $else {
+			for i in 0 .. t.size {
+				ret.data.data[i] = cast[T](math.sinh(td(t.data.data[i]).f64()))
+			}
+		}
+		return ret
+	}
 	return t.map_values(fn [T](x T) T {
 		return cast[T](math.sinh(td(x).f64()))
 	})
@@ -913,6 +1253,23 @@ pub fn (t &Tensor[T]) sinh[T]() &Tensor[T] {
 // sqrt exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) sqrt[T]() &Tensor[T] {
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		mut ret := tensor_like[T](t)
+		$if T is f64 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = math.sqrt(t.data.data[i])
+			}
+		} $else $if T is f32 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = f32(math.sqrt(f64(t.data.data[i])))
+			}
+		} $else {
+			for i in 0 .. t.size {
+				ret.data.data[i] = cast[T](math.sqrt(td(t.data.data[i]).f64()))
+			}
+		}
+		return ret
+	}
 	return t.map_values(fn [T](x T) T {
 		return cast[T](math.sqrt(td(x).f64()))
 	})
@@ -925,6 +1282,23 @@ pub fn (t &Tensor[T]) sqrt[T]() &Tensor[T] {
 // tan exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) tan[T]() &Tensor[T] {
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		mut ret := tensor_like[T](t)
+		$if T is f64 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = math.tan(t.data.data[i])
+			}
+		} $else $if T is f32 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = f32(math.tan(f64(t.data.data[i])))
+			}
+		} $else {
+			for i in 0 .. t.size {
+				ret.data.data[i] = cast[T](math.tan(td(t.data.data[i]).f64()))
+			}
+		}
+		return ret
+	}
 	return t.map_values(fn [T](x T) T {
 		return cast[T](math.tan(td(x).f64()))
 	})
@@ -937,6 +1311,23 @@ pub fn (t &Tensor[T]) tan[T]() &Tensor[T] {
 // tanh exposes this operation as part of the public API.
 @[inline]
 pub fn (t &Tensor[T]) tanh[T]() &Tensor[T] {
+	if t.is_row_major_contiguous() && t.data.data.len == t.size {
+		mut ret := tensor_like[T](t)
+		$if T is f64 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = math.tanh(t.data.data[i])
+			}
+		} $else $if T is f32 {
+			for i in 0 .. t.size {
+				ret.data.data[i] = f32(math.tanh(f64(t.data.data[i])))
+			}
+		} $else {
+			for i in 0 .. t.size {
+				ret.data.data[i] = cast[T](math.tanh(td(t.data.data[i]).f64()))
+			}
+		}
+		return ret
+	}
 	return t.map_values(fn [T](x T) T {
 		return cast[T](math.tanh(td(x).f64()))
 	})
