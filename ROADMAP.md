@@ -116,7 +116,6 @@ See [docs/DEVICE_MEMORY.md](docs/DEVICE_MEMORY.md).
 | P2 | Improve CPU kernel performance and revisit alias/compiler optimizations when V provides a safe contract ([#3](https://github.com/vlang/vtl/issues/3)) |
 | P2 | Add ARM GPU support ([#63](https://github.com/vlang/vtl/issues/63)) |
 | P2 | Expand measured YOLO gate/layer fusion beyond binary multiply/divide backward kernels ([#40](https://github.com/vlang/vtl/issues/40)) |
-| Research | Assess the [Burn](https://github.com/tracel-ai/burn) feature set against VTL ([#52](https://github.com/vlang/vtl/issues/52)) |
 
 ---
 
@@ -126,7 +125,6 @@ See [docs/DEVICE_MEMORY.md](docs/DEVICE_MEMORY.md).
 |---|-------|----------|-------|
 | [#3](https://github.com/vlang/vtl/issues/3) | V aliasing (`restrict`) | 🟡 Perf | Open; await safe compiler support; see note below |
 | [#40](https://github.com/vlang/vtl/issues/40) | YOLO for autograd gates | 🟡 Performance | Open; requires end-to-end benchmark evidence |
-| [#52](https://github.com/vlang/vtl/issues/52) | Tracel-AI/Burn reference | Research | Open; compare concrete capabilities and architecture |
 | [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support | 🟡 P2 | Open; requires ARM GPU hardware for device validation |
 | [#161](https://github.com/vlang/vtl/issues/161) | CUDA backward gaps | 🔴 ML | Open; LSTM, attention, norms, embeddings, and pooling remain |
 
