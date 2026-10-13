@@ -167,7 +167,8 @@ support. The versioned JSON checkpoint API saves model weights and training
 metadata; Adam checkpoint helpers preserve configuration and moment buffers,
 AdamW helpers preserve configuration and moment buffers, and SGD helpers
 preserve configuration, momentum buffers, and first-step momentum
-initialization state.
+initialization state. RMSProp helpers preserve configuration and
+squared-gradient buffers.
 
 **Next:** Extend optimizer-state support to the remaining optimizers, add
 device remapping, version migration, and safe loading behavior. PyTorch pickle
