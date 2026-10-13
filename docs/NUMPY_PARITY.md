@@ -174,6 +174,13 @@ Elementwise `max`/`min` match NumPy's NaN-propagating `maximum`/`minimum`, and
 support boolean, integer, floating-point, and complex tensors; floating-point
 zero ties follow each NumPy ufunc's sign behavior.
 
+Unary transcendental operations (`exp`, `sin`, `log`, and 20 more) use a
+contiguous fast path that calls libm directly per element for f32/f64
+(f32 is evaluated in f64 and rounded once), avoiding the previous
+per-element closure and sum-type boxing. On this machine (1M f64, `-prod`)
+`exp` improved from 12.1 ms to 4.7 ms per iteration (NumPy: ~3.3 ms) and
+`sin` measures 15.5 ms against NumPy's ~12.8 ms.
+
 **Remaining:** audit unary/binary function families, add promoted arithmetic
 for the remaining operations, and infer output dtypes automatically for mixed
 tensor and weak scalar operands.
