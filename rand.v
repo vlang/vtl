@@ -441,6 +441,31 @@ pub fn (mut generator RandomGenerator) laplace(location f64, scale f64, shape []
 	return from_array[f64](values, shape)
 }
 
+// cauchy returns samples from a Cauchy distribution with the given location
+// and positive scale using this generator's independent stream.
+pub fn (mut generator RandomGenerator) cauchy(location f64, scale f64, shape []int) !&Tensor[f64] {
+	validate_cauchy_parameters(location, scale)!
+	mut values := []f64{len: size_from_shape(shape)}
+	for i in 0 .. values.len {
+		u := open_unit_interval(generator.rng.f64_in_range(0.0, 1.0)!)
+		values[i] = sample_cauchy(location, scale, u)
+	}
+	return from_array[f64](values, shape)
+}
+
+// wald returns samples from a Wald (inverse Gaussian) distribution with the
+// given positive mean and positive scale using this generator's stream.
+pub fn (mut generator RandomGenerator) wald(mean f64, scale f64, shape []int) !&Tensor[f64] {
+	validate_wald_parameters(mean, scale)!
+	mut values := []f64{len: size_from_shape(shape)}
+	for i in 0 .. values.len {
+		z := generator.rng.normal(config.NormalConfigStruct{})!
+		u := open_unit_interval(generator.rng.f64_in_range(0.0, 1.0)!)
+		values[i] = sample_wald(mean, scale, z, u)
+	}
+	return from_array[f64](values, shape)
+}
+
 // logistic returns samples from a Logistic distribution with the given
 // location and non-negative scale using this generator's independent stream.
 pub fn (mut generator RandomGenerator) logistic(location f64, scale f64, shape []int) !&Tensor[f64] {
@@ -974,6 +999,30 @@ pub fn laplace(location f64, scale f64, shape []int, params TensorData) !&Tensor
 	return from_array[f64](values, shape, params)
 }
 
+// cauchy returns samples from a Cauchy distribution using VTL's global stream.
+pub fn cauchy(location f64, scale f64, shape []int, params TensorData) !&Tensor[f64] {
+	validate_cauchy_parameters(location, scale)!
+	mut values := []f64{len: size_from_shape(shape)}
+	for i in 0 .. values.len {
+		u := open_unit_interval(rand.f64_in_range(0.0, 1.0)!)
+		values[i] = sample_cauchy(location, scale, u)
+	}
+	return from_array[f64](values, shape, params)
+}
+
+// wald returns samples from a Wald (inverse Gaussian) distribution using
+// VTL's global stream.
+pub fn wald(mean f64, scale f64, shape []int, params TensorData) !&Tensor[f64] {
+	validate_wald_parameters(mean, scale)!
+	mut values := []f64{len: size_from_shape(shape)}
+	for i in 0 .. values.len {
+		z := rand.normal(config.NormalConfigStruct{})!
+		u := open_unit_interval(rand.f64_in_range(0.0, 1.0)!)
+		values[i] = sample_wald(mean, scale, z, u)
+	}
+	return from_array[f64](values, shape, params)
+}
+
 // logistic returns samples from a Logistic distribution using VTL's global stream.
 pub fn logistic(location f64, scale f64, shape []int, params TensorData) !&Tensor[f64] {
 	validate_location_scale(location, scale, 'logistic')!
@@ -1067,6 +1116,36 @@ fn sample_laplace(location f64, scale f64, uniform_value f64) f64 {
 
 fn sample_logistic(location f64, scale f64, uniform_value f64) f64 {
 	return location + scale * math.log(uniform_value / (1 - uniform_value))
+}
+
+fn validate_cauchy_parameters(location f64, scale f64) ! {
+	if math.is_nan(location) || math.is_inf(location, 0) || scale <= 0 || math.is_nan(scale)
+		|| math.is_inf(scale, 0) {
+		return error('cauchy: location must be finite and scale must be finite and positive')
+	}
+}
+
+fn validate_wald_parameters(mean f64, scale f64) ! {
+	if mean <= 0 || math.is_nan(mean) || math.is_inf(mean, 0) || scale <= 0
+		|| math.is_nan(scale) || math.is_inf(scale, 0) {
+		return error('wald: mean and scale must be finite and positive')
+	}
+}
+
+fn sample_cauchy(location f64, scale f64, uniform_value f64) f64 {
+	return location + scale * math.tan(math.pi * (uniform_value - 0.5))
+}
+
+// sample_wald applies the Michael-Schucany-Haas algorithm for the inverse
+// Gaussian distribution with the given mean and scale (shape) parameters.
+fn sample_wald(mean f64, scale f64, standard_normal f64, uniform_value f64) f64 {
+	y := standard_normal * standard_normal
+	x := mean + (mean * mean * y) / (2 * scale) -
+		(mean / (2 * scale)) * math.sqrt(4 * mean * scale * y + mean * mean * y * y)
+	if uniform_value <= mean / (mean + x) {
+		return x
+	}
+	return mean * mean / x
 }
 
 fn sample_triangular(left f64, mode f64, right f64, uniform_value f64) f64 {
