@@ -93,7 +93,9 @@ with the same V build and settings before drawing performance conclusions.
 `relu_backward_bench.v` compares the contiguous ReLU backward path with the
 previous coordinate-indexed `nmap` implementation. It checks exact output
 equality and reports local VTL CPU microbenchmark timings. This is an internal
-kernel comparison, not a PyTorch performance claim:
+kernel comparison, not a PyTorch performance claim. The same contiguous path
+selection is used by sigmoid, tanh, and leaky ReLU backward operations; this
+benchmark measures ReLU only:
 
 ```bash
 cd ~/.vmodules
