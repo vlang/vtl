@@ -116,6 +116,22 @@ fn (nn &Sequential[T]) validate_adam_parameters(optimizer &optimizers.AdamOptimi
 	}
 }
 
+fn (nn &Sequential[T]) validate_sgd_parameters(optimizer &optimizers.SgdOptimizer[T]) ! {
+	mut parameter_index := 0
+	for layer in nn.info.layers {
+		for parameter in layer.variables() {
+			if parameter_index >= optimizer.params.len
+				|| voidptr(parameter) != voidptr(optimizer.params[parameter_index]) {
+				return error('training checkpoint: SGD parameters must belong to this model in layer order')
+			}
+			parameter_index++
+		}
+	}
+	if parameter_index != optimizer.params.len {
+		return error('training checkpoint: SGD parameter count does not match this model')
+	}
+}
+
 // save saves a Sequential model's weights to a JSON file.
 // Does NOT save optimizer state - use save_checkpoint for full state.
 pub fn (nn &Sequential[T]) save(path string) ! {
@@ -148,6 +164,29 @@ pub fn (nn &Sequential[T]) save_training_checkpoint(path string, epoch int, loss
 	optimizer.validate_checkpoint_state(config, optimizer.first_moments, optimizer.second_moments)!
 	state := OptimizerData{
 		optimizer_type: 'AdamOptimizer'
+		learning_rate:  config['learning_rate']
+		config:         config
+		moments:        moments
+	}
+	nn.save_checkpoint_with_optimizer(path, epoch, loss, state)!
+}
+
+// save_sgd_training_checkpoint stores model weights and SGD momentum state for
+// an exact training resume.
+pub fn (nn &Sequential[T]) save_sgd_training_checkpoint(path string, epoch int, loss f64,
+	optimizer &optimizers.SgdOptimizer[T]) ! {
+	nn.validate_sgd_parameters(optimizer)!
+	if optimizer.params.len == 0 {
+		return error('save_sgd_training_checkpoint: build SGD parameters before saving')
+	}
+	config := optimizer.checkpoint_config()
+	optimizer.validate_checkpoint_state(config, optimizer.momentum_buffers)!
+	mut moments := map[string]string{}
+	for i, momentum in optimizer.momentum_buffers {
+		moments['momentum_${i}'] = encode_tensor[T](momentum)!
+	}
+	state := OptimizerData{
+		optimizer_type: 'SgdOptimizer'
 		learning_rate:  config['learning_rate']
 		config:         config
 		moments:        moments
@@ -364,6 +403,47 @@ pub fn (mut nn Sequential[T]) load_training_checkpoint(path string,
 	optimizer.validate_checkpoint_state(model.optimizer.config, first_moments, second_moments)!
 	nn.load_weights(path)!
 	optimizer.restore_checkpoint_state(model.optimizer.config, first_moments, second_moments)!
+	return model.metadata.epoch, model.metadata.loss
+}
+
+// load_sgd_training_checkpoint restores model weights, metadata, and SGD
+// momentum state into an optimizer already built from the destination model.
+pub fn (mut nn Sequential[T]) load_sgd_training_checkpoint(path string,
+	mut optimizer &optimizers.SgdOptimizer[T]) !(int, f64) {
+	data := os.read_file(path)!
+	model := json2.decode[ModelFile](data)!
+	if model.version != model_version {
+		return error('Model version mismatch: expected ${model_version}, got ${model.version}')
+	}
+	if model.optimizer.optimizer_type != 'SgdOptimizer' {
+		return error('load_sgd_training_checkpoint: expected SgdOptimizer state, got ${model.optimizer.optimizer_type}')
+	}
+	if 'learning_rate' !in model.optimizer.config
+		|| model.optimizer.config['learning_rate'] != model.optimizer.learning_rate {
+		return error('load_sgd_training_checkpoint: SGD learning rate metadata is inconsistent')
+	}
+	if 'momentum' !in model.optimizer.config {
+		return error('load_sgd_training_checkpoint: missing SGD momentum configuration')
+	}
+	momentum := model.optimizer.config['momentum']
+	expected_moments := if momentum > 0 { optimizer.params.len } else { 0 }
+	if expected_moments != model.optimizer.moments.len {
+		return error('load_sgd_training_checkpoint: optimizer parameter count does not match checkpoint state')
+	}
+	mut momentum_buffers := []&vtl.Tensor[T]{cap: expected_moments}
+	if momentum > 0 {
+		for i, parameter in optimizer.params {
+			key := 'momentum_${i}'
+			if key !in model.optimizer.moments {
+				return error('load_sgd_training_checkpoint: missing momentum buffer for parameter ${i}')
+			}
+			momentum_buffers << decode_tensor[T](model.optimizer.moments[key], parameter.value.shape)!
+		}
+	}
+	nn.validate_sgd_parameters(optimizer)!
+	optimizer.validate_checkpoint_state(model.optimizer.config, momentum_buffers)!
+	nn.load_weights(path)!
+	optimizer.restore_checkpoint_state(model.optimizer.config, momentum_buffers)!
 	return model.metadata.epoch, model.metadata.loss
 }
 
