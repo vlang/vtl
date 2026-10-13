@@ -156,9 +156,9 @@ fn test_f32_unary_gate_simd_blocks_and_tails() ! {
 	assert sqrt_result[0].array_equal(vtl.from_1d[f32]([1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
 		1.0])!)
 
-	clamp_input := vtl.from_1d[f32]([-2.0, -1.0, 0.0, 1.0, 2.0, -1.5, 0.5, 1.5, -0.5])!
+	clamp_input := vtl.from_1d[f32]([-2.0, -1.0, f32(math.nan()), 1.0, 2.0, -1.5, 0.5, 1.5, -0.5])!
 	output.grad = vtl.from_1d[f32]([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0])!
 	clamp_result := autograd.clamp_gate[f32](-1.0, 1.0, clamp_input).backward(autograd.payload(output))!
-	assert clamp_result[0].array_equal(vtl.from_1d[f32]([0.0, 2.0, 3.0, 4.0, 0.0, 0.0, 7.0, 0.0,
+	assert clamp_result[0].array_equal(vtl.from_1d[f32]([0.0, 2.0, 0.0, 4.0, 0.0, 0.0, 7.0, 0.0,
 		9.0])!)
 }
