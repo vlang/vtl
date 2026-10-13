@@ -18,6 +18,9 @@ pub fn exp_gate[T](a &Variable[T]) &ExpGate[T] {
 // backward exposes this operation as part of the public API.
 pub fn (g &ExpGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
+	if fused := fused_unary_gate_backward[T](gradient, g.a.value, .exp) {
+		return [fused]
+	}
 	r0 := gradient.multiply[T](g.a.value.exp[T]())!
 	return [r0]
 }

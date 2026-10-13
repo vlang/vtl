@@ -21,6 +21,9 @@ pub fn log_gate[T](a &Variable[T]) &LogGate[T] {
 // backward exposes this operation as part of the public API.
 pub fn (g &LogGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
+	if fused := fused_unary_gate_backward[T](gradient, g.a.value, .log) {
+		return [fused]
+	}
 	r0 := gradient.divide[T](g.a.value)!
 	return [r0]
 }
@@ -246,6 +249,42 @@ fn can_flat_unary_gate_backward[T](gradient &vtl.Tensor[T], cached &vtl.Tensor[T
 	return gradient.shape == cached.shape && gradient.is_row_major_contiguous()
 		&& cached.is_row_major_contiguous() && gradient.data.data.len == gradient.size
 		&& cached.data.data.len == cached.size
+}
+
+enum FusedUnaryDerivative {
+	exp
+	log
+	sin
+	cos
+	tan
+}
+
+// fused_unary_gate_backward computes grad * f'(x) for exp, log, sin, cos and
+// tan in a single traversal over contiguous tensors, without materializing
+// intermediate derivative tensors. Non-contiguous or broadcast inputs return
+// none and keep the general tensor-operation path. Derivatives are evaluated
+// in f64 and cast back to T, matching the precision of the tensor ops.
+@[direct_array_access]
+fn fused_unary_gate_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], derivative FusedUnaryDerivative) ?&vtl.Tensor[T] {
+	if !can_flat_unary_gate_backward[T](gradient, input) {
+		return none
+	}
+	mut result := vtl.tensor_like[T](gradient)
+	for i in 0 .. gradient.size {
+		x := vtl.cast[f64](input.data.data[i])
+		factor := match derivative {
+			.exp { math.exp(x) }
+			.log { 1.0 / x }
+			.sin { math.cos(x) }
+			.cos { -math.sin(x) }
+			.tan {
+				c := math.cos(x)
+				1.0 / (c * c)
+			}
+		}
+		result.data.data[i] = vtl.cast[T](vtl.cast[f64](gradient.data.data[i]) * factor)
+	}
+	return result
 }
 
 fn tanh_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {

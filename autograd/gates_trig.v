@@ -18,6 +18,9 @@ pub fn sin_gate[T](a &Variable[T]) &SinGate[T] {
 // backward exposes this operation as part of the public API.
 pub fn (g &SinGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
+	if fused := fused_unary_gate_backward[T](gradient, g.a.value, .sin) {
+		return [fused]
+	}
 	r0 := gradient.multiply[T](g.a.value.cos[T]())!
 	return [r0]
 }
@@ -58,6 +61,9 @@ pub fn cos_gate[T](a &Variable[T]) &CosGate[T] {
 // backward exposes this operation as part of the public API.
 pub fn (g &CosGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
+	if fused := fused_unary_gate_backward[T](gradient, g.a.value, .cos) {
+		return [fused]
+	}
 	r0 := gradient.multiply[T](g.a.value.sin[T]().multiply_scalar[T](vtl.cast[T](-1))!)!
 	return [r0]
 }
@@ -98,6 +104,9 @@ pub fn tan_gate[T](a &Variable[T]) &TanGate[T] {
 // backward exposes this operation as part of the public API.
 pub fn (g &TanGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
+	if fused := fused_unary_gate_backward[T](gradient, g.a.value, .tan) {
+		return [fused]
+	}
 	cos := g.a.value.cos[T]()
 	r0 := gradient.divide[T](cos.multiply[T](cos)!)!
 	return [r0]
