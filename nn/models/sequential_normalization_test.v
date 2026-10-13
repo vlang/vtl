@@ -95,3 +95,25 @@ fn test_sequential_batchnorm_mode_is_independent_of_input_gradients() ! {
 	eval_loss.backprop()!
 	assert batchnorm_vars[1].grad.to_array() == [4.0, 4.0]
 }
+
+fn test_sequential_batchnorm2d_forward_and_backward() ! {
+	ctx := autograd.ctx[f64]()
+	mut nn := sequential_from_ctx[f64](ctx)
+	nn.input([1, 2, 2])
+	nn.batchnorm2d(1, layers.BatchNorm2DConfig{})
+	assert nn.info.layer_types[1] == 'BatchNorm2DLayer'
+	input := ctx.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0], [1, 1, 2, 2])!)
+	output := nn.forward(input)!
+	assert output.value.shape == [1, 1, 2, 2]
+	// Training mode (default): channel mean 2.5, biased var 1.25.
+	inv_std := 1.0 / math.sqrt(1.25 + 1e-5)
+	assert math.abs(output.value.get_nth(0) - (1.0 - 2.5) * inv_std) < 1e-12
+	mut loss := output.sum()!
+	loss.backprop()!
+	assert input.grad.shape == [1, 1, 2, 2]
+	assert nn.info.layers[1].variables().len == 2
+	// Eval mode uses the running statistics updated during training.
+	nn.eval()
+	eval_output := nn.forward(input)!
+	assert eval_output.value.to_array() != output.value.to_array()
+}
