@@ -148,6 +148,22 @@ fn (nn &Sequential[T]) validate_adamw_parameters(optimizer &optimizers.AdamWOpti
 	}
 }
 
+fn (nn &Sequential[T]) validate_rmsprop_parameters(optimizer &optimizers.RMSPropOptimizer[T]) ! {
+	mut parameter_index := 0
+	for layer in nn.info.layers {
+		for parameter in layer.variables() {
+			if parameter_index >= optimizer.params.len
+				|| voidptr(parameter) != voidptr(optimizer.params[parameter_index]) {
+				return error('training checkpoint: RMSProp parameters must belong to this model in layer order')
+			}
+			parameter_index++
+		}
+	}
+	if parameter_index != optimizer.params.len {
+		return error('training checkpoint: RMSProp parameter count does not match this model')
+	}
+}
+
 // save saves a Sequential model's weights to a JSON file.
 // Does NOT save optimizer state - use save_checkpoint for full state.
 pub fn (nn &Sequential[T]) save(path string) ! {
@@ -203,6 +219,29 @@ pub fn (nn &Sequential[T]) save_sgd_training_checkpoint(path string, epoch int, 
 	}
 	state := OptimizerData{
 		optimizer_type: 'SgdOptimizer'
+		learning_rate:  config['learning_rate']
+		config:         config
+		moments:        moments
+	}
+	nn.save_checkpoint_with_optimizer(path, epoch, loss, state)!
+}
+
+// save_rmsprop_training_checkpoint stores model weights and RMSProp state for
+// an exact training resume.
+pub fn (nn &Sequential[T]) save_rmsprop_training_checkpoint(path string, epoch int, loss f64,
+	optimizer &optimizers.RMSPropOptimizer[T]) ! {
+	nn.validate_rmsprop_parameters(optimizer)!
+	if optimizer.params.len == 0 || optimizer.params.len != optimizer.sq_avg.len {
+		return error('save_rmsprop_training_checkpoint: build RMSProp parameters before saving')
+	}
+	config := optimizer.checkpoint_config()
+	optimizer.validate_checkpoint_state(config, optimizer.sq_avg)!
+	mut moments := map[string]string{}
+	for i, sq_avg in optimizer.sq_avg {
+		moments['sq_avg_${i}'] = encode_tensor[T](sq_avg)!
+	}
+	state := OptimizerData{
+		optimizer_type: 'RMSPropOptimizer'
 		learning_rate:  config['learning_rate']
 		config:         config
 		moments:        moments
@@ -489,6 +528,40 @@ pub fn (mut nn Sequential[T]) load_sgd_training_checkpoint(path string,
 	optimizer.validate_checkpoint_state(model.optimizer.config, momentum_buffers)!
 	nn.load_weights(path)!
 	optimizer.restore_checkpoint_state(model.optimizer.config, momentum_buffers)!
+	return model.metadata.epoch, model.metadata.loss
+}
+
+// load_rmsprop_training_checkpoint restores model weights, metadata, and RMSProp
+// state into an optimizer already built from the destination model.
+pub fn (mut nn Sequential[T]) load_rmsprop_training_checkpoint(path string,
+	mut optimizer &optimizers.RMSPropOptimizer[T]) !(int, f64) {
+	data := os.read_file(path)!
+	model := json2.decode[ModelFile](data)!
+	if model.version != model_version {
+		return error('Model version mismatch: expected ${model_version}, got ${model.version}')
+	}
+	if model.optimizer.optimizer_type != 'RMSPropOptimizer' {
+		return error('load_rmsprop_training_checkpoint: expected RMSPropOptimizer state, got ${model.optimizer.optimizer_type}')
+	}
+	if 'learning_rate' !in model.optimizer.config
+		|| model.optimizer.config['learning_rate'] != model.optimizer.learning_rate {
+		return error('load_rmsprop_training_checkpoint: RMSProp learning rate metadata is inconsistent')
+	}
+	if optimizer.params.len != model.optimizer.moments.len {
+		return error('load_rmsprop_training_checkpoint: optimizer parameter count does not match checkpoint state')
+	}
+	mut sq_avg := []&vtl.Tensor[T]{cap: optimizer.params.len}
+	for i, parameter in optimizer.params {
+		key := 'sq_avg_${i}'
+		if key !in model.optimizer.moments {
+			return error('load_rmsprop_training_checkpoint: missing squared-gradient buffer for parameter ${i}')
+		}
+		sq_avg << decode_tensor[T](model.optimizer.moments[key], parameter.value.shape)!
+	}
+	nn.validate_rmsprop_parameters(optimizer)!
+	optimizer.validate_checkpoint_state(model.optimizer.config, sq_avg)!
+	nn.load_weights(path)!
+	optimizer.restore_checkpoint_state(model.optimizer.config, sq_avg)!
 	return model.metadata.epoch, model.metadata.loss
 }
 

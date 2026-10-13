@@ -56,6 +56,52 @@ pub fn rmsprop[T](config RMSPropOptimizerConfig) &RMSPropOptimizer[T] {
 	}
 }
 
+// checkpoint_config returns the scalar RMSProp state needed to resume training.
+pub fn (o &RMSPropOptimizer[T]) checkpoint_config() map[string]f64 {
+	return {
+		'learning_rate': o.learning_rate
+		'alpha':         o.alpha
+		'epsilon':       o.epsilon
+		'weight_decay':  o.weight_decay
+	}
+}
+
+// restore_checkpoint_state restores RMSProp configuration and squared-gradient buffers.
+pub fn (mut o RMSPropOptimizer[T]) restore_checkpoint_state(config map[string]f64,
+	sq_avg []&vtl.Tensor[T]) ! {
+	o.validate_checkpoint_state(config, sq_avg)!
+	o.learning_rate = config['learning_rate']
+	o.alpha = config['alpha']
+	o.epsilon = config['epsilon']
+	o.weight_decay = config['weight_decay']
+	o.sq_avg = sq_avg.clone()
+}
+
+// validate_checkpoint_state checks RMSProp scalars and buffers without mutation.
+pub fn (o &RMSPropOptimizer[T]) validate_checkpoint_state(config map[string]f64,
+	sq_avg []&vtl.Tensor[T]) ! {
+	for key in ['learning_rate', 'alpha', 'epsilon', 'weight_decay'] {
+		if key !in config || !math.is_finite(config[key]) {
+			return error('RMSPropOptimizer.restore_checkpoint_state: missing or non-finite ${key}')
+		}
+	}
+	lr := config['learning_rate']
+	alpha := config['alpha']
+	epsilon := config['epsilon']
+	weight_decay := config['weight_decay']
+	if lr < 0 || alpha < 0 || alpha >= 1 || epsilon <= 0 || weight_decay < 0 {
+		return error('RMSPropOptimizer.restore_checkpoint_state: scalar values are outside valid ranges')
+	}
+	if o.params.len != sq_avg.len {
+		return error('RMSPropOptimizer.restore_checkpoint_state: parameter and buffer counts do not match')
+	}
+	for i, parameter in o.params {
+		if sq_avg[i].shape != parameter.value.shape {
+			return error('RMSPropOptimizer.restore_checkpoint_state: buffer shape mismatch at parameter ${i}')
+		}
+	}
+}
+
 // build_params registers all trainable variables from `layers`. Call once before training.
 pub fn (mut o RMSPropOptimizer[T]) build_params(layers []types.Layer[T]) {
 	for layer in layers {
