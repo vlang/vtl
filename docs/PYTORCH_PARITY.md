@@ -109,11 +109,12 @@ offered by PyTorch's `get_total_norm` and `clip_grads_with_norm_` APIs.
 `ReduceLROnPlateau.step(current_lr, metric)` tracks the best metric and supports
 PyTorch-style min/max modes, relative/absolute thresholds, patience, cooldown,
 minimum LR, and epsilon. It returns the next LR for the caller to apply.
-`SgdOptimizer`, `AdamOptimizer` and `RMSPropOptimizer` now support
-PyTorch-style parameter groups through `add_param_group`, each with its own
-learning rate and optimizer-specific settings and independent state buffers;
-`set_group_learning_rate` is the scheduler integration point. Extending
-parameter groups to the remaining optimizers is still open.
+`SgdOptimizer`, `AdamOptimizer`, `AdamWOptimizer`, `RMSPropOptimizer` and
+`AdaGradOptimizer` now support PyTorch-style parameter groups through
+`add_param_group`, each with its own learning rate and optimizer-specific
+settings and independent state buffers; `set_group_learning_rate` is the
+scheduler integration point. Extending parameter groups to NAdam and RAdam
+is still open.
 
 `nll_loss` supports weighted class-index and one-hot/soft targets, mean and sum
 reductions, per-position `none` reduction, and `ignore_index` for class-index
