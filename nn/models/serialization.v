@@ -180,6 +180,38 @@ fn (nn &Sequential[T]) validate_adagrad_parameters(optimizer &optimizers.AdaGrad
 	}
 }
 
+fn (nn &Sequential[T]) validate_nadam_parameters(optimizer &optimizers.NAdamOptimizer[T]) ! {
+	mut parameter_index := 0
+	for layer in nn.info.layers {
+		for parameter in layer.variables() {
+			if parameter_index >= optimizer.params.len
+				|| voidptr(parameter) != voidptr(optimizer.params[parameter_index]) {
+				return error('training checkpoint: NAdam parameters must belong to this model in layer order')
+			}
+			parameter_index++
+		}
+	}
+	if parameter_index != optimizer.params.len {
+		return error('training checkpoint: NAdam parameter count does not match this model')
+	}
+}
+
+fn (nn &Sequential[T]) validate_radam_parameters(optimizer &optimizers.RAdamOptimizer[T]) ! {
+	mut parameter_index := 0
+	for layer in nn.info.layers {
+		for parameter in layer.variables() {
+			if parameter_index >= optimizer.params.len
+				|| voidptr(parameter) != voidptr(optimizer.params[parameter_index]) {
+				return error('training checkpoint: RAdam parameters must belong to this model in layer order')
+			}
+			parameter_index++
+		}
+	}
+	if parameter_index != optimizer.params.len {
+		return error('training checkpoint: RAdam parameter count does not match this model')
+	}
+}
+
 // save saves a Sequential model's weights to a JSON file.
 // Does NOT save optimizer state - use save_checkpoint for full state.
 pub fn (nn &Sequential[T]) save(path string) ! {
@@ -281,6 +313,62 @@ pub fn (nn &Sequential[T]) save_adagrad_training_checkpoint(path string, epoch i
 	}
 	state := OptimizerData{
 		optimizer_type: 'AdaGradOptimizer'
+		learning_rate:  config['learning_rate']
+		config:         config
+		moments:        moments
+	}
+	nn.save_checkpoint_with_optimizer(path, epoch, loss, state)!
+}
+
+// save_nadam_training_checkpoint stores model weights and complete NAdam state.
+pub fn (nn &Sequential[T]) save_nadam_training_checkpoint(path string, epoch int, loss f64,
+	optimizer &optimizers.NAdamOptimizer[T]) ! {
+	nn.validate_nadam_parameters(optimizer)!
+	if optimizer.params.len == 0 || optimizer.params.len != optimizer.first_moments.len
+		|| optimizer.params.len != optimizer.second_moments.len {
+		return error('save_nadam_training_checkpoint: build NAdam parameters before saving')
+	}
+	mut moments := map[string]string{}
+	for i, parameter in optimizer.params {
+		if optimizer.first_moments[i].shape != parameter.value.shape
+			|| optimizer.second_moments[i].shape != parameter.value.shape {
+			return error('save_nadam_training_checkpoint: moment shape mismatch at parameter ${i}')
+		}
+		moments['moment_${i}'] = encode_tensor[T](optimizer.first_moments[i])!
+		moments['second_moment_${i}'] = encode_tensor[T](optimizer.second_moments[i])!
+	}
+	config := optimizer.checkpoint_config()
+	optimizer.validate_checkpoint_state(config, optimizer.first_moments, optimizer.second_moments)!
+	state := OptimizerData{
+		optimizer_type: 'NAdamOptimizer'
+		learning_rate:  config['learning_rate']
+		config:         config
+		moments:        moments
+	}
+	nn.save_checkpoint_with_optimizer(path, epoch, loss, state)!
+}
+
+// save_radam_training_checkpoint stores model weights and complete RAdam state.
+pub fn (nn &Sequential[T]) save_radam_training_checkpoint(path string, epoch int, loss f64,
+	optimizer &optimizers.RAdamOptimizer[T]) ! {
+	nn.validate_radam_parameters(optimizer)!
+	if optimizer.params.len == 0 || optimizer.params.len != optimizer.first_moments.len
+		|| optimizer.params.len != optimizer.second_moments.len {
+		return error('save_radam_training_checkpoint: build RAdam parameters before saving')
+	}
+	mut moments := map[string]string{}
+	for i, parameter in optimizer.params {
+		if optimizer.first_moments[i].shape != parameter.value.shape
+			|| optimizer.second_moments[i].shape != parameter.value.shape {
+			return error('save_radam_training_checkpoint: moment shape mismatch at parameter ${i}')
+		}
+		moments['moment_${i}'] = encode_tensor[T](optimizer.first_moments[i])!
+		moments['second_moment_${i}'] = encode_tensor[T](optimizer.second_moments[i])!
+	}
+	config := optimizer.checkpoint_config()
+	optimizer.validate_checkpoint_state(config, optimizer.first_moments, optimizer.second_moments)!
+	state := OptimizerData{
+		optimizer_type: 'RAdamOptimizer'
 		learning_rate:  config['learning_rate']
 		config:         config
 		moments:        moments
@@ -635,6 +723,78 @@ pub fn (mut nn Sequential[T]) load_adagrad_training_checkpoint(path string,
 	optimizer.validate_checkpoint_state(model.optimizer.config, accumulators)!
 	nn.load_weights(path)!
 	optimizer.restore_checkpoint_state(model.optimizer.config, accumulators)!
+	return model.metadata.epoch, model.metadata.loss
+}
+
+// load_nadam_training_checkpoint restores model weights, metadata, and NAdam state.
+pub fn (mut nn Sequential[T]) load_nadam_training_checkpoint(path string,
+	mut optimizer &optimizers.NAdamOptimizer[T]) !(int, f64) {
+	data := os.read_file(path)!
+	model := json2.decode[ModelFile](data)!
+	if model.version != model_version {
+		return error('Model version mismatch: expected ${model_version}, got ${model.version}')
+	}
+	if model.optimizer.optimizer_type != 'NAdamOptimizer' {
+		return error('load_nadam_training_checkpoint: expected NAdamOptimizer state, got ${model.optimizer.optimizer_type}')
+	}
+	if 'learning_rate' !in model.optimizer.config
+		|| model.optimizer.config['learning_rate'] != model.optimizer.learning_rate {
+		return error('load_nadam_training_checkpoint: NAdam learning rate metadata is inconsistent')
+	}
+	if optimizer.params.len * 2 != model.optimizer.moments.len {
+		return error('load_nadam_training_checkpoint: optimizer parameter count does not match checkpoint state')
+	}
+	mut first_moments := []&vtl.Tensor[T]{cap: optimizer.params.len}
+	mut second_moments := []&vtl.Tensor[T]{cap: optimizer.params.len}
+	for i, parameter in optimizer.params {
+		first_key := 'moment_${i}'
+		second_key := 'second_moment_${i}'
+		if first_key !in model.optimizer.moments || second_key !in model.optimizer.moments {
+			return error('load_nadam_training_checkpoint: missing moments for parameter ${i}')
+		}
+		first_moments << decode_tensor[T](model.optimizer.moments[first_key], parameter.value.shape)!
+		second_moments << decode_tensor[T](model.optimizer.moments[second_key], parameter.value.shape)!
+	}
+	nn.validate_nadam_parameters(optimizer)!
+	optimizer.validate_checkpoint_state(model.optimizer.config, first_moments, second_moments)!
+	nn.load_weights(path)!
+	optimizer.restore_checkpoint_state(model.optimizer.config, first_moments, second_moments)!
+	return model.metadata.epoch, model.metadata.loss
+}
+
+// load_radam_training_checkpoint restores model weights, metadata, and RAdam state.
+pub fn (mut nn Sequential[T]) load_radam_training_checkpoint(path string,
+	mut optimizer &optimizers.RAdamOptimizer[T]) !(int, f64) {
+	data := os.read_file(path)!
+	model := json2.decode[ModelFile](data)!
+	if model.version != model_version {
+		return error('Model version mismatch: expected ${model_version}, got ${model.version}')
+	}
+	if model.optimizer.optimizer_type != 'RAdamOptimizer' {
+		return error('load_radam_training_checkpoint: expected RAdamOptimizer state, got ${model.optimizer.optimizer_type}')
+	}
+	if 'learning_rate' !in model.optimizer.config
+		|| model.optimizer.config['learning_rate'] != model.optimizer.learning_rate {
+		return error('load_radam_training_checkpoint: RAdam learning rate metadata is inconsistent')
+	}
+	if optimizer.params.len * 2 != model.optimizer.moments.len {
+		return error('load_radam_training_checkpoint: optimizer parameter count does not match checkpoint state')
+	}
+	mut first_moments := []&vtl.Tensor[T]{cap: optimizer.params.len}
+	mut second_moments := []&vtl.Tensor[T]{cap: optimizer.params.len}
+	for i, parameter in optimizer.params {
+		first_key := 'moment_${i}'
+		second_key := 'second_moment_${i}'
+		if first_key !in model.optimizer.moments || second_key !in model.optimizer.moments {
+			return error('load_radam_training_checkpoint: missing moments for parameter ${i}')
+		}
+		first_moments << decode_tensor[T](model.optimizer.moments[first_key], parameter.value.shape)!
+		second_moments << decode_tensor[T](model.optimizer.moments[second_key], parameter.value.shape)!
+	}
+	nn.validate_radam_parameters(optimizer)!
+	optimizer.validate_checkpoint_state(model.optimizer.config, first_moments, second_moments)!
+	nn.load_weights(path)!
+	optimizer.restore_checkpoint_state(model.optimizer.config, first_moments, second_moments)!
 	return model.metadata.epoch, model.metadata.loss
 }
 

@@ -54,6 +54,79 @@ pub fn nadam_optimizer[T](config NAdamOptimizerConfig) &NAdamOptimizer[T] {
 	}
 }
 
+// checkpoint_config returns the scalar NAdam state needed to resume training.
+pub fn (o &NAdamOptimizer[T]) checkpoint_config() map[string]f64 {
+	return {
+		'learning_rate':          o.learning_rate
+		'beta1':                  o.beta1
+		'beta2':                  o.beta2
+		'beta1_t':                o.beta1_t
+		'beta2_t':                o.beta2_t
+		'mu_product_t':           o.mu_product_t
+		'step':                   f64(o.step)
+		'epsilon':                o.epsilon
+		'weight_decay':           o.weight_decay
+		'momentum_decay':         o.momentum_decay
+		'decoupled_weight_decay': if o.decoupled_weight_decay { 1.0 } else { 0.0 }
+	}
+}
+
+// restore_checkpoint_state restores NAdam scalars and moment buffers.
+pub fn (mut o NAdamOptimizer[T]) restore_checkpoint_state(config map[string]f64,
+	first_moments []&vtl.Tensor[T], second_moments []&vtl.Tensor[T]) ! {
+	o.validate_checkpoint_state(config, first_moments, second_moments)!
+	o.learning_rate = config['learning_rate']
+	o.beta1 = config['beta1']
+	o.beta2 = config['beta2']
+	o.beta1_t = config['beta1_t']
+	o.beta2_t = config['beta2_t']
+	o.mu_product_t = config['mu_product_t']
+	o.step = int(config['step'])
+	o.epsilon = config['epsilon']
+	o.weight_decay = config['weight_decay']
+	o.momentum_decay = config['momentum_decay']
+	o.decoupled_weight_decay = config['decoupled_weight_decay'] == 1.0
+	o.first_moments = first_moments.clone()
+	o.second_moments = second_moments.clone()
+}
+
+// validate_checkpoint_state checks NAdam scalars and moments without mutation.
+pub fn (o &NAdamOptimizer[T]) validate_checkpoint_state(config map[string]f64,
+	first_moments []&vtl.Tensor[T], second_moments []&vtl.Tensor[T]) ! {
+	for key in ['learning_rate', 'beta1', 'beta2', 'beta1_t', 'beta2_t', 'mu_product_t', 'step',
+		'epsilon', 'weight_decay', 'momentum_decay', 'decoupled_weight_decay'] {
+		if key !in config || !math.is_finite(config[key]) {
+			return error('NAdamOptimizer.restore_checkpoint_state: missing or non-finite ${key}')
+		}
+	}
+	lr := config['learning_rate']
+	beta1 := config['beta1']
+	beta2 := config['beta2']
+	beta1_t := config['beta1_t']
+	beta2_t := config['beta2_t']
+	mu_product_t := config['mu_product_t']
+	step := config['step']
+	epsilon := config['epsilon']
+	weight_decay := config['weight_decay']
+	momentum_decay := config['momentum_decay']
+	decoupled := config['decoupled_weight_decay']
+	if lr < 0 || beta1 < 0 || beta1 >= 1 || beta2 < 0 || beta2 >= 1 || beta1_t < 0
+		|| beta1_t > 1 || beta2_t < 0 || beta2_t > 1 || mu_product_t < 0 || mu_product_t > 1
+		|| step < 0 || step > 9007199254740992.0 || math.floor(step) != step || epsilon <= 0
+		|| weight_decay < 0 || momentum_decay < 0 || (decoupled != 0.0 && decoupled != 1.0) {
+		return error('NAdamOptimizer.restore_checkpoint_state: scalar values are outside valid ranges')
+	}
+	if o.params.len != first_moments.len || o.params.len != second_moments.len {
+		return error('NAdamOptimizer.restore_checkpoint_state: parameter and moment counts do not match')
+	}
+	for i, parameter in o.params {
+		if first_moments[i].shape != parameter.value.shape
+			|| second_moments[i].shape != parameter.value.shape {
+			return error('NAdamOptimizer.restore_checkpoint_state: moment shape mismatch at parameter ${i}')
+		}
+	}
+}
+
 // build_params registers trainable variables and initializes moment estimates.
 pub fn (mut o NAdamOptimizer[T]) build_params(layers []types.Layer[T]) {
 	for layer in layers {

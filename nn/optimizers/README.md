@@ -66,6 +66,12 @@ returns the rate for the caller to apply. `try_reduce_lr_on_plateau` reports
 invalid configuration; the original `next_lr(current_lr, step, metric_delta)`
 remains available for callers that already calculate metric deltas.
 
+Versioned model training checkpoints support all seven built-in optimizers:
+SGD, AdaGrad, RMSProp, Adam, AdamW, NAdam, and RAdam. The NAdam checkpoint
+preserves its scheduled momentum product and step; RAdam preserves the step
+used by variance rectification. See the [model checkpoint API](../models/README.md)
+for the save/load methods and their limits.
+
 `CyclicLR` provides triangular, triangular2, and exp_range amplitude policies
 with independently configurable rise and fall durations. It also computes the
 inverse momentum curve through `next_momentum(step)` by default; set

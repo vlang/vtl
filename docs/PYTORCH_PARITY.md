@@ -169,11 +169,12 @@ AdamW helpers preserve configuration and moment buffers, and SGD helpers
 preserve configuration, momentum buffers, and first-step momentum
 initialization state. RMSProp helpers preserve configuration and
 squared-gradient buffers. AdaGrad helpers preserve configuration and accumulated
-squared gradients.
+squared gradients. NAdam checkpoints preserve the scheduled momentum product;
+RAdam checkpoints preserve the rectification step. Both persist configuration
+and first/second moments.
 
-**Next:** Extend optimizer-state support to the remaining optimizers, add
-device remapping, version migration, and safe loading behavior. PyTorch pickle
-compatibility is not implied.
+**Next:** Add device remapping, version migration, and safe loading behavior.
+PyTorch pickle compatibility is not implied.
 
 ### Compilation and execution
 
