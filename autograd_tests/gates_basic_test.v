@@ -33,6 +33,34 @@ fn test_subtract() {
 	assert x.grad.array_equal(expected_grad)
 }
 
+fn test_subtract_fused_backward_for_f32() {
+	ctx := autograd.ctx[f32]()
+	x := ctx.variable(vtl.from_1d[f32]([5.0, 7.0])!)
+	y := ctx.variable(vtl.from_1d[f32]([2.0, 3.0])!)
+
+	mut result := x.subtract(y)!
+	result.backprop()!
+
+	assert x.grad.get_nth(0) == f32(1)
+	assert x.grad.get_nth(1) == f32(1)
+	assert y.grad.get_nth(0) == f32(-1)
+	assert y.grad.get_nth(1) == f32(-1)
+}
+
+fn test_subtract_backward_falls_back_for_non_contiguous_gradient() {
+	ctx := autograd.ctx[f64]()
+	mut result := ctx.variable(vtl.zeros[f64]([2, 2]))
+	result.grad = vtl.from_array[f64]([1.0, 2.0, 3.0, 4.0], [2, 2])!.transpose([1, 0])!
+	gate := autograd.subtract_gate[f64]()
+	backward := gate.backward(autograd.payload(result))!
+
+	assert backward[0].get([0, 0]) == 1.0
+	assert backward[1].get([0, 0]) == -1.0
+	assert backward[1].get([0, 1]) == -3.0
+	assert backward[1].get([1, 0]) == -2.0
+	assert backward[1].get([1, 1]) == -4.0
+}
+
 fn test_multiply() {
 	f64_ctx := autograd.ctx[f64]()
 

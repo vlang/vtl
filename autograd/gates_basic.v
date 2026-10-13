@@ -7,6 +7,19 @@ enum BinaryGateBackwardOperation {
 	divide
 }
 
+@[direct_array_access]
+fn fused_negate_contiguous[T](gradient &vtl.Tensor[T]) ?&vtl.Tensor[T] {
+	if !gradient.is_row_major_contiguous() || gradient.data.data.len != gradient.size {
+		return none
+	}
+	mut result := vtl.tensor_like[T](gradient)
+	negative_one := vtl.cast[T](-1)
+	for i in 0 .. gradient.size {
+		result.data.data[i] = gradient.data.data[i] * negative_one
+	}
+	return result
+}
+
 // fused_binary_gate_backward calculates both input gradients in one traversal
 // for same-shaped contiguous tensors. Broadcasted and strided inputs retain the
 // general tensor-operation path below.
@@ -95,6 +108,9 @@ pub fn subtract_gate[T]() &SubtractGate[T] {
 // backward exposes this operation as part of the public API.
 pub fn (g &SubtractGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
+	if opposite := fused_negate_contiguous[T](gradient) {
+		return [gradient, opposite]
+	}
 	opposite := gradient.multiply_scalar[T](vtl.cast[T](-1))!
 	return [gradient, opposite]
 }

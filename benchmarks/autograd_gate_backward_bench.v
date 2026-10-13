@@ -13,11 +13,69 @@ const iterations = 10
 
 fn main() {
 	println('VTL binary autograd gate backward (f64, CPU)')
-	println('Elements | Multiply separate (ms) | fused (ms) | speedup | Divide separate (ms) | fused (ms) | speedup')
+	println('Elements | Subtract scalar (ms) | fused (ms) | speedup | Multiply separate (ms) | fused (ms) | speedup | Divide separate (ms) | fused (ms) | speedup')
 	for size in sizes {
+		subtract_scalar, subtract_fused := benchmark_subtract(size)!
 		multiply_separate, multiply_fused := benchmark_multiply(size)!
 		divide_separate, divide_fused := benchmark_divide(size)!
-		println('${size} | ${multiply_separate:.4f} | ${multiply_fused:.4f} | ${multiply_separate / multiply_fused:.2f}x | ${divide_separate:.4f} | ${divide_fused:.4f} | ${divide_separate / divide_fused:.2f}x')
+		println('${size} | ${subtract_scalar:.4f} | ${subtract_fused:.4f} | ${subtract_scalar / subtract_fused:.2f}x | ${multiply_separate:.4f} | ${multiply_fused:.4f} | ${multiply_separate / multiply_fused:.2f}x | ${divide_separate:.4f} | ${divide_fused:.4f} | ${divide_separate / divide_fused:.2f}x')
+	}
+}
+
+fn benchmark_subtract(size int) !(f64, f64) {
+	_, _, gradient_values := inputs(size)
+	gradient := vtl.from_array[f64](gradient_values, [size])!
+	ctx := autograd.ctx[f64]()
+	mut result := ctx.variable(vtl.zeros[f64]([size]))
+	result.grad = gradient
+	payload := autograd.payload(result)
+	gate := autograd.subtract_gate[f64]()
+	for _ in 0 .. warmup_runs {
+		_ = gradient.multiply_scalar[f64](-1.0)!
+		_ = gate.backward(payload)!
+	}
+	scalar_ms, fused_ms, scalar_output, fused_output := time_subtract_backward(gradient,
+		gate, payload)
+	assert_subtract_outputs_equal(scalar_output, fused_output)
+	return scalar_ms, fused_ms
+}
+
+fn time_subtract_backward(gradient &vtl.Tensor[f64], gate &autograd.SubtractGate[f64],
+	payload &autograd.Payload[f64]) (f64, f64, &vtl.Tensor[f64], &vtl.Tensor[f64]) {
+	mut scalar_times := []f64{len: iterations}
+	mut fused_times := []f64{len: iterations}
+	mut scalar_output := gradient.multiply_scalar[f64](-1.0) or { panic(err) }
+	fused_initial := gate.backward(payload) or { panic(err) }
+	mut fused_output := fused_initial[1]
+	for i in 0 .. iterations {
+		if i % 2 == 0 {
+			mut start := time.sys_mono_now()
+			scalar_result := gradient.multiply_scalar[f64](-1.0) or { panic(err) }
+			scalar_times[i] = f64(time.sys_mono_now() - start) / 1_000_000.0
+			scalar_output = scalar_result
+			start = time.sys_mono_now()
+			fused_result := gate.backward(payload) or { panic(err) }
+			fused_times[i] = f64(time.sys_mono_now() - start) / 1_000_000.0
+			fused_output = fused_result[1]
+		} else {
+			mut start := time.sys_mono_now()
+			fused_result := gate.backward(payload) or { panic(err) }
+			fused_times[i] = f64(time.sys_mono_now() - start) / 1_000_000.0
+			fused_output = fused_result[1]
+			start = time.sys_mono_now()
+			scalar_result := gradient.multiply_scalar[f64](-1.0) or { panic(err) }
+			scalar_times[i] = f64(time.sys_mono_now() - start) / 1_000_000.0
+			scalar_output = scalar_result
+		}
+	}
+	return mean(mut scalar_times), mean(mut fused_times), scalar_output, fused_output
+}
+
+fn assert_subtract_outputs_equal(scalar &vtl.Tensor[f64], fused &vtl.Tensor[f64]) {
+	assert scalar.shape == fused.shape
+	assert scalar.size == fused.size
+	for i in 0 .. scalar.size {
+		assert scalar.data.data[i] == fused.data.data[i]
 	}
 }
 
