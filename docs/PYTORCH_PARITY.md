@@ -164,12 +164,13 @@ defaults differ.
 
 **VTL today:** NumPy `.npy`/`.npz` interchange and neural-network checkpoint
 support. The versioned JSON checkpoint API saves model weights and training
-metadata; `save_training_checkpoint` and `load_training_checkpoint` also
-preserve Adam configuration and moment buffers.
+metadata; Adam checkpoint helpers preserve configuration and moment buffers,
+and SGD checkpoint helpers preserve configuration, momentum buffers, and
+first-step momentum initialization state.
 
-**Next:** Extend optimizer-state support beyond Adam, add device remapping,
-version migration, and safe loading behavior. PyTorch pickle compatibility is
-not implied.
+**Next:** Extend optimizer-state support to the remaining optimizers, add
+device remapping, version migration, and safe loading behavior. PyTorch pickle
+compatibility is not implied.
 
 ### Compilation and execution
 

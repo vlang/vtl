@@ -4,6 +4,7 @@ import vtl.autograd
 import vtl.nn.types
 import vtl.nn.internal
 import vtl
+import math
 
 // SgdOptimizer implements Stochastic Gradient Descent with optional momentum and weight decay.
 pub struct SgdOptimizer[T] {
@@ -13,8 +14,7 @@ pub struct SgdOptimizer[T] {
 	weight_decay  f64
 	nesterov      bool
 pub mut:
-	params []&autograd.Variable[T]
-mut:
+	params               []&autograd.Variable[T]
 	momentum_buffers     []&vtl.Tensor[T]
 	momentum_initialized []bool
 }
@@ -47,6 +47,84 @@ pub fn sgd[T](config SgdOptimizerConfig) &SgdOptimizer[T] {
 		dampening:     config.dampening
 		weight_decay:  config.weight_decay
 		nesterov:      config.nesterov
+	}
+}
+
+// checkpoint_config returns the scalar configuration and per-parameter
+// momentum initialization state needed to resume SGD exactly.
+pub fn (o &SgdOptimizer[T]) checkpoint_config() map[string]f64 {
+	mut config := {
+		'learning_rate': o.learning_rate
+		'momentum':      o.momentum
+		'dampening':     o.dampening
+		'weight_decay':  o.weight_decay
+		'nesterov':      if o.nesterov { 1.0 } else { 0.0 }
+	}
+	if o.momentum > 0 {
+		for i, initialized in o.momentum_initialized {
+			config['momentum_initialized_${i}'] = if initialized { 1.0 } else { 0.0 }
+		}
+	}
+	return config
+}
+
+// restore_checkpoint_state restores SGD configuration, momentum buffers, and
+// their initialization state. Parameters must already be registered in order.
+pub fn (mut o SgdOptimizer[T]) restore_checkpoint_state(config map[string]f64,
+	momentum_buffers []&vtl.Tensor[T]) ! {
+	o.validate_checkpoint_state(config, momentum_buffers)!
+	o.learning_rate = config['learning_rate']
+	o.momentum = config['momentum']
+	o.dampening = config['dampening']
+	o.weight_decay = config['weight_decay']
+	o.nesterov = config['nesterov'] == 1.0
+	o.momentum_buffers = momentum_buffers.clone()
+	o.momentum_initialized = []bool{cap: o.params.len}
+	if o.momentum > 0 {
+		for i in 0 .. o.params.len {
+			o.momentum_initialized << config['momentum_initialized_${i}'] == 1.0
+		}
+	}
+}
+
+// validate_checkpoint_state checks SGD configuration and momentum state
+// without changing the optimizer.
+pub fn (o &SgdOptimizer[T]) validate_checkpoint_state(config map[string]f64,
+	momentum_buffers []&vtl.Tensor[T]) ! {
+	for key in ['learning_rate', 'momentum', 'dampening', 'weight_decay', 'nesterov'] {
+		if key !in config || !math.is_finite(config[key]) {
+			return error('SgdOptimizer.restore_checkpoint_state: missing or non-finite ${key}')
+		}
+	}
+	lr := config['learning_rate']
+	momentum := config['momentum']
+	dampening := config['dampening']
+	weight_decay := config['weight_decay']
+	nesterov_value := config['nesterov']
+	if lr < 0 || momentum < 0 || dampening < 0 || weight_decay < 0
+		|| nesterov_value !in [0.0, 1.0] {
+		return error('SgdOptimizer.restore_checkpoint_state: scalar values are outside valid ranges')
+	}
+	if nesterov_value == 1.0 && (momentum <= 0 || dampening != 0) {
+		return error('SgdOptimizer.restore_checkpoint_state: invalid Nesterov configuration')
+	}
+	if momentum == 0 {
+		if momentum_buffers.len != 0 {
+			return error('SgdOptimizer.restore_checkpoint_state: unexpected momentum buffers')
+		}
+		return
+	}
+	if momentum_buffers.len != o.params.len {
+		return error('SgdOptimizer.restore_checkpoint_state: parameter and momentum counts do not match')
+	}
+	for i, parameter in o.params {
+		initialized_key := 'momentum_initialized_${i}'
+		if initialized_key !in config || config[initialized_key] !in [0.0, 1.0] {
+			return error('SgdOptimizer.restore_checkpoint_state: invalid momentum state at parameter ${i}')
+		}
+		if momentum_buffers[i].shape != parameter.value.shape {
+			return error('SgdOptimizer.restore_checkpoint_state: momentum shape mismatch at parameter ${i}')
+		}
 	}
 }
 
