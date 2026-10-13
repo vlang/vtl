@@ -69,7 +69,8 @@ fn test_gru_layer_batch_first_matches_sequence_first_and_backpropagates() ! {
 			}
 		}
 	}
-	batch_output.sum()!.backprop()!
+	mut batch_loss := batch_output.sum()!
+	batch_loss.backprop()!
 	assert batch_input.grad.shape == batch_input.value.shape
 	assert batch_input.grad.to_array().any(it != 0)
 }
@@ -86,7 +87,10 @@ fn test_gru_layer_batch_first_state_api_preserves_batch_shape_and_gradients() ! 
 	mut output, mut final_state := layer.forward_batch_first_with_state(input, h0)!
 	assert output.value.shape == [2, 2, 3]
 	assert final_state.value.shape == [2, 3]
-	output.sum()!.add(final_state.sum()!)!.backprop()!
+	output_loss := output.sum()!
+	final_state_loss := final_state.sum()!
+	mut combined_loss := output_loss.add(final_state_loss)!
+	combined_loss.backprop()!
 	assert input.grad.shape == input.value.shape
 	assert h0.grad.to_array().any(it != 0)
 }
