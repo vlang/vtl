@@ -27,6 +27,7 @@ pub mut:
 	params         []&autograd.Variable[T]
 	first_moments  []&vtl.Tensor[T]
 	second_moments []&vtl.Tensor[T]
+	groups         []&AdamParamGroup[T]
 }
 
 // AdamOptimizerConfig configures AdamOptimizer.
@@ -127,6 +128,113 @@ pub fn (o &AdamOptimizer[T]) validate_checkpoint_state(config map[string]f64,
 	}
 }
 
+// AdamParamGroup is a set of parameters sharing one Adam configuration,
+// mirroring PyTorch parameter groups. Each group keeps its own learning
+// rate, betas, epsilon, bias-correction counters and moment buffers.
+// Grouped parameters always take the CPU step; the CUDA and Vulkan hooks
+// remain available through the flat params list.
+pub struct AdamParamGroup[T] {
+pub mut:
+	params        []&autograd.Variable[T]
+	learning_rate f64
+	beta1         f64
+	beta2         f64
+	epsilon       f64
+mut:
+	beta1_t        f64
+	beta2_t        f64
+	first_moments  []&vtl.Tensor[T]
+	second_moments []&vtl.Tensor[T]
+}
+
+// add_param_group registers parameters under their own Adam configuration
+// and returns the group index. Register each variable either flat (via
+// build_params) or in exactly one group.
+pub fn (mut o AdamOptimizer[T]) add_param_group(params []&autograd.Variable[T], config AdamOptimizerConfig) !int {
+	if config.learning_rate < 0 || config.beta1 < 0 || config.beta1 >= 1 || config.beta2 < 0
+		|| config.beta2 >= 1 || config.epsilon <= 0 {
+		return error('Adam group learning rate must be non-negative, betas must lie in [0, 1), and epsilon must be positive')
+	}
+	mut group := &AdamParamGroup[T]{
+		learning_rate: config.learning_rate
+		beta1:         config.beta1
+		beta2:         config.beta2
+		epsilon:       config.epsilon
+		beta1_t:       config.beta1
+		beta2_t:       config.beta2
+	}
+	for v in params {
+		group.params << v
+		group.first_moments << vtl.zeros_like[T](v.grad)
+		group.second_moments << vtl.zeros_like[T](v.grad)
+	}
+	o.groups << group
+	return o.groups.len - 1
+}
+
+// group_count returns how many parameter groups are registered.
+pub fn (o &AdamOptimizer[T]) group_count() int {
+	return o.groups.len
+}
+
+// group_learning_rate returns the current learning rate of one group.
+pub fn (o &AdamOptimizer[T]) group_learning_rate(group_index int) !f64 {
+	if group_index < 0 || group_index >= o.groups.len {
+		return error('Adam group index ${group_index} out of range for ${o.groups.len} groups')
+	}
+	return o.groups[group_index].learning_rate
+}
+
+// set_group_learning_rate applies a new learning rate to one group only;
+// this is the integration point for learning-rate schedulers.
+pub fn (mut o AdamOptimizer[T]) set_group_learning_rate(group_index int, learning_rate f64) ! {
+	if learning_rate < 0 {
+		return error('Adam group learning rate must be non-negative')
+	}
+	if group_index < 0 || group_index >= o.groups.len {
+		return error('Adam group index ${group_index} out of range for ${o.groups.len} groups')
+	}
+	o.groups[group_index].learning_rate = learning_rate
+}
+
+fn (mut g AdamParamGroup[T]) update_group() ! {
+	lr_t := g.learning_rate * math.sqrt(1.0 - g.beta2_t) / (1.0 - g.beta1_t)
+	g.beta1_t *= g.beta1
+	g.beta2_t *= g.beta2
+	step := AdamStepParams{
+		beta1:   g.beta1
+		beta2:   g.beta2
+		lr_t:    lr_t
+		epsilon: g.epsilon
+	}
+	for i, mut v in g.params {
+		if v.requires_grad {
+			$if sizeof(T) == 8 {
+				grad := v.grad.to_array()
+				mut theta := v.value.to_array()
+				mut m_arr := g.first_moments[i].to_array()
+				mut v_arr := g.second_moments[i].to_array()
+				adam_step_f64_cpu(grad, mut theta, mut m_arr, mut v_arr, step)
+				v.value = vtl.from_array(theta, v.value.shape) or { return err }
+				g.first_moments[i] = vtl.from_array(m_arr, v.value.shape) or { return err }
+				g.second_moments[i] = vtl.from_array(v_arr, v.value.shape) or { return err }
+			} $else $if sizeof(T) == 4 {
+				grad := v.grad.to_array()
+				mut theta := v.value.to_array()
+				mut m_arr := g.first_moments[i].to_array()
+				mut v_arr := g.second_moments[i].to_array()
+				adam_step_f32_cpu(grad, mut theta, mut m_arr, mut v_arr, step)
+				v.value = vtl.from_array(theta, v.value.shape) or { return err }
+				g.first_moments[i] = vtl.from_array(m_arr, v.value.shape) or { return err }
+				g.second_moments[i] = vtl.from_array(v_arr, v.value.shape) or { return err }
+			} $else {
+				return error('AdamParamGroup.update: unsupported element type size ${sizeof(T)}')
+			}
+			v.grad = vtl.zeros_like[T](v.value)
+		}
+	}
+}
+
 // build_params registers all trainable variables from `layers` into the optimizer.
 // Call once after constructing the model, before the first `update()`.
 pub fn (mut o AdamOptimizer[T]) build_params(layers []types.Layer[T]) {
@@ -142,6 +250,9 @@ pub fn (mut o AdamOptimizer[T]) build_params(layers []types.Layer[T]) {
 // update performs one Adam parameter update step and zeros all gradients.
 // Must be called after `loss.backward()`.
 pub fn (mut o AdamOptimizer[T]) update() ! {
+	for mut group in o.groups {
+		group.update_group()!
+	}
 	lr_t := o.learning_rate * math.sqrt(1.0 - o.beta2_t) / (1.0 - o.beta1_t)
 
 	o.beta1_t *= o.beta1
