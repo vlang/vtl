@@ -995,5 +995,5 @@ be used for portable binaries.
 | V flags | `-d cuda`, `-d vulkan`, `-prod` |
 | Baseline | NumPy or PyTorch timing |
 
-See [the Tanh autograd benchmark](autograd_tanh.md) for the workload, build
-commands, NumPy comparison, and measurement limits.
+See [the unary autograd benchmark](autograd_unary_gates.md) for the workloads,
+build commands, NumPy comparisons, and measurement limits.
