@@ -51,8 +51,8 @@ fn test_multiply() {
 
 fn test_multiply_fused_backward_for_f32() {
 	ctx := autograd.ctx[f32]()
-	x := ctx.variable(vtl.from_1d([2.0, 4.0])!)
-	y := ctx.variable(vtl.from_1d([3.0, 5.0])!)
+	x := ctx.variable(vtl.from_1d[f32]([2.0, 4.0])!)
+	y := ctx.variable(vtl.from_1d[f32]([3.0, 5.0])!)
 
 	mut result := x.multiply(y)!
 	result.backprop()!
