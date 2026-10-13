@@ -156,7 +156,9 @@ promoted input dtype is `float32`; other supported combinations return
 floating-point dtypes and broadcasting. Nonzero results follow the divisor's
 sign; signed zero follows the divisor; integer zero divisors produce zero and
 floating-point zero divisors produce NaN. Floating-point remainder is a tensor
-operation and does not yet propagate gradients through `Variable`.
+operation and does not yet propagate gradients through `Variable`. See the
+[implementation](../math_promoted.v), [focused tests](../tests/core/math_promoted_remainder_test.v),
+and [dtype conversion tutorial](./TUTORIAL_FIRST_STEPS.md#numeric-dtype-conversion).
 `round_decimals` rounds real floating-point tensors to positive or negative
 decimal places using ties-to-even, matching NumPy `round` for the supported
 same-dtype inputs; integer tensors are copied unchanged. VTL preserves finite
