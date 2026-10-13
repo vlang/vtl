@@ -65,6 +65,13 @@ dimensions by their root mean square and supports optional per-element weights.
 Both are available as layers and in `Sequential`, with CPU autograd; device
 kernels and broader module parity remain separate work.
 
+`BatchNorm2D` normalizes `[batch, channels, height, width]` inputs per channel
+with train/eval modes, running statistics (the running variance uses the
+unbiased batch variance, as in PyTorch), optional affine parameters, and CPU
+autograd for input, gamma and beta. It is available as a layer and in
+`Sequential` via `batchnorm2d`, closing the BatchNorm2d gap next to the
+existing `BatchNorm1D`. BatchNorm3D and device kernels remain separate work.
+
 `Sequential.gru` can be called repeatedly to compose a stack of single-layer
 GRUs, each with a zero initial hidden state. This composes stacked forward
 passes but does not expose PyTorch's single-module `num_layers` or stacked

@@ -63,6 +63,141 @@ pub fn batchnorm1d_training[T](input &vtl.Tensor[T], gamma &vtl.Tensor[T], beta 
 	return output, batch_mean, batch_var
 }
 
+// batchnorm2d_forward computes BatchNorm2D using running mean/var
+// (inference path). Input is [N, C, H, W]; gamma, beta and the running
+// statistics are per-channel vectors of length C.
+pub fn batchnorm2d_forward[T](input &vtl.Tensor[T], gamma &vtl.Tensor[T], beta &vtl.Tensor[T], running_mean &vtl.Tensor[T], running_var &vtl.Tensor[T], eps f64) !&vtl.Tensor[T] {
+	n_size := input.shape[0]
+	channels := input.shape[1]
+	height := input.shape[2]
+	width := input.shape[3]
+	mut output_data := []f64{len: n_size * channels * height * width}
+	for n in 0 .. n_size {
+		for c in 0 .. channels {
+			inv_std := 1.0 / math.sqrt(f64(running_var.get([c])) + eps)
+			mean_c := f64(running_mean.get([c]))
+			gamma_c := f64(gamma.get([c]))
+			beta_c := f64(beta.get([c]))
+			for h in 0 .. height {
+				for w in 0 .. width {
+					idx := ((n * channels + c) * height + h) * width + w
+					output_data[idx] = gamma_c * (f64(input.get([n, c, h, w])) - mean_c) * inv_std + beta_c
+				}
+			}
+		}
+	}
+	return vtl.from_array(output_data.map(vtl.cast[T](it)), input.shape)!
+}
+
+// batchnorm2d_training computes BatchNorm2D using per-channel batch
+// statistics over N*H*W elements (training path). Returns the output plus
+// the biased batch mean and variance as [C] tensors.
+pub fn batchnorm2d_training[T](input &vtl.Tensor[T], gamma &vtl.Tensor[T], beta &vtl.Tensor[T], eps f64) !(&vtl.Tensor[T], &vtl.Tensor[T], &vtl.Tensor[T]) {
+	n_size := input.shape[0]
+	channels := input.shape[1]
+	height := input.shape[2]
+	width := input.shape[3]
+	count := f64(n_size * height * width)
+
+	mut mean_data := []f64{len: channels}
+	for c in 0 .. channels {
+		mut sum := f64(0)
+		for n in 0 .. n_size {
+			for h in 0 .. height {
+				for w in 0 .. width {
+					sum += f64(input.get([n, c, h, w]))
+				}
+			}
+		}
+		mean_data[c] = sum / count
+	}
+
+	mut var_data := []f64{len: channels}
+	for c in 0 .. channels {
+		mut sum := f64(0)
+		for n in 0 .. n_size {
+			for h in 0 .. height {
+				for w in 0 .. width {
+					diff := f64(input.get([n, c, h, w])) - mean_data[c]
+					sum += diff * diff
+				}
+			}
+		}
+		var_data[c] = sum / count
+	}
+
+	mut output_data := []f64{len: n_size * channels * height * width}
+	for n in 0 .. n_size {
+		for c in 0 .. channels {
+			inv_std := 1.0 / math.sqrt(var_data[c] + eps)
+			gamma_c := f64(gamma.get([c]))
+			beta_c := f64(beta.get([c]))
+			for h in 0 .. height {
+				for w in 0 .. width {
+					idx := ((n * channels + c) * height + h) * width + w
+					output_data[idx] = gamma_c * (f64(input.get([n, c, h, w])) - mean_data[c]) * inv_std + beta_c
+				}
+			}
+		}
+	}
+	output := vtl.from_array(output_data.map(vtl.cast[T](it)), input.shape)!
+	batch_mean := vtl.from_array(mean_data.map(vtl.cast[T](it)), [channels])!
+	batch_var := vtl.from_array(var_data.map(vtl.cast[T](it)), [channels])!
+	return output, batch_mean, batch_var
+}
+
+// batchnorm2d_backward_mode computes gradients w.r.t. input, gamma and beta
+// for BatchNorm2D, using batch statistics in training mode and the fixed
+// running statistics as a constant affine transform in evaluation mode.
+pub fn batchnorm2d_backward_mode[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], gamma &vtl.Tensor[T], _beta &vtl.Tensor[T], mean &vtl.Tensor[T], var_ &vtl.Tensor[T], eps f64, training bool) ![]&vtl.Tensor[T] {
+	n_size := input.shape[0]
+	channels := input.shape[1]
+	height := input.shape[2]
+	width := input.shape[3]
+	count := f64(n_size * height * width)
+
+	mut dx_data := []f64{len: n_size * channels * height * width}
+	mut dgamma_data := []f64{len: channels}
+	mut dbeta_data := []f64{len: channels}
+	for c in 0 .. channels {
+		std_c := math.sqrt(f64(var_.get([c])) + eps)
+		mean_c := f64(mean.get([c]))
+		gamma_c := f64(gamma.get([c]))
+		mut grad_sum := f64(0)
+		mut grad_norm_sum := f64(0)
+		for n in 0 .. n_size {
+			for h in 0 .. height {
+				for w in 0 .. width {
+					grad := f64(gradient.get([n, c, h, w]))
+					normalized := (f64(input.get([n, c, h, w])) - mean_c) / std_c
+					grad_sum += grad
+					grad_norm_sum += grad * normalized
+				}
+			}
+		}
+		dgamma_data[c] = grad_norm_sum
+		dbeta_data[c] = grad_sum
+		for n in 0 .. n_size {
+			for h in 0 .. height {
+				for w in 0 .. width {
+					grad := f64(gradient.get([n, c, h, w]))
+					mut dx := grad
+					if training {
+						normalized := (f64(input.get([n, c, h, w])) - mean_c) / std_c
+						dx = (count * grad - grad_sum - normalized * grad_norm_sum) / count
+					}
+					idx := ((n * channels + c) * height + h) * width + w
+					dx_data[idx] = gamma_c * dx / std_c
+				}
+			}
+		}
+	}
+	dx := vtl.from_array(dx_data.map(vtl.cast[T](it)), input.shape)!
+	dgamma := vtl.from_array(dgamma_data.map(vtl.cast[T](it)), [channels])!
+	dbeta := vtl.from_array(dbeta_data.map(vtl.cast[T](it)), [channels])!
+	return [dx, dgamma, dbeta]
+}
+
 // batchnorm1d_backward computes gradients w.r.t. input, gamma, beta.
 pub fn batchnorm1d_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], gamma &vtl.Tensor[T], beta &vtl.Tensor[T], mean &vtl.Tensor[T], var_ &vtl.Tensor[T], eps f64) ![]&vtl.Tensor[T] {
 	return batchnorm1d_backward_mode[T](gradient, input, gamma, beta, mean, var_, eps, true)
