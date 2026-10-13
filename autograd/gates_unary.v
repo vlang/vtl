@@ -1,5 +1,7 @@
 module autograd
 
+import math
+import simd
 import vtl
 
 // LogGate implements log(x) element-wise.
@@ -57,8 +59,38 @@ pub fn abs_gate[T](a &Variable[T]) &AbsGate[T] {
 }
 
 // backward exposes this operation as part of the public API.
+@[direct_array_access]
 pub fn (g &AbsGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
+	if can_flat_unary_gate_backward[T](gradient, g.a.value) {
+		mut result := vtl.tensor_like[T](gradient)
+		eps := vtl.cast[T](1e-8)
+		mut i := 0
+		$if T is f64 {
+			epsilon := simd.splat_f64x4(1e-8)
+			for ; i + 4 <= gradient.size; i += 4 {
+				values := simd.load_f64x4_at(g.a.value.data.data, i)
+				gradients := simd.load_f64x4_at(gradient.data.data, i)
+				safe_denominator := values.abs().maximum(epsilon)
+				(gradients * (values / safe_denominator)).store_at(mut result.data.data, i)
+			}
+		} $else $if T is f32 {
+			epsilon := simd.splat_f32x8(1e-8)
+			for ; i + 8 <= gradient.size; i += 8 {
+				values := simd.load_f32x8_at(g.a.value.data.data, i)
+				gradients := simd.load_f32x8_at(gradient.data.data, i)
+				safe_denominator := values.abs().maximum(epsilon)
+				(gradients * (values / safe_denominator)).store_at(mut result.data.data, i)
+			}
+		}
+		for ; i < gradient.size; i++ {
+			value := g.a.value.data.data[i]
+			abs_value := if value < vtl.cast[T](0) { -value } else { value }
+			safe_denom := if abs_value < eps { eps } else { abs_value }
+			result.data.data[i] = gradient.data.data[i] * (value / safe_denom)
+		}
+		return [result]
+	}
 	eps := vtl.cast[T](1e-8)
 	abs_a := g.a.value.abs[T]()
 	safe_denom := abs_a.map(fn [eps] [T](val T, _ []int) T {
@@ -103,8 +135,37 @@ pub fn sqrt_gate[T](a &Variable[T]) &SqrtGate[T] {
 }
 
 // backward exposes this operation as part of the public API.
+@[direct_array_access]
 pub fn (g &SqrtGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
+	if can_flat_unary_gate_backward[T](gradient, g.a.value) {
+		mut result := vtl.tensor_like[T](gradient)
+		mut i := 0
+		$if T is f64 {
+			two := simd.splat_f64x4(2.0)
+			for ; i + 4 <= gradient.size; i += 4 {
+				values := simd.load_f64x4_at(g.a.value.data.data, i)
+				gradients := simd.load_f64x4_at(gradient.data.data, i)
+				denominator := values.sqrt() * two
+				(gradients / denominator).store_at(mut result.data.data, i)
+			}
+		} $else $if T is f32 {
+			two := simd.splat_f32x8(2.0)
+			for ; i + 8 <= gradient.size; i += 8 {
+				values := simd.load_f32x8_at(g.a.value.data.data, i)
+				gradients := simd.load_f32x8_at(gradient.data.data, i)
+				denominator := values.sqrt() * two
+				(gradients / denominator).store_at(mut result.data.data, i)
+			}
+		}
+		two := vtl.cast[T](2)
+		for ; i < gradient.size; i++ {
+			root := vtl.cast[T](math.sqrt(vtl.cast[f64](g.a.value.data.data[i])))
+			denominator := root * two
+			result.data.data[i] = gradient.data.data[i] / denominator
+		}
+		return [result]
+	}
 	// d/dx sqrt(x) = 1/(2*sqrt(x)) = gradient * (0.5 / sqrt(x))
 	sqrt_a := g.a.value.sqrt[T]()
 	two_sqrt := sqrt_a.multiply_scalar[T](vtl.cast[T](2.0))!
@@ -153,7 +214,23 @@ pub fn (g &TanhGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	if can_flat_unary_gate_backward[T](gradient, g.cache) {
 		mut result := vtl.tensor_like[T](gradient)
-		for i in 0 .. gradient.size {
+		mut i := 0
+		$if T is f64 {
+			one := simd.splat_f64x4(1.0)
+			for ; i + 4 <= gradient.size; i += 4 {
+				gradients := simd.load_f64x4_at(gradient.data.data, i)
+				values := simd.load_f64x4_at(g.cache.data.data, i)
+				(gradients * (one - values * values)).store_at(mut result.data.data, i)
+			}
+		} $else $if T is f32 {
+			one := simd.splat_f32x8(1.0)
+			for ; i + 8 <= gradient.size; i += 8 {
+				gradients := simd.load_f32x8_at(gradient.data.data, i)
+				values := simd.load_f32x8_at(g.cache.data.data, i)
+				(gradients * (one - values * values)).store_at(mut result.data.data, i)
+			}
+		}
+		for ; i < gradient.size; i++ {
 			value := g.cache.data.data[i]
 			result.data.data[i] = gradient.data.data[i] * (vtl.cast[T](1) - value * value)
 		}
@@ -211,11 +288,25 @@ pub fn clamp_gate[T](min_val T, max_val T, a &vtl.Tensor[T]) &ClampGate[T] {
 }
 
 // backward exposes this operation as part of the public API.
+@[direct_array_access]
 pub fn (g &ClampGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	gradient := payload.variable.grad
 	input := g.a
 	min_val := g.min_val
 	max_val := g.max_val
+	if can_flat_unary_gate_backward[T](gradient, input) {
+		mut result := vtl.tensor_like[T](gradient)
+		zero := vtl.cast[T](0)
+		for i in 0 .. gradient.size {
+			value := input.data.data[i]
+			result.data.data[i] = if value >= min_val && value <= max_val {
+				gradient.data.data[i]
+			} else {
+				zero
+			}
+		}
+		return [result]
+	}
 	r0 := gradient.nmap([input], fn [min_val, max_val] [T](vals []T, _ []int) T {
 		if vals[1] >= min_val && vals[1] <= max_val {
 			return vals[0]
