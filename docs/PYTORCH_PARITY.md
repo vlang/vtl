@@ -108,9 +108,12 @@ behavior remain gaps.
 offered by PyTorch's `get_total_norm` and `clip_grads_with_norm_` APIs.
 `ReduceLROnPlateau.step(current_lr, metric)` tracks the best metric and supports
 PyTorch-style min/max modes, relative/absolute thresholds, patience, cooldown,
-minimum LR, and epsilon. It returns the next LR for the caller to apply;
-optimizer mutation and per-parameter-group LR support remain gaps. Optimizer
-parameter-group integration remains a gap.
+minimum LR, and epsilon. It returns the next LR for the caller to apply.
+`SgdOptimizer` now supports PyTorch-style parameter groups through
+`add_param_group`, each with its own learning rate, momentum, dampening,
+weight decay and Nesterov settings and independent momentum buffers;
+`set_group_learning_rate` is the scheduler integration point. Extending
+parameter groups to the remaining optimizers is still open.
 
 `nll_loss` supports weighted class-index and one-hot/soft targets, mean and sum
 reductions, per-position `none` reduction, and `ignore_index` for class-index
@@ -131,10 +134,9 @@ of non-ignored target weights; soft-target means divide by the number of samples
 `label_smoothing` mixes targets with the uniform class distribution. All paths
 propagate gradients.
 
-**Next:** Audit formulas, defaults, reduction modes, parameter groups, sparse
-gradients, and numerical behavior against `torch.nn` and `torch.optim`. Add
-parameter-group support, then integrate scheduler values with optimizer
-updates.
+**Next:** Audit formulas, defaults, reduction modes, sparse gradients, and
+numerical behavior against `torch.nn` and `torch.optim`. Extend parameter
+groups beyond SGD, then integrate scheduler values with optimizer updates.
 
 ### Data pipeline
 
