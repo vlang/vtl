@@ -16,6 +16,7 @@ performance, or ecosystem.
 | Higher-order autograd | [#733](https://github.com/vlang/vtl/issues/733) |
 | Stacked recurrent APIs; custom module state | [#734](https://github.com/vlang/vtl/issues/734), [#735](https://github.com/vlang/vtl/issues/735) |
 | Optimizer/scheduler parity | [#736](https://github.com/vlang/vtl/issues/736) |
+| Device-resident CUDA optimizer state and updates | [#758](https://github.com/vlang/vtl/issues/758) |
 | Data transforms and scalable loading | [#737](https://github.com/vlang/vtl/issues/737), [#738](https://github.com/vlang/vtl/issues/738) |
 | Checkpoint migration and safe loading | [#739](https://github.com/vlang/vtl/issues/739) |
 | Graph execution and memory profiling | [#740](https://github.com/vlang/vtl/issues/740), [#741](https://github.com/vlang/vtl/issues/741) |
