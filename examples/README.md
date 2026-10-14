@@ -91,6 +91,7 @@ CIFAR examples for CI-safe checks.
 | [clip](./clip) | Clamp a tensor with broadcastable per-element bounds in one pass | `v run ./vtl/examples/clip/main.v` |
 | [round_decimals](./round_decimals) | Round floating-point tensors to positive or negative decimal places | `v run ./vtl/examples/round_decimals/main.v` |
 | [math_decomposition](./math_decomposition) | Split and reconstruct binary floating-point values | `v run ./vtl/examples/math_decomposition/main.v` |
+| [math_log_domain](./math_log_domain) | Combine log values stably and inspect floating-point sign bits | `v run ./vtl/examples/math_log_domain/main.v` |
 | [nan_to_num](./nan_to_num) | Replace NaN and infinities before numerical processing | `v run ./vtl/examples/nan_to_num/main.v` |
 | [bitwise](./bitwise) | Broadcast integer masks and shift flag bits | `v run ./vtl/examples/bitwise/main.v` |
 | [take_nd](./take_nd) | Gather along an axis while preserving a multidimensional index shape | `v run ./vtl/examples/take_nd/main.v` |

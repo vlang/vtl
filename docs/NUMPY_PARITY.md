@@ -195,6 +195,13 @@ propagates gradients through finite inputs and returns zero gradients for
 replaced NaN/infinite inputs, matching PyTorch.
 See [NumPy's nan_to_num reference](https://numpy.org/doc/stable/reference/generated/numpy.nan_to_num.html)
 for the component-wise complex behavior.
+`signbit` returns a boolean tensor for negative floating-point sign bits,
+including negative zero; signed negative integers are true, while unsigned
+integers and booleans produce false. `logaddexp`
+and `logaddexp2` use stable log-domain formulas, preserve f32/f64 dtype, and
+broadcast same-dtype operands while handling IEEE infinities and NaNs. See the
+[math ufunc tutorial](./TUTORIAL_MATH_UFUNCS.md) and
+[`math_log_domain` example](../examples/math_log_domain/README.md).
 `Tensor.modf` returns fractional then integral parts, matching NumPy's output
 order, and `Tensor.frexp` returns floating-point mantissas with integer base-2
 exponents. The `ldexp` function reconstructs values and broadcasts mantissas

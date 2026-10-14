@@ -42,3 +42,26 @@ mantissas. All three functions preserve logical tensor order, including views.
 
 See the [math decomposition example](../examples/math_decomposition/README.md)
 and the [NumPy parity tracker](./NUMPY_PARITY.md#math-and-ufuncs).
+
+## Stable log-domain operations and sign bits
+
+`vtl.logaddexp(a, b)` computes `log(exp(a) + exp(b))` without overflowing
+intermediate exponentials. `vtl.logaddexp2` computes the base-2 equivalent,
+`log2(2^a + 2^b)`. Both accept same-type f32/f64 tensors, broadcast operands,
+preserve dtype, and handle infinities and NaNs.
+
+`Tensor.signbit()` returns a boolean tensor identifying negative floating-point
+values, including negative zero and negative infinity. Signed integers are true
+when negative; unsigned integers and booleans return false for every element.
+
+```v
+import vtl
+
+logits := vtl.from_1d[f64]([-1000.0, -1001.0])!
+normalizer := vtl.from_1d[f64]([-1000.0])!
+log_sum := vtl.logaddexp(logits, normalizer)!
+println(log_sum.to_array())
+```
+
+See the [stable log-domain example](../examples/math_log_domain/README.md) and
+the [NumPy parity tracker](./NUMPY_PARITY.md#math-and-ufuncs).
