@@ -11,6 +11,7 @@ performance, or ecosystem.
 | Capability | Issue |
 |------------|-------|
 | OpenCL compute and neural-network dispatch | [#750](https://github.com/vlang/vtl/issues/750) |
+| Vulkan activation residency across sequential layers | [#797](https://github.com/vlang/vtl/issues/797) |
 | CUDA backward for remaining neural-network layers | [#161](https://github.com/vlang/vtl/issues/161) |
 | Tensor semantics; dtype and device model | [#731](https://github.com/vlang/vtl/issues/731), [#732](https://github.com/vlang/vtl/issues/732) |
 | Higher-order autograd | [#733](https://github.com/vlang/vtl/issues/733) |

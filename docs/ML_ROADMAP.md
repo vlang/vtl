@@ -57,8 +57,50 @@ itemized status is in the [main roadmap](../ROADMAP.md#phase-5--opencl-backend).
 
 | Issue | Topic |
 |-------|-------|
-| [#161](https://github.com/vlang/vtl/issues/161) | CUDA backward for LSTM, attention, norms, embeddings, and pooling; validation pending |
-| [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support |
+| [#63](https://github.com/vlang/vtl/issues/63) | Phase 6: ARM GPU Support — Android, iOS, Embedded |
+| [#161](https://github.com/vlang/vtl/issues/161) | feat: CUDA backward for LSTM, Attention, BatchNorm, LayerNorm, Embedding, Pooling |
+| [#717](https://github.com/vlang/vtl/issues/717) | feat: complete NumPy dtype promotion for tensor arithmetic |
+| [#718](https://github.com/vlang/vtl/issues/718) | feat: unify dtype and device options for tensor creation |
+| [#719](https://github.com/vlang/vtl/issues/719) | feat: define NumPy-compatible copy and view semantics |
+| [#720](https://github.com/vlang/vtl/issues/720) | feat: complete NumPy bounds modes across indexing APIs |
+| [#721](https://github.com/vlang/vtl/issues/721) | feat: complete NumPy reduction keepdims and accumulator dtype coverage |
+| [#722](https://github.com/vlang/vtl/issues/722) | feat: expand complex tensor and linear algebra coverage |
+| [#723](https://github.com/vlang/vtl/issues/723) | feat: complete NumPy random distributions and generator streams |
+| [#724](https://github.com/vlang/vtl/issues/724) | perf: validate FFT dtype and strided-array parity |
+| [#725](https://github.com/vlang/vtl/issues/725) | feat(io): add NumPy text array interoperability |
+| [#726](https://github.com/vlang/vtl/issues/726) | feat(io): add memory-mapped NumPy array access |
+| [#727](https://github.com/vlang/vtl/issues/727) | feat: connect masked arrays to autograd and neural networks |
+| [#728](https://github.com/vlang/vtl/issues/728) | feat: define structured-array and table interoperability scope |
+| [#729](https://github.com/vlang/vtl/issues/729) | perf: publish a reproducible NumPy backend benchmark matrix |
+| [#730](https://github.com/vlang/vtl/issues/730) | docs: add end-to-end NumPy and classical ML migration examples |
+| [#731](https://github.com/vlang/vtl/issues/731) | feat: complete PyTorch tensor operator semantics audit |
+| [#732](https://github.com/vlang/vtl/issues/732) | feat: define a unified PyTorch-style dtype and device model |
+| [#733](https://github.com/vlang/vtl/issues/733) | feat: add higher-order autograd and graph controls |
+| [#734](https://github.com/vlang/vtl/issues/734) | feat(nn): add stacked and bidirectional recurrent APIs |
+| [#735](https://github.com/vlang/vtl/issues/735) | feat(nn): add parameter and buffer registration for custom modules |
+| [#736](https://github.com/vlang/vtl/issues/736) | feat(optim): integrate schedulers and complete optimizer parity |
+| [#737](https://github.com/vlang/vtl/issues/737) | feat(data): add composable transforms and reproducible streaming datasets |
+| [#738](https://github.com/vlang/vtl/issues/738) | feat(data): add worker loading, prefetch and pinned-memory batches |
+| [#739](https://github.com/vlang/vtl/issues/739) | feat: add safe checkpoint migration and device remapping |
+| [#740](https://github.com/vlang/vtl/issues/740) | feat: add graph capture and fused tensor execution |
+| [#741](https://github.com/vlang/vtl/issues/741) | perf: add tensor memory planning and profiling tools |
+| [#742](https://github.com/vlang/vtl/issues/742) | feat: add distributed training and mixed-precision primitives |
+| [#743](https://github.com/vlang/vtl/issues/743) | feat: expand VTL model interoperability and deployment |
+| [#746](https://github.com/vlang/vtl/issues/746) | feat: add sparse tensor formats and operations |
+| [#747](https://github.com/vlang/vtl/issues/747) | feat: define non-numeric NumPy dtype support |
+| [#748](https://github.com/vlang/vtl/issues/748) | feat: add explicit array interoperability APIs |
+| [#750](https://github.com/vlang/vtl/issues/750) | feat(opencl): expand tensor compute and neural-network dispatch |
+| [#758](https://github.com/vlang/vtl/issues/758) | feat(cuda): keep optimizer state resident across training steps |
+| [#770](https://github.com/vlang/vtl/issues/770) | docs: add PyTorch migration and training tutorials |
+| [#771](https://github.com/vlang/vtl/issues/771) | perf: add matched VTL and PyTorch benchmarks |
+| [#773](https://github.com/vlang/vtl/issues/773) | feat: add NumPy polynomial families and fitting |
+| [#777](https://github.com/vlang/vtl/issues/777) | feat(math): complete NumPy ufunc family coverage |
+| [#779](https://github.com/vlang/vtl/issues/779) | feat(io): add optional HDF5 tensor interoperability |
+| [#783](https://github.com/vlang/vtl/issues/783) | feat(math): define NumPy ufunc execution methods |
+| [#784](https://github.com/vlang/vtl/issues/784) | feat(autograd): add functional tensor transforms |
+| [#792](https://github.com/vlang/vtl/issues/792) | feat(quantization): add INT8 tensor and inference support |
+| [#797](https://github.com/vlang/vtl/issues/797) | feat(vulkan): retain activations across sequential layers |
+| [#798](https://github.com/vlang/vtl/issues/798) | feat(autograd): differentiate floating remainder |
 
 Issues #3 and #40 were closed on GitHub on 2026-10-13. The #3 resolution
 uses explicit SIMD and validated contiguous kernels rather than a V-level
@@ -73,7 +115,7 @@ corruption was fixed in main (PR [#409](https://github.com/vlang/vtl/pull/409)).
 
 | Priority | Issue | Topic |
 |----------|-------|--------|
-| P2 | — | Vulkan: persistent GPU activation chain between layers (CUDA has `VTL_GPU_ACTIVATIONS`) |
+| P2 | [#797](https://github.com/vlang/vtl/issues/797) | Vulkan: preserve activations across sequential layers |
 
 ## Performance engineering backlog
 
