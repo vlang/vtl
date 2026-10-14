@@ -250,15 +250,17 @@ single-axis, and multi-axis sum and product reductions. Cumulative sum and
 product along one axis also provide explicit output dtype selection through
 `cumsum_as` and `cumprod_as`.
 `mean_as`, `mean_along_axis_as`, and `mean_along_axes_as` likewise select the
-accumulator and output type for ordinary means. Existing mean APIs remain
-available with their original return types.
+accumulator and output type for ordinary means. `variance_as` and `std_as`,
+with their single-axis and multi-axis forms, provide the same control for
+ordinary variance and standard deviation. Existing APIs remain available with
+their original return types.
 `stats.sum_accurate` provides an opt-in Neumaier-compensated global sum for
 floating-point tensors.
 
 **Remaining:** add `keepdims` options consistently across remaining
-reductions, extend accumulator dtype controls to variance and standard
-deviation, and broaden reduction coverage. NaN-aware means currently retain
-their existing `f64` output behavior.
+reductions, extend accumulator dtype controls to NaN-aware means, variance,
+standard deviation and other families, and broaden reduction coverage.
+NaN-aware moments currently retain their existing `f64` output behavior.
 
 Logical `all_axis`/`any_axis` and multi-axis `all_axes`/`any_axes` reductions
 return `bool` tensors; empty reduced dimensions return the logical identities
