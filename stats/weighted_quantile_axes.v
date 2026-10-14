@@ -33,10 +33,24 @@ pub fn quantiles_weighted_axes[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64
 	return weighted_quantiles_multi_axis[T](values, weights, quantiles, axes, false, false, true)
 }
 
+// quantiles_weighted_axes_keepdims optionally retains all reduced axes as
+// size-one dimensions after the prepended quantile dimension.
+pub fn quantiles_weighted_axes_keepdims[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], quantiles []f64, axes []int, keepdims bool) !&vtl.Tensor[f64] {
+	return weighted_quantiles_multi_axis[T](values, weights, quantiles, axes, keepdims, false,
+		true)
+}
+
 // nanquantiles_weighted_axes computes multiple NaN-aware weighted quantiles
 // per multi-axis slice.
 pub fn nanquantiles_weighted_axes[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], quantiles []f64, axes []int) !&vtl.Tensor[f64] {
 	return weighted_quantiles_multi_axis[T](values, weights, quantiles, axes, false, true, true)
+}
+
+// nanquantiles_weighted_axes_keepdims retains all reduced axes as size-one
+// dimensions after the prepended quantile dimension and ignores NaN values.
+pub fn nanquantiles_weighted_axes_keepdims[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], quantiles []f64, axes []int, keepdims bool) !&vtl.Tensor[f64] {
+	return weighted_quantiles_multi_axis[T](values, weights, quantiles, axes, keepdims, true,
+		true)
 }
 
 // percentiles_weighted_axes computes multi-axis percentiles on the 0..100 scale.
@@ -45,10 +59,24 @@ pub fn percentiles_weighted_axes[T](values &vtl.Tensor[T], weights &vtl.Tensor[f
 		axes)
 }
 
+// percentiles_weighted_axes_keepdims computes weighted percentiles and
+// optionally retains reduced axes after the leading percentile dimension.
+pub fn percentiles_weighted_axes_keepdims[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], percentiles []f64, axes []int, keepdims bool) !&vtl.Tensor[f64] {
+	return quantiles_weighted_axes_keepdims[T](values, weights,
+		percentiles_to_quantiles(percentiles)!, axes, keepdims)
+}
+
 // nanpercentiles_weighted_axes computes NaN-aware multi-axis percentiles.
 pub fn nanpercentiles_weighted_axes[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], percentiles []f64, axes []int) !&vtl.Tensor[f64] {
 	return nanquantiles_weighted_axes[T](values, weights, percentiles_to_quantiles(percentiles)!,
 		axes)
+}
+
+// nanpercentiles_weighted_axes_keepdims computes NaN-aware weighted
+// percentiles and optionally retains reduced axes after the leading dimension.
+pub fn nanpercentiles_weighted_axes_keepdims[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], percentiles []f64, axes []int, keepdims bool) !&vtl.Tensor[f64] {
+	return nanquantiles_weighted_axes_keepdims[T](values, weights,
+		percentiles_to_quantiles(percentiles)!, axes, keepdims)
 }
 
 fn weighted_quantiles_multi_axis[T](values &vtl.Tensor[T], weights &vtl.Tensor[f64], quantiles []f64, axes []int, keepdims bool, ignore_nan bool, multi bool) !&vtl.Tensor[f64] {
@@ -84,7 +112,7 @@ fn weighted_quantiles_multi_axis[T](values &vtl.Tensor[T], weights &vtl.Tensor[f
 	}
 	for dimension, size in values.shape {
 		if reduced[dimension] {
-			if keepdims && !multi {
+			if keepdims {
 				output_shape << 1
 			}
 		} else {
@@ -152,7 +180,11 @@ fn weighted_quantiles_multi_axis[T](values &vtl.Tensor[T], weights &vtl.Tensor[f
 			output_index[0] = 0
 			mut output_dimension := 1
 			for dimension in 0 .. rank {
-				if !reduced[dimension] {
+				if keepdims {
+					if !reduced[dimension] {
+						output_index[dimension + 1] = input_index[dimension]
+					}
+				} else if !reduced[dimension] {
 					output_index[output_dimension] = input_index[dimension]
 					output_dimension++
 				}

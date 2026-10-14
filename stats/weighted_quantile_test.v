@@ -126,6 +126,13 @@ fn test_weighted_quantiles_reduce_multiple_axes_with_compact_weights() ! {
 	levels := quantiles_weighted_axes(values, weights, [0.5, 0.0, 1.0], [0, 2])!
 	assert levels.shape == [3, 2]
 	assert levels.to_array() == [5.0, 7.0, 1.0, 3.0, 6.0, 8.0]
+	levels_kept := quantiles_weighted_axes_keepdims(values, weights, [0.5, 0.0, 1.0], [
+		0,
+		2,
+	],
+		true)!
+	assert levels_kept.shape == [3, 1, 2, 1]
+	assert levels_kept.to_array() == levels.to_array()
 	assert percentile_weighted_axes(values, weights, 50, [0, 2], false)!.to_array() == [
 		5.0,
 		7.0,
@@ -138,6 +145,16 @@ fn test_weighted_quantiles_reduce_multiple_axes_with_compact_weights() ! {
 		6.0,
 		8.0,
 	]
+	percentiles_kept := percentiles_weighted_axes_keepdims(values, weights, [0, 50, 100], [
+		0,
+		2,
+	], true)!
+	assert percentiles_kept.shape == [3, 1, 2, 1]
+	assert percentiles_kept.to_array() == percentiles_weighted_axes(values, weights, [
+		0,
+		50,
+		100,
+	], [0, 2])!.to_array()
 	kept := quantile_weighted_axes(values, vtl.ones[f64]([2, 2, 2]), 0.5, [0, 2], true)!
 	assert kept.shape == [1, 2, 1]
 	assert kept.to_array() == [2.0, 4.0]
@@ -196,6 +213,22 @@ fn test_nanweighted_quantiles_reduce_multiple_axes() ! {
 		6.0,
 		8.0,
 	]
+	quantiles_kept := nanquantiles_weighted_axes_keepdims(values, weights, [0.0, 0.5, 1.0],
+		[0, 2], true)!
+	assert quantiles_kept.shape == [3, 1, 2, 1]
+	assert quantiles_kept.to_array() == nanquantiles_weighted_axes(values, weights, [
+		0.0,
+		0.5,
+		1.0,
+	], [0, 2])!.to_array()
+	percentiles_kept := nanpercentiles_weighted_axes_keepdims(values, weights, [0, 50, 100],
+		[0, 2], true)!
+	assert percentiles_kept.shape == [3, 1, 2, 1]
+	assert percentiles_kept.to_array() == nanpercentiles_weighted_axes(values, weights, [
+		0,
+		50,
+		100,
+	], [0, 2])!.to_array()
 	all_nan := vtl.full[f64]([2, 2], math.nan())
 	assert math.is_nan(nanquantile_weighted_axes(all_nan, vtl.ones[f64]([2, 2]), 0.5, [
 		0,
