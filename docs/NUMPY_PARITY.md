@@ -241,6 +241,9 @@ bin-selection rules; peak-to-peak range via `stats.ptp` globally and across one
 or several axes with optional `keepdims` for integer and floating-point input;
 integer/weighted `bincount`.
 
+Global and tensor-axis `min`/`max` propagate NaNs; their `nanmin`/`nanmax`
+variants skip NaNs and return NaN when a reduction has no valid values.
+
 `histogramdd` matches sample and bin ordering and density normalization for the
 covered `(N, D)` tensor API. Unweighted VTL counts use `int` storage, while
 NumPy returns `float64`; this output-dtype difference remains explicit.

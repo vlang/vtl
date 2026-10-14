@@ -446,6 +446,26 @@ fn test_sum_accurate_preserves_non_finite_sum_semantics() {
 	assert math.is_inf(sum_accurate(overflowing), 1)
 }
 
+fn test_global_min_max_and_indices_propagate_nan() {
+	values := vtl.from_1d([1.0, math.nan(), 2.0])!
+	assert math.is_nan(min(values))
+	assert math.is_nan(max(values))
+	min_value, max_value := minmax(values)
+	assert math.is_nan(min_value)
+	assert math.is_nan(max_value)
+	assert min_index(values) == 1
+	assert max_index(values) == 1
+	min_at, max_at := minmax_index(values)
+	assert min_at == 1
+	assert max_at == 1
+
+	f32_values := vtl.from_1d([f32(1), 2, f32(math.nan())])!
+	f32_min := min(f32_values)
+	f32_max := max(f32_values)
+	assert f32_min != f32_min
+	assert f32_max != f32_max
+}
+
 fn test_contiguous_sum_handles_unrolled_tail() {
 	values := vtl.from_1d([f64(1), 2, 3, 4, 5, 6, 7])!
 	assert sum(values) == 28.0

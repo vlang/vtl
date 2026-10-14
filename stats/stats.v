@@ -619,6 +619,9 @@ fn minmax_with_indices[T](t &vtl.Tensor[T]) (T, T, int, int) {
 	mut max_at := 0
 	for i in 1 .. t.size {
 		value := t.get_nth[T](i)
+		if stats_value_is_nan[T](value) {
+			return value, value, i, i
+		}
 		if value < min_value {
 			min_value = value
 			min_at = i
@@ -636,6 +639,9 @@ fn min_with_index[T](t &vtl.Tensor[T]) (T, int) {
 	mut min_at := 0
 	for i in 1 .. t.size {
 		value := t.get_nth[T](i)
+		if stats_value_is_nan[T](value) {
+			return value, i
+		}
 		if value < min_value {
 			min_value = value
 			min_at = i
@@ -649,12 +655,23 @@ fn max_with_index[T](t &vtl.Tensor[T]) (T, int) {
 	mut max_at := 0
 	for i in 1 .. t.size {
 		value := t.get_nth[T](i)
+		if stats_value_is_nan[T](value) {
+			return value, i
+		}
 		if value > max_value {
 			max_value = value
 			max_at = i
 		}
 	}
 	return max_value, max_at
+}
+
+fn stats_value_is_nan[T](value T) bool {
+	$if T is $float {
+		return math.is_nan(f64(value))
+	} $else {
+		return false
+	}
 }
 
 // Minimum of the given input array
