@@ -195,6 +195,12 @@ propagates gradients through finite inputs and returns zero gradients for
 replaced NaN/infinite inputs, matching PyTorch.
 See [NumPy's nan_to_num reference](https://numpy.org/doc/stable/reference/generated/numpy.nan_to_num.html)
 for the component-wise complex behavior.
+`Tensor.modf` returns fractional then integral parts, matching NumPy's output
+order, and `Tensor.frexp` returns floating-point mantissas with integer base-2
+exponents. The `ldexp` function reconstructs values and broadcasts mantissas
+against integer exponent tensors. These decomposition ufuncs support f32/f64;
+see the [math ufunc tutorial](./TUTORIAL_MATH_UFUNCS.md) and
+[`math_decomposition` example](../examples/math_decomposition/README.md).
 Elementwise `max`/`min` match NumPy's NaN-propagating `maximum`/`minimum`, and
 `fmax`/`fmin` ignore a single NaN operand. These operations broadcast and
 support boolean, integer, floating-point, and complex tensors; floating-point
