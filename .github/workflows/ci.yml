@@ -307,36 +307,32 @@ jobs:
           repository: vlang/vsl
           path: vsl
 
-      - name: Install official V release binary (Windows)
+      - name: Checkout V compiler source
+        uses: actions/checkout@v4
+        with:
+          repository: vlang/v
+          ref: master
+          path: v
+
+      - name: Build current V compiler (Windows)
         shell: pwsh
         run: |
-          # setup-v's source bootstrap currently fails on Windows.
-          # Use the official release binary and verify its pinned digest.
-          $version = '0.5.2'
-          $expectedSha256 = (
-            '5f1d619b6b04a2b54b4ad21826a25bdc' +
-            'ba2acf75a941c8f72fc95672b6b064ca'
-          )
-          $archive = Join-Path $env:RUNNER_TEMP 'v_windows.zip'
-          $installRoot = Join-Path $env:RUNNER_TEMP 'vlang'
-          $releaseUri = "https://github.com/vlang/v/releases/download/$version"
-          $uri = "$releaseUri/v_windows.zip"
-          Invoke-WebRequest -Uri $uri -OutFile $archive
-          $archiveHash = Get-FileHash -Path $archive -Algorithm SHA256
-          $actualSha256 = $archiveHash.Hash.ToLowerInvariant()
-          if ($actualSha256 -ne $expectedSha256) {
-            throw "V archive SHA-256 mismatch: $actualSha256"
+          # Use V's Windows bootstrap so it supports current VTL syntax.
+          Push-Location v
+          try {
+            $bootstrap = 'makev.bat -msvc && v.exe -o v2.exe cmd/v && ' +
+              'v2.exe -showcc -o v.exe cmd/v'
+            cmd /c $bootstrap
+            if ($LASTEXITCODE -ne 0) {
+              throw "V bootstrap failed with exit code $LASTEXITCODE"
+            }
+            $vDirectory = (Get-Location).Path
+            Add-Content -Path $env:GITHUB_PATH -Value $vDirectory
+            & (Join-Path $vDirectory 'v.exe') version
           }
-          Expand-Archive -LiteralPath $archive `
-            -DestinationPath $installRoot -Force
-          $vDirectory = Join-Path $installRoot 'v'
-          if (-not (Test-Path (Join-Path $vDirectory 'v.exe'))) {
-            throw 'The official V release archive does not contain v.exe'
+          finally {
+            Pop-Location
           }
-          $vDirectory | Out-File -FilePath $env:GITHUB_PATH `
-            -Append -Encoding utf8
-          $vExecutable = Join-Path $vDirectory 'v.exe'
-          & $vExecutable version
 
       - name: Move VTL source code to V Modules
         shell: bash
