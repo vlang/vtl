@@ -405,13 +405,17 @@ with mask union, scalar arithmetic, filling masked entries, compression,
 valid-value counting, mixed indexing, and axis-wise gather/update that keeps
 values and masks aligned. Sum, product, min, max, mean, variance, standard
 deviation, median, linearly interpolated quantiles and percentiles, and
-masked-aware argmin/argmax work globally or along one axis. Arg reductions
+masked-aware argmin/argmax work globally, along one axis, or along multiple
+axes. Axis and multi-axis reductions support `keepdims`; negative axes are
+normalized and repeated or out-of-range axes are rejected. Arg reductions
 return the first valid matching index and mark all-masked slices in the output
 mask. Axis reductions mark empty slices in the output mask;
 global reductions expose an `is_masked` flag when every value is missing. See
 [the masked data tutorial](./TUTORIAL_MASKED_DATA.md).
 
-**Remaining:** additional reductions and statistics, and interoperability with
+**Remaining:** additional masked statistics, NumPy quantile interpolation
+methods beyond the current linear method, cumulative sum/product operations
+([#761](https://github.com/vlang/vtl/issues/761)), and interoperability with
 autograd and neural-network operations. NaN-aware reductions are separate and
 do not automatically treat NaN as masked data.
 
