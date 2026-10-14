@@ -81,6 +81,23 @@ assert stats.sum(values) == 0.0
 assert stats.sum_accurate(values) == 1.0
 ```
 
+`mean_as` and its axis variants use the selected type for both accumulation
+and output. A wider type preserves small contributions that would be rounded
+away by a lower-precision input accumulator:
+
+```v
+import vtl
+import vtl.stats
+
+measurements := vtl.from_1d([f32(16_777_216), 1, -16_777_216])!
+assert stats.mean_as[f32, f64](measurements) == 1.0 / 3.0
+row_means := stats.mean_along_axis_as[f32, f64](measurements, 0, true)!
+assert row_means.shape == [1]
+```
+
+Floating-point means of empty inputs return NaN. For non-empty inputs, choose
+the accumulator type according to the precision required by the calculation.
+
 ## Statistical reductions along an axis
 
 `mean_along_axis`, `variance_along_axis`, and `std_along_axis` accept an
