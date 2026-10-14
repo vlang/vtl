@@ -43,7 +43,7 @@ jobs:
           repository: vlang/vsl
           path: vsl
 
-      - uses: vlang/setup-v@v1.6
+      - uses: vlang/setup-v@663cc08827d1fc0532ee755b4dedbb183c11d06a # v1.7
         with:
           check-latest: true
 
