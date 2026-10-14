@@ -179,10 +179,17 @@ promoted input dtype is `float32`; other supported combinations return
 `remainder_promoted` performs NumPy-style remainder with mixed integer and
 floating-point dtypes and broadcasting. Nonzero results follow the divisor's
 sign; signed zero follows the divisor; integer zero divisors produce zero and
-floating-point zero divisors produce NaN. Floating-point remainder is a tensor
-operation and does not yet propagate gradients through `Variable`. See the
-[implementation](../math_promoted.v), [focused tests](../tests/core/math_promoted_remainder_test.v),
-and [dtype conversion tutorial](./TUTORIAL_FIRST_STEPS.md#numeric-dtype-conversion).
+floating-point zero divisors produce NaN. Floating-point autograd is available
+through `Variable.remainder` for f32/f64: the divisor gradient uses
+`-floor(a / b) * grad`, including at exact multiples, and broadcast gradients
+are reduced to each input shape. Non-finite values follow the forward
+operation's IEEE results and the same derivative formula. The rule follows
+[PyTorch's remainder derivative](https://github.com/pytorch/pytorch/blob/main/tools/autograd/derivatives.yaml#L1311-L1317).
+See
+[issue #798](https://github.com/vlang/vtl/issues/798), the
+[implementation](../math_promoted.v), [forward tests](../tests/core/math_promoted_remainder_test.v),
+[gradient tests](../autograd_tests/gates_remainder_test.v), and
+[dtype conversion tutorial](./TUTORIAL_FIRST_STEPS.md#numeric-dtype-conversion).
 `round_decimals` rounds real floating-point tensors to positive or negative
 decimal places using ties-to-even, matching NumPy `round` for the supported
 same-dtype inputs; integer tensors are copied unchanged. VTL preserves finite

@@ -1,6 +1,7 @@
 module autograd
 
 import vtl
+import vtl.stats as vtl_stats
 
 enum BinaryGateBackwardOperation {
 	multiply
@@ -261,4 +262,83 @@ pub fn (g &DivideGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 			return error('DivideGate: a must be a Variable')
 		}
 	}
+}
+
+// RemainderGate defines the backward rule for floating-point remainder.
+pub struct RemainderGate[T] {
+pub:
+	a &Variable[T] = unsafe { nil }
+	b &Variable[T] = unsafe { nil }
+}
+
+// remainder_gate creates a backward rule for floating-point remainder.
+pub fn remainder_gate[T](a &Variable[T], b &Variable[T]) &RemainderGate[T] {
+	return &RemainderGate[T]{
+		a: a
+		b: b
+	}
+}
+
+// backward returns da = grad and db = -grad * floor(a / b), reducing
+// broadcast dimensions back to each original operand shape.
+pub fn (g &RemainderGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
+	gradient := payload.variable.grad
+	quotient := g.a.value.divide[T](g.b.value)!.floor[T]()
+	negative_quotient := quotient.multiply_scalar[T](vtl.cast[T](-1))!
+	divisor_gradient := gradient.multiply[T](negative_quotient)!
+	left_gradient := remainder_reduce_gradient[T](gradient, g.a.value.shape)!
+	right_gradient := remainder_reduce_gradient[T](divisor_gradient, g.b.value.shape)!
+	return [left_gradient, right_gradient]
+}
+
+fn remainder_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := unsafe { (&RemainderGate[T](gate)).backward(typed_payload)! }
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
+// cache registers the operands needed by the remainder backward rule.
+pub fn (g &RemainderGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
+	a := args[0]
+	b := args[1]
+	match a {
+		Variable[T] {
+			match b {
+				Variable[T] {
+					register[T]('Remainder', voidptr(g), remainder_gate_backward_dispatch[T], result, [
+						a,
+						b,
+					])!
+				}
+				else {
+					return error('RemainderGate: b must be a Variable')
+				}
+			}
+		}
+		else {
+			return error('RemainderGate: a must be a Variable')
+		}
+	}
+}
+
+fn remainder_reduce_gradient[T](gradient &vtl.Tensor[T], input_shape []int) !&vtl.Tensor[T] {
+	if gradient.shape == input_shape {
+		return gradient
+	}
+	if input_shape.len > gradient.rank() {
+		return error('remainder gradient shape cannot be reduced to the input shape')
+	}
+	leading_axes := gradient.rank() - input_shape.len
+	mut axes := []int{cap: gradient.rank()}
+	for axis in 0 .. leading_axes {
+		axes << axis
+	}
+	for axis, dimension in input_shape {
+		output_axis := leading_axes + axis
+		if dimension == 1 && gradient.shape[output_axis] != 1 {
+			axes << output_axis
+		}
+	}
+	reduced := vtl_stats.sum_along_axes[T](gradient, axes, true)!
+	return reduced.reshape[T](input_shape)!
 }

@@ -397,8 +397,8 @@ fn normalize_take_index(index int, size int, mode TakeMode) !int {
 			normalized
 		}
 		.wrap {
-			remainder := index % size
-			if remainder < 0 { remainder + size } else { remainder }
+			wrapped_index := index % size
+			if wrapped_index < 0 { wrapped_index + size } else { wrapped_index }
 		}
 		.clip {
 			if index < 0 {
