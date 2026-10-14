@@ -255,15 +255,14 @@ fn quantile_order_indices(q f64, n int, method QuantileMethod) (int, int, f64) {
 		.lower, .higher, .midpoint, .nearest {
 			base := q * f64(n - 1)
 			lower := math.floor(base)
-			fraction := base - lower
-			position = lower + match method {
-				.lower { 0.0 }
-				.higher { 1.0 }
-				.midpoint { 0.5 }
+			upper := math.ceil(base)
+			position = match method {
+				.lower { lower }
+				.higher { upper }
+				.midpoint { (lower + upper) / 2.0 }
 				.nearest {
-					if fraction > 0.5 { 1.0 } else { 0.0 }
+					if base - lower > 0.5 { upper } else { lower }
 				}
-				else { 0.0 }
 			}
 		}
 	}

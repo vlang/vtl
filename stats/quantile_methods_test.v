@@ -13,6 +13,8 @@ fn test_quantile_methods_match_numpy_estimator_examples() ! {
 	for i, method in methods {
 		actual := quantile_with_method(values, 0.25, method)!
 		assert math.abs(actual - expected[i]) < 1e-12, '${method}: got ${actual}, expected ${expected[i]}'
+		assert quantile_with_method(values, 0.0, method)! == 1.0, '${method}: q=0'
+		assert quantile_with_method(values, 1.0, method)! == 4.0, '${method}: q=1'
 	}
 	assert quantile_with_method(values, 0.5, .closest_observation)! == 2.0
 	assert quantile_with_method(values, 0.5, .nearest)! == 2.0
