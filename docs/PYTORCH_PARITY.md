@@ -59,7 +59,9 @@ coverage and test transfers, mixed precision, and device-specific behavior.
 ### Autograd
 
 **VTL today:** Reverse-mode differentiation for supported tensor operations,
-including cumulative sum and product, and selected neural-network layers.
+including cumulative sum and product, selected neural-network layers, and
+differentiable multi-axis sum and mean reductions (`Variable.sum_along_axes`
+and `Variable.mean_along_axes`; follow-up detail in [#753](https://github.com/vlang/vtl/issues/753)).
 
 **Next:** Expand operation coverage and add gradient APIs and graph controls
 comparable to `torch.autograd`, including higher-order gradients and retained

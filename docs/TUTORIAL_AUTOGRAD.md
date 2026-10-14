@@ -71,6 +71,22 @@ global and axis reductions. `sum_along_axis(axis, keepdims)` and
 axis. When `keepdims` is false, the backward pass restores the removed axis
 before broadcasting.
 
+`sum_along_axes(axes, keepdims)` and `mean_along_axes(axes, keepdims)` reduce
+multiple axes in one operation and propagate gradients to the input. Negative
+axes are accepted; an empty list leaves the tensor unchanged.
+
+```v
+import vtl
+import vtl.autograd
+
+mut ctx := autograd.ctx[f64]()
+x := ctx.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0], [2, 2, 2])!)
+mut means := x.mean_along_axes([0, 2], true)!
+assert means.value.shape == [1, 2, 1]
+means.backprop()!
+assert x.grad.to_array() == [0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
+```
+
 `cumsum(axis)` is differentiable as well. Its backward pass accumulates each
 output gradient toward the beginning of its axis slice:
 

@@ -107,6 +107,91 @@ pub fn (g &MeanGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
 	}
 }
 
+// MultiAxisReductionGate implements sum and mean reductions over several
+// axes. Backward restores the reduced dimensions and broadcasts to the input.
+struct MultiAxisReductionGate[T] {
+pub:
+	shape     []int
+	axes      []int
+	keepdims  bool
+	num_elems int
+	mean      bool
+}
+
+// multi_axis_reduction_gate creates a gate for a multi-axis reduction.
+fn multi_axis_reduction_gate[T](shape []int, axes []int, keepdims bool, num_elems int, mean bool) &MultiAxisReductionGate[T] {
+	return &MultiAxisReductionGate[T]{
+		shape:     shape.clone()
+		axes:      axes.clone()
+		keepdims:  keepdims
+		num_elems: num_elems
+		mean:      mean
+	}
+}
+
+// backward restores reduced axes before broadcasting the gradient.
+fn (g &MultiAxisReductionGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
+	gradient := payload.variable.grad
+	broadcasted := multi_axis_reduction_gradient_broadcast[T](gradient, g.shape, g.axes, g.keepdims)!
+	if !g.mean {
+		return [broadcasted]
+	}
+	if g.num_elems <= 0 {
+		return [vtl.zeros[T](g.shape, vtl.TensorData{})]
+	}
+	return [broadcasted.divide_scalar[T](vtl.cast[T](g.num_elems))!]
+}
+
+fn multi_axis_reduction_gradient_broadcast[T](gradient &vtl.Tensor[T], shape []int, axes []int, keepdims bool) !&vtl.Tensor[T] {
+	if axes.len == 0 || keepdims {
+		return gradient.broadcast_to[T](shape)
+	}
+	mut reduced := []bool{len: shape.len}
+	for axis in axes {
+		reduced[axis] = true
+	}
+	mut expanded_shape := []int{cap: shape.len}
+	mut gradient_axis := 0
+	for axis in 0 .. shape.len {
+		if reduced[axis] {
+			expanded_shape << 1
+		} else {
+			if gradient_axis >= gradient.shape.len {
+				return error('multi-axis reduction gradient rank does not match input shape')
+			}
+			expanded_shape << gradient.shape[gradient_axis]
+			gradient_axis++
+		}
+	}
+	if gradient_axis != gradient.shape.len {
+		return error('multi-axis reduction gradient rank does not match input shape')
+	}
+	mut expanded_gradient := gradient
+	if gradient.shape != expanded_shape {
+		expanded_gradient = gradient.reshape[T](expanded_shape)!
+	}
+	return expanded_gradient.broadcast_to[T](shape)
+}
+
+fn multi_axis_reduction_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := unsafe { (&MultiAxisReductionGate[T](gate)).backward(typed_payload)! }
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
+// cache registers this reduction's backward rule on its input variable.
+fn (g &MultiAxisReductionGate[T]) cache(mut result Variable[T], args ...CacheParam) ! {
+	a := args[0]
+	match a {
+		Variable[T] {
+			register[T]('MultiAxisReduction', voidptr(g), multi_axis_reduction_gate_backward_dispatch[T], result, [a])!
+		}
+		else {
+			return error('MultiAxisReductionGate: a must be a Variable')
+		}
+	}
+}
+
 // CumsumGate reverses the cumulative-sum operation by accumulating output
 // gradients from the end of each axis slice toward its beginning.
 pub struct CumsumGate[T] {

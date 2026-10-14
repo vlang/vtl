@@ -69,7 +69,8 @@ experimental; see [device memory notes](../docs/DEVICE_MEMORY.md).
 `Variable` methods record gates for elementwise add, subtract, multiply,
 divide, and power; exponential, logarithm, sine, cosine, tangent, absolute
 value, square root, hyperbolic tangent, and clamp; matrix multiplication; sum
-and mean reductions; reshape, permutation transpose, and concatenation. See
+and mean reductions over the whole tensor, one axis, or multiple axes; reshape,
+permutation transpose, and concatenation. See
 [`variable_ops.v`](variable_ops.v) for method signatures and the
 [`gates` reference](../nn/gates/README.md) for the backward-rule adapters.
 
