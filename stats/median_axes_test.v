@@ -46,3 +46,20 @@ fn test_nanmedian_axis_and_axes_keepdims() ! {
 	])!
 	assert math.is_nan(nanmedian_axes(all_nan, [0, 1], true)!.to_array()[0])
 }
+
+fn test_median_axis_and_multi_axis_propagate_nan() ! {
+	values := vtl.from_array[f64]([1, math.nan(), 3, 4, 5, 6], [2, 3])!
+
+	rows := median_axis_squeeze(values, 1)!
+	assert math.is_nan(rows.get_nth(0))
+	assert rows.get_nth(1) == 5.0
+
+	columns := median_axis_squeeze(values, 0)!
+	assert columns.get_nth(0) == 2.5
+	assert math.is_nan(columns.get_nth(1))
+	assert columns.get_nth(2) == 4.5
+
+	all_axes := median_axes(values, [0, 1], false)!
+	assert all_axes.shape == [1]
+	assert math.is_nan(all_axes.get_nth(0))
+}

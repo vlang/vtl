@@ -289,7 +289,7 @@ elements; an empty output caused only by an unreduced dimension remains empty.
 | `mean` / `variance` / `std` | G/A/M; KD on tensor A/M forms | mean T; var/std f64; `_as` selects U | Propagate | See moments details below |
 | `nanmean` / `nanvar` / `nanstd` | G/A/M; KD on tensor A/M forms | f64; `_as` selects U | Skip | NaN if empty, invalid, or under-sampled |
 | `argmin` / `argmax` | G flattened index; A retained or squeezed | int | First NaN; `nanarg*` skips | Empty/no-valid reductions error |
-| `median` / quantiles | G/A/M; KD forms; multi-q prepends q axis | f64 | See quantile details below | Median NaN; quantile errors |
+| `median` / quantiles | G/A/M; KD forms; multi-q prepends q axis | f64 | Ordinary forms propagate; `nan*` skips | Median NaN; quantile errors |
 | Weighted average / quantiles | G/A/M; KD; multi-q adds q axis | f64 | Average propagates; `nan` skips | Empty/zero-weight errors |
 | `all` / `any` | G/A/M; KD; A=() is elementwise | bool | NaN is truthy | Identities true / false |
 | `cumsum` / `cumprod` | A preserves shape; flat returns 1-D; no KD | T; `_as` selects U | Propagates forward | Empty tensor |
@@ -306,8 +306,8 @@ slices and when valid observations do not exceed `ddof`.
 
 Axis `argmin`/`argmax` keep the reduced dimension in their default forms;
 `*_squeeze` removes it. Ordinary quantile forms propagate NaNs in covered tests;
-`nan*` forms skip them. Cross-API NaN fixtures for ordinary median remain part
-of the parity audit. Empty median returns NaN, while empty quantile/percentile
+ordinary median propagates NaNs globally and for axis/multi-axis slices;
+`nan*` forms skip them. Empty median returns NaN, while empty quantile/percentile
 calls error. Weighted average errors on empty inputs or zero total weight;
 weighted quantiles use the inverted-CDF method and error if valid observations
 have zero total weight.
@@ -320,7 +320,8 @@ no valid values. Regression coverage lives in
 [`multi_axis_reductions_test.v`](../tests/core/multi_axis_reductions_test.v),
 [`logical_reduction_test.v`](../tests/core/logical_reduction_test.v),
 [`reduction_test.v`](../tests/core/reduction_test.v), and the
-[`stats` tests](../stats/).
+[`stats` tests](../stats/), including
+[`median_axes_test.v`](../stats/median_axes_test.v).
 
 ### Linear algebra
 
