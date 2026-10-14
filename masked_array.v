@@ -140,6 +140,108 @@ pub fn (array &MaskedArray[T]) count[T]() int {
 	return valid
 }
 
+// cumsum returns the flattened cumulative sum of valid values. Masked entries
+// stay masked in the result and do not change the running total.
+pub fn (array &MaskedArray[T]) cumsum[T]() !MaskedArray[T] {
+	flat_shape := [array.values.size]
+	values := array.values.reshape[T](flat_shape)!
+	mask := array.mask.reshape[bool](flat_shape)!
+	return masked_cumulative_axis[T](&MaskedArray[T]{
+		values: values
+		mask:   mask
+	}, 0, false)
+}
+
+// cumsum_along_axis returns prefix sums along one axis. Masked entries remain
+// masked and are skipped by the running total.
+pub fn (array &MaskedArray[T]) cumsum_along_axis[T](axis int) !MaskedArray[T] {
+	return masked_cumulative_axis[T](array, axis, false)
+}
+
+// cumsum_as returns the flattened cumulative sum using an explicit output
+// accumulator type. Masked positions remain masked and are skipped.
+pub fn (array &MaskedArray[T]) cumsum_as[U]() !MaskedArray[U] {
+	flat_shape := [array.values.size]
+	values := array.values.reshape[T](flat_shape)!
+	mask := array.mask.reshape[bool](flat_shape)!
+	flat := MaskedArray[T]{
+		values: values
+		mask:   mask
+	}
+	return masked_cumulative_axis_as[T, U](&flat, 0, false)
+}
+
+// cumsum_along_axis_as returns cumulative sums along one axis using an
+// explicit output accumulator type.
+pub fn (array &MaskedArray[T]) cumsum_along_axis_as[U](axis int) !MaskedArray[U] {
+	return masked_cumulative_axis_as[T, U](array, axis, false)
+}
+
+// cumprod returns the flattened cumulative product of valid values. Masked
+// entries stay masked in the result and do not change the running product.
+pub fn (array &MaskedArray[T]) cumprod[T]() !MaskedArray[T] {
+	flat_shape := [array.values.size]
+	values := array.values.reshape[T](flat_shape)!
+	mask := array.mask.reshape[bool](flat_shape)!
+	return masked_cumulative_axis[T](&MaskedArray[T]{
+		values: values
+		mask:   mask
+	}, 0, true)
+}
+
+// cumprod_along_axis returns prefix products along one axis. Masked entries
+// remain masked and are skipped by the running product.
+pub fn (array &MaskedArray[T]) cumprod_along_axis[T](axis int) !MaskedArray[T] {
+	return masked_cumulative_axis[T](array, axis, true)
+}
+
+// cumprod_as returns the flattened cumulative product using an explicit
+// output accumulator type. Masked positions remain masked and are skipped.
+pub fn (array &MaskedArray[T]) cumprod_as[U]() !MaskedArray[U] {
+	flat_shape := [array.values.size]
+	values := array.values.reshape[T](flat_shape)!
+	mask := array.mask.reshape[bool](flat_shape)!
+	flat := MaskedArray[T]{
+		values: values
+		mask:   mask
+	}
+	return masked_cumulative_axis_as[T, U](&flat, 0, true)
+}
+
+// cumprod_along_axis_as returns cumulative products along one axis using an
+// explicit output accumulator type.
+pub fn (array &MaskedArray[T]) cumprod_along_axis_as[U](axis int) !MaskedArray[U] {
+	return masked_cumulative_axis_as[T, U](array, axis, true)
+}
+
+fn masked_cumulative_axis[T](array &MaskedArray[T], axis int, product bool) !MaskedArray[T] {
+	return masked_cumulative_axis_as[T, T](array, axis, product)
+}
+
+fn masked_cumulative_axis_as[T, U](array &MaskedArray[T], axis int, product bool) !MaskedArray[U] {
+	identity := masked_cumulative_identity[T](product)
+	filled_values := array.filled[T](identity)
+	result_values := if product {
+		filled_values.cumprod_as[U](axis)!
+	} else {
+		filled_values.cumsum_as[U](axis)!
+	}
+	return MaskedArray[U]{
+		values: result_values
+		mask:   array.mask.copy(.row_major)
+	}
+}
+
+fn masked_cumulative_identity[T](product bool) T {
+	$if T is bool {
+		return product
+	} $else $if T is string {
+		return ''
+	} $else {
+		return cast[T](if product { 1 } else { 0 })
+	}
+}
+
 // add adds two masked arrays with broadcasting and combines their masks.
 pub fn (array &MaskedArray[T]) add[T](other &MaskedArray[T]) !MaskedArray[T] {
 	return masked_binary[T](array, other, .add)

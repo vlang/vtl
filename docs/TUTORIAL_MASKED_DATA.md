@@ -57,6 +57,8 @@ lower_quartile := data.percentile(25)!
 row_medians := data.median_along_axis(1, true)!
 quantiles := data.quantile_along_axes([0, 1], 0.25, false)!
 row_percentiles := data.percentile_along_axis(1, 25, false)!
+flat_prefix_sum := data.cumsum()!
+row_prefix_product := data.cumprod_along_axis(1)!
 ```
 
 Global `sum` and `mean` return `MaskedValue`, whose `is_masked` field is true
@@ -84,13 +86,18 @@ result.
 The `*_along_axes` variants reduce a list of axes in one operation; negative
 axes are supported and duplicates are rejected. An empty axes list preserves
 values and masks elementwise (the mean variant converts values to `f64`).
+`cumsum` scans the flattened logical order, while `cumsum_along_axis` scans
+each slice on one axis. `cumprod` and `cumprod_along_axis` provide the
+corresponding products. At masked positions the output remains masked and the
+running accumulator skips that input, so later valid positions continue from
+the previous valid total or product. Use `cumsum_as[U]()` and
+`cumprod_as[U]()` or their axis variants to choose a wider accumulator type.
 
-This API currently covers filling, compression, counting, and sum/product/
-minimum/maximum/argmin/argmax/mean/variance/standard deviation/quantile/
-percentile/median. It does not
-yet implement masked elementwise operations or the full NumPy masked-array
-statistics surface. NaN values are not implicitly treated as missing; use an
-explicit boolean mask when that is desired.
+This API covers filling, compression, counting, broadcast elementwise
+arithmetic and comparisons, reductions, and cumulative sum/product. Additional
+NumPy masked statistics and interoperability with autograd and neural-network
+operations remain open. NaN values are not implicitly treated as missing; use
+an explicit boolean mask when that is desired.
 
 See the [NumPy parity tracker](./NUMPY_PARITY.md) for remaining work.
 
