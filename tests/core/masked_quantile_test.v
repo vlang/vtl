@@ -24,6 +24,28 @@ fn test_masked_quantile_and_median_ignore_masked_payloads() ! {
 	assert math.is_nan(result.value)
 }
 
+fn test_masked_quantile_methods_match_numpy_estimators() ! {
+	values := vtl.from_1d([1.0, 99, 3, 5])!
+	mask := vtl.from_1d[bool]([false, true, false, false])!
+	data := vtl.masked_array(values, mask)!
+	methods := [vtl.QuantileMethod.inverted_cdf, .averaged_inverted_cdf, .closest_observation,
+		.interpolated_inverted_cdf, .hazen, .weibull, .linear, .median_unbiased, .normal_unbiased,
+		.lower, .higher, .midpoint, .nearest]
+	expected := [1.0, 1.0, 1.0, 1.0, 1.5, 1.0, 2.0, 1.3333333333333335, 1.375, 1.0, 3.0, 2.0, 1.0]
+	for i, method in methods {
+		result := data.quantile_with_method(0.25, method)!
+		assert !result.is_masked
+		assert math.abs(result.value - expected[i]) < 1e-12
+		assert data.quantile_with_method(0, method)!.value == 1.0
+		assert data.quantile_with_method(1, method)!.value == 5.0
+	}
+	assert data.percentile_with_method(25, .higher)!.value == 3.0
+	rows := data.quantile_along_axis_with_method(0, 0.25, .higher, true)!
+	assert rows.values.shape == [1]
+	assert rows.values.to_array() == [3.0]
+	assert rows.mask.to_array() == [false]
+}
+
 fn test_masked_quantiles_reduce_axis_and_preserve_empty_slices() ! {
 	values := vtl.from_array[f64]([1, 2, 3, 4, 5, 6], [2, 3])!
 	mask := vtl.from_array[bool]([false, true, false, true, true, true], [2, 3])!

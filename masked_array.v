@@ -579,6 +579,12 @@ pub fn (array &MaskedArray[T]) std[T](ddof int) !MaskedValue[f64] {
 // quantile computes NumPy's default linearly interpolated quantile over all
 // unmasked values. An entirely masked or empty array returns a masked NaN.
 pub fn (array &MaskedArray[T]) quantile[T](q f64) !MaskedValue[f64] {
+	return array.quantile_with_method[T](q, .linear)
+}
+
+// quantile_with_method computes a selected NumPy-compatible quantile over all
+// unmasked values. An entirely masked or empty array returns a masked NaN.
+pub fn (array &MaskedArray[T]) quantile_with_method[T](q f64, method QuantileMethod) !MaskedValue[f64] {
 	validate_masked_quantile(q)!
 	mut valid := []f64{cap: array.count()}
 	for flat_index in 0 .. array.values.size {
@@ -593,7 +599,7 @@ pub fn (array &MaskedArray[T]) quantile[T](q f64) !MaskedValue[f64] {
 		}
 	}
 	return MaskedValue[f64]{
-		value:     masked_quantile_interpolate(mut valid, q)
+		value:     masked_quantile_with_method(mut valid, q, method)
 		is_masked: false
 	}
 }
@@ -610,24 +616,46 @@ pub fn (array &MaskedArray[T]) median[T]() MaskedValue[f64] {
 
 // percentile computes a linearly interpolated percentile over unmasked values.
 pub fn (array &MaskedArray[T]) percentile[T](percentile f64) !MaskedValue[f64] {
+	return array.percentile_with_method[T](percentile, .linear)
+}
+
+// percentile_with_method computes a selected percentile over unmasked values.
+pub fn (array &MaskedArray[T]) percentile_with_method[T](percentile f64, method QuantileMethod) !MaskedValue[f64] {
 	validate_masked_percentile(percentile)!
-	return array.quantile[T](percentile / 100)
+	return array.quantile_with_method[T](percentile / 100, method)
 }
 
 // quantile_along_axis computes one quantile per slice, optionally retaining
 // the reduced axis with length one.
 pub fn (array &MaskedArray[T]) quantile_along_axis[T](axis int, q f64, keepdims bool) !MaskedArray[f64] {
-	return array.quantile_along_axes[T]([axis], q, keepdims)
+	return array.quantile_along_axis_with_method[T](axis, q, .linear, keepdims)
+}
+
+// quantile_along_axis_with_method computes one selected quantile per slice.
+pub fn (array &MaskedArray[T]) quantile_along_axis_with_method[T](axis int, q f64, method QuantileMethod, keepdims bool) !MaskedArray[f64] {
+	return array.quantile_along_axes_with_method[T]([axis], q, method, keepdims)
 }
 
 // percentile_along_axis computes one percentile per axis slice.
 pub fn (array &MaskedArray[T]) percentile_along_axis[T](axis int, percentile f64, keepdims bool) !MaskedArray[f64] {
-	return array.percentile_along_axes[T]([axis], percentile, keepdims)
+	return array.percentile_along_axis_with_method[T](axis, percentile, .linear, keepdims)
+}
+
+// percentile_along_axis_with_method computes a selected percentile per slice.
+pub fn (array &MaskedArray[T]) percentile_along_axis_with_method[T](axis int, percentile f64, method QuantileMethod, keepdims bool) !MaskedArray[f64] {
+	validate_masked_percentile(percentile)!
+	return array.quantile_along_axis_with_method[T](axis, percentile / 100, method, keepdims)
 }
 
 // quantile_along_axes computes one quantile per slice over several axes.
 // Slices with no valid values have a NaN payload and a true output mask.
 pub fn (array &MaskedArray[T]) quantile_along_axes[T](axes []int, q f64, keepdims bool) !MaskedArray[f64] {
+	return array.quantile_along_axes_with_method[T](axes, q, .linear, keepdims)
+}
+
+// quantile_along_axes_with_method reduces multiple axes with a selected
+// estimator. Slices with no valid values have a NaN payload and true mask.
+pub fn (array &MaskedArray[T]) quantile_along_axes_with_method[T](axes []int, q f64, method QuantileMethod, keepdims bool) !MaskedArray[f64] {
 	validate_masked_quantile(q)!
 	if axes.len == 0 {
 		mut values := empty[f64](array.values.shape, memory: .row_major)
@@ -686,7 +714,7 @@ pub fn (array &MaskedArray[T]) quantile_along_axes[T](axes []int, q f64, keepdim
 		for i in start .. end {
 			slice_values << flat_values[i]
 		}
-		values.set_nth(output_index, masked_quantile_interpolate(mut slice_values, q))
+		values.set_nth(output_index, masked_quantile_with_method(mut slice_values, q, method))
 		output_mask.set_nth(output_index, false)
 	}
 	return MaskedArray[f64]{
@@ -697,8 +725,14 @@ pub fn (array &MaskedArray[T]) quantile_along_axes[T](axes []int, q f64, keepdim
 
 // percentile_along_axes computes one percentile per slice over several axes.
 pub fn (array &MaskedArray[T]) percentile_along_axes[T](axes []int, percentile f64, keepdims bool) !MaskedArray[f64] {
+	return array.percentile_along_axes_with_method[T](axes, percentile, .linear, keepdims)
+}
+
+// percentile_along_axes_with_method reduces several axes with a selected
+// estimator on the 0..100 percentile scale.
+pub fn (array &MaskedArray[T]) percentile_along_axes_with_method[T](axes []int, percentile f64, method QuantileMethod, keepdims bool) !MaskedArray[f64] {
 	validate_masked_percentile(percentile)!
-	return array.quantile_along_axes[T](axes, percentile / 100, keepdims)
+	return array.quantile_along_axes_with_method[T](axes, percentile / 100, method, keepdims)
 }
 
 // median_along_axis computes the median of each unmasked axis slice.
@@ -723,15 +757,13 @@ fn validate_masked_percentile(percentile f64) ! {
 	}
 }
 
-fn masked_quantile_interpolate(mut values []f64, q f64) f64 {
+fn masked_quantile_with_method(mut values []f64, q f64, method QuantileMethod) f64 {
 	for value in values {
 		if math.is_nan(value) {
 			return math.nan()
 		}
 	}
-	position := q * f64(values.len - 1)
-	lower_index := int(math.floor(position))
-	upper_index := math.min(lower_index + 1, values.len - 1)
+	lower_index, upper_index, weight := masked_quantile_indices(q, values.len, method)
 	select_value[f64](mut values, lower_index)
 	lower := values[lower_index]
 	if lower_index == upper_index {
@@ -739,8 +771,59 @@ fn masked_quantile_interpolate(mut values []f64, q f64) f64 {
 	}
 	select_value[f64](mut values, upper_index)
 	upper := values[upper_index]
-	weight := position - f64(lower_index)
 	return lower * (1 - weight) + upper * weight
+}
+
+fn masked_quantile_indices(q f64, n int, method QuantileMethod) (int, int, f64) {
+	mut position := q * f64(n - 1)
+	match method {
+		.inverted_cdf, .averaged_inverted_cdf, .closest_observation {
+			m := match method {
+				.inverted_cdf, .averaged_inverted_cdf { 0.0 }
+				else { -0.5 }
+			}
+			index := q * f64(n) + m - 1.0
+			lower := math.floor(index)
+			fraction := index - lower
+			weight := match method {
+				.inverted_cdf {
+					if fraction > 0.0 { 1.0 } else { 0.0 }
+				}
+				.averaged_inverted_cdf {
+					if fraction > 0.0 { 1.0 } else { 0.5 }
+				}
+				.closest_observation {
+					if fraction == 0.0 && int(lower) % 2 == 1 { 0.0 } else { 1.0 }
+				}
+				else { 0.0 }
+			}
+			position = lower + weight
+		}
+		.interpolated_inverted_cdf { position = q * f64(n) - 1.0 }
+		.hazen { position = q * f64(n) - 0.5 }
+		.weibull { position = q * f64(n + 1) - 1.0 }
+		.linear { position = q * f64(n - 1) }
+		.median_unbiased { position = q * f64(n) + q / 3.0 + 1.0 / 3.0 - 1.0 }
+		.normal_unbiased { position = q * f64(n) + q / 4.0 + 3.0 / 8.0 - 1.0 }
+		.lower, .higher, .midpoint, .nearest {
+			base := q * f64(n - 1)
+			lower := math.floor(base)
+			upper := math.ceil(base)
+			position = match method {
+				.lower { lower }
+				.higher { upper }
+				.midpoint { (lower + upper) / 2.0 }
+				.nearest {
+					if base - lower > 0.5 { upper } else { lower }
+				}
+			}
+		}
+	}
+	position = math.max(0.0, math.min(position, f64(n - 1)))
+	lower_index := int(math.floor(position))
+	upper_index := math.min(lower_index + 1, n - 1)
+	weight := position - f64(lower_index)
+	return lower_index, upper_index, weight
 }
 
 // sum_along_axis reduces unmasked values along one axis. Output mask entries

@@ -79,7 +79,11 @@ arg-reduction behavior.
 population statistics and `ddof=1` computes sample statistics. Global or
 per-slice results with `count <= ddof` are masked and carry a NaN payload.
 `quantile`, `percentile`, and `median` use NumPy's default linear interpolation
-over valid values. Axis and multi-axis quantiles and percentiles return
+over valid values. Pass a `vtl.QuantileMethod` to `quantile_with_method` or
+`percentile_with_method` to select any of NumPy's thirteen estimators; the
+`*_along_axis_with_method` and `*_along_axes_with_method` variants apply the
+same choice to slices. For example, `data.quantile_with_method(0.25, .hazen)!`
+uses the Hazen estimator. Axis and multi-axis quantiles and percentiles return
 `MaskedArray[f64]`; slices with no valid values are marked in the output mask
 and carry NaN. Unmasked NaNs remain data and propagate to the corresponding
 result.
