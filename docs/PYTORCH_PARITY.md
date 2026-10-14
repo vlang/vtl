@@ -24,6 +24,8 @@ performance, or ecosystem.
 | Interoperability and deployment | [#743](https://github.com/vlang/vtl/issues/743) |
 | Sparse tensor formats and operations | [#746](https://github.com/vlang/vtl/issues/746) |
 | In-process tensor buffer interoperability | [#748](https://github.com/vlang/vtl/issues/748) |
+| PyTorch migration and training tutorials | [#770](https://github.com/vlang/vtl/issues/770) |
+| Matched VTL/PyTorch performance benchmarks | [#771](https://github.com/vlang/vtl/issues/771) |
 
 ## Capability matrix
 
