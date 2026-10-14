@@ -70,6 +70,95 @@ fn test_variable_axis_sum_and_mean_forward_backward() ! {
 	assert mean_input.grad.to_array() == [0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
 }
 
+fn test_variable_multi_axis_sum_and_mean_forward_backward() ! {
+	values := [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0]
+	mut sum_context := autograd.ctx[f64]()
+	sum_input := sum_context.variable(vtl.from_array(values, [2, 2, 2])!)
+	mut sums := sum_input.sum_along_axes([0, -1], false)!
+	assert sums.value.shape == [2]
+	assert sums.value.to_array() == [14.0, 22.0]
+	sum_weights := sum_context.variable(vtl.from_1d([10.0, 20.0])!)
+	mut weighted_sum_loss := sums.multiply(sum_weights)!.sum()!
+	weighted_sum_loss.backprop()!
+	assert sum_input.grad.to_array() == [10.0, 10.0, 20.0, 20.0, 10.0, 10.0, 20.0, 20.0]
+
+	mut kept_sum_context := autograd.ctx[f64]()
+	kept_sum_input := kept_sum_context.variable(vtl.from_array(values, [2, 2, 2])!)
+	mut kept_sums := kept_sum_input.sum_along_axes([0, -1], true)!
+	assert kept_sums.value.shape == [1, 2, 1]
+	kept_sums.backprop()!
+	assert kept_sum_input.grad.to_array() == [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+	mut mean_context := autograd.ctx[f64]()
+	mean_input := mean_context.variable(vtl.from_array(values, [2, 2, 2])!)
+	mut means := mean_input.mean_along_axes([0, -1], true)!
+	assert means.value.shape == [1, 2, 1]
+	assert means.value.to_array() == [3.5, 5.5]
+	means.backprop()!
+	assert mean_input.grad.to_array() == [0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
+
+	mut flat_mean_context := autograd.ctx[f64]()
+	flat_mean_input := flat_mean_context.variable(vtl.from_array(values, [2, 2, 2])!)
+	mut flat_means := flat_mean_input.mean_along_axes([0, -1], false)!
+	assert flat_means.value.shape == [2]
+	assert flat_means.value.to_array() == [3.5, 5.5]
+	mean_weights := flat_mean_context.variable(vtl.from_1d([10.0, 20.0])!)
+	mut weighted_mean_loss := flat_means.multiply(mean_weights)!.sum()!
+	weighted_mean_loss.backprop()!
+	assert flat_mean_input.grad.to_array() == [2.5, 2.5, 5.0, 5.0, 2.5, 2.5, 5.0, 5.0]
+}
+
+fn test_variable_multi_axis_reductions_with_empty_axes_are_identity() ! {
+	mut sum_context := autograd.ctx[f64]()
+	sum_input := sum_context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0], [2, 2])!)
+	mut sums := sum_input.sum_along_axes([], false)!
+	assert sums.value.shape == [2, 2]
+	assert sums.value.to_array() == [1.0, 2.0, 3.0, 4.0]
+	sums.backprop()!
+	assert sum_input.grad.to_array() == [1.0, 1.0, 1.0, 1.0]
+
+	mut mean_context := autograd.ctx[f64]()
+	mean_input := mean_context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0], [2, 2])!)
+	mut means := mean_input.mean_along_axes([], true)!
+	assert means.value.shape == [2, 2]
+	assert means.value.to_array() == [1.0, 2.0, 3.0, 4.0]
+	means.backprop()!
+	assert mean_input.grad.to_array() == [1.0, 1.0, 1.0, 1.0]
+}
+
+fn test_variable_multi_axis_reductions_can_reduce_all_axes() ! {
+	mut sum_context := autograd.ctx[f64]()
+	sum_input := sum_context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0], [2, 2])!)
+	mut total := sum_input.sum_along_axes([0, 1], false)!
+	assert total.value.shape.len == 0
+	assert total.value.get_nth(0) == 10.0
+	total.backprop()!
+	assert sum_input.grad.to_array() == [1.0, 1.0, 1.0, 1.0]
+
+	mut mean_context := autograd.ctx[f64]()
+	mean_input := mean_context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0], [2, 2])!)
+	mut average := mean_input.mean_along_axes([0, 1], false)!
+	assert average.value.shape.len == 0
+	assert average.value.get_nth(0) == 2.5
+	average.backprop()!
+	assert mean_input.grad.to_array() == [0.25, 0.25, 0.25, 0.25]
+}
+
+fn test_variable_multi_axis_reductions_reject_invalid_axes() {
+	context := autograd.ctx[f64]()
+	input := context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0], [2, 2])!)
+	if _ := input.sum_along_axes([0, -2], false) {
+		assert false, 'multi-axis reduction must reject duplicate normalized axes'
+	}
+	if _ := input.mean_along_axes([2], false) {
+		assert false, 'multi-axis reduction must reject out-of-range axes'
+	}
+	scalar := context.variable(vtl.from_array([1.0], []int{})!)
+	if _ := scalar.sum_along_axes([0], false) {
+		assert false, 'multi-axis reduction must reject axes on scalar variables'
+	}
+}
+
 fn test_variable_cumsum_forward_backward() ! {
 	mut context := autograd.ctx[f64]()
 	input := context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [

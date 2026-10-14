@@ -110,6 +110,60 @@ pub fn (v &Variable[T]) mean_along_axis(axis int, keepdims bool) !&Variable[T] {
 	return result
 }
 
+// sum_along_axes reduces several axes. Negative axes are accepted; an empty
+// axes list returns an elementwise copy. Set keepdims to retain reduced axes.
+pub fn (v &Variable[T]) sum_along_axes(axes []int, keepdims bool) !&Variable[T] {
+	normalized_axes := normalize_variable_reduction_axes(axes, v.value.rank(), 'sum_along_axes')!
+	value := vtl_stats.sum_along_axes[T](v.value, normalized_axes, keepdims)!
+	mut result := v.context.variable(value)
+	if v.requires_grad {
+		gate := multi_axis_reduction_gate[T](v.value.shape, normalized_axes, keepdims, 1, false)
+		gate.cache(mut result, v)!
+	}
+	return result
+}
+
+// mean_along_axes computes means over several axes and propagates gradients.
+// Negative axes are accepted; an empty axes list returns an elementwise copy.
+pub fn (v &Variable[T]) mean_along_axes(axes []int, keepdims bool) !&Variable[T] {
+	normalized_axes := normalize_variable_reduction_axes(axes, v.value.rank(), 'mean_along_axes')!
+	mean_values := vtl_stats.mean_along_axes[T](v.value, normalized_axes, keepdims)!
+	value := mean_values.map[T](fn [T](mean f64, _ []int) T {
+		return vtl.cast[T](mean)
+	})
+	mut num_elems := 1
+	for axis in normalized_axes {
+		num_elems *= v.value.shape[axis]
+	}
+	mut result := v.context.variable(value)
+	if v.requires_grad {
+		gate := multi_axis_reduction_gate[T](v.value.shape, normalized_axes, keepdims, num_elems,
+			true)
+		gate.cache(mut result, v)!
+	}
+	return result
+}
+
+fn normalize_variable_reduction_axes(axes []int, rank int, operation string) ![]int {
+	if rank == 0 && axes.len > 0 {
+		return error('Variable.${operation}: input has no dimensions')
+	}
+	mut seen := []bool{len: rank}
+	mut normalized := []int{cap: axes.len}
+	for axis in axes {
+		axis_index := if axis < 0 { axis + rank } else { axis }
+		if axis_index < 0 || axis_index >= rank {
+			return error('Variable.${operation}: axis ${axis} out of bounds for shape')
+		}
+		if seen[axis_index] {
+			return error('Variable.${operation}: axis ${axis} appears more than once')
+		}
+		seen[axis_index] = true
+		normalized << axis_index
+	}
+	return normalized
+}
+
 // add Adds two variables together.
 pub fn (v &Variable[T]) add(other &Variable[T]) !&Variable[T] {
 	mut result := v.context.variable(v.value.add(other.value)!)
