@@ -53,6 +53,8 @@ preserve dtype, and handle infinities and NaNs.
 `Tensor.signbit()` returns a boolean tensor identifying negative floating-point
 values, including negative zero and negative infinity. Signed integers are true
 when negative; unsigned integers and booleans return false for every element.
+`vtl.copysign(magnitude, sign)` combines the magnitude of its first f32/f64
+tensor with the sign bit of its second, with standard broadcasting.
 
 ```v
 import vtl
@@ -60,7 +62,9 @@ import vtl
 logits := vtl.from_1d[f64]([-1000.0, -1001.0])!
 normalizer := vtl.from_1d[f64]([-1000.0])!
 log_sum := vtl.logaddexp(logits, normalizer)!
+signed := vtl.copysign(logits.abs(), logits)!
 println(log_sum.to_array())
+println(signed.to_array())
 ```
 
 See the [stable log-domain example](../examples/math_log_domain/README.md) and

@@ -52,3 +52,29 @@ fn test_logaddexp_propagates_nan_and_rejects_incompatible_shapes() ! {
 	}
 	assert false, 'expected incompatible operand shapes to be rejected'
 }
+
+fn test_copysign_broadcasts_and_preserves_special_sign_bits() ! {
+	magnitude := vtl.from_2d([[1.0, 0.0], [math.inf(1), math.nan()]])!
+	sign := vtl.from_1d([-1.0, 1.0])!
+	result := vtl.copysign(magnitude, sign)!
+	assert result.shape == [2, 2]
+	assert result.get([0, 0]) == -1.0
+	assert result.get([0, 1]) == 0.0
+	assert !math.signbit(result.get([0, 1]))
+	assert result.get([1, 0]) == math.inf(-1)
+	assert math.is_nan(result.get([1, 1]))
+	assert !math.signbit(result.get([1, 1]))
+
+	negative_sign := vtl.from_1d([math.copysign(0.0, -1.0)])!
+	negative_zero := vtl.copysign(vtl.from_1d([0.0])!, negative_sign)!
+	assert negative_zero.get_nth(0) == 0.0
+	assert math.signbit(negative_zero.get_nth(0))
+}
+
+fn test_copysign_preserves_f32_dtype() ! {
+	magnitude := vtl.from_1d[f32]([1.5, 0.0])!
+	sign := vtl.from_1d[f32]([-1.0, -1.0])!
+	result := vtl.copysign(magnitude, sign)!
+	assert typeof(result.get_nth(0)).name == 'f32'
+	assert result.to_array() == [f32(-1.5), f32(-0.0)]
+}
