@@ -31,7 +31,7 @@ CIFAR examples for CI-safe checks.
 | [autograd_put](./autograd_put) | Propagate gradients through indexed replacement | `v run ./vtl/examples/autograd_put/main.v` |
 | [autograd_slice](./autograd_slice) | Route gradients through slice views | `v run ./vtl/examples/autograd_slice/main.v` |
 | [autograd_scalar_loss](./autograd_scalar_loss) | Scalar sum/mean loss and backward pass | `v run ./vtl/examples/autograd_scalar_loss/main.v` |
-| [cross_entropy_unbatched](./cross_entropy_unbatched) | Unbatched `[C]` logits and scalar labels with autograd | `v run ./vtl/examples/cross_entropy_unbatched/main.v` |
+| [cross_entropy_unbatched](./cross_entropy_unbatched) | Unbatched logits and scalar labels | `v run ./vtl/examples/cross_entropy_unbatched/main.v` |
 | [nll_unbatched](./nll_unbatched) | PyTorch-style `[C]` NLL input, scalar class target, weighting, and autograd | `v run ./vtl/examples/nll_unbatched/main.v` |
 | [npy_round_trip](./npy_round_trip) | Read and write NumPy `.npy` arrays | `v run ./vtl/examples/npy_round_trip/main.v` |
 | [npy_complex128](./npy_complex128) | Read and write NumPy complex128 `.npy` arrays | `v run ./vtl/examples/npy_complex128/main.v` |
@@ -54,6 +54,7 @@ CIFAR examples for CI-safe checks.
 | [meshgrid_n](./meshgrid_n) | Build N-dimensional coordinate grids with `xy` or `ij` indexing | `v run ./vtl/examples/meshgrid_n/main.v` |
 | [indices](./indices) | Build a dense tensor of N-dimensional integer coordinates | `v run ./vtl/examples/indices/main.v` |
 | [indices_sparse](./indices_sparse) | Build broadcastable coordinate tensors without a dense grid | `v run ./vtl/examples/indices_sparse/main.v` |
+| [multi_index](./multi_index) | Convert broadcast coordinates to C/F flat indices and back | `v run ./vtl/examples/multi_index/main.v` |
 | [triangular_matrices](./triangular_matrices) | Extract lower and upper triangles from batched matrices | `v run ./vtl/examples/triangular_matrices/main.v` |
 | [matrix_norm](./matrix_norm) | Compute batched Frobenius, nuclear, and spectral matrix norms | `v run ./vtl/examples/matrix_norm/main.v` |
 | [trace_axes](./trace_axes) | Sum diagonals across selected tensor axes | `v run ./vtl/examples/trace_axes/main.v` |
