@@ -10,6 +10,7 @@ performance, or ecosystem.
 
 | Capability | Issue |
 |------------|-------|
+| OpenCL compute and neural-network dispatch | [#750](https://github.com/vlang/vtl/issues/750) |
 | Tensor semantics; dtype and device model | [#731](https://github.com/vlang/vtl/issues/731), [#732](https://github.com/vlang/vtl/issues/732) |
 | Higher-order autograd | [#733](https://github.com/vlang/vtl/issues/733) |
 | Stacked recurrent APIs; custom module state | [#734](https://github.com/vlang/vtl/issues/734), [#735](https://github.com/vlang/vtl/issues/735) |
@@ -48,7 +49,9 @@ cases.
 ### Dtypes and devices
 
 **VTL today:** V supports multiple numeric types; optional CUDA and Vulkan paths
-exist for selected operations.
+exist for selected operations. OpenCL currently covers tensor transfer and a
+small `add_scalar` smoke path; broader compute and neural-network dispatch are
+tracked in [#750](https://github.com/vlang/vtl/issues/750).
 
 **Next:** Define a consistent dtype promotion and device model. Broaden backend
 coverage and test transfers, mixed precision, and device-specific behavior.
