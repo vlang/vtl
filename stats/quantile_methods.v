@@ -5,21 +5,7 @@ import vtl
 
 // QuantileMethod selects one of NumPy's thirteen supported sample-quantile
 // estimators.
-pub enum QuantileMethod {
-	inverted_cdf
-	averaged_inverted_cdf
-	closest_observation
-	interpolated_inverted_cdf
-	hazen
-	weibull
-	linear
-	median_unbiased
-	normal_unbiased
-	lower
-	higher
-	midpoint
-	nearest
-}
+pub type QuantileMethod = vtl.QuantileMethod
 
 // quantile_with_method computes a flattened quantile using the selected
 // estimator. It sorts a copy and returns f64, including for integer inputs.
