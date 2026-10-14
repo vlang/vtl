@@ -17,6 +17,7 @@ tests, documentation, and examples where users need them.
 | NumPy text I/O and memory maps | [#725](https://github.com/vlang/vtl/issues/725), [#726](https://github.com/vlang/vtl/issues/726) |
 | Masked autograd and structured data | [#727](https://github.com/vlang/vtl/issues/727), [#728](https://github.com/vlang/vtl/issues/728) |
 | Backend benchmarks and learning examples | [#729](https://github.com/vlang/vtl/issues/729), [#730](https://github.com/vlang/vtl/issues/730) |
+| OpenCL compute and neural-network dispatch | [#750](https://github.com/vlang/vtl/issues/750) |
 | Sparse tensor operations | [#746](https://github.com/vlang/vtl/issues/746) |
 | Non-numeric dtypes and array interoperability | [#747](https://github.com/vlang/vtl/issues/747), [#748](https://github.com/vlang/vtl/issues/748) |
 
@@ -424,6 +425,9 @@ table/dataframe package.
 **Current:** pure-V CPU and optional CBLAS paths, f32 GEMM, and optional GPU
 backends. Contiguous `f64` p=2 vector norms use VSL's backend-dispatching
 `dnrm2`, so CBLAS builds can call the configured implementation.
+OpenCL currently covers tensor transfer and a small `add_scalar` smoke path;
+broader compute and neural-network dispatch are tracked in
+[#750](https://github.com/vlang/vtl/issues/750).
 
 **Remaining:** publish reproducible per-backend benchmarks and optimize while
 preserving numerical behavior.
