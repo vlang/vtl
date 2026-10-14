@@ -242,6 +242,23 @@ pub fn (v &Variable[T]) divide(other &Variable[T]) !&Variable[T] {
 	return result
 }
 
+// remainder applies NumPy/PyTorch-style floating-point remainder and records
+// its piecewise derivative. At discontinuities the divisor derivative uses
+// floor(a / b), matching PyTorch's defined backward convention.
+pub fn (v &Variable[T]) remainder(other &Variable[T]) !&Variable[T] {
+	$if T is f32 || T is f64 {
+		value := vtl.remainder_promoted[T, T, T](v.value, other.value)!
+		mut result := v.context.variable(value)
+		if v.requires_grad || other.requires_grad {
+			gate := remainder_gate[T](v, other)
+			gate.cache(mut result, v, other)!
+		}
+		return result
+	} $else {
+		return error('Variable.remainder requires f32 or f64 values')
+	}
+}
+
 // pow raises a variable to a power.
 pub fn (v &Variable[T]) pow(other &Variable[T]) !&Variable[T] {
 	mut result := v.context.variable(v.value.pow(other.value)!)

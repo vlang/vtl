@@ -212,8 +212,8 @@ fn normalize_put_index(selected int, size int, mode PutMode) !int {
 			index
 		}
 		.wrap {
-			remainder := selected % size
-			if remainder < 0 { remainder + size } else { remainder }
+			wrapped_index := selected % size
+			if wrapped_index < 0 { wrapped_index + size } else { wrapped_index }
 		}
 		.clip {
 			if selected < 0 {

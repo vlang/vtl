@@ -67,8 +67,8 @@ fn normalize_take_nd_index(index int, size int, mode vtl.TakeMode) int {
 			if index < 0 { index + size } else { index }
 		}
 		.wrap {
-			remainder := index % size
-			if remainder < 0 { remainder + size } else { remainder }
+			wrapped_index := index % size
+			if wrapped_index < 0 { wrapped_index + size } else { wrapped_index }
 		}
 		.clip {
 			if index < 0 {
@@ -652,8 +652,8 @@ fn normalize_flat_put_index(selected int, size int, mode vtl.PutMode) !int {
 			index
 		}
 		.wrap {
-			remainder := selected % size
-			if remainder < 0 { remainder + size } else { remainder }
+			wrapped_index := selected % size
+			if wrapped_index < 0 { wrapped_index + size } else { wrapped_index }
 		}
 		.clip {
 			if selected < 0 {
