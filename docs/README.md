@@ -28,6 +28,7 @@ neural network module.
 | Histograms and binning | [Histograms](./TUTORIAL_HISTOGRAMS.md) |
 | Fourier transforms | [FFT and normalization modes](./TUTORIAL_FFT.md) |
 | NumPy file interchange | [`.npy` input/output](./TUTORIAL_NUMPY_IO.md) |
+| INT8 tensor quantization | [Quantization API](../quantization/README.md), [runnable example](../examples/quantization_int8/main.v) |
 | Linear algebra and norms | [Linear algebra](./TUTORIAL_LINEAR_ALGEBRA.md), [Advanced LA](./TUTORIAL_ADVANCED_LA.md) |
 | Autograd | [Autograd](./TUTORIAL_AUTOGRAD.md) |
 | Neural networks | [Neural networks](./TUTORIAL_NEURAL_NETWORKS.md), [Optimizers](./TUTORIAL_OPTIMIZERS.md) |
@@ -84,6 +85,7 @@ tensors, autograd, datasets, layers, losses, optimizers, and training loops.
 | Linear algebra | [API overview](../la/README.md) |
 | Statistics | [API overview](../stats/README.md) |
 | Storage backends | [API overview](../storage/README.md) |
+| INT8 quantization | [API overview](../quantization/README.md) |
 | ML metrics | [API overview](../ml/README.md) |
 | Neural networks | [Overview](../nn/README.md), [layers](../nn/layers/README.md), [models](../nn/models/README.md) |
 | Neural network training | [Losses](../nn/loss/README.md), [optimizers](../nn/optimizers/README.md) |
