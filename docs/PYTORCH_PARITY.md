@@ -6,6 +6,20 @@ the major capability groups in the [PyTorch API reference](https://docs.pytorch.
 It is a work list, not a claim that VTL currently matches PyTorch's breadth,
 performance, or ecosystem.
 
+## Open implementation issues
+
+| Capability | Issue |
+|------------|-------|
+| Tensor semantics; dtype and device model | [#731](https://github.com/vlang/vtl/issues/731), [#732](https://github.com/vlang/vtl/issues/732) |
+| Higher-order autograd | [#733](https://github.com/vlang/vtl/issues/733) |
+| Stacked recurrent APIs; custom module state | [#734](https://github.com/vlang/vtl/issues/734), [#735](https://github.com/vlang/vtl/issues/735) |
+| Optimizer/scheduler parity | [#736](https://github.com/vlang/vtl/issues/736) |
+| Data transforms and scalable loading | [#737](https://github.com/vlang/vtl/issues/737), [#738](https://github.com/vlang/vtl/issues/738) |
+| Checkpoint migration and safe loading | [#739](https://github.com/vlang/vtl/issues/739) |
+| Graph execution and memory profiling | [#740](https://github.com/vlang/vtl/issues/740), [#741](https://github.com/vlang/vtl/issues/741) |
+| Distributed training and mixed precision | [#742](https://github.com/vlang/vtl/issues/742) |
+| Interoperability and deployment | [#743](https://github.com/vlang/vtl/issues/743) |
+
 ## Capability matrix
 
 ### Tensor operations

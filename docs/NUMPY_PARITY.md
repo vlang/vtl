@@ -6,6 +6,18 @@ array operations that make sense in V. This is a capability roadmap, not a
 claim of current parity. Every checked item must be backed by public API,
 tests, documentation, and examples where users need them.
 
+## Open implementation issues
+
+| Area | Issue |
+|------|-------|
+| Numeric promotion and tensor creation | [#717](https://github.com/vlang/vtl/issues/717), [#718](https://github.com/vlang/vtl/issues/718) |
+| Copy/view rules and indexing bounds | [#719](https://github.com/vlang/vtl/issues/719), [#720](https://github.com/vlang/vtl/issues/720) |
+| Reductions and complex support | [#721](https://github.com/vlang/vtl/issues/721), [#722](https://github.com/vlang/vtl/issues/722) |
+| Random streams and FFT parity | [#723](https://github.com/vlang/vtl/issues/723), [#724](https://github.com/vlang/vtl/issues/724) |
+| NumPy text I/O and memory maps | [#725](https://github.com/vlang/vtl/issues/725), [#726](https://github.com/vlang/vtl/issues/726) |
+| Masked autograd and structured data | [#727](https://github.com/vlang/vtl/issues/727), [#728](https://github.com/vlang/vtl/issues/728) |
+| Backend benchmarks and learning examples | [#729](https://github.com/vlang/vtl/issues/729), [#730](https://github.com/vlang/vtl/issues/730) |
+
 For neural-network and framework-level gaps relative to PyTorch, see the
 [PyTorch parity tracker](./PYTORCH_PARITY.md).
 
