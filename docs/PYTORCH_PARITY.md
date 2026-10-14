@@ -16,6 +16,8 @@ performance, or ecosystem.
 | Tensor semantics; dtype and device model | [#731](https://github.com/vlang/vtl/issues/731), [#732](https://github.com/vlang/vtl/issues/732) |
 | Higher-order autograd | [#733](https://github.com/vlang/vtl/issues/733) |
 | Functional tensor transforms such as `vmap` | [#784](https://github.com/vlang/vtl/issues/784) |
+| Core layer-family coverage | [#802](https://github.com/vlang/vtl/issues/802) |
+| Loss function coverage | [#803](https://github.com/vlang/vtl/issues/803) |
 | Stacked recurrent APIs; custom module state | [#734](https://github.com/vlang/vtl/issues/734), [#735](https://github.com/vlang/vtl/issues/735) |
 | Optimizer/scheduler parity | [#736](https://github.com/vlang/vtl/issues/736) |
 | Device-resident CUDA optimizer state and updates | [#758](https://github.com/vlang/vtl/issues/758) |

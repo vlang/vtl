@@ -100,6 +100,8 @@ itemized status is in the [main roadmap](../ROADMAP.md#phase-5--opencl-backend).
 | [#784](https://github.com/vlang/vtl/issues/784) | feat(autograd): add functional tensor transforms |
 | [#792](https://github.com/vlang/vtl/issues/792) | feat(quantization): add INT8 tensor and inference support |
 | [#797](https://github.com/vlang/vtl/issues/797) | feat(vulkan): retain activations across sequential layers |
+| [#802](https://github.com/vlang/vtl/issues/802) | feat(nn): expand PyTorch core layer coverage |
+| [#803](https://github.com/vlang/vtl/issues/803) | feat(nn): complete PyTorch loss function coverage |
 
 Issues #3 and #40 were closed on GitHub on 2026-10-13. The #3 resolution
 uses explicit SIMD and validated contiguous kernels rather than a V-level
