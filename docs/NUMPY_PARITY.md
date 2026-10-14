@@ -490,11 +490,11 @@ overflow and structured-data limits.
 (`true` means missing). It supports broadcasted arithmetic and comparisons
 with mask union, scalar arithmetic, filling masked entries, compression,
 valid-value counting, mixed indexing, and axis-wise gather/update that keeps
-values and masks aligned. Sum, product, min, max, mean, variance, standard
-deviation, median, all thirteen NumPy quantile estimators and their percentile
-forms, and
-masked-aware argmin/argmax work globally, along one axis, or along multiple
-axes. Axis and multi-axis reductions support `keepdims`; negative axes are
+values and masks aligned. Sum, product, min, max, mean, weighted average,
+variance, standard deviation, median, all thirteen NumPy quantile estimators
+and their percentile forms, and masked-aware argmin/argmax work globally,
+along one axis, or along multiple axes. Axis and multi-axis reductions support
+`keepdims`; negative axes are
 normalized and repeated or out-of-range axes are rejected. Arg reductions
 return the first valid matching index and mark all-masked slices in the output
 mask. Axis reductions mark empty slices in the output mask;
@@ -504,8 +504,8 @@ masked positions stay masked and contribute their operation's identity to the
 running accumulator. Explicit output accumulator types are available for both
 operations. See the [masked data tutorial](./TUTORIAL_MASKED_DATA.md).
 
-**Remaining:** masked weighted averages, additional masked statistics, and
-interoperability with autograd and neural-network operations. NaN-aware
+**Remaining:** additional masked statistics and interoperability with
+autograd and neural-network operations. NaN-aware
 reductions are separate and do not automatically treat NaN as masked data.
 
 ### Structured and record arrays
