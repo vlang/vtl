@@ -21,6 +21,7 @@ performance, or ecosystem.
 | Stacked recurrent APIs; custom module state | [#734](https://github.com/vlang/vtl/issues/734), [#735](https://github.com/vlang/vtl/issues/735) |
 | Optimizer/scheduler parity | [#736](https://github.com/vlang/vtl/issues/736) |
 | Device-resident CUDA optimizer state and updates | [#758](https://github.com/vlang/vtl/issues/758) |
+| INT8 quantization and inference kernels | [#792](https://github.com/vlang/vtl/issues/792) |
 | Data transforms and scalable loading | [#737](https://github.com/vlang/vtl/issues/737), [#738](https://github.com/vlang/vtl/issues/738) |
 | Checkpoint migration and safe loading | [#739](https://github.com/vlang/vtl/issues/739) |
 | Graph execution and memory profiling | [#740](https://github.com/vlang/vtl/issues/740), [#741](https://github.com/vlang/vtl/issues/741) |
@@ -63,6 +64,12 @@ tracked in [#750](https://github.com/vlang/vtl/issues/750).
 
 **Next:** Define a consistent dtype promotion and device model. Broaden backend
 coverage and test transfers, mixed precision, and device-specific behavior.
+
+VTL now has an opt-in `vtl.quantization` foundation for signed INT8 affine
+per-tensor and per-channel conversion, min/max calibration observers, and
+f32/f64 dequantization. Quantized Linear/Conv kernels, layer conversion, and
+accelerator execution are still open in [#792](https://github.com/vlang/vtl/issues/792);
+the current API makes no inference performance claim.
 
 ### Autograd
 

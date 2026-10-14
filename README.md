@@ -187,6 +187,7 @@ See [DEV_LIGHTWEIGHT.md](docs/DEV_LIGHTWEIGHT.md) for memory-safe subsets in CI.
 | Run examples | [Examples catalog](examples/README.md) |
 | Use datasets | [Datasets](datasets/README.md) |
 | Exchange NumPy `.npy` arrays | [`.npy` input/output](docs/TUTORIAL_NUMPY_IO.md) |
+| Quantize tensors for INT8 inference | [Quantization API](quantization/README.md), [example](examples/quantization_int8/main.v) |
 | Load numeric CSV data | [CSV and NumPy I/O](docs/TUTORIAL_NUMPY_IO.md) |
 | Use GPU paths safely | [DEV_LIGHTWEIGHT.md](docs/DEV_LIGHTWEIGHT.md), [DEVICE_MEMORY.md](docs/DEVICE_MEMORY.md) |
 
