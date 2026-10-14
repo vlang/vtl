@@ -13,8 +13,8 @@ pub:
 	neginf ?f64
 }
 
-// nan_to_num replaces NaN and positive or negative infinity in f32/f64 tensors.
-// Integer tensors are copied unchanged; complex tensors are not yet supported.
+// nan_to_num replaces NaN and positive or negative infinity in floating-point
+// tensors. Complex values are handled component-wise; other types are copied.
 pub fn (t &Tensor[T]) nan_to_num[T](params NanToNumConfig) &Tensor[T] {
 	$if T is f64 {
 		positive_infinity := params.posinf or { math.max_f64 }
@@ -46,9 +46,36 @@ pub fn (t &Tensor[T]) nan_to_num[T](params NanToNumConfig) &Tensor[T] {
 			}
 			return value
 		})
+	} $else $if T is vcomplex.Complex {
+		return nan_to_num_complex(t, params)
 	} $else {
 		return t.copy(.row_major)
 	}
+}
+
+fn nan_to_num_complex(t &Tensor[vcomplex.Complex], params NanToNumConfig) &Tensor[vcomplex.Complex] {
+	positive_infinity := params.posinf or { math.max_f64 }
+	negative_infinity := params.neginf or { -math.max_f64 }
+	return t.map_values(fn [params, positive_infinity, negative_infinity] (value vcomplex.Complex) vcomplex.Complex {
+		return vcomplex.Complex{
+			re: nan_to_num_component(value.re, params.nan, positive_infinity, negative_infinity)
+			im: nan_to_num_component(value.im, params.nan, positive_infinity, negative_infinity)
+		}
+	})
+}
+
+@[inline]
+fn nan_to_num_component(value f64, nan f64, positive_infinity f64, negative_infinity f64) f64 {
+	if math.is_nan(value) {
+		return nan
+	}
+	if math.is_inf(value, 1) {
+		return positive_infinity
+	}
+	if math.is_inf(value, -1) {
+		return negative_infinity
+	}
+	return value
 }
 
 // sign returns the elementwise sign of each value: -1, 0, or 1. Floating-point

@@ -106,6 +106,34 @@ fn test_complex_angle_and_finite_value_predicates() ! {
 	assert vtl.complex_is_finite(values)!.to_array() == [true, true, true, false, false]
 }
 
+fn test_complex_nan_to_num_replaces_components_independently() ! {
+	values := vtl.from_1d([
+		vcomplex.Complex{ re: math.nan(), im: 3.0 },
+		vcomplex.Complex{ re: 2.0, im: math.nan() },
+		vcomplex.Complex{ re: math.inf(1), im: math.inf(-1) },
+		vcomplex.Complex{ re: math.inf(-1), im: math.inf(1) },
+		vcomplex.Complex{ re: 1.0, im: 2.0 },
+	])!
+	result := values.nan_to_num(nan: -2.0, posinf: 9.0, neginf: -7.0)
+	assert result.shape == values.shape
+	assert result.to_array() == [
+		vcomplex.Complex{ re: -2.0, im: 3.0 },
+		vcomplex.Complex{ re: 2.0, im: -2.0 },
+		vcomplex.Complex{ re: 9.0, im: -7.0 },
+		vcomplex.Complex{ re: -7.0, im: 9.0 },
+		vcomplex.Complex{ re: 1.0, im: 2.0 },
+	]
+
+	defaults := values.nan_to_num().to_array()
+	assert defaults == [
+		vcomplex.Complex{ re: 0.0, im: 3.0 },
+		vcomplex.Complex{ re: 2.0, im: 0.0 },
+		vcomplex.Complex{ re: math.max_f64, im: -math.max_f64 },
+		vcomplex.Complex{ re: -math.max_f64, im: math.max_f64 },
+		vcomplex.Complex{ re: 1.0, im: 2.0 },
+	]
+}
+
 fn test_complex_transcendental_functions() ! {
 	values := vtl.from_1d([
 		vcomplex.Complex{ re: 0.0, im: 0.0 },
