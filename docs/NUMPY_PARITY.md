@@ -11,6 +11,7 @@ tests, documentation, and examples where users need them.
 | Area | Issue |
 |------|-------|
 | Numeric promotion and tensor creation | [#717](https://github.com/vlang/vtl/issues/717), [#718](https://github.com/vlang/vtl/issues/718) |
+| Ufunc and elementwise math coverage | [#777](https://github.com/vlang/vtl/issues/777) |
 | Copy/view rules and indexing bounds | [#719](https://github.com/vlang/vtl/issues/719), [#720](https://github.com/vlang/vtl/issues/720) |
 | Reductions and complex support | [#721](https://github.com/vlang/vtl/issues/721), [#722](https://github.com/vlang/vtl/issues/722) |
 | Random streams and FFT parity | [#723](https://github.com/vlang/vtl/issues/723), [#724](https://github.com/vlang/vtl/issues/724) |
@@ -206,9 +207,11 @@ per-element closure and sum-type boxing. On this machine (1M f64, `-prod`)
 `exp` improved from 12.1 ms to 4.7 ms per iteration (NumPy: ~3.3 ms) and
 `sin` measures 15.5 ms against NumPy's ~12.8 ms.
 
-**Remaining:** audit unary/binary function families, add promoted arithmetic
-for the remaining operations, and infer output dtypes automatically for mixed
-tensor and weak scalar operands.
+**Remaining:** audit unary/binary function families and complete the missing
+NumPy ufunc coverage in [#777](https://github.com/vlang/vtl/issues/777). Add
+promoted arithmetic for the remaining operations and infer output dtypes
+automatically for mixed tensor and weak scalar operands in
+[#717](https://github.com/vlang/vtl/issues/717).
 
 ### Reductions and statistics
 
