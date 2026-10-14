@@ -314,14 +314,87 @@ jobs:
           ref: master
           path: v
 
+      - name: Checkout V Windows bootstrap source
+        uses: actions/checkout@v4
+        with:
+          repository: vlang/vc
+          ref: master
+          path: v/vc
+
+      - name: Checkout bundled Windows TCC
+        uses: actions/checkout@v4
+        with:
+          repository: vlang/tccbin
+          ref: thirdparty-windows-amd64
+          path: v/thirdparty/tcc
+
       - name: Build current V compiler (Windows)
         shell: pwsh
         run: |
           # Use V's Windows bootstrap so it supports current VTL syntax.
           Push-Location v
           try {
-            $bootstrap = 'makev.bat -msvc && v.exe -o v2.exe cmd/v && ' +
-              'v2.exe -showcc -o v.exe cmd/v'
+            # The published vc snapshot declares these helpers but does not
+            # define them yet. Reuse their implementations from current V.
+            $vcFile = Join-Path (Get-Location).Path 'vc/v_win.c'
+            $source = [IO.File]::ReadAllText($vcFile)
+            $helperNames = @(
+              'v3_win_thread_create',
+              'v3_win_thread_is_current',
+              'v3_win_thread_join',
+              'v_time_ticks_ms',
+              'v_toolcache_close_handle',
+              'v_toolcache_create_file_w',
+              'v_toolcache_file_is_disk',
+              'v_toolcache_get_file_information',
+              'v_toolcache_move_file_ex_w',
+              'v_toolcache_read_file',
+              'v_toolcache_root_is_private'
+            )
+            $namePattern = $helperNames -join '|'
+            $definitionPattern = (
+              '(?m)^(?:static\s+)?(?:inline\s+)?(?:void\*|int|u64)\s+'
+            ) + "($namePattern)\([^;{}]*\)\s*\{"
+            $definitions = [regex]::Matches($source, $definitionPattern).Count
+            if ($definitions -eq 0) {
+              $prototypePattern = (
+                '(?m)^(void\*|int|u64) (' + $namePattern +
+                ')\(([^\r\n;]*)\);$'
+              )
+              $prototypes = [regex]::Matches($source, $prototypePattern).Count
+              if ($prototypes -ne $helperNames.Count) {
+                throw "Expected 11 V helper declarations, found $prototypes"
+              }
+              $source = [regex]::Replace(
+                $source,
+                $prototypePattern,
+                'static $1 $2($3);'
+              )
+              $marker = '#include <windows.h>'
+              $markerIndex = $source.IndexOf($marker)
+              if ($markerIndex -lt 0) {
+                throw 'Could not find the Windows header in vc/v_win.c'
+              }
+              $includeAt = $source.IndexOf("`n", $markerIndex)
+              if ($includeAt -lt 0) {
+                throw 'Could not find the Windows header line ending'
+              }
+              $headers = @(
+                '#include "../cmd/v/toolcache_windows_helpers.h"',
+                '#include "../vlib/time/ticks_windows.h"',
+                '#include "../vlib/v/winthread_helper.h"'
+              ) -join "`r`n"
+              $source = $source.Insert($includeAt + 1, "$headers`r`n")
+              [IO.File]::WriteAllText(
+                $vcFile,
+                $source,
+                [System.Text.UTF8Encoding]::new($false)
+              )
+            } elseif ($definitions -ne $helperNames.Count) {
+              throw "Found a partial V helper implementation set: $definitions"
+            }
+            $bootstrap = 'makev.bat -msvc --local && ' +
+              'v.exe -o v2.exe cmd/v && v2.exe -showcc -o v.exe cmd/v'
             cmd /c $bootstrap
             if ($LASTEXITCODE -ne 0) {
               throw "V bootstrap failed with exit code $LASTEXITCODE"
