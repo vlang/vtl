@@ -215,7 +215,9 @@ tensor and weak scalar operands.
 min/max, and logical all/any with `keepdims`; weighted average globally, over
 one axis, and over multiple axes with optional `keepdims`; scalar
 population/sample variance and standard deviation; single-axis and multi-axis
-mean/variance/std with explicit `keepdims` and NaN-aware forms; axis-wise
+mean/variance/std with explicit `keepdims` and NaN-aware forms; explicit
+accumulator dtypes for global, single-axis, and multi-axis regular sum/product
+and NaN-aware sum/product; axis-wise
 `trapezoid`; all thirteen NumPy quantile estimators via `QuantileMethod`, with
 global, axis, multi-axis, multi-quantile, percentile, and NaN-aware forms; axis arg
 reductions and squeezed min/max/argmin/argmax results; median and NaN-aware

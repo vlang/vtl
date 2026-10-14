@@ -509,9 +509,12 @@ assert levels_kept.shape == [3, 1, 2, 1]
 ## NaN-aware sums and extrema
 
 `nansum`, `nanprod`, `nanmin`, and `nanmax` skip NaN values. Their axis
-variants return promoted `f64` tensors. Use `_axis_keepdims` to retain the
-reduced axis with length one. Empty or all-NaN slices reduce to `0` for sums,
-`1` for products, and NaN for minima or maxima.
+variants return promoted `f64` tensors. `nansum_as[T, U]` and
+`nanprod_as[T, U]` select a global accumulator type; their `_axis_as` and
+`_axes_as` variants provide the same control for axis and multi-axis
+reductions. Use `_axis_keepdims` to retain the reduced axis with length one.
+Empty or all-NaN slices reduce to `0` for sums, `1` for products, and NaN for
+minima or maxima.
 
 ```v
 import vtl
@@ -521,6 +524,8 @@ import math
 samples := vtl.from_array([1.0, math.nan(), 3.0, 4.0, math.nan(), 6.0], [2, 3])!
 assert stats.nansum(samples) == 14.0
 assert stats.nanprod(samples) == 72.0
+assert stats.nansum_as[f64, f64](samples) == 14.0
+assert stats.nansum_axis_as[f64, f64](samples, 1, true)!.shape == [2, 1]
 assert stats.nanmin_axis(samples, 1)!.to_array() == [1.0, 4.0]
 assert stats.nanmax_axis_keepdims(samples, 1)!.to_array() == [3.0, 6.0]
 ```
