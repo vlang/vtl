@@ -47,6 +47,9 @@ first_maximum_index := data.argmax()
 row_minimum_indices := data.argmin_along_axis(1, false)!
 sample_variance := data.variance(1)!
 sample_deviation := data.std(1)!
+weights := vtl.from_1d([1.0, 2.0])!
+weighted_average := data.weighted_average(weights)!
+row_weighted_averages := data.weighted_average_along_axis(weights, 0, true)!
 column_sums := data.sum_along_axis(0, false)!
 row_means := data.mean_along_axis(1, true)!
 all_values_sum := data.sum_along_axes([0, 1], false)!
@@ -78,6 +81,10 @@ arg-reduction behavior.
 `variance` and `std` use Welford's online algorithm; `ddof=0` computes
 population statistics and `ddof=1` computes sample statistics. Global or
 per-slice results with `count <= ddof` are masked and carry a NaN payload.
+Weighted averages ignore masked values and their corresponding weights.
+Weights may broadcast to the values shape; the single-axis form also accepts a
+weight vector matching the reduced axis. All-masked reductions return masked
+NaN, while a zero sum of weights over valid observations is an error.
 `quantile`, `percentile`, and `median` use NumPy's default linear interpolation
 over valid values. Pass a `vtl.QuantileMethod` to `quantile_with_method` or
 `percentile_with_method` to select any of NumPy's thirteen estimators; the
