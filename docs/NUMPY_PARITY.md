@@ -83,6 +83,11 @@ destination flat index, matching NumPy.
 `select` applies ordered broadcastable conditions to choice tensors; the first
 true condition wins and `default` fills positions with no match, matching
 `numpy.select` when all choices and the default share one V element type.
+`ravel_multi_index` broadcasts coordinate tensors and supports C/F flattening,
+global `raise`/`wrap`/`clip` bounds modes, and per-axis bounds modes;
+`unravel_index` returns one coordinate tensor per dimension in the requested
+order. The indexing tutorial and runnable `multi_index` example cover both
+orders and a bounds-mode case.
 
 `Variable.take`, `Variable.take_nd`, `Variable.take_flat`,
 `Variable.take_along_axis`, `Variable.boolean_index`, and

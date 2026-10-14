@@ -15,6 +15,34 @@ assert selected.shape == [2, 2]
 assert selected.to_array() == [12, 10, 22, 20]
 ```
 
+## Convert between coordinate and flat indices
+
+`ravel_multi_index` converts one coordinate tensor per axis into flat indices.
+Coordinate shapes broadcast, `order: .c` uses row-major layout, and
+`order: .f` uses column-major layout. Use `mode` for one bounds rule on all
+axes, or `axis_modes` to choose `raise`, `wrap`, or `clip` separately per axis.
+`unravel_index` converts flat indices back into a list of coordinate tensors
+in C order by default; each returned tensor has the shape of the input indices.
+
+```v
+import vtl
+
+row := vtl.from_1d([3, 6, 6])!
+column := vtl.from_1d([4, 5, 1])!
+coordinates := [row, column]
+flat := vtl.ravel_multi_index(coordinates, [7, 6])!
+assert flat.to_array() == [22, 41, 37]
+
+parts := vtl.unravel_index(flat, [7, 6])!
+assert parts[0].to_array() == [3, 6, 6]
+assert parts[1].to_array() == [4, 5, 1]
+
+wrapped := vtl.ravel_multi_index([vtl.from_1d([-1])!, vtl.from_1d([6])!], [4, 6],
+	mode: .wrap
+)!
+assert wrapped.to_array() == [18]
+```
+
 `roll` circularly shifts a copy of the logical values. Without an axis it rolls
 the flattened tensor and restores the original shape; `roll_shifts` pairs a
 shift with each axis. Axes and shifts may be negative, and repeated axes add
