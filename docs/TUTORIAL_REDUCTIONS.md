@@ -501,6 +501,9 @@ assert medians.shape == [2]
 assert medians.to_array() == [5.0, 7.0]
 levels := stats.quantiles_weighted_axes(volume, weights, [0.0, 0.5, 1.0], [0, 2])!
 assert levels.shape == [3, 2]
+levels_kept := stats.quantiles_weighted_axes_keepdims(volume, weights, [0.0, 0.5, 1.0],
+	[0, 2], true)!
+assert levels_kept.shape == [3, 1, 2, 1]
 ```
 
 ## NaN-aware sums and extrema

@@ -226,6 +226,8 @@ weights, including NaN-aware forms that discard weights for NaN observations;
 single-axis weighted multi-quantile and multi-percentile APIs also provide
 `*_keepdims` variants that retain the reduced axis after the leading quantile
 dimension;
+multi-axis weighted multi-quantile and multi-percentile APIs provide the same
+retained-axis behavior;
 multi-axis quantile and percentile convenience APIs default to NumPy's linear
 estimator, alongside forms that expose all thirteen estimator methods;
 multi-quantile multi-axis forms can also retain reduced dimensions with

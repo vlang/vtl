@@ -117,6 +117,9 @@ or a vector for the reduced axis. Multi-axis forms accept full-shape weights or
 a compact tensor whose dimensions follow the supplied axes order. The
 `nanquantile_weighted*` and `nanpercentile_weighted*` variants omit NaN values
 and their corresponding weights.
+Multi-axis weighted multi-quantile and multi-percentile APIs also provide
+`*_axes_keepdims` forms to retain each reduced axis after the leading quantile
+dimension.
 
 `median` accepts unsorted tensors, uses linear interpolation, and returns
 `f64` for every input type. An empty tensor returns NaN.
