@@ -298,3 +298,48 @@ fn test_cumulative_operations_support_wider_output_types() ! {
 		assert false, 'out-of-range cumulative axis must return an error'
 	}
 }
+
+fn test_flattened_cumulative_operations_follow_logical_order() ! {
+	values := vtl.from_array([1, 2, 3, 4, 5, 6], [2, 3])!
+	assert values.cumsum_flat()!.shape == [6]
+	assert values.cumsum_flat()!.to_array() == [1, 3, 6, 10, 15, 21]
+	assert values.cumprod_flat()!.to_array() == [1, 2, 6, 24, 120, 720]
+
+	transposed := values.transpose([1, 0])!
+	assert transposed.cumsum_flat()!.to_array() == [1, 5, 7, 12, 15, 21]
+	assert transposed.cumprod_flat()!.to_array() == [1, 4, 8, 40, 120, 720]
+}
+
+fn test_flattened_cumulative_operations_handle_scalar_and_empty_inputs() ! {
+	scalar := vtl.from_array([7], []int{})!
+	assert scalar.cumsum_flat()!.shape == [1]
+	assert scalar.cumsum_flat()!.to_array() == [7]
+	assert scalar.cumprod_flat()!.to_array() == [7]
+
+	empty := vtl.zeros[i32]([2, 0, 3], vtl.TensorData{})
+	assert empty.cumsum_flat()!.shape == [0]
+	assert empty.cumprod_flat()!.shape == [0]
+	assert empty.cumsum_flat_as[i64]()!.shape == [0]
+	assert empty.cumprod_flat_as[i64]()!.shape == [0]
+}
+
+fn test_flattened_cumulative_operations_support_wider_output_types() ! {
+	values := vtl.from_1d([f32(1e8), 1, -1e8])!
+	assert values.cumsum_flat_as[f64]()!.to_array() == [1e8, 1e8 + 1.0, 1.0]
+
+	integers := vtl.from_array([i8(100), 4, 100, 4], [2, 2])!
+	assert integers.cumsum_flat_as[i64]()!.to_array() == [100, 104, 204, 208]
+	assert integers.cumprod_flat_as[i64]()!.to_array() == [100, 400, 40000, 160000]
+}
+
+fn test_flattened_cumulative_operations_reject_inconsistent_storage() ! {
+	mut values := vtl.from_1d([1.0, 2.0])!
+	values.shape = [3]
+	values.size = 3
+	if _ := values.cumsum_flat() {
+		assert false, 'flattened cumsum must reject inconsistent storage'
+	}
+	if _ := values.cumprod_flat() {
+		assert false, 'flattened cumprod must reject inconsistent storage'
+	}
+}

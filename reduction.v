@@ -858,3 +858,73 @@ pub fn (t &Tensor[T]) cumprod_as[U](axis int) !&Tensor[U] {
 	}
 	return result
 }
+
+// cumsum_flat computes a cumulative sum over the tensor's logical row-major
+// order and returns a one-dimensional tensor. This is the flattened form of
+// NumPy's cumsum with axis=None.
+pub fn (t &Tensor[T]) cumsum_flat[T]() !&Tensor[T] {
+	return t.cumsum_flat_as[T]()
+}
+
+// cumsum_flat_as computes a flattened cumulative sum with an explicit output
+// accumulator type.
+pub fn (t &Tensor[T]) cumsum_flat_as[U]() !&Tensor[U] {
+	return cumulative_flat_as[T, U](t, false)
+}
+
+// cumprod_flat computes a cumulative product over the tensor's logical
+// row-major order and returns a one-dimensional tensor. This is the flattened
+// form of NumPy's cumprod with axis=None.
+pub fn (t &Tensor[T]) cumprod_flat[T]() !&Tensor[T] {
+	return t.cumprod_flat_as[T]()
+}
+
+// cumprod_flat_as computes a flattened cumulative product with an explicit
+// output accumulator type.
+pub fn (t &Tensor[T]) cumprod_flat_as[U]() !&Tensor[U] {
+	return cumulative_flat_as[T, U](t, true)
+}
+
+fn cumulative_flat_as[T, U](t &Tensor[T], product bool) !&Tensor[U] {
+	if t.size != size_from_shape(t.shape) || (t.shape.len > 0 && t.strides.len != t.shape.len) {
+		return error('flattened cumulative operation: inconsistent tensor shape, strides, or size')
+	}
+	input_is_contiguous := t.is_row_major_contiguous()
+	if input_is_contiguous && t.data.data.len < t.size {
+		return error('flattened cumulative operation: contiguous tensor storage is shorter than its size')
+	}
+	mut result := zeros[U]([t.size], TensorData{})
+	$if U is bool {
+		mut acc := if product { true } else { false }
+		for i in 0 .. t.size {
+			value := cast[U](if input_is_contiguous { t.data.data[i] } else { t.get_nth(i) })
+			if product {
+				acc = acc && value
+			} else {
+				acc = acc || value
+			}
+			result.data.data[i] = acc
+		}
+	} $else $if U is string {
+		if !product {
+			mut acc := ''
+			for i in 0 .. t.size {
+				value := cast[U](if input_is_contiguous { t.data.data[i] } else { t.get_nth(i) })
+				acc += value
+				result.data.data[i] = acc
+			}
+		}
+	} $else {
+		mut acc := if product { cast[U](1) } else { cast[U](0) }
+		for i in 0 .. t.size {
+			value := cast[U](if input_is_contiguous { t.data.data[i] } else { t.get_nth(i) })
+			if product {
+				acc *= value
+			} else {
+				acc += value
+			}
+			result.data.data[i] = acc
+		}
+	}
+	return result
+}
