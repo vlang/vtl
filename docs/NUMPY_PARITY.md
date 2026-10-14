@@ -182,10 +182,14 @@ same-dtype inputs; integer tensors are copied unchanged. VTL preserves finite
 inputs rather than overflowing when an extreme positive decimal position
 would overflow its intermediate scale.
 `nan_to_num` replaces NaN with zero and infinities with finite type limits for
-f32/f64 tensors, with optional custom replacements. Integer tensors are copied;
-complex tensor support remains unimplemented. `Variable.nan_to_num` also
+f32/f64 tensors and replaces non-finite real and imaginary components
+independently for complex128 tensors, with optional custom replacements.
+Integer tensors are copied. For real floating-point tensors,
+`Variable.nan_to_num` also
 propagates gradients through finite inputs and returns zero gradients for
 replaced NaN/infinite inputs, matching PyTorch.
+See [NumPy's nan_to_num reference](https://numpy.org/doc/stable/reference/generated/numpy.nan_to_num.html)
+for the component-wise complex behavior.
 Elementwise `max`/`min` match NumPy's NaN-propagating `maximum`/`minimum`, and
 `fmax`/`fmin` ignore a single NaN operand. These operations broadcast and
 support boolean, integer, floating-point, and complex tensors; floating-point

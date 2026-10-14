@@ -3,6 +3,7 @@ module autograd_tests
 import math
 import vtl.autograd
 import vtl
+import math.complex as vcomplex
 
 fn test_log_forward_backward() {
 	f64_ctx := autograd.ctx[f64]()
@@ -99,4 +100,12 @@ fn test_nan_to_num_forward_backward_f32() ! {
 	assert result.value.array_equal(vtl.from_1d[f32]([1.5, -2.0, 8.0, -9.0])!)
 	result.backprop()!
 	assert x.grad.array_equal(vtl.from_1d[f32]([1.0, 0.0, 0.0, 0.0])!)
+}
+
+fn test_nan_to_num_rejects_complex_autograd_until_component_gradients_exist() ! {
+	ctx := autograd.ctx[vcomplex.Complex]()
+	x := ctx.variable(vtl.from_1d([vcomplex.Complex{ re: 1.0, im: 2.0 }])!)
+	if _ := x.nan_to_num() {
+		assert false, 'complex nan_to_num must not silently pass gradients'
+	}
 }

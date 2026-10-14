@@ -1,6 +1,7 @@
 module autograd
 
 import vtl
+import math.complex as vcomplex
 import vtl.stats as vtl_stats
 
 // sum reduces every tensor element into a one-element tensor and records the
@@ -359,6 +360,9 @@ pub fn (v &Variable[T]) clamp(min_val T, max_val T) !&Variable[T] {
 // nan_to_num replaces NaN and infinite values and passes gradients through
 // finite inputs only. Its forward and backward behavior follows PyTorch.
 pub fn (v &Variable[T]) nan_to_num(params vtl.NanToNumConfig) !&Variable[T] {
+	$if T is vcomplex.Complex {
+		return error('Variable.nan_to_num does not yet support complex tensors')
+	}
 	value := v.value.nan_to_num[T](params)
 	mut result := v.context.variable(value)
 	if v.requires_grad {
