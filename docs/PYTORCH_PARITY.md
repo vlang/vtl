@@ -19,6 +19,8 @@ performance, or ecosystem.
 | Graph execution and memory profiling | [#740](https://github.com/vlang/vtl/issues/740), [#741](https://github.com/vlang/vtl/issues/741) |
 | Distributed training and mixed precision | [#742](https://github.com/vlang/vtl/issues/742) |
 | Interoperability and deployment | [#743](https://github.com/vlang/vtl/issues/743) |
+| Sparse tensor formats and operations | [#746](https://github.com/vlang/vtl/issues/746) |
+| In-process tensor buffer interoperability | [#748](https://github.com/vlang/vtl/issues/748) |
 
 ## Capability matrix
 

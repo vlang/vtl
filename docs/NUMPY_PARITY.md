@@ -17,6 +17,8 @@ tests, documentation, and examples where users need them.
 | NumPy text I/O and memory maps | [#725](https://github.com/vlang/vtl/issues/725), [#726](https://github.com/vlang/vtl/issues/726) |
 | Masked autograd and structured data | [#727](https://github.com/vlang/vtl/issues/727), [#728](https://github.com/vlang/vtl/issues/728) |
 | Backend benchmarks and learning examples | [#729](https://github.com/vlang/vtl/issues/729), [#730](https://github.com/vlang/vtl/issues/730) |
+| Sparse tensor operations | [#746](https://github.com/vlang/vtl/issues/746) |
+| Non-numeric dtypes and array interoperability | [#747](https://github.com/vlang/vtl/issues/747), [#748](https://github.com/vlang/vtl/issues/748) |
 
 For neural-network and framework-level gaps relative to PyTorch, see the
 [PyTorch parity tracker](./PYTORCH_PARITY.md).
