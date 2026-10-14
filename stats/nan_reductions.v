@@ -20,6 +20,18 @@ pub fn nanprod[T](t &vtl.Tensor[T]) f64 {
 	return nan_reduce_scalar[T](t, .product)
 }
 
+// nansum_as adds non-NaN values using an explicitly selected accumulator
+// type. Empty and all-NaN inputs return the additive identity.
+pub fn nansum_as[T, U](t &vtl.Tensor[T]) U {
+	return nan_reduce_scalar_as[T, U](t, false)
+}
+
+// nanprod_as multiplies non-NaN values using an explicitly selected
+// accumulator type. Empty and all-NaN inputs return the multiplicative identity.
+pub fn nanprod_as[T, U](t &vtl.Tensor[T]) U {
+	return nan_reduce_scalar_as[T, U](t, true)
+}
+
 // nanmin returns the minimum non-NaN element, or NaN if none exists.
 pub fn nanmin[T](t &vtl.Tensor[T]) f64 {
 	return nan_reduce_scalar[T](t, .minimum)
@@ -48,6 +60,16 @@ pub fn nanprod_axis[T](t &vtl.Tensor[T], axis int) !&vtl.Tensor[f64] {
 // nanprod_axis_keepdims reduces one axis and keeps it with length one.
 pub fn nanprod_axis_keepdims[T](t &vtl.Tensor[T], axis int) !&vtl.Tensor[f64] {
 	return nan_reduce_axis[T](t, axis, .product, true)
+}
+
+// nansum_axis_as reduces one axis using the requested accumulator type.
+pub fn nansum_axis_as[T, U](t &vtl.Tensor[T], axis int, keepdims bool) !&vtl.Tensor[U] {
+	return nan_reduce_axis_as[T, U](t, axis, keepdims, false)
+}
+
+// nanprod_axis_as reduces one axis using the requested accumulator type.
+pub fn nanprod_axis_as[T, U](t &vtl.Tensor[T], axis int, keepdims bool) !&vtl.Tensor[U] {
+	return nan_reduce_axis_as[T, U](t, axis, keepdims, true)
 }
 
 // nanmin_axis reduces one axis and removes it from the result shape. Slices
@@ -82,6 +104,16 @@ pub fn nansum_axes[T](t &vtl.Tensor[T], axes []int, keepdims bool) !&vtl.Tensor[
 // reduced dimensions remain in the output.
 pub fn nanprod_axes[T](t &vtl.Tensor[T], axes []int, keepdims bool) !&vtl.Tensor[f64] {
 	return nan_reduce_axes[T](t, axes, .product, keepdims)
+}
+
+// nansum_axes_as reduces several axes using an explicit accumulator type.
+pub fn nansum_axes_as[T, U](t &vtl.Tensor[T], axes []int, keepdims bool) !&vtl.Tensor[U] {
+	return nan_reduce_sum_product_axes_as[T, U](t, axes, keepdims, false)
+}
+
+// nanprod_axes_as reduces several axes using an explicit accumulator type.
+pub fn nanprod_axes_as[T, U](t &vtl.Tensor[T], axes []int, keepdims bool) !&vtl.Tensor[U] {
+	return nan_reduce_sum_product_axes_as[T, U](t, axes, keepdims, true)
 }
 
 // nanmin_axes reduces multiple axes to their minimum, ignoring NaN values.
@@ -155,6 +187,20 @@ fn nan_reduce_scalar[T](t &vtl.Tensor[T], operation NanReduction) f64 {
 	return result
 }
 
+fn nan_reduce_scalar_as[T, U](t &vtl.Tensor[T], product bool) U {
+	mut result := vtl.cast[U](if product { 1 } else { 0 })
+	mut iter := t.iterator[T]()
+	for {
+		value, _ := iter.next() or { break }
+		if math.is_nan(f64(value)) {
+			continue
+		}
+		converted := vtl.cast[U](value)
+		result = if product { result * converted } else { result + converted }
+	}
+	return result
+}
+
 fn nan_reduce_axis[T](t &vtl.Tensor[T], axis int, operation NanReduction, keepdims bool) !&vtl.Tensor[f64] {
 	rank := t.rank()
 	if rank == 0 {
@@ -207,6 +253,89 @@ fn nan_reduce_axis[T](t &vtl.Tensor[T], axis int, operation NanReduction, keepdi
 			output_index << index[axis_index + 1..]
 			result.set(output_index, reduced)
 		}
+	}
+	return result
+}
+
+fn nan_reduce_axis_as[T, U](t &vtl.Tensor[T], axis int, keepdims bool, product bool) !&vtl.Tensor[U] {
+	rank := t.rank()
+	if rank == 0 {
+		return error('NaN reduction axis requires a tensor with at least one dimension')
+	}
+	axis_index := if axis < 0 { axis + rank } else { axis }
+	if axis_index < 0 || axis_index >= rank {
+		return error('NaN reduction axis ${axis} out of bounds for rank ${rank}')
+	}
+	mut output_shape := t.shape.clone()
+	if keepdims {
+		output_shape[axis_index] = 1
+	} else {
+		output_shape.delete(axis_index)
+	}
+	mut result := vtl.empty[U](output_shape, memory: .row_major)
+	mut slice_count := 1
+	for dimension, size in t.shape {
+		if dimension != axis_index {
+			slice_count *= size
+		}
+	}
+	identity := vtl.cast[U](if product { 1 } else { 0 })
+	mut index := []int{len: rank}
+	for slice in 0 .. slice_count {
+		decode_nan_reduction_slice(slice, t.shape, axis_index, mut index)
+		mut reduced := identity
+		for position in 0 .. t.shape[axis_index] {
+			index[axis_index] = position
+			value := t.get(index)
+			if math.is_nan(f64(value)) {
+				continue
+			}
+			converted := vtl.cast[U](value)
+			reduced = if product { reduced * converted } else { reduced + converted }
+		}
+		if keepdims {
+			index[axis_index] = 0
+			result.set(index, reduced)
+		} else {
+			mut output_index := index[..axis_index].clone()
+			output_index << index[axis_index + 1..]
+			result.set(output_index, reduced)
+		}
+	}
+	return result
+}
+
+fn nan_reduce_sum_product_axes_as[T, U](t &vtl.Tensor[T], axes []int, keepdims bool, product bool) !&vtl.Tensor[U] {
+	if axes.len == 0 {
+		mut result := vtl.empty[U](t.shape, memory: .row_major)
+		mut iter := t.iterator[T]()
+		for {
+			value, index := iter.next() or { break }
+			result.set(index, vtl.cast[U](value))
+		}
+		return result
+	}
+	mut normalized := []int{cap: axes.len}
+	for axis in axes {
+		axis_index := if axis < 0 { axis + t.rank() } else { axis }
+		if axis_index < 0 || axis_index >= t.rank() {
+			return error('NaN reduction axis ${axis} out of bounds for rank ${t.rank()}')
+		}
+		if axis_index in normalized {
+			return error('duplicate NaN reduction axis ${axis}')
+		}
+		normalized << axis_index
+	}
+	for i in 0 .. normalized.len {
+		for j in i + 1 .. normalized.len {
+			if normalized[i] < normalized[j] {
+				normalized[i], normalized[j] = normalized[j], normalized[i]
+			}
+		}
+	}
+	mut result := nan_reduce_axis_as[T, U](t, normalized[0], keepdims, product)!
+	for axis_index in normalized[1..] {
+		result = nan_reduce_axis_as[U, U](result, axis_index, keepdims, product)!
 	}
 	return result
 }
