@@ -410,14 +410,16 @@ axes. Axis and multi-axis reductions support `keepdims`; negative axes are
 normalized and repeated or out-of-range axes are rejected. Arg reductions
 return the first valid matching index and mark all-masked slices in the output
 mask. Axis reductions mark empty slices in the output mask;
-global reductions expose an `is_masked` flag when every value is missing. See
-[the masked data tutorial](./TUTORIAL_MASKED_DATA.md).
+global reductions expose an `is_masked` flag when every value is missing.
+Cumulative sum and product work over flattened logical order or along one axis;
+masked positions stay masked and contribute their operation's identity to the
+running accumulator. Explicit output accumulator types are available for both
+operations. See the [masked data tutorial](./TUTORIAL_MASKED_DATA.md).
 
 **Remaining:** additional masked statistics, NumPy quantile interpolation
-methods beyond the current linear method, cumulative sum/product operations
-([#761](https://github.com/vlang/vtl/issues/761)), and interoperability with
-autograd and neural-network operations. NaN-aware reductions are separate and
-do not automatically treat NaN as masked data.
+methods beyond the current linear method, and interoperability with autograd
+and neural-network operations. NaN-aware reductions are separate and do not
+automatically treat NaN as masked data.
 
 ### Structured and record arrays
 
