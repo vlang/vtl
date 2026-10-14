@@ -86,6 +86,7 @@ and output. A wider type preserves small contributions that would be rounded
 away by a lower-precision input accumulator:
 
 ```v
+import math
 import vtl
 import vtl.stats
 
@@ -93,6 +94,11 @@ measurements := vtl.from_1d([f32(16_777_216), 1, -16_777_216])!
 assert stats.mean_as[f32, f64](measurements) == 1.0 / 3.0
 row_means := stats.mean_along_axis_as[f32, f64](measurements, 0, true)!
 assert row_means.shape == [1]
+
+spread := vtl.from_array([f32(10_000), 10_001, 10_002], [1, 3])!
+assert math.abs(stats.variance_as[f32, f64](spread, 0)! - 2.0 / 3.0) < 1e-12
+row_std := stats.std_along_axis_as[f32, f64](spread, 1, 0, true)!
+assert row_std.shape == [1, 1]
 ```
 
 Floating-point means of empty inputs return NaN. For non-empty inputs, choose
