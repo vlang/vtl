@@ -15,7 +15,7 @@ tests, documentation, and examples where users need them.
 | Copy/view rules and indexing bounds | [#719](https://github.com/vlang/vtl/issues/719), [#720](https://github.com/vlang/vtl/issues/720) |
 | Reductions and complex support | [#721](https://github.com/vlang/vtl/issues/721), [#722](https://github.com/vlang/vtl/issues/722) |
 | Random streams and FFT parity | [#723](https://github.com/vlang/vtl/issues/723), [#724](https://github.com/vlang/vtl/issues/724) |
-| NumPy text I/O and memory maps | [#725](https://github.com/vlang/vtl/issues/725), [#726](https://github.com/vlang/vtl/issues/726) |
+| Array I/O formats | [#725][i725], [#726][i726], [#779][i779] |
 | Masked autograd and structured data | [#727](https://github.com/vlang/vtl/issues/727), [#728](https://github.com/vlang/vtl/issues/728) |
 | Backend benchmarks and learning examples | [#729](https://github.com/vlang/vtl/issues/729), [#730](https://github.com/vlang/vtl/issues/730) |
 | OpenCL compute and neural-network dispatch | [#750](https://github.com/vlang/vtl/issues/750) |
@@ -438,8 +438,12 @@ v1/v2/v3 headers, both byte orders, Fortran order, bool, f32/f64, complex128, an
 integer widths when the requested V type matches.
 `.npz` read/write also supports complex128 members.
 
-**Remaining:** support more text formats and dtypes, add independent NumPy
-fixtures, and continue rejecting unsupported object/structured values.
+**Remaining:** support more text formats and dtypes, add memory-mapped arrays
+and optional HDF5 interoperability, add independent NumPy fixtures, and
+continue rejecting unsupported object/structured values. See
+[#725](https://github.com/vlang/vtl/issues/725),
+[#726](https://github.com/vlang/vtl/issues/726), and
+[#779](https://github.com/vlang/vtl/issues/779).
 
 ### Data types
 
@@ -546,7 +550,8 @@ Track these capabilities in addition to the NumPy table:
   permutation, and matrix algebra.
 - CSV/NPY/HDF5 data interchange and CPU/GPU backends. VTL supports numeric
   CSV tensors, typed `.npy` arrays, and named `.npz` members with mixed
-  supported dtypes; HDF5 is not yet provided by VTL itself.
+  supported dtypes; optional HDF5 interoperability is tracked in
+  [#779](https://github.com/vlang/vtl/issues/779).
 - Statistics, covariance, eigen/least-squares operations, PCA, and K-means.
 - Neural-network layers and recurrent models, with training examples.
 
@@ -562,3 +567,7 @@ documentation/tutorial, example, and benchmark (when performance matters).
 Keep unsupported or partially supported features explicitly marked. Do not
 describe VTL as more complete than NumPy or Arraymancer until the applicable
 rows are implemented and independently verified.
+
+[i725]: https://github.com/vlang/vtl/issues/725
+[i726]: https://github.com/vlang/vtl/issues/726
+[i779]: https://github.com/vlang/vtl/issues/779
