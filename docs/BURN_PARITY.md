@@ -42,9 +42,12 @@ using this as a current product comparison.
 - **Burn:** A Fusion backend decorator supports automatic fusion on accelerated
   backends that provide it.
 - **VTL:** Specific fused paths exist, including the Vulkan Adam shader.
-  General operation-chain fusion remains open in [issue #40][issue40].
-- **Gap:** Grow fusion incrementally. Require numerical tests and end-to-end
-  benchmarks for each fused workload.
+  The autograd gate fusion tracked in
+  [issue #40](https://github.com/vlang/vtl/issues/40) is complete: all gate
+  families have single-traversal backward paths on contiguous tensors.
+- **Gap:** Broader operation-chain fusion remains separate work. Grow fusion
+  incrementally; require numerical tests and end-to-end benchmarks for each
+  fused workload. See the [ML roadmap](./ML_ROADMAP.md).
 
 ### Training and models
 
@@ -114,6 +117,5 @@ benchmark references for their respective VTL domains.
 - [VTL PyTorch parity](./PYTORCH_PARITY.md)
 - [VTL ML roadmap](./ML_ROADMAP.md)
 
-[issue40]: https://github.com/vlang/vtl/issues/40
 [issue52]: https://github.com/vlang/vtl/issues/52
 [issue63]: https://github.com/vlang/vtl/issues/63
