@@ -18,6 +18,7 @@ neural network module.
 |------|------|
 | New to VTL | [Tutorial overview](./TUTORIAL.md) |
 | Tensor creation, indexing, slicing | [First steps](./TUTORIAL_FIRST_STEPS.md), [Slicing](./TUTORIAL_SLICING.md) |
+| Elementwise math and NumPy ufuncs | [Math ufuncs](./TUTORIAL_MATH_UFUNCS.md) |
 | Complex tensor storage and arithmetic | [Complex tensors](./TUTORIAL_COMPLEX.md) |
 | Unique values and occurrence counts | [Unique values](./TUTORIAL_UNIQUE.md) |
 | Missing values and masked reductions | [Masked data](./TUTORIAL_MASKED_DATA.md) |

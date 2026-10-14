@@ -193,6 +193,7 @@ See [DEV_LIGHTWEIGHT.md](docs/DEV_LIGHTWEIGHT.md) for memory-safe subsets in CI.
 | Tutorial | Topic |
 |----------|-------|
 | [TUTORIAL_FIRST_STEPS.md](docs/TUTORIAL_FIRST_STEPS.md) | Tensor creation, indexing, slicing |
+| [TUTORIAL_MATH_UFUNCS.md](docs/TUTORIAL_MATH_UFUNCS.md) | NumPy-style elementwise math and binary decomposition |
 | [TUTORIAL_MAP_REDUCE.md](docs/TUTORIAL_MAP_REDUCE.md) | `map` / `nmap` and reductions |
 | [TUTORIAL_AUTOGRAD.md](docs/TUTORIAL_AUTOGRAD.md) | `Variable`, gates, backprop |
 | [TUTORIAL_REDUCTIONS.md](docs/TUTORIAL_REDUCTIONS.md) | argmax / argmin / cumsum |

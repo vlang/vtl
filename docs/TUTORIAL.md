@@ -10,9 +10,10 @@ builds toward autograd, neural networks, optimizers, and GPU-backed examples.
 3. [Indexing and scatter](./TUTORIAL_INDEXING.md) — gather and indexed updates.
 4. [Broadcasting](./TUTORIAL_BROADCASTING.md) — shape-compatible operations.
 5. [Map and Reduce](./TUTORIAL_MAP_REDUCE.md) — element-wise transforms and reductions.
-6. [Reductions](./TUTORIAL_REDUCTIONS.md) — argmax, argmin, cumulative operations.
-7. [Random numbers](./TUTORIAL_RANDOM.md) — random tensors and reproducible seeds.
-8. [Histograms](./TUTORIAL_HISTOGRAMS.md) — one- and two-dimensional binning and density.
+6. [Math ufuncs](./TUTORIAL_MATH_UFUNCS.md) — elementwise functions and binary decomposition.
+7. [Reductions](./TUTORIAL_REDUCTIONS.md) — argmax, argmin, cumulative operations.
+8. [Random numbers](./TUTORIAL_RANDOM.md) — random tensors and reproducible seeds.
+9. [Histograms](./TUTORIAL_HISTOGRAMS.md) — one- and two-dimensional binning and density.
 
 ## Linear algebra
 
