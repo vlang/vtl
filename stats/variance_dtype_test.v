@@ -54,3 +54,39 @@ fn test_variance_explicit_dtype_empty_and_insufficient_slices() ! {
 		assert math.is_nan(value)
 	}
 }
+
+fn test_nan_moments_explicit_dtype_global() ! {
+	values := vtl.from_1d([f32(1), f32(math.nan()), 3, 5])!
+	assert nanmean_as[f32, f64](values) == 3.0
+	assert math.abs(nanvariance_as[f32, f64](values, 0)! - 8.0 / 3.0) < 1e-12
+	assert math.abs(nanstd_as[f32, f64](values, 0)! - math.sqrt(8.0 / 3.0)) < 1e-12
+
+	all_nan := vtl.from_1d([f32(math.nan()), f32(math.nan())])!
+	assert math.is_nan(nanmean_as[f32, f64](all_nan))
+	assert math.is_nan(nanvariance_as[f32, f64](all_nan, 0)!)
+	if _ := nanvariance_as[f32, f64](values, -1) {
+		assert false, 'negative ddof must return an error'
+	}
+}
+
+fn test_nan_moments_explicit_dtype_axis_reductions() ! {
+	values := vtl.from_array([f32(1), f32(math.nan()), f32(math.nan()), f32(math.nan())], [
+		2,
+		2,
+	])!
+	means := nanmean_along_axis_as[f32, f64](values, 1, false)!
+	assert means.shape == [2]
+	assert means.get_nth(0) == 1.0
+	assert math.is_nan(means.get_nth(1))
+
+	variances := nanvariance_along_axis_as[f32, f64](values, 1, 1, true)!
+	assert variances.shape == [2, 1]
+	assert math.is_nan(variances.get_nth(0))
+	assert math.is_nan(variances.get_nth(1))
+
+	multi_mean := nanmean_along_axes_as[f32, f64](values, [0, 1], false)!
+	assert multi_mean.get_nth(0) == 1.0
+	multi_std := nanstd_along_axes_as[f32, f64](values, [0, 1], 0, true)!
+	assert multi_std.shape == [1, 1]
+	assert multi_std.get_nth(0) == 0.0
+}
