@@ -170,8 +170,9 @@ of non-ignored target weights; soft-target means divide by the number of samples
 propagate gradients.
 
 **Next:** Audit formulas, defaults, reduction modes, sparse gradients, and
-numerical behavior against `torch.nn` and `torch.optim`. Extend parameter
-groups beyond SGD, then integrate scheduler values with optimizer updates.
+numerical behavior against `torch.nn` and `torch.optim`. Parameter groups are
+implemented for all current optimizers. Scheduler integration and remaining
+backend differences are tracked in [#736](https://github.com/vlang/vtl/issues/736).
 
 ### Data pipeline
 
