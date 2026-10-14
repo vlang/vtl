@@ -198,8 +198,9 @@ See [NumPy's nan_to_num reference](https://numpy.org/doc/stable/reference/genera
 for the component-wise complex behavior.
 `signbit` returns a boolean tensor for negative floating-point sign bits,
 including negative zero; signed negative integers are true, while unsigned
-integers and booleans produce false. `logaddexp`
-and `logaddexp2` use stable log-domain formulas, preserve f32/f64 dtype, and
+integers and booleans produce false. `copysign` applies the sign bit of one
+f32/f64 tensor to another tensor's magnitude with broadcasting. `logaddexp` and
+`logaddexp2` use stable log-domain formulas, preserve f32/f64 dtype, and
 broadcast same-dtype operands while handling IEEE infinities and NaNs. See the
 [math ufunc tutorial](./TUTORIAL_MATH_UFUNCS.md) and
 [`math_log_domain` example](../examples/math_log_domain/README.md).

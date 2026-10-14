@@ -53,6 +53,26 @@ fn logaddexp2_value(x f64, y f64) f64 {
 	return maximum + math.log2(1.0 + math.exp2(minimum - maximum))
 }
 
+// copysign returns the magnitude of `magnitude` with the sign bit of `sign`.
+// Both f32 and f64 inputs broadcast to a common output shape.
+pub fn copysign[T](magnitude &Tensor[T], sign &Tensor[T]) !&Tensor[T] {
+	$if T is f32 || T is f64 {
+		shape := broadcast_shapes(magnitude.shape, sign.shape)!
+		absolute := magnitude.broadcast_to(shape)!
+		signs := sign.broadcast_to(shape)!
+		mut result := empty[T](shape, memory: .row_major)
+		for flat_index in 0 .. result.size {
+			magnitude_offset := broadcast_tensor_offset(flat_index, shape, absolute.strides)
+			sign_offset := broadcast_tensor_offset(flat_index, shape, signs.strides)
+			result.data.data[flat_index] = T(math.copysign(f64(absolute.data.data[magnitude_offset]),
+				f64(signs.data.data[sign_offset])))
+		}
+		return result
+	} $else {
+		return error('copysign requires f32 or f64 tensors of the same type')
+	}
+}
+
 // logaddexp computes log(exp(a) + exp(b)) elementwise using a stable form.
 // The f32/f64 operands broadcast to a common output shape.
 pub fn logaddexp[T](a &Tensor[T], b &Tensor[T]) !&Tensor[T] {

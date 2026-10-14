@@ -1,7 +1,8 @@
 # Stable Log-Domain Ufuncs
 
-Use `signbit` to inspect floating-point signs and `logaddexp` / `logaddexp2` to
-combine log-domain values without overflowing intermediate exponentials.
+Use `signbit` and `copysign` for floating-point signs and `logaddexp` /
+`logaddexp2` to combine log-domain values without overflowing intermediate
+exponentials.
 
 Run from the V modules directory:
 
