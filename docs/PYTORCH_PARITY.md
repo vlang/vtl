@@ -81,8 +81,11 @@ hidden-state contract.
 
 **Next:** Add bidirectional recurrent layers, a PyTorch-style stacked recurrent
 state API, recurrent dropout and variable-length packed sequences. `Sequential`
-supports `train()`/`eval()` behavior for Dropout and BatchNorm1D; extend mode-aware
-behavior to custom modules and the rest of the normalization API. Parameter and
+supports `train()`/`eval()` behavior for Dropout, BatchNorm1D, BatchNorm2D and
+BatchNorm3D (mode propagation and running-statistics behavior are covered by
+`nn/models/sequential_normalization_test.v`); LayerNorm, GroupNorm and RMSNorm
+have no training-dependent statistics, matching PyTorch. Extending mode-aware
+behavior to custom modules remains open. Parameter and
 buffer registration and composable user-defined modules remain gaps. Stateful
 LSTM/GRU entry points are available today, but do not imply parity with the
 full `torch.nn` recurrent API or CUDA backward.
