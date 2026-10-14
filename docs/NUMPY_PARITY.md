@@ -274,6 +274,54 @@ return `bool` tensors; empty reduced dimensions return the logical identities
 (true and false respectively). Empty axis lists perform elementwise truth
 conversion, matching NumPy's `axis=()` behavior.
 
+### Reduction behavior matrix
+
+This matrix records the current public contracts, including legacy differences
+that callers must account for. “Empty reduction” means the reduced input has no
+elements; an empty output caused only by an unreduced dimension remains empty.
+
+| Family | Axes / `keepdims` | Output type | NaNs | Empty reduction |
+|--------|-----------------|-------------|------|-----------------|
+| `sum` / `product` | G/A/M; KD on A/M; A=() is identity | T; `_as` selects U | Propagate | Identities 0 / 1 |
+| `nansum` / `nanprod` | G/A/M; KD on A/M | f64; `_as` selects U | Skip | Identities 0 / 1 |
+| `min` / `max` | G/A/M; A retains by default; M takes KD | T | Propagate first NaN | G returns 0; empty reduced A errors |
+| `nanmin` / `nanmax` | G/A/M; retained and squeezed A forms | f64 | Skip | NaN if empty or no valid values |
+| `mean` / `variance` / `std` | G/A/M; KD on tensor A/M forms | mean T; var/std f64; `_as` selects U | Propagate | See moments details below |
+| `nanmean` / `nanvar` / `nanstd` | G/A/M; KD on tensor A/M forms | f64; `_as` selects U | Skip | NaN if empty, invalid, or under-sampled |
+| `argmin` / `argmax` | G flattened index; A retained or squeezed | int | First NaN; `nanarg*` skips | Empty/no-valid reductions error |
+| `median` / quantiles | G/A/M; KD forms; multi-q prepends q axis | f64 | See quantile details below | Median NaN; quantile errors |
+| Weighted average / quantiles | G/A/M; KD; multi-q adds q axis | f64 | Average propagates; `nan` skips | Empty/zero-weight errors |
+| `all` / `any` | G/A/M; KD; A=() is elementwise | bool | NaN is truthy | Identities true / false |
+| `cumsum` / `cumprod` | A preserves shape; flat returns 1-D; no KD | T; `_as` selects U | Propagates forward | Empty tensor |
+| `ptp` | G/A/M; KD on tensor forms | T | Propagate | Empty reduced extent errors |
+
+Legend: G=global, A=one axis, M=multiple axes, KD=`keepdims`, T=input type,
+U=explicit output/accumulator type, q=number of requested quantiles.
+
+For moments, legacy global `mean` returns the additive identity on an empty
+real tensor; `mean_as[T, f64]` returns NaN. Global variance/std error when the
+observation count does not exceed `ddof`; axis variance/std return NaN for
+under-sampled slices. NaN-aware moments return NaN for empty/all-NaN inputs or
+slices and when valid observations do not exceed `ddof`.
+
+Axis `argmin`/`argmax` keep the reduced dimension in their default forms;
+`*_squeeze` removes it. Ordinary quantile forms propagate NaNs in covered tests;
+`nan*` forms skip them. Cross-API NaN fixtures for ordinary median remain part
+of the parity audit. Empty median returns NaN, while empty quantile/percentile
+calls error. Weighted average errors on empty inputs or zero total weight;
+weighted quantiles use the inverted-CDF method and error if valid observations
+have zero total weight.
+
+The global empty-input results for `mean`, `min`, and `max` are compatibility
+differences in the legacy generic APIs. `mean_as[T, f64]` returns NaN for an
+empty input, while `nanmean`, `nanmin`, and `nanmax` return NaN when they have
+no valid values. Regression coverage lives in
+[`axis_reductions_test.v`](../tests/core/axis_reductions_test.v),
+[`multi_axis_reductions_test.v`](../tests/core/multi_axis_reductions_test.v),
+[`logical_reduction_test.v`](../tests/core/logical_reduction_test.v),
+[`reduction_test.v`](../tests/core/reduction_test.v), and the
+[`stats` tests](../stats/).
+
 ### Linear algebra
 
 **Current:** NumPy-style vector/matrix `matmul` promotion and batched
