@@ -15,7 +15,6 @@ performance, or ecosystem.
 | CUDA backward for remaining neural-network layers | [#161](https://github.com/vlang/vtl/issues/161) |
 | Tensor semantics; dtype and device model | [#731](https://github.com/vlang/vtl/issues/731), [#732](https://github.com/vlang/vtl/issues/732) |
 | Higher-order autograd | [#733](https://github.com/vlang/vtl/issues/733) |
-| Floating-point remainder autograd | [#798](https://github.com/vlang/vtl/issues/798) |
 | Functional tensor transforms such as `vmap` | [#784](https://github.com/vlang/vtl/issues/784) |
 | Stacked recurrent APIs; custom module state | [#734](https://github.com/vlang/vtl/issues/734), [#735](https://github.com/vlang/vtl/issues/735) |
 | Optimizer/scheduler parity | [#736](https://github.com/vlang/vtl/issues/736) |
@@ -69,6 +68,9 @@ coverage and test transfers, mixed precision, and device-specific behavior.
 including cumulative sum and product, selected neural-network layers, and
 differentiable multi-axis sum and mean reductions (`Variable.sum_along_axes`
 and `Variable.mean_along_axes`; implemented in [#753](https://github.com/vlang/vtl/issues/753)).
+Floating-point `Variable.remainder` also propagates gradients to both operands,
+reduces broadcast gradients to their input shapes, and follows PyTorch's
+`floor(a / b)` divisor-gradient convention at exact multiples.
 
 **Next:** Expand operation coverage and add gradient APIs and graph controls
 comparable to `torch.autograd`, including higher-order gradients and retained

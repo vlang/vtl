@@ -12,7 +12,6 @@ tests, documentation, and examples where users need them.
 |------|-------|
 | Numeric promotion and tensor creation | [#717](https://github.com/vlang/vtl/issues/717), [#718](https://github.com/vlang/vtl/issues/718) |
 | Ufunc and elementwise math coverage | [#777](https://github.com/vlang/vtl/issues/777) |
-| Floating remainder autograd | [#798](https://github.com/vlang/vtl/issues/798) |
 | Ufunc execution methods and output/mask semantics | [#783](https://github.com/vlang/vtl/issues/783) |
 | Copy/view rules and indexing bounds | [#719](https://github.com/vlang/vtl/issues/719), [#720](https://github.com/vlang/vtl/issues/720) |
 | Reductions and complex support | [#721](https://github.com/vlang/vtl/issues/721), [#722](https://github.com/vlang/vtl/issues/722) |
