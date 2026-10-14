@@ -253,14 +253,15 @@ product along one axis also provide explicit output dtype selection through
 accumulator and output type for ordinary means. `variance_as` and `std_as`,
 with their single-axis and multi-axis forms, provide the same control for
 ordinary variance and standard deviation. Existing APIs remain available with
-their original return types.
+their original return types. NaN-aware mean, variance, and standard deviation
+also provide typed global, single-axis, and multi-axis APIs; empty or all-NaN
+floating-point slices produce NaN.
 `stats.sum_accurate` provides an opt-in Neumaier-compensated global sum for
 floating-point tensors.
 
 **Remaining:** add `keepdims` options consistently across remaining
-reductions, extend accumulator dtype controls to NaN-aware means, variance,
-standard deviation and other families, and broaden reduction coverage.
-NaN-aware moments currently retain their existing `f64` output behavior.
+reductions, extend accumulator dtype controls to other reduction families, and
+broaden reduction coverage.
 
 Logical `all_axis`/`any_axis` and multi-axis `all_axes`/`any_axes` reductions
 return `bool` tensors; empty reduced dimensions return the logical identities

@@ -539,6 +539,10 @@ reductions. Use `_axis_keepdims` to retain the reduced axis with length one.
 Empty or all-NaN slices reduce to `0` for sums, `1` for products, and NaN for
 minima or maxima.
 
+NaN-aware means, variances, and standard deviations also accept an explicit
+accumulator and output type. Their `_along_axis_as` and `_along_axes_as`
+variants accept `keepdims`; all-NaN floating-point slices return NaN.
+
 ```v
 import vtl
 import vtl.stats
@@ -548,6 +552,9 @@ samples := vtl.from_array([1.0, math.nan(), 3.0, 4.0, math.nan(), 6.0], [2, 3])!
 assert stats.nansum(samples) == 14.0
 assert stats.nanprod(samples) == 72.0
 assert stats.nansum_as[f64, f64](samples) == 14.0
+typed_samples := vtl.from_1d([f32(1), f32(math.nan()), 3, 5])!
+assert stats.nanmean_as[f32, f64](typed_samples) == 3.0
+assert math.abs(stats.nanvariance_as[f32, f64](typed_samples, 0)! - 8.0 / 3.0) < 1e-12
 assert stats.nansum_axis_as[f64, f64](samples, 1, true)!.shape == [2, 1]
 assert stats.nanmin_axis(samples, 1)!.to_array() == [1.0, 4.0]
 assert stats.nanmax_axis_keepdims(samples, 1)!.to_array() == [3.0, 6.0]
