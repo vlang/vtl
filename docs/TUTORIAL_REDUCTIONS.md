@@ -272,6 +272,27 @@ t2.cumsum[f64](0)!
 //    [5, 7,  9]]   — cumulative sum along columns (axis=0)
 ```
 
+NumPy's default `axis=None` flattens the input in logical row-major order and
+returns a one-dimensional result. Use `cumsum_flat` and `cumprod_flat` for
+that behavior; the explicit-type variants select the accumulator and output
+type:
+
+```v
+import vtl
+
+t := vtl.from_array([1, 2, 3, 4, 5, 6], [2, 3])!
+assert t.cumsum_flat()!.to_array() == [1, 3, 6, 10, 15, 21]
+assert t.cumprod_flat()!.to_array() == [1, 2, 6, 24, 120, 720]
+
+small := vtl.from_1d([i8(100), 4, 100, 4])!
+wide := small.cumprod_flat_as[i64]()!
+assert wide.to_array() == [100, 400, 40000, 160000]
+```
+
+The default generic variants keep the input element type. NumPy promotes
+boolean cumulative operations to an integer output by default; use the
+`*_flat_as` variants to choose the desired output type explicitly.
+
 Use `cumsum_as[U]` and `cumprod_as[U]` to choose a wider output type when the
 input dtype could lose precision or overflow during accumulation:
 

@@ -209,6 +209,31 @@ fn test_variable_cumprod_forward_backward_with_zero_inputs() ! {
 	assert matrix_input.grad.to_array() == [4.0, 2.0, 6.0, 4.0]
 }
 
+fn test_variable_flattened_cumulative_operations_forward_backward() ! {
+	mut sum_context := autograd.ctx[f64]()
+	sum_input := sum_context.variable(vtl.from_array([1.0, 2.0, 3.0, 4.0], [2, 2])!)
+	mut cumulative_sum := sum_input.cumsum_flat()!
+	assert cumulative_sum.value.shape == [4]
+	assert cumulative_sum.value.to_array() == [1.0, 3.0, 6.0, 10.0]
+	cumulative_sum.backprop()!
+	assert sum_input.grad.to_array() == [4.0, 3.0, 2.0, 1.0]
+
+	mut product_context := autograd.ctx[f64]()
+	product_input := product_context.variable(vtl.from_array([2.0, 3.0, 4.0, 5.0], [2, 2])!)
+	mut cumulative_product := product_input.cumprod_flat()!
+	assert cumulative_product.value.shape == [4]
+	assert cumulative_product.value.to_array() == [2.0, 6.0, 24.0, 120.0]
+	cumulative_product.backprop()!
+	assert product_input.grad.to_array() == [76.0, 50.0, 36.0, 24.0]
+
+	mut zero_context := autograd.ctx[f64]()
+	zero_input := zero_context.variable(vtl.from_1d([2.0, 0.0, 3.0])!)
+	mut zero_product := zero_input.cumprod_flat()!
+	assert zero_product.value.to_array() == [2.0, 0.0, 0.0]
+	zero_product.backprop()!
+	assert zero_input.grad.to_array() == [1.0, 8.0, 0.0]
+}
+
 fn test_reshape_forward_backward() {
 	f64_ctx := autograd.ctx[f64]()
 	x := f64_ctx.variable(vtl.from_1d([1.0, 2.0, 3.0, 4.0])!)

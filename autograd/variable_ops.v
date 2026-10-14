@@ -87,6 +87,30 @@ pub fn (v &Variable[T]) cumprod(axis int) !&Variable[T] {
 	return result
 }
 
+// cumsum_flat computes a cumulative sum over logical row-major order and
+// returns a one-dimensional variable.
+pub fn (v &Variable[T]) cumsum_flat() !&Variable[T] {
+	value := v.value.cumsum_flat[T]()!
+	mut result := v.context.variable(value)
+	if v.requires_grad {
+		gate := cumsum_gate[T](v.value.shape, -1)
+		gate.cache(mut result, v)!
+	}
+	return result
+}
+
+// cumprod_flat computes a cumulative product over logical row-major order and
+// returns a one-dimensional variable.
+pub fn (v &Variable[T]) cumprod_flat() !&Variable[T] {
+	value := v.value.cumprod_flat[T]()!
+	mut result := v.context.variable(value)
+	if v.requires_grad {
+		gate := cumprod_gate[T](v.value, -1)
+		gate.cache(mut result, v)!
+	}
+	return result
+}
+
 // mean_along_axis computes one-axis means. Set keepdims to retain the reduced
 // axis with length one.
 pub fn (v &Variable[T]) mean_along_axis(axis int, keepdims bool) !&Variable[T] {

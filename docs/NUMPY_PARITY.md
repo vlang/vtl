@@ -260,7 +260,10 @@ their original return types. NaN-aware mean, variance, and standard deviation
 also provide typed global, single-axis, and multi-axis APIs; empty or all-NaN
 floating-point slices produce NaN.
 `stats.sum_accurate` provides an opt-in Neumaier-compensated global sum for
-floating-point tensors.
+floating-point tensors. `Tensor.cumsum_flat` and `Tensor.cumprod_flat` provide
+NumPy's flattened `axis=None` cumulative behavior, with explicit accumulator
+types through `cumsum_flat_as` and `cumprod_flat_as`; their `Variable`
+counterparts propagate gradients through the flattened order.
 
 **Remaining:** add `keepdims` options consistently across remaining
 reductions, extend accumulator dtype controls to other reduction families, and

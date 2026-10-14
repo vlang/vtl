@@ -214,6 +214,15 @@ pub fn (g &CumsumGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	if result.size == 0 {
 		return [result]
 	}
+	if g.axis < 0 {
+		gradient := payload.variable.grad
+		mut acc := vtl.cast[T](0)
+		for i := result.size - 1; i >= 0; i-- {
+			acc += gradient.get_nth(i)
+			result.set_nth(i, acc)
+		}
+		return [result]
+	}
 	rank := g.shape.len
 	mut strides := []int{len: rank}
 	strides[rank - 1] = 1
@@ -295,6 +304,25 @@ pub fn (g &CumprodGate[T]) backward(payload &Payload[T]) ![]&vtl.Tensor[T] {
 	shape := g.input.shape
 	mut result := vtl.zeros[T](shape, vtl.TensorData{})
 	if result.size == 0 {
+		return [result]
+	}
+	if g.axis < 0 {
+		gradient := payload.variable.grad
+		mut prefix_products := []T{len: result.size}
+		mut prefix_product := vtl.cast[T](1)
+		for i in 0 .. result.size {
+			prefix_products[i] = prefix_product
+			prefix_product *= g.input.get_nth(i)
+		}
+		mut suffix_gradient := vtl.cast[T](0)
+		for i := result.size - 1; i >= 0; i-- {
+			if i + 1 < result.size {
+				suffix_gradient = gradient.get_nth(i) + g.input.get_nth(i + 1) * suffix_gradient
+			} else {
+				suffix_gradient = gradient.get_nth(i)
+			}
+			result.set_nth(i, prefix_products[i] * suffix_gradient)
+		}
 		return [result]
 	}
 	rank := shape.len
