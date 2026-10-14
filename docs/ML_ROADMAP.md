@@ -53,27 +53,22 @@ softmax, LayerNorm, Conv2D, or neural-network dispatch path. Track this as
 unfinished backend work; issue closure is not implementation evidence. The
 itemized status is in the [main roadmap](../ROADMAP.md#phase-5--opencl-backend).
 
-## Current open issues (checked 2026-10-11)
+## Current open issues (checked 2026-10-14)
 
-| Priority | Issue | Topic |
-|----------|-------|--------|
-| P1 | [#161](https://github.com/vlang/vtl/issues/161) | CUDA backward for LSTM, attention, norms, embeddings, and pooling; validation pending |
-| P2 | [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support |
-| P2 | [#40][issue40] | Gate fusion remains; fresh gradient-buffer reuse merged in [#598][pr598] |
-| P2 | [#3](https://github.com/vlang/vtl/issues/3) | Await a safe V compiler alias contract; continue benchmarking CPU kernels |
+| Issue | Topic |
+|-------|-------|
+| [#161](https://github.com/vlang/vtl/issues/161) | CUDA backward for LSTM, attention, norms, embeddings, and pooling; validation pending |
+| [#63](https://github.com/vlang/vtl/issues/63) | ARM GPU support |
 
-V 0.5.2 does not emit a `restrict` alias contract. The upstream
-[V issue #1839](https://github.com/vlang/v/issues/1839) is closed, but the
-current C generator source still does not emit a non-aliasing qualifier for
-tensor kernel pointers. `@[direct_array_access]` removes bounds checks only;
-it does not establish non-aliasing.
-
-Project #8 currently contains four open VTL issues: #3, #40, #63, and #161.
-Issue #161 is tracked as a P1 backend correctness item in M2-GPU-Core. Issue
-#52's Burn comparison is complete in [BURN_PARITY.md](./BURN_PARITY.md), and
-the issue and project item are closed/Done. Issue #41 is closed and marked
-Done on the board; it is no longer a beta gate.
-
+Issues #3 and #40 were closed on GitHub on 2026-10-13. The #3 resolution
+uses explicit SIMD and validated contiguous kernels rather than a V-level
+`restrict` contract; V 0.5.2 does not emit a non-aliasing qualifier, and
+`@[direct_array_access]` removes bounds checks without establishing alias
+guarantees. The #40 resolution reports single-traversal backward coverage for
+every autograd gate family; broader operation-chain fusion remains in the
+performance backlog below. Issue #52's Burn comparison is documented in
+[BURN_PARITY.md](./BURN_PARITY.md) and is closed. Issue #41's Windows heap
+corruption was fixed in main (PR [#409](https://github.com/vlang/vtl/pull/409)).
 ## Additional post-beta tracking
 
 | Priority | Issue | Topic |
@@ -111,9 +106,6 @@ v run ./vtl/examples/nn_cifar10_f32_tiny_synth/main.v
 # VTL_USE_VULKAN=1 v -prod -d vulkan run vtl/examples/nn_cifar10_vulkan/main.v
 # VTL_USE_VULKAN=1 VTL_TEST_VULKAN=1 VJOBS=1 v -prod -d vulkan test vtl/nn/f32_vulkan_training_smoke_d_vulkan_test.v
 ```
-
-[issue40]: https://github.com/vlang/vtl/issues/40
-[pr598]: https://github.com/vlang/vtl/pull/598
 
 ## CI
 
