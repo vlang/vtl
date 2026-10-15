@@ -359,7 +359,7 @@ jobs:
             if ($definitions -eq 0) {
               $prototypePattern = (
                 '(?m)^(void\*|int|u64) (' + $namePattern +
-                ')\(([^\r\n;]*)\);$'
+                ')\(([^\r\n;]*)\);(\r?)$'
               )
               $prototypes = [regex]::Matches($source, $prototypePattern).Count
               if ($prototypes -ne $helperNames.Count) {
@@ -368,7 +368,7 @@ jobs:
               $source = [regex]::Replace(
                 $source,
                 $prototypePattern,
-                'static $1 $2($3);'
+                'static $1 $2($3);$4'
               )
               $marker = '#include <windows.h>'
               $markerIndex = $source.IndexOf($marker)
