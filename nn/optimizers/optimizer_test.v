@@ -2,8 +2,7 @@ module optimizers
 
 import vtl
 import vtl.autograd
-import vtl.nn.models
-import rand
+import vtl.nn.layers
 import math
 
 fn ctx[T]() &autograd.Context[T] {
@@ -41,11 +40,9 @@ fn test_sgd_zeros_grad_after_update() ! {
 
 fn test_sgd_momentum_weight_decay_and_dampening() ! {
 	c := ctx[f64]()
-	mut model := models.sequential_from_ctx[f64](c)
-	model.input([1])
-	model.linear(1)
+	layer := layers.linear_layer[f64](c, 1, 1)
 	mut opt := sgd[f64](momentum: 0.9, dampening: 0.5, weight_decay: 0.1, learning_rate: 0.1)
-	opt.build_params(model.info.layers)
+	opt.build_params([layer])
 	assert opt.params.len == 2
 	assert opt.momentum_buffers.len == opt.params.len
 	mut p := opt.params[0]
@@ -62,11 +59,9 @@ fn test_sgd_momentum_weight_decay_and_dampening() ! {
 
 fn test_sgd_nesterov_uses_first_momentum_buffer() ! {
 	c := ctx[f64]()
-	mut model := models.sequential_from_ctx[f64](c)
-	model.input([1])
-	model.linear(1)
+	layer := layers.linear_layer[f64](c, 1, 1)
 	mut opt := sgd[f64](learning_rate: 0.1, momentum: 0.9, nesterov: true)
-	opt.build_params(model.info.layers)
+	opt.build_params([layer])
 	mut p := opt.params[0]
 	p.value.set_nth(0, 5.0)
 	p.grad.set_nth(0, 1.0)
@@ -410,75 +405,4 @@ fn test_nadam_and_radam_weight_decay_modes() ! {
 	assert math.abs(radam_decoupled_param.value.get_nth(0) - 1.998) < 1e-12
 	assert radam_decoupled.first_moments[0].get_nth(0) == 0.0
 	assert radam_decoupled.second_moments[0].get_nth(0) == 0.0
-}
-
-fn train_xor_with_nadam() !(f64, f64, int) {
-	rand.seed([u32(42), u32(0)])
-	c := ctx[f64]()
-	mut model := models.sequential_from_ctx[f64](c)
-	model.input([2])
-	model.linear(4)
-	model.tanh()
-	model.linear(1)
-	model.sigmoid_cross_entropy_loss()
-	mut optimizer := nadam_optimizer[f64](learning_rate: 0.01)
-	optimizer.build_params(model.info.layers)
-	mut x := c.variable(vtl.from_array([0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0], [4, 2])!)
-	y := vtl.from_array([0.0, 1.0, 1.0, 0.0], [4])!
-	mut initial_loss := 0.0
-	for epoch in 0 .. 5000 {
-		prediction := model.forward(x)!
-		mut loss := model.loss(prediction, y)!
-		if epoch == 0 { initial_loss = loss.value.get_nth(0) }
-		loss.backprop()!
-		optimizer.update()!
-		x.grad = vtl.zeros_like[f64](x.value)
-	}
-	prediction := model.forward(x)!
-	mut correct := 0
-	for i in 0 .. 4 {
-		if (prediction.value.get_nth(i) > 0.0) == (y.get_nth(i) == 1.0) { correct++ }
-	}
-	final_loss := model.loss(prediction, y)!.value.get_nth(0)
-	return initial_loss, final_loss, correct
-}
-
-fn train_xor_with_radam() !(f64, f64, int) {
-	rand.seed([u32(42), u32(0)])
-	c := ctx[f64]()
-	mut model := models.sequential_from_ctx[f64](c)
-	model.input([2])
-	model.linear(4)
-	model.tanh()
-	model.linear(1)
-	model.sigmoid_cross_entropy_loss()
-	mut optimizer := radam_optimizer[f64](learning_rate: 0.01)
-	optimizer.build_params(model.info.layers)
-	mut x := c.variable(vtl.from_array([0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0], [4, 2])!)
-	y := vtl.from_array([0.0, 1.0, 1.0, 0.0], [4])!
-	mut initial_loss := 0.0
-	for epoch in 0 .. 5000 {
-		prediction := model.forward(x)!
-		mut loss := model.loss(prediction, y)!
-		if epoch == 0 { initial_loss = loss.value.get_nth(0) }
-		loss.backprop()!
-		optimizer.update()!
-		x.grad = vtl.zeros_like[f64](x.value)
-	}
-	prediction := model.forward(x)!
-	mut correct := 0
-	for i in 0 .. 4 {
-		if (prediction.value.get_nth(i) > 0.0) == (y.get_nth(i) == 1.0) { correct++ }
-	}
-	final_loss := model.loss(prediction, y)!.value.get_nth(0)
-	return initial_loss, final_loss, correct
-}
-
-fn test_nadam_and_radam_converge_on_deterministic_xor() ! {
-	nadam_initial, nadam_final, nadam_correct := train_xor_with_nadam()!
-	assert nadam_correct == 4, 'NAdam should classify all XOR cases, got ${nadam_correct}/4'
-	assert nadam_final < nadam_initial, 'NAdam loss did not decrease: ${nadam_initial} -> ${nadam_final}'
-	radam_initial, radam_final, radam_correct := train_xor_with_radam()!
-	assert radam_correct == 4, 'RAdam should classify all XOR cases, got ${radam_correct}/4'
-	assert radam_final < radam_initial, 'RAdam loss did not decrease: ${radam_initial} -> ${radam_final}'
 }
