@@ -85,8 +85,8 @@ VJOBS=1 vscoped env VSL_TEST_VULKAN=1 v -prod -d vulkan test ./vsl/vulkan/comput
 
 - **PR default (`ci.yml`):** `bin/test` — discover every directory containing
   `*_test.v` and run each package separately to release compiler memory. Root
-  tests and the large `autograd_tests`, `datasets`, `la`, `nn`, `nn/layers`,
-  `nn/models`, and selected optimizer/loss packages run one file at a time. The
+  tests and the large `autograd_tests`, `datasets`, `la`, `nn`, `nn/internal`,
+  `nn/layers`, `nn/models`, and selected optimizer/loss packages run one file at a time. The
   script also compiles examples except `nn_cifar10/main.v` and runs tiny
   synthetic CIFAR examples.
 - **Label `full-ml`:** workflow `ci-full-ml.yml` — `bin/test --full`
