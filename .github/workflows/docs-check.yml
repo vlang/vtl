@@ -22,33 +22,42 @@ on:
 jobs:
   check-docs:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     env:
       VJOBS: '2'
     steps:
       - name: Checkout VTL
+        id: checkout_vtl
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           path: vtl
 
       - name: Checkout VSL
+        id: checkout_vsl
+        if: ${{ !cancelled() && steps.checkout_vtl.outcome == 'success' }}
         uses: actions/checkout@v4
         with:
           repository: vlang/vsl
           path: vsl
 
       - name: Setup V
+        id: setup_v
+        if: ${{ !cancelled() && steps.checkout_vsl.outcome == 'success' }}
         uses: vlang/setup-v@663cc08827d1fc0532ee755b4dedbb183c11d06a # v1.7
         with:
           check-latest: true
 
       - name: Copy VTL source code to V Modules
+        id: copy_vtl_source_code_to_v_modules
+        if: ${{ !cancelled() && steps.setup_v.outcome == 'success' }}
         run: |
           mkdir -p ~/.vmodules
           cp -rf ./vtl ~/.vmodules/vtl
           cp -rf ./vsl ~/.vmodules/vsl
 
       - name: Detect changed Markdown
+        if: ${{ !cancelled() && steps.copy_vtl_source_code_to_v_modules.outcome == 'success' }}
         id: markdown
         run: |
           cd vtl
