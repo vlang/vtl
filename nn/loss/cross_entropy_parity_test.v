@@ -41,7 +41,7 @@ fn test_cross_entropy_weighted_mean_uses_target_weight_sum() ! {
 	want := (math.log(4.0) + 3.0 * math.log(4.0 / 3.0)) / 4.0
 	assert math.abs(result.value.get_nth(0) - want) < 1e-12
 	result.backprop()!
-	for i, expected in [-0.1875, 0.1875, 0.140625, -0.140625] {
+	for i, expected in [-0.1875, 0.1875, 0.1875, -0.1875] {
 		assert math.abs(prediction.grad.get_nth(i) - expected) < 1e-12
 	}
 }
@@ -63,7 +63,7 @@ fn test_cross_entropy_label_smoothing_index_target_and_gradient() ! {
 	target := vtl.from_array([1], [])!
 	mut result := cross_entropy_loss_indices[f64](unsafe { nil }, label_smoothing: 0.2).loss(prediction,
 		target)!
-	expected := -(0.9 * math.log(0.75) + 0.05 * (math.log(0.25) + math.log(0.75)))
+	expected := -(0.1 * math.log(0.25) + 0.9 * math.log(0.75))
 	assert math.abs(result.value.get_nth(0) - expected) < 1e-12
 	result.backprop()!
 	assert math.abs(prediction.grad.get_nth(0) - 0.15) < 1e-12

@@ -6,7 +6,7 @@ import vtl.nn.types
 import vtl.nn.gates.loss as loss_gates
 import vtl.nn.internal
 
-// HuberLoss (also known as Smooth L1 Loss) combines L1 and L2 loss, controlled by `delta`.
+// HuberLoss combines quadratic and linear error, controlled by `delta`.
 //
 // Formula:
 //   `L = mean(0.5·(x-y)²)               if |x-y| ≤ delta`
@@ -29,8 +29,6 @@ pub struct HuberLoss[T] {
 //
 // Fields:
 //   - `delta` — transition threshold between L2 (below) and L1 (above) behaviour. Default: 1.0.
-
-// HuberLossConfig defines a public data structure for this module.
 
 // HuberLossConfig defines a public data structure for this module.
 @[params]

@@ -229,6 +229,92 @@ pub fn huber_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], target &
 	return ret
 }
 
+// smooth_l1 computes PyTorch-style Smooth L1 with the selected reduction.
+pub fn smooth_l1[T](input &vtl.Tensor[T], target &vtl.Tensor[T], beta T, reduction string) !&vtl.Tensor[T] {
+	if input.shape != target.shape {
+		return error('Smooth L1 loss requires input and target with identical shapes')
+	}
+	if reduction !in ['none', 'mean', 'sum'] {
+		return error('Smooth L1 reduction must be none, mean, or sum')
+	}
+	beta_value := f64(beta)
+	if !math.is_finite(beta_value) || beta_value < 0.0 {
+		return error('Smooth L1 beta must be finite and non-negative')
+	}
+	mut total := 0.0
+	mut values := []T{len: input.size()}
+	for i in 0 .. input.size() {
+		difference := f64(input.get_nth(i)) - f64(target.get_nth(i))
+		absolute_difference := math.abs(difference)
+		value := if beta_value == 0.0 {
+			absolute_difference
+		} else if absolute_difference < beta_value {
+			0.5 * difference * difference / beta_value
+		} else {
+			absolute_difference - 0.5 * beta_value
+		}
+		values[i] = vtl.cast[T](value)
+		total += value
+	}
+	if reduction == 'none' {
+		return vtl.from_array(values, input.shape.clone())
+	}
+	if reduction == 'sum' {
+		return vtl.from_1d([vtl.cast[T](total)])
+	}
+	if input.size() == 0 {
+		return vtl.from_1d([vtl.cast[T](math.nan())])
+	}
+	return vtl.from_1d([vtl.cast[T](total / f64(input.size()))])
+}
+
+// smooth_l1_backward computes the gradient of Smooth L1 for the selected reduction.
+pub fn smooth_l1_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], target &vtl.Tensor[T], beta T, reduction string) !&vtl.Tensor[T] {
+	if input.shape != target.shape {
+		return error('Smooth L1 loss requires input and target with identical shapes')
+	}
+	if reduction !in ['none', 'mean', 'sum'] {
+		return error('Smooth L1 reduction must be none, mean, or sum')
+	}
+	beta_value := f64(beta)
+	if !math.is_finite(beta_value) || beta_value < 0.0 {
+		return error('Smooth L1 beta must be finite and non-negative')
+	}
+	mut values := []T{len: input.size()}
+	for i in 0 .. input.size() {
+		difference := f64(input.get_nth(i)) - f64(target.get_nth(i))
+		derivative := if beta_value == 0.0 {
+			if difference > 0.0 {
+				1.0
+			} else if difference < 0.0 {
+				-1.0
+			} else {
+				difference
+			}
+		} else if math.abs(difference) < beta_value {
+			difference / beta_value
+		} else if difference > 0.0 {
+			1.0
+		} else if difference < 0.0 {
+			-1.0
+		} else {
+			difference
+		}
+		upstream := if reduction == 'none' {
+			f64(gradient.get_nth(i))
+		} else {
+			f64(gradient.get([0]))
+		}
+		normalization := if reduction == 'mean' && input.size() > 0 {
+			f64(input.size())
+		} else {
+			1.0
+		}
+		values[i] = vtl.cast[T](upstream * derivative / normalization)
+	}
+	return vtl.from_array(values, input.shape.clone())
+}
+
 // nll computes Negative Log Likelihood from log-probabilities. Class-index
 // targets omit the class axis; one-hot/soft targets match the input shape.
 pub fn nll[T](input &vtl.Tensor[T], target &vtl.Tensor[T], weight &vtl.Tensor[T], ignore_index int, reduction string) !&vtl.Tensor[T] {
