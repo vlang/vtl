@@ -6,11 +6,14 @@ on:
 jobs:
   todo:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
 
     steps:
       - name: Begin CI...
+        id: begin_ci
         uses: actions/checkout@v3
 
       - name: TODO to Issue
+        if: ${{ success() && !cancelled() && steps.begin_ci.outcome == 'success' }}
         uses: alstr/todo-to-issue-action@v4
         id: todo
