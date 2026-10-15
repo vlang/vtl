@@ -103,7 +103,7 @@ else
 		if [[ "${relative_dir}" == "autograd_tests" || "${relative_dir}" == "autograd_tests/gate_iso" || "${relative_dir}" == "la" ||
 			"${relative_dir}" == "nn/internal" || "${relative_dir}" == "nn/layers" ||
 			"${relative_dir}" == "nn/loss" || "${relative_dir}" == "nn/optimizers" || "${relative_dir}" == "tests/core" ||
-			"${relative_dir}" == "datasets" ]]; then
+			"${relative_dir}" == "datasets" || "${relative_dir}" == "fft" ]]; then
 			echo "Testing ${relative_dir} one file at a time to cap compiler memory"
 			for file in "${test_dir}"/*_test.v; do
 				if [[ -f "${file}" ]]; then
