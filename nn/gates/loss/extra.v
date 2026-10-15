@@ -94,6 +94,52 @@ pub fn (g &HuberLossGate[T]) cache(mut result autograd.Variable[T], args ...auto
 	}
 }
 
+// SmoothL1LossGate stores tensors and beta needed for a Smooth L1 backward pass.
+pub struct SmoothL1LossGate[T] {
+pub:
+	input     &vtl.Tensor[T] = unsafe { nil }
+	target    &vtl.Tensor[T] = unsafe { nil }
+	beta      T
+	reduction string = 'mean'
+}
+
+// smooth_l1_loss_gate creates a Smooth L1 backward gate.
+pub fn smooth_l1_loss_gate[T](input &vtl.Tensor[T], target &vtl.Tensor[T], beta T, reduction string) &SmoothL1LossGate[T] {
+	return &SmoothL1LossGate[T]{
+		input:     input
+		target:    target
+		beta:      beta
+		reduction: reduction
+	}
+}
+
+// backward computes the Smooth L1 gradient with respect to the prediction.
+pub fn (g &SmoothL1LossGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
+	gradient := payload.variable.grad
+	result := internal.smooth_l1_backward[T](gradient, g.input, g.target, g.beta, g.reduction)!
+	return [result]
+}
+
+fn smooth_l1_loss_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &autograd.Payload[T](payload) }
+	tensors := unsafe { (&SmoothL1LossGate[T](gate)).backward(typed_payload)! }
+	return autograd.tensor_ptrs_to_voidptrs[T](tensors)
+}
+
+// cache registers prediction as the differentiable input of Smooth L1.
+pub fn (g &SmoothL1LossGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
+	a := args[0]
+	match a {
+		autograd.Variable[T] {
+			autograd.register[T]('SmoothL1', voidptr(g), smooth_l1_loss_gate_backward_dispatch[T], result,
+				[a])!
+		}
+		else {
+			return error('Smooth L1: cache: invalid argument')
+		}
+	}
+}
+
 // NLLLossGate defines a public data structure for this module.
 pub struct NLLLossGate[T] {
 pub:

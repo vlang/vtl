@@ -14,6 +14,11 @@ This module currently provides:
 | `nll_loss` | Negative log likelihood from log probabilities after log-softmax; accepts class indices or one-hot/soft targets and optional per-class weights. |
 | `kl_div_loss` | `sum(P * log(P / Q))`; input is `log(Q)` and target is probability distribution `P`. |
 | `huber_loss` | `0.5 d^2` when `|d| <= delta`, otherwise `delta (|d| - 0.5 delta)`, averaged. |
+| `smooth_l1_loss` | PyTorch-style `0.5 d^2 / beta` when `|d| < beta`, otherwise `|d| - 0.5 beta`; supports `none`, `mean`, and `sum` reductions. |
+
+`huber_loss` and `smooth_l1_loss` are separate objectives: Huber scales its
+linear region by `delta`, while Smooth L1 divides the quadratic region by
+`beta` and has unit slope outside it.
 
 Constructor signatures and reduction behavior are defined in the corresponding
 source files. In particular, binary cross entropy's `from_logits` setting and
