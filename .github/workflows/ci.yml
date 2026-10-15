@@ -40,26 +40,34 @@ jobs:
 
   fmt-check:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     env:
       VJOBS: '2'
 
     steps:
       - name: Checkout VTL
+        id: checkout_vtl
         uses: actions/checkout@v4
         with:
           path: vtl
 
       - name: Setup V
+        id: setup_v
+        if: ${{ success() && !cancelled() && steps.checkout_vtl.outcome == 'success' }}
         uses: vlang/setup-v@663cc08827d1fc0532ee755b4dedbb183c11d06a # v1.7
         with:
           check-latest: true
 
       - name: Move VTL source code to V Modules
+        id: move_vtl_source_code_to_v_modules
+        if: ${{ success() && !cancelled() && steps.setup_v.outcome == 'success' }}
         run: |
           mkdir -p ~/.vmodules
           mv ./vtl ~/.vmodules/vtl
 
       - name: V doctor
+        id: v_doctor
+        if: ${{ success() && !cancelled() && steps.move_vtl_source_code_to_v_modules.outcome == 'success' }}
         run: |
           cd ~/.vmodules
           if [[ "$RUNNER_OS" == "Linux" ]]; then
@@ -69,6 +77,8 @@ jobs:
           fi
 
       - name: Install dependencies
+        id: install_dependencies
+        if: ${{ success() && !cancelled() && steps.v_doctor.outcome == 'success' }}
         run: |
           sudo apt-get -qq update && \
           sudo apt-get -qq install \
@@ -86,6 +96,8 @@ jobs:
             opencl-headers
 
       - name: Verify Fmt
+        id: verify_fmt
+        if: ${{ success() && !cancelled() && steps.install_dependencies.outcome == 'success' }}
         run: |
           cd ~/.vmodules
           if [[ "$RUNNER_OS" == "Linux" ]]; then
@@ -96,6 +108,7 @@ jobs:
 
   run-tests:
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
 
     strategy:
       matrix:
@@ -130,28 +143,37 @@ jobs:
 
     steps:
       - name: Checkout VTL
+        id: checkout_vtl
         uses: actions/checkout@v4
         with:
           path: vtl
 
       - name: Checkout VSL
+        id: checkout_vsl
+        if: ${{ success() && !cancelled() && steps.checkout_vtl.outcome == 'success' }}
         uses: actions/checkout@v4
         with:
           repository: vlang/vsl
           path: vsl
 
       - name: Setup V
+        id: setup_v
+        if: ${{ success() && !cancelled() && steps.checkout_vsl.outcome == 'success' }}
         uses: vlang/setup-v@663cc08827d1fc0532ee755b4dedbb183c11d06a # v1.7
         with:
           check-latest: true
 
       - name: Move VTL source code to V Modules
+        id: move_vtl_source_code_to_v_modules
+        if: ${{ success() && !cancelled() && steps.setup_v.outcome == 'success' }}
         run: |
           mkdir -p ~/.vmodules
           mv ./vtl ~/.vmodules/vtl
           mv ./vsl ~/.vmodules/vsl
 
       - name: V doctor
+        id: v_doctor
+        if: ${{ success() && !cancelled() && steps.move_vtl_source_code_to_v_modules.outcome == 'success' }}
         run: |
           cd ~/.vmodules
           if [[ "$RUNNER_OS" == "Linux" ]]; then
@@ -161,6 +183,8 @@ jobs:
           fi
 
       - name: Install dependencies
+        id: install_dependencies
+        if: ${{ success() && !cancelled() && steps.v_doctor.outcome == 'success' }}
         run: |
           if [ $RUNNER_OS == 'Linux' ]; then
             sudo apt -qq update
@@ -182,6 +206,8 @@ jobs:
           fi
 
       - name: Execute Tests
+        id: execute_tests
+        if: ${{ success() && !cancelled() && steps.install_dependencies.outcome == 'success' }}
         env:
           VJOBS: '2'
         run: |
@@ -202,43 +228,57 @@ jobs:
   opencl-vcl-smoke:
     name: OpenCL/VCL tensor smoke
     runs-on: ubuntu-24.04
+    timeout-minutes: 60
     env:
       VJOBS: '2'
 
     steps:
       - name: Checkout VTL
+        id: checkout_vtl
         uses: actions/checkout@v4
         with:
           path: vtl
 
       - name: Checkout VSL
+        id: checkout_vsl
+        if: ${{ success() && !cancelled() && steps.checkout_vtl.outcome == 'success' }}
         uses: actions/checkout@v4
         with:
           repository: vlang/vsl
           path: vsl
 
       - name: Setup V
+        id: setup_v
+        if: ${{ success() && !cancelled() && steps.checkout_vsl.outcome == 'success' }}
         uses: vlang/setup-v@663cc08827d1fc0532ee755b4dedbb183c11d06a # v1.7
         with:
           check-latest: true
 
       - name: Move modules to V Modules
+        id: move_modules_to_v_modules
+        if: ${{ success() && !cancelled() && steps.setup_v.outcome == 'success' }}
         run: |
           mkdir -p ~/.vmodules
           mv ./vtl ~/.vmodules/vtl
           mv ./vsl ~/.vmodules/vsl
 
       - name: V doctor
+        id: v_doctor
+        if: ${{ success() && !cancelled() && steps.move_modules_to_v_modules.outcome == 'success' }}
         run: |
           cd ~/.vmodules
           env HOME="$HOME" PATH="$PATH" VJOBS=2 v doctor
 
       - name: Install OpenCL CPU runtime
+        id: install_opencl_cpu_runtime
+        if: ${{ success() && !cancelled() && steps.v_doctor.outcome == 'success' }}
         run: |
           sudo apt-get -qq update
           sudo apt-get -qq install opencl-headers ocl-icd-opencl-dev pocl-opencl-icd
 
       - name: Run VTL OpenCL/VCL smoke
+        id: run_vtl_opencl_vcl_smoke
+        if: ${{ success() && !cancelled() && steps.install_opencl_cpu_runtime.outcome == 'success' }}
         env:
           VJOBS: '2'
         run: |
@@ -249,38 +289,50 @@ jobs:
   vulkan-activation-smoke:
     name: Vulkan activation kernels
     runs-on: ubuntu-24.04
+    timeout-minutes: 60
     env:
       VJOBS: '2'
 
     steps:
       - name: Checkout VTL
+        id: checkout_vtl
         uses: actions/checkout@v4
         with:
           path: vtl
 
       - name: Checkout VSL
+        id: checkout_vsl
+        if: ${{ success() && !cancelled() && steps.checkout_vtl.outcome == 'success' }}
         uses: actions/checkout@v4
         with:
           repository: vlang/vsl
           path: vsl
 
       - name: Setup V
+        id: setup_v
+        if: ${{ success() && !cancelled() && steps.checkout_vsl.outcome == 'success' }}
         uses: vlang/setup-v@663cc08827d1fc0532ee755b4dedbb183c11d06a # v1.7
         with:
           check-latest: true
 
       - name: Move modules to V Modules
+        id: move_modules_to_v_modules
+        if: ${{ success() && !cancelled() && steps.setup_v.outcome == 'success' }}
         run: |
           mkdir -p ~/.vmodules
           mv ./vtl ~/.vmodules/vtl
           mv ./vsl ~/.vmodules/vsl
 
       - name: Install Vulkan runtime and headers
+        id: install_vulkan_runtime_and_headers
+        if: ${{ success() && !cancelled() && steps.move_modules_to_v_modules.outcome == 'success' }}
         run: |
           sudo apt-get -qq update
           sudo apt-get -qq install libvulkan-dev mesa-vulkan-drivers vulkan-tools
 
       - name: Run Vulkan activation layer tests
+        id: run_vulkan_activation_layer_tests
+        if: ${{ success() && !cancelled() && steps.install_vulkan_runtime_and_headers.outcome == 'success' }}
         run: |
           cd ~/.vmodules
           env HOME="$HOME" PATH="$PATH" \
@@ -292,22 +344,32 @@ jobs:
   windows-smoke:
     name: Windows core and autograd tests
     runs-on: windows-latest
+    timeout-minutes: 60
     env:
+      # Stop a failing test session at its first failure instead of
+      # running the whole suite to completion; the remaining files
+      # add no signal.
+      VTEST_FAIL_FAST: '1'
       VJOBS: '2'
 
     steps:
       - name: Checkout VTL
+        id: checkout_vtl
         uses: actions/checkout@v4
         with:
           path: vtl
 
       - name: Checkout VSL
+        id: checkout_vsl
+        if: ${{ success() && !cancelled() && steps.checkout_vtl.outcome == 'success' }}
         uses: actions/checkout@v4
         with:
           repository: vlang/vsl
           path: vsl
 
       - name: Checkout V compiler source
+        id: checkout_v_compiler_source
+        if: ${{ success() && !cancelled() && steps.checkout_vsl.outcome == 'success' }}
         uses: actions/checkout@v4
         with:
           repository: vlang/v
@@ -315,6 +377,8 @@ jobs:
           path: v
 
       - name: Checkout V Windows bootstrap source
+        id: checkout_v_windows_bootstrap_source
+        if: ${{ success() && !cancelled() && steps.checkout_v_compiler_source.outcome == 'success' }}
         uses: actions/checkout@v4
         with:
           repository: vlang/vc
@@ -322,6 +386,8 @@ jobs:
           path: v/vc
 
       - name: Checkout bundled Windows TCC
+        id: checkout_bundled_windows_tcc
+        if: ${{ success() && !cancelled() && steps.checkout_v_windows_bootstrap_source.outcome == 'success' }}
         uses: actions/checkout@v4
         with:
           repository: vlang/tccbin
@@ -329,6 +395,8 @@ jobs:
           path: v/thirdparty/tcc
 
       - name: Build current V compiler (Windows)
+        id: build_current_v_compiler_windows
+        if: ${{ success() && !cancelled() && steps.checkout_bundled_windows_tcc.outcome == 'success' }}
         shell: pwsh
         run: |
           # Use V's Windows bootstrap so it supports current VTL syntax.
@@ -408,6 +476,8 @@ jobs:
           }
 
       - name: Move VTL source code to V Modules
+        id: move_vtl_source_code_to_v_modules
+        if: ${{ success() && !cancelled() && steps.build_current_v_compiler_windows.outcome == 'success' }}
         shell: bash
         run: |
           mkdir -p ~/.vmodules
@@ -415,18 +485,24 @@ jobs:
           mv ./vsl ~/.vmodules/vsl
 
       - name: V doctor
+        id: v_doctor
+        if: ${{ success() && !cancelled() && steps.move_vtl_source_code_to_v_modules.outcome == 'success' }}
         shell: bash
         run: |
           cd ~/.vmodules
           v doctor
 
       - name: Run Windows core tensor tests
+        id: run_windows_core_tensor_tests
+        if: ${{ success() && !cancelled() && steps.v_doctor.outcome == 'success' }}
         shell: bash
         run: |
           cd ~/.vmodules
           v test vtl/tests/core
 
       - name: Run Windows autograd gate tests
+        id: run_windows_autograd_gate_tests
+        if: ${{ success() && !cancelled() && steps.run_windows_core_tensor_tests.outcome == 'success' }}
         shell: bash
         run: |
           cd ~/.vmodules
