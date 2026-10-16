@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="x-ua-compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>README | vdoc</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link
+			href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+		<link rel="manifest" href="site.webmanifest" />
+		<link rel="mask-icon" href="safari-pinned-tab.svg" color="#5bbad5" />
+		<meta name="msapplication-TileColor" content="#da532c" />
+		<meta name="theme-color" content="#ffffff" />
+		<link rel="stylesheet" href="doc.css" />
+		<link rel="stylesheet" href="normalize.css" />
+		<script src="dark-mode.js"></script>
+	</head>
+
+	<body>
+		<div><a id="skip-to-content-link" href="#main-content">Skip to content</a></div>
+		<div id="page">
+			<header class="doc-nav hidden">
+				<div class="heading-container">
+					<div class="heading">
+						<div class="info">
+							<div class="module">vtl</div>
+							<div class="toggle-version-container">
+								<span>0.2.0-beta.1 </span>
+								<div
+									id="dark-mode-toggle"
+									role="switch"
+									aria-checked="false"
+									aria-label="Toggle dark mode"
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" class="light-icon" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" class="dark-icon" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><g><rect fill="none" height="24" width="24"/></g><g><g><g><path d="M11.1,12.08C8.77,7.57,10.6,3.6,11.63,2.01C6.27,2.2,1.98,6.59,1.98,12c0,0.14,0.02,0.28,0.02,0.42 C2.62,12.15,3.29,12,4,12c1.66,0,3.18,0.83,4.1,2.15C9.77,14.63,11,16.17,11,18c0,1.52-0.87,2.83-2.12,3.51 c0.98,0.32,2.03,0.5,3.11,0.5c3.5,0,6.58-1.8,8.37-4.52C18,17.72,13.38,16.52,11.1,12.08z"/></g><path d="M7,16l-0.18,0C6.4,14.84,5.3,14,4,14c-1.66,0-3,1.34-3,3s1.34,3,3,3c0.62,0,2.49,0,3,0c1.1,0,2-0.9,2-2 C9,16.9,8.1,16,7,16z"/></g></g></svg>
+
+								</div>
+							</div>
+							<svg xmlns="http://www.w3.org/2000/svg" id="toggle-menu" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+
+						</div>
+						<div id="search">
+							<input type="text" placeholder="Search... (beta)" autocomplete="off" />
+						</div>
+					</div>
+				</div>
+				<nav class="search hidden"></nav>
+				<nav class="content hidden">
+					<ul>
+						<li class="open active">
+<div class="menu-row"><a href="./index.html">README</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./vtl.html">vtl</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./autograd.html">autograd</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./autograd_cuda.html">autograd_cuda</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./main.html">main</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./util.html">util</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./csv.html">csv</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./datasets.html">datasets</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./fft.html">fft</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./la.html">la</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./metrics.html">metrics</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./data.html">data</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./activation.html">activation</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./layers.html">layers</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./loss.html">loss</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./internal.html">internal</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./models.html">models</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./optimizers.html">optimizers</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./types.html">types</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./npy.html">npy</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./npz.html">npz</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./quantization.html">quantization</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./stats.html">stats</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./storage.html">storage</a></div>
+</li>
+
+					</ul>
+				</nav>
+			</header>
+			<div class="doc-scrollview" tabindex="-1" id="main-content">
+				<div class="doc-container">
+					<div class="doc-content">
+								<section id="readme_README" class="doc-node">
+			<div class="title"><h1> README <a href="#readme_README">#</a></h1></div>
+<div align="center"> <p>
+    <img
+      style="width: 200px"
+      width="200"
+      src="static/vtl-logo.png"
+      alt="VTL tensor network logo"
+    >
+  </p> <h1>The V Tensor Library</h1>
+
+<p>[![Mentioned in Awesome V][awesomevbadge]][awesomevurl] [![CI][workflowbadge]][workflowurl] [![Docs][docsbadge]][docsurl] [![Full ML][fullmlbadge]][fullmlurl] [![Benchmarks][benchmarksbadge]][benchmarksurl] [![License: MIT][licensebadge]][licenseurl] ![VSL Backed][vslbackedbadge] ![CUDA Optional][cudaoptionalbadge] ![Vulkan f32][vulkanbadge]</p>
+<p><strong>VTL</strong> is a pure-<a href="https://vlang.io">V</a> tensor library for numerical computing and machine learning — n-dimensional arrays, autograd, linear algebra via <a href="https://github.com/vlang/vsl">VSL</a>, and a full neural network module.</p>
+<p>Train small neural networks, experiment with autograd, and use VSL-backed CPU, CUDA, and Vulkan compute paths from one V-native API.</p>
+<p><a href="https://vlang.io">vlang.io</a> | <a href="https://vlang.github.io/vtl">Docs</a> | <a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL.md">Tutorials</a> | <a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_HISTOGRAMS.md">Histograms</a> | <a href="https://github.com/vlang/vtl/blob/master/docs/PYTORCH_PARITY.md">PyTorch parity</a> | <a href="https://github.com/vlang/vtl/blob/master/docs/BURN_PARITY.md">Burn comparison</a> | <a href="https://github.com/vlang/vtl/blob/master/docs/ML_ROADMAP.md">ML Roadmap</a> | <a href="https://github.com/vlang/vtl/blob/master/CONTRIBUTING.md">Contributing</a> | <a href="https://github.com/vlang/vsl">VSL</a></p></div>
+
+<p><a href="docs/README.md"> &lt;imgsrc="static/vtl-feature-banner.svg"alt="VTL tensors, autograd, numerical computing, and CPU and GPU training paths"width="100%"</p>
+<blockquote></blockquote></a>
+<details> <summary>VTL and VSL architecture</summary>
+
+<p><img src="https://github.com/vlang/vtl/blob/master/docs/assets/vtl-architecture.png" alt="VTL tensor, VSL kernel, and compute backend architecture" /></p>
+<p><a href="https://github.com/vlang/vtl/blob/master/docs/assets/vtl-architecture.svg">View SVG source</a> · <a href="https://github.com/vlang/vtl/blob/master/docs/assets/vtl-architecture.png">PNG</a> </details></p>
+<pre><code class="language-v"><span class="token keyword">import</span> <span class="token module_">vtl</span>
+t <span class="token operator">:=</span> <span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token function">from_array</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">1.0</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token operator">!</span>
+t<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token comment">// 4.0</span></code></pre>
+<h2 id="features">Features</h2>
+<ul>
+<li><strong>Tensors</strong> — create, slice, indexed <code>take</code>/<code>take_nd</code>/<code>take_flat</code>/<code>put</code>, <code>choose</code>/<code>select</code>, <code>round_decimals</code>, <code>nan_to_num</code>, <code>compress</code>, <code>indices</code>, <code>pad</code>, set membership, reshape, transpose, move/roll axes, N-D diagonal views, NumPy-style Kronecker products, broadcast, map/reduce, <code>einsum</code>, and <code>complex128</code> storage with elementwise and matrix products</li>
+<li><strong>Autograd</strong> — reverse-mode AD; arbitrary computational graphs</li>
+<li><strong>Neural networks</strong> — <code>Sequential</code> API; Linear, Conv2D, LSTM, Attention, …</li>
+<li><strong>Losses &amp; optimizers</strong> — MSE, MAE, BCE, Hinge, Focal, CrossEntropy, Huber; Adam, AdamW, NAdam, RAdam, SGD, …</li>
+<li><strong>Linear algebra</strong> — VSL-backed real matmul and general eigensolvers, pure-V complex128 matmul, solve, QR, LU, Cholesky, SVD, pinv</li>
+<li><strong>Hardware</strong> — zero-copy <code>Tensor.data</code> for C libs; optional CUDA and Vulkan training paths</li></ul>
+<h2 id="ml-release-highlights">ML Release Highlights</h2>
+<p>The ML beta scope is the high-level VTL API: tensors, autograd, layers, losses, optimizers, datasets, and CPU training. CUDA and Vulkan paths are available for opt-in validation and early adopters, but remain experimental backend accelerators rather than stable user contracts.</p>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Status</th></tr></thead>
+<tbody>
+<tr>
+<td>f32 training</td>
+<td><code>Sequential</code> + MSE + Adam smoke tests</td></tr>
+<tr>
+<td>CUDA</td>
+<td>Experimental opt-in Linear/Conv2D forward; f64 Linear/Conv2D/Dropout backward; activation chain and Adam slots</td></tr>
+<tr>
+<td>Vulkan</td>
+<td>Experimental opt-in f32 Linear, Conv2D same-padding, ReLU/Sigmoid/Softplus/SELU/HardSwish, fused Adam shader</td></tr>
+<tr>
+<td>Datasets</td>
+<td>MNIST, IMDB, CIFAR-10 loaders plus CI-safe synthetic examples</td></tr>
+<tr>
+<td>Benchmarks</td>
+<td>VTL vs NumPy/PyTorch scripts and PR benchmark workflow</td></tr></tbody></table>
+<p>For memory-safe local commands, see <a href="https://github.com/vlang/vtl/blob/master/docs/DEV_LIGHTWEIGHT.md">DEV_LIGHTWEIGHT.md</a>.</p>
+<h2 id="quick-start">Quick start</h2>
+<pre><code class="language-v"><span class="token keyword">import</span> <span class="token module_">vtl</span>
+<span class="token keyword">import</span> <span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token module_">autograd</span>
+<span class="token keyword">import</span> <span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token module_">nn</span><span class="token punctuation">.</span><span class="token module_">layers</span>
+<span class="token keyword">import</span> <span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token module_">nn</span><span class="token punctuation">.</span><span class="token module_">models</span>
+<span class="token keyword">import</span> <span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token module_">nn</span><span class="token punctuation">.</span><span class="token module_">optimizers</span>
+
+<span class="token keyword">mut</span> ctx <span class="token operator">:=</span> <span class="token module_">autograd</span><span class="token punctuation">.</span>ctx<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">mut</span> model <span class="token operator">:=</span> <span class="token module_">models</span><span class="token punctuation">.</span>sequential_from_ctx<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">(</span>ctx<span class="token punctuation">)</span>
+model<span class="token punctuation">.</span><span class="token function">input</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">784</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+model<span class="token punctuation">.</span><span class="token function">linear</span><span class="token punctuation">(</span><span class="token number">256</span><span class="token punctuation">)</span>
+model<span class="token punctuation">.</span><span class="token function">linear</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span>
+model<span class="token punctuation">.</span><span class="token function">mse_loss</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+input_tensor <span class="token operator">:=</span> <span class="token module_">vtl</span><span class="token punctuation">.</span>zeros<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">64</span><span class="token punctuation">,</span> <span class="token number">784</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token keyword">mut</span> x <span class="token operator">:=</span> ctx<span class="token punctuation">.</span><span class="token function">variable</span><span class="token punctuation">(</span>input_tensor<span class="token punctuation">)</span>
+y_pred <span class="token operator">:=</span> model<span class="token punctuation">.</span><span class="token function">forward</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token operator">!</span>
+
+target <span class="token operator">:=</span> <span class="token module_">vtl</span><span class="token punctuation">.</span>zeros<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">64</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token keyword">mut</span> loss_val <span class="token operator">:=</span> model<span class="token punctuation">.</span><span class="token function">loss</span><span class="token punctuation">(</span>y_pred<span class="token punctuation">,</span> target<span class="token punctuation">)</span><span class="token operator">!</span>
+loss_val<span class="token punctuation">.</span><span class="token function">backprop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">!</span>
+
+<span class="token keyword">mut</span> opt <span class="token operator">:=</span> <span class="token module_">optimizers</span><span class="token punctuation">.</span>adam_optimizer<span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token module_">optimizers</span><span class="token punctuation">.</span><span class="token type_name">AdamOptimizerConfig</span><span class="token punctuation">{</span>
+    learning_rate<span class="token punctuation">:</span> <span class="token number">0.001</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+opt<span class="token punctuation">.</span><span class="token function">build_params</span><span class="token punctuation">(</span>model<span class="token punctuation">.</span>info<span class="token punctuation">.</span>layers<span class="token punctuation">)</span>
+opt<span class="token punctuation">.</span><span class="token function">update</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">!</span></code></pre>
+<h2 id="module-overview">Module overview</h2>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Purpose</th>
+<th>Guide</th></tr></thead>
+<tbody>
+<tr>
+<td><code>vtl</code></td>
+<td>Tensor creation, slicing, broadcasting, reductions</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_FIRST_STEPS.md">First steps</a></td></tr>
+<tr>
+<td>Complex tensors</td>
+<td><code>math.complex.Complex</code> storage and elementwise arithmetic</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_COMPLEX.md">Complex tensors</a></td></tr>
+<tr>
+<td><code>vtl.fft</code></td>
+<td>Real and complex FFTs via VSL PocketFFT</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_FFT.md">FFT</a></td></tr>
+<tr>
+<td><code>vtl.csv</code></td>
+<td>Numeric CSV tensor input and output</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_NUMPY_IO.md">NumPy I/O</a></td></tr>
+<tr>
+<td><code>vtl.npy</code> / <code>vtl.npz</code></td>
+<td>Typed NumPy array and archive I/O</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_NUMPY_IO.md">NumPy I/O</a></td></tr>
+<tr>
+<td><code>vtl.autograd</code></td>
+<td>Differentiable operations and backpropagation</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_AUTOGRAD.md">Autograd</a></td></tr>
+<tr>
+<td><code>vtl.autograd_cuda</code></td>
+<td>Optional CUDA autograd</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/DEVICE_MEMORY.md">Device memory</a></td></tr>
+<tr>
+<td><code>vtl.la</code></td>
+<td>VSL-backed linear algebra</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_LINEAR_ALGEBRA.md">Linear algebra</a></td></tr>
+<tr>
+<td><code>vtl.nn</code></td>
+<td>Layers, losses, optimizers, and training</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_NEURAL_NETWORKS.md">Neural networks</a></td></tr>
+<tr>
+<td><code>vtl.nn.models</code></td>
+<td>Model construction, training, serialization</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_NEURAL_NETWORKS.md">Neural networks</a></td></tr>
+<tr>
+<td><code>vtl.nn.layers</code></td>
+<td>Dense, convolutional, recurrent, and attention layers</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_NEURAL_NETWORKS.md">Neural networks</a></td></tr>
+<tr>
+<td><code>vtl.nn.loss</code></td>
+<td>Regression and classification losses</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_NEURAL_NETWORKS.md">Neural networks</a></td></tr>
+<tr>
+<td><code>vtl.nn.optimizers</code></td>
+<td>Optimizers and learning-rate schedulers</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_OPTIMIZERS.md">Optimizers</a></td></tr>
+<tr>
+<td><code>vtl.nn.data</code></td>
+<td>Neural-network data loaders</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/examples/README.md">Examples</a></td></tr>
+<tr>
+<td><code>vtl.nn.internal</code></td>
+<td>Internal tensor and activation operations</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/nn/internal">Source</a></td></tr>
+<tr>
+<td><code>vtl.nn.gates</code></td>
+<td>Neural-network autograd gates</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_AUTOGRAD.md">Autograd</a></td></tr>
+<tr>
+<td><code>vtl.datasets</code></td>
+<td>MNIST, CIFAR-10, and IMDB loaders</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/datasets/README.md">Datasets</a></td></tr>
+<tr>
+<td><code>vtl.stats</code></td>
+<td>Averages, descriptive statistics, and summaries</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_REDUCTIONS.md">Reductions</a></td></tr>
+<tr>
+<td>Core lookup</td>
+<td>Unique values, indexing, and set operations</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_INDEXING.md">Indexing</a></td></tr>
+<tr>
+<td><code>vtl.ml.metrics</code></td>
+<td>Machine-learning metrics and evaluation</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/ml/metrics">Source</a></td></tr>
+<tr>
+<td><code>vtl.storage</code></td>
+<td>CPU, CUDA, VCL, and Vulkan storage</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/DEVICE_MEMORY.md">Device memory</a></td></tr></tbody></table>
+<h2 id="installation">Installation</h2>
+<p>VTL uses <a href="https://github.com/vlang/vsl">VSL</a> for linear algebra. The core <code>vtl</code> module works without optional system BLAS/LAPACK, but LA features need VSL.</p>
+<p>Follow <a href="https://github.com/vlang/vsl#install-vsl-locally">VSL install instructions</a>, then:</p>
+<pre><code class="language-sh">v install vtl</code></pre>
+<h2 id="testing">Testing</h2>
+<pre><code class="language-sh"><span class="token punctuation"># Run the full scoped suite from ~/.vmodules; compiler parallelism is disabled</span>
+<span class="token punctuation"># to keep the local memory ceiling predictable.</span>
+cd <span class="token operator">~</span><span class="token operator">/</span><span class="token enum_value">.</span><span class="token enum_value">vmodules</span>
+systemd<span class="token operator">-</span>run <span class="token operator">--</span>user <span class="token operator">--</span>scope <span class="token operator">--</span>property<span class="token operator">=</span><span class="token type_name">MemoryMax</span><span class="token operator">=</span><span class="token number">4G</span> <span class="token operator">--</span>property<span class="token operator">=</span><span class="token type_name">MemorySwapMax</span><span class="token operator">=</span><span class="token number">0</span> <span class="token punctuation">\</span>
+    env <span class="token type_name">VJOBS</span><span class="token operator">=</span><span class="token number">2</span> <span class="token type_name">VTL_NO_PARALLEL</span><span class="token operator">=</span><span class="token number">1</span> <span class="token punctuation">.</span><span class="token operator">/</span>vtl<span class="token operator">/</span>bin<span class="token operator">/</span>test</code></pre>
+<p>See <a href="https://github.com/vlang/vtl/blob/master/docs/DEV_LIGHTWEIGHT.md">DEV_LIGHTWEIGHT.md</a> for memory-safe subsets in CI.</p>
+<h2 id="documentation">Documentation</h2>
+<h3 id="start-here">Start Here</h3>
+<table>
+<thead>
+<tr>
+<th>Goal</th>
+<th>Read</th></tr></thead>
+<tbody>
+<tr>
+<td>Learn tensors</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_FIRST_STEPS.md">First steps</a></td></tr>
+<tr>
+<td>Learn autograd</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_AUTOGRAD.md">Autograd tutorial</a></td></tr>
+<tr>
+<td>Build neural networks</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_NEURAL_NETWORKS.md">Neural networks</a></td></tr>
+<tr>
+<td>Pick optimizers</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_OPTIMIZERS.md">Optimizers</a></td></tr>
+<tr>
+<td>Run examples</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/examples/README.md">Examples catalog</a></td></tr>
+<tr>
+<td>Use datasets</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/datasets/README.md">Datasets</a></td></tr>
+<tr>
+<td>Exchange NumPy <code>.npy</code> arrays</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_NUMPY_IO.md"><code>.npy</code> input/output</a></td></tr>
+<tr>
+<td>Quantize tensors for INT8 inference</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/quantization/README.md">Quantization API</a>, <a href="https://github.com/vlang/vtl/blob/master/examples/quantization_int8/main.v">example</a></td></tr>
+<tr>
+<td>Load numeric CSV data</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_NUMPY_IO.md">CSV and NumPy I/O</a></td></tr>
+<tr>
+<td>Use GPU paths safely</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/DEV_LIGHTWEIGHT.md">DEV_LIGHTWEIGHT.md</a>, <a href="https://github.com/vlang/vtl/blob/master/docs/DEVICE_MEMORY.md">DEVICE_MEMORY.md</a></td></tr></tbody></table>
+<table>
+<thead>
+<tr>
+<th>Tutorial</th>
+<th>Topic</th></tr></thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_FIRST_STEPS.md">TUTORIAL_FIRST_STEPS.md</a></td>
+<td>Tensor creation, indexing, slicing</td></tr>
+<tr>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_MATH_UFUNCS.md">TUTORIAL_MATH_UFUNCS.md</a></td>
+<td>NumPy-style elementwise math and binary decomposition</td></tr>
+<tr>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_MAP_REDUCE.md">TUTORIAL_MAP_REDUCE.md</a></td>
+<td><code>map</code> / <code>nmap</code> and reductions</td></tr>
+<tr>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_AUTOGRAD.md">TUTORIAL_AUTOGRAD.md</a></td>
+<td><code>Variable</code>, gates, backprop</td></tr>
+<tr>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_REDUCTIONS.md">TUTORIAL_REDUCTIONS.md</a></td>
+<td>argmax / argmin / cumsum</td></tr>
+<tr>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_NEURAL_NETWORKS.md">TUTORIAL_NEURAL_NETWORKS.md</a></td>
+<td>Layers, losses, <code>Sequential</code></td></tr>
+<tr>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_OPTIMIZERS.md">TUTORIAL_OPTIMIZERS.md</a></td>
+<td>Adam, AdamW, RMSProp, schedulers</td></tr>
+<tr>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_LINEAR_ALGEBRA.md">TUTORIAL_LINEAR_ALGEBRA.md</a></td>
+<td>LA basics via VSL</td></tr>
+<tr>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_FFT.md">TUTORIAL_FFT.md</a></td>
+<td>One-dimensional real Fourier transforms via PocketFFT</td></tr>
+<tr>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_ADVANCED_LA.md">TUTORIAL_ADVANCED_LA.md</a></td>
+<td>QR, LU, Cholesky, pinv</td></tr>
+<tr>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_BROADCASTING.md">TUTORIAL_BROADCASTING.md</a></td>
+<td>Broadcasting rules</td></tr>
+<tr>
+<td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_SLICING.md">TUTORIAL_SLICING.md</a></td>
+<td>Slicing and views</td></tr></tbody></table>
+<p>Full index: <a href="https://github.com/vlang/vtl/blob/master/docs/README.md"><code>docs/README.md</code></a>.</p>
+<h2 id="contributors">Contributors</h2>
+<p>VTL's early development was inspired by <code>vnum</code>, part of the Vlang Num group, and the work of <a href="https://github.com/christopherzimmerman">Christopher Zimmerman</a>. The core was reimplemented while keeping that lineage and inspiration. The original <code>vnum</code> work carried a BSD 3-Clause license with attribution to <code>vlang-num contributors</code>; the historical license text is preserved in the <a href="https://github.com/vlang/vtl/blob/32a9a609/LICENSE">VTL repository history</a>. This acknowledgment records that history and does not change VTL's current license, shown below.</p>
+<p><a href="https://github.com/vlang/vtl/contributors"> <img src="https://contrib.rocks/image?repo=vlang/vtl" alt="VTL contributors"/> </a></p>
+<p>Made with <a href="https://contrib.rocks">contributors-img</a>.</p>
+<h2 id="license">License</h2>
+<p><a href="https://github.com/vlang/vtl/blob/master/LICENSE">MIT</a></p>
+<p>[awesomevbadge]: <a href="https://awesome.re/mentioned-badge.svg">https://awesome.re/mentioned-badge.svg</a> [workflowbadge]: <a href="https://github.com/vlang/vtl/actions/workflows/ci.yml/badge.svg">https://github.com/vlang/vtl/actions/workflows/ci.yml/badge.svg</a> [docsbadge]: <a href="https://github.com/vlang/vtl/actions/workflows/deploy-docs.yml/badge.svg">https://github.com/vlang/vtl/actions/workflows/deploy-docs.yml/badge.svg</a> [fullmlbadge]: <a href="https://github.com/vlang/vtl/actions/workflows/ci-full-ml.yml/badge.svg">https://github.com/vlang/vtl/actions/workflows/ci-full-ml.yml/badge.svg</a> [benchmarksbadge]: <a href="https://github.com/vlang/vtl/actions/workflows/benchmark-pr-comment.yml/badge.svg">https://github.com/vlang/vtl/actions/workflows/benchmark-pr-comment.yml/badge.svg</a> [licensebadge]: <a href="https://img.shields.io/badge/License-MIT-blue.svg">https://img.shields.io/badge/License-MIT-blue.svg</a> [vslbackedbadge]: <a href="https://img.shields.io/badge/VSL-backed-027d9c?logo=v">https://img.shields.io/badge/VSL-backed-027d9c?logo=v</a> [cudaoptionalbadge]: <a href="https://img.shields.io/badge/CUDA-optional-76b900?logo=nvidia">https://img.shields.io/badge/CUDA-optional-76b900?logo=nvidia</a> [vulkanbadge]: <a href="https://img.shields.io/badge/Vulkan-f32-ac162c?logo=vulkan">https://img.shields.io/badge/Vulkan-f32-ac162c?logo=vulkan</a> [awesomevurl]: <a href="https://github.com/vlang/awesome-v/blob/master/README.md#scientific-computing">https://github.com/vlang/awesome-v/blob/master/README.md#scientific-computing</a> [workflowurl]: <a href="https://github.com/vlang/vtl/actions/workflows/ci.yml">https://github.com/vlang/vtl/actions/workflows/ci.yml</a> [docsurl]: <a href="https://github.com/vlang/vtl/actions/workflows/deploy-docs.yml">https://github.com/vlang/vtl/actions/workflows/deploy-docs.yml</a> [fullmlurl]: <a href="https://github.com/vlang/vtl/actions/workflows/ci-full-ml.yml">https://github.com/vlang/vtl/actions/workflows/ci-full-ml.yml</a> [benchmarksurl]: <a href="https://github.com/vlang/vtl/actions/workflows/benchmark-pr-comment.yml">https://github.com/vlang/vtl/actions/workflows/benchmark-pr-comment.yml</a> [licenseurl]: <a href="https://github.com/vlang/vtl/blob/main/LICENSE">https://github.com/vlang/vtl/blob/main/LICENSE</a></p>
+
+</section>
+
+
+						<div class="footer">Powered by vdoc. Generated on: 16 Oct 2026 03:04:02</div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+		<script src="doc.js"></script>
+		<script async src="search_index.js"></script>
+	</body>
+</html>

@@ -123,6 +123,9 @@
 <div class="menu-row"><a href="./npz.html">npz</a></div>
 </li>
 <li class="open">
+<div class="menu-row"><a href="./quantization.html">quantization</a></div>
+</li>
+<li class="open">
 <div class="menu-row"><a href="./stats.html">stats</a></div>
 </li>
 <li class="open">
@@ -144,7 +147,7 @@
 		<section id="read" class="doc-node">
 			<div class="title"><h2>fn read <a href="#read">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/csv/csv.v#L29"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> read<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>path <span class="token builtin">string</span><span class="token punctuation">,</span> config CsvReadConfig<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<code><span class="token keyword">fn</span> read<span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>path <span class="token builtin">string</span><span class="token punctuation">,</span> config <span class="token type_name">CsvReadConfig</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
 <p>read parses a numeric CSV file into a rank-two tensor. Quoted fields and quoted newlines follow the V standard library CSV reader's behavior.</p>
 
 </section>
@@ -152,7 +155,7 @@
 		<section id="write" class="doc-node">
 			<div class="title"><h2>fn write <a href="#write">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/csv/csv.v#L107"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> write<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>path <span class="token builtin">string</span><span class="token punctuation">,</span> tensor <span class="token operator">&amp;</span>vtl<span class="token punctuation">.</span>Tensor<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> config CsvWriteConfig<span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<code><span class="token keyword">fn</span> write<span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>path <span class="token builtin">string</span><span class="token punctuation">,</span> tensor <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> config <span class="token type_name">CsvWriteConfig</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
 <p>write serializes a rank-two tensor to CSV, optionally adding a header row.</p>
 
 </section>
@@ -160,7 +163,7 @@
 		<section id="CsvReadConfig" class="doc-node">
 			<div class="title"><h2>struct CsvReadConfig <a href="#CsvReadConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/csv/csv.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">struct</span> CsvReadConfig <span class="token punctuation">{</span>
+<code><span class="token keyword">struct</span> <span class="token type_name">CsvReadConfig</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
 	delimiter   <span class="token builtin">u8</span> <span class="token operator">=</span> <span class="token char">`,`</span>
 	comment     <span class="token builtin">u8</span> <span class="token operator">=</span> <span class="token char">`#`</span>
@@ -176,7 +179,7 @@
 		<section id="CsvWriteConfig" class="doc-node">
 			<div class="title"><h2>struct CsvWriteConfig <a href="#CsvWriteConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/csv/csv.v#L20"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">struct</span> CsvWriteConfig <span class="token punctuation">{</span>
+<code><span class="token keyword">struct</span> <span class="token type_name">CsvWriteConfig</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
 	delimiter <span class="token builtin">u8</span> <span class="token operator">=</span> <span class="token char">`,`</span>
 	header    <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">string</span>
@@ -187,7 +190,7 @@
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 12 Oct 2026 23:22:13</div>
+						<div class="footer">Powered by vdoc. Generated on: 16 Oct 2026 03:04:02</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#read">fn read</a>        <ul>
 </ul>

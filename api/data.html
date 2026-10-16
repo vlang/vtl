@@ -123,6 +123,9 @@
 <div class="menu-row"><a href="./npz.html">npz</a></div>
 </li>
 <li class="open">
+<div class="menu-row"><a href="./quantization.html">quantization</a></div>
+</li>
+<li class="open">
 <div class="menu-row"><a href="./stats.html">stats</a></div>
 </li>
 <li class="open">
@@ -144,7 +147,7 @@
 		<section id="DataLoader.new" class="doc-node">
 			<div class="title"><h2>fn DataLoader.new <a href="#DataLoader.new">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/dataloader.v#L87"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> DataLoader<span class="token enum_value">.</span><span class="token enum_value">new</span><span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>data <span class="token operator">&amp;</span>la<span class="token punctuation">.</span>Matrix<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> labels <span class="token punctuation">[</span><span class="token punctuation">]</span>T<span class="token punctuation">,</span> batch_size <span class="token builtin">int</span><span class="token punctuation">,</span> shuffle <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<code><span class="token keyword">fn</span> <span class="token type_name">DataLoader</span><span class="token enum_value">.</span><span class="token enum_value">new</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>data <span class="token operator">&amp;</span><span class="token module_">la</span><span class="token punctuation">.</span><span class="token type_name">Matrix</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> labels <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token type_name">T</span><span class="token punctuation">,</span> batch_size <span class="token builtin">int</span><span class="token punctuation">,</span> shuffle <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token type_name">DataLoader</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
 <p>DataLoader.new creates a new DataLoader data is [nb_samples][nb_features] matrix labels is [nb_samples] vector</p>
 
 </section>
@@ -152,7 +155,7 @@
 		<section id="DataLoader.new_with_sampler" class="doc-node">
 			<div class="title"><h2>fn DataLoader.new_with_sampler <a href="#DataLoader.new_with_sampler">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/dataloader.v#L108"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> DataLoader<span class="token enum_value">.</span><span class="token enum_value">new_with_sampler</span><span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>data <span class="token operator">&amp;</span>la<span class="token punctuation">.</span>Matrix<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> labels <span class="token punctuation">[</span><span class="token punctuation">]</span>T<span class="token punctuation">,</span> batch_size <span class="token builtin">int</span><span class="token punctuation">,</span> sampler Sampler<span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<code><span class="token keyword">fn</span> <span class="token type_name">DataLoader</span><span class="token enum_value">.</span><span class="token enum_value">new_with_sampler</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>data <span class="token operator">&amp;</span><span class="token module_">la</span><span class="token punctuation">.</span><span class="token type_name">Matrix</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> labels <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token type_name">T</span><span class="token punctuation">,</span> batch_size <span class="token builtin">int</span><span class="token punctuation">,</span> sampler <span class="token type_name">Sampler</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token type_name">DataLoader</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
 <p>new_with_sampler creates a DataLoader that obtains its sample order from a custom sampler. The sampler is called once per epoch, including after reset.</p>
 
 </section>
@@ -160,7 +163,7 @@
 		<section id="FixedBatchSampler.new" class="doc-node">
 			<div class="title"><h2>fn FixedBatchSampler.new <a href="#FixedBatchSampler.new">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/sampler.v#L176"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> FixedBatchSampler<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span>sampler Sampler<span class="token punctuation">,</span> batch_size <span class="token builtin">int</span><span class="token punctuation">,</span> drop_last <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>FixedBatchSampler</code></pre>
+<code><span class="token keyword">fn</span> <span class="token type_name">FixedBatchSampler</span><span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span>sampler <span class="token type_name">Sampler</span><span class="token punctuation">,</span> batch_size <span class="token builtin">int</span><span class="token punctuation">,</span> drop_last <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token type_name">FixedBatchSampler</span></code></pre>
 <p>FixedBatchSampler.new creates a fixed-size batch sampler.</p>
 
 </section>
@@ -168,7 +171,7 @@
 		<section id="Subset.new" class="doc-node">
 			<div class="title"><h2>fn Subset.new <a href="#Subset.new">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/dataloader.v#L28"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> Subset<span class="token enum_value">.</span><span class="token enum_value">new</span><span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>dataset <span class="token operator">&amp;</span>Dataset<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> indices <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>Subset<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<code><span class="token keyword">fn</span> <span class="token type_name">Subset</span><span class="token enum_value">.</span><span class="token enum_value">new</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>dataset <span class="token operator">&amp;</span><span class="token type_name">Dataset</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> indices <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token type_name">Subset</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
 <p>Subset.new creates a new Subset from a Dataset</p>
 
 </section>
@@ -176,7 +179,7 @@
 		<section id="SubsetRandomSampler.new" class="doc-node">
 			<div class="title"><h2>fn SubsetRandomSampler.new <a href="#SubsetRandomSampler.new">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/sampler.v#L50"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> SubsetRandomSampler<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span>indices <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>SubsetRandomSampler</code></pre>
+<code><span class="token keyword">fn</span> <span class="token type_name">SubsetRandomSampler</span><span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span>indices <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token type_name">SubsetRandomSampler</span></code></pre>
 <p>SubsetRandomSampler.new snapshots the requested subset indices.</p>
 
 </section>
@@ -184,7 +187,7 @@
 		<section id="TensorDataset.new" class="doc-node">
 			<div class="title"><h2>fn TensorDataset.new <a href="#TensorDataset.new">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/dataloader.v#L211"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> TensorDataset<span class="token enum_value">.</span><span class="token enum_value">new</span><span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">(</span>x <span class="token operator">&amp;</span>la<span class="token punctuation">.</span>Matrix<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> y <span class="token punctuation">[</span><span class="token punctuation">]</span>T<span class="token punctuation">)</span> <span class="token operator">&amp;</span>TensorDataset<span class="token punctuation">[</span>T<span class="token punctuation">]</span></code></pre>
+<code><span class="token keyword">fn</span> <span class="token type_name">TensorDataset</span><span class="token enum_value">.</span><span class="token enum_value">new</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>x <span class="token operator">&amp;</span><span class="token module_">la</span><span class="token punctuation">.</span><span class="token type_name">Matrix</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> y <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token type_name">T</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token type_name">TensorDataset</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
 <p>TensorDataset.new creates a new TensorDataset</p>
 
 </section>
@@ -192,7 +195,7 @@
 		<section id="WeightedRandomSampler.new" class="doc-node">
 			<div class="title"><h2>fn WeightedRandomSampler.new <a href="#WeightedRandomSampler.new">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/sampler.v#L82"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> WeightedRandomSampler<span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span>weights <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> num_samples <span class="token builtin">int</span><span class="token punctuation">,</span> replacement <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span>WeightedRandomSampler</code></pre>
+<code><span class="token keyword">fn</span> <span class="token type_name">WeightedRandomSampler</span><span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span>weights <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span><span class="token punctuation">,</span> num_samples <span class="token builtin">int</span><span class="token punctuation">,</span> replacement <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token type_name">WeightedRandomSampler</span></code></pre>
 <p>WeightedRandomSampler.new snapshots weights and validates the draw count.</p>
 
 </section>
@@ -200,7 +203,7 @@
 		<section id="BatchSampler" class="doc-node">
 			<div class="title"><h2>interface BatchSampler <a href="#BatchSampler">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/sampler.v#L12"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">interface</span> BatchSampler <span class="token punctuation">{</span>
+<code><span class="token keyword">interface</span> <span class="token type_name">BatchSampler</span> <span class="token punctuation">{</span>
 	<span class="token function">sample_batches</span><span class="token punctuation">(</span>dataset_size <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
 <span class="token punctuation">}</span></code></pre>
 <p>BatchSampler produces explicit batches of sample indices.</p>
@@ -210,11 +213,11 @@
 		<section id="Dataset" class="doc-node">
 			<div class="title"><h2>interface Dataset <a href="#Dataset">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/dataloader.v#L8"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">interface</span> Dataset<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<code><span class="token keyword">interface</span> <span class="token type_name">Dataset</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
 	<span class="token comment">// len returns the number of samples in the dataset</span>
 	<span class="token function">len</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">int</span>
 	<span class="token comment">// get returns the input and label at index i</span>
-	<span class="token function">get</span><span class="token punctuation">(</span>i <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>la<span class="token punctuation">.</span>Matrix<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>T<span class="token punctuation">)</span>
+	<span class="token function">get</span><span class="token punctuation">(</span>i <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span><span class="token module_">la</span><span class="token punctuation">.</span><span class="token type_name">Matrix</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token type_name">T</span><span class="token punctuation">)</span>
 <span class="token punctuation">}</span></code></pre>
 <p>Dataset is an interface for accessing data in batches</p>
 
@@ -223,7 +226,7 @@
 		<section id="Sampler" class="doc-node">
 			<div class="title"><h2>interface Sampler <a href="#Sampler">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/sampler.v#L7"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">interface</span> Sampler <span class="token punctuation">{</span>
+<code><span class="token keyword">interface</span> <span class="token type_name">Sampler</span> <span class="token punctuation">{</span>
 	<span class="token function">sample_indices</span><span class="token punctuation">(</span>dataset_size <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
 <span class="token punctuation">}</span></code></pre>
 <p>Sampler produces sample indices for a dataset of the provided size.</p>
@@ -233,7 +236,7 @@
 		<section id="DataLoader[T].len" class="doc-node">
 			<div class="title"><h2>fn (DataLoader[T]) len <a href="#DataLoader[T].len">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/dataloader.v#L137"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>dl <span class="token operator">&amp;</span>DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">len</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">int</span></code></pre>
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>dl <span class="token operator">&amp;</span><span class="token type_name">DataLoader</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">len</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">int</span></code></pre>
 <p>len returns the number of batches per epoch</p>
 
 </section>
@@ -241,7 +244,7 @@
 		<section id="DataLoader[T].next" class="doc-node">
 			<div class="title"><h2>fn (DataLoader[T]) next <a href="#DataLoader[T].next">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/dataloader.v#L146"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> dl DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>la<span class="token punctuation">.</span>Matrix<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>T<span class="token punctuation">)</span></code></pre>
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> dl <span class="token type_name">DataLoader</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span><span class="token module_">la</span><span class="token punctuation">.</span><span class="token type_name">Matrix</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token type_name">T</span><span class="token punctuation">)</span></code></pre>
 <p>next returns the next batch of data and labels returns an error when no more batches are available</p>
 
 </section>
@@ -249,7 +252,7 @@
 		<section id="DataLoader[T].reset" class="doc-node">
 			<div class="title"><h2>fn (DataLoader[T]) reset <a href="#DataLoader[T].reset">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/dataloader.v#L193"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> dl DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">reset</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> dl <span class="token type_name">DataLoader</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">reset</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>reset resets the DataLoader to start a new epoch</p>
 
 </section>
@@ -257,7 +260,7 @@
 		<section id="Subset[T].len" class="doc-node">
 			<div class="title"><h2>fn (Subset[T]) len <a href="#Subset[T].len">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/dataloader.v#L36"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span>Subset<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">len</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">int</span></code></pre>
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span><span class="token type_name">Subset</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">len</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">int</span></code></pre>
 <p>len returns the number of samples in the subset</p>
 
 </section>
@@ -265,7 +268,7 @@
 		<section id="Subset[T].get" class="doc-node">
 			<div class="title"><h2>fn (Subset[T]) get <a href="#Subset[T].get">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/dataloader.v#L41"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span>Subset<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">get</span><span class="token punctuation">(</span>i <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>la<span class="token punctuation">.</span>Matrix<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>T<span class="token punctuation">)</span></code></pre>
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span><span class="token type_name">Subset</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">get</span><span class="token punctuation">(</span>i <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span><span class="token module_">la</span><span class="token punctuation">.</span><span class="token type_name">Matrix</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token type_name">T</span><span class="token punctuation">)</span></code></pre>
 <p>get returns the input and label at subset index i</p>
 
 </section>
@@ -273,7 +276,7 @@
 		<section id="Subset[T].split" class="doc-node">
 			<div class="title"><h2>fn (Subset[T]) split <a href="#Subset[T].split">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/dataloader.v#L50"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span>Subset<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">split</span><span class="token punctuation">(</span>train_ratio <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>Subset<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>Subset<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span><span class="token type_name">Subset</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">split</span><span class="token punctuation">(</span>train_ratio <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span><span class="token type_name">Subset</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span><span class="token type_name">Subset</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
 <p>split splits a Subset into train and validation subsets train_ratio is the proportion of data to use for training</p>
 
 </section>
@@ -281,7 +284,7 @@
 		<section id="TensorDataset[T].len" class="doc-node">
 			<div class="title"><h2>fn (TensorDataset[T]) len <a href="#TensorDataset[T].len">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/dataloader.v#L219"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>ds <span class="token operator">&amp;</span>TensorDataset<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">len</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">int</span></code></pre>
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>ds <span class="token operator">&amp;</span><span class="token type_name">TensorDataset</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">len</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">int</span></code></pre>
 <p>len returns the number of samples</p>
 
 </section>
@@ -289,7 +292,7 @@
 		<section id="TensorDataset[T].get" class="doc-node">
 			<div class="title"><h2>fn (TensorDataset[T]) get <a href="#TensorDataset[T].get">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/dataloader.v#L224"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>ds <span class="token operator">&amp;</span>TensorDataset<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">get</span><span class="token punctuation">(</span>i <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>la<span class="token punctuation">.</span>Matrix<span class="token punctuation">[</span>T<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>T<span class="token punctuation">)</span></code></pre>
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>ds <span class="token operator">&amp;</span><span class="token type_name">TensorDataset</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">get</span><span class="token punctuation">(</span>i <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span><span class="token module_">la</span><span class="token punctuation">.</span><span class="token type_name">Matrix</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token type_name">T</span><span class="token punctuation">)</span></code></pre>
 <p>get returns the input matrix and labels at index i</p>
 
 </section>
@@ -298,13 +301,13 @@
 			<div class="title"><h2>struct DataLoader <a href="#DataLoader">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/dataloader.v#L71"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <div class="attributes"><div class="attribute">@[heap]</div></div>
 <pre class="signature">
-<code><span class="token keyword">struct</span> DataLoader<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<code><span class="token keyword">struct</span> <span class="token type_name">DataLoader</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
-	data       <span class="token operator">&amp;</span>la<span class="token punctuation">.</span>Matrix<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token comment">// full data matrix [nb_samples][nb_features]</span>
-	labels     <span class="token punctuation">[</span><span class="token punctuation">]</span>T           <span class="token comment">// labels [nb_samples]</span>
+	data       <span class="token operator">&amp;</span><span class="token module_">la</span><span class="token punctuation">.</span><span class="token type_name">Matrix</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span> <span class="token comment">// full data matrix [nb_samples][nb_features]</span>
+	labels     <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token type_name">T</span>           <span class="token comment">// labels [nb_samples]</span>
 	batch_size <span class="token builtin">int</span>
 	shuffle    <span class="token builtin">bool</span>
-	sampler    Sampler
+	sampler    <span class="token type_name">Sampler</span>
 <span class="token keyword">pub</span> <span class="token keyword">mut</span><span class="token punctuation">:</span>
 	indices          <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span> <span class="token comment">// sample order for the current epoch</span>
 	position         <span class="token builtin">int</span>   <span class="token comment">// current position in epoch</span>
@@ -317,8 +320,8 @@
 		<section id="FixedBatchSampler" class="doc-node">
 			<div class="title"><h2>struct FixedBatchSampler <a href="#FixedBatchSampler">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/sampler.v#L169"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">struct</span> FixedBatchSampler <span class="token punctuation">{</span>
-	sampler    Sampler
+<code><span class="token keyword">struct</span> <span class="token type_name">FixedBatchSampler</span> <span class="token punctuation">{</span>
+	sampler    <span class="token type_name">Sampler</span>
 	batch_size <span class="token builtin">int</span>
 	drop_last  <span class="token builtin">bool</span>
 <span class="token punctuation">}</span></code></pre>
@@ -329,7 +332,7 @@
 		<section id="FixedBatchSampler.sample_batches" class="doc-node">
 			<div class="title"><h2>fn (FixedBatchSampler) sample_batches <a href="#FixedBatchSampler.sample_batches">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/sampler.v#L188"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span>FixedBatchSampler<span class="token punctuation">)</span> <span class="token function">sample_batches</span><span class="token punctuation">(</span>dataset_size <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span></code></pre>
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span><span class="token type_name">FixedBatchSampler</span><span class="token punctuation">)</span> <span class="token function">sample_batches</span><span class="token punctuation">(</span>dataset_size <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span></code></pre>
 <p>sample_batches asks the underlying sampler for indices and groups them.</p>
 
 </section>
@@ -337,7 +340,7 @@
 		<section id="RandomSampler" class="doc-node">
 			<div class="title"><h2>struct RandomSampler <a href="#RandomSampler">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/sampler.v#L28"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">struct</span> RandomSampler <span class="token punctuation">{</span><span class="token punctuation">}</span></code></pre>
+<code><span class="token keyword">struct</span> <span class="token type_name">RandomSampler</span> <span class="token punctuation">{</span><span class="token punctuation">}</span></code></pre>
 <p>RandomSampler returns every dataset index once in a random order.</p>
 
 </section>
@@ -345,7 +348,7 @@
 		<section id="RandomSampler.sample_indices" class="doc-node">
 			<div class="title"><h2>fn (RandomSampler) sample_indices <a href="#RandomSampler.sample_indices">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/sampler.v#L31"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span>RandomSampler<span class="token punctuation">)</span> <span class="token function">sample_indices</span><span class="token punctuation">(</span>dataset_size <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span></code></pre>
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span><span class="token type_name">RandomSampler</span><span class="token punctuation">)</span> <span class="token function">sample_indices</span><span class="token punctuation">(</span>dataset_size <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span></code></pre>
 <p>sample_indices shuffles a full index range using Fisher-Yates.</p>
 
 </section>
@@ -353,7 +356,7 @@
 		<section id="SequentialSampler" class="doc-node">
 			<div class="title"><h2>struct SequentialSampler <a href="#SequentialSampler">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/sampler.v#L17"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">struct</span> SequentialSampler <span class="token punctuation">{</span><span class="token punctuation">}</span></code></pre>
+<code><span class="token keyword">struct</span> <span class="token type_name">SequentialSampler</span> <span class="token punctuation">{</span><span class="token punctuation">}</span></code></pre>
 <p>SequentialSampler returns every dataset index in order.</p>
 
 </section>
@@ -361,7 +364,7 @@
 		<section id="SequentialSampler.sample_indices" class="doc-node">
 			<div class="title"><h2>fn (SequentialSampler) sample_indices <a href="#SequentialSampler.sample_indices">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/sampler.v#L20"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span>SequentialSampler<span class="token punctuation">)</span> <span class="token function">sample_indices</span><span class="token punctuation">(</span>dataset_size <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span></code></pre>
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span><span class="token type_name">SequentialSampler</span><span class="token punctuation">)</span> <span class="token function">sample_indices</span><span class="token punctuation">(</span>dataset_size <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span></code></pre>
 <p>sample_indices returns [0, 1, ..., dataset_size-1].</p>
 
 </section>
@@ -370,9 +373,9 @@
 			<div class="title"><h2>struct Subset <a href="#Subset">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/dataloader.v#L21"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <div class="attributes"><div class="attribute">@[heap]</div></div>
 <pre class="signature">
-<code><span class="token keyword">struct</span> Subset<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<code><span class="token keyword">struct</span> <span class="token type_name">Subset</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
-	dataset <span class="token operator">&amp;</span>Dataset<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
+	dataset <span class="token operator">&amp;</span><span class="token type_name">Dataset</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span>
 	indices <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
 <span class="token punctuation">}</span></code></pre>
 <p>Subset defines a public data structure for this module.</p>
@@ -382,7 +385,7 @@
 		<section id="SubsetRandomSampler" class="doc-node">
 			<div class="title"><h2>struct SubsetRandomSampler <a href="#SubsetRandomSampler">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/sampler.v#L44"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">struct</span> SubsetRandomSampler <span class="token punctuation">{</span>
+<code><span class="token keyword">struct</span> <span class="token type_name">SubsetRandomSampler</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
 	indices <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
 <span class="token punctuation">}</span></code></pre>
@@ -393,7 +396,7 @@
 		<section id="SubsetRandomSampler.sample_indices" class="doc-node">
 			<div class="title"><h2>fn (SubsetRandomSampler) sample_indices <a href="#SubsetRandomSampler.sample_indices">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/sampler.v#L57"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span>SubsetRandomSampler<span class="token punctuation">)</span> <span class="token function">sample_indices</span><span class="token punctuation">(</span>dataset_size <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span></code></pre>
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span><span class="token type_name">SubsetRandomSampler</span><span class="token punctuation">)</span> <span class="token function">sample_indices</span><span class="token punctuation">(</span>dataset_size <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span></code></pre>
 <p>sample_indices shuffles the subset after checking dataset bounds.</p>
 
 </section>
@@ -402,10 +405,10 @@
 			<div class="title"><h2>struct TensorDataset <a href="#TensorDataset">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/dataloader.v#L204"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <div class="attributes"><div class="attribute">@[heap]</div></div>
 <pre class="signature">
-<code><span class="token keyword">struct</span> TensorDataset<span class="token punctuation">[</span>T<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<code><span class="token keyword">struct</span> <span class="token type_name">TensorDataset</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span> <span class="token keyword">mut</span><span class="token punctuation">:</span>
-	x <span class="token operator">&amp;</span>la<span class="token punctuation">.</span>Matrix<span class="token punctuation">[</span>T<span class="token punctuation">]</span>
-	y <span class="token punctuation">[</span><span class="token punctuation">]</span>T
+	x <span class="token operator">&amp;</span><span class="token module_">la</span><span class="token punctuation">.</span><span class="token type_name">Matrix</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span>
+	y <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token type_name">T</span>
 <span class="token punctuation">}</span></code></pre>
 <p>TensorDataset defines a public data structure for this module.</p>
 
@@ -414,7 +417,7 @@
 		<section id="WeightedRandomSampler" class="doc-node">
 			<div class="title"><h2>struct WeightedRandomSampler <a href="#WeightedRandomSampler">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/sampler.v#L75"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">struct</span> WeightedRandomSampler <span class="token punctuation">{</span>
+<code><span class="token keyword">struct</span> <span class="token type_name">WeightedRandomSampler</span> <span class="token punctuation">{</span>
 	weights     <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">f64</span>
 	num_samples <span class="token builtin">int</span>
 	replacement <span class="token builtin">bool</span>
@@ -426,13 +429,13 @@
 		<section id="WeightedRandomSampler.sample_indices" class="doc-node">
 			<div class="title"><h2>fn (WeightedRandomSampler) sample_indices <a href="#WeightedRandomSampler.sample_indices">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/data/sampler.v#L112"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
-<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span>WeightedRandomSampler<span class="token punctuation">)</span> <span class="token function">sample_indices</span><span class="token punctuation">(</span>dataset_size <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span></code></pre>
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>s <span class="token operator">&amp;</span><span class="token type_name">WeightedRandomSampler</span><span class="token punctuation">)</span> <span class="token function">sample_indices</span><span class="token punctuation">(</span>dataset_size <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span></code></pre>
 <p>sample_indices draws the configured number of weighted dataset indices.</p>
 
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 12 Oct 2026 23:22:13</div>
+						<div class="footer">Powered by vdoc. Generated on: 16 Oct 2026 03:04:02</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#DataLoader.new">fn DataLoader.new</a>        <ul>
 </ul>
