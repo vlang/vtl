@@ -144,14 +144,60 @@
 <p>Compute a global weighted mean using elementwise weights and row-wise weighted means using shared per-column reliability weights.</p>
 <h2 id="run">Run</h2>
 <p>From <code>~/.vmodules</code>:</p>
-<pre><code class="language-sh">v run <span class="token punctuation">.</span><span class="token operator">/</span>vtl<span class="token operator">/</span>examples<span class="token operator">/</span>weighted_average<span class="token operator">/</span><span class="token module_">main</span><span class="token punctuation">.</span>v</code></pre>
+<pre><code class="language-sh">v run ./vtl/examples/weighted_average/main.v
+</code></pre>
 <h2 id="notes">Notes</h2>
 <p>Weights must be non-negative and have a nonzero sum for each reduced slice. See <a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_REDUCTIONS.md">reductions tutorial</a>.</p>
 
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 16 Oct 2026 03:04:02</div>
+						<div class="footer">Powered by vdoc. Generated on: 2 Nov 2026 06:43:55</div>
+					</div>
+					<div class="doc-toc"><ul><li class="open"><a href="#readme_main">README</a></li>
+</ul></div>
+				</div>
+			</div>
+		</div>
+		<script src="doc.js"></script>
+		<script async src="search_index.js"></script>
+	</body>
+</html>
+   81],
+ [ 64,  256]]
+[2, 2]
+span slice:
+[[ 4,   16,   64,  256, 1024],
+ [ 5,   25,  125,  625, 3125]]
+[2, 5]
+slice until:
+[[1, 1, 1, 1, 1],
+ [2, 4, 8, 16, 32],
+ [3, 9, 27, 81, 243]]
+[3, 5]
+assign:
+[[   1,    1,    1,    1,    1],
+ [   2,    4,    8,   16,   32],
+ [   3,    9,  999,  999,  243],
+ [   4,   16,  999,  999, 1024],
+ [   5,   25,  125,  625, 3125]]
+</code></pre>
+<h2 id="key-api">Key API</h2>
+<p>| Function / method | Description |
+|-------------------|-------------|
+| <code>vtl.from_2d(arr)</code> | Create a 2-D tensor from a nested V array |
+| <code>t.slice_hilo(rows, cols)</code> | Slice by [start, end) row and column ranges |
+| <code>t.shape</code> | <code>[]int</code> with the size of each dimension |
+| <code>slice.assign(t)</code> | Write values from <code>t</code> into the slice's memory |</p>
+<h2 id="related-examples">Related examples</h2>
+<ul>
+<li><a href="https://github.com/vlang/vtl/blob/master/examples/vtl_basic_usage"><code>vtl_basic_usage</code></a> — 1-D tensors and basic operations</li>
+<li><a href="https://github.com/vlang/vtl/blob/master/examples/autograd_backprop"><code>autograd_backprop</code></a> — automatic differentiation</li></ul>
+
+</section>
+
+
+						<div class="footer">Powered by vdoc. Generated on: 2 Nov 2026 06:43:55</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_main">README</a></li>
 </ul></div>
