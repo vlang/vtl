@@ -81,6 +81,19 @@ pub fn maxpool2d[T](input &vtl.Tensor[T], kernel []int, padding []int, stride []
 	return max_indices, output
 }
 
+// maxpool2d_backward_with_input routes the gradient through cuDNN when
+// maxpool2d_cudnn_eligible allows it (`-d cuda`, VTL_USE_CUDA=1, VTL_CUDA_BACKWARD=1).
+// Otherwise it runs the CPU scatter in maxpool2d_backward.
+pub fn maxpool2d_backward_with_input[T](shape []int, max_indices &vtl.Tensor[int], input &vtl.Tensor[T], grad_output &vtl.Tensor[T], kernel []int, stride []int, padding []int) !&vtl.Tensor[T] {
+	$if T is f64 {
+		if maxpool2d_cudnn_eligible(input, max_indices, grad_output, kernel, stride, padding) {
+			return maxpool2d_backward_cuda_f64(shape, max_indices, input, grad_output, kernel,
+				stride)
+		}
+	}
+	return maxpool2d_backward[T](shape, max_indices, grad_output)
+}
+
 // maxpool2d_backward exposes this operation as part of the public API.
 pub fn maxpool2d_backward[T](shape []int, max_indices &vtl.Tensor[int], grad_output &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	if grad_output.size != max_indices.size {
