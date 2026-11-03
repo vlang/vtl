@@ -29,7 +29,7 @@ Phase 1 removes redundant **allocations** via `DeviceSession` buffer reuse on th
 |----------|--------|
 | `VTL_USE_CUDA=1` | Enable GPU forward for eligible ops |
 | `VTL_GPU_ACTIVATIONS=1` | Phase 2: chain GPU activations across Linear layers |
-| `VTL_CUDA_BACKWARD=1` | Phase 3: cuBLAS GEMM for Linear gate backward |
+| `VTL_CUDA_BACKWARD=1` | Phase 3: cuBLAS GEMM for Linear gate backward; cuDNN BatchNorm2D (training) and MaxPool2D backward (see `VSL_VTL_CUDA.md`) |
 | `VTL_CUDA_OPTIMIZER=1` | Phase 4: cuBLAS moment updates for Adam |
 | `VTL_TEST_CUDA=1` | Run GPU tests |
 | `VTL_USE_VULKAN=1` | f32 Linear/Conv2D/ReLU/Sigmoid/Adam via Vulkan |
