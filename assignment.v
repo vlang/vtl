@@ -195,10 +195,10 @@ pub fn (mut t Tensor[T]) put_with_mode[T](indices &Tensor[int], values &Tensor[T
 }
 
 fn tensor_shares_storage[T, U](a &Tensor[T], b &Tensor[U]) bool {
-	a_start := unsafe { usize(a.data.data.data) }
-	a_end := a_start + usize(a.data.data.len) * usize(sizeof(T))
-	b_start := unsafe { usize(b.data.data.data) }
-	b_end := b_start + usize(b.data.data.len) * usize(sizeof(U))
+	a_start := unsafe { uint(a.data.data.data) }
+	a_end := a_start + uint(a.data.data.len) * uint(sizeof(T))
+	b_start := unsafe { uint(b.data.data.data) }
+	b_end := b_start + uint(b.data.data.len) * uint(sizeof(U))
 	return a_start < b_end && b_start < a_end
 }
 
