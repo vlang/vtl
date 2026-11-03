@@ -30,7 +30,10 @@ pub fn array[T](tensor &vtl.Tensor[T]) NpyArray {
 // is not already present.
 pub fn write[T](path string, arrays map[string]&vtl.Tensor[T]) ! {
 	names := sorted_member_names(arrays.keys())!
-	mut archive := szip.open(path, .default_compression, .write)!
+	// Stored (uncompressed) members, as numpy.savez writes by default. V 0.5.2's
+	// compress.deflate crashes on the exact .npy payload of small float arrays
+	// ("invalid memory access" in deflate_compress_fixed); see the upstream report.
+	mut archive := szip.open(path, .no_compression, .write)!
 	defer {
 		archive.close()
 	}
@@ -47,7 +50,7 @@ pub fn write[T](path string, arrays map[string]&vtl.Tensor[T]) ! {
 // NumPy .npz archive. Build each value with array[T](tensor).
 pub fn write_arrays(path string, arrays map[string]NpyArray) ! {
 	names := sorted_member_names(arrays.keys())!
-	mut archive := szip.open(path, .default_compression, .write)!
+	mut archive := szip.open(path, .no_compression, .write)!
 	defer {
 		archive.close()
 	}
