@@ -67,7 +67,6 @@ fn test_linear_forward_vulkan() {
 	}
 
 	println('✓ Linear forward test passed')
-
 }
 
 // Test ReLU activation
@@ -95,7 +94,6 @@ fn test_relu_forward_vulkan() {
 	}
 
 	println('✓ ReLU forward test passed')
-
 }
 
 // Test Sigmoid activation
@@ -120,7 +118,6 @@ fn test_sigmoid_forward_vulkan() {
 	}
 
 	println('✓ Sigmoid forward test passed')
-
 }
 
 fn main() {
