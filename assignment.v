@@ -195,10 +195,11 @@ pub fn (mut t Tensor[T]) put_with_mode[T](indices &Tensor[int], values &Tensor[T
 }
 
 fn tensor_shares_storage[T, U](a &Tensor[T], b &Tensor[U]) bool {
-	a_start := unsafe { usize(a.data.data.data) }
-	a_end := a_start + usize(a.data.data.len) * usize(sizeof(T))
-	b_start := unsafe { usize(b.data.data.data) }
-	b_end := b_start + usize(b.data.data.len) * usize(sizeof(U))
+	// u64 holds a full 64-bit address; uint would truncate it. usize is deprecated in V 0.5.2.
+	a_start := unsafe { u64(a.data.data.data) }
+	a_end := a_start + u64(a.data.data.len) * u64(sizeof(T))
+	b_start := unsafe { u64(b.data.data.data) }
+	b_end := b_start + u64(b.data.data.len) * u64(sizeof(U))
 	return a_start < b_end && b_start < a_end
 }
 
