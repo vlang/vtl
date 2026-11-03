@@ -142,7 +142,10 @@ fn test_lstsq_rank_deficient_system_has_empty_residuals_and_validates_rows() {
 	b := vtl.from_1d([2.0, 4, 6])!
 	x, residuals, rank, _ := lstsq(a, b)!
 	assert x.shape == [2]
-	assert x.to_array() == [1.0, 1.0]
+	// LAPACKE returns 0.9999999999999997 for this system, so compare with a tolerance.
+	values := x.to_array()
+	assert math.abs(values[0] - 1.0) < 1e-10
+	assert math.abs(values[1] - 1.0) < 1e-10
 	assert residuals.shape == [0]
 	assert rank == 1
 	wrong_rows := vtl.from_1d([1.0, 2])!
