@@ -2,7 +2,6 @@ module internal
 
 import math
 import vsl.cuda
-import vsl.cuda.gpu
 import vtl
 import vtl.autograd_cuda
 
@@ -73,73 +72,73 @@ fn batchnorm2d_backward_cuda_f64(gradient &vtl.Tensor[f64], input &vtl.Tensor[f6
 		cudnn_bn_ops_bn, x_desc, y_desc, dy_desc, unsafe { nil }, dx_desc, bn_desc, unsafe { nil },
 		&ws_bytes), 'cudnnGetBatchNormalizationBackwardExWorkspaceSize')!
 
-	mut d_x := gpu.cuda_memory_new[f64](count)!
+	d_x := device_alloc_bytes(count * int(sizeof(f64)))!
 	defer {
-		d_x.free() or {}
+		C.cudaFree(d_x)
 	}
-	mut d_y := gpu.cuda_memory_new[f64](count)!
+	d_y := device_alloc_bytes(count * int(sizeof(f64)))!
 	defer {
-		d_y.free() or {}
+		C.cudaFree(d_y)
 	}
-	mut d_dy := gpu.cuda_memory_new[f64](count)!
+	d_dy := device_alloc_bytes(count * int(sizeof(f64)))!
 	defer {
-		d_dy.free() or {}
+		C.cudaFree(d_dy)
 	}
-	mut d_dx := gpu.cuda_memory_new[f64](count)!
+	d_dx := device_alloc_bytes(count * int(sizeof(f64)))!
 	defer {
-		d_dx.free() or {}
+		C.cudaFree(d_dx)
 	}
-	mut d_gamma := gpu.cuda_memory_new[f64](c)!
+	d_gamma := device_alloc_bytes(c * int(sizeof(f64)))!
 	defer {
-		d_gamma.free() or {}
+		C.cudaFree(d_gamma)
 	}
-	mut d_mean := gpu.cuda_memory_new[f64](c)!
+	d_mean := device_alloc_bytes(c * int(sizeof(f64)))!
 	defer {
-		d_mean.free() or {}
+		C.cudaFree(d_mean)
 	}
-	mut d_inv_std := gpu.cuda_memory_new[f64](c)!
+	d_inv_std := device_alloc_bytes(c * int(sizeof(f64)))!
 	defer {
-		d_inv_std.free() or {}
+		C.cudaFree(d_inv_std)
 	}
-	mut d_dgamma := gpu.cuda_memory_new[f64](c)!
+	d_dgamma := device_alloc_bytes(c * int(sizeof(f64)))!
 	defer {
-		d_dgamma.free() or {}
+		C.cudaFree(d_dgamma)
 	}
-	mut d_dbeta := gpu.cuda_memory_new[f64](c)!
+	d_dbeta := device_alloc_bytes(c * int(sizeof(f64)))!
 	defer {
-		d_dbeta.free() or {}
+		C.cudaFree(d_dbeta)
 	}
 
-	mut ws := gpu.CudaMemory[u8]{}
 	mut ws_ptr := unsafe { voidptr(nil) }
 	if ws_bytes > 0 {
-		ws = gpu.cuda_memory_new[u8](int(ws_bytes))!
-		ws_ptr = ws.ptr
+		ws_ptr = device_alloc_bytes(int(ws_bytes))!
 	}
 	defer {
-		ws.free() or {}
+		if ws_ptr != unsafe { nil } {
+			C.cudaFree(ws_ptr)
+		}
 	}
 
-	d_x.upload(input.to_array())!
-	d_dy.upload(gradient.to_array())!
-	d_gamma.upload(gamma.to_array())!
-	d_mean.upload(mean.to_array())!
-	d_inv_std.upload(inv_std)!
+	device_upload_f64(d_x, input.to_array())!
+	device_upload_f64(d_dy, gradient.to_array())!
+	device_upload_f64(d_gamma, gamma.to_array())!
+	device_upload_f64(d_mean, mean.to_array())!
+	device_upload_f64(d_inv_std, inv_std)!
 
 	alpha := f64(1.0)
 	beta := f64(0.0)
 	cudnn_check(C.cudnnBatchNormalizationBackwardEx(dev.cudnn, cudnn_bn_mode_spatial, cudnn_bn_ops_bn,
-		&alpha, &beta, &alpha, &beta, x_desc, d_x.ptr, y_desc, d_y.ptr, dy_desc, d_dy.ptr,
-		unsafe { nil }, unsafe { nil }, dx_desc, d_dx.ptr, bn_desc, d_gamma.ptr, unsafe { nil },
-		d_dgamma.ptr, d_dbeta.ptr, eps, d_mean.ptr, d_inv_std.ptr, unsafe { nil }, ws_ptr,
-		ws_bytes, unsafe { nil }, 0), 'cudnnBatchNormalizationBackwardEx')!
+		&alpha, &beta, &alpha, &beta, x_desc, d_x, y_desc, d_y, dy_desc, d_dy, unsafe { nil },
+		unsafe { nil }, dx_desc, d_dx, bn_desc, d_gamma, unsafe { nil }, d_dgamma, d_dbeta, eps,
+		d_mean, d_inv_std, unsafe { nil }, ws_ptr, ws_bytes, unsafe { nil }, 0),
+		'cudnnBatchNormalizationBackwardEx')!
 
 	mut dx_values := []f64{len: count}
-	d_dx.download(mut dx_values)!
+	device_download_f64(d_dx, mut dx_values)!
 	mut dgamma_values := []f64{len: c}
-	d_dgamma.download(mut dgamma_values)!
+	device_download_f64(d_dgamma, mut dgamma_values)!
 	mut dbeta_values := []f64{len: c}
-	d_dbeta.download(mut dbeta_values)!
+	device_download_f64(d_dbeta, mut dbeta_values)!
 
 	dx := vtl.from_array(dx_values, input.shape)!
 	dgamma := vtl.from_array(dgamma_values, [c])!

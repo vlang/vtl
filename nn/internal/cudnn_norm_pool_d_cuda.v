@@ -56,3 +56,37 @@ fn new_f64_nchw_desc(n int, c int, h int, w int) !cuda.CudnnTensorDescriptor {
 	}
 	return desc
 }
+
+// device_alloc_bytes allocates device memory. The caller releases it with C.cudaFree.
+// Raw runtime calls are used instead of vsl's generic gpu.CudaMemory, which broke
+// codegen for other VTL CUDA tests when instantiated from this module.
+fn device_alloc_bytes(bytes int) !voidptr {
+	mut ptr := unsafe { voidptr(nil) }
+	status := C.cudaMalloc(&ptr, bytes)
+	if status != 0 {
+		return error('cudaMalloc(${bytes} bytes) failed with status ${status}')
+	}
+	return ptr
+}
+
+// device_upload_f64 copies host float64 values to device memory at dst.
+fn device_upload_f64(dst voidptr, src []f64) ! {
+	if src.len == 0 {
+		return
+	}
+	status := C.cudaMemcpy(dst, src.data, int(sizeof(f64)) * src.len, cuda.cuda_memcpy_host_to_device)
+	if status != 0 {
+		return error('cudaMemcpy host-to-device failed with status ${status}')
+	}
+}
+
+// device_download_f64 copies device float64 values from src into dst.
+fn device_download_f64(src voidptr, mut dst []f64) ! {
+	if dst.len == 0 {
+		return
+	}
+	status := C.cudaMemcpy(dst.data, src, int(sizeof(f64)) * dst.len, cuda.cuda_memcpy_device_to_host)
+	if status != 0 {
+		return error('cudaMemcpy device-to-host failed with status ${status}')
+	}
+}

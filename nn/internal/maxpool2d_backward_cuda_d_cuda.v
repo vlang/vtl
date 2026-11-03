@@ -1,7 +1,6 @@
 module internal
 
 import vsl.cuda
-import vsl.cuda.gpu
 import vtl
 import vtl.autograd_cuda
 
@@ -119,33 +118,33 @@ fn maxpool2d_backward_cuda_f64(shape []int, max_indices &vtl.Tensor[int], input 
 	cudnn_check(C.cudnnSetPooling2dDescriptor(pool_desc, cudnn_pooling_mode_max, cudnn_nan_not_propagate,
 		kernel[0], kernel[1], 0, 0, stride[0], stride[1]), 'cudnnSetPooling2dDescriptor')!
 
-	mut d_x := gpu.cuda_memory_new[f64](in_count)!
+	d_x := device_alloc_bytes(in_count * int(sizeof(f64)))!
 	defer {
-		d_x.free() or {}
+		C.cudaFree(d_x)
 	}
-	mut d_y := gpu.cuda_memory_new[f64](out_count)!
+	d_y := device_alloc_bytes(out_count * int(sizeof(f64)))!
 	defer {
-		d_y.free() or {}
+		C.cudaFree(d_y)
 	}
-	mut d_dy := gpu.cuda_memory_new[f64](out_count)!
+	d_dy := device_alloc_bytes(out_count * int(sizeof(f64)))!
 	defer {
-		d_dy.free() or {}
+		C.cudaFree(d_dy)
 	}
-	mut d_dx := gpu.cuda_memory_new[f64](in_count)!
+	d_dx := device_alloc_bytes(in_count * int(sizeof(f64)))!
 	defer {
-		d_dx.free() or {}
+		C.cudaFree(d_dx)
 	}
 
-	d_x.upload(x_values)!
-	d_y.upload(y_values)!
-	d_dy.upload(grad_output.to_array())!
+	device_upload_f64(d_x, x_values)!
+	device_upload_f64(d_y, y_values)!
+	device_upload_f64(d_dy, grad_output.to_array())!
 
 	alpha := f64(1.0)
 	beta := f64(0.0)
-	cudnn_check(C.cudnnPoolingBackward(dev.cudnn, pool_desc, &alpha, y_desc, d_y.ptr, dy_desc,
-		d_dy.ptr, x_desc, d_x.ptr, &beta, dx_desc, d_dx.ptr), 'cudnnPoolingBackward')!
+	cudnn_check(C.cudnnPoolingBackward(dev.cudnn, pool_desc, &alpha, y_desc, d_y, dy_desc, d_dy,
+		x_desc, d_x, &beta, dx_desc, d_dx), 'cudnnPoolingBackward')!
 
 	mut dx_values := []f64{len: in_count}
-	d_dx.download(mut dx_values)!
+	device_download_f64(d_dx, mut dx_values)!
 	return vtl.from_array(dx_values, shape)!
 }
