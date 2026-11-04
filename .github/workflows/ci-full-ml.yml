@@ -28,6 +28,7 @@ jobs:
     env:
       TERM: xterm
       VJOBS: '2'
+      VTEST_FAIL_FAST: '1'
 
     steps:
       - uses: actions/checkout@v4
