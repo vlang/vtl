@@ -63,6 +63,12 @@ pub fn layer_norm_backward_shape[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T
 	if gradient.shape != input.shape {
 		return error('layer_norm_backward: gradient shape must match input shape')
 	}
+	// The cuDNN path is FP32 and needs both affine parameters; other cases stay on the CPU.
+	$if T is f32 {
+		if gamma != unsafe { nil } && beta != unsafe { nil } && layer_norm_cudnn_eligible() {
+			return layer_norm_backward_cuda_f32(gradient, input, gamma, eps, normalized_size)
+		}
+	}
 	group_count := input.size / normalized_size
 	mut dx_data := []f64{len: input.size}
 	mut dgamma_data := if gamma != unsafe { nil } { []f64{len: normalized_size} } else { []f64{} }
