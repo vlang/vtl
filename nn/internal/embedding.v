@@ -57,6 +57,11 @@ pub fn embedding_backward[T](grad_out &vtl.Tensor[T], input &vtl.Tensor[T], weig
 	if input.shape[0] != batch || input.shape[1] != seq_len || weight.shape[1] != embedding_dim {
 		return error('embedding_backward: input, gradient, and weight shapes do not match')
 	}
+	$if T is f64 {
+		if embedding_cuda_eligible() {
+			return embedding_backward_cuda_f64(grad_out, input, weight)
+		}
+	}
 
 	mut d_weight := vtl.zeros_like[T](weight)
 	if input.is_row_major_contiguous() && grad_out.is_row_major_contiguous()
