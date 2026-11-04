@@ -72,9 +72,9 @@ fn test_batchnorm2d_backward_dispatch_selects_cuda_when_enabled() ! {
 		os.unsetenv('VTL_CUDA_BACKWARD')
 	}
 	$if cuda ? {
-		assert batchnorm2d_cudnn_eligible(eps, true)
-		assert !batchnorm2d_cudnn_eligible(eps, false)
-		assert !batchnorm2d_cudnn_eligible(1e-6, true)
+		assert batchnorm_cudnn_eligible(eps, true)
+		assert !batchnorm_cudnn_eligible(eps, false)
+		assert !batchnorm_cudnn_eligible(1e-6, true)
 	}
 
 	dispatched := batchnorm2d_backward_mode[f64](grad, input, gamma, beta, mean, var_, eps, true)!

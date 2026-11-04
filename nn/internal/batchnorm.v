@@ -147,12 +147,12 @@ pub fn batchnorm2d_training[T](input &vtl.Tensor[T], gamma &vtl.Tensor[T], beta 
 }
 
 // batchnorm2d_backward_mode computes gradients w.r.t. input, gamma and beta
-// for BatchNorm2D. Training-mode gradients use cuDNN when batchnorm2d_cudnn_eligible
+// for BatchNorm2D. Training-mode gradients use cuDNN when batchnorm_cudnn_eligible
 // says so (`-d cuda`, VTL_USE_CUDA=1, VTL_CUDA_BACKWARD=1); otherwise the CPU path runs.
 // Evaluation mode always uses the CPU path.
 pub fn batchnorm2d_backward_mode[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], gamma &vtl.Tensor[T], beta &vtl.Tensor[T], mean &vtl.Tensor[T], var_ &vtl.Tensor[T], eps f64, training bool) ![]&vtl.Tensor[T] {
 	$if T is f64 {
-		if batchnorm2d_cudnn_eligible(eps, training) {
+		if batchnorm_cudnn_eligible(eps, training) {
 			return batchnorm2d_backward_cuda_f64(gradient, input, gamma, mean, var_, eps)
 		}
 	}
@@ -217,6 +217,11 @@ pub fn batchnorm1d_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], ga
 // batchnorm1d_backward_mode computes gradients using batch or fixed running
 // statistics, depending on whether the layer is training.
 pub fn batchnorm1d_backward_mode[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], gamma &vtl.Tensor[T], _beta &vtl.Tensor[T], mean &vtl.Tensor[T], var_ &vtl.Tensor[T], eps f64, training bool) ![]&vtl.Tensor[T] {
+	$if T is f64 {
+		if batchnorm_cudnn_eligible(eps, training) {
+			return batchnorm1d_backward_cuda_f64(gradient, input, gamma, mean, var_, eps)
+		}
+	}
 	batch_size := input.shape[0]
 	num_features := input.shape[1]
 
@@ -350,7 +355,13 @@ pub fn batchnorm3d_training[T](input &vtl.Tensor[T], gamma &vtl.Tensor[T], beta 
 // batchnorm3d_backward_mode computes gradients w.r.t. input, gamma and beta
 // for BatchNorm3D, using batch statistics in training mode and the fixed
 // running statistics as a constant affine transform in evaluation mode.
+// Training-mode gradients use cuDNN when batchnorm_cudnn_eligible says so.
 pub fn batchnorm3d_backward_mode[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], gamma &vtl.Tensor[T], _beta &vtl.Tensor[T], mean &vtl.Tensor[T], var_ &vtl.Tensor[T], eps f64, training bool) ![]&vtl.Tensor[T] {
+	$if T is f64 {
+		if batchnorm_cudnn_eligible(eps, training) {
+			return batchnorm3d_backward_cuda_f64(gradient, input, gamma, mean, var_, eps)
+		}
+	}
 	channels := input.shape[1]
 	spatial := input.shape[2] * input.shape[3] * input.shape[4]
 	count := f64(input.shape[0] * spatial)
