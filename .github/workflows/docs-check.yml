@@ -46,7 +46,7 @@ jobs:
         if: ${{ success() && !cancelled() && steps.checkout_vsl.outcome == 'success' }}
         uses: vlang/setup-v@663cc08827d1fc0532ee755b4dedbb183c11d06a # v1.7
         with:
-          check-latest: true
+          version: 78869311b51c76ddb4c3d2ed17e8a7733d8d5979
 
       - name: Copy VTL source code to V Modules
         id: copy_vtl_source_code_to_v_modules

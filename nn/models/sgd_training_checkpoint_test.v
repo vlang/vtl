@@ -48,6 +48,12 @@ fn test_sgd_training_checkpoint_restores_momentum_and_model_state() ! {
 		assert optimizer.momentum_buffers[i].to_array() == restored_optimizer.momentum_buffers[i].to_array()
 	}
 	optimizer.update()!
+	// Checkpoints carry weights and optimizer state, not gradients. A resumed
+	// training loop recomputes them before each step, so give the restored
+	// parameters the same gradients the original step used.
+	for i, mut parameter in restored_optimizer.params {
+		parameter.grad = vtl.full[f64](parameter.value.shape, f64(i + 1))
+	}
 	restored_optimizer.update()!
 	assert restored_optimizer.momentum_initialized == optimizer.momentum_initialized
 	for i, parameter in optimizer.params {

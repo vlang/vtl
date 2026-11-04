@@ -46,7 +46,7 @@ jobs:
         id: uses_setup_v_663cc08827d1fc0532ee755b4dedbb183c11d06a_v1_7
         if: ${{ success() && !cancelled() && steps.uses_checkout_v4_2.outcome == 'success' }}
         with:
-          check-latest: true
+          version: 78869311b51c76ddb4c3d2ed17e8a7733d8d5979
 
       - name: Install dependencies
         id: install_dependencies

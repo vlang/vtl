@@ -138,7 +138,7 @@ fn test_clip_grad_norm_rejects_invalid_norm_type() {
 
 fn test_clip_grad_norm_preserves_small_and_f32_gradients() ! {
 	context := autograd.ctx[f32]()
-	parameter := context.variable(vtl.from_1d([0.3, 0.4])!)
+	parameter := context.variable(vtl.from_1d([f32(0.3), 0.4])!)
 	parameter.grad.set_nth(0, f32(0.3))
 	parameter.grad.set_nth(1, f32(0.4))
 	mut parameters := [parameter]

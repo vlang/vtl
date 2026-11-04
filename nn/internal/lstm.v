@@ -85,6 +85,12 @@ pub fn lstm_backward_single_with_final_state[T](input &vtl.Tensor[T], hidden0 &v
 	cell0 &vtl.Tensor[T], w_ih &vtl.Tensor[T], w_hh &vtl.Tensor[T], b_ih &vtl.Tensor[T],
 	b_hh &vtl.Tensor[T], grad_output &vtl.Tensor[T], grad_final_hidden &vtl.Tensor[T],
 	grad_final_cell &vtl.Tensor[T]) ![]&vtl.Tensor[T] {
+	$if T is f64 {
+		if lstm_cuda_eligible() {
+			return lstm_backward_cuda_f64(input, hidden0, cell0, w_ih, w_hh, b_ih, b_hh, grad_output,
+				grad_final_hidden, grad_final_cell)
+		}
+	}
 	output, _, _ := lstm_forward_single_with_cell[T](input, hidden0, cell0, w_ih, w_hh, b_ih,
 		b_hh)!
 	if grad_output.shape != output.shape {

@@ -56,7 +56,8 @@ fn test_batchnorm3d_backward_matches_finite_differences() ! {
 	layer := batchnorm3d_layer[f64](c, 1, BatchNorm3DConfig{})
 	base := [1.0, 2.0, 3.0, 4.0]
 	weights := c.variable(vtl.from_array([1.0, 0.5, -0.25, 2.0], [1, 1, 1, 2, 2])!,
-		requires_grad: false)
+		requires_grad: false
+	)
 
 	input := bn3d_input(c, base, [1, 1, 1, 2, 2])!
 	output := layer.forward_with_mode(input, true)!
