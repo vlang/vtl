@@ -194,6 +194,12 @@ pub fn attention_gate[T](input &vtl.Tensor[T], w_q &vtl.Tensor[T], w_k &vtl.Tens
 // backward exposes this operation as part of the public API.
 pub fn (g &AttentionGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
 	grad := payload.variable.grad
+	$if T is f64 {
+		if internal.attention_cuda_eligible() {
+			return internal.attention_backward_cuda_f64(grad, g.input, g.w_q, g.w_k, g.w_v, g.w_o,
+				g.q, g.k, g.v, g.attn_weights, g.merged, g.num_heads, g.head_dim)
+		}
+	}
 	batch := g.input.shape[0]
 	seq_len := g.input.shape[1]
 	embed_dim := g.input.shape[2]
