@@ -544,4 +544,11 @@ fn test_nth_index_on_huge_views() {
 	assert empty.nth_index(0) == [0, 0, 0, 0, 0]
 	assert empty.nth_index(1) == [0, 0, 0, 0, 1]
 	assert empty.nth_index(1 << 16) == [0, 0, 1, 0, 0]
+	// where int is 64 bits, positions past 2^32 too
+	if sizeof(int) == 8 {
+		n := int(i64(1) << 32)
+		assert wide.nth_index(n) == [0, 1, 0, 0]
+		assert empty.nth_index(n) == [0, 1, 0, 0, 0]
+		assert wide.get_nth(2 * n - 1) == 7
+	}
 }
