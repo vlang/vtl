@@ -528,16 +528,20 @@ fn test_nth_index_matches_the_counting_order() {
 }
 
 fn test_nth_index_on_huge_views() {
-	// the old loop counted up to n, so this would not finish
-	big := vtl.from_array([7], [1, 1])!.broadcast_to([1 << 20, 1 << 20])!
-	assert big.nth_index(big.size - 1) == [(1 << 20) - 1, (1 << 20) - 1]
+	// the old loop counted up to n: about 2^30 steps for each of these calls
+	big := vtl.from_array([7], [1, 1])!.broadcast_to([1 << 15, 1 << 15])!
+	for k in 0 .. 64 {
+		assert big.nth_index(big.size - 1 - k) == [(1 << 15) - 1, (1 << 15) - 1 - k]
+	}
 	assert big.get_nth(big.size - 1) == 7
-	// the number of elements does not fit in an int here
-	wide := vtl.from_array([7], [1, 1])!.broadcast_to([1 << 32, 1 << 32])!
-	assert wide.nth_index(5) == [0, 5]
-	assert wide.nth_index(1 << 32) == [1, 0]
-	empty := vtl.from_array([7], [1, 1, 1])!.broadcast_to([1 << 32, 0, 1 << 32])!
-	assert empty.nth_index(0) == [0, 0, 0]
-	assert empty.nth_index(1) == [0, 0, 1]
-	assert empty.nth_index(1 << 32) == [1, 0, 0]
+	// every axis length fits in a 32-bit int; counting an empty axis as one,
+	// both views have 2^64 positions, more than an int of either width holds
+	wide := vtl.from_array([7], [1, 1, 1, 1])!.broadcast_to([1 << 16, 1 << 16, 1 << 16, 1 << 16])!
+	assert wide.nth_index(5) == [0, 0, 0, 5]
+	assert wide.nth_index(1 << 16) == [0, 0, 1, 0]
+	empty := vtl.from_array([7], [1, 1, 1, 1, 1])!.broadcast_to([1 << 16, 1 << 16, 0, 1 << 16,
+		1 << 16])!
+	assert empty.nth_index(0) == [0, 0, 0, 0, 0]
+	assert empty.nth_index(1) == [0, 0, 0, 0, 1]
+	assert empty.nth_index(1 << 16) == [0, 0, 0, 1, 0]
 }
