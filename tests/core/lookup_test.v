@@ -539,9 +539,9 @@ fn test_nth_index_on_huge_views() {
 	wide := vtl.from_array([7], [1, 1, 1, 1])!.broadcast_to([1 << 16, 1 << 16, 1 << 16, 1 << 16])!
 	assert wide.nth_index(5) == [0, 0, 0, 5]
 	assert wide.nth_index(1 << 16) == [0, 0, 1, 0]
-	empty := vtl.from_array([7], [1, 1, 1, 1, 1])!.broadcast_to([1 << 16, 1 << 16, 0, 1 << 16,
+	empty := vtl.from_array([7], [1, 1, 1, 1, 1])!.broadcast_to([1 << 16, 1 << 16, 1 << 16, 0,
 		1 << 16])!
 	assert empty.nth_index(0) == [0, 0, 0, 0, 0]
 	assert empty.nth_index(1) == [0, 0, 0, 0, 1]
-	assert empty.nth_index(1 << 16) == [0, 0, 0, 1, 0]
+	assert empty.nth_index(1 << 16) == [0, 0, 1, 0, 0]
 }
