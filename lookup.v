@@ -546,25 +546,19 @@ pub fn (t &Tensor[T]) offset_index[T](index []int) int {
 // and for a `shape` of `[2, 3]` and `n == 3` the _nth index_ is `[0, 1, 1]`
 // in sorted order.
 pub fn (t &Tensor[T]) nth_index[T](n int) []int {
-	rank := t.rank()
-	mut index := []int{len: rank}
-	for i in 0 .. rank {
-		index[i] = 0
-	}
-	mut i := 0
-	for {
-		if i == n {
-			return index
+	// Mixed-radix digits of n, last axis first, with floor division so that
+	// positions past either end wrap around; an empty axis always stays at 0.
+	mut index := []int{len: t.rank()}
+	mut rest := n
+	for j := t.rank() - 1; j >= 0; j-- {
+		dim := if t.shape[j] > 0 { t.shape[j] } else { 1 }
+		mut digit := rest % dim
+		rest /= dim
+		if digit < 0 {
+			digit += dim
+			rest--
 		}
-		i += 1
-		for j := rank - 1; j >= 0; j -= 1 {
-			if index[j] < t.shape[j] - 1 {
-				index[j] += 1
-				break
-			}
-			index[j] = 0
-		}
+		index[j] = digit
 	}
-
 	return index
 }
