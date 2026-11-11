@@ -197,7 +197,8 @@ fn test_atanh() {
 	a := vtl.from_1d([-0.5, 0, 0.5])!
 	result := a.atanh()
 	expected := vtl.from_1d([-0.5493061443340548, 0.0, 0.5493061443340548])!
-	assert result.array_equal(expected)
+	// Platform libm implementations can differ by a few ULPs.
+	assert result.allclose(expected, rtol: 0.0, atol: 1e-15)!
 }
 
 fn test_cbrt() {
@@ -348,7 +349,8 @@ fn test_log1p() {
 	a := vtl.from_1d([1.0, 2, 3])!
 	result := a.log1p()
 	expected := vtl.from_1d([0.6931471805599453, 1.0986122886681096, 1.3862943611198906])!
-	assert result.array_equal(expected)
+	// Platform libm implementations can differ by a few ULPs.
+	assert result.allclose(expected, rtol: 0.0, atol: 1e-15)!
 }
 
 fn test_log2() {
