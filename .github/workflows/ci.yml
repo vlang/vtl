@@ -117,7 +117,7 @@ jobs:
           - os: ubuntu-24.04
             flags: '--prod'
             backend: pure-v
-          - os: macos-14
+          - os: macos-15
             flags: ''
             backend: pure-v
       fail-fast: false
