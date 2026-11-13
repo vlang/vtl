@@ -1018,8 +1018,14 @@ fn encode_tensor[T](t &vtl.Tensor[T]) !string {
 	for val in t.data.data {
 		data << f64(val)
 	}
-	// Encode shape as comma-separated
-	shape_str := shape.map(it.str()).join(',')
+	// Encode shape as comma-separated without generic map/join inference.
+	mut shape_str := ''
+	for i, dimension in shape {
+		if i > 0 {
+			shape_str += ','
+		}
+		shape_str += dimension.str()
+	}
 	memory_str := if t.memory == .col_major { 'col_major' } else { 'row_major' }
 	// Encode data as base64
 	mut byte_data := []u8{len: data.len * 8}
