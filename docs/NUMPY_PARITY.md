@@ -68,6 +68,8 @@ contiguous input, and copies when another layout cannot be reshaped as that
 view; tests cover transposed and column-major values as well as storage sharing.
 `transpose`, `moveaxis`, `squeeze`, `unsqueeze`, and `expand_dims` preserve
 shared storage as views, including for transposed input.
+`split` returns storage-sharing slices, including when splitting a transposed
+input.
 `ravel` shares storage for row-major contiguous input and copies other layouts;
 `flatten` always copies. Mutation tests verify these contracts for contiguous
 and transposed inputs.
