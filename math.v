@@ -747,11 +747,27 @@ pub fn (t &Tensor[T]) floor[T]() &Tensor[T] {
 // fmod exposes this operation as part of the public API.
 @[inline]
 pub fn (a &Tensor[T]) fmod[T](b &Tensor[T]) !&Tensor[T] {
-	return a.nmap[T]([b], fn [T](xs []T, _ []int) T {
-		x := xs[0]
-		y := xs[1]
-		return cast[T](math.fmod(td(x).f64(), td(y).f64()))
-	})
+	$if T is $int || T is $float {
+		return a.nmap[T]([b], fn [T](xs []T, _ []int) T {
+			x := xs[0]
+			y := xs[1]
+			$if T is $int {
+				if y == T(0) {
+					return T(0)
+				}
+				$if T is i8 || T is i16 || T is i32 || T is i64 || T is int {
+					if y == T(-1) {
+						return T(0)
+					}
+				}
+				return x % y
+			} $else {
+				return T(math.fmod(f64(x), f64(y)))
+			}
+		})
+	} $else {
+		return error('fmod only supports integer and floating-point tensors')
+	}
 }
 
 // gamma returns the elementwise gamma of an tensor

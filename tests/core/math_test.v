@@ -301,6 +301,53 @@ fn test_fmod() {
 	assert result.array_equal(expected)
 }
 
+fn test_fmod_keeps_full_integer_precision_and_truncates_toward_zero() ! {
+	values := vtl.from_1d[i64]([9007199254740993, -9007199254740993])!
+	divisors := vtl.from_1d[i64]([2])!
+	unsigned_values := vtl.from_1d[u64]([9007199254740993])!
+	unsigned_divisor := vtl.from_1d[u64]([2])!
+
+	assert values.fmod(divisors)!.to_array() == [i64(1), i64(-1)]
+	assert unsigned_values.fmod(unsigned_divisor)!.to_array() == [u64(1)]
+}
+
+fn test_fmod_supports_float32_tensors() ! {
+	values := vtl.from_1d[f32]([5.0, -5.0])!
+	divisors := vtl.from_1d[f32]([2.0])!
+	result := values.fmod(divisors)!
+
+	assert result.dtype() == .float32
+	assert result.to_array() == [f32(1.0), f32(-1.0)]
+}
+
+fn test_fmod_integer_zero_and_negative_one_divisors_are_safe() ! {
+	minimum := i64(-9223372036854775807 - 1)
+	values := vtl.from_1d[i64]([minimum, -5, 5])!
+	divisors := vtl.from_1d[i64]([-1, 0, 0])!
+
+	assert values.fmod(divisors)!.to_array() == [i64(0), i64(0), i64(0)]
+}
+
+fn test_fmod_float_preserves_ieee_results_and_signed_zero() ! {
+	values := vtl.from_1d([5.0, -5.0, -0.0, math.inf(1), math.nan()])!
+	divisors := vtl.from_1d([2.0])!
+	result := values.fmod(divisors)!
+
+	assert result.get_nth(0) == 1.0
+	assert result.get_nth(1) == -1.0
+	assert result.get_nth(2) == 0.0
+	assert math.signbit(result.get_nth(2))
+	assert math.is_nan(result.get_nth(3))
+	assert math.is_nan(result.get_nth(4))
+}
+
+fn test_fmod_rejects_boolean_tensors() ! {
+	values := vtl.from_1d([true, false])!
+	if _ := values.fmod(values) {
+		assert false, 'fmod must reject boolean tensors'
+	}
+}
+
 fn test_gamma() {
 	a := vtl.from_1d([1.0, 2, 3])!
 	result := a.gamma()
