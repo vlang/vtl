@@ -187,6 +187,17 @@ fn test_promote_types_for_matching_numeric_kinds() {
 	assert vtl.promote_types(.string, .string)! == .string
 }
 
+fn test_promote_types_prefers_fixed_width_for_native_integer_ties() ! {
+	assert vtl.promote_types(.int64, .native_int)! == .int64
+	assert vtl.promote_types(.native_int, .int64)! == .int64
+
+	fixed := vtl.from_1d[i64]([7])!
+	native := vtl.from_1d[int]([2])!
+	sum := vtl.add_promoted[i64, i64, int](fixed, native)!
+	assert sum.dtype() == .int64
+	assert sum.to_array() == [i64(9)]
+}
+
 fn test_promote_types_rejects_string_and_numeric_mixtures() {
 	if _ := vtl.promote_types(.string, .int8) {
 		assert false, 'promote_types must reject string/numeric mixtures'

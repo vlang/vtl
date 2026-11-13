@@ -152,8 +152,11 @@ fn widest_signed_dtype(a DType, b DType) DType {
 	if b_bits > a_bits {
 		return b
 	}
-	if a == .native_int || b == .native_int {
-		return .native_int
+	if a == .native_int {
+		return b
+	}
+	if b == .native_int {
+		return a
 	}
 	return a
 }
