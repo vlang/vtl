@@ -373,6 +373,37 @@ fn test_get() {
 	assert t.get([4, 1]) == 10
 }
 
+fn test_get_checked_normalizes_negative_coordinates_and_reports_invalid_bounds() ! {
+	tensor := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
+	assert tensor.get_checked([-1, -1])! == 6
+	assert tensor.get_checked([0, 2])! == 3
+
+	if _ := tensor.get_checked([0, 3]) {
+		assert false, 'get_checked must reject a coordinate beyond its axis'
+	} else {
+		assert err.msg().contains('axis 1')
+	}
+	if _ := tensor.get_checked([0]) {
+		assert false, 'get_checked must reject an incomplete coordinate'
+	} else {
+		assert err.msg().contains('rank 1')
+	}
+	if _ := tensor.get_checked([0, 0, 0]) {
+		assert false, 'get_checked must reject extra coordinates'
+	} else {
+		assert err.msg().contains('rank 3')
+	}
+
+	scalar := vtl.from_array([7], [])!
+	assert scalar.get_checked([])! == 7
+	empty := vtl.from_array([]int{}, [0, 3])!
+	if _ := empty.get_checked([0, 0]) {
+		assert false, 'get_checked must reject coordinates in an empty axis'
+	} else {
+		assert err.msg().contains('axis 0')
+	}
+}
+
 fn test_get_nth() {
 	t := vtl.from_array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [5, 2])!
 	assert t.size() == 10
