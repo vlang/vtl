@@ -154,18 +154,20 @@ assert mins.to_array() == [2.0, 3.0]
 
 ## argmax / argmin
 
-`argmax_axis(axis)` and `argmin_axis(axis)` retain the reduced axis with
-length one. Use `argmax_axis_squeeze(axis)` or `argmin_axis_squeeze(axis)` to
-remove it, matching NumPy's default `keepdims=false` shape behavior. VTL's
-one-dimensional tensors use shape `[1]` for scalar results.
+`argmax_axis(axis)` and `argmin_axis(axis)` retain the reduced axis, preserving
+the existing API behavior. The `argmax_axis_with_keepdims(axis, keepdims)` and
+`argmin_axis_with_keepdims(axis, keepdims)` variants can also remove it, using
+`keepdims=false` for NumPy's default shape behavior. The
+`argmax_axis_squeeze(axis)` and `argmin_axis_squeeze(axis)` convenience forms
+remain available. VTL's one-dimensional tensors use shape `[1]` for scalar
+results.
 
 Use `argmax_flat()` or `argmin_flat()` to get the first extremum's flattened
-index. The axis methods keep the reduced axis with length one; their
-`*_squeeze` forms remove that axis. Standard arg reductions return the first
-NaN index when one is present, while `nanargmax()` and `nanargmin()` skip NaNs
-and return an error when no non-NaN value exists. `nanargmax_axis(axis,
-keepdims)` and `nanargmin_axis(axis, keepdims)` provide the same NaN-ignoring
-behavior over one axis.
+index. Standard arg reductions return the first NaN index when one is present,
+while `nanargmax()` and `nanargmin()` skip NaNs and return an error when no
+non-NaN value exists. `nanargmax_axis(axis, keepdims)` and
+`nanargmin_axis(axis, keepdims)` provide the same NaN-ignoring behavior over
+one axis.
 
 ```v
 import math
@@ -178,6 +180,7 @@ t := vtl.from_array[f64]([3.0, 5.0, 1.0, 4.0], [2, 2])!
 amax := t.argmax_axis_squeeze[f64](1)!
 assert amax.shape == [2]
 // amax = [1, 1]  → row 0: max is at col 1 (5.0), row 1: max is at col 1 (4.0)
+assert t.argmax_axis_with_keepdims[f64](1, false)!.to_array() == amax.to_array()
 
 amin := t.argmin_axis_squeeze[f64](0)!
 assert amin.shape == [2]

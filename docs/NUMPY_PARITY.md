@@ -261,9 +261,11 @@ mean/variance/std with explicit `keepdims` and NaN-aware forms; explicit
 accumulator dtypes for global, single-axis, and multi-axis regular sum/product
 and NaN-aware sum/product; axis-wise
 `trapezoid`; all thirteen NumPy quantile estimators via `QuantileMethod`, with
-global, axis, multi-axis, multi-quantile, percentile, and NaN-aware forms; axis arg
-reductions and squeezed min/max/argmin/argmax results; median and NaN-aware
-median helpers over one or multiple axes with explicit `keepdims`; multi-axis min/max;
+global, axis, multi-axis, multi-quantile, percentile, and NaN-aware forms;
+axis-wise argmax/argmin with `*_axis_with_keepdims` variants (legacy APIs
+retain the axis) and squeezed min/max/argmin/argmax convenience results; median
+and NaN-aware median helpers over one or multiple axes with explicit
+`keepdims`; multi-axis min/max;
 weighted inverted-CDF quantile, multi-quantile, percentile, and multi-percentile
 forms globally and along one or several axes, with same-shape or reduced-shape
 weights, including NaN-aware forms that discard weights for NaN observations;
@@ -307,8 +309,8 @@ NumPy's flattened `axis=None` cumulative behavior, with explicit accumulator
 types through `cumsum_flat_as` and `cumprod_flat_as`; their `Variable`
 counterparts propagate gradients through the flattened order.
 
-**Remaining:** add `keepdims` options consistently across remaining
-reductions, extend accumulator dtype controls to other reduction families, and
+**Remaining:** add `keepdims` options consistently across the remaining
+reduction families, extend accumulator dtype controls to other reductions, and
 broaden reduction coverage.
 
 Logical `all_axis`/`any_axis` and multi-axis `all_axes`/`any_axes` reductions
@@ -330,7 +332,7 @@ elements; an empty output caused only by an unreduced dimension remains empty.
 | `nanmin` / `nanmax` | G/A/M; retained and squeezed A forms | f64 | Skip | NaN if empty or no valid values |
 | `mean` / `variance` / `std` | G/A/M; KD on tensor A/M forms | mean T; var/std f64; `_as` selects U | Propagate | See moments details below |
 | `nanmean` / `nanvar` / `nanstd` | G/A/M; KD on tensor A/M forms | f64; `_as` selects U | Skip | NaN if empty, invalid, or under-sampled |
-| `argmin` / `argmax` | G flattened index; A retained or squeezed | int | First NaN; `nanarg*` skips | Empty/no-valid reductions error |
+| `argmin` / `argmax` | G flattened index; A `*_with_keepdims` variants | int | First NaN; `nanarg*` skips | Empty/no-valid reductions error |
 | `median` / quantiles | G/A/M; KD forms; multi-q prepends q axis | f64 | Ordinary forms propagate; `nan*` skips | Median NaN; quantile errors |
 | Weighted average / quantiles | G/A/M; KD; multi-q adds q axis | f64 | Average propagates; `nan` skips | Empty/zero-weight errors |
 | `all` / `any` | G/A/M; KD; A=() is elementwise | bool | NaN is truthy | Identities true / false |
@@ -346,8 +348,9 @@ observation count does not exceed `ddof`; axis variance/std return NaN for
 under-sampled slices. NaN-aware moments return NaN for empty/all-NaN inputs or
 slices and when valid observations do not exceed `ddof`.
 
-Axis `argmin`/`argmax` keep the reduced dimension in their default forms;
-`*_squeeze` removes it. Ordinary quantile forms propagate NaNs in covered tests;
+Axis `argmin`/`argmax` keep the reduced dimension by default; use
+`*_axis_with_keepdims(..., false)` or `*_axis_squeeze` to remove it. Ordinary
+quantile forms propagate NaNs in covered tests;
 ordinary median propagates NaNs globally and for axis/multi-axis slices;
 `nan*` forms skip them. Empty median returns NaN, while empty quantile/percentile
 calls error. Weighted average errors on empty inputs or zero total weight;

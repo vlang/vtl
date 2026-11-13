@@ -69,6 +69,24 @@ fn test_arg_extrema_axis_squeeze_matches_numpy_shape() {
 	assert vector.argmin_axis_squeeze(0)!.to_array() == [1]
 }
 
+fn test_arg_extrema_axis_keepdims_option_preserves_legacy_default() {
+	t := vtl.from_2d([[1.0, 5.0], [3.0, 2.0]])!
+	assert t.argmax_axis(1)!.shape == [2, 1]
+	assert t.argmax_axis_with_keepdims(1, true)!.shape == [2, 1]
+	assert t.argmax_axis_with_keepdims(1, false)!.shape == [2]
+	assert t.argmax_axis_with_keepdims(1, false)!.to_array() == [1, 0]
+	assert t.argmin_axis_with_keepdims(0, false)!.to_array() == [0, 1]
+	assert t.argmax(1)!.to_array() == [1, 0]
+	assert t.argmin(1)!.to_array() == [0, 1]
+
+	vector := vtl.from_1d([4.0, 2.0, 6.0])!
+	assert vector.argmax_axis_with_keepdims(0, false)!.shape == [1]
+
+	empty_output := vtl.zeros[f64]([0, 2])
+	assert empty_output.argmax_axis_with_keepdims(1, false)!.shape == [0]
+	assert empty_output.argmin_axis_with_keepdims(1, false)!.shape == [0]
+}
+
 fn test_argmax_flat() {
 	t := vtl.from_1d([1.0, 7.0, 3.0, 5.0])!
 	result := t.argmax(0)!
