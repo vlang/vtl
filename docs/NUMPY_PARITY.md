@@ -50,9 +50,16 @@ matrices; `arange` with start/stop/step; endpoint-aware `linspace`; configurable
 `logspace`; 2-D `meshgrid` and N-D `meshgrid_n` with `xy` and `ij` indexing;
 dense stacked coordinates through `indices` and broadcastable per-axis sparse
 coordinates through `indices_sparse`. VTL also provides `one_hot` for ML labels,
-appending a class dimension and validating class bounds.
+appending a class dimension and validating class bounds. Element dtype is
+selected through each constructor's generic type argument. Constructors that
+accept `TensorData`, `LinspaceData`, or `LogspaceData` accept a memory format;
+creation tests verify column-major layout for the scalar-fill and sequence
+families.
 
-**Remaining:** validate edge cases and make dtype/device options consistent.
+**Remaining:** constructor APIs do not expose a common device option. `meshgrid`,
+`meshgrid_n`, `indices`, `indices_sparse`, and `one_hot` currently use their
+fixed default layout. Document and validate those differences, edge cases, and
+device support as the storage/device model evolves.
 
 ### Shape and manipulation
 

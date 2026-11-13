@@ -2,9 +2,8 @@ module vtl
 
 import vtl.storage
 
-// TensorData defines a public data structure for this module.
-
-// TensorData defines a public data structure for this module.
+// TensorData configures the memory layout used by tensor creation functions.
+// The element type is selected through the function's generic type argument.
 @[params]
 pub struct TensorData {
 pub:
@@ -40,7 +39,7 @@ pub fn from_array[T](arr []T, shape []int, params TensorData) !&Tensor[T] {
 	}
 }
 
-// tensor allocates a Tensor onto specified device with a given data
+// tensor allocates a Tensor filled with the given value and shape.
 pub fn tensor[T](init T, shape []int, params TensorData) &Tensor[T] {
 	if shape.len == 0 {
 		data_storage := storage.storage[T](1, 0, init)

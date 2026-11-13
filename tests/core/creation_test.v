@@ -154,6 +154,31 @@ fn test_full_like() {
 	assert t2.get([2]) == 4.0
 }
 
+fn test_creation_functions_preserve_requested_memory_format() ! {
+	zero := vtl.zeros[int]([2, 3], memory: .col_major)
+	assert zero.memory == .col_major
+	assert zero.strides == [1, 2]
+
+	one := vtl.ones[int]([2, 3], memory: .col_major)
+	assert one.memory == .col_major
+	assert one.strides == [1, 2]
+	assert one.to_array() == [1, 1, 1, 1, 1, 1]
+
+	filled := vtl.full[int]([2, 3], 7, memory: .col_major)
+	assert filled.memory == .col_major
+	assert filled.strides == [1, 2]
+	assert filled.to_array() == [7, 7, 7, 7, 7, 7]
+
+	diagonal := vtl.eye[int](2, 3, 0, memory: .col_major)
+	assert diagonal.memory == .col_major
+	assert diagonal.strides == [1, 2]
+	assert diagonal.to_array() == [1, 0, 0, 0, 1, 0]
+
+	assert vtl.arange[int](0, 3, 1, memory: .col_major)!.memory == .col_major
+	assert vtl.linspace[f64](0.0, 1.0, 3, memory: .col_major)!.memory == .col_major
+	assert vtl.logspace[f64](0.0, 2.0, 3, memory: .col_major)!.memory == .col_major
+}
+
 fn test_range() {
 	t := vtl.range[f64](-2, 10)
 	expected := vtl.from_array([-2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0], [
