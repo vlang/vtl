@@ -225,8 +225,8 @@ fn test_adam_training_checkpoint_restores_model_and_optimizer_state() ! {
 	model.linear(1)
 	mut optimizer := optimizers.adam_optimizer[f64](learning_rate: 0.01)
 	optimizer.build_params(model.info.layers)
-	for i, mut parameter in optimizer.params {
-		parameter.grad = vtl.full[f64](parameter.value.shape, f64(i + 1))
+	for i in 0 .. optimizer.params.len {
+		optimizer.params[i].grad = vtl.full[f64](optimizer.params[i].value.shape, f64(i + 1))
 	}
 	optimizer.update()!
 
@@ -252,10 +252,10 @@ fn test_adam_training_checkpoint_restores_model_and_optimizer_state() ! {
 		assert optimizer.second_moments[i].to_array() == restored_optimizer.second_moments[i].to_array()
 	}
 
-	for i, mut parameter in optimizer.params {
-		parameter.grad = vtl.full[f64](parameter.value.shape, f64(i + 2))
+	for i in 0 .. optimizer.params.len {
+		optimizer.params[i].grad = vtl.full[f64](optimizer.params[i].value.shape, f64(i + 2))
 		mut restored_parameter := restored_optimizer.params[i]
-		restored_parameter.grad = vtl.full[f64](parameter.value.shape, f64(i + 2))
+		restored_parameter.grad = vtl.full[f64](optimizer.params[i].value.shape, f64(i + 2))
 	}
 	optimizer.update()!
 	restored_optimizer.update()!

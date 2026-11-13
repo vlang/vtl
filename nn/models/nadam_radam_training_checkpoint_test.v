@@ -23,8 +23,8 @@ fn test_nadam_training_checkpoint_restores_schedule_and_moments() ! {
 		decoupled_weight_decay: true
 	)
 	optimizer.build_params(model.info.layers)
-	for i, mut parameter in optimizer.params {
-		parameter.grad = vtl.full[f64](parameter.value.shape, f64(i + 1))
+	for i in 0 .. optimizer.params.len {
+		optimizer.params[i].grad = vtl.full[f64](optimizer.params[i].value.shape, f64(i + 1))
 	}
 	optimizer.update()!
 	path := '${nadam_training_checkpoint_test_dir}/nadam.json'
@@ -60,8 +60,8 @@ fn test_radam_training_checkpoint_restores_step_and_moments() ! {
 		decoupled_weight_decay: true
 	)
 	optimizer.build_params(model.info.layers)
-	for i, mut parameter in optimizer.params {
-		parameter.grad = vtl.full[f64](parameter.value.shape, f64(i + 1))
+	for i in 0 .. optimizer.params.len {
+		optimizer.params[i].grad = vtl.full[f64](optimizer.params[i].value.shape, f64(i + 1))
 	}
 	optimizer.update()!
 	path := '${radam_training_checkpoint_test_dir}/radam.json'

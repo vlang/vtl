@@ -78,7 +78,7 @@ fn (nn &Sequential[T]) layer_config_at(index int) map[string]int {
 }
 
 fn is_erased_layer_type(name string) bool {
-	return name == '' || name == 'Layer' || name.starts_with('types.Layer[')
+	return name == '' || name == 'Layer' || name.starts_with('Layer[') || name.contains('types.Layer[')
 }
 
 fn set_config_default(mut config map[string]int, key string, value int) {
@@ -1019,7 +1019,11 @@ fn encode_tensor[T](t &vtl.Tensor[T]) !string {
 		data << f64(val)
 	}
 	// Encode shape as comma-separated
-	shape_str := shape.map(it.str()).join(',')
+	mut shape_parts := []string{cap: shape.len}
+	for dimension in shape {
+		shape_parts << dimension.str()
+	}
+	shape_str := shape_parts.join(',')
 	memory_str := if t.memory == .col_major { 'col_major' } else { 'row_major' }
 	// Encode data as base64
 	mut byte_data := []u8{len: data.len * 8}

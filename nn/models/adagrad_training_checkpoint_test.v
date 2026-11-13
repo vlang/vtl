@@ -18,8 +18,8 @@ fn test_adagrad_training_checkpoint_restores_accumulators_and_model_state() ! {
 	model.linear(1)
 	mut optimizer := optimizers.adagrad[f64](learning_rate: 0.1, weight_decay: 0.01)
 	optimizer.build_params(model.info.layers)
-	for i, mut parameter in optimizer.params {
-		parameter.grad = vtl.full[f64](parameter.value.shape, f64(i + 1))
+	for i in 0 .. optimizer.params.len {
+		optimizer.params[i].grad = vtl.full[f64](optimizer.params[i].value.shape, f64(i + 1))
 	}
 	optimizer.update()!
 	path := '${adagrad_training_checkpoint_test_dir}/adagrad_training_checkpoint.json'
@@ -39,10 +39,10 @@ fn test_adagrad_training_checkpoint_restores_accumulators_and_model_state() ! {
 		assert optimizer.accumulated_sq_grads[i].to_array() == restored_optimizer.accumulated_sq_grads[i].to_array()
 	}
 
-	for i, mut parameter in optimizer.params {
-		parameter.grad = vtl.full[f64](parameter.value.shape, f64(i + 2))
+	for i in 0 .. optimizer.params.len {
+		optimizer.params[i].grad = vtl.full[f64](optimizer.params[i].value.shape, f64(i + 2))
 		mut restored_parameter := restored_optimizer.params[i]
-		restored_parameter.grad = vtl.full[f64](parameter.value.shape, f64(i + 2))
+		restored_parameter.grad = vtl.full[f64](optimizer.params[i].value.shape, f64(i + 2))
 	}
 	optimizer.update()!
 	restored_optimizer.update()!
