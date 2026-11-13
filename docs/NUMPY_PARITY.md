@@ -123,11 +123,13 @@ The bounds and duplicate-update contracts are intentionally API-specific:
 | `unravel_index` | Raise-only when flat indices are outside the selected order's valid range. | Repeated flat indices repeat their coordinate values. |
 
 `Variable.take`, `Variable.take_nd`, `Variable.take_flat`,
-`Variable.take_along_axis`, `Variable.boolean_index`, and
+`Variable.take_along_axis`, `Variable.mixed_index`, `Variable.boolean_index`, and
 `Variable.masked_select` propagate gradients by scattering them to selected
 source positions, including accumulation for repeated indices and reduction of
-broadcast source dimensions. `Variable.masked_fill` zeros gradients at replaced
-input positions.
+broadcast source dimensions. `Variable.mixed_index` snapshots the resolved
+logical source positions during the forward pass, so later index mutations do
+not affect backward. `Variable.masked_fill` zeros gradients at replaced input
+positions.
 `Variable.scatter_add` returns an updated copy and propagates gradients to its
 source and update values, including repeated destination indices.
 `Variable.put_along_axis` follows last-write-wins semantics and routes gradients
