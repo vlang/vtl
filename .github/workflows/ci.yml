@@ -52,7 +52,7 @@ jobs:
       - name: Setup V
         uses: vlang/setup-v@663cc08827d1fc0532ee755b4dedbb183c11d06a # v1.7
         with:
-          version: d0d253f9187a82ca2b0d71db889493283e9e4754
+          version: ba41fa121b738a1a694e0050401a45d2376e09b9
 
       - name: Move VTL source code to V Modules
         run: |
@@ -143,7 +143,7 @@ jobs:
       - name: Setup V
         uses: vlang/setup-v@663cc08827d1fc0532ee755b4dedbb183c11d06a # v1.7
         with:
-          version: d0d253f9187a82ca2b0d71db889493283e9e4754
+          version: ba41fa121b738a1a694e0050401a45d2376e09b9
 
       - name: Move VTL source code to V Modules
         run: |
@@ -220,7 +220,7 @@ jobs:
       - name: Setup V
         uses: vlang/setup-v@663cc08827d1fc0532ee755b4dedbb183c11d06a # v1.7
         with:
-          version: d0d253f9187a82ca2b0d71db889493283e9e4754
+          version: ba41fa121b738a1a694e0050401a45d2376e09b9
 
       - name: Move modules to V Modules
         run: |
@@ -267,7 +267,7 @@ jobs:
       - name: Setup V
         uses: vlang/setup-v@663cc08827d1fc0532ee755b4dedbb183c11d06a # v1.7
         with:
-          version: d0d253f9187a82ca2b0d71db889493283e9e4754
+          version: ba41fa121b738a1a694e0050401a45d2376e09b9
 
       - name: Move modules to V Modules
         run: |

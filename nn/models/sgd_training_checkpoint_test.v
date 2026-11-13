@@ -23,8 +23,8 @@ fn test_sgd_training_checkpoint_restores_momentum_and_model_state() ! {
 		weight_decay:  0.01
 	)
 	optimizer.build_params(model.info.layers)
-	for i, mut parameter in optimizer.params {
-		parameter.grad = vtl.full[f64](parameter.value.shape, f64(i + 1))
+	for i in 0 .. optimizer.params.len {
+		optimizer.params[i].grad = vtl.full[f64](optimizer.params[i].value.shape, f64(i + 1))
 	}
 	path := '${sgd_training_checkpoint_test_dir}/sgd_training_checkpoint.json'
 	model.save_sgd_training_checkpoint(path, 5, 0.75, optimizer)!
@@ -51,8 +51,9 @@ fn test_sgd_training_checkpoint_restores_momentum_and_model_state() ! {
 	// Checkpoints carry weights and optimizer state, not gradients. A resumed
 	// training loop recomputes them before each step, so give the restored
 	// parameters the same gradients the original step used.
-	for i, mut parameter in restored_optimizer.params {
-		parameter.grad = vtl.full[f64](parameter.value.shape, f64(i + 1))
+	for i in 0 .. restored_optimizer.params.len {
+		restored_optimizer.params[i].grad = vtl.full[f64](restored_optimizer.params[i].value.shape,
+			f64(i + 1))
 	}
 	restored_optimizer.update()!
 	assert restored_optimizer.momentum_initialized == optimizer.momentum_initialized
@@ -61,10 +62,10 @@ fn test_sgd_training_checkpoint_restores_momentum_and_model_state() ! {
 		assert optimizer.momentum_buffers[i].to_array() == restored_optimizer.momentum_buffers[i].to_array()
 	}
 
-	for i, mut parameter in optimizer.params {
-		parameter.grad = vtl.full[f64](parameter.value.shape, f64(i + 2))
+	for i in 0 .. optimizer.params.len {
+		optimizer.params[i].grad = vtl.full[f64](optimizer.params[i].value.shape, f64(i + 2))
 		mut restored_parameter := restored_optimizer.params[i]
-		restored_parameter.grad = vtl.full[f64](parameter.value.shape, f64(i + 2))
+		restored_parameter.grad = vtl.full[f64](optimizer.params[i].value.shape, f64(i + 2))
 	}
 	optimizer.update()!
 	restored_optimizer.update()!
