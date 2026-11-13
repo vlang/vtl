@@ -15,6 +15,22 @@ assert selected.shape == [2, 2]
 assert selected.to_array() == [12, 10, 22, 20]
 ```
 
+## Basic indexing with bounds errors
+
+`Tensor.get` and `Tensor.set` accept one coordinate per axis. Negative
+coordinates count from the end of their axis. Invalid coordinates or a
+coordinate vector with the wrong rank panic; use `get_checked` and
+`set_checked` when the caller must handle a bounds error.
+
+```v
+import vtl
+
+mut matrix := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
+assert matrix.get_checked([-1, -1])! == 6
+matrix.set_checked([0, -1], 30)!
+assert matrix.to_array() == [1, 2, 30, 4, 5, 6]
+```
+
 ## Convert between coordinate and flat indices
 
 `ravel_multi_index` converts one coordinate tensor per axis into flat indices.

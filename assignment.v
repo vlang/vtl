@@ -7,14 +7,19 @@ pub enum PutMode {
 	clip
 }
 
-// set copies a scalar value into a Tensor at the provided index
-
-// set exposes this operation as part of the public API.
-
-// set exposes this operation as part of the public API.
+// set copies a scalar value into a Tensor at the provided index. Negative
+// coordinates count from the end of each axis; invalid coordinates panic. Use
+// set_checked when bounds errors must be returned to the caller.
 @[inline]
 pub fn (mut t Tensor[T]) set[T](index []int, val T) {
 	offset := t.offset_index(index)
+	t.data.set[T](offset, val)
+}
+
+// set_checked copies a value at index, or returns an error if the index rank
+// or any coordinate is outside the tensor bounds.
+pub fn (mut t Tensor[T]) set_checked[T](index []int, val T) ! {
+	offset := t.checked_offset_index(index)!
 	t.data.set[T](offset, val)
 }
 

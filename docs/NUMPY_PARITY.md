@@ -107,6 +107,21 @@ global `raise`/`wrap`/`clip` bounds modes, and per-axis bounds modes;
 order. The indexing tutorial and runnable `multi_index` example cover both
 orders and a bounds-mode case.
 
+The bounds and duplicate-update contracts are intentionally API-specific:
+
+| API | Bounds behavior | Duplicate behavior |
+| --- | --- | --- |
+| `Tensor.get` / `set` / `offset_index` | Negative coordinates count from the end; invalid rank or coordinates panic. `get_checked` / `set_checked` return errors. No mode parameter. | One coordinate addresses one element. |
+| `advanced_index` / `mixed_index` / `boolean_index` | Raise-only on invalid coordinates or mask shapes, matching NumPy indexing. Negative in-range coordinates count from the end. | Repeated coordinates repeat selected output values; these APIs do not write. |
+| `take` / `take_nd` / `take_flat` | `TakeMode.raise`, `.wrap`, and `.clip`; default is `.raise`. | Repeated indices repeat gathered values. |
+| `take_along_axis` | Raise-only with negative in-range indices counting from the end, matching NumPy. | Repeated indices repeat gathered values. |
+| `put` / `put_with_mode` | `PutMode.raise`, `.wrap`, and `.clip`; default is `.raise`. All indices validate before writes. | Repeated destinations use row-major last-write-wins; shorter update tensors repeat. |
+| `put_along_axis` | Raise-only with negative in-range indices counting from the end, matching NumPy. All indices validate before writes. | Repeated destinations use row-major last-write-wins. |
+| `scatter_add` | Raise-only with negative in-range indices counting from the end. All indices validate before writes. | Repeated destinations accumulate in row-major order. |
+| `putmask` | The mask must match the target shape; no integer bounds mode applies. | Values cycle by destination flat position. |
+| `ravel_multi_index` | Supports global or per-axis `raise`, `wrap`, and `clip` modes. | Repeated coordinates produce repeated flat indices. |
+| `unravel_index` | Raise-only when flat indices are outside the selected order's valid range. | Repeated flat indices repeat their coordinate values. |
+
 `Variable.take`, `Variable.take_nd`, `Variable.take_flat`,
 `Variable.take_along_axis`, `Variable.boolean_index`, and
 `Variable.masked_select` propagate gradients by scattering them to selected
@@ -141,10 +156,11 @@ edge, wrap, reflect, and symmetric padding modes.
 and propagate gradients to every input element. Their `*_along_axis` variants
 support one-axis sum and mean, with either squeezed or retained dimensions.
 
-**Remaining:** continue expanding NumPy-compatible bounds semantics across
-the other indexing APIs. `take_along_axis` keeps its NumPy behavior of raising
-on invalid indices. Tensor indexed writes remain in-place and
-non-differentiable; use the `Variable` APIs when gradients are required.
+`take_along_axis`, coordinate/boolean indexing, axis-wise replacement, and
+`scatter_add` intentionally remain raise-only; NumPy does not define alternate
+bounds modes for these indexing operations. Tensor indexed writes remain
+in-place and non-differentiable; use the `Variable` APIs when gradients are
+required.
 
 Axis-wise `argmax` and `argmin` retain a length-one axis for compatibility;
 `argmax_axis_squeeze` and `argmin_axis_squeeze` provide NumPy's default

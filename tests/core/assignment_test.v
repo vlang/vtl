@@ -34,6 +34,21 @@ fn test_set_nth() {
 	assert t.array_equal(expected)
 }
 
+fn test_set_checked_normalizes_negative_coordinates_and_preserves_target_on_error() ! {
+	mut tensor := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
+	tensor.set_checked([-1, -1], 60)!
+	assert tensor.to_array() == [1, 2, 3, 4, 5, 60]
+
+	if _ := tensor.set_checked([0, 3], 99) {
+		assert false, 'set_checked must reject a coordinate beyond its axis'
+	}
+	assert tensor.to_array() == [1, 2, 3, 4, 5, 60]
+	if _ := tensor.set_checked([1], 99) {
+		assert false, 'set_checked must reject an incomplete coordinate'
+	}
+	assert tensor.to_array() == [1, 2, 3, 4, 5, 60]
+}
+
 fn test_fill() {
 	mut t := vtl.from_array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [2, 5])!
 	t.fill(-1)

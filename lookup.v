@@ -470,7 +470,9 @@ pub fn (t &Tensor[T]) take_along_axis[T](indices &Tensor[int], axis int) !&Tenso
 	return result
 }
 
-// get returns a scalar value from a Tensor at the provided index
+// get returns a scalar value from a Tensor at the provided index. Negative
+// indices count from the end of each axis; invalid coordinates panic. Use
+// get_checked when bounds errors must be returned to the caller.
 
 // get exposes this operation as part of the public API.
 
@@ -478,6 +480,14 @@ pub fn (t &Tensor[T]) take_along_axis[T](indices &Tensor[int], axis int) !&Tenso
 @[inline]
 pub fn (t &Tensor[T]) get[T](index []int) T {
 	offset := t.offset_index(index)
+	return t.data.get[T](offset)
+}
+
+// get_checked returns a scalar value at index, or an error if the index rank
+// or any coordinate is outside the tensor bounds. Negative coordinates count
+// from the end of their axis.
+pub fn (t &Tensor[T]) get_checked[T](index []int) !T {
+	offset := t.checked_offset_index(index)!
 	return t.data.get[T](offset)
 }
 
@@ -495,31 +505,40 @@ pub fn (t &Tensor[T]) get_nth[T](n int) T {
 	return t.get[T](index)
 }
 
-// offset_index returns the index to a Tensor's data at
-// a given index
-
-// offset_index exposes this operation as part of the public API.
-
-// offset_index exposes this operation as part of the public API.
-@[inline]
-pub fn (t &Tensor[T]) offset_index[T](index []int) int {
+// checked_offset_index validates a tensor coordinate and returns its storage
+// offset.
+fn (t &Tensor[T]) checked_offset_index[T](index []int) !int {
+	if index.len != t.rank() {
+		return error('tensor index rank ${index.len} does not match tensor rank ${t.rank()}')
+	}
 	mut offset := 0
-	for i in 0 .. t.rank() {
-		mut j := index[i]
-		if j < 0 {
-			j += t.shape[i]
+	for axis in 0 .. t.rank() {
+		coordinate := index[axis]
+		normalized := if coordinate < 0 { coordinate + t.shape[axis] } else { coordinate }
+		if normalized < 0 || normalized >= t.shape[axis] {
+			return error('tensor index ${coordinate} is out of range for axis ${axis} with size ${t.shape[axis]}')
 		}
-		offset += j * t.strides[i]
-		if t.strides[i] < 0 {
-			offset += t.shape[i] - 1
+		offset += normalized * t.strides[axis]
+		if t.strides[axis] < 0 {
+			offset += t.shape[axis] - 1
 		}
 	}
 
 	if offset < 0 {
 		offset = t.size - 1 + offset
 	}
-
 	return offset
+}
+
+// offset_index returns the storage offset for a tensor coordinate. Negative
+// coordinates count from the end of each axis; invalid coordinates panic.
+
+// offset_index exposes this operation as part of the public API.
+
+// offset_index exposes this operation as part of the public API.
+@[inline]
+pub fn (t &Tensor[T]) offset_index[T](index []int) int {
+	return t.checked_offset_index(index) or { panic('offset_index: ${err}') }
 }
 
 // nth_index returns the nth index of a Tensor's shape
