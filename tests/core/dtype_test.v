@@ -171,6 +171,8 @@ fn test_promote_types_for_matching_numeric_kinds() {
 	assert vtl.promote_types(.int16, .uint8)! == .int16
 	assert vtl.promote_types(.uint8, .int8)! == .int16
 	assert vtl.promote_types(.int32, .uint16)! == .int32
+	assert vtl.promote_types(.int32, .uint32)! == .int64
+	assert vtl.promote_types(.uint32, .int32)! == .int64
 	assert vtl.promote_types(.uint32, .int64)! == .int64
 	assert vtl.promote_types(.uint64, .int64)! == .float64
 	assert vtl.promote_types(.float32, .uint16)! == .float32
@@ -214,6 +216,12 @@ fn test_promoted_integer_arithmetic_uses_numpy_dtype_and_broadcasting() ! {
 	broadcast_sum := vtl.add_promoted[i16, i8, u8](rows, columns)!
 	assert broadcast_sum.shape == [2, 3]
 	assert broadcast_sum.to_array() == [i16(-1), 0, 1, 6, 7, 8]
+
+	signed32 := vtl.from_1d[i32]([-1, 10])!
+	unsigned32 := vtl.from_1d[u32]([4, 2])!
+	wide_sum := vtl.add_promoted[i64, i32, u32](signed32, unsigned32)!
+	assert wide_sum.dtype() == .int64
+	assert wide_sum.to_array() == [i64(3), 12]
 }
 
 fn test_promoted_arithmetic_preserves_dtype_precision_and_rejects_wrong_dtype() ! {
