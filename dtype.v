@@ -166,7 +166,8 @@ fn widest_unsigned_dtype(a DType, b DType) DType {
 }
 
 fn smallest_signed_dtype(minimum_bits int) ?DType {
-	candidates := [DType.int8, DType.int16, DType.int32, DType.native_int, DType.int64]
+	// Prefer fixed-width int64 over native_int when both represent the range.
+	candidates := [DType.int8, DType.int16, DType.int32, DType.int64, DType.native_int]
 	mut best_bits := 65
 	mut best := DType.native_int
 	for candidate in candidates {
