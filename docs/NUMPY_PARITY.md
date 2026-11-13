@@ -58,8 +58,8 @@ families.
 
 **Remaining:** constructor APIs do not expose a common device option. `meshgrid`,
 `meshgrid_n`, `indices`, `indices_sparse`, and `one_hot` currently use their
-fixed default layout. Document and validate those differences, edge cases, and
-device support as the storage/device model evolves.
+fixed row-major layout. Document and validate those differences, edge cases,
+and device support as the storage/device model evolves.
 
 ### Shape and manipulation
 

@@ -179,6 +179,28 @@ fn test_creation_functions_preserve_requested_memory_format() ! {
 	assert vtl.logspace[f64](0.0, 2.0, 3, memory: .col_major)!.memory == .col_major
 }
 
+fn test_coordinate_and_label_constructors_use_row_major_layout() ! {
+	x := vtl.from_1d([1, 2])!
+	y := vtl.from_1d([3, 4, 5])!
+	x_grid, y_grid := vtl.meshgrid(x, y)!
+	assert x_grid.memory == .row_major
+	assert y_grid.memory == .row_major
+
+	grids := vtl.meshgrid_n([x, y], .ij)!
+	assert grids[0].memory == .row_major
+	assert grids[1].memory == .row_major
+
+	dense := vtl.indices([2, 3])!
+	assert dense.memory == .row_major
+	sparse := vtl.indices_sparse([2, 3])!
+	for coordinate in sparse {
+		assert coordinate.memory == .row_major
+	}
+
+	labels := vtl.one_hot(vtl.from_1d([1, 0])!, 2)!
+	assert labels.memory == .row_major
+}
+
 fn test_range() {
 	t := vtl.range[f64](-2, 10)
 	expected := vtl.from_array([-2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0], [
