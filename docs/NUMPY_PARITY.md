@@ -79,10 +79,10 @@ create zero-copy views, validate incompatible shapes, and follow NumPy's
 zero-dimension rules. Tests cover empty inputs, rank mismatches, and invalid
 target dimensions.
 
-**Remaining:** audit copy-versus-view behavior across manipulation APIs beyond
-the tested reshape, transpose, indexing, and diagonal cases.
-VTL diagonal views share writable storage; NumPy exposes its diagonal views as
-read-only by default.
+**Remaining:** continue the aliasing audit for manipulation APIs not listed
+above, including concatenation, splitting, repeats/tiles, flips/rotations, and
+padding. VTL diagonal views remain writable; NumPy exposes them as read-only by
+default, an intentional documented deviation pending a safe read-only model.
 
 ### Indexing and set operations
 
