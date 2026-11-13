@@ -184,7 +184,11 @@ NumPy-style axis-removed output shape.
 gradients along selected axes; elementwise logical AND/OR/XOR/NOT; integer
 bitwise AND/OR/XOR/invert and scalar left/right shifts. Gradients support
 uniform spacing or monotonic non-uniform coordinates and first/second-order
-boundary differences. `add_promoted`, `subtract_promoted`, and
+boundary differences. Same-dtype `floor_divide` and `floor_divide_scalar`
+round signed quotients toward negative infinity, preserve input dtype, return
+zero for integer zero divisors, and follow IEEE results for floating-point
+zero divisors. Mixed-dtype promotion remains tracked in
+[#717](https://github.com/vlang/vtl/issues/717). `add_promoted`, `subtract_promoted`, and
 `multiply_promoted` accept mixed real numeric dtypes, broadcast their inputs,
 and validate an explicitly selected output dtype against `promote_types`.
 `divide_promoted` performs NumPy-style true division for mixed real numeric and

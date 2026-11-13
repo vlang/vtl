@@ -1,5 +1,7 @@
 module vtl
 
+import math
+
 // add adds two tensors elementwise
 
 // add exposes this operation as part of the public API.
@@ -102,6 +104,70 @@ pub fn (a &Tensor[T]) divide_scalar[T](scalar T) !&Tensor[T] {
 			return x / scalar
 		}
 	})
+}
+
+// floor_divide returns elementwise floor(a / b), following NumPy's
+// floor-division rounding for same-dtype real numeric tensors.
+pub fn (a &Tensor[T]) floor_divide[T](b &Tensor[T]) !&Tensor[T] {
+	$if T is $int || T is $float {
+		return a.map_pair_values[T](b, fn [T](x T, y T) T {
+			return numpy_floor_divide[T](x, y)
+		})
+	} $else {
+		return error('floor_divide supports only real integer and floating-point tensors')
+	}
+}
+
+// floor_divide_scalar returns elementwise floor(a / scalar), preserving the
+// tensor dtype and using the same zero-divisor behavior as floor_divide.
+pub fn (a &Tensor[T]) floor_divide_scalar[T](scalar T) !&Tensor[T] {
+	$if T is $int || T is $float {
+		return a.map_values(fn [scalar] [T](x T) T {
+			return numpy_floor_divide[T](x, scalar)
+		})
+	} $else {
+		return error('floor_divide_scalar supports only real integer and floating-point tensors')
+	}
+}
+
+@[inline]
+fn numpy_floor_divide[T](x T, y T) T {
+	$if T is $int {
+		if y == T(0) {
+			return T(0)
+		}
+		$if T is i8 {
+			if x == i8(-128) && y == i8(-1) {
+				return x
+			}
+		} $else $if T is i16 {
+			if x == i16(-32768) && y == i16(-1) {
+				return x
+			}
+		} $else $if T is i32 {
+			if x == i32(-2147483648) && y == i32(-1) {
+				return x
+			}
+		} $else $if T is i64 {
+			if x == i64(-9223372036854775807 - 1) && y == i64(-1) {
+				return x
+			}
+		} $else $if T is int {
+			if x == int(-9223372036854775807 - 1) && y == int(-1) {
+				return x
+			}
+		}
+		mut quotient := x / y
+		remainder := x % y
+		if remainder != T(0) && (remainder < T(0)) != (y < T(0)) {
+			quotient -= T(1)
+		}
+		return quotient
+	} $else $if T is $float {
+		return T(math.floor(f64(x / y)))
+	} $else {
+		panic('floor_divide requires real numeric values')
+	}
 }
 
 // multiply multiplies two tensors elementwise
