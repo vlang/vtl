@@ -45,6 +45,37 @@ pub fn remainder_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
 	return binary_promoted[R, T, U](a, b, .remainder)
 }
 
+// add_scalar_promoted adds a weak numeric scalar using NumPy-style promotion.
+// R must be the inferred result dtype; this explicit type is required by V's
+// statically typed generic return values.
+pub fn add_scalar_promoted[R, T, U](a &Tensor[T], scalar U) !&Tensor[R] {
+	return scalar_promoted[R, T, U](a, scalar, .add)
+}
+
+// subtract_scalar_promoted subtracts a weak numeric scalar using NumPy-style
+// promotion. R must be the inferred result dtype.
+pub fn subtract_scalar_promoted[R, T, U](a &Tensor[T], scalar U) !&Tensor[R] {
+	return scalar_promoted[R, T, U](a, scalar, .subtract)
+}
+
+// multiply_scalar_promoted multiplies by a weak numeric scalar using NumPy-style
+// promotion. R must be the inferred result dtype.
+pub fn multiply_scalar_promoted[R, T, U](a &Tensor[T], scalar U) !&Tensor[R] {
+	return scalar_promoted[R, T, U](a, scalar, .multiply)
+}
+
+// divide_scalar_promoted performs true division by a weak numeric scalar using
+// NumPy-style promotion. R must be the inferred result dtype.
+pub fn divide_scalar_promoted[R, T, U](a &Tensor[T], scalar U) !&Tensor[R] {
+	return scalar_promoted[R, T, U](a, scalar, .divide)
+}
+
+// remainder_scalar_promoted returns the NumPy-style remainder of a tensor and
+// weak numeric scalar. R must be the inferred result dtype.
+pub fn remainder_scalar_promoted[R, T, U](a &Tensor[T], scalar U) !&Tensor[R] {
+	return scalar_promoted[R, T, U](a, scalar, .remainder)
+}
+
 @[inline]
 fn binary_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation PromotedBinaryOperation) !&Tensor[R] {
 	$if R is $int || R is $float {
@@ -142,6 +173,108 @@ fn binary_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation PromotedBinary
 	} $else {
 		return error('promoted arithmetic requires a real numeric output dtype')
 	}
+}
+
+fn scalar_promoted[R, T, U](a &Tensor[T], scalar U, operation PromotedBinaryOperation) !&Tensor[R] {
+	$if R is $int || R is $float {
+		array_dtype := dtype_of[T]()
+		result_dtype := weak_scalar_result_dtype[T, U](array_dtype, scalar)!
+		expected := if operation == .divide {
+			division_result_dtype(result_dtype)
+		} else {
+			result_dtype
+		}
+		if dtype_of[R]() != expected {
+			return error('output dtype ${dtype_of[R]()} does not match weak-scalar result dtype ${expected}')
+		}
+		left := cast_promoted_tensor_values[T, R](a)!
+		right_scalar := cast_promoted_value[U, R](scalar)
+		right := from_array[R]([right_scalar], [])!
+		return binary_promoted[R, R, R](left, right, operation)
+	} $else {
+		return error('weak-scalar promoted arithmetic requires a real numeric output dtype')
+	}
+}
+
+fn weak_scalar_result_dtype[T, U](array_dtype DType, scalar U) !DType {
+	if !is_real_numeric_dtype(array_dtype) {
+		return error('weak-scalar promoted arithmetic supports real numeric tensors')
+	}
+	scalar_dtype := dtype_of[U]()
+	if !is_real_numeric_dtype(scalar_dtype) && scalar_dtype != .boolean {
+		return error('weak-scalar promoted arithmetic supports real numeric and boolean scalars')
+	}
+	if is_integer_dtype(array_dtype) {
+		if is_integer_dtype(scalar_dtype) || scalar_dtype == .boolean {
+			if !integer_scalar_fits_dtype[U](scalar, array_dtype) {
+				return error('integer scalar is out of range for array dtype ${array_dtype}')
+			}
+			return array_dtype
+		}
+		return .float64
+	}
+	return array_dtype
+}
+
+fn integer_scalar_fits_dtype[U](scalar U, dtype DType) bool {
+	$if U is bool {
+		return true
+	} $else $if U is i8 || U is i16 || U is i32 || U is i64 || U is int {
+		return signed_scalar_fits_dtype(i64(scalar), dtype)
+	} $else $if U is u8 || U is u16 || U is u32 || U is u64 {
+		return unsigned_scalar_fits_dtype(u64(scalar), dtype)
+	} $else {
+		return false
+	}
+}
+
+fn signed_scalar_fits_dtype(value i64, dtype DType) bool {
+	return match dtype {
+		.int8 { value >= -128 && value <= 127 }
+		.int16 { value >= -32768 && value <= 32767 }
+		.int32 { value >= -2147483648 && value <= 2147483647 }
+		.int64 { true }
+		.native_int {
+			if sizeof(int) == 4 {
+				value >= -2147483648 && value <= 2147483647
+			} else {
+				true
+			}
+		}
+		.uint8, .uint16, .uint32, .uint64 {
+			value >= 0 && unsigned_scalar_fits_dtype(u64(value), dtype)
+		}
+		else { false }
+	}
+}
+
+fn unsigned_scalar_fits_dtype(value u64, dtype DType) bool {
+	return match dtype {
+		.int8 { value <= 127 }
+		.int16 { value <= 32767 }
+		.int32 { value <= 2147483647 }
+		.int64 { value <= 9223372036854775807 }
+		.native_int {
+			if sizeof(int) == 4 {
+				value <= 2147483647
+			} else {
+				value <= 9223372036854775807
+			}
+		}
+		.uint8 { value <= 255 }
+		.uint16 { value <= 65535 }
+		.uint32 { value <= 4294967295 }
+		.uint64 { true }
+		else { false }
+	}
+}
+
+fn cast_promoted_tensor_values[T, R](t &Tensor[T]) !&Tensor[R] {
+	mut values := []R{len: t.size}
+	for index in 0 .. t.size {
+		values[index] = cast_promoted_value[T, R](t.get_nth[T](index))
+	}
+	return from_array[R](values, t.shape)
 }
 
 fn division_result_dtype(promoted_dtype DType) DType {

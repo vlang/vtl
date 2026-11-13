@@ -164,6 +164,28 @@ float_remainders := vtl.remainder_promoted[f64, f32, f64](float_left, float_righ
 assert float_remainders.to_array() == [1.0, -1.0]
 ```
 
+The `*_scalar_promoted` variants apply NumPy-style weak scalar promotion to
+real numeric tensors. Floating tensors retain their dtype with boolean,
+integer, or floating scalars. Integer tensors retain their dtype for in-range
+integer and boolean scalars, while floating scalars promote the result to
+`f64`; an out-of-range integer scalar returns an error. Integer true division
+returns `f64`. Because V generic return types are static, specify the result
+type `R`; VTL validates it against the inferred result dtype.
+
+```v
+import vtl
+
+values := vtl.from_1d[f32]([1.5, -2.0])!
+shifted := vtl.add_scalar_promoted[f32, f32, f64](values, 0.25)!
+assert shifted.dtype() == .float32
+assert shifted.get_nth(0) == f32(1.75)
+
+integers := vtl.from_1d[i8]([10, -5])!
+fractional := vtl.add_scalar_promoted[f64, i8, f64](integers, 0.5)!
+assert fractional.dtype() == .float64
+assert fractional.to_array() == [10.5, -4.5]
+```
+
 Same-dtype tensors support elementwise arithmetic operators with broadcasting.
 For shape errors returned as `!`, use the corresponding methods such as
 `subtract` instead of operators. V requires dereferencing tensor pointers for
