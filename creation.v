@@ -45,13 +45,28 @@ pub fn meshgrid_n[T](vectors []&Tensor[T], indexing MeshgridIndexing) ![]&Tensor
 		shape[0] = shape[1]
 		shape[1] = first_dimension
 	}
+	mut has_zero_dimension := false
+	for dimension in shape {
+		if dimension < 0 {
+			return error('meshgrid_n dimensions must be non-negative')
+		}
+		if dimension == 0 {
+			has_zero_dimension = true
+		}
+	}
+	mut total_size := 0
+	if !has_zero_dimension {
+		total_size = 1
+		for dimension in shape {
+			if total_size > max_int / dimension {
+				return error('meshgrid_n output shape overflows the maximum tensor size')
+			}
+			total_size *= dimension
+		}
+	}
 	mut grids := []&Tensor[T]{cap: vectors.len}
 	for _ in vectors {
 		grids << empty[T](shape, memory: .row_major)
-	}
-	mut total_size := 1
-	for dimension in shape {
-		total_size *= dimension
 	}
 	for flat_index in 0 .. total_size {
 		mut output_index := []int{len: shape.len}
