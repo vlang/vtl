@@ -162,6 +162,12 @@ fn test_range() {
 	assert t.array_equal(expected)
 }
 
+fn test_range_returns_empty_for_non_ascending_bounds() {
+	assert vtl.range[int](5, 2).shape == [0]
+	assert vtl.range[int](3, 3).shape == [0]
+	assert vtl.seq[int](-1).shape == [0]
+}
+
 fn test_arange_float_step() ! {
 	t := vtl.arange[f64](0.0, 1.0, 0.2)!
 	assert t.size() == 5
