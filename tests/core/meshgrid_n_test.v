@@ -34,3 +34,40 @@ fn test_meshgrid_n_validates_inputs() ! {
 		assert false, 'meshgrid_n must reject non-vector inputs'
 	}
 }
+
+fn test_meshgrid_n_rejects_output_size_overflow() {
+	large := max_int / 2 + 1
+	x := &vtl.Tensor[int]{
+		shape:   [large]
+		strides: [1]
+		size:    large
+	}
+	y := &vtl.Tensor[int]{
+		shape:   [4]
+		strides: [1]
+		size:    4
+	}
+	if _ := vtl.meshgrid_n[int]([x, y], .ij) {
+		assert false, 'meshgrid_n must reject an overflowing output shape'
+	} else {
+		assert err.msg().contains('overflows')
+	}
+}
+
+fn test_meshgrid_n_handles_zero_dimension_before_large_axes() ! {
+	large := max_int / 2 + 1
+	x := &vtl.Tensor[int]{
+		shape:   [large]
+		strides: [1]
+		size:    large
+	}
+	y := vtl.from_1d([1, 2, 3, 4])!
+	z := vtl.from_1d([]int{})!
+
+	grids := vtl.meshgrid_n[int]([x, y, z], .xy)!
+	assert grids.len == 3
+	for grid in grids {
+		assert grid.size == 0
+	}
+	assert grids[0].shape == [4, large, 0]
+}

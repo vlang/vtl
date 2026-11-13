@@ -175,6 +175,11 @@ fn strides_from_shape(shape []int, memory MemoryFormat) []int {
 
 // size_from_shape returns the allocated size for a given shape
 fn size_from_shape(shape []int) int {
+	for dimension in shape {
+		if dimension == 0 {
+			return 0
+		}
+	}
 	mut accum := 1
 	for i in shape {
 		accum *= i
