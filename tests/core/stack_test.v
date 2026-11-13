@@ -111,3 +111,20 @@ fn test_expand_dims() {
 	expected := vtl.from_array([1.0, 1, 1, 1], [2, 1, 2])!
 	assert result.array_equal(expected)
 }
+
+fn test_axis_insertion_and_squeeze_preserve_transposed_storage() ! {
+	mut tensor := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
+	transposed := tensor.transpose([1, 0])!
+
+	mut unsqueezed := transposed.unsqueeze[int](axis: 0)!
+	unsqueezed.set([0, 1, 0], 99)
+	assert tensor.get([0, 1]) == 99
+
+	mut squeezed := unsqueezed.squeeze[int](axis: 0)!
+	squeezed.set([2, 1], 88)
+	assert tensor.get([1, 2]) == 88
+
+	mut expanded := transposed.expand_dims[int](axis: 1)!
+	expanded.set([1, 0, 0], 77)
+	assert tensor.get([0, 1]) == 77
+}

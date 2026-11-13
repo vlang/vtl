@@ -76,6 +76,13 @@ pub fn stack[T](ts []&Tensor[T], data AxisData) !&Tensor[T] {
 	return concatenate[T](expanded, data)
 }
 
+fn shape_view[T](t &Tensor[T], shape []int, strides []int) &Tensor[T] {
+	mut view := t.view()
+	view.shape = shape
+	view.strides = strides
+	return view
+}
+
 // unsqueeze adds a dimension of size one to a Tensor
 pub fn (t &Tensor[T]) unsqueeze[T](data AxisData) !&Tensor[T] {
 	axis := data.axis
@@ -87,7 +94,10 @@ pub fn (t &Tensor[T]) unsqueeze[T](data AxisData) !&Tensor[T] {
 
 	actual_axis := if newaxis > t.rank() { t.rank() } else { newaxis }
 	newshape.insert(actual_axis, 1)
-	return t.reshape[T](newshape)
+	inserted_stride := if actual_axis < t.rank() { t.strides[actual_axis] } else { 1 }
+	mut newstrides := t.strides.clone()
+	newstrides.insert(actual_axis, inserted_stride)
+	return shape_view[T](t, newshape, newstrides)
 }
 
 // squeeze removes dimensions of size one from a Tensor.
@@ -95,11 +105,13 @@ pub fn (t &Tensor[T]) unsqueeze[T](data AxisData) !&Tensor[T] {
 // If no dim is provided, all size-1 dimensions are removed.
 pub fn (t &Tensor[T]) squeeze[T](data AxisData) !&Tensor[T] {
 	mut newshape := []int{}
+	mut newstrides := []int{}
 	if data.axis < 0 {
 		// Remove all size-1 dimensions
-		for dim in t.shape {
+		for i, dim in t.shape {
 			if dim != 1 {
 				newshape << dim
+				newstrides << t.strides[i]
 			}
 		}
 	} else {
@@ -108,13 +120,15 @@ pub fn (t &Tensor[T]) squeeze[T](data AxisData) !&Tensor[T] {
 		for i, dim in t.shape {
 			if i != axis || dim != 1 {
 				newshape << dim
+				newstrides << t.strides[i]
 			}
 		}
 	}
 	if newshape.len == 0 {
 		newshape = [1]
+		newstrides = [1]
 	}
-	return t.reshape[T](newshape)
+	return shape_view[T](t, newshape, newstrides)
 }
 
 // concatenate concatenates two Tensors together
@@ -152,5 +166,9 @@ pub fn (t &Tensor[T]) expand_dims[T](data AxisData) !&Tensor[T] {
 	newshape << t.shape[..newaxis]
 	newshape << 1
 	newshape << t.shape[newaxis..]
-	return t.reshape[T](newshape)
+	mut newstrides := []int{}
+	newstrides << t.strides[..newaxis]
+	newstrides << if newaxis < t.rank() { t.strides[newaxis] } else { 1 }
+	newstrides << t.strides[newaxis..]
+	return shape_view[T](t, newshape, newstrides)
 }
