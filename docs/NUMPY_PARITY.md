@@ -237,6 +237,10 @@ Elementwise `max`/`min` match NumPy's NaN-propagating `maximum`/`minimum`, and
 `fmax`/`fmin` ignore a single NaN operand. These operations broadcast and
 support boolean, integer, floating-point, and complex tensors; floating-point
 zero ties follow each NumPy ufunc's sign behavior.
+`fmod` follows NumPy's sign-of-dividend remainder rule. Integer inputs use
+exact-width arithmetic, including values beyond float64's exact-integer range;
+integer zero divisors and signed minimum modulo `-1` produce zero. Floating
+inputs follow IEEE/libm behavior and preserve the sign of zero remainders.
 
 Unary transcendental operations (`exp`, `sin`, `log`, and 20 more) use a
 contiguous fast path that calls libm directly per element for f32/f64
