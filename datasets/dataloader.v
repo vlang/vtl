@@ -38,7 +38,7 @@ mut:
 	batches            [][]int
 	// Erase the generic callback to avoid emitting an incomplete result type
 	// when consumers instantiate DataLoader without using collated batches.
-	collate_fn         voidptr
+	collate_fn voidptr
 }
 
 // DataLoaderConfig holds configuration for creating a DataLoader.
