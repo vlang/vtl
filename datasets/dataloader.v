@@ -36,7 +36,9 @@ mut:
 	batch_sampler      nn_data.BatchSampler
 	uses_batch_sampler bool
 	batches            [][]int
-	collate_fn         CollateFn[T] = unsafe { nil }
+	// Erase the generic callback to avoid emitting an incomplete result type
+	// when consumers instantiate DataLoader without using collated batches.
+	collate_fn         voidptr
 }
 
 // DataLoaderConfig holds configuration for creating a DataLoader.
@@ -132,7 +134,7 @@ pub fn (dl &DataLoader[T]) batch_with_labels(i int) ?(&vtl.Tensor[T], &vtl.Tenso
 // set_collate_fn installs a callback used by collated_batch. Existing batch
 // accessors keep their default tensor slicing and gathering behavior.
 pub fn (mut dl DataLoader[T]) set_collate_fn(collate_fn CollateFn[T]) {
-	dl.collate_fn = collate_fn
+	dl.collate_fn = unsafe { voidptr(collate_fn) }
 }
 
 // collated_batch builds the batch selected by `i`. A custom callback receives
@@ -145,7 +147,8 @@ pub fn (dl &DataLoader[T]) collated_batch(i int) !CollatedBatch[T] {
 		return error('batch index ${i} is out of range')
 	}
 	if dl.collate_fn != unsafe { nil } {
-		return dl.collate_fn(dl.dataset, dl.labels, batch_indices.clone())
+		callback := unsafe { CollateFn[T](dl.collate_fn) }
+		return callback(dl.dataset, dl.labels, batch_indices.clone())
 	}
 	if dl.labels == unsafe { nil } {
 		features := dl.batch(i) or { return error('unable to build batch ${i}') }
