@@ -66,6 +66,7 @@ padding, and stable axis-wise `sort`/`argsort`.
 `reshape` follows row-major logical order, shares storage for row-major
 contiguous input, and copies when another layout cannot be reshaped as that
 view; tests cover transposed and column-major values as well as storage sharing.
+`transpose` and `moveaxis` are views that preserve shared storage.
 `ravel` shares storage for row-major contiguous input and copies other layouts;
 `flatten` always copies. Mutation tests verify these contracts for contiguous
 and transposed inputs.

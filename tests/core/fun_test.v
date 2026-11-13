@@ -156,6 +156,17 @@ fn test_transpose() {
 	assert tt.shape == [3, 2]
 }
 
+fn test_transpose_and_moveaxis_preserve_shared_storage() ! {
+	mut tensor := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
+	mut transposed := tensor.transpose([1, 0])!
+	transposed.set([1, 0], 99)
+	assert tensor.get([0, 1]) == 99
+
+	mut moved := transposed.moveaxis([0], [1])!
+	moved.set([1, 2], 88)
+	assert tensor.get([1, 2]) == 88
+}
+
 fn test_moveaxis() {
 	t := vtl.from_array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
 		20, 21, 22, 23],
