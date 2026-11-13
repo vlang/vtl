@@ -248,8 +248,14 @@ pub fn full_like[T](t &Tensor[T], val T) &Tensor[T] {
 	return tensor
 }
 
-// range returns a Tensor containing values ranging from [from, to)
+// range returns values in [from, to), or an empty tensor when to <= from.
 pub fn range[T](from int, to int, params TensorData) &Tensor[T] {
+	if to <= from {
+		return empty[T]([0], params)
+	}
+	if from < 0 && to > max_int + from {
+		panic('range output size exceeds the maximum tensor size')
+	}
 	mut res := empty[T]([to - from], params)
 	mut index := 0
 	for val in from .. to {
