@@ -10,9 +10,9 @@ pub:
 	memory MemoryFormat = .row_major
 }
 
-// from_varray takes a one dimensional array of T values
-// and coerces it into an arbitrary shaped Tensor if possible.
-// Panics if the shape provided does not hold the provided array
+// from_array takes a one-dimensional array of T values and coerces it into an
+// arbitrary shape. It returns an error when the shape does not fit the values.
+// Values are interpreted in the selected memory order.
 pub fn from_array[T](arr []T, shape []int, params TensorData) !&Tensor[T] {
 	size := size_from_shape(shape)
 	if size != arr.len {

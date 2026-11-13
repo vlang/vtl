@@ -174,6 +174,11 @@ fn test_creation_functions_preserve_requested_memory_format() ! {
 	assert diagonal.strides == [1, 2]
 	assert diagonal.to_array() == [1, 0, 0, 0, 1, 0]
 
+	column_major_values := vtl.from_array([1, 4, 2, 5, 3, 6], [2, 3], memory: .col_major)!
+	assert column_major_values.to_array() == [1, 2, 3, 4, 5, 6]
+	column_major_rows := vtl.from_2d([[1, 2, 3], [4, 5, 6]], memory: .col_major)!
+	assert column_major_rows.to_array() == [1, 2, 3, 4, 5, 6]
+
 	assert vtl.arange[int](0, 3, 1, memory: .col_major)!.memory == .col_major
 	assert vtl.linspace[f64](0.0, 1.0, 3, memory: .col_major)!.memory == .col_major
 	assert vtl.logspace[f64](0.0, 2.0, 3, memory: .col_major)!.memory == .col_major

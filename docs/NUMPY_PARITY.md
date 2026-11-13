@@ -55,6 +55,9 @@ selected through each constructor's generic type argument. Constructors that
 accept `TensorData`, `LinspaceData`, or `LogspaceData` accept a memory format;
 creation tests verify column-major layout for the scalar-fill and sequence
 families.
+Flat `from_array` values follow the requested physical memory order; nested
+`from_2d` rows remain logical row-major values and are rearranged for
+column-major storage.
 
 **Remaining:** constructor APIs do not expose a common device option. `meshgrid`,
 `meshgrid_n`, `indices`, `indices_sparse`, and `one_hot` currently use their
