@@ -93,6 +93,9 @@ single-axis, and multiple-axis `count_nonzero`; `argwhere` and per-axis `nonzero
 `put_along_axis` and `scatter_add`; lookup and DataLoader gathers; broadcastable
 `masked_select`, `masked_fill`, and `masked_scatter`; leading-dimension boolean-mask indexing via
 `boolean_index`, which preserves trailing dimensions like NumPy `array[mask]`.
+`put_along_axis` and `scatter_add` accept negative indices, raise on out-of-range
+indices, and validate all indices before mutating; repeated destinations use
+last-write-wins and accumulation semantics, respectively.
 `Tensor.put` and `put_with_mode` update row-major logical flat indices with
 NumPy's `raise`, `wrap`, and `clip` modes; short value tensors repeat, and
 validation completes before mutation. `Tensor.putmask` performs in-place

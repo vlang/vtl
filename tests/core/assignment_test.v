@@ -224,4 +224,11 @@ fn test_indexed_updates_reject_invalid_shapes_axes_and_indices() {
 		assert false, 'put_along_axis must reject an out-of-range index'
 	}
 	assert target.array_equal(vtl.zeros[int]([2, 3]))
+
+	scatter_indices := vtl.from_array([1, 3], [1, 2])!
+	scatter_updates := vtl.from_array([5, 6], [1, 2])!
+	if _ := target.scatter_add(scatter_indices, scatter_updates, 1) {
+		assert false, 'scatter_add must reject an out-of-range index'
+	}
+	assert target.array_equal(vtl.zeros[int]([2, 3]))
 }
