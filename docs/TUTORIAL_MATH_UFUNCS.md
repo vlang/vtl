@@ -4,6 +4,28 @@ VTL provides elementwise math operations on tensors, including decomposition of
 floating-point values into integer/fractional parts or binary mantissas and
 exponents.
 
+## Floor division
+
+`Tensor.floor_divide()` broadcasts same-dtype real integer or floating-point
+tensors and rounds the quotient toward negative infinity, unlike integer
+division that truncates toward zero. `floor_divide_scalar()` applies the same
+operation to a scalar while preserving the tensor's dtype:
+
+```v
+import vtl
+
+numerators := vtl.from_1d([-3, 3])!
+divisors := vtl.from_1d([2, -2])!
+quotients := numerators.floor_divide(divisors)!
+println(quotients.to_array()) // [-2, -2]
+```
+
+Integer zero divisors produce zero, matching NumPy's result values (VTL does
+not emit NumPy's runtime warning). Floating-point zero divisors follow IEEE
+behavior. Mixed-dtype operands and automatic result-type selection remain part
+of [#717](https://github.com/vlang/vtl/issues/717). Boolean and complex tensors
+are unsupported. See the [parity tracker](./NUMPY_PARITY.md#math-and-ufuncs).
+
 ## Split fractional and integral parts
 
 `Tensor.modf()` returns `(fractional, integral)`, in the same order as
