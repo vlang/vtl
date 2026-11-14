@@ -33,6 +33,15 @@ pub fn (t &Tensor[T]) argmax_axis[T](axis int) !&Tensor[int] {
 		return result
 	}
 
+	// Dense row-major fast path: linear indexing with no per-row
+	// allocation and no multi-index decode (mirrors the contiguous
+	// branch convention of cumsum/cumprod). Semantics — including
+	// first-NaN-wins — match the generic path below exactly.
+	if t.is_row_major_contiguous() && t.data.data.len >= t.size {
+		arg_extrema_axis_contiguous[T](t, na, mut result, true)
+		return result
+	}
+
 	mut out_strides := []int{len: rank}
 	out_strides[rank - 1] = 1
 	for i := rank - 2; i >= 0; i-- {
@@ -116,6 +125,15 @@ pub fn (t &Tensor[T]) argmin_axis[T](axis int) !&Tensor[int] {
 		return result
 	}
 
+	// Dense row-major fast path: linear indexing with no per-row
+	// allocation and no multi-index decode (mirrors the contiguous
+	// branch convention of cumsum/cumprod). Semantics — including
+	// first-NaN-wins — match the generic path below exactly.
+	if t.is_row_major_contiguous() && t.data.data.len >= t.size {
+		arg_extrema_axis_contiguous[T](t, na, mut result, false)
+		return result
+	}
+
 	mut out_strides := []int{len: rank}
 	out_strides[rank - 1] = 1
 	for i := rank - 2; i >= 0; i-- {
@@ -166,6 +184,82 @@ pub fn (t &Tensor[T]) argmin_axis[T](axis int) !&Tensor[int] {
 		}
 	}
 	return result
+}
+
+// arg_extrema_axis_contiguous is the dense row-major fast path behind
+// argmax_axis (maximum=true) and argmin_axis (maximum=false). The caller
+// guarantees validated shapes and dense storage, so indexing is linear
+// with no per-row allocation and no multi-index decode. NaN handling
+// matches the generic paths exactly: the first NaN (a leading NaN
+// included) wins its line, ties keep the earlier index.
+@[direct_array_access]
+fn arg_extrema_axis_contiguous[T](t &Tensor[T], na int, mut result &Tensor[int], maximum bool) {
+	shape := t.shape
+	rank := shape.len
+	axis_size := shape[na]
+	// Dense row-major strides, computed once (mirrors extrema_axis).
+	mut in_strides := []int{len: rank}
+	in_strides[rank - 1] = 1
+	for i := rank - 2; i >= 0; i-- {
+		in_strides[i] = in_strides[i + 1] * shape[i + 1]
+	}
+	axis_stride := in_strides[na]
+	// Output strides: the reduced axis has extent 1.
+	mut out_strides := []int{len: rank}
+	out_strides[rank - 1] = 1
+	for i := rank - 2; i >= 0; i-- {
+		d := if i + 1 == na { 1 } else { shape[i + 1] }
+		out_strides[i] = out_strides[i + 1] * d
+	}
+	mut outer := []int{len: rank}
+	for {
+		mut base := 0
+		for i in 0 .. rank {
+			base += outer[i] * in_strides[i]
+		}
+		mut best_arg := 0
+		mut best_val := t.data.data[base]
+		mut best_is_nan := math.is_nan(f64(best_val))
+		for j := 1; j < axis_size; j++ {
+			val := t.data.data[base + j * axis_stride]
+			if math.is_nan(f64(val)) {
+				best_arg = j
+				break
+			}
+			if best_is_nan {
+				continue
+			}
+			if maximum && val > best_val {
+				best_val = val
+				best_arg = j
+			}
+			if !maximum && val < best_val {
+				best_val = val
+				best_arg = j
+			}
+		}
+		mut out_lin := 0
+		for i in 0 .. rank {
+			out_lin += outer[i] * out_strides[i]
+		}
+		result.set_nth(out_lin, best_arg)
+		// Odometer over outer dims; one index array reused, never cloned.
+		mut done := true
+		for i := rank - 1; i >= 0; i-- {
+			if i == na {
+				continue
+			}
+			outer[i]++
+			if outer[i] < shape[i] {
+				done = false
+				break
+			}
+			outer[i] = 0
+		}
+		if done {
+			break
+		}
+	}
 }
 
 // max_axis returns the maximum value along the given axis as a reduced tensor.
