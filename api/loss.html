@@ -145,17 +145,60 @@
 			<div class="title"><h1> loss <a href="#readme_loss">#</a></h1></div>
 <h1 id="vtlnnloss"><code>vtl.nn.loss</code></h1>
 <p>Differentiable objectives consume a prediction <code>autograd.Variable[T]</code> and a target <code>vtl.Tensor[T]</code>, returning a scalar-like variable for backpropagation. This module currently provides:</p>
-<p>| Constructor | Objective and input convention |
-| --- | --- |
-| <code>mse_loss</code> | Mean squared error: <code>mean((x - y)^2)</code>. |
-| <code>bce_loss</code> | Binary cross entropy: <code>-mean(y log(p) + (1-y) log(1-p))</code>; applies sigmoid by default (<code>from_logits: true</code>). |
-| <code>sigmoid_cross_entropy_loss</code> | Binary cross entropy from logits, using a sigmoid internally. |
-| <code>cross_entropy_loss</code> | <code>-sum(y * log_softmax(logits))</code>; raw logits with one-hot/soft targets. |
-| <code>softmax_cross_entropy_loss</code> | Multiclass cross entropy with softmax over logits and one-hot targets. |
-| <code>nll_loss</code> | Negative log likelihood from log probabilities after log-softmax; accepts class indices or one-hot/soft targets and optional per-class weights. |
-| <code>kl_div_loss</code> | <code>sum(P * log(P / Q))</code>; input is <code>log(Q)</code> and target is probability distribution <code>P</code>. |
-| <code>huber_loss</code> | <code>0.5 d^2</code> when <code>|d| &lt;= delta</code>, otherwise <code>delta (|d| - 0.5 delta)</code>, averaged. |
-| <code>smooth_l1_loss</code> | PyTorch-style <code>0.5 d^2 / beta</code> when <code>|d| &lt; beta</code>, otherwise <code>|d| - 0.5 beta</code>; supports <code>none</code>, <code>mean</code>, and <code>sum</code> reductions. |</p>
+<table>
+<thead>
+<tr>
+<th>Constructor</th>
+<th>Objective and input convention</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mse_loss</code></td>
+<td>Mean squared error: <code>mean((x - y)^2)</code>.</td>
+</tr>
+<tr>
+<td><code>bce_loss</code></td>
+<td>Binary cross entropy: <code>-mean(y log(p) + (1-y) log(1-p))</code>; applies sigmoid by default (<code>from_logits: true</code>).</td>
+</tr>
+<tr>
+<td><code>sigmoid_cross_entropy_loss</code></td>
+<td>Binary cross entropy from logits, using a sigmoid internally.</td>
+</tr>
+<tr>
+<td><code>cross_entropy_loss</code></td>
+<td><code>-sum(y * log_softmax(logits))</code>; raw logits with one-hot/soft targets.</td>
+</tr>
+<tr>
+<td><code>softmax_cross_entropy_loss</code></td>
+<td>Multiclass cross entropy with softmax over logits and one-hot targets.</td>
+</tr>
+<tr>
+<td><code>nll_loss</code></td>
+<td>Negative log likelihood from log probabilities after log-softmax; accepts class indices or one-hot/soft targets and optional per-class weights.</td>
+</tr>
+<tr>
+<td><code>kl_div_loss</code></td>
+<td><code>sum(P * log(P / Q))</code>; input is <code>log(Q)</code> and target is probability distribution <code>P</code>.</td>
+</tr>
+<tr>
+<td><code>huber_loss</code></td>
+<td><code>0.5 d^2</code> when `</td>
+<td>d</td>
+<td>&lt;= delta<code>, otherwise </code>delta (</td>
+<td>d</td>
+<td>- 0.5 delta)`, averaged.</td>
+</tr>
+<tr>
+<td><code>smooth_l1_loss</code></td>
+<td>PyTorch-style <code>0.5 d^2 / beta</code> when `</td>
+<td>d</td>
+<td>&lt; beta<code>, otherwise </code></td>
+<td>d</td>
+<td>- 0.5 beta<code>; supports </code>none<code>, </code>mean<code>, and </code>sum` reductions.</td>
+</tr>
+</tbody>
+</table>
 <p><code>huber_loss</code> and <code>smooth_l1_loss</code> are separate objectives: Huber scales its linear region by <code>delta</code>, while Smooth L1 divides the quadratic region by <code>beta</code> and has unit slope outside it.</p>
 <p>Constructor signatures and reduction behavior are defined in the corresponding source files. In particular, binary cross entropy's <code>from_logits</code> setting and the expected representation for multiclass losses must match the model output.</p>
 <p><code>cross_entropy_loss_with_options</code> supports optional class weights, <code>ignore_index</code>, <code>label_smoothing</code> in <code>[0, 1]</code>, and <code>none</code>, <code>mean</code>, or <code>sum</code> reductions. Use <code>cross_entropy_loss_indices</code> for <code>Tensor[int]</code> targets; it accepts a scalar target with logits shaped <code>[C]</code> or targets shaped <code>[N, ...]</code> with logits shaped <code>[N, C, ...]</code>. The generic <code>cross_entropy_loss</code> also accepts same-type integer-valued class-index targets and one-hot/soft targets matching the logits. For <code>mean</code>, weighted class-index targets divide by the sum of their non-ignored class weights; probability targets divide by the number of samples.</p>
@@ -603,7 +646,9 @@ out <span class="token operator">:=</span> l<span class="token punctuation">.</s
 <p>KLDivLoss computes the Kullback-Leibler divergence loss.</p>
 <p>Formula: <code>D_KL(P ‖ Q) = sum(P · log(P / Q))</code></p>
 <p>Input:  <code>[batch, n_classes]</code> — Q log-probabilities (e.g. log-softmax output) Target: <code>[batch, n_classes]</code> — P probabilities (non-negative, sum to 1 per sample)</p>
-<p>Fields:- <code>reduction</code> — <code>'mean'</code> | <code>'sum'</code> | <code>'none'</code> (default: <code>'mean'</code>)</p>
+<p>Fields:</p>
+<ul>
+<li><code>reduction</code> — <code>'mean'</code> | <code>'sum'</code> | <code>'none'</code> (default: <code>'mean'</code>)</li></ul>
 
 <section class="doc-node examples"><h4>Example</h4>
 <pre>
@@ -659,8 +704,9 @@ out  <span class="token operator">:=</span> l<span class="token punctuation">.</
 <p>NLLLoss computes the Negative Log Likelihood loss.</p>
 <p>Intended to be used after a log-softmax layer for multi-class classification.</p>
 <p>Input shape: <code>[n_classes]</code> or <code>[batch, n_classes, ...]</code> — log-probabilities (log-softmax output). Unbatched class-index targets are scalar; batched targets omit the class axis or match the input shape for one-hot/soft labels.</p>
-<p>Fields:- <code>weight</code>       — optional per-class weight tensor (<code>nil</code> = uniform weights)</p>
+<p>Fields:</p>
 <ul>
+<li><code>weight</code>       — optional per-class weight tensor (<code>nil</code> = uniform weights)</li>
 <li><code>ignore_index</code> — class index to ignore in class-index targets (default: -1 = none)</li>
 <li><code>reduction</code>    — <code>'none'</code> | <code>'mean'</code> | <code>'sum'</code> (default: <code>'mean'</code>)</li></ul>
 
@@ -733,7 +779,7 @@ result <span class="token operator">:=</span> objective<span class="token punctu
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 13 Nov 2026 06:14:54</div>
+						<div class="footer">Powered by vdoc. Generated on: 14 Nov 2026 07:26:15</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_loss">README</a></li>
 <li class="open"><a href="#bce_loss">fn bce_loss</a>        <ul>

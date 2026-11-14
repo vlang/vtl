@@ -145,7 +145,13 @@
 			<div class="title"><h1> hooks <a href="#readme_hooks">#</a></h1></div>
 <p>Module hooks for forward and backward inspection (issue #808).</p>
 <p>with_hooks wraps any types.Layer without changing the layer or the Layer type. The wrapper is itself a types.Layer, so it can be placed in a Sequential or nested inside another wrapper. The registry is not part of the layer's variables or serialized parameters.</p>
-<p>Contract:- Forward. Pre-hooks run first, in registration order. Each receives the input produced by the previous hook and may replace it. The wrapped layer then runs. Post-hooks run next, in registration order, each receiving the input the layer saw and the output of the previous hook. A hook error stops the forward pass and is returned unchanged.- Backward. Backward hooks are attached to the module output only when that output requires a gradient. They run in registration order, each receiving the gradient produced by the previous hook, and the last result flows into the layer output. A hook error stops backpropagation and is returned from the backward call.- No gradients. Backward hooks attach only when Variable.is_grad_needed() holds, that is requires_grad is set and the context is not no_grad. Pre- and post-hooks run either way.- Removal. Each registration returns a HookHandle. remove() takes the hook out of the registry, so later passes do not run it. Calling remove() again has no effect.- Order between kinds: forward_pre, the layer, forward, then backward in reverse graph order.</p>
+<p>Contract:</p>
+<ul>
+<li>Forward. Pre-hooks run first, in registration order. Each receives the input produced by the previous hook and may replace it. The wrapped layer then runs. Post-hooks run next, in registration order, each receiving the input the layer saw and the output of the previous hook. A hook error stops the forward pass and is returned unchanged.</li>
+<li>Backward. Backward hooks are attached to the module output only when that output requires a gradient. They run in registration order, each receiving the gradient produced by the previous hook, and the last result flows into the layer output. A hook error stops backpropagation and is returned from the backward call.</li>
+<li>No gradients. Backward hooks attach only when Variable.is_grad_needed() holds, that is requires_grad is set and the context is not no_grad. Pre- and post-hooks run either way.</li>
+<li>Removal. Each registration returns a HookHandle. remove() takes the hook out of the registry, so later passes do not run it. Calling remove() again has no effect.</li>
+<li>Order between kinds: forward_pre, the layer, forward, then backward in reverse graph order.</li></ul>
 
 </section>
 
@@ -287,7 +293,7 @@
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 13 Nov 2026 06:14:54</div>
+						<div class="footer">Powered by vdoc. Generated on: 14 Nov 2026 07:26:15</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_hooks">README</a></li>
 <li class="open"><a href="#with_hooks">fn with_hooks</a>        <ul>

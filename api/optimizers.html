@@ -151,15 +151,52 @@ optimizer<span class="token punctuation">.</span><span class="token function">bu
 optimizer<span class="token punctuation">.</span><span class="token function">update</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">!</span></code></pre>
 <p>See the <a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_OPTIMIZERS.md">optimizer tutorial</a> for end-to-end training examples and <a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_NEURAL_NETWORKS.md">neural network tutorial</a> for <code>Sequential</code> models.</p>
 <h2 id="optimizers">Optimizers</h2>
-<p>| Constructor | Defaults | Notes |
-|-------------|----------|-------|
-| <code>sgd[T](...)</code> | LR 0.001, momentum 0 | SGD with optional momentum, dampening, coupled weight decay, and Nesterov |
-| <code>adagrad[T](...)</code> | Learning rate 0.01 | Accumulates squared gradients |
-| <code>rmsprop[T](...)</code> | Learning rate 0.001 | Exponential squared-gradient average |
-| <code>adam_optimizer[T](...)</code> | LR 0.001, β₁ 0.9, β₂ 0.999 | Adam with bias correction; existing CUDA/Vulkan acceleration |
-| <code>adamw[T](...)</code> | LR 0.001, decay 0.01 | Adam with decoupled weight decay |
-| <code>nadam_optimizer[T](...)</code> | LR 0.002, β₁ 0.9, β₂ 0.999, momentum decay 0.004 | Dozat momentum schedule; f32/f64 CPU paths |
-| <code>radam_optimizer[T](...)</code> | LR 0.001, β₁ 0.9, β₂ 0.999 | Rectified Adam variance estimate; f32 and f64 CPU paths |</p>
+<table>
+<thead>
+<tr>
+<th>Constructor</th>
+<th>Defaults</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sgd[T](...)</code></td>
+<td>LR 0.001, momentum 0</td>
+<td>SGD with optional momentum, dampening, coupled weight decay, and Nesterov</td>
+</tr>
+<tr>
+<td><code>adagrad[T](...)</code></td>
+<td>Learning rate 0.01</td>
+<td>Accumulates squared gradients</td>
+</tr>
+<tr>
+<td><code>rmsprop[T](...)</code></td>
+<td>Learning rate 0.001</td>
+<td>Exponential squared-gradient average</td>
+</tr>
+<tr>
+<td><code>adam_optimizer[T](...)</code></td>
+<td>LR 0.001, β₁ 0.9, β₂ 0.999</td>
+<td>Adam with bias correction; existing CUDA/Vulkan acceleration</td>
+</tr>
+<tr>
+<td><code>adamw[T](...)</code></td>
+<td>LR 0.001, decay 0.01</td>
+<td>Adam with decoupled weight decay</td>
+</tr>
+<tr>
+<td><code>nadam_optimizer[T](...)</code></td>
+<td>LR 0.002, β₁ 0.9, β₂ 0.999, momentum decay 0.004</td>
+<td>Dozat momentum schedule; f32/f64 CPU paths</td>
+</tr>
+<tr>
+<td><code>radam_optimizer[T](...)</code></td>
+<td>LR 0.001, β₁ 0.9, β₂ 0.999</td>
+<td>Rectified Adam variance estimate; f32 and f64 CPU paths</td>
+</tr>
+</tbody>
+</table>
 <p><code>SgdOptimizerConfig</code> follows the SGD options <code>momentum</code>, <code>dampening</code>, <code>weight_decay</code>, and <code>nesterov</code>. The first momentum buffer is initialized from the regularized gradient, as in PyTorch; dampening applies on later updates. Nesterov requires positive momentum and zero dampening.</p>
 <p>NAdam and RAdam configuration structs accept <code>weight_decay</code> (default <code>0</code>). Set <code>decoupled_weight_decay: true</code> to apply decay directly to parameter values, without adding it to the gradient or moment estimates. NAdam additionally accepts <code>momentum_decay</code> (default <code>0.004</code>).</p>
 <h2 id="learning-rate-schedulers">Learning-rate schedulers</h2>
@@ -1960,7 +1997,7 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 13 Nov 2026 06:14:54</div>
+						<div class="footer">Powered by vdoc. Generated on: 14 Nov 2026 07:26:15</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_optimizers">README</a></li>
 <li class="open"><a href="#adagrad">fn adagrad</a>        <ul>

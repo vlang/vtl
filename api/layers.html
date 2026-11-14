@@ -145,13 +145,36 @@
 			<div class="title"><h1> layers <a href="#readme_layers">#</a></h1></div>
 <h1 id="vtlnnlayers"><code>vtl.nn.layers</code></h1>
 <p>Layers transform autograd variables and expose trainable parameters to optimizers. Implementations on <code>main</code> include:</p>
-<p>| Category | Layers |
-| --- | --- |
-| Core | Input, Linear, Flatten, Embedding |
-| Convolution and pooling | Conv2D, MaxPool2D, Pool2D |
-| Normalization and regularization | BatchNorm, GroupNorm, LayerNorm, RMSNorm, Dropout |
-| Recurrent and attention | GRU, LSTM, multi-head attention, positional encoding |
-| Activations | ReLU, Sigmoid, Tanh, Softmax, Leaky ReLU, ELU, GELU, Swish, Mish, Softplus, SELU, HardSwish |</p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Layers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Core</td>
+<td>Input, Linear, Flatten, Embedding</td>
+</tr>
+<tr>
+<td>Convolution and pooling</td>
+<td>Conv2D, MaxPool2D, Pool2D</td>
+</tr>
+<tr>
+<td>Normalization and regularization</td>
+<td>BatchNorm, GroupNorm, LayerNorm, RMSNorm, Dropout</td>
+</tr>
+<tr>
+<td>Recurrent and attention</td>
+<td>GRU, LSTM, multi-head attention, positional encoding</td>
+</tr>
+<tr>
+<td>Activations</td>
+<td>ReLU, Sigmoid, Tanh, Softmax, Leaky ReLU, ELU, GELU, Swish, Mish, Softplus, SELU, HardSwish</td>
+</tr>
+</tbody>
+</table>
 <p>The common low-level constructor returns a <code>types.Layer[T]</code>:</p>
 <p><code>gru_layer(ctx, input_size, hidden_size)</code> returns this interface and starts each sequence from a zero hidden state. Use <code>new_gru_layer</code> when you need the typed <code>GRULayer[T]</code> API: <code>forward_with_state(input, h0)</code> returns both the full sequence and final hidden state, with autograd support for either output and the initial state. The typed layer also provides <code>forward_batch_first</code> and <code>forward_batch_first_with_state</code> for <code>[batch, sequence, features]</code> input; its hidden states keep shape <code>[batch, hidden_size]</code>.</p>
 <p><code>lstm_layer</code> uses batch-first <code>[batch, sequence, features]</code> inputs and returns the output at every timestep. It supports stacked layers and full CPU BPTT for input and parameters, with gate matrices ordered input, forget, cell, output. Use <code>new_lstm_layer</code> and <code>forward_with_state(input, h0, c0)</code> to provide initial states and receive final hidden and cell states shaped <code>[num_layers, batch, hidden_size]</code>; autograd propagates gradients through each of the three outputs and back to the initial states.</p>
@@ -1798,8 +1821,9 @@ norm <span class="token operator">:=</span> <span class="token module_">layers</
 <span class="token punctuation">}</span></code></pre>
 <p>AveragePool2DLayer applies 2D average pooling over a 4D input.</p>
 <p>Input:    <code>[batch, channels, H, W]</code> Output:   <code>[batch, channels, out_H, out_W]</code></p>
-<p>Config options:- <code>kernel</code> — pool window size in (H, W) (default: determined by <code>input_shape</code>)</p>
+<p>Config options:</p>
 <ul>
+<li><code>kernel</code> — pool window size in (H, W) (default: determined by <code>input_shape</code>)</li>
 <li><code>padding</code> — zero-border padding before pooling (default: [0,0])</li>
 <li><code>stride</code>  — pool stride in (H, W) (default: same as kernel)</li></ul>
 
@@ -2040,8 +2064,9 @@ norm <span class="token operator">:=</span> <span class="token module_">layers</
 <span class="token punctuation">}</span></code></pre>
 <p>Conv2DLayer applies a 2D convolution over a 4D input tensor.</p>
 <p>Input:    <code>[batch, in_channels, H, W]</code> Output:   <code>[batch, out_channels, out_H, out_W]</code></p>
-<p>Config options (via <code>Conv2DConfig</code>):- <code>padding</code>  — zero-padding added to input borders (default: [0,0])</p>
+<p>Config options (via <code>Conv2DConfig</code>):</p>
 <ul>
+<li><code>padding</code>  — zero-padding added to input borders (default: [0,0])</li>
 <li><code>stride</code>   — sampling stride in H and W dimensions (default: [1,1])</li>
 <li><code>dilation</code> — spacing between kernel elements (default: [1,1])</li>
 <li><code>groups</code>   — split input channels into <code>groups</code> groups (default: 1)</li></ul>
@@ -2383,8 +2408,9 @@ norm <span class="token operator">:=</span> <span class="token module_">layers</
 <p>MultiHeadAttentionLayer implements scaled dot-product multi-head attention.</p>
 <p>Input:    <code>[batch, seq_len, embed_dim]</code> Output:   <code>[batch, seq_len, embed_dim]</code></p>
 <p>Computes attention across <code>num_heads</code> heads and projects back to <code>embed_dim</code>.</p>
-<p>Config options (via constructor parameters):- <code>embed_dim</code> — model dimension (must be divisible by <code>num_heads</code>)</p>
+<p>Config options (via constructor parameters):</p>
 <ul>
+<li><code>embed_dim</code> — model dimension (must be divisible by <code>num_heads</code>)</li>
 <li><code>num_heads</code> — number of parallel attention heads</li></ul>
 
 </section>
@@ -2535,7 +2561,7 @@ norm <span class="token operator">:=</span> <span class="token module_">layers</
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 13 Nov 2026 06:14:54</div>
+						<div class="footer">Powered by vdoc. Generated on: 14 Nov 2026 07:26:15</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_layers">README</a></li>
 <li class="open"><a href="#attention_gate">fn attention_gate</a>        <ul>

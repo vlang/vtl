@@ -146,12 +146,37 @@
 <h1 id="vtl-datasets">VTL Datasets</h1>
 <p>VTL provides dataset loaders and batching utilities for ML examples and tests.</p>
 <h2 id="available-datasets">Available datasets</h2>
-<p>| Dataset | Loader | Purpose |
-|---------|--------|---------|
-| MNIST | <code>datasets.load_mnist()</code> | Handwritten digit images (<code>28x28</code>) |
-| IMDB | <code>datasets.load_imdb()</code> | Sentiment analysis reviews |
-| CIFAR-10 | <code>datasets.load_cifar10(...)</code> | Image classification examples |
-| DataLoader | <code>datasets.DataLoader[T]</code> | Batch, shuffle, and iterate tensors/labels |</p>
+<table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th>Loader</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MNIST</td>
+<td><code>datasets.load_mnist()</code></td>
+<td>Handwritten digit images (<code>28x28</code>)</td>
+</tr>
+<tr>
+<td>IMDB</td>
+<td><code>datasets.load_imdb()</code></td>
+<td>Sentiment analysis reviews</td>
+</tr>
+<tr>
+<td>CIFAR-10</td>
+<td><code>datasets.load_cifar10(...)</code></td>
+<td>Image classification examples</td>
+</tr>
+<tr>
+<td>DataLoader</td>
+<td><code>datasets.DataLoader[T]</code></td>
+<td>Batch, shuffle, and iterate tensors/labels</td>
+</tr>
+</tbody>
+</table>
 <p>DataLoader returns a view when a batch's sample indices form a contiguous range. Shuffled, non-contiguous batches allocate tensors to preserve the requested sample order. A non-positive <code>batch_size</code> produces an empty loader.</p>
 <p><code>DataLoaderConfig</code> defaults to <code>batch_size: 32</code>, <code>shuffle: true</code>, and <code>drop_last: true</code>. These differ from PyTorch's defaults (<code>1</code>, <code>false</code>, and <code>false</code>), so set all three explicitly when porting a training pipeline. Call <code>reset()</code> between epochs to advance the deterministic shuffle order from the configured seed.</p>
 <p>For custom sample order, <code>new_data_loader_with_sampler_checked</code> and <code>new_data_loader_with_labels_and_sampler_checked</code> accept samplers from <code>vtl.nn.data</code>. Built-in options include sequential, random, subset-random, weighted, and fixed batch sampling. Wrap a sampler with <code>FixedBatchSampler</code> to choose batch boundaries and <code>drop_last</code> explicitly. Call <code>reset_checked()</code> between epochs when using a sampler; it reports errors from custom sampler implementations.</p>
@@ -588,7 +613,7 @@ v run ./vtl/examples/nn_cifar10_tiny_synth/main.v
 	batches            <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
 	<span class="token comment">// Erase the generic callback to avoid emitting an incomplete result type</span>
 	<span class="token comment">// when consumers instantiate DataLoader without using collated batches.</span>
-	collate_fn         <span class="token builtin">voidptr</span>
+	collate_fn <span class="token builtin">voidptr</span>
 <span class="token punctuation">}</span></code></pre>
 <p>DataLoader defines a public data structure for this module.</p>
 
@@ -699,7 +724,7 @@ v run ./vtl/examples/nn_cifar10_tiny_synth/main.v
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 13 Nov 2026 06:14:53</div>
+						<div class="footer">Powered by vdoc. Generated on: 14 Nov 2026 07:26:15</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_datasets">README</a></li>
 <li class="open"><a href="#Constants">Constants</a></li>
