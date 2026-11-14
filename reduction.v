@@ -35,8 +35,10 @@ pub fn (t &Tensor[T]) argmax_axis[T](axis int) !&Tensor[int] {
 
 	// Dense row-major fast path: linear indexing with no per-row
 	// allocation and no multi-index decode (mirrors the contiguous
-	// branch convention of cumsum/cumprod). Semantics — including
-	// first-NaN-wins — match the generic path below exactly.
+	// branch convention of cumsum/cumprod). NaN handling matches the
+	// generic path below exactly: the scan stops at the first NaN found
+	// at j >= 1 (so [NaN, 1, NaN] yields 2); a leading NaN is retained
+	// only when no later NaN occurs. Ties keep the earlier index.
 	if t.is_row_major_contiguous() && t.data.data.len >= t.size {
 		arg_extrema_axis_contiguous[T](t, na, mut result, true)
 		return result
@@ -127,8 +129,10 @@ pub fn (t &Tensor[T]) argmin_axis[T](axis int) !&Tensor[int] {
 
 	// Dense row-major fast path: linear indexing with no per-row
 	// allocation and no multi-index decode (mirrors the contiguous
-	// branch convention of cumsum/cumprod). Semantics — including
-	// first-NaN-wins — match the generic path below exactly.
+	// branch convention of cumsum/cumprod). NaN handling matches the
+	// generic path below exactly: the scan stops at the first NaN found
+	// at j >= 1 (so [NaN, 1, NaN] yields 2); a leading NaN is retained
+	// only when no later NaN occurs. Ties keep the earlier index.
 	if t.is_row_major_contiguous() && t.data.data.len >= t.size {
 		arg_extrema_axis_contiguous[T](t, na, mut result, false)
 		return result
@@ -190,8 +194,9 @@ pub fn (t &Tensor[T]) argmin_axis[T](axis int) !&Tensor[int] {
 // argmax_axis (maximum=true) and argmin_axis (maximum=false). The caller
 // guarantees validated shapes and dense storage, so indexing is linear
 // with no per-row allocation and no multi-index decode. NaN handling
-// matches the generic paths exactly: the first NaN (a leading NaN
-// included) wins its line, ties keep the earlier index.
+// matches the generic paths exactly: the scan stops at the first NaN
+// found at j >= 1 (so [NaN, 1, NaN] yields 2); a leading NaN is retained
+// only when no later NaN occurs. Ties keep the earlier index.
 @[direct_array_access]
 fn arg_extrema_axis_contiguous[T](t &Tensor[T], na int, mut result &Tensor[int], maximum bool) {
 	shape := t.shape

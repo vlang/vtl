@@ -42,6 +42,19 @@ fn test_arg_extrema_axis_respect_strides_and_numpy_nan_order() {
 	assert transposed.argmin_axis(0)!.to_array() == [0, 1]
 }
 
+fn test_arg_extrema_contiguous_nan_matches_generic() {
+	// Differential lock for fast (contiguous) vs generic (strided) paths:
+	// the scan stops at the first NaN at j >= 1, so [NaN, 1, NaN] yields 2.
+	contig := vtl.from_2d[f64]([[math.nan(), 1.0, math.nan()]])!
+	assert contig.argmax_axis(1)!.to_array() == [2]
+	assert contig.argmin_axis(1)!.to_array() == [2]
+	// Same logical row through the strided generic path.
+	base := vtl.from_2d[f64]([[math.nan()], [1.0], [math.nan()]])!
+	view := base.transpose([1, 0])!
+	assert view.argmax_axis(1)!.to_array() == [2]
+	assert view.argmin_axis(1)!.to_array() == [2]
+}
+
 fn test_arg_axis_rejects_empty_reduced_axis_and_preserves_empty_output() {
 	empty_axis := vtl.zeros[f64]([2, 0])
 	if _ := empty_axis.argmax_axis(1) {
