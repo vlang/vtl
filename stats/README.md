@@ -46,7 +46,8 @@ choose the accumulator and output type explicitly.
 
 `trapezoid`, `trapezoid_axis`, and `trapezoid_x_axis` integrate numeric tensors
 with the composite trapezoidal rule and return `f64` tensors with the reduced
-axis removed. Explicit sample coordinates remain in their given order.
+axis removed. The `_as` variants select an `f32` or `f64` accumulator/output
+type. Explicit sample coordinates remain in their given order.
 
 `gradient_axis` estimates the numerical derivative along one axis using
 uniform sample spacing. It preserves the input shape, accepts negative axes,

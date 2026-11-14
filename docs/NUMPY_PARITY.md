@@ -345,6 +345,8 @@ floating-point slices produce NaN. Weighted averages expose typed global,
 single-axis, and multi-axis forms through `average_as` and its axis variants.
 `bincount_as` and `bincount_weighted_as` likewise expose output/accumulator
 type selection for unweighted and weighted label counts.
+`trapezoid_as`, `trapezoid_axis_as`, and `trapezoid_x_axis_as` select an
+`f32` or `f64` integration accumulator/output type.
 `stats.sum_accurate` provides an opt-in Neumaier-compensated global sum for
 floating-point tensors. `Tensor.cumsum_flat` and `Tensor.cumprod_flat` provide
 NumPy's flattened `axis=None` cumulative behavior, with explicit accumulator
@@ -380,6 +382,7 @@ elements; an empty output caused only by an unreduced dimension remains empty.
 | `bincount` | G over vector; no KD | int; `_as` selects U; weighted defaults to f64 | Integer labels; weight NaNs propagate | Empty vector returns `minlength` zeros |
 | `all` / `any` | G/A/M; KD; A=() is elementwise | bool | NaN is truthy | Identities true / false |
 | `cumsum` / `cumprod` | A preserves shape; flat returns 1-D; no KD | T; `_as` selects U | Propagates forward | Empty tensor |
+| `trapezoid` | Last/A axis; reduced axis removed; no KD | f64; `_as` selects f32/f64 | Propagates | Empty/singleton axis integrates to 0 |
 | `ptp` | G/A/M; KD on tensor forms | T | Propagate | Empty reduced extent errors |
 
 Legend: G=global, A=one axis, M=multiple axes, KD=`keepdims`, T=input type,

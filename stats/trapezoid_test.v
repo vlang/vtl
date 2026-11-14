@@ -12,6 +12,26 @@ fn test_trapezoid_integrates_uniformly_spaced_values() ! {
 	assert double_spacing.get_nth(0) == 8.0
 }
 
+fn test_trapezoid_explicit_accumulator_dtype() ! {
+	values := vtl.from_1d([f32(0), 16_777_216, 0, 1])!
+	f32_area := trapezoid_as[f32, f32](values, 1.0)!
+	f64_area := trapezoid_as[f32, f64](values, 1.0)!
+	assert f32_area.get_nth(0) == f32(16_777_216)
+	assert f64_area.get_nth(0) == 16_777_216.5
+
+	matrix := vtl.from_array[f32]([1, 2, 3, 4, 5, 6], [2, 3])!
+	axis_areas := trapezoid_axis_as[f32, f32](matrix, 1.0, 1)!
+	assert axis_areas.shape == [2]
+	assert axis_areas.to_array() == [f32(4), f32(10)]
+	coordinates := vtl.from_1d([f32(0), 2, 4])!
+	x_areas := trapezoid_x_axis_as[f32, f32, f64](matrix, coordinates, 1)!
+	assert x_areas.to_array() == [8.0, 20.0]
+
+	if _ := trapezoid_as[f32, int](values, 1.0) {
+		assert false, 'trapezoid accumulation must use a floating-point type'
+	}
+}
+
 fn test_trapezoid_reduces_selected_axis_and_respects_x_order() ! {
 	values := vtl.from_2d([[0, 1, 2], [3, 4, 5]])!
 	last_axis := trapezoid_axis[int](values, 1.0, -1)!
