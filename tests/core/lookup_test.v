@@ -483,3 +483,72 @@ fn test_unique_counts_groups_nan_values() ! {
 	assert vtl.unique_inverse(tensor)!.to_array() == [2, 1, 2, 0, 1]
 	assert vtl.unique_first_indices(tensor)!.to_array() == [3, 1, 0]
 }
+
+// odometer_index is the old nth_index: count up from zero, carrying like an
+// odometer. An empty axis never advances, so it behaves as an axis of length 1.
+fn odometer_index(shape []int, n int) []int {
+	mut index := []int{len: shape.len}
+	for _ in 0 .. n {
+		for j := shape.len - 1; j >= 0; j-- {
+			if index[j] < shape[j] - 1 {
+				index[j]++
+				break
+			}
+			index[j] = 0
+		}
+	}
+	return index
+}
+
+fn odometer_period(shape []int) int {
+	mut period := 1
+	for dim in shape {
+		period *= if dim > 0 { dim } else { 1 }
+	}
+	return period
+}
+
+fn test_nth_index_matches_the_counting_order() {
+	for shape in [[2, 3, 4], [4, 1, 3], [7], [2, 0, 3], [0], []int{}] {
+		t := vtl.zeros[f64](shape)
+		period := odometer_period(shape)
+		for n in 0 .. 2 * period + 3 {
+			assert t.nth_index(n) == odometer_index(shape, n), 'shape ${shape}, n ${n}'
+		}
+		// negative positions wrap from the end
+		for k in 1 .. period + 2 {
+			assert t.nth_index(-k) == odometer_index(shape, 2 * period - k), 'shape ${shape}, n -${k}'
+		}
+		low := int((i64(min_int) % i64(period) + i64(period)) % i64(period))
+		assert t.nth_index(min_int) == odometer_index(shape, low), 'shape ${shape}, n min'
+	}
+	transposed := vtl.from_array([1, 2, 3, 4, 5, 6], [2, 3])!.t()!
+	assert transposed.nth_index(4) == [2, 0]
+	assert transposed.get_nth(4) == 3
+}
+
+fn test_nth_index_on_huge_views() {
+	// the old loop counted up to n: about 2^30 steps for each of these calls
+	big := vtl.from_array([7], [1, 1])!.broadcast_to([1 << 15, 1 << 15])!
+	for k in 0 .. 64 {
+		assert big.nth_index(big.size - 1 - k) == [(1 << 15) - 1, (1 << 15) - 1 - k]
+	}
+	assert big.get_nth(big.size - 1) == 7
+	// every axis length fits in a 32-bit int; counting an empty axis as one,
+	// both views have 2^64 positions, more than an int of either width holds
+	wide := vtl.from_array([7], [1, 1, 1, 1])!.broadcast_to([1 << 16, 1 << 16, 1 << 16, 1 << 16])!
+	assert wide.nth_index(5) == [0, 0, 0, 5]
+	assert wide.nth_index(1 << 16) == [0, 0, 1, 0]
+	empty := vtl.from_array([7], [1, 1, 1, 1, 1])!.broadcast_to([1 << 16, 1 << 16, 1 << 16, 0,
+		1 << 16])!
+	assert empty.nth_index(0) == [0, 0, 0, 0, 0]
+	assert empty.nth_index(1) == [0, 0, 0, 0, 1]
+	assert empty.nth_index(1 << 16) == [0, 0, 1, 0, 0]
+	// where int is 64 bits, positions past 2^32 too
+	if sizeof(int) == 8 {
+		n := int(i64(1) << 32)
+		assert wide.nth_index(n) == [0, 1, 0, 0]
+		assert empty.nth_index(n) == [0, 1, 0, 0, 0]
+		assert wide.get_nth(2 * n - 1) == 7
+	}
+}
