@@ -361,20 +361,38 @@ fn squeeze_reduction_axis[T](t &Tensor[T], axis int) !&Tensor[T] {
 	return t.reshape[T](shape)
 }
 
+// argmax_axis_with_keepdims returns maximum indices with optional axis
+// retention.
+pub fn (t &Tensor[T]) argmax_axis_with_keepdims[T](axis int, keepdims bool) !&Tensor[int] {
+	result := t.argmax_axis[T](axis)!
+	if keepdims {
+		return result
+	}
+	na := if axis < 0 { axis + t.rank() } else { axis }
+	return squeeze_reduction_axis[int](result, na)
+}
+
+// argmin_axis_with_keepdims returns minimum indices with optional axis
+// retention.
+pub fn (t &Tensor[T]) argmin_axis_with_keepdims[T](axis int, keepdims bool) !&Tensor[int] {
+	result := t.argmin_axis[T](axis)!
+	if keepdims {
+		return result
+	}
+	na := if axis < 0 { axis + t.rank() } else { axis }
+	return squeeze_reduction_axis[int](result, na)
+}
+
 // argmax_axis_squeeze returns the maximum indices with the reduced axis
 // removed, matching NumPy's default keepdims=false behavior.
 pub fn (t &Tensor[T]) argmax_axis_squeeze[T](axis int) !&Tensor[int] {
-	result := t.argmax_axis[T](axis)!
-	na := if axis < 0 { axis + t.rank() } else { axis }
-	return squeeze_reduction_axis[int](result, na)
+	return t.argmax_axis_with_keepdims[T](axis, false)
 }
 
 // argmin_axis_squeeze returns the minimum indices with the reduced axis
 // removed, matching NumPy's default keepdims=false behavior.
 pub fn (t &Tensor[T]) argmin_axis_squeeze[T](axis int) !&Tensor[int] {
-	result := t.argmin_axis[T](axis)!
-	na := if axis < 0 { axis + t.rank() } else { axis }
-	return squeeze_reduction_axis[int](result, na)
+	return t.argmin_axis_with_keepdims[T](axis, false)
 }
 
 // argmax returns the indices of the maximum values along the given axis.
