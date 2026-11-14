@@ -24,14 +24,20 @@ Use `trapezoid_axis` for another axis, or `trapezoid_x_axis` for explicit
 coordinates. The order of explicit coordinates is preserved, so decreasing
 coordinates produce a negative integral, matching
 [NumPy's `trapezoid`](https://numpy.org/doc/stable/reference/generated/numpy.trapezoid.html).
+The `trapezoid_*_as` variants select `f32` or `f64` for accumulation and output.
 
 ```v
-import math
 import vtl
 import vtl.stats
 
 series := vtl.from_1d([1.0, 2.0, 3.0])!
 assert stats.trapezoid[f64](series, 1.0)!.get_nth(0) == 4.0
+
+cancellation := vtl.from_1d([f32(0), 16_777_216, 0, 1])!
+area_f32 := stats.trapezoid_as[f32, f32](cancellation, 1.0)!
+area_f64 := stats.trapezoid_as[f32, f64](cancellation, 1.0)!
+assert area_f32.get_nth(0) == f32(16_777_216)
+assert area_f64.get_nth(0) == 16_777_216.5
 ```
 
 ## Reduce several axes
