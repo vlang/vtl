@@ -2,18 +2,17 @@ module vtl
 
 import vtl.storage
 
-// TensorData defines a public data structure for this module.
-
-// TensorData defines a public data structure for this module.
+// TensorData configures the memory layout used by tensor creation functions.
+// The element type is selected through the function's generic type argument.
 @[params]
 pub struct TensorData {
 pub:
 	memory MemoryFormat = .row_major
 }
 
-// from_varray takes a one dimensional array of T values
-// and coerces it into an arbitrary shaped Tensor if possible.
-// Panics if the shape provided does not hold the provided array
+// from_array takes a one-dimensional array of T values and coerces it into an
+// arbitrary shape. It returns an error when the shape does not fit the values.
+// Values are interpreted in the selected memory order.
 pub fn from_array[T](arr []T, shape []int, params TensorData) !&Tensor[T] {
 	size := size_from_shape(shape)
 	if size != arr.len {
@@ -40,7 +39,7 @@ pub fn from_array[T](arr []T, shape []int, params TensorData) !&Tensor[T] {
 	}
 }
 
-// tensor allocates a Tensor onto specified device with a given data
+// tensor allocates a Tensor filled with the given value and shape.
 pub fn tensor[T](init T, shape []int, params TensorData) &Tensor[T] {
 	if shape.len == 0 {
 		data_storage := storage.storage[T](1, 0, init)

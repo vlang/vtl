@@ -154,6 +154,58 @@ fn test_full_like() {
 	assert t2.get([2]) == 4.0
 }
 
+fn test_creation_functions_preserve_requested_memory_format() ! {
+	zero := vtl.zeros[int]([2, 3], memory: .col_major)
+	assert zero.memory == .col_major
+	assert zero.strides == [1, 2]
+
+	one := vtl.ones[int]([2, 3], memory: .col_major)
+	assert one.memory == .col_major
+	assert one.strides == [1, 2]
+	assert one.to_array() == [1, 1, 1, 1, 1, 1]
+
+	filled := vtl.full[int]([2, 3], 7, memory: .col_major)
+	assert filled.memory == .col_major
+	assert filled.strides == [1, 2]
+	assert filled.to_array() == [7, 7, 7, 7, 7, 7]
+
+	diagonal := vtl.eye[int](2, 3, 0, memory: .col_major)
+	assert diagonal.memory == .col_major
+	assert diagonal.strides == [1, 2]
+	assert diagonal.to_array() == [1, 0, 0, 0, 1, 0]
+
+	column_major_values := vtl.from_array([1, 4, 2, 5, 3, 6], [2, 3], memory: .col_major)!
+	assert column_major_values.to_array() == [1, 2, 3, 4, 5, 6]
+	column_major_rows := vtl.from_2d([[1, 2, 3], [4, 5, 6]], memory: .col_major)!
+	assert column_major_rows.to_array() == [1, 2, 3, 4, 5, 6]
+
+	assert vtl.arange[int](0, 3, 1, memory: .col_major)!.memory == .col_major
+	assert vtl.linspace[f64](0.0, 1.0, 3, memory: .col_major)!.memory == .col_major
+	assert vtl.logspace[f64](0.0, 2.0, 3, memory: .col_major)!.memory == .col_major
+}
+
+fn test_coordinate_and_label_constructors_use_row_major_layout() ! {
+	x := vtl.from_1d([1, 2])!
+	y := vtl.from_1d([3, 4, 5])!
+	x_grid, y_grid := vtl.meshgrid(x, y)!
+	assert x_grid.memory == .row_major
+	assert y_grid.memory == .row_major
+
+	grids := vtl.meshgrid_n([x, y], .ij)!
+	assert grids[0].memory == .row_major
+	assert grids[1].memory == .row_major
+
+	dense := vtl.indices([2, 3])!
+	assert dense.memory == .row_major
+	sparse := vtl.indices_sparse([2, 3])!
+	for coordinate in sparse {
+		assert coordinate.memory == .row_major
+	}
+
+	labels := vtl.one_hot(vtl.from_1d([1, 0])!, 2)!
+	assert labels.memory == .row_major
+}
+
 fn test_range() {
 	t := vtl.range[f64](-2, 10)
 	expected := vtl.from_array([-2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0], [

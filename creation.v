@@ -394,8 +394,8 @@ pub fn from_1d[T](arr []T, params TensorData) !&Tensor[T] {
 	return from_array[T](arr, [arr.len], params)
 }
 
-// from_2d takes a two dimensional array of floating point values
-// and returns a two-dimensional Tensor if possible
+// from_2d takes a two-dimensional array and returns a Tensor if possible.
+// Nested rows remain logical row-major values with either storage layout.
 
 // from_2d exposes this operation as part of the public API.
 
