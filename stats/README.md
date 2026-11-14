@@ -26,8 +26,11 @@ output slice.
 Use `sum_as[T, U]`, `product_as[T, U]`, and the `_along_axis_as` or
 `_along_axes_as` variants to choose accumulator/output type `U` explicitly.
 For example, summing an `f32` tensor into `f64` reduces rounding error during
-accumulation. These APIs currently cover sum and product; other reductions keep
-their documented output types.
+accumulation. `mean_as` and its axis variants, along with typed variance and
+standard-deviation APIs, offer the same control for statistical moments.
+`average_as`, `average_axis_as`, `average_along_axis_as`, and
+`average_along_axes_as` select the weighted-average accumulator and output type.
+Other reductions retain their documented output types.
 
 For floating-point inputs, `sum_accurate` uses Neumaier compensation to retain
 small contributions that a faster reduction may round away. It returns the
@@ -38,7 +41,8 @@ input types keep the regular `sum` behavior.
 `average_along_axis(..., keepdims)` to choose whether to keep or remove it;
 weights may match the input or be a vector matching the selected axis.
 `average_along_axes` reduces several axes with explicit `keepdims` and requires
-weights with the same shape as the input.
+weights with the same shape as the input. The corresponding `_as` functions
+choose the accumulator and output type explicitly.
 
 `trapezoid`, `trapezoid_axis`, and `trapezoid_x_axis` integrate numeric tensors
 with the composite trapezoidal rule and return `f64` tensors with the reduced
