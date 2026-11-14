@@ -208,6 +208,15 @@ fn extrema_axis[T](t &Tensor[T], axis int, maximum bool) !&Tensor[T] {
 	if result.size == 0 {
 		return result
 	}
+	// Dense row-major fast path: linear indexing with no multi-index
+	// decode (mirrors the contiguous branch convention of cumsum/cumprod
+	// and arg_extrema_axis_contiguous). NaN semantics match exactly:
+	// any NaN poisons the line, otherwise the extremum wins ties by
+	// first occurrence.
+	if t.is_row_major_contiguous() && t.data.data.len >= t.size {
+		extrema_axis_contiguous[T](t, axis_index, maximum, mut result)
+		return result
+	}
 	mut output_strides := []int{len: rank}
 	output_strides[rank - 1] = 1
 	for dimension := rank - 2; dimension >= 0; dimension-- {
@@ -258,6 +267,68 @@ fn extrema_axis[T](t &Tensor[T], axis int, maximum bool) !&Tensor[T] {
 		}
 	}
 	return result
+}
+
+// extrema_axis_contiguous is the dense row-major fast path behind
+// max_axis/min_axis (via extrema_axis). The caller guarantees validated
+// shapes and dense storage, so indexing is linear with no multi-index
+// decode. NaN semantics match the generic path exactly.
+@[direct_array_access]
+fn extrema_axis_contiguous[T](t &Tensor[T], axis_index int, maximum bool, mut result &Tensor[T]) {
+	shape := t.shape
+	rank := shape.len
+	axis_size := shape[axis_index]
+	mut in_strides := []int{len: rank}
+	in_strides[rank - 1] = 1
+	for i := rank - 2; i >= 0; i-- {
+		in_strides[i] = in_strides[i + 1] * shape[i + 1]
+	}
+	axis_stride := in_strides[axis_index]
+	mut out_strides := []int{len: rank}
+	out_strides[rank - 1] = 1
+	for i := rank - 2; i >= 0; i-- {
+		d := if i + 1 == axis_index { 1 } else { shape[i + 1] }
+		out_strides[i] = out_strides[i + 1] * d
+	}
+	mut outer := []int{len: rank}
+	for {
+		mut base := 0
+		for i in 0 .. rank {
+			base += outer[i] * in_strides[i]
+		}
+		mut best_value := t.data.data[base]
+		mut best_is_nan := value_is_nan[T](best_value)
+		for position in 1 .. axis_size {
+			value := t.data.data[base + position * axis_stride]
+			value_nan := value_is_nan[T](value)
+			if value_nan {
+				best_value = value
+				best_is_nan = true
+			} else if !best_is_nan && (if maximum { value > best_value } else { value < best_value }) {
+				best_value = value
+			}
+		}
+		mut out_lin := 0
+		for i in 0 .. rank {
+			out_lin += outer[i] * out_strides[i]
+		}
+		result.set_nth(out_lin, best_value)
+		mut done := true
+		for i := rank - 1; i >= 0; i-- {
+			if i == axis_index {
+				continue
+			}
+			outer[i]++
+			if outer[i] < shape[i] {
+				done = false
+				break
+			}
+			outer[i] = 0
+		}
+		if done {
+			break
+		}
+	}
 }
 
 fn value_is_nan[T](value T) bool {
