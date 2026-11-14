@@ -108,7 +108,8 @@ jobs:
 
   run-tests:
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
+    # Production and backend test suites can take longer than an hour.
+    timeout-minutes: 120
 
     strategy:
       matrix:
