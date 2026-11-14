@@ -209,6 +209,15 @@ See
 [implementation](../math_promoted.v), [forward tests](../tests/core/math_promoted_remainder_test.v),
 [gradient tests](../autograd_tests/gates_remainder_test.v), and
 [dtype conversion tutorial](./TUTORIAL_FIRST_STEPS.md#numeric-dtype-conversion).
+The `add_scalar_promoted`, `subtract_scalar_promoted`,
+`multiply_scalar_promoted`, `divide_scalar_promoted`, and
+`remainder_scalar_promoted` variants apply NumPy-style weak scalar promotion
+for real numeric tensors: float arrays retain their dtype; integer arrays
+retain their dtype for in-range integer/bool scalars and promote to float64
+for floating scalars; integer true division returns float64. Out-of-range
+integer scalars return an error. The output type parameter is explicit because
+V requires statically typed generic return values; the implementation checks
+it against the inferred result dtype.
 `round_decimals` rounds real floating-point tensors to positive or negative
 decimal places using ties-to-even, matching NumPy `round` for the supported
 same-dtype inputs; integer tensors are copied unchanged. VTL preserves finite
@@ -508,8 +517,10 @@ complex variance and standard deviation return real tensors and support
 `as_*` conversions cover real numeric and boolean types, preserve shape and
 logical order, and truncate floating-point values when converting to integers.
 
-**Remaining:** extend promoted arithmetic to all supported operations, add
-weak scalar promotion and string conversion, extend complex support beyond
+**Remaining:** complete automatic output-type dispatch, extend weak scalar
+promotion to complex tensors and additional scalar categories, extend promoted
+arithmetic coverage across all supported operations and string conversion, and
+extend complex support beyond
 elementwise operations, `matmul`, Einstein contractions, `solve_complex`,
 `inv_complex`, `det_complex`, `slogdet_complex`, and `lstsq_complex` to more
 general linear algebra and random generation, add complex32, and define integer
