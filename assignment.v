@@ -238,6 +238,7 @@ fn normalize_put_index(selected int, size int, mode PutMode) !int {
 // index dimensions outside axis may be smaller than the target dimensions.
 // Negative indices count from the end.
 // When an index is repeated, the last value in row-major iteration order wins.
+// Out-of-range indices return an error before any target values are changed.
 pub fn (mut t Tensor[T]) put_along_axis[T](indices &Tensor[int], values &Tensor[T], axis int) ! {
 	axis_index := validate_axis_update_shapes(t.shape, indices, values, axis, 'put_along_axis')!
 	normalized_indices := normalize_axis_update_indices(indices, t.shape[axis_index], 'put_along_axis')!
@@ -253,7 +254,8 @@ pub fn (mut t Tensor[T]) put_along_axis[T](indices &Tensor[int], values &Tensor[
 }
 
 // scatter_add adds values at indices along axis. Duplicate indices accumulate
-// in row-major iteration order; negative indices count from the end.
+// in row-major iteration order; negative indices count from the end. An
+// out-of-range index returns an error before any target values are changed.
 pub fn (mut t Tensor[T]) scatter_add[T](indices &Tensor[int], values &Tensor[T], axis int) ! {
 	axis_index := validate_axis_update_shapes(t.shape, indices, values, axis, 'scatter_add')!
 	normalized_indices := normalize_axis_update_indices(indices, t.shape[axis_index], 'scatter_add')!
