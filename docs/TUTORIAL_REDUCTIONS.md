@@ -593,3 +593,25 @@ assert stats.nansum_axis_as[f64, f64](samples, 1, true)!.shape == [2, 1]
 assert stats.nanmin_axis(samples, 1)!.to_array() == [1.0, 4.0]
 assert stats.nanmax_axis_keepdims(samples, 1)!.to_array() == [3.0, 6.0]
 ```
+
+## Typed bincount accumulators
+
+`bincount_as` chooses the output type for integer label counts.
+`bincount_weighted_as` chooses the accumulator and output type when summing
+weights into each label:
+
+```v
+import vtl
+import vtl.stats
+
+labels := vtl.from_1d([0, 1, 1, 3])!
+counts := stats.bincount_as[int, f64](labels, 5)!
+assert counts.to_array() == [1.0, 2.0, 0.0, 1.0, 0.0]
+
+repeated := vtl.from_1d([0, 0])!
+weights := vtl.from_1d([f32(16_777_216), 1])!
+f32_accumulator := stats.bincount_weighted_as[int, f32, f32](repeated, weights, 1)!
+f64_accumulator := stats.bincount_weighted_as[int, f32, f64](repeated, weights, 1)!
+assert f32_accumulator.to_array() == [16_777_216.0]
+assert f64_accumulator.to_array() == [16_777_217.0]
+```

@@ -343,6 +343,8 @@ their original return types. NaN-aware mean, variance, and standard deviation
 also provide typed global, single-axis, and multi-axis APIs; empty or all-NaN
 floating-point slices produce NaN. Weighted averages expose typed global,
 single-axis, and multi-axis forms through `average_as` and its axis variants.
+`bincount_as` and `bincount_weighted_as` likewise expose output/accumulator
+type selection for unweighted and weighted label counts.
 `stats.sum_accurate` provides an opt-in Neumaier-compensated global sum for
 floating-point tensors. `Tensor.cumsum_flat` and `Tensor.cumprod_flat` provide
 NumPy's flattened `axis=None` cumulative behavior, with explicit accumulator
@@ -375,6 +377,7 @@ elements; an empty output caused only by an unreduced dimension remains empty.
 | `argmin` / `argmax` | G flattened index; A `*_with_keepdims` variants | int | First NaN; `nanarg*` skips | Empty/no-valid reductions error |
 | `median` / quantiles | G/A/M; KD forms; multi-q prepends q axis | f64 | Ordinary forms propagate; `nan*` skips | Median NaN; quantile errors |
 | Weighted average / quantiles | G/A/M; KD; multi-q adds q axis | f64; weighted-average `_as` selects U | Average propagates; `nan` skips | Empty/zero-weight errors |
+| `bincount` | G over vector; no KD | int; `_as` selects U; weighted defaults to f64 | Integer labels; weight NaNs propagate | Empty vector returns `minlength` zeros |
 | `all` / `any` | G/A/M; KD; A=() is elementwise | bool | NaN is truthy | Identities true / false |
 | `cumsum` / `cumprod` | A preserves shape; flat returns 1-D; no KD | T; `_as` selects U | Propagates forward | Empty tensor |
 | `ptp` | G/A/M; KD on tensor forms | T | Propagate | Empty reduced extent errors |

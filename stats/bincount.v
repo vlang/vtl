@@ -5,10 +5,15 @@ import vtl
 // bincount counts occurrences of each non-negative integer in a vector. The
 // output length is max(input)+1 or minlength, whichever is larger.
 pub fn bincount[T](input &vtl.Tensor[T], minlength int) !&vtl.Tensor[int] {
+	return bincount_as[T, int](input, minlength)
+}
+
+// bincount_as counts labels using U for the accumulator and output.
+pub fn bincount_as[T, U](input &vtl.Tensor[T], minlength int) !&vtl.Tensor[U] {
 	indices := validate_bincount_input[T](input, minlength)!
-	mut counts := []int{len: bincount_output_length(indices, minlength)}
+	mut counts := []U{len: bincount_output_length(indices, minlength)}
 	for index in indices {
-		counts[index]++
+		counts[index] += vtl.cast[U](1)
 	}
 	return vtl.from_1d(counts)
 }
@@ -16,13 +21,18 @@ pub fn bincount[T](input &vtl.Tensor[T], minlength int) !&vtl.Tensor[int] {
 // bincount_weighted sums one weight per non-negative integer input value.
 // It follows NumPy's weighted bincount shape and minlength rules.
 pub fn bincount_weighted[T, W](input &vtl.Tensor[T], weights &vtl.Tensor[W], minlength int) !&vtl.Tensor[f64] {
+	return bincount_weighted_as[T, W, f64](input, weights, minlength)
+}
+
+// bincount_weighted_as sums weights using U for the accumulator and output.
+pub fn bincount_weighted_as[T, W, U](input &vtl.Tensor[T], weights &vtl.Tensor[W], minlength int) !&vtl.Tensor[U] {
 	indices := validate_bincount_input[T](input, minlength)!
 	if weights.rank() != 1 || weights.size != indices.len {
 		return error('bincount weights must match the one-dimensional input shape')
 	}
-	mut counts := []f64{len: bincount_output_length(indices, minlength)}
+	mut counts := []U{len: bincount_output_length(indices, minlength)}
 	for i, index in indices {
-		counts[index] += bincount_weight_value[W](weights.get_nth(i))!
+		counts[index] += bincount_weight_value[W, U](weights.get_nth(i))!
 	}
 	return vtl.from_1d(counts)
 }
@@ -61,9 +71,9 @@ fn bincount_index[T](value T) !int {
 	}
 }
 
-fn bincount_weight_value[W](value W) !f64 {
+fn bincount_weight_value[W, U](value W) !U {
 	$if W is i8 || W is i16 || W is i32 || W is i64 || W is int || W is u8 || W is u16 || W is u32 || W is u64 || W is f32 || W is f64 {
-		return f64(value)
+		return vtl.cast[U](value)
 	} $else {
 		return error('bincount weights must have a numeric dtype')
 	}

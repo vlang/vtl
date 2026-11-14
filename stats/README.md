@@ -93,7 +93,8 @@ See the [N-dimensional histogram example](../examples/histogramdd).
 
 `bincount(input, minlength)` counts non-negative integer labels in a vector;
 `bincount_weighted(input, weights, minlength)` sums numeric weights for each
-label. Both return vectors sized to at least `minlength`.
+label. Both return vectors sized to at least `minlength`. Use `bincount_as`
+or `bincount_weighted_as` to select the count accumulator and output type.
 
 ```v
 import vtl
