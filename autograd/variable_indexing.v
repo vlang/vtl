@@ -216,6 +216,45 @@ fn boolean_index_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr 
 	return tensor_ptrs_to_voidptrs[T](tensors)
 }
 
+// mixed_index applies Tensor mixed indexing and scatters gradients back to the
+// selected logical source positions. Repeated coordinates accumulate gradients.
+pub fn (v &Variable[T]) mixed_index(indices []vtl.TensorIndex) !&Variable[T] {
+	value := vtl.mixed_index[T](v.value, indices)!
+	mut result := variable[T](v.context, value, requires_grad: v.requires_grad)
+	if v.requires_grad {
+		flat_indices := []int{len: v.value.size, init: index}
+		logical_indices := vtl.from_array[int](flat_indices, v.value.shape)!
+		selected_indices := vtl.mixed_index[int](logical_indices, indices)!
+		gate := &MixedIndexGate[T]{
+			input_indices: selected_indices.to_array()
+			input_shape:   v.value.shape.clone()
+		}
+		register[T]('MixedIndex', voidptr(gate), mixed_index_backward_dispatch[T], result, [v])!
+	}
+	return result
+}
+
+struct MixedIndexGate[T] {
+	input_indices []int
+	input_shape   []int
+}
+
+fn (g &MixedIndexGate[T]) backward(gradient &vtl.Tensor[T]) ![]&vtl.Tensor[T] {
+	mut input_gradient := vtl.zeros[T](g.input_shape)
+	for output_index, input_index in g.input_indices {
+		input_gradient.set_nth[T](input_index, input_gradient.get_nth[T](input_index) +
+			gradient.get_nth[T](output_index))
+	}
+	return [input_gradient]
+}
+
+fn mixed_index_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_gate := unsafe { &MixedIndexGate[T](gate) }
+	typed_payload := unsafe { &Payload[T](payload) }
+	tensors := typed_gate.backward(typed_payload.variable.grad)!
+	return tensor_ptrs_to_voidptrs[T](tensors)
+}
+
 // masked_select selects broadcast-mask values in row-major logical order and
 // scatters gradients back to their source coordinates.
 pub fn (v &Variable[T]) masked_select(mask &vtl.Tensor[bool]) !&Variable[T] {

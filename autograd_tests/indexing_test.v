@@ -88,6 +88,33 @@ fn test_boolean_index_backward_scatter_adds_selected_prefix_gradients() ! {
 	assert input.grad.to_array() == [1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0]
 }
 
+fn test_mixed_index_backward_accumulates_repeated_coordinates_and_snapshots_indices() ! {
+	mut ctx := autograd.ctx[f64]()
+	input := ctx.variable(vtl.from_array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0], [2, 3])!)
+	mut rows := vtl.from_1d([1, 0, 1])!
+	mut columns := vtl.from_1d([2, 0, 2])!
+	mut selected := input.mixed_index([vtl.array_index(rows), vtl.array_index(columns)])!
+
+	assert selected.value.shape == [3]
+	assert selected.value.to_array() == [5.0, 0.0, 5.0]
+
+	rows.fill(0)
+	columns.fill(0)
+	selected.backprop()!
+	assert input.grad.to_array() == [1.0, 0.0, 0.0, 0.0, 0.0, 2.0]
+}
+
+fn test_mixed_index_backward_routes_basic_slice_views() ! {
+	mut ctx := autograd.ctx[f64]()
+	input := ctx.variable(vtl.from_array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0], [2, 3])!)
+	mut selected := input.mixed_index([vtl.integer_index(-1), vtl.slice_index(0, 3, 2)!])!
+
+	assert selected.value.shape == [2]
+	assert selected.value.to_array() == [3.0, 5.0]
+	selected.backprop()!
+	assert input.grad.to_array() == [0.0, 0.0, 0.0, 1.0, 0.0, 1.0]
+}
+
 fn test_masked_select_backward_handles_broadcast_mask() ! {
 	mut ctx := autograd.ctx[f64]()
 	input := ctx.variable(vtl.from_array([10.0, 20.0, 30.0, 40.0], [2, 2])!)

@@ -26,6 +26,7 @@ CIFAR examples for CI-safe checks.
 | [vtl_vandermont](./vtl_vandermont) | Matrix construction and LA utilities | `v run ./vtl/examples/vtl_vandermont/main.v` |
 | [autograd_backprop](./autograd_backprop) | Manual autograd/backprop flow | `v run ./vtl/examples/autograd_backprop/main.v` |
 | [autograd_gather](./autograd_gather) | Gather gradients with repeated-index accumulation | `v run ./vtl/examples/autograd_gather/main.v` |
+| [autograd_mixed_index](./autograd_mixed_index) | Backpropagate through mixed indexing with repeated coordinates | `v run ./vtl/examples/autograd_mixed_index/main.v` |
 | [autograd_nan_to_num](./autograd_nan_to_num) | Sanitize non-finite values and mask their gradients | `v run ./vtl/examples/autograd_nan_to_num/main.v` |
 | [autograd_scatter](./autograd_scatter) | Propagate gradients through indexed additions | `v run ./vtl/examples/autograd_scatter/main.v` |
 | [autograd_put](./autograd_put) | Propagate gradients through indexed replacement | `v run ./vtl/examples/autograd_put/main.v` |

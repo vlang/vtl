@@ -95,8 +95,13 @@ assert clipped.to_array() == [10, 40]
 
 `Variable.take`, `Variable.take_with_mode`, `Variable.take_nd`,
 `Variable.take_nd_with_mode`, `Variable.take_flat`,
-`Variable.take_flat_with_mode`, `Variable.take_along_axis`, and
-`Variable.boolean_index` record gathers in the computation graph. `take_nd`
+`Variable.take_flat_with_mode`, `Variable.take_along_axis`,
+`Variable.mixed_index`, and `Variable.boolean_index` record gathers in the
+computation graph. `Variable.mixed_index` accepts the same coordinate arrays,
+scalar indices, slices, ellipsis, and inserted axes as `Tensor.mixed_index`.
+Its backward pass scatters gradients to the selected logical source positions;
+repeated coordinates accumulate, and the resolved positions are snapshotted
+during the forward pass. `take_nd`
 accepts an index tensor whose complete shape replaces the selected axis;
 `take_flat` gathers from row-major logical order; `boolean_index` selects
 leading dimensions and preserves trailing dimensions. `Variable.masked_select`
@@ -122,6 +127,9 @@ assert input.grad.to_array() == [1.0, 2.0, 1.0, 1.0, 2.0, 1.0]
 
 See the runnable [autograd gather example](../examples/autograd_gather/README.md)
 for repeated indices and the resulting gradient.
+
+See the runnable [autograd mixed-index example](../examples/autograd_mixed_index/README.md)
+for combined coordinate arrays and repeated-coordinate gradient accumulation.
 
 `Variable.scatter_add` returns an updated copy and records gradients for both
 the source and update tensors. The source receives the output gradient at each
