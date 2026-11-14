@@ -33,6 +33,14 @@ fn test_split() {
 	assert e3.array_equal(result[2])
 }
 
+fn test_split_preserves_storage_for_transposed_input() ! {
+	mut tensor := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
+	mut transposed := tensor.transpose([1, 0])!
+	mut parts := transposed.split(3, 0)!
+	parts[1].set([0, 1], 88)
+	assert tensor.get([1, 1]) == 88
+}
+
 fn test_split_expl() {
 	a := vtl.seq[f64](9).reshape([3, 3])!
 	e1 := vtl.from_array([0.0, 3, 6], [3, 1])!
