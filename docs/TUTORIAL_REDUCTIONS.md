@@ -425,6 +425,7 @@ when you need the reduced axis removed, matching NumPy's `average` shape choice.
 ```v
 import vtl
 import vtl.stats
+import math
 
 measurements := vtl.from_2d([[4.0, 5.0, 4.5], [3.0, 4.0, 5.0]])!
 reliability := vtl.from_1d([1.0, 2.0, 1.0])!
@@ -433,10 +434,19 @@ row_means_squeezed := stats.average_along_axis(measurements, reliability, 1, fal
 assert row_means.to_array() == [4.625, 4.0]
 assert row_means_squeezed.shape == [2]
 assert row_means_squeezed.to_array() == [4.625, 4.0]
+
+low_precision := vtl.from_1d([f32(16_777_216), 1, -16_777_216])!
+unit_weights := vtl.ones[f32]([3])
+wide_mean := stats.average_as[f32, f32, f64](low_precision, unit_weights)!
+assert math.abs(wide_mean - 1.0 / 3.0) < 1e-12
+single_precision_mean := stats.average_as[f32, f32, f32](low_precision, unit_weights)!
+assert single_precision_mean == 0.0
 ```
 
 `stats.average_along_axes` reduces a tuple of dimensions in one pass. For
 multi-axis weighted means, provide a weight tensor matching the input shape:
+`average_axis_as`, `average_along_axis_as`, and `average_along_axes_as` also
+accept an explicit output/accumulator type.
 
 ```v
 import vtl

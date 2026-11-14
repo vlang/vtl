@@ -1,5 +1,6 @@
 module stats
 
+import math
 import vtl
 
 fn test_average_uses_weights_and_supports_integer_tensors() ! {
@@ -89,4 +90,40 @@ fn test_average_rejects_empty_mismatched_and_zero_weight_inputs() ! {
 	} else {
 		assert true
 	}
+}
+
+fn test_average_explicit_accumulator_dtype() ! {
+	values := vtl.from_1d([f32(16_777_216), 1, -16_777_216])!
+	weights := vtl.ones[f32]([3])
+	assert average_as[f32, f32, f32](values, weights)! == 0.0
+	assert math.abs(average_as[f32, f32, f64](values, weights)! - 1.0 / 3.0) < 1e-12
+}
+
+fn test_average_explicit_dtype_axis_and_multi_axis() ! {
+	values := vtl.from_array[f64]([1, 2, 3, 4, 5, 6, 7, 8], [2, 2, 2])!
+	weights := vtl.from_array[f64]([1, 2, 3, 4, 5, 6, 7, 8], [2, 2, 2])!
+
+	axis := average_axis_as[f64, f64, f32](values, vtl.from_1d([1.0, 2.0])!, -1)!
+	assert axis.shape == [2, 2, 1]
+	assert math.abs(axis.get_nth(0) - (5.0 / 3.0)) < 1e-6
+	assert math.abs(axis.get_nth(1) - (11.0 / 3.0)) < 1e-6
+	assert math.abs(axis.get_nth(2) - (17.0 / 3.0)) < 1e-6
+	assert math.abs(axis.get_nth(3) - (23.0 / 3.0)) < 1e-6
+
+	middle_axis := average_axis_as[f64, f64, f64](values, weights, 1)!
+	assert middle_axis.shape == [2, 1, 2]
+	assert middle_axis.to_array() == [2.5, 10.0 / 3.0, 74.0 / 12.0, 100.0 / 14.0]
+
+	squeezed := average_along_axis_as[f64, f64, f64](values, vtl.from_1d([1.0, 2.0])!,
+		-1, false)!
+	assert squeezed.shape == [2, 2]
+	assert squeezed.to_array() == [5.0 / 3.0, 11.0 / 3.0, 17.0 / 3.0, 23.0 / 3.0]
+
+	multiple := average_along_axes_as[f64, f64, f64](values, weights, [0, -1], false)!
+	assert multiple.shape == [2]
+	assert multiple.to_array() == [66.0 / 14.0, 138.0 / 22.0]
+	kept := average_along_axes_as[f64, f64, f32](values, weights, [0, -1], true)!
+	assert kept.shape == [1, 2, 1]
+	assert math.abs(kept.get_nth(0) - (66.0 / 14.0)) < 1e-6
+	assert math.abs(kept.get_nth(1) - (138.0 / 22.0)) < 1e-6
 }
