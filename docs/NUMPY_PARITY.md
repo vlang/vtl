@@ -351,7 +351,9 @@ type selection for unweighted and weighted label counts.
 floating-point tensors. `Tensor.cumsum_flat` and `Tensor.cumprod_flat` provide
 NumPy's flattened `axis=None` cumulative behavior, with explicit accumulator
 types through `cumsum_flat_as` and `cumprod_flat_as`; their `Variable`
-counterparts propagate gradients through the flattened order.
+counterparts propagate gradients through the flattened order. NaN-aware
+`nancumsum`/`nancumprod` support axis and flattened scans, skip NaN inputs using
+the additive or multiplicative identity, and provide typed `_as` variants.
 
 **Remaining:** add `keepdims` options consistently across the remaining
 reduction families, extend accumulator dtype controls to other reductions, and
@@ -382,6 +384,7 @@ elements; an empty output caused only by an unreduced dimension remains empty.
 | `bincount` | G over vector; no KD | int; `_as` selects U; weighted defaults to f64 | Integer labels; weight NaNs propagate | Empty vector returns `minlength` zeros |
 | `all` / `any` | G/A/M; KD; A=() is elementwise | bool | NaN is truthy | Identities true / false |
 | `cumsum` / `cumprod` | A preserves shape; flat returns 1-D; no KD | T; `_as` selects U | Propagates forward | Empty tensor |
+| `nancumsum` / `nancumprod` | A preserves shape; flat returns 1-D; no KD | T; `_as` selects U | Skip NaN as 0 / 1 | Empty tensor |
 | `trapezoid` | Last/A axis; reduced axis removed; no KD | f64; `_as` selects f32/f64 | Propagates | Empty/singleton axis integrates to 0 |
 | `ptp` | G/A/M; KD on tensor forms | T | Propagate | Empty reduced extent errors |
 

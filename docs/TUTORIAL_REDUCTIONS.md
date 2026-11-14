@@ -313,11 +313,26 @@ wide_running_sum := measurements.cumsum_as[f64](0)!
 assert wide_running_sum.to_array() == [1e8, 1e8 + 1.0, 1.0]
 ```
 
+For floating-point tensors, `nancumsum` and `nancumprod` treat each NaN input
+as the identity value for the running accumulator. They support axis scans and
+flattened logical row-major scans; the corresponding `_as[U]` methods choose
+the accumulator and output type. Non-NaN numeric input is accumulated normally.
+
+```v
+import math
+import vtl
+
+values := vtl.from_1d([1.0, math.nan(), 3.0])!
+assert values.nancumsum(0)!.to_array() == [1.0, 1.0, 4.0]
+assert values.nancumprod_flat()!.to_array() == [1.0, 1.0, 3.0]
+```
+
 ## Autograd support
 
-All reduction operations above are differentiable when called through a
-`Variable`. See [TUTORIAL_AUTOGRAD.md](./TUTORIAL_AUTOGRAD.md) for general
-information about automatic differentiation in VTL.
+Standard reduction operations above are differentiable when called through a
+`Variable`; NaN-aware cumulative methods are currently available on `Tensor`.
+See [TUTORIAL_AUTOGRAD.md](./TUTORIAL_AUTOGRAD.md) for information about
+automatic differentiation in VTL.
 
 ## Quantiles
 
