@@ -1116,3 +1116,211 @@ fn cumulative_flat_as[T, U](t &Tensor[T], product bool) !&Tensor[U] {
 	}
 	return result
 }
+
+// nancumsum returns the cumulative sum along an axis, treating NaN inputs as
+// zero while preserving the input element type.
+pub fn (t &Tensor[T]) nancumsum[T](axis int) !&Tensor[T] {
+	return t.nancumsum_as[T](axis)
+}
+
+// nancumsum_as selects the accumulator and output type for an axis scan.
+pub fn (t &Tensor[T]) nancumsum_as[U](axis int) !&Tensor[U] {
+	return nan_cumulative_axis_as[T, U](t, axis, false)
+}
+
+// nancumprod returns the cumulative product along an axis, treating NaN inputs
+// as one while preserving the input element type.
+pub fn (t &Tensor[T]) nancumprod[T](axis int) !&Tensor[T] {
+	return t.nancumprod_as[T](axis)
+}
+
+// nancumprod_as selects the accumulator and output type for an axis scan.
+pub fn (t &Tensor[T]) nancumprod_as[U](axis int) !&Tensor[U] {
+	return nan_cumulative_axis_as[T, U](t, axis, true)
+}
+
+// nancumsum_flat returns a one-dimensional cumulative sum in logical row-major
+// order, treating NaN inputs as zero.
+pub fn (t &Tensor[T]) nancumsum_flat[T]() !&Tensor[T] {
+	return t.nancumsum_flat_as[T]()
+}
+
+// nancumsum_flat_as selects the accumulator and output type for a flattened
+// NaN-aware cumulative sum.
+pub fn (t &Tensor[T]) nancumsum_flat_as[U]() !&Tensor[U] {
+	return nan_cumulative_flat_as[T, U](t, false)
+}
+
+// nancumprod_flat returns a one-dimensional cumulative product in logical
+// row-major order, treating NaN inputs as one.
+pub fn (t &Tensor[T]) nancumprod_flat[T]() !&Tensor[T] {
+	return t.nancumprod_flat_as[T]()
+}
+
+// nancumprod_flat_as selects the accumulator and output type for a flattened
+// NaN-aware cumulative product.
+pub fn (t &Tensor[T]) nancumprod_flat_as[U]() !&Tensor[U] {
+	return nan_cumulative_flat_as[T, U](t, true)
+}
+
+@[direct_array_access]
+fn nan_cumulative_axis_as[T, U](t &Tensor[T], axis int, product bool) !&Tensor[U] {
+	shape := t.shape
+	rank := shape.len
+	if rank == 0 {
+		return error('NaN-aware cumulative operation requires a tensor with dimensions')
+	}
+	na := if axis < 0 { axis + rank } else { axis }
+	if na < 0 || na >= rank {
+		return error('NaN-aware cumulative axis ${axis} out of bounds for shape ${shape}')
+	}
+	if t.strides.len != rank || t.size != size_from_shape(shape) {
+		return error('NaN-aware cumulative operation: inconsistent tensor shape, strides, or size')
+	}
+	mut strides := []int{len: rank}
+	strides[rank - 1] = 1
+	for i := rank - 2; i >= 0; i-- {
+		strides[i] = strides[i + 1] * shape[i + 1]
+	}
+	axis_stride := strides[na]
+	n_axis := shape[na]
+	mut result := zeros[U](shape)
+	if result.size == 0 {
+		return result
+	}
+	input_is_contiguous := t.is_row_major_contiguous()
+	if input_is_contiguous && t.data.data.len < t.size {
+		return error('NaN-aware cumulative operation: contiguous storage is shorter than its size')
+	}
+	mut outer_idx := []int{len: rank}
+	for {
+		mut base_lin := 0
+		for i in 0 .. rank {
+			base_lin += outer_idx[i] * strides[i]
+		}
+		$if U is bool {
+			mut acc := if product { true } else { false }
+			for j in 0 .. n_axis {
+				lin := base_lin + j * axis_stride
+				value := if input_is_contiguous { t.data.data[lin] } else { t.get_nth(lin) }
+				if cumulative_value_is_nan[T](value) {
+					result.data.data[lin] = acc
+					continue
+				}
+				converted := cast[U](value)
+				acc = if product { acc && converted } else { acc || converted }
+				result.data.data[lin] = acc
+			}
+		} $else $if U is string {
+			if !product {
+				mut acc := ''
+				for j in 0 .. n_axis {
+					lin := base_lin + j * axis_stride
+					value := if input_is_contiguous { t.data.data[lin] } else { t.get_nth(lin) }
+					if cumulative_value_is_nan[T](value) {
+						result.data.data[lin] = acc
+						continue
+					}
+					acc += cast[U](value)
+					result.data.data[lin] = acc
+				}
+			}
+		} $else {
+			mut acc := if product { cast[U](1) } else { cast[U](0) }
+			for j in 0 .. n_axis {
+				lin := base_lin + j * axis_stride
+				value := if input_is_contiguous { t.data.data[lin] } else { t.get_nth(lin) }
+				if cumulative_value_is_nan[T](value) {
+					result.data.data[lin] = acc
+					continue
+				}
+				converted := cast[U](value)
+				if product {
+					acc *= converted
+				} else {
+					acc += converted
+				}
+				result.data.data[lin] = acc
+			}
+		}
+		mut done := true
+		for i := rank - 1; i >= 0; i-- {
+			if i == na {
+				continue
+			}
+			outer_idx[i]++
+			if outer_idx[i] < shape[i] {
+				done = false
+				break
+			}
+			outer_idx[i] = 0
+		}
+		if done {
+			break
+		}
+	}
+	return result
+}
+
+@[direct_array_access]
+fn nan_cumulative_flat_as[T, U](t &Tensor[T], product bool) !&Tensor[U] {
+	if t.size != size_from_shape(t.shape) || (t.shape.len > 0 && t.strides.len != t.shape.len) {
+		return error('flattened NaN-aware cumulative operation: inconsistent tensor shape, strides, or size')
+	}
+	input_is_contiguous := t.is_row_major_contiguous()
+	if input_is_contiguous && t.data.data.len < t.size {
+		return error('flattened NaN-aware cumulative operation: contiguous storage is shorter than its size')
+	}
+	mut result := zeros[U]([t.size], TensorData{})
+	$if U is bool {
+		mut acc := if product { true } else { false }
+		for i in 0 .. t.size {
+			value := if input_is_contiguous { t.data.data[i] } else { t.get_nth(i) }
+			if cumulative_value_is_nan[T](value) {
+				result.data.data[i] = acc
+				continue
+			}
+			converted := cast[U](value)
+			acc = if product { acc && converted } else { acc || converted }
+			result.data.data[i] = acc
+		}
+	} $else $if U is string {
+		if !product {
+			mut acc := ''
+			for i in 0 .. t.size {
+				value := if input_is_contiguous { t.data.data[i] } else { t.get_nth(i) }
+				if cumulative_value_is_nan[T](value) {
+					result.data.data[i] = acc
+					continue
+				}
+				acc += cast[U](value)
+				result.data.data[i] = acc
+			}
+		}
+	} $else {
+		mut acc := if product { cast[U](1) } else { cast[U](0) }
+		for i in 0 .. t.size {
+			value := if input_is_contiguous { t.data.data[i] } else { t.get_nth(i) }
+			if cumulative_value_is_nan[T](value) {
+				result.data.data[i] = acc
+				continue
+			}
+			converted := cast[U](value)
+			if product {
+				acc *= converted
+			} else {
+				acc += converted
+			}
+			result.data.data[i] = acc
+		}
+	}
+	return result
+}
+
+fn cumulative_value_is_nan[T](value T) bool {
+	$if T is f32 || T is f64 {
+		return math.is_nan(f64(value))
+	} $else {
+		return false
+	}
+}

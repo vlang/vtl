@@ -374,3 +374,56 @@ fn test_flattened_cumulative_operations_reject_inconsistent_storage() ! {
 		assert false, 'flattened cumprod must reject inconsistent storage'
 	}
 }
+
+fn test_nan_cumulative_operations_skip_nan_and_preserve_axis_shape() ! {
+	values := vtl.from_2d[f64]([[1.0, math.nan(), 3.0], [math.nan(), 4.0, math.nan()]])!
+	assert values.nancumsum(1)!.shape == [2, 3]
+	assert values.nancumsum(1)!.to_array() == [1.0, 1.0, 4.0, 0.0, 4.0, 4.0]
+	assert values.nancumprod(-1)!.to_array() == [1.0, 1.0, 3.0, 1.0, 4.0, 4.0]
+
+	transposed := values.transpose([1, 0])!
+	assert transposed.nancumsum(1)!.to_array() == [1.0, 1.0, 0.0, 4.0, 3.0, 3.0]
+	assert transposed.nancumprod(1)!.to_array() == [1.0, 1.0, 1.0, 4.0, 3.0, 3.0]
+}
+
+fn test_nan_cumulative_flattened_operations_follow_logical_order_and_typed_accumulation() ! {
+	values := vtl.from_array[f64]([1.0, math.nan(), 3.0, 4.0], [2, 2])!
+	transposed := values.transpose([1, 0])!
+	assert transposed.nancumsum_flat()!.to_array() == [1.0, 4.0, 4.0, 8.0]
+	assert transposed.nancumprod_flat()!.to_array() == [1.0, 3.0, 3.0, 12.0]
+
+	wide_input := vtl.from_1d([f32(1e8), f32(math.nan()), 1])!
+	assert wide_input.nancumsum_flat()!.to_array() == [f32(1e8), f32(1e8), f32(1e8)]
+	assert wide_input.nancumprod_flat()!.to_array() == [f32(1e8), f32(1e8), f32(1e8)]
+	assert wide_input.nancumsum_as[f64](0)!.to_array() == [1e8, 1e8, 1e8 + 1.0]
+	assert wide_input.nancumprod_as[f64](0)!.to_array() == [1e8, 1e8, 1e8]
+	assert wide_input.nancumsum_flat_as[f64]()!.to_array() == [1e8, 1e8, 1e8 + 1.0]
+	assert wide_input.nancumprod_flat_as[f64]()!.to_array() == [1e8, 1e8, 1e8]
+}
+
+fn test_nan_cumulative_operations_cover_non_nan_and_empty_inputs() ! {
+	integers := vtl.from_1d([1, 2, 3])!
+	assert integers.nancumsum(0)!.to_array() == [1, 3, 6]
+	assert integers.nancumprod_flat()!.to_array() == [1, 2, 6]
+
+	all_nan := vtl.from_1d([math.nan(), math.nan()])!
+	assert all_nan.nancumsum_flat()!.to_array() == [0.0, 0.0]
+	assert all_nan.nancumprod(0)!.to_array() == [1.0, 1.0]
+
+	empty := vtl.zeros[f64]([2, 0], vtl.TensorData{})
+	assert empty.nancumsum(1)!.shape == [2, 0]
+	assert empty.nancumprod_flat()!.shape == [0]
+	if _ := integers.nancumsum(1) {
+		assert false, 'NaN-aware cumulative operations must validate axes'
+	}
+
+	mut malformed := vtl.from_1d([1.0, math.nan()])!
+	malformed.shape = [3]
+	malformed.size = 3
+	if _ := malformed.nancumsum(0) {
+		assert false, 'axis NaN-aware cumulative operations must validate storage'
+	}
+	if _ := malformed.nancumprod_flat() {
+		assert false, 'flattened NaN-aware cumulative operations must validate storage'
+	}
+}
