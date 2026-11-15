@@ -213,8 +213,8 @@ boundary differences. `atan2_promoted`, `sqrt_promoted`, `cbrt_promoted`,
 the direct and inverse hyperbolic functions provide NumPy-style
 floating-point outputs for real numeric or boolean inputs. They return f64
 for f64 or 32-bit-and-wider integer inputs, otherwise f32.
-The same dtype rules apply to the broadcasted binary `hypot_promoted`,
-`logaddexp_promoted`, and `logaddexp2_promoted`.
+The same dtype rules apply to the broadcasted binary `copysign_promoted`,
+`hypot_promoted`, `logaddexp_promoted`, and `logaddexp2_promoted`.
 `rint_promoted` follows the same floating output rules and uses ties-to-even;
 `floor_promoted`, `ceil_promoted`, and `trunc_promoted` preserve the input
 dtype, including exact large integer values.
@@ -252,7 +252,7 @@ See
 
 **Remaining ufunc gaps:** promoted mixed-dtype variants are still needed for
 `abs`, `sign`, `heaviside`, `degrees`/`radians`, `maximum`/`minimum`/`fmax`/`fmin`,
-`copysign`, `nextafter`, `fmod`, `pow`, and `frexp`/`modf`/`ldexp`. Existing
+`nextafter`, `fmod`, `pow`, and `frexp`/`modf`/`ldexp`. Existing
 same-dtype methods remain available, but their presence does not imply NumPy
 promotion or every input dtype is supported. `erf`/`erfc`, `gamma`, and
 `log_gamma` are useful VTL math APIs beyond NumPy core ufunc parity. The general

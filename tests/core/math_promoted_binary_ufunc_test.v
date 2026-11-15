@@ -40,10 +40,37 @@ fn test_promoted_logaddexp_variants_are_stable_and_follow_numpy_dtype_rules() ! 
 	assert math.is_nan(special.get_nth(1))
 }
 
+fn test_promoted_copysign_broadcasts_mixed_dtypes() ! {
+	magnitude := vtl.from_2d[i16]([[-1, 2], [-3, 4]])!
+	sign := vtl.from_1d[f32]([-0.0, math.inf(1)])!
+
+	result := vtl.copysign_promoted[f32, i16, f32](magnitude, sign)!
+	expected := vtl.from_2d[f32]([[-1.0, 2.0], [-3.0, 4.0]])!
+
+	assert result.dtype() == .float32
+	assert result.shape == [2, 2]
+	assert result.allclose(expected, rtol: 0.0, atol: 0.0)!
+}
+
+fn test_promoted_copysign_preserves_ieee_sign_bits() ! {
+	magnitude := vtl.from_1d[f64]([0.0, 0.0, math.nan(), math.inf(1)])!
+	sign := vtl.from_1d[f64]([-0.0, 0.0, -math.inf(1), -1.0])!
+	result := vtl.copysign_promoted[f64, f64, f64](magnitude, sign)!
+
+	assert math.signbit(result.get_nth(0))
+	assert !math.signbit(result.get_nth(1))
+	assert math.is_nan(result.get_nth(2))
+	assert math.signbit(result.get_nth(2))
+	assert math.is_inf(result.get_nth(3), -1)
+}
+
 fn test_promoted_binary_ufuncs_validate_output_dtype() ! {
 	left := vtl.from_1d[i32]([1])!
 	right := vtl.from_1d[i16]([2])!
 	if _ := vtl.hypot_promoted[f32, i32, i16](left, right) {
+		assert false, '32-bit integer inputs must produce float64'
+	}
+	if _ := vtl.copysign_promoted[f32, i32, i16](left, right) {
 		assert false, '32-bit integer inputs must produce float64'
 	}
 }

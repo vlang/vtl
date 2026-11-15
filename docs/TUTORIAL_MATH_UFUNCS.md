@@ -114,10 +114,10 @@ function when NumPy-style integer or mixed-dtype output is needed.
 
 ## Promoted binary numeric functions
 
-`hypot_promoted`, `logaddexp_promoted`, and `logaddexp2_promoted` broadcast
-real numeric or boolean operands and use the same floating output dtype rules
-as `atan2_promoted`. The log-add-exp variants use stable calculations for
-large-magnitude inputs:
+`copysign_promoted`, `hypot_promoted`, `logaddexp_promoted`, and
+`logaddexp2_promoted` broadcast real numeric or boolean operands and use the
+same floating output dtype rules as `atan2_promoted`. The log-add-exp variants
+use stable calculations for large-magnitude inputs:
 
 ```v
 import vtl
@@ -201,6 +201,9 @@ values, including negative zero and negative infinity. Signed integers are true
 when negative; unsigned integers and booleans return false for every element.
 `vtl.copysign(magnitude, sign)` combines the magnitude of its first f32/f64
 tensor with the sign bit of its second, with standard broadcasting.
+`vtl.copysign_promoted` additionally accepts mixed real numeric and boolean
+inputs and applies the same NumPy-style float output promotion as
+`atan2_promoted`, including negative-zero and NaN sign bits.
 
 ```v
 import vtl

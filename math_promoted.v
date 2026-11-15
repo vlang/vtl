@@ -252,6 +252,12 @@ pub fn atan2_promoted[R, T, U](y &Tensor[T], x &Tensor[U]) !&Tensor[R] {
 	return binary_real_ufunc_promoted[R, T, U](y, x, math.atan2, 'atan2')
 }
 
+// copysign_promoted applies the sign bit of a real numeric or boolean tensor
+// to another tensor's magnitude, with NumPy-style float output promotion.
+pub fn copysign_promoted[R, T, U](magnitude &Tensor[T], sign &Tensor[U]) !&Tensor[R] {
+	return binary_real_ufunc_promoted[R, T, U](magnitude, sign, math.copysign, 'copysign')
+}
+
 // hypot_promoted computes elementwise hypotenuses with NumPy-style float
 // output promotion and broadcasting.
 pub fn hypot_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
