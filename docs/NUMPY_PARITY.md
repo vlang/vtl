@@ -379,8 +379,8 @@ elements; an empty output caused only by an unreduced dimension remains empty.
 |--------|-----------------|-------------|------|-----------------|
 | `sum` / `product` | G/A/M; KD on A/M; A=() is identity | T; `_as` selects U | Propagate | Identities 0 / 1 |
 | `nansum` / `nanprod` | G/A/M; KD on A/M | f64; `_as` selects U | Skip | Identities 0 / 1 |
-| `min` / `max` | G/A/M; A retains by default; M takes KD | T | Propagate first NaN | G returns 0; empty reduced A errors |
-| `nanmin` / `nanmax` | G/A/M; retained and squeezed A forms | f64; `_as` selects U | Skip | NaN if empty or no valid values; `_as` requires floating U here |
+| `min` / `max` | G/A/M; A retains by default; `*_axis_with_keepdims`; M takes KD | T | Propagate first NaN | G returns 0; empty reduced A errors |
+| `nanmin` / `nanmax` | G/A/M; retained/squeezed A; `*_axis_with_keepdims` | f64; `_as` selects U | Skip | No valid values -> NaN; `_as` U must be float |
 | `mean` / `variance` / `std` | G/A/M; KD on tensor A/M forms | mean T; var/std f64; `_as` selects U | Propagate | See moments details below |
 | `nanmean` / `nanvar` / `nanstd` | G/A/M; KD on tensor A/M forms | f64; `_as` selects U | Skip | NaN if empty, invalid, or under-sampled |
 | `argmin` / `argmax` | G flattened index; A `*_with_keepdims` variants | int | First NaN; `nanarg*` skips | Empty/no-valid reductions error |
@@ -409,7 +409,10 @@ ordinary median propagates NaNs globally and for axis/multi-axis slices;
 `nan*` forms skip them. Empty median returns NaN, while empty quantile/percentile
 calls error. Weighted average errors on empty inputs or zero total weight;
 weighted quantiles use the inverted-CDF method and error if valid observations
-have zero total weight.
+have zero total weight. Ordinary `min_axis`/`max_axis` retain the reduced axis
+for compatibility; use their `*_axis_with_keepdims(..., false)` variants to
+remove it. NaN-aware extrema retain it in the legacy `*_axis_keepdims` forms;
+their `*_axis_with_keepdims` variants select either shape explicitly.
 
 The global empty-input results for `mean`, `min`, and `max` are compatibility
 differences in the legacy generic APIs. `mean_as[T, f64]` returns NaN for an

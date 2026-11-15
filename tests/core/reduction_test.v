@@ -219,6 +219,22 @@ fn test_min_max_axis_squeeze_matches_numpy_shape() {
 	assert vector.max_axis_squeeze(0)!.to_array() == [6.0]
 }
 
+fn test_min_max_axis_keepdims_options_preserve_legacy_defaults() {
+	t := vtl.from_array[f64]([1.0, 5.0, 3.0, 4.0, 2.0, 6.0], [2, 3])!
+	assert t.max_axis(1)!.shape == [2, 1]
+	assert t.min_axis(1)!.shape == [2, 1]
+	assert t.max_axis_with_keepdims(1, true)!.shape == [2, 1]
+	assert t.min_axis_with_keepdims(1, true)!.shape == [2, 1]
+	assert t.max_axis_with_keepdims(1, false)!.shape == [2]
+	assert t.min_axis_with_keepdims(1, false)!.shape == [2]
+	assert t.max_axis_with_keepdims(1, false)!.to_array() == [5.0, 6.0]
+	assert t.min_axis_with_keepdims(1, false)!.to_array() == [1.0, 2.0]
+
+	empty_output := vtl.zeros[f64]([0, 3])
+	assert empty_output.max_axis_with_keepdims(1, true)!.shape == [0, 1]
+	assert empty_output.min_axis_with_keepdims(1, false)!.shape == [0]
+}
+
 fn test_min_max_multi_axis_reductions_match_numpy_shapes() {
 	t := vtl.from_array([0.0, 5.0, 3.0, 7.0, 4.0, 2.0, 8.0, 1.0], [2, 2, 2])!
 	maxima := t.max_axes([0, -1], false)!
