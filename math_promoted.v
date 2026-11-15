@@ -39,6 +39,55 @@ pub fn divide_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
 	return binary_promoted[R, T, U](a, b, .divide)
 }
 
+// atan2_promoted computes elementwise atan2 for real numeric or boolean
+// tensors. It returns float64 when either input is float64 or a >=32-bit
+// integer; other results use float32. NumPy float16 results for booleans and
+// <=8-bit integers are widened because VTL does not support float16.
+pub fn atan2_promoted[R, T, U](y &Tensor[T], x &Tensor[U]) !&Tensor[R] {
+	y_dtype := dtype_of[T]()
+	x_dtype := dtype_of[U]()
+	if !(is_real_numeric_dtype(y_dtype) || y_dtype == .boolean)
+		|| !(is_real_numeric_dtype(x_dtype) || x_dtype == .boolean) {
+		return error('promoted atan2 supports only real numeric and boolean tensors')
+	}
+	mut expected_dtype := DType.float32
+	if y_dtype == .float64 || x_dtype == .float64
+		|| (is_integer_dtype(y_dtype) && dtype_bits(y_dtype) >= 32)
+		|| (is_integer_dtype(x_dtype) && dtype_bits(x_dtype) >= 32) {
+		expected_dtype = .float64
+	}
+	if dtype_of[R]() != expected_dtype {
+		return error('output dtype ${dtype_of[R]()} does not match atan2 result dtype ${expected_dtype}')
+	}
+
+	shape := broadcast_shapes(y.shape, x.shape)!
+	y_values := y.broadcast_to(shape)!
+	x_values := x.broadcast_to(shape)!
+	mut result := empty[R](shape, memory: .row_major)
+	y_is_flat := y_values.size == result.size && y_values.is_row_major_contiguous()
+	x_is_flat := x_values.size == result.size && x_values.is_row_major_contiguous()
+	for index in 0 .. result.size {
+		y_offset := if y_is_flat {
+			index
+		} else if y.size == 1 {
+			0
+		} else {
+			broadcast_tensor_offset(index, shape, y_values.strides)
+		}
+		x_offset := if x_is_flat {
+			index
+		} else if x.size == 1 {
+			0
+		} else {
+			broadcast_tensor_offset(index, shape, x_values.strides)
+		}
+		y_value := cast_promoted_value[T, R](y_values.data.data[y_offset])
+		x_value := cast_promoted_value[U, R](x_values.data.data[x_offset])
+		result.data.data[index] = R(math.atan2(f64(y_value), f64(x_value)))
+	}
+	return result
+}
+
 // remainder_promoted returns the element-wise NumPy remainder of real numeric
 // tensors after dtype promotion and broadcasting. Complex inputs are rejected.
 // Integer zero divisors produce zero; floating-point zero divisors produce NaN.

@@ -4,6 +4,28 @@ VTL provides elementwise math operations on tensors, including decomposition of
 floating-point values into integer/fractional parts or binary mantissas and
 exponents.
 
+## Promoted arctangent with two arguments
+
+`vtl.atan2_promoted[R, T, U](y, x)` broadcasts real numeric or boolean tensors
+and returns the floating-point result. It returns f64 if either input is f64 or a
+32-bit-or-wider integer; otherwise it returns f32. NumPy's float16 results for
+boolean and 8-bit integer inputs are widened because VTL does not support
+float16. Since V requires statically selected generic types, callers specify
+the output and both input types; mismatches return an error:
+
+```v
+import vtl
+
+y := vtl.from_1d[i32]([1, 0])!
+x := vtl.from_1d[f64]([1.0, -1.0])!
+angles := vtl.atan2_promoted[f64, i32, f64](y, x)!
+println(angles.to_array()) // [0.785398..., 3.141592...]
+```
+
+Complex and string inputs are unsupported. The same-dtype
+`Tensor.atan2()` method remains available for compatibility; use the promoted
+function when NumPy-style integer or mixed-dtype output is needed.
+
 ## Floor division
 
 `Tensor.floor_divide()` broadcasts same-dtype real integer or floating-point

@@ -206,7 +206,14 @@ NumPy-style axis-removed output shape.
 gradients along selected axes; elementwise logical AND/OR/XOR/NOT; integer
 bitwise AND/OR/XOR/invert and scalar left/right shifts. Gradients support
 uniform spacing or monotonic non-uniform coordinates and first/second-order
-boundary differences. Same-dtype `floor_divide` and `floor_divide_scalar`
+boundary differences. `atan2_promoted` broadcasts real numeric or boolean
+inputs. It returns f64 if either input is f64 or a 32-bit-or-wider integer;
+otherwise it returns f32. NumPy float16 results for booleans and 8-bit integers
+are widened to f32 because VTL has no float16. The legacy same-dtype
+`Tensor.atan2()` method
+preserves its generic input dtype, so integer inputs should use the promoted
+function to avoid truncated angles. Complex and string inputs are unsupported.
+Same-dtype `floor_divide` and `floor_divide_scalar`
 round signed quotients toward negative infinity, preserve input dtype, return
 zero for integer zero divisors, and follow IEEE results for floating-point
 zero divisors. Mixed-dtype promotion remains tracked in
