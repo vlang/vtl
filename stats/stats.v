@@ -40,6 +40,22 @@ pub fn std[T](t &vtl.Tensor[T], data VarianceData) !f64 {
 	return math.sqrt(variance(t, data)?)
 }
 
+// variance_with_keepdims returns global variance as a tensor, optionally
+// retaining the input rank with dimensions of one.
+pub fn variance_with_keepdims[T](t &vtl.Tensor[T], ddof int, keepdims bool) !&vtl.Tensor[f64] {
+	return flat_reduction_result[f64](variance[T](t, VarianceData{
+		ddof: ddof
+	})?, t.rank(), keepdims)
+}
+
+// std_with_keepdims returns global standard deviation as a tensor, optionally
+// retaining the input rank with dimensions of one.
+pub fn std_with_keepdims[T](t &vtl.Tensor[T], ddof int, keepdims bool) !&vtl.Tensor[f64] {
+	return flat_reduction_result[f64](std[T](t, VarianceData{
+		ddof: ddof
+	})?, t.rank(), keepdims)
+}
+
 // AxisData defines a public data structure for this module.
 pub struct AxisData {
 pub:
@@ -226,6 +242,12 @@ pub fn mean[T](t &vtl.Tensor[T]) T {
 	} $else {
 		return sum(t) / vtl.cast[T](t.size)
 	}
+}
+
+// mean_with_keepdims returns the global mean as a tensor, optionally retaining
+// the input rank with dimensions of one.
+pub fn mean_with_keepdims[T](t &vtl.Tensor[T], keepdims bool) !&vtl.Tensor[T] {
+	return flat_reduction_result[T](mean[T](t), t.rank(), keepdims)
 }
 
 fn sum_identity[T]() T {

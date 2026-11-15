@@ -38,6 +38,20 @@ pub fn std_as[T, U](t &vtl.Tensor[T], ddof int) !U {
 	return vtl.cast[U](math.sqrt(f64(variance)))
 }
 
+// variance_as_with_keepdims returns global variance using U for accumulation
+// and output, with optional retained input dimensions.
+pub fn variance_as_with_keepdims[T, U](t &vtl.Tensor[T], ddof int, keepdims bool) !&vtl.Tensor[U] {
+	value := variance_as[T, U](t, ddof)!
+	return flat_reduction_result[U](value, t.rank(), keepdims)
+}
+
+// std_as_with_keepdims returns global standard deviation using U for
+// accumulation and output, with optional retained input dimensions.
+pub fn std_as_with_keepdims[T, U](t &vtl.Tensor[T], ddof int, keepdims bool) !&vtl.Tensor[U] {
+	value := std_as[T, U](t, ddof)!
+	return flat_reduction_result[U](value, t.rank(), keepdims)
+}
+
 // nanmean_as computes a mean while ignoring NaNs, using U for accumulation
 // and output. An empty or all-NaN tensor returns NaN for floating-point U.
 pub fn nanmean_as[T, U](t &vtl.Tensor[T]) U {
@@ -73,6 +87,26 @@ pub fn nanvariance_as[T, U](t &vtl.Tensor[T], ddof int) !U {
 pub fn nanstd_as[T, U](t &vtl.Tensor[T], ddof int) !U {
 	variance := nanvariance_as[T, U](t, ddof)!
 	return vtl.cast[U](math.sqrt(f64(variance)))
+}
+
+// nanmean_as_with_keepdims returns the NaN-aware global mean using U for
+// accumulation and output, with optional retained input dimensions.
+pub fn nanmean_as_with_keepdims[T, U](t &vtl.Tensor[T], keepdims bool) !&vtl.Tensor[U] {
+	return flat_reduction_result[U](nanmean_as[T, U](t), t.rank(), keepdims)
+}
+
+// nanvariance_as_with_keepdims returns NaN-aware global variance using U for
+// accumulation and output, with optional retained input dimensions.
+pub fn nanvariance_as_with_keepdims[T, U](t &vtl.Tensor[T], ddof int, keepdims bool) !&vtl.Tensor[U] {
+	value := nanvariance_as[T, U](t, ddof)!
+	return flat_reduction_result[U](value, t.rank(), keepdims)
+}
+
+// nanstd_as_with_keepdims returns NaN-aware global standard deviation using U
+// for accumulation and output, with optional retained input dimensions.
+pub fn nanstd_as_with_keepdims[T, U](t &vtl.Tensor[T], ddof int, keepdims bool) !&vtl.Tensor[U] {
+	value := nanstd_as[T, U](t, ddof)!
+	return flat_reduction_result[U](value, t.rank(), keepdims)
 }
 
 // variance_along_axis_as reduces one axis using U for accumulation and output.

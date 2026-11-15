@@ -440,8 +440,8 @@ elements; an empty output caused only by an unreduced dimension remains empty.
 | `nansum` / `nanprod` | G; KD via `nansum_with_keepdims` / `nanprod_with_keepdims`; A/M | f64; `_as` selects U | Skip | Identities 0 / 1 |
 | `min` / `max` | G/A/M; A retains by default; `*_axis_with_keepdims`; M takes KD | T | Propagate first NaN | G returns 0; empty reduced A errors |
 | `nanmin` / `nanmax` | G/A/M; retained/squeezed A; `*_axis_with_keepdims` | f64; `_as` selects U | Skip | No valid values -> NaN; `_as` U must be float |
-| `mean` / `variance` / `std` | G/A/M; KD on tensor A/M forms | mean T; var/std f64; `_as` selects U | Propagate | See moments details below |
-| `nanmean` / `nanvar` / `nanstd` | G/A/M; KD on tensor A/M forms | f64; `_as` selects U | Skip | NaN if empty, invalid, or under-sampled |
+| `mean` / `variance` / `std` | G; KD via `*_with_keepdims`; A/M; KD on A/M | mean T; var/std f64; `_as` selects U | Propagate | See moments details below |
+| `nanmean` / `nanvar` / `nanstd` | G; KD via `*_with_keepdims`; A/M; KD on A/M | f64; `_as` selects U | Skip | NaN if empty, invalid, or under-sampled |
 | `argmin` / `argmax` | G flat; KD `*_flat_with_keepdims`; A `*_axis_with_keepdims` | int | First NaN; `nanarg*` skips | Empty/no-valid reductions error |
 | `median` / quantiles | G/A/M; KD forms; multi-q prepends q axis | f64 | Ordinary forms propagate; `nan*` skips | Median NaN; quantile errors |
 | Weighted average / quantiles | G/A/M; KD; multi-q adds q axis | f64; weighted-average `_as` selects U | Average propagates; `nan` skips | Empty/zero-weight errors |
