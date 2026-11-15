@@ -695,6 +695,43 @@ pub fn (t &Tensor[T]) nanargmin[T]() !int {
 	return best_index
 }
 
+// argmax_flat_with_keepdims returns the flattened maximum index as a tensor.
+// When keepdims is true, the tensor retains the input rank with all dimensions
+// set to one; otherwise it is scalar-shaped.
+pub fn (t &Tensor[T]) argmax_flat_with_keepdims[T](keepdims bool) !&Tensor[int] {
+	index := t.argmax_flat()!
+	return flat_arg_index_tensor(index, t.rank(), keepdims)
+}
+
+// argmin_flat_with_keepdims returns the flattened minimum index as a tensor.
+// When keepdims is true, the tensor retains the input rank with all dimensions
+// set to one; otherwise it is scalar-shaped.
+pub fn (t &Tensor[T]) argmin_flat_with_keepdims[T](keepdims bool) !&Tensor[int] {
+	index := t.argmin_flat()!
+	return flat_arg_index_tensor(index, t.rank(), keepdims)
+}
+
+// nanargmax_flat_with_keepdims returns the flattened non-NaN maximum index as
+// a tensor, optionally retaining the input rank with length-one dimensions.
+pub fn (t &Tensor[T]) nanargmax_flat_with_keepdims[T](keepdims bool) !&Tensor[int] {
+	index := t.nanargmax()!
+	return flat_arg_index_tensor(index, t.rank(), keepdims)
+}
+
+// nanargmin_flat_with_keepdims returns the flattened non-NaN minimum index as
+// a tensor, optionally retaining the input rank with length-one dimensions.
+pub fn (t &Tensor[T]) nanargmin_flat_with_keepdims[T](keepdims bool) !&Tensor[int] {
+	index := t.nanargmin()!
+	return flat_arg_index_tensor(index, t.rank(), keepdims)
+}
+
+fn flat_arg_index_tensor(index int, rank int, keepdims bool) &Tensor[int] {
+	shape := if keepdims { []int{len: rank, init: 1} } else { []int{} }
+	mut result := zeros[int](shape)
+	result.set_nth(0, index)
+	return result
+}
+
 // nanargmax_axis returns the index of the largest non-NaN value on axis.
 // Set keepdims to retain the reduced axis as a length-one dimension.
 pub fn (t &Tensor[T]) nanargmax_axis[T](axis int, keepdims bool) !&Tensor[int] {
