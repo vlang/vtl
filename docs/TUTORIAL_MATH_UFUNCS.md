@@ -66,9 +66,10 @@ println(tangents.to_array())
 
 The promoted inverse trigonometric APIs are `asin_promoted`, `acos_promoted`,
 and `atan_promoted`; the hyperbolic counterparts are `sinh_promoted`,
-`cosh_promoted`, and `tanh_promoted`. All take angles in radians where
-applicable and preserve the floating-point domain behavior of the underlying
-operations.
+`cosh_promoted`, and `tanh_promoted`. Their inverse hyperbolic counterparts
+are `asinh_promoted`, `acosh_promoted`, and `atanh_promoted`. All preserve the
+floating-point domain behavior of the underlying operations; the trigonometric
+functions take angles in radians.
 
 ## Promoted arctangent with two arguments
 
