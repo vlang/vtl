@@ -149,6 +149,18 @@ pub fn tanh_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
 	return unary_real_ufunc_promoted[R, T](t, math.tanh)
 }
 
+// degrees_promoted converts radians to degrees with NumPy-style float output
+// promotion.
+pub fn degrees_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.degrees)
+}
+
+// radians_promoted converts degrees to radians with NumPy-style float output
+// promotion.
+pub fn radians_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.radians)
+}
+
 // asinh_promoted computes elementwise inverse hyperbolic sine using the same
 // output dtype rules as sqrt_promoted.
 pub fn asinh_promoted[R, T](t &Tensor[T]) !&Tensor[R] {

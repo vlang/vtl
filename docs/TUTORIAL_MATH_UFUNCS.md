@@ -69,6 +69,8 @@ println(floored.to_array()) // [-3.0, -2.0, 1.0, 2.0]
 `vtl.sin_promoted[R, T]`, `vtl.cos_promoted[R, T]`, and
 `vtl.tan_promoted[R, T]` apply the trigonometric functions elementwise and use
 the same promoted output dtype rules. Angles are in radians.
+`degrees_promoted` and `radians_promoted` convert angle units with those same
+output dtype rules.
 
 ```v
 import math

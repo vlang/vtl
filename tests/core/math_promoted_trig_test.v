@@ -30,3 +30,25 @@ fn test_promoted_trig_accepts_integer_inputs_and_propagates_nan() ! {
 	assert math.is_nan(vtl.cos_promoted[f64, f64](values)!.get_nth(0))
 	assert math.is_nan(vtl.tan_promoted[f64, f64](values)!.get_nth(0))
 }
+
+fn test_promoted_degrees_and_radians_follow_float_dtype_rules() ! {
+	radian_input := vtl.from_1d[f32]([0.0, f32(math.pi)])!
+	degrees := vtl.degrees_promoted[f32, f32](radian_input)!
+	expected_degrees := vtl.from_1d[f32]([0.0, 180.0])!
+	assert degrees.dtype() == .float32
+	assert degrees.allclose(expected_degrees, rtol: 1e-6, atol: 1e-5)!
+
+	degree_input := vtl.from_1d[i16]([0, 180])!
+	radians := vtl.radians_promoted[f32, i16](degree_input)!
+	expected_radians := vtl.from_1d[f32]([0.0, f32(math.pi)])!
+	assert radians.dtype() == .float32
+	assert radians.allclose(expected_radians, rtol: 1e-6, atol: 1e-6)!
+
+	boolean_input := vtl.from_1d([false, true])!
+	boolean_degrees := vtl.degrees_promoted[f32, bool](boolean_input)!
+	boolean_radians := vtl.radians_promoted[f32, bool](boolean_input)!
+	assert boolean_degrees.dtype() == .float32
+	assert boolean_radians.dtype() == .float32
+	assert math.abs(f64(boolean_degrees.get_nth(1)) - 180.0 / math.pi) < 1e-5
+	assert math.abs(f64(boolean_radians.get_nth(1)) - math.pi / 180.0) < 1e-7
+}

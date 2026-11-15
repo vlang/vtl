@@ -251,13 +251,15 @@ See
 [gradient tests](../autograd_tests/gates_remainder_test.v), and
 [dtype conversion tutorial](./TUTORIAL_FIRST_STEPS.md#numeric-dtype-conversion).
 
-**Remaining ufunc gaps:** promoted mixed-dtype variants are still needed for
-`abs`, `sign`, `heaviside`, `degrees`/`radians`, `maximum`/`minimum`/`fmax`/`fmin`,
-`fmod`, `pow`, and `frexp`/`modf`/`ldexp`. Existing
-same-dtype methods remain available, but their presence does not imply NumPy
-promotion or every input dtype is supported. `erf`/`erfc`, `gamma`, and
-`log_gamma` are useful VTL math APIs beyond NumPy core ufunc parity. The general
-NumPy ufunc `out` and `where` execution protocol is tracked separately in
+**Remaining ufunc gaps:** same-dtype methods exist for `abs`, `sign`,
+`heaviside`, extrema, `fmod`, `pow`, and `frexp`/`modf`/`ldexp`, but NumPy's
+mixed-dtype, broadcast, and edge-case contracts are not fully covered. Unary
+`abs`/`sign` and the multi-output decomposition functions still need broader
+dtype and special-value differential tests; promoted mixed-input variants
+remain for `heaviside`, `maximum`/`minimum`/`fmax`/`fmin`, `fmod`, `pow`, and
+`ldexp`. `erf`/`erfc`, `gamma`, and `log_gamma` are useful VTL math APIs beyond
+NumPy core ufunc parity. The general NumPy ufunc `out` and `where` execution
+protocol is tracked separately in
 [#783](https://github.com/vlang/vtl/issues/783).
 
 Promoted tensor-to-tensor result dtypes are:
