@@ -4,6 +4,19 @@ VTL provides elementwise math operations on tensors, including decomposition of
 floating-point values into integer/fractional parts or binary mantissas and
 exponents.
 
+## Square
+
+`Tensor.square()` returns an elementwise square in the input dtype and shape.
+It supports numeric, boolean, and complex tensors:
+
+```v
+import vtl
+
+values := vtl.from_1d[f64]([1.5, -2.0])!
+squared := values.square()!
+println(squared.to_array()) // [2.25, 4.0]
+```
+
 ## Promoted square and cube roots
 
 `vtl.sqrt_promoted[R, T](values)` and `vtl.cbrt_promoted[R, T](values)` return

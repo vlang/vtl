@@ -199,7 +199,8 @@ NumPy-style axis-removed output shape.
 
 ### Math and ufuncs
 
-**Current:** broad elementwise math and broadcasting; same-dtype tensor `+`,
+**Current:** broad elementwise math and broadcasting, including dtype-preserving
+`square`; same-dtype tensor `+`,
 `-`, `*`, and `/` operators; `clip` and fused
 `clip_tensor`; broadcast-aware `where`; elementwise `is_nan`, `is_inf`, and
 `is_finite`; `isclose`, `allclose`, `heaviside`, `sign`, `diff`, and numerical

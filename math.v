@@ -1155,6 +1155,21 @@ pub fn (a &Tensor[T]) pow[T](b &Tensor[T]) !&Tensor[T] {
 	})
 }
 
+// square returns the elementwise square while preserving the tensor dtype.
+pub fn (t &Tensor[T]) square[T]() !&Tensor[T] {
+	$if T is bool {
+		return t.map_values(fn [T](value T) T {
+			return value
+		})
+	} $else $if T is $int || T is $float || T is vcomplex.Complex {
+		return t.map_values(fn [T](value T) T {
+			return value * value
+		})
+	} $else {
+		return error('square supports only numeric and boolean tensors')
+	}
+}
+
 // pow10 returns the elementwise pow10 of an tensor
 
 // pow10 exposes this operation as part of the public API.
