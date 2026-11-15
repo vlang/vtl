@@ -138,6 +138,18 @@ fn test_nanarg_flattened_skips_nan_and_keeps_first_tie() {
 	assert t.nanargmin()! == 2
 }
 
+fn test_nanarg_integer_comparisons_preserve_u64_precision() {
+	larger := u64(9007199254740993)
+	smaller := u64(9007199254740992)
+	values := vtl.from_1d[u64]([larger, smaller])!
+	assert values.nanargmax()! == 0
+	assert values.nanargmin()! == 1
+
+	matrix := vtl.from_2d[u64]([[larger, smaller], [smaller, larger]])!
+	assert matrix.nanargmax_axis(1, false)!.to_array() == [0, 1]
+	assert matrix.nanargmin_axis(1, false)!.to_array() == [1, 0]
+}
+
 fn test_nanarg_flattened_errors_when_no_valid_values() {
 	all_nan := vtl.from_1d[f64]([math.nan(), math.nan()])!
 	if _ := all_nan.nanargmax() {
