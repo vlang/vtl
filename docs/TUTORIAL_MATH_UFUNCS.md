@@ -4,6 +4,25 @@ VTL provides elementwise math operations on tensors, including decomposition of
 floating-point values into integer/fractional parts or binary mantissas and
 exponents.
 
+## Promoted square root
+
+`vtl.sqrt_promoted[R, T](values)` returns a floating-point square root. It
+returns f64 for f64 or 32-bit-and-wider integer inputs, and f32 otherwise.
+NumPy's float16 results for booleans and 8-bit integers are widened because
+VTL does not support float16. The output type is explicit and validated:
+
+```v
+import vtl
+
+values := vtl.from_1d[i32]([1, 2, 9])!
+roots := vtl.sqrt_promoted[f64, i32](values)!
+println(roots.to_array()) // [1.0, 1.414..., 3.0]
+```
+
+Complex and string inputs are unsupported. The same-dtype `Tensor.sqrt()`
+method remains available for compatibility; use the promoted function when
+NumPy-style integer output is needed.
+
 ## Promoted arctangent with two arguments
 
 `vtl.atan2_promoted[R, T, U](y, x)` broadcasts real numeric or boolean tensors

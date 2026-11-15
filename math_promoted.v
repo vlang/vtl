@@ -39,6 +39,31 @@ pub fn divide_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
 	return binary_promoted[R, T, U](a, b, .divide)
 }
 
+// sqrt_promoted computes elementwise square roots for real numeric or boolean
+// tensors. It returns float64 for float64 and >=32-bit integer inputs, and
+// float32 otherwise; NumPy float16 results are widened because VTL does not
+// support float16.
+pub fn sqrt_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	input_dtype := dtype_of[T]()
+	if !(is_real_numeric_dtype(input_dtype) || input_dtype == .boolean) {
+		return error('promoted sqrt supports only real numeric and boolean tensors')
+	}
+	mut expected_dtype := DType.float32
+	if numpy_float_ufunc_uses_f64(input_dtype) {
+		expected_dtype = .float64
+	}
+	if dtype_of[R]() != expected_dtype {
+		return error('output dtype ${dtype_of[R]()} does not match sqrt result dtype ${expected_dtype}')
+	}
+
+	mut result := empty[R](t.shape, memory: .row_major)
+	for index in 0 .. t.size {
+		value := cast_promoted_value[T, R](t.get_nth[T](index))
+		result.data.data[index] = R(math.sqrt(f64(value)))
+	}
+	return result
+}
+
 // atan2_promoted computes elementwise atan2 for real numeric or boolean
 // tensors. It returns float64 when either input is float64 or a >=32-bit
 // integer; other results use float32. NumPy float16 results for booleans and
@@ -51,9 +76,7 @@ pub fn atan2_promoted[R, T, U](y &Tensor[T], x &Tensor[U]) !&Tensor[R] {
 		return error('promoted atan2 supports only real numeric and boolean tensors')
 	}
 	mut expected_dtype := DType.float32
-	if y_dtype == .float64 || x_dtype == .float64
-		|| (is_integer_dtype(y_dtype) && dtype_bits(y_dtype) >= 32)
-		|| (is_integer_dtype(x_dtype) && dtype_bits(x_dtype) >= 32) {
+	if numpy_float_ufunc_uses_f64(y_dtype) || numpy_float_ufunc_uses_f64(x_dtype) {
 		expected_dtype = .float64
 	}
 	if dtype_of[R]() != expected_dtype {
@@ -86,6 +109,10 @@ pub fn atan2_promoted[R, T, U](y &Tensor[T], x &Tensor[U]) !&Tensor[R] {
 		result.data.data[index] = R(math.atan2(f64(y_value), f64(x_value)))
 	}
 	return result
+}
+
+fn numpy_float_ufunc_uses_f64(dtype DType) bool {
+	return dtype == .float64 || (is_integer_dtype(dtype) && dtype_bits(dtype) >= 32)
 }
 
 // remainder_promoted returns the element-wise NumPy remainder of real numeric
