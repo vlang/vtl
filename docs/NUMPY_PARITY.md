@@ -292,8 +292,9 @@ automatically for mixed tensor and weak scalar operands in
 
 ### Reductions and statistics
 
-**Current:** single-axis and multi-axis sum/product, NaN-aware sum/product/
-min/max, and logical all/any with `keepdims`; weighted average globally, over
+**Current:** single-axis and multi-axis sum/product; NaN-aware
+sum/product/min/max, with typed `_as` forms for NaN-aware extrema; logical
+all/any with `keepdims`; weighted average globally, over
 one axis, and over multiple axes with optional `keepdims`; scalar
 population/sample variance and standard deviation; single-axis and multi-axis
 mean/variance/std with explicit `keepdims` and NaN-aware forms; explicit
@@ -341,7 +342,11 @@ with their single-axis and multi-axis forms, provide the same control for
 ordinary variance and standard deviation. Existing APIs remain available with
 their original return types. NaN-aware mean, variance, and standard deviation
 also provide typed global, single-axis, and multi-axis APIs; empty or all-NaN
-floating-point slices produce NaN. Weighted averages expose typed global,
+floating-point slices produce NaN. `nanmin_as`/`nanmax_as` and their axis and
+multi-axis forms compare source values before converting to the requested output
+type, preserving exact integer extrema when the selected output type can hold
+them. Empty or all-NaN results require a floating-point output type to represent
+NaN; the legacy extrema APIs continue to return `f64`. Weighted averages expose typed global,
 single-axis, and multi-axis forms through `average_as` and its axis variants.
 `bincount_as` and `bincount_weighted_as` likewise expose output/accumulator
 type selection for unweighted and weighted label counts.
@@ -375,7 +380,7 @@ elements; an empty output caused only by an unreduced dimension remains empty.
 | `sum` / `product` | G/A/M; KD on A/M; A=() is identity | T; `_as` selects U | Propagate | Identities 0 / 1 |
 | `nansum` / `nanprod` | G/A/M; KD on A/M | f64; `_as` selects U | Skip | Identities 0 / 1 |
 | `min` / `max` | G/A/M; A retains by default; M takes KD | T | Propagate first NaN | G returns 0; empty reduced A errors |
-| `nanmin` / `nanmax` | G/A/M; retained and squeezed A forms | f64 | Skip | NaN if empty or no valid values |
+| `nanmin` / `nanmax` | G/A/M; retained and squeezed A forms | f64; `_as` selects U | Skip | NaN if empty or no valid values; `_as` requires floating U here |
 | `mean` / `variance` / `std` | G/A/M; KD on tensor A/M forms | mean T; var/std f64; `_as` selects U | Propagate | See moments details below |
 | `nanmean` / `nanvar` / `nanstd` | G/A/M; KD on tensor A/M forms | f64; `_as` selects U | Skip | NaN if empty, invalid, or under-sampled |
 | `argmin` / `argmax` | G flattened index; A `*_with_keepdims` variants | int | First NaN; `nanarg*` skips | Empty/no-valid reductions error |

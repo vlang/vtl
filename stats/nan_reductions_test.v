@@ -130,3 +130,60 @@ fn test_nan_sum_product_explicit_accumulator_types_for_multi_axis_reductions() !
 		assert false, 'dtype-controlled NaN reduction must reject duplicate axes'
 	}
 }
+
+fn test_nan_extrema_explicit_output_preserves_integer_precision() ! {
+	values := vtl.from_array([
+		i64(9_007_199_254_740_993),
+		i64(9_007_199_254_740_992),
+		i64(9_007_199_254_740_992),
+		i64(9_007_199_254_740_993),
+	], [2, 2])!
+
+	assert nanmin_as[i64, i64](values)! == i64(9_007_199_254_740_992)
+	assert nanmax_as[i64, i64](values)! == i64(9_007_199_254_740_993)
+	assert nanmin_axis_as[i64, i64](values, 1, false)!.to_array() == [
+		i64(9_007_199_254_740_992),
+		i64(9_007_199_254_740_992),
+	]
+	assert nanmax_axis_as[i64, i64](values, 1, true)!.to_array() == [
+		i64(9_007_199_254_740_993),
+		i64(9_007_199_254_740_993),
+	]
+	assert nanmin_axes_as[i64, i64](values, [0, 1], true)!.get_nth(0) == i64(9_007_199_254_740_992)
+	assert nanmax_axes_as[i64, i64](values, [0, 1], false)!.get_nth(0) == i64(9_007_199_254_740_993)
+
+	boolean_values := vtl.from_1d([true, false])!
+	assert !nanmin_as[bool, bool](boolean_values)!
+	assert nanmax_as[bool, bool](boolean_values)!
+}
+
+fn test_nan_extrema_explicit_output_handles_missing_values_and_empty_axes() ! {
+	values := vtl.from_array([
+		f32(math.nan()),
+		f32(2.0),
+		f32(math.nan()),
+		f32(math.nan()),
+	], [2, 2])!
+	minimum := nanmin_axis_as[f32, f32](values, 1, true)!
+	assert minimum.shape == [2, 1]
+	assert minimum.get([0, 0]) == 2.0
+	assert math.is_nan(minimum.get([1, 0]))
+
+	maximum := nanmax_axes_as[f32, f64](values, [1], false)!
+	assert maximum.shape == [2]
+	assert maximum.get([0]) == 2.0
+	assert math.is_nan(maximum.get([1]))
+
+	unchanged := nanmin_axes_as[f32, f32](values, [], false)!
+	assert unchanged.shape == values.shape
+	assert unchanged.get_nth(1) == 2.0
+	assert math.is_nan(unchanged.get_nth(0))
+	assert math.is_nan(nanmin_as[f32, f64](vtl.from_1d([f32(math.nan())])!)!)
+
+	if _ := nanmin_as[f32, i64](vtl.from_1d([f32(math.nan())])!) {
+		assert false, 'integer output cannot represent an empty NaN-aware extremum'
+	}
+	if _ := nanmax_axis_as[f32, i64](vtl.empty[f32]([1, 0]), 1, false) {
+		assert false, 'integer output cannot represent an empty NaN-aware slice'
+	}
+}
