@@ -207,11 +207,12 @@ gradients along selected axes; elementwise logical AND/OR/XOR/NOT; integer
 bitwise AND/OR/XOR/invert and scalar left/right shifts. Gradients support
 uniform spacing or monotonic non-uniform coordinates and first/second-order
 boundary differences. `atan2_promoted`, `sqrt_promoted`, `cbrt_promoted`,
-`exp_promoted`, `log_promoted`, `sin_promoted`, `cos_promoted`, and
-`tan_promoted`, the inverse-trigonometric functions, and the direct and inverse
-hyperbolic functions provide NumPy-style floating-point outputs for real
-numeric or boolean inputs. They return f64 for f64 or 32-bit-and-wider integer
-inputs, otherwise f32.
+`exp_promoted`, `exp2_promoted`, `expm1_promoted`, `log_promoted`,
+`log2_promoted`, `log10_promoted`, `log1p_promoted`, `sin_promoted`,
+`cos_promoted`, and `tan_promoted`, the inverse-trigonometric functions, and
+the direct and inverse hyperbolic functions provide NumPy-style
+floating-point outputs for real numeric or boolean inputs. They return f64
+for f64 or 32-bit-and-wider integer inputs, otherwise f32.
 NumPy float16 results for booleans and 8-bit integers are widened because VTL
 has no float16. The legacy same-dtype `Tensor.atan2()`, `Tensor.sqrt()`, and
 `Tensor.cbrt()` methods preserve their generic input dtype; use the promoted

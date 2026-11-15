@@ -30,10 +30,12 @@ functions when NumPy-style integer output is needed.
 
 ## Promoted exponential and logarithm
 
-`vtl.exp_promoted[R, T](values)` and `vtl.log_promoted[R, T](values)` share the
-promoted real-output dtype rules: f64 for f64 or 32-bit-and-wider integer
-inputs, and f32 otherwise. They preserve IEEE domain results, such as `-inf`
-for `log(0)` and `NaN` for logarithms of negative values.
+`vtl.exp_promoted[R, T](values)` and `vtl.log_promoted[R, T](values)`, along
+with `exp2_promoted`, `expm1_promoted`, `log2_promoted`, `log10_promoted`, and
+`log1p_promoted`, share the promoted real-output dtype rules: f64 for f64 or
+32-bit-and-wider integer inputs, and f32 otherwise. They preserve IEEE domain
+results, such as `-inf` for `log(0)` and `NaN` for logarithms of negative
+values. `expm1` and `log1p` retain precision near zero.
 
 ```v
 import vtl

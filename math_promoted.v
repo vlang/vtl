@@ -59,10 +59,40 @@ pub fn exp_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
 	return unary_real_ufunc_promoted[R, T](t, math.exp)
 }
 
+// exp2_promoted computes elementwise powers of two using the same output dtype
+// rules as sqrt_promoted.
+pub fn exp2_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.exp2)
+}
+
+// expm1_promoted computes exp(x)-1 accurately near zero using the same output
+// dtype rules as sqrt_promoted.
+pub fn expm1_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.expm1)
+}
+
 // log_promoted computes elementwise natural logarithms using the same output
 // dtype rules as sqrt_promoted.
 pub fn log_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
 	return unary_real_ufunc_promoted[R, T](t, math.log)
+}
+
+// log2_promoted computes elementwise base-two logarithms using the same output
+// dtype rules as sqrt_promoted.
+pub fn log2_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.log2)
+}
+
+// log10_promoted computes elementwise base-ten logarithms using the same output
+// dtype rules as sqrt_promoted.
+pub fn log10_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.log10)
+}
+
+// log1p_promoted computes log(1+x) accurately near zero using the same output
+// dtype rules as sqrt_promoted.
+pub fn log1p_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.log1p)
 }
 
 // sin_promoted computes elementwise sine values using the same output dtype
