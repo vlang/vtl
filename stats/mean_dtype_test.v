@@ -11,6 +11,17 @@ fn test_mean_accumulator_dtype_global() {
 	assert math.is_nan(mean_as[f32, f64](vtl.from_1d([]f32{})!))
 }
 
+fn test_mean_accumulator_dtype_global_keepdims_shapes() ! {
+	values := vtl.from_array([f32(16_777_216), 1, -16_777_216], [1, 3])!
+	kept := mean_as_with_keepdims[f32, f64](values, true)!
+	assert kept.shape == [1, 1]
+	assert math.abs(kept.get_nth(0) - 1.0 / 3.0) < 1e-12
+	assert mean_as_with_keepdims[f32, f64](values, false)!.shape == []int{}
+
+	empty := vtl.empty[f32]([0])
+	assert math.is_nan(mean_as_with_keepdims[f32, f64](empty, true)!.get_nth(0))
+}
+
 fn test_mean_accumulator_dtype_axis_and_multiple_axes() ! {
 	values := vtl.from_array([f32(1), 2, 3, 4, 5, 6, 7, 8], [2, 2, 2])!
 	axis := mean_along_axis_as[f32, f64](values, -1, true)!
