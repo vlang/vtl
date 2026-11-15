@@ -34,11 +34,8 @@ pub fn (t &Tensor[T]) argmax_axis[T](axis int) !&Tensor[int] {
 	}
 
 	// Dense row-major fast path: linear indexing with no per-row
-	// allocation and no multi-index decode (mirrors the contiguous
-	// branch convention of cumsum/cumprod). NaN handling matches the
-	// generic path below exactly: the scan stops at the first NaN found
-	// at j >= 1 (so [NaN, 1, NaN] yields 2); a leading NaN is retained
-	// only when no later NaN occurs. Ties keep the earlier index.
+	// allocation and no multi-index decode. A leading NaN wins; otherwise
+	// the first NaN wins, matching NumPy. Ties keep the earlier index.
 	if t.is_row_major_contiguous() && t.data.data.len >= t.size {
 		arg_extrema_axis_contiguous[T](t, na, mut result, true)
 		return result
@@ -59,12 +56,12 @@ pub fn (t &Tensor[T]) argmax_axis[T](axis int) !&Tensor[int] {
 		for j := 1; j < shape[na]; j++ {
 			input_idx[na] = j
 			val := t.get(input_idx)
+			if best_is_nan {
+				break
+			}
 			if math.is_nan(f64(val)) {
 				best_arg = j
 				break
-			}
-			if best_is_nan {
-				continue
 			}
 			if val > best_val {
 				best_val = val
@@ -128,11 +125,8 @@ pub fn (t &Tensor[T]) argmin_axis[T](axis int) !&Tensor[int] {
 	}
 
 	// Dense row-major fast path: linear indexing with no per-row
-	// allocation and no multi-index decode (mirrors the contiguous
-	// branch convention of cumsum/cumprod). NaN handling matches the
-	// generic path below exactly: the scan stops at the first NaN found
-	// at j >= 1 (so [NaN, 1, NaN] yields 2); a leading NaN is retained
-	// only when no later NaN occurs. Ties keep the earlier index.
+	// allocation and no multi-index decode. A leading NaN wins; otherwise
+	// the first NaN wins, matching NumPy. Ties keep the earlier index.
 	if t.is_row_major_contiguous() && t.data.data.len >= t.size {
 		arg_extrema_axis_contiguous[T](t, na, mut result, false)
 		return result
@@ -153,12 +147,12 @@ pub fn (t &Tensor[T]) argmin_axis[T](axis int) !&Tensor[int] {
 		for j := 1; j < shape[na]; j++ {
 			input_idx[na] = j
 			val := t.get(input_idx)
+			if best_is_nan {
+				break
+			}
 			if math.is_nan(f64(val)) {
 				best_arg = j
 				break
-			}
-			if best_is_nan {
-				continue
 			}
 			if val < best_val {
 				best_val = val
@@ -193,10 +187,8 @@ pub fn (t &Tensor[T]) argmin_axis[T](axis int) !&Tensor[int] {
 // arg_extrema_axis_contiguous is the dense row-major fast path behind
 // argmax_axis (maximum=true) and argmin_axis (maximum=false). The caller
 // guarantees validated shapes and dense storage, so indexing is linear
-// with no per-row allocation and no multi-index decode. NaN handling
-// matches the generic paths exactly: the scan stops at the first NaN
-// found at j >= 1 (so [NaN, 1, NaN] yields 2); a leading NaN is retained
-// only when no later NaN occurs. Ties keep the earlier index.
+// with no per-row allocation and no multi-index decode. A leading NaN wins;
+// otherwise the first NaN wins, matching NumPy. Ties keep the earlier index.
 @[direct_array_access]
 fn arg_extrema_axis_contiguous[T](t &Tensor[T], na int, mut result &Tensor[int], maximum bool) {
 	shape := t.shape
@@ -227,12 +219,12 @@ fn arg_extrema_axis_contiguous[T](t &Tensor[T], na int, mut result &Tensor[int],
 		mut best_is_nan := math.is_nan(f64(best_val))
 		for j := 1; j < axis_size; j++ {
 			val := t.data.data[base + j * axis_stride]
+			if best_is_nan {
+				break
+			}
 			if math.is_nan(f64(val)) {
 				best_arg = j
 				break
-			}
-			if best_is_nan {
-				continue
 			}
 			if maximum && val > best_val {
 				best_val = val
