@@ -122,6 +122,26 @@ fn test_flat_arg_extrema_return_first_index_and_handle_nan() {
 	assert large_u64.argmax_flat()! == 1
 }
 
+fn test_flat_arg_extrema_keepdims_shapes_and_values() {
+	values := vtl.from_array[f64]([1.0, 5.0, 3.0, 7.0, 4.0, 2.0, 8.0, 1.0], [2, 2, 2])!
+	maximum := values.argmax_flat_with_keepdims(true)!
+	assert maximum.shape == [1, 1, 1]
+	assert maximum.to_array() == [6]
+	assert values.argmin_flat_with_keepdims(true)!.to_array() == [0]
+	assert values.argmax_flat_with_keepdims(false)!.shape == []int{}
+	assert values.argmax_flat_with_keepdims(false)!.to_array() == [6]
+
+	with_nan := vtl.from_1d[f64]([1.0, math.nan(), 3.0])!
+	assert with_nan.argmax_flat_with_keepdims(true)!.to_array() == [1]
+	assert with_nan.nanargmax_flat_with_keepdims(true)!.to_array() == [2]
+	assert with_nan.nanargmin_flat_with_keepdims(false)!.shape == []int{}
+	assert with_nan.nanargmin_flat_with_keepdims(false)!.to_array() == [0]
+
+	scalar := vtl.from_array[f64]([7.0], []int{})!
+	assert scalar.argmax_flat_with_keepdims(true)!.shape == []int{}
+	assert scalar.nanargmin_flat_with_keepdims(true)!.to_array() == [0]
+}
+
 fn test_flat_arg_extrema_reject_empty_tensors() {
 	empty := vtl.from_1d[f64]([]f64{})!
 	if _ := empty.argmax_flat() {
@@ -129,6 +149,12 @@ fn test_flat_arg_extrema_reject_empty_tensors() {
 	}
 	if _ := empty.argmin_flat() {
 		assert false, 'argmin_flat must reject empty input'
+	}
+	if _ := empty.argmax_flat_with_keepdims(true) {
+		assert false, 'argmax_flat_with_keepdims must reject empty input'
+	}
+	if _ := empty.nanargmax_flat_with_keepdims(false) {
+		assert false, 'nanargmax_flat_with_keepdims must reject empty input'
 	}
 }
 

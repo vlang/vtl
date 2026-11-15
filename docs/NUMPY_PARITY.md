@@ -334,6 +334,8 @@ axis-wise argmax/argmin with `*_axis_with_keepdims` variants (legacy APIs
 retain the axis) and squeezed min/max/argmin/argmax convenience results; median
 and NaN-aware median helpers over one or multiple axes with explicit
 `keepdims`; multi-axis min/max;
+global flattened `argmin`/`argmax` and `nanargmin`/`nanargmax` index tensors
+with optional `keepdims`, retaining every input dimension as length one;
 weighted inverted-CDF quantile, multi-quantile, percentile, and multi-percentile
 forms globally and along one or several axes, with same-shape or reduced-shape
 weights, including NaN-aware forms that discard weights for NaN observations;
@@ -411,7 +413,7 @@ elements; an empty output caused only by an unreduced dimension remains empty.
 | `nanmin` / `nanmax` | G/A/M; retained/squeezed A; `*_axis_with_keepdims` | f64; `_as` selects U | Skip | No valid values -> NaN; `_as` U must be float |
 | `mean` / `variance` / `std` | G/A/M; KD on tensor A/M forms | mean T; var/std f64; `_as` selects U | Propagate | See moments details below |
 | `nanmean` / `nanvar` / `nanstd` | G/A/M; KD on tensor A/M forms | f64; `_as` selects U | Skip | NaN if empty, invalid, or under-sampled |
-| `argmin` / `argmax` | G flattened index; A `*_with_keepdims` variants | int | First NaN; `nanarg*` skips | Empty/no-valid reductions error |
+| `argmin` / `argmax` | G flat; KD `*_flat_with_keepdims`; A `*_axis_with_keepdims` | int | First NaN; `nanarg*` skips | Empty/no-valid reductions error |
 | `median` / quantiles | G/A/M; KD forms; multi-q prepends q axis | f64 | Ordinary forms propagate; `nan*` skips | Median NaN; quantile errors |
 | Weighted average / quantiles | G/A/M; KD; multi-q adds q axis | f64; weighted-average `_as` selects U | Average propagates; `nan` skips | Empty/zero-weight errors |
 | `bincount` | G over vector; no KD | int; `_as` selects U; weighted defaults to f64 | Integer labels; weight NaNs propagate | Empty vector returns `minlength` zeros |
