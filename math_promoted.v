@@ -83,6 +83,42 @@ pub fn tan_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
 	return unary_real_ufunc_promoted[R, T](t, math.tan)
 }
 
+// asin_promoted computes elementwise inverse sine values using the same output
+// dtype rules as sqrt_promoted.
+pub fn asin_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.asin)
+}
+
+// acos_promoted computes elementwise inverse cosine values using the same
+// output dtype rules as sqrt_promoted.
+pub fn acos_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.acos)
+}
+
+// atan_promoted computes elementwise inverse tangent values using the same
+// output dtype rules as sqrt_promoted.
+pub fn atan_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.atan)
+}
+
+// sinh_promoted computes elementwise hyperbolic sine values using the same
+// output dtype rules as sqrt_promoted.
+pub fn sinh_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.sinh)
+}
+
+// cosh_promoted computes elementwise hyperbolic cosine values using the same
+// output dtype rules as sqrt_promoted.
+pub fn cosh_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.cosh)
+}
+
+// tanh_promoted computes elementwise hyperbolic tangent values using the same
+// output dtype rules as sqrt_promoted.
+pub fn tanh_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.tanh)
+}
+
 fn unary_real_ufunc_promoted[R, T](t &Tensor[T], operation fn (f64) f64) !&Tensor[R] {
 	input_dtype := dtype_of[T]()
 	if !(is_real_numeric_dtype(input_dtype) || input_dtype == .boolean) {

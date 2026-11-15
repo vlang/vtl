@@ -64,6 +64,12 @@ println(cosines.to_array())
 println(tangents.to_array())
 ```
 
+The promoted inverse trigonometric APIs are `asin_promoted`, `acos_promoted`,
+and `atan_promoted`; the hyperbolic counterparts are `sinh_promoted`,
+`cosh_promoted`, and `tanh_promoted`. All take angles in radians where
+applicable and preserve the floating-point domain behavior of the underlying
+operations.
+
 ## Promoted arctangent with two arguments
 
 `vtl.atan2_promoted[R, T, U](y, x)` broadcasts real numeric or boolean tensors
