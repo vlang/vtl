@@ -646,12 +646,15 @@ pub fn (t &Tensor[T]) argmin_flat[T]() !int {
 // nanargmax returns the flattened index of the largest non-NaN value. The
 // first index wins ties, matching NumPy. Empty and all-NaN tensors return an error.
 pub fn (t &Tensor[T]) nanargmax[T]() !int {
+	if t.size == 0 {
+		return error('nanargmax: tensor contains no non-NaN values')
+	}
 	mut found := false
-	mut best_value := f64(0)
+	mut best_value := t.get_nth(0)
 	mut best_index := 0
 	for index in 0 .. t.size {
-		value := f64(t.get_nth(index))
-		if math.is_nan(value) {
+		value := t.get_nth(index)
+		if math.is_nan(f64(value)) {
 			continue
 		}
 		if !found || value > best_value {
@@ -669,12 +672,15 @@ pub fn (t &Tensor[T]) nanargmax[T]() !int {
 // nanargmin returns the flattened index of the smallest non-NaN value. The
 // first index wins ties, matching NumPy. Empty and all-NaN tensors return an error.
 pub fn (t &Tensor[T]) nanargmin[T]() !int {
+	if t.size == 0 {
+		return error('nanargmin: tensor contains no non-NaN values')
+	}
 	mut found := false
-	mut best_value := f64(0)
+	mut best_value := t.get_nth(0)
 	mut best_index := 0
 	for index in 0 .. t.size {
-		value := f64(t.get_nth(index))
-		if math.is_nan(value) {
+		value := t.get_nth(index)
+		if math.is_nan(f64(value)) {
 			continue
 		}
 		if !found || value < best_value {
@@ -747,12 +753,12 @@ fn nanarg_axis[T](t &Tensor[T], axis int, keepdims bool, maximum bool) !&Tensor[
 			output_dimension++
 		}
 		mut found := false
-		mut best_value := f64(0)
+		mut best_value := t.get(input_index)
 		mut best_index := 0
 		for position in 0 .. t.shape[axis_index] {
 			input_index[axis_index] = position
-			value := f64(t.get(input_index))
-			if math.is_nan(value) {
+			value := t.get(input_index)
+			if math.is_nan(f64(value)) {
 				continue
 			}
 			if !found || (maximum && value > best_value) || (!maximum && value < best_value) {
