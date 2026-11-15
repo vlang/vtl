@@ -9,6 +9,11 @@ fn test_nanmean_nanvar_nanstd_ignore_nan_and_use_ddof() ! {
 	assert math.abs(nanvar(values, 0)! - 8.0 / 3.0) < 1e-12
 	assert math.abs(nanvar(values, 1)! - 4.0) < 1e-12
 	assert math.abs(nanstd(values, 1)! - 2.0) < 1e-12
+	matrix := vtl.from_array([1.0, math.nan(), 3.0, 5.0], [2, 2])!
+	assert nanmean_with_keepdims(matrix, true)!.shape == [1, 1]
+	assert nanmean_with_keepdims(matrix, true)!.get_nth(0) == 3.0
+	assert math.abs(nanvar_with_keepdims(matrix, 0, true)!.get_nth(0) - 8.0 / 3.0) < 1e-12
+	assert math.abs(nanstd_with_keepdims(matrix, 1, false)!.get_nth(0) - 2.0) < 1e-12
 }
 
 fn test_nan_reductions_axis_keep_dimension_and_nan_only_slices() ! {
@@ -37,6 +42,11 @@ fn test_nan_reductions_all_nan_and_invalid_ddof_or_axis() ! {
 	assert math.is_nan(nanmean(values))
 	assert math.is_nan(nanvar(values, 0)!)
 	assert math.is_nan(nanstd(values, 0)!)
+	assert math.is_nan(nanmean_with_keepdims(values, true)!.get_nth(0))
+	assert math.is_nan(nanvar_with_keepdims(values, 0, true)!.get_nth(0))
+	empty := vtl.empty[f64]([2, 0])
+	assert nanmean_with_keepdims(empty, true)!.shape == [1, 1]
+	assert math.is_nan(nanstd_with_keepdims(empty, 0, true)!.get_nth(0))
 	if _ := nanvar(values, -1) {
 		assert false, 'nanvar must reject negative ddof'
 	} else {
