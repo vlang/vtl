@@ -65,6 +65,24 @@ pub fn log_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
 	return unary_real_ufunc_promoted[R, T](t, math.log)
 }
 
+// sin_promoted computes elementwise sine values using the same output dtype
+// rules as sqrt_promoted.
+pub fn sin_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.sin)
+}
+
+// cos_promoted computes elementwise cosine values using the same output dtype
+// rules as sqrt_promoted.
+pub fn cos_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.cos)
+}
+
+// tan_promoted computes elementwise tangent values using the same output dtype
+// rules as sqrt_promoted.
+pub fn tan_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.tan)
+}
+
 fn unary_real_ufunc_promoted[R, T](t &Tensor[T], operation fn (f64) f64) !&Tensor[R] {
 	input_dtype := dtype_of[T]()
 	if !(is_real_numeric_dtype(input_dtype) || input_dtype == .boolean) {

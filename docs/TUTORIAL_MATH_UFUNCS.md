@@ -45,6 +45,25 @@ println(exponents.to_array())
 println(logs.to_array()) // [-inf, 0.0]
 ```
 
+## Promoted trigonometric functions
+
+`vtl.sin_promoted[R, T]`, `vtl.cos_promoted[R, T]`, and
+`vtl.tan_promoted[R, T]` apply the trigonometric functions elementwise and use
+the same promoted output dtype rules. Angles are in radians.
+
+```v
+import math
+import vtl
+
+angles := vtl.from_1d[f32]([0.0, f32(math.pi / 4.0)])!
+sines := vtl.sin_promoted[f32, f32](angles)!
+cosines := vtl.cos_promoted[f32, f32](angles)!
+tangents := vtl.tan_promoted[f32, f32](angles)!
+println(sines.to_array())
+println(cosines.to_array())
+println(tangents.to_array())
+```
+
 ## Promoted arctangent with two arguments
 
 `vtl.atan2_promoted[R, T, U](y, x)` broadcasts real numeric or boolean tensors
