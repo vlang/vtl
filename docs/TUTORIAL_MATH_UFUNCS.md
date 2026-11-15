@@ -155,6 +155,30 @@ heaviside_result := vtl.heaviside_promoted[f32, f32, i8](x1, x2)!
 println(heaviside_result.to_array())
 ```
 
+## Promoted fmod
+
+`fmod_promoted` applies the remainder operation whose nonzero results take the
+sign of the dividend, unlike `remainder_promoted`, whose results follow the
+divisor's sign. Tensor inputs broadcast and use `promote_types` for the output
+dtype. Integer inputs retain exact-width arithmetic; integer zero divisors
+produce zero. Floating-point inputs use `math.fmod`, preserving signed zero and
+IEEE results. Boolean and complex inputs are unsupported.
+
+The weak-scalar variants preserve NumPy-style promotion and operand order:
+
+```v
+import vtl
+
+values := vtl.from_1d[f32]([-5.0, 5.0])!
+divisors := vtl.from_1d[f64]([3.0, -3.0])!
+mixed := vtl.fmod_promoted[f64, f32, f64](values, divisors)!
+right_scalar := vtl.fmod_scalar_promoted[f32, f32, f64](values, 3.0)!
+left_scalar := vtl.fmod_scalar_left_promoted[f32, f32, f64](3.0, values)!
+println(mixed.to_array()) // [-2.0, 2.0]
+println(right_scalar.to_array()) // [-2.0, 2.0]
+println(left_scalar.to_array()) // [3.0, 3.0]
+```
+
 ## Floor division
 
 `Tensor.floor_divide()` broadcasts same-dtype real integer or floating-point

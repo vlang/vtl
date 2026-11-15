@@ -240,6 +240,12 @@ when the promoted input dtype is `float32`, and `float64` otherwise.
 floating-point dtypes and broadcasting. Nonzero results follow the divisor's
 sign; signed zero follows the divisor; integer zero divisors produce zero and
 floating-point zero divisors produce NaN; complex inputs are rejected.
+`fmod_promoted` and its weak-scalar variants preserve the sign-of-dividend
+remainder rule across promoted real numeric dtypes and broadcasting. Integer
+operations retain exact-width arithmetic; zero divisors and signed minimum
+modulo `-1` produce zero. Floating-point operations use `math.fmod`, including
+IEEE NaN results and signed-zero preservation. Boolean and complex inputs are
+unsupported.
 Floating-point autograd is available
 through `Variable.remainder` for f32/f64: the divisor gradient uses
 `-floor(a / b) * grad`, including at exact multiples, and broadcast gradients
@@ -253,11 +259,11 @@ See
 [dtype conversion tutorial](./TUTORIAL_FIRST_STEPS.md#numeric-dtype-conversion).
 
 **Remaining ufunc gaps:** same-dtype methods exist for `abs`, `sign`, extrema,
-`fmod`, `pow`, and `frexp`/`modf`/`ldexp`, but NumPy's
+`pow`, and `frexp`/`modf`/`ldexp`, but NumPy's
 mixed-dtype, broadcast, and edge-case contracts are not fully covered. Unary
 `abs`/`sign` and the multi-output decomposition functions still need broader
 dtype and special-value differential tests; promoted mixed-input variants
-remain for `maximum`/`minimum`/`fmax`/`fmin`, `fmod`, `pow`, and `ldexp`.
+remain for `maximum`/`minimum`/`fmax`/`fmin`, `pow`, and `ldexp`.
 `erf`/`erfc`, `gamma`, and `log_gamma` are useful VTL math APIs beyond NumPy
 core ufunc parity. The general NumPy ufunc `out` and `where` execution protocol
 is tracked separately in
@@ -265,26 +271,27 @@ is tracked separately in
 
 Promoted tensor-to-tensor result dtypes are:
 
-| Tensor operands | Add/subtract/multiply | True divide | Floor divide | Remainder |
-|-----------------|-----------------------|-------------|--------------|-----------|
-| Real numeric pair | `promote_types` | f32 if promoted dtype is f32; else f64 | `promote_types` | `promote_types` |
-| Complex128 with numeric, bool, or complex128 | complex128 | complex128 | unsupported | unsupported |
-| Boolean pair | unsupported | f64 | unsupported | unsupported |
+| Tensor operands | Add/subtract/multiply | True divide | Floor divide | Fmod | Remainder |
+|-----------------|-----------------------|-------------|--------------|------|-----------|
+| Real numeric pair | `promote_types` | f32 if promoted dtype is f32; else f64 | `promote_types` | `promote_types` | `promote_types` |
+| Complex128 with numeric, bool, or complex128 | complex128 | complex128 | unsupported | unsupported | unsupported |
+| Boolean pair | unsupported | f64 | unsupported | unsupported | unsupported |
 
 The `add_scalar_promoted`, `subtract_scalar_promoted`,
-`multiply_scalar_promoted`, `divide_scalar_promoted`, and
-`remainder_scalar_promoted` variants, as well as the corresponding
-`floor_divide_scalar_promoted` form, apply NumPy-style weak scalar promotion
-with the tensor as the left operand. Matching `*_scalar_left_promoted`
-variants put the scalar on the left, preserving noncommutative operation
-order. These APIs support real numeric and complex tensors, except remainder
-and floor division, which reject complex values. Real float arrays retain their dtype;
+`multiply_scalar_promoted`, `divide_scalar_promoted`,
+`remainder_scalar_promoted`, and `fmod_scalar_promoted` variants, as well as
+the corresponding `floor_divide_scalar_promoted` form, apply NumPy-style
+weak scalar promotion with the tensor as the left operand. Matching
+`*_scalar_left_promoted` variants put the scalar on the left, preserving
+noncommutative operation order. These APIs support real numeric and complex
+tensors, except remainder, fmod, and floor division, which reject complex
+values. Real float arrays retain their dtype;
 integer arrays retain their dtype for in-range integer/bool scalars and promote
 to float64 for floating scalars; integer true division returns float64.
 Complex arrays retain complex128 with real or complex scalars, while a complex
 scalar promotes real numeric and boolean arrays to complex128. Out-of-range
-integer scalars return an error. Complex remainder and floor division are
-unsupported. The output type parameter is explicit because V requires
+integer scalars return an error. Complex remainder, fmod, and floor division
+are unsupported. The output type parameter is explicit because V requires
 statically typed generic return values; the implementation checks it against
 the inferred result dtype.
 Floor division preserves the promoted dtype, rounds toward negative infinity,
@@ -293,13 +300,13 @@ zero divisors.
 
 Weak-scalar result dtypes for the supported arithmetic are:
 
-| Array dtype | Scalar dtype | Add/subtract/multiply | True divide | Floor divide | Remainder |
-|-------------|--------------|-----------------------|-------------|--------------|-----------|
-| f32 / f64 | real numeric or bool | array dtype | array dtype for floats | array dtype | array dtype |
-| integer | in-range integer or bool | array dtype | f64 | array dtype | array dtype |
-| integer | real float | f64 | f64 | f64 | f64 |
-| real numeric or bool | complex128 | complex128 | complex128 | unsupported | unsupported |
-| complex128 | real numeric, bool, or complex128 | complex128 | complex128 | unsupported | unsupported |
+| Array dtype | Scalar dtype | Add/subtract/multiply | True divide | Floor divide | Fmod | Remainder |
+|-------------|--------------|-----------------------|-------------|--------------|------|-----------|
+| f32 / f64 | real numeric or bool | array dtype | array dtype for floats | array dtype | array dtype | array dtype |
+| integer | in-range integer or bool | array dtype | f64 | array dtype | array dtype | array dtype |
+| integer | real float | f64 | f64 | f64 | f64 | f64 |
+| real numeric or bool | complex128 | complex128 | complex128 | unsupported | unsupported | unsupported |
+| complex128 | real numeric, bool, or complex128 | complex128 | complex128 | unsupported | unsupported | unsupported |
 
 An out-of-range integer scalar is an error rather than an implicit wrap.
 `round_decimals` rounds real floating-point tensors to positive or negative
