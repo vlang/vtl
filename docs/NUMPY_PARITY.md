@@ -244,7 +244,10 @@ Promoted tensor-to-tensor result dtypes are:
 The `add_scalar_promoted`, `subtract_scalar_promoted`,
 `multiply_scalar_promoted`, `divide_scalar_promoted`, and
 `remainder_scalar_promoted` variants apply NumPy-style weak scalar promotion
-for real numeric and complex tensors. Real float arrays retain their dtype;
+with the tensor as the left operand. Matching `*_scalar_left_promoted`
+variants put the scalar on the left, preserving subtraction, division, and
+remainder operand order. These APIs support real numeric and complex tensors.
+Real float arrays retain their dtype;
 integer arrays retain their dtype for in-range integer/bool scalars and promote
 to float64 for floating scalars; integer true division returns float64.
 Complex arrays retain complex128 with real or complex scalars, while a complex
@@ -585,10 +588,10 @@ complex variance and standard deviation return real tensors and support
 `as_*` conversions cover real numeric and boolean types, preserve shape and
 logical order, and truncate floating-point values when converting to integers.
 
-**Remaining:** complete automatic output-type dispatch, extend weak scalar
-promotion to complex tensors and additional scalar categories, extend promoted
-arithmetic coverage across all supported operations and string conversion, and
-extend complex support beyond
+**Remaining:** provide an output-type dispatch API that does not require the
+caller to specify the generic result type, extend weak scalar promotion to
+additional scalar categories, extend promoted arithmetic coverage across
+supported operations and string conversion, and extend complex support beyond
 elementwise operations, `matmul`, Einstein contractions, `solve_complex`,
 `inv_complex`, `det_complex`, `slogdet_complex`, and `lstsq_complex` to more
 general linear algebra and random generation, add complex32, and define integer
