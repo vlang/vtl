@@ -167,6 +167,62 @@ pub fn atanh_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
 	return unary_real_ufunc_promoted[R, T](t, math.atanh)
 }
 
+// rint_promoted rounds elementwise to the nearest integer using ties-to-even
+// and the floating output dtype rules of sqrt_promoted.
+pub fn rint_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.round_to_even)
+}
+
+// floor_promoted returns elementwise floors while preserving the input dtype.
+pub fn floor_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_dtype_preserving_ufunc_promoted[R, T](t, math.floor)
+}
+
+// ceil_promoted returns elementwise ceilings while preserving the input dtype.
+pub fn ceil_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_dtype_preserving_ufunc_promoted[R, T](t, math.ceil)
+}
+
+// trunc_promoted truncates elementwise toward zero while preserving the input
+// dtype.
+pub fn trunc_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_dtype_preserving_ufunc_promoted[R, T](t, math.trunc)
+}
+
+fn unary_dtype_preserving_ufunc_promoted[R, T](t &Tensor[T], operation fn (f64) f64) !&Tensor[R] {
+	input_dtype := dtype_of[T]()
+	if !(is_real_numeric_dtype(input_dtype) || input_dtype == .boolean) {
+		return error('promoted rounding supports only real numeric and boolean tensors')
+	}
+	if dtype_of[R]() != input_dtype {
+		return error('output dtype ${dtype_of[R]()} does not match input dtype ${input_dtype}')
+	}
+
+	mut result := empty[R](t.shape, memory: .row_major)
+	$if R is bool {
+		$if T is bool {
+			for index in 0 .. t.size {
+				result.data.data[index] = t.get_nth[T](index)
+			}
+		} $else {
+			return error('rounding output dtype must match the input dtype')
+		}
+	} $else $if R is $int || R is $float {
+		for index in 0 .. t.size {
+			value := t.get_nth[T](index)
+			converted := cast_promoted_value[T, R](value)
+			if is_integer_dtype(input_dtype) || input_dtype == .boolean {
+				result.data.data[index] = converted
+			} else {
+				result.data.data[index] = R(operation(f64(converted)))
+			}
+		}
+	} $else {
+		return error('promoted rounding output must be real numeric or boolean')
+	}
+	return result
+}
+
 fn unary_real_ufunc_promoted[R, T](t &Tensor[T], operation fn (f64) f64) !&Tensor[R] {
 	input_dtype := dtype_of[T]()
 	if !(is_real_numeric_dtype(input_dtype) || input_dtype == .boolean) {

@@ -47,6 +47,23 @@ println(exponents.to_array())
 println(logs.to_array()) // [-inf, 0.0]
 ```
 
+## Promoted rounding
+
+`rint_promoted` rounds ties to even and uses the same floating output dtype
+rules as `sqrt_promoted`. `floor_promoted`, `ceil_promoted`, and
+`trunc_promoted` preserve their input dtype, including booleans and integers;
+integer inputs are copied without conversion through floating point.
+
+```v
+import vtl
+
+values := vtl.from_1d[f64]([-2.5, -1.5, 1.5, 2.5])!
+rounded := vtl.rint_promoted[f64, f64](values)!
+floored := vtl.floor_promoted[f64, f64](values)!
+println(rounded.to_array()) // [-2.0, -2.0, 2.0, 2.0]
+println(floored.to_array()) // [-3.0, -2.0, 1.0, 2.0]
+```
+
 ## Promoted trigonometric functions
 
 `vtl.sin_promoted[R, T]`, `vtl.cos_promoted[R, T]`, and
