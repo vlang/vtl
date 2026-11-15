@@ -52,8 +52,8 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -qq -y libopenblas-dev liblapacke-dev gfortran python3 python3-numpy
 
-      - name: Test matmul performance budget parser
-        run: python3 -m unittest discover -s vtl/benchmarks/vs_numpy -p test_check_matmul_perf.py
+      - name: Test benchmark report helpers
+        run: python3 -m unittest discover -s vtl/benchmarks/vs_numpy -p 'test_*.py'
 
       - name: Install module
         run: |
@@ -105,12 +105,15 @@ jobs:
       - name: Add matmul ratios to benchmark report
         run: python3 vtl/benchmarks/vs_numpy/check_matmul_perf.py --annotate vs_numpy_pr.md
 
+      - name: Prepare bounded benchmark comment
+        run: python3 vtl/benchmarks/vs_numpy/prepare_pr_comment.py vs_numpy_pr.md vs_numpy_pr_comment.md
+
       - name: Post sticky PR comment
         if: github.event.pull_request.head.repo.full_name == github.repository
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: vtl-vs-numpy
-          path: vs_numpy_pr.md
+          path: vs_numpy_pr_comment.md
 
       - name: Enforce 3x CPU matmul slowdown budget
         if: ${{ !contains(github.event.pull_request.labels.*.name, 'performance-exempt') }}
