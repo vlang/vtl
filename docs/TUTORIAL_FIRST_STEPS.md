@@ -172,7 +172,12 @@ integer and boolean scalars, while floating scalars promote the result to
 returns `f64`. Because V generic return types are static, specify the result
 type `R`; VTL validates it against the inferred result dtype.
 
+Complex tensors keep `complex128` with real or complex scalars. A complex
+scalar promotes real numeric and boolean tensors to `complex128`; complex
+remainder is unsupported.
+
 ```v
+import math.complex
 import vtl
 
 values := vtl.from_1d[f32]([1.5, -2.0])!
@@ -184,6 +189,12 @@ integers := vtl.from_1d[i8]([10, -5])!
 fractional := vtl.add_scalar_promoted[f64, i8, f64](integers, 0.5)!
 assert fractional.dtype() == .float64
 assert fractional.to_array() == [10.5, -4.5]
+
+complex_values := vtl.add_scalar_promoted[complex.Complex, f32, complex.Complex](values,
+	complex.complex(0.25, 0.5))!
+assert complex_values.dtype() == .complex128
+assert complex_values.get_nth(0).re == 1.75
+assert complex_values.get_nth(0).im == 0.5
 ```
 
 Same-dtype tensors support elementwise arithmetic operators with broadcasting.

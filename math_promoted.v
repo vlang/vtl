@@ -1,6 +1,7 @@
 module vtl
 
 import math
+import math.complex
 
 enum PromotedBinaryOperation {
 	add
@@ -176,7 +177,29 @@ fn binary_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation PromotedBinary
 }
 
 fn scalar_promoted[R, T, U](a &Tensor[T], scalar U, operation PromotedBinaryOperation) !&Tensor[R] {
-	$if R is $int || R is $float {
+	$if R is complex.Complex {
+		if operation == .remainder {
+			return error('promoted remainder does not support complex values')
+		}
+		result_dtype := weak_complex_scalar_result_dtype[T, U]()!
+		if dtype_of[R]() != result_dtype {
+			return error('output dtype ${dtype_of[R]()} does not match weak-scalar result dtype ${result_dtype}')
+		}
+		left := cast_promoted_tensor_values[T, R](a)!
+		right_scalar := cast_promoted_value[U, R](scalar)
+		mut result := empty[R](a.shape, memory: .row_major)
+		for index in 0 .. a.size {
+			x := left.data.data[index]
+			result.data.data[index] = match operation {
+				.add { x + right_scalar }
+				.subtract { x - right_scalar }
+				.multiply { x * right_scalar }
+				.divide { x / right_scalar }
+				.remainder { panic('complex remainder is unsupported') }
+			}
+		}
+		return result
+	} $else $if R is $int || R is $float {
 		array_dtype := dtype_of[T]()
 		result_dtype := weak_scalar_result_dtype[T, U](array_dtype, scalar)!
 		expected := if operation == .divide {
@@ -194,6 +217,19 @@ fn scalar_promoted[R, T, U](a &Tensor[T], scalar U, operation PromotedBinaryOper
 	} $else {
 		return error('weak-scalar promoted arithmetic requires a real numeric output dtype')
 	}
+}
+
+fn weak_complex_scalar_result_dtype[T, U]() !DType {
+	array_dtype := dtype_of[T]()
+	scalar_dtype := dtype_of[U]()
+	array_supported := array_dtype == .complex128 || is_real_numeric_dtype(array_dtype)
+		|| array_dtype == .boolean
+	scalar_supported := scalar_dtype == .complex128 || is_real_numeric_dtype(scalar_dtype)
+		|| scalar_dtype == .boolean
+	if !array_supported || !scalar_supported {
+		return error('complex weak-scalar arithmetic supports numeric and boolean operands')
+	}
+	return .complex128
 }
 
 fn weak_scalar_result_dtype[T, U](array_dtype DType, scalar U) !DType {
@@ -327,7 +363,21 @@ fn numpy_remainder[T](x T, y T) T {
 
 @[inline]
 fn cast_promoted_value[T, R](value T) R {
-	$if R is $int || R is $float {
+	$if R is complex.Complex {
+		$if T is complex.Complex {
+			return value
+		} $else $if T is bool {
+			return complex.Complex{
+				re: if value { 1.0 } else { 0.0 }
+				im: 0.0
+			}
+		} $else $if T is $int || T is $float {
+			return complex.Complex{
+				re: f64(value)
+				im: 0.0
+			}
+		}
+	} $else $if R is $int || R is $float {
 		$if T is bool {
 			return if value { R(1) } else { R(0) }
 		} $else $if T is $int || T is $float {

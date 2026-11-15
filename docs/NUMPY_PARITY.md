@@ -234,12 +234,26 @@ See
 The `add_scalar_promoted`, `subtract_scalar_promoted`,
 `multiply_scalar_promoted`, `divide_scalar_promoted`, and
 `remainder_scalar_promoted` variants apply NumPy-style weak scalar promotion
-for real numeric tensors: float arrays retain their dtype; integer arrays
-retain their dtype for in-range integer/bool scalars and promote to float64
-for floating scalars; integer true division returns float64. Out-of-range
-integer scalars return an error. The output type parameter is explicit because
-V requires statically typed generic return values; the implementation checks
-it against the inferred result dtype.
+for real numeric and complex tensors. Real float arrays retain their dtype;
+integer arrays retain their dtype for in-range integer/bool scalars and promote
+to float64 for floating scalars; integer true division returns float64.
+Complex arrays retain complex128 with real or complex scalars, while a complex
+scalar promotes real numeric and boolean arrays to complex128. Out-of-range
+integer scalars return an error. Complex remainder is unsupported. The output
+type parameter is explicit because V requires statically typed generic return
+values; the implementation checks it against the inferred result dtype.
+
+Weak-scalar result dtypes for the supported arithmetic are:
+
+| Array dtype | Scalar dtype | Add/subtract/multiply | True divide | Remainder |
+|-------------|--------------|-----------------------|-------------|-----------|
+| f32 / f64 | real numeric or bool | array dtype | array dtype for floats | array dtype |
+| integer | in-range integer or bool | array dtype | f64 | array dtype |
+| integer | real float | f64 | f64 | f64 |
+| real numeric or bool | complex128 | complex128 | complex128 | unsupported |
+| complex128 | real numeric, bool, or complex128 | complex128 | complex128 | unsupported |
+
+An out-of-range integer scalar is an error rather than an implicit wrap.
 `round_decimals` rounds real floating-point tensors to positive or negative
 decimal places using ties-to-even, matching NumPy `round` for the supported
 same-dtype inputs; integer tensors are copied unchanged. VTL preserves finite
@@ -285,10 +299,11 @@ per-element closure and sum-type boxing. On this machine (1M f64, `-prod`)
 `sin` measures 15.5 ms against NumPy's ~12.8 ms.
 
 **Remaining:** audit unary/binary function families and complete the missing
-NumPy ufunc coverage in [#777](https://github.com/vlang/vtl/issues/777). Add
-promoted arithmetic for the remaining operations and infer output dtypes
-automatically for mixed tensor and weak scalar operands in
-[#717](https://github.com/vlang/vtl/issues/717).
+NumPy ufunc coverage in [#777](https://github.com/vlang/vtl/issues/777).
+Promoted tensor-to-tensor arithmetic still lacks complex operands and broader
+operation coverage. Automatic output-dtype selection is not provided: callers
+select the statically typed result parameter, which VTL validates against the
+promotion contract in [#717](https://github.com/vlang/vtl/issues/717).
 
 ### Reductions and statistics
 

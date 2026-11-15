@@ -2,6 +2,7 @@ module core
 
 import vtl
 import math
+import math.complex
 
 fn test_weak_scalar_promotion_preserves_float_tensor_dtype() ! {
 	values := vtl.from_1d[f32]([1.5, -2.0])!
@@ -97,4 +98,67 @@ fn test_weak_scalar_promotion_handles_strided_and_empty_tensors() ! {
 
 	empty := vtl.from_array[f32]([]f32{}, [0])!
 	assert vtl.add_scalar_promoted[f32, f32, f64](empty, 1.0)!.size == 0
+}
+
+fn test_weak_real_scalar_preserves_complex_tensor_dtype() ! {
+	values := vtl.from_1d[complex.Complex]([
+		complex.complex(1.0, 2.0),
+		complex.complex(-3.0, 4.0),
+	])!
+	added := vtl.add_scalar_promoted[complex.Complex, complex.Complex, f64](values, 0.5)!
+	assert added.dtype() == .complex128
+	assert added.get_nth(0).re == 1.5
+	assert added.get_nth(0).im == 2.0
+	assert added.get_nth(1).re == -2.5
+	assert added.get_nth(1).im == 4.0
+
+	multiplied := vtl.multiply_scalar_promoted[complex.Complex, complex.Complex, i32](values,
+		2)!
+	assert multiplied.get_nth(0).re == 2.0
+	assert multiplied.get_nth(0).im == 4.0
+	assert multiplied.get_nth(1).re == -6.0
+	assert multiplied.get_nth(1).im == 8.0
+}
+
+fn test_weak_complex_scalar_promotes_real_tensor_to_complex128() ! {
+	values := vtl.from_1d[f32]([1.5, -2.0])!
+	scalar := complex.complex(0.25, 0.5)
+	added := vtl.add_scalar_promoted[complex.Complex, f32, complex.Complex](values, scalar)!
+	assert added.dtype() == .complex128
+	assert added.get_nth(0).re == 1.75
+	assert added.get_nth(0).im == 0.5
+	assert added.get_nth(1).re == -1.75
+	assert added.get_nth(1).im == 0.5
+
+	subtracted := vtl.subtract_scalar_promoted[complex.Complex, f32, complex.Complex](values,
+		scalar)!
+	assert subtracted.get_nth(0).re == 1.25
+	assert subtracted.get_nth(0).im == -0.5
+	assert subtracted.get_nth(1).re == -2.25
+	assert subtracted.get_nth(1).im == -0.5
+
+	integers := vtl.from_1d[i8]([2, -3])!
+	divided := vtl.divide_scalar_promoted[complex.Complex, i8, complex.Complex](integers,
+		complex.complex(0.0, 2.0))!
+	assert divided.get_nth(0).re == 0.0
+	assert divided.get_nth(0).im == -1.0
+	assert divided.get_nth(1).re == 0.0
+	assert divided.get_nth(1).im == 1.5
+
+	booleans := vtl.from_1d[bool]([true, false])!
+	boolean_values := vtl.add_scalar_promoted[complex.Complex, bool, complex.Complex](booleans,
+		complex.complex(0.0, 1.0))!
+	assert boolean_values.get_nth(0).re == 1.0
+	assert boolean_values.get_nth(0).im == 1.0
+	assert boolean_values.get_nth(1).re == 0.0
+	assert boolean_values.get_nth(1).im == 1.0
+}
+
+fn test_weak_complex_scalar_promotion_rejects_remainder() ! {
+	values := vtl.from_1d[complex.Complex]([complex.complex(1.0, 2.0)])!
+	if _ := vtl.remainder_scalar_promoted[complex.Complex, complex.Complex, f64](values, 2.0) {
+		assert false, 'complex remainder must be rejected'
+	} else {
+		assert err.msg().contains('remainder')
+	}
 }
