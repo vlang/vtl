@@ -250,6 +250,15 @@ See
 [gradient tests](../autograd_tests/gates_remainder_test.v), and
 [dtype conversion tutorial](./TUTORIAL_FIRST_STEPS.md#numeric-dtype-conversion).
 
+**Remaining ufunc gaps:** promoted mixed-dtype variants are still needed for
+`abs`, `sign`, `heaviside`, `degrees`/`radians`, `maximum`/`minimum`/`fmax`/`fmin`,
+`copysign`, `nextafter`, `fmod`, `pow`, and `frexp`/`modf`/`ldexp`. Existing
+same-dtype methods remain available, but their presence does not imply NumPy
+promotion or every input dtype is supported. `erf`/`erfc`, `gamma`, and
+`log_gamma` are useful VTL math APIs beyond NumPy core ufunc parity. The general
+NumPy ufunc `out` and `where` execution protocol is tracked separately in
+[#783](https://github.com/vlang/vtl/issues/783).
+
 Promoted tensor-to-tensor result dtypes are:
 
 | Tensor operands | Add/subtract/multiply | True divide | Remainder |
