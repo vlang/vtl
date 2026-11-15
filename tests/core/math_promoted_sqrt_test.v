@@ -61,3 +61,11 @@ fn test_sqrt_promoted_rejects_unsupported_inputs_and_result_dtype() {
 		assert false, 'string sqrt is unsupported'
 	}
 }
+
+fn test_cbrt_promoted_preserves_sign_and_selects_result_dtype() ! {
+	values := vtl.from_1d[i16]([-8, 0, 27])!
+	roots := vtl.cbrt_promoted[f32, i16](values)!
+	expected := vtl.from_1d[f32]([-2.0, 0.0, 3.0])!
+	assert roots.dtype() == .float32
+	assert roots.allclose(expected, rtol: 0.0, atol: 0.0)!
+}

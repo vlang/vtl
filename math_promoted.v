@@ -44,22 +44,32 @@ pub fn divide_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
 // float32 otherwise; NumPy float16 results are widened because VTL does not
 // support float16.
 pub fn sqrt_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.sqrt)
+}
+
+// cbrt_promoted computes elementwise cube roots using the same output dtype
+// rules as sqrt_promoted.
+pub fn cbrt_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.cbrt)
+}
+
+fn unary_real_ufunc_promoted[R, T](t &Tensor[T], operation fn (f64) f64) !&Tensor[R] {
 	input_dtype := dtype_of[T]()
 	if !(is_real_numeric_dtype(input_dtype) || input_dtype == .boolean) {
-		return error('promoted sqrt supports only real numeric and boolean tensors')
+		return error('promoted unary math supports only real numeric and boolean tensors')
 	}
 	mut expected_dtype := DType.float32
 	if numpy_float_ufunc_uses_f64(input_dtype) {
 		expected_dtype = .float64
 	}
 	if dtype_of[R]() != expected_dtype {
-		return error('output dtype ${dtype_of[R]()} does not match sqrt result dtype ${expected_dtype}')
+		return error('output dtype ${dtype_of[R]()} does not match unary math result dtype ${expected_dtype}')
 	}
 
 	mut result := empty[R](t.shape, memory: .row_major)
 	for index in 0 .. t.size {
 		value := cast_promoted_value[T, R](t.get_nth[T](index))
-		result.data.data[index] = R(math.sqrt(f64(value)))
+		result.data.data[index] = R(operation(f64(value)))
 	}
 	return result
 }
