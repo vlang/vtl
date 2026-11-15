@@ -287,6 +287,24 @@ pub fn (t &Tensor[T]) min_axis[T](axis int) !&Tensor[T] {
 	return extrema_axis[T](t, axis, false)
 }
 
+// max_axis_with_keepdims returns maximum values with the reduced axis
+// optionally retained with length one.
+pub fn (t &Tensor[T]) max_axis_with_keepdims[T](axis int, keepdims bool) !&Tensor[T] {
+	if keepdims {
+		return t.max_axis[T](axis)
+	}
+	return t.max_axis_squeeze[T](axis)
+}
+
+// min_axis_with_keepdims returns minimum values with the reduced axis
+// optionally retained with length one.
+pub fn (t &Tensor[T]) min_axis_with_keepdims[T](axis int, keepdims bool) !&Tensor[T] {
+	if keepdims {
+		return t.min_axis[T](axis)
+	}
+	return t.min_axis_squeeze[T](axis)
+}
+
 fn extrema_axis[T](t &Tensor[T], axis int, maximum bool) !&Tensor[T] {
 	shape := t.shape
 	rank := shape.len

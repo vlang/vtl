@@ -31,6 +31,12 @@ fn test_nan_axis_sum_product_and_extrema_shapes_and_empty_slices() ! {
 	assert nanprod_axis_keepdims(values, 0)!.shape == [1, 3]
 	assert nanmin_axis_keepdims(values, -1)!.shape == [2, 1]
 	assert nanmax_axis_keepdims(values, 0)!.shape == [1, 3]
+	minimum_without_axis := nanmin_axis_with_keepdims(values, 1, false)!
+	assert minimum_without_axis.shape == [2]
+	assert minimum_without_axis.to_array() == [1.0, 4.0]
+	maximum_with_axis := nanmax_axis_with_keepdims(values, 1, true)!
+	assert maximum_with_axis.shape == [2, 1]
+	assert maximum_with_axis.to_array() == [3.0, 6.0]
 
 	missing := vtl.from_array([math.nan(), 2.0, math.nan(), math.nan()], [2, 2])!
 	sums := nansum_axis(missing, 1)!

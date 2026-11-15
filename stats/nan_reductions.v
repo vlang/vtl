@@ -90,6 +90,11 @@ pub fn nanmin_axis[T](t &vtl.Tensor[T], axis int) !&vtl.Tensor[f64] {
 	return nan_reduce_axis[T](t, axis, .minimum, false)
 }
 
+// nanmin_axis_with_keepdims selects whether the reduced axis remains in shape.
+pub fn nanmin_axis_with_keepdims[T](t &vtl.Tensor[T], axis int, keepdims bool) !&vtl.Tensor[f64] {
+	return nan_reduce_axis[T](t, axis, .minimum, keepdims)
+}
+
 // nanmin_axis_keepdims reduces one axis and keeps it with length one.
 pub fn nanmin_axis_keepdims[T](t &vtl.Tensor[T], axis int) !&vtl.Tensor[f64] {
 	return nan_reduce_axis[T](t, axis, .minimum, true)
@@ -99,6 +104,11 @@ pub fn nanmin_axis_keepdims[T](t &vtl.Tensor[T], axis int) !&vtl.Tensor[f64] {
 // containing no non-NaN values produce NaN.
 pub fn nanmax_axis[T](t &vtl.Tensor[T], axis int) !&vtl.Tensor[f64] {
 	return nan_reduce_axis[T](t, axis, .maximum, false)
+}
+
+// nanmax_axis_with_keepdims selects whether the reduced axis remains in shape.
+pub fn nanmax_axis_with_keepdims[T](t &vtl.Tensor[T], axis int, keepdims bool) !&vtl.Tensor[f64] {
+	return nan_reduce_axis[T](t, axis, .maximum, keepdims)
 }
 
 // nanmax_axis_keepdims reduces one axis and keeps it with length one.
