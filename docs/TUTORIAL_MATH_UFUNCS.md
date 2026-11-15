@@ -20,11 +20,28 @@ quotients := numerators.floor_divide(divisors)!
 println(quotients.to_array()) // [-2, -2]
 ```
 
+For mixed real numeric dtypes, `floor_divide_promoted` accepts the result dtype
+explicitly. Weak-scalar variants preserve NumPy-style scalar promotion and
+operand order:
+
+```v
+import vtl
+
+values := vtl.from_1d[i16]([-3, 3])!
+mixed := vtl.floor_divide_promoted[f32, i16, f32](values,
+	vtl.from_1d[f32]([2.0])!)!
+scalar_left := vtl.floor_divide_scalar_left_promoted[f64, i16, f32](-3.0,
+	vtl.from_1d[i16]([2, -2])!)!
+println(mixed.to_array()) // [-2.0, 1.0]
+println(scalar_left.to_array()) // [-2.0, 1.0]
+```
+
 Integer zero divisors produce zero, matching NumPy's result values (VTL does
 not emit NumPy's runtime warning). Floating-point zero divisors follow IEEE
-behavior. Mixed-dtype operands and automatic result-type selection remain part
-of [#717](https://github.com/vlang/vtl/issues/717). Boolean and complex tensors
-are unsupported. See the [parity tracker](./NUMPY_PARITY.md#math-and-ufuncs).
+behavior. Boolean and complex tensors are unsupported. Automatic result-type
+selection remains part of [#717](https://github.com/vlang/vtl/issues/717);
+V requires the promoted result type as a generic parameter. See the
+[parity tracker](./NUMPY_PARITY.md#math-and-ufuncs).
 
 ## Split fractional and integral parts
 

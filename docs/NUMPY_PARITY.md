@@ -235,36 +235,41 @@ See
 
 Promoted tensor-to-tensor result dtypes are:
 
-| Tensor operands | Add/subtract/multiply | True divide | Remainder |
-|-----------------|-----------------------|-------------|-----------|
-| Real numeric pair | `promote_types` | f32 if promoted dtype is f32; else f64 | `promote_types` |
-| Complex128 with numeric, bool, or complex128 | complex128 | complex128 | unsupported |
-| Boolean pair | unsupported | f64 | unsupported |
+| Tensor operands | Add/subtract/multiply | True divide | Floor divide | Remainder |
+|-----------------|-----------------------|-------------|--------------|-----------|
+| Real numeric pair | `promote_types` | f32 if promoted dtype is f32; else f64 | `promote_types` | `promote_types` |
+| Complex128 with numeric, bool, or complex128 | complex128 | complex128 | unsupported | unsupported |
+| Boolean pair | unsupported | f64 | unsupported | unsupported |
 
 The `add_scalar_promoted`, `subtract_scalar_promoted`,
 `multiply_scalar_promoted`, `divide_scalar_promoted`, and
-`remainder_scalar_promoted` variants apply NumPy-style weak scalar promotion
+`remainder_scalar_promoted` variants, as well as the corresponding
+`floor_divide_scalar_promoted` form, apply NumPy-style weak scalar promotion
 with the tensor as the left operand. Matching `*_scalar_left_promoted`
-variants put the scalar on the left, preserving subtraction, division, and
-remainder operand order. These APIs support real numeric and complex tensors.
-Real float arrays retain their dtype;
+variants put the scalar on the left, preserving noncommutative operation
+order. These APIs support real numeric and complex tensors, except remainder
+and floor division, which reject complex values. Real float arrays retain their dtype;
 integer arrays retain their dtype for in-range integer/bool scalars and promote
 to float64 for floating scalars; integer true division returns float64.
 Complex arrays retain complex128 with real or complex scalars, while a complex
 scalar promotes real numeric and boolean arrays to complex128. Out-of-range
-integer scalars return an error. Complex remainder is unsupported. The output
-type parameter is explicit because V requires statically typed generic return
-values; the implementation checks it against the inferred result dtype.
+integer scalars return an error. Complex remainder and floor division are
+unsupported. The output type parameter is explicit because V requires
+statically typed generic return values; the implementation checks it against
+the inferred result dtype.
+Floor division preserves the promoted dtype, rounds toward negative infinity,
+returns zero for integer zero divisors, and follows IEEE behavior for floating
+zero divisors.
 
 Weak-scalar result dtypes for the supported arithmetic are:
 
-| Array dtype | Scalar dtype | Add/subtract/multiply | True divide | Remainder |
-|-------------|--------------|-----------------------|-------------|-----------|
-| f32 / f64 | real numeric or bool | array dtype | array dtype for floats | array dtype |
-| integer | in-range integer or bool | array dtype | f64 | array dtype |
-| integer | real float | f64 | f64 | f64 |
-| real numeric or bool | complex128 | complex128 | complex128 | unsupported |
-| complex128 | real numeric, bool, or complex128 | complex128 | complex128 | unsupported |
+| Array dtype | Scalar dtype | Add/subtract/multiply | True divide | Floor divide | Remainder |
+|-------------|--------------|-----------------------|-------------|--------------|-----------|
+| f32 / f64 | real numeric or bool | array dtype | array dtype for floats | array dtype | array dtype |
+| integer | in-range integer or bool | array dtype | f64 | array dtype | array dtype |
+| integer | real float | f64 | f64 | f64 | f64 |
+| real numeric or bool | complex128 | complex128 | complex128 | unsupported | unsupported |
+| complex128 | real numeric, bool, or complex128 | complex128 | complex128 | unsupported | unsupported |
 
 An out-of-range integer scalar is an error rather than an implicit wrap.
 `round_decimals` rounds real floating-point tensors to positive or negative

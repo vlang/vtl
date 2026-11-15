@@ -8,6 +8,7 @@ enum PromotedBinaryOperation {
 	subtract
 	multiply
 	divide
+	floor_divide
 	remainder
 }
 
@@ -37,6 +38,12 @@ pub fn multiply_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
 // when the promoted input dtype is float32, and float64 otherwise.
 pub fn divide_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
 	return binary_promoted[R, T, U](a, b, .divide)
+}
+
+// floor_divide_promoted performs NumPy-style floor division after promoting
+// real numeric tensor operands to R. Complex inputs are unsupported.
+pub fn floor_divide_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
+	return binary_promoted[R, T, U](a, b, .floor_divide)
 }
 
 // remainder_promoted returns the element-wise NumPy remainder of real numeric
@@ -79,6 +86,12 @@ pub fn remainder_scalar_promoted[R, T, U](a &Tensor[T], scalar U) !&Tensor[R] {
 	return scalar_promoted[R, T, U](a, scalar, .remainder)
 }
 
+// floor_divide_scalar_promoted performs NumPy-style floor division by a weak
+// real numeric scalar using the inferred promoted dtype R.
+pub fn floor_divide_scalar_promoted[R, T, U](a &Tensor[T], scalar U) !&Tensor[R] {
+	return scalar_promoted[R, T, U](a, scalar, .floor_divide)
+}
+
 // add_scalar_left_promoted adds a tensor to a weak numeric or complex scalar
 // using NumPy-style promotion.
 pub fn add_scalar_left_promoted[R, T, U](scalar U, a &Tensor[T]) !&Tensor[R] {
@@ -109,11 +122,20 @@ pub fn remainder_scalar_left_promoted[R, T, U](scalar U, a &Tensor[T]) !&Tensor[
 	return scalar_left_promoted[R, T, U](scalar, a, .remainder)
 }
 
+// floor_divide_scalar_left_promoted performs NumPy-style floor division with a
+// weak real numeric scalar as the numerator using the inferred dtype R.
+pub fn floor_divide_scalar_left_promoted[R, T, U](scalar U, a &Tensor[T]) !&Tensor[R] {
+	return scalar_left_promoted[R, T, U](scalar, a, .floor_divide)
+}
+
 @[inline]
 fn binary_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation PromotedBinaryOperation) !&Tensor[R] {
 	$if R is complex.Complex {
 		if operation == .remainder {
 			return error('promoted remainder does not support complex values')
+		}
+		if operation == .floor_divide {
+			return error('promoted floor division does not support complex values')
 		}
 		left_dtype := dtype_of[T]()
 		right_dtype := dtype_of[U]()
@@ -246,6 +268,8 @@ fn binary_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation PromotedBinary
 				.subtract { x - y }
 				.multiply { x * y }
 				.divide { x / y }
+				.floor_divide { numpy_floor_divide[R](x, y) }
+				.remainder { return error('promoted remainder dispatch failed') }
 			}
 		}
 		return result
@@ -266,6 +290,9 @@ fn scalar_promoted_impl[R, T, U](a &Tensor[T], scalar U, operation PromotedBinar
 	$if R is complex.Complex {
 		if operation == .remainder {
 			return error('promoted remainder does not support complex values')
+		}
+		if operation == .floor_divide {
+			return error('promoted floor division does not support complex values')
 		}
 		result_dtype := weak_complex_scalar_result_dtype[T, U]()!
 		if dtype_of[R]() != result_dtype {
@@ -326,6 +353,7 @@ fn complex_promoted_value(x complex.Complex, y complex.Complex, operation Promot
 		.subtract { x - y }
 		.multiply { x * y }
 		.divide { x / y }
+		.floor_divide { return error('promoted floor division does not support complex values') }
 		.remainder { return error('promoted remainder does not support complex values') }
 	}
 }
