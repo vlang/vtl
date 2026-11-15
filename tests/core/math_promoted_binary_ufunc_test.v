@@ -64,6 +64,31 @@ fn test_promoted_copysign_preserves_ieee_sign_bits() ! {
 	assert math.is_inf(result.get_nth(3), -1)
 }
 
+fn test_promoted_nextafter_broadcasts_at_float32_precision() ! {
+	x := vtl.from_2d[i16]([[0, 1]])!
+	y := vtl.from_1d[f32]([1.0, -math.inf(1)])!
+
+	result := vtl.nextafter_promoted[f32, i16, f32](x, y)!
+
+	assert result.dtype() == .float32
+	assert result.shape == [1, 2]
+	assert result.get_nth(0) == math.nextafter32(f32(0.0), f32(1.0))
+	assert result.get_nth(1) == math.nextafter32(f32(1.0), -f32(math.inf(1)))
+}
+
+fn test_promoted_nextafter_handles_signed_zero_infinity_and_nan() ! {
+	x := vtl.from_1d[f64]([-0.0, 0.0, math.inf(1), math.nan()])!
+	y := vtl.from_1d[f64]([1.0, -1.0, 0.0, 0.0])!
+	result := vtl.nextafter_promoted[f64, f64, f64](x, y)!
+
+	assert result.get_nth(0) == math.nextafter(-0.0, 1.0)
+	assert !math.signbit(result.get_nth(0))
+	assert result.get_nth(1) == math.nextafter(0.0, -1.0)
+	assert math.signbit(result.get_nth(1))
+	assert result.get_nth(2) == math.nextafter(math.inf(1), 0.0)
+	assert math.is_nan(result.get_nth(3))
+}
+
 fn test_promoted_binary_ufuncs_validate_output_dtype() ! {
 	left := vtl.from_1d[i32]([1])!
 	right := vtl.from_1d[i16]([2])!
@@ -71,6 +96,9 @@ fn test_promoted_binary_ufuncs_validate_output_dtype() ! {
 		assert false, '32-bit integer inputs must produce float64'
 	}
 	if _ := vtl.copysign_promoted[f32, i32, i16](left, right) {
+		assert false, '32-bit integer inputs must produce float64'
+	}
+	if _ := vtl.nextafter_promoted[f32, i32, i16](left, right) {
 		assert false, '32-bit integer inputs must produce float64'
 	}
 }

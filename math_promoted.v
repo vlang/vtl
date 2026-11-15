@@ -258,6 +258,16 @@ pub fn copysign_promoted[R, T, U](magnitude &Tensor[T], sign &Tensor[U]) !&Tenso
 	return binary_real_ufunc_promoted[R, T, U](magnitude, sign, math.copysign, 'copysign')
 }
 
+// nextafter_promoted steps one representable output value from x toward y.
+// The f32 path uses f32 nextafter semantics instead of rounding an f64 step.
+pub fn nextafter_promoted[R, T, U](x &Tensor[T], y &Tensor[U]) !&Tensor[R] {
+	$if R is f32 {
+		return binary_real_ufunc_promoted[R, T, U](x, y, nextafter32_as_f64, 'nextafter')
+	} $else {
+		return binary_real_ufunc_promoted[R, T, U](x, y, math.nextafter, 'nextafter')
+	}
+}
+
 // hypot_promoted computes elementwise hypotenuses with NumPy-style float
 // output promotion and broadcasting.
 pub fn hypot_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
@@ -321,6 +331,10 @@ fn binary_real_ufunc_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation fn 
 
 fn numpy_float_ufunc_uses_f64(dtype DType) bool {
 	return dtype == .float64 || (is_integer_dtype(dtype) && dtype_bits(dtype) >= 32)
+}
+
+fn nextafter32_as_f64(x f64, y f64) f64 {
+	return f64(math.nextafter32(f32(x), f32(y)))
 }
 
 // remainder_promoted returns the element-wise NumPy remainder of real numeric

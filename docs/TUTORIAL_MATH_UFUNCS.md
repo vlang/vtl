@@ -114,18 +114,25 @@ function when NumPy-style integer or mixed-dtype output is needed.
 
 ## Promoted binary numeric functions
 
-`copysign_promoted`, `hypot_promoted`, `logaddexp_promoted`, and
-`logaddexp2_promoted` broadcast real numeric or boolean operands and use the
-same floating output dtype rules as `atan2_promoted`. The log-add-exp variants
-use stable calculations for large-magnitude inputs:
+`copysign_promoted`, `hypot_promoted`, `logaddexp_promoted`,
+`logaddexp2_promoted`, and `nextafter_promoted` broadcast real numeric or
+boolean operands and use the same floating output dtype rules as
+`atan2_promoted`. The f32 `nextafter_promoted` path steps at f32 precision.
+The log-add-exp variants use stable calculations for large-magnitude inputs:
 
 ```v
+import math
 import vtl
 
 a := vtl.from_1d[i16]([1000, -1000])!
 b := vtl.from_1d[f32]([1000.0, -1000.0])!
 values := vtl.logaddexp_promoted[f32, i16, f32](a, b)!
 println(values.to_array())
+
+x := vtl.from_1d[i16]([0, 1])!
+toward := vtl.from_1d[f32]([1.0, -math.inf(1)])!
+steps := vtl.nextafter_promoted[f32, i16, f32](x, toward)!
+println(steps.to_array())
 ```
 
 ## Floor division
