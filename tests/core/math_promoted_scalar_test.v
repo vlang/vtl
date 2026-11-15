@@ -47,6 +47,76 @@ fn test_weak_scalar_promotion_preserves_integer_dtype_when_scalar_fits() ! {
 	assert divided.to_array() == [5.0, -2.5]
 }
 
+fn test_weak_scalar_left_promotion_preserves_operand_order_and_dtype() ! {
+	values := vtl.from_1d[i8]([-3, 2])!
+
+	added := vtl.add_scalar_left_promoted[i8, i8, int](5, values)!
+	assert added.dtype() == .int8
+	assert added.to_array() == [2, 7]
+
+	subtracted := vtl.subtract_scalar_left_promoted[i8, i8, int](5, values)!
+	assert subtracted.dtype() == .int8
+	assert subtracted.to_array() == [8, 3]
+
+	multiplied := vtl.multiply_scalar_left_promoted[i8, i8, int](5, values)!
+	assert multiplied.dtype() == .int8
+	assert multiplied.to_array() == [-15, 10]
+
+	divided := vtl.divide_scalar_left_promoted[f64, i8, int](5, values)!
+	assert divided.dtype() == .float64
+	assert divided.to_array() == [-5.0 / 3.0, 2.5]
+
+	remainders := vtl.remainder_scalar_left_promoted[i8, i8, int](5, values)!
+	assert remainders.dtype() == .int8
+	assert remainders.to_array() == [-1, 1]
+
+	if _ := vtl.add_scalar_left_promoted[i8, i8, int](128, values) {
+		assert false, 'out-of-range left scalar must not wrap into the tensor dtype'
+	} else {
+		assert err.msg().contains('out of range')
+	}
+}
+
+fn test_weak_complex_scalar_left_promotion_preserves_operand_order() ! {
+	values := vtl.from_1d[f32]([1.5, -2.0])!
+	scalar := complex.complex(0.25, 0.5)
+
+	subtracted := vtl.subtract_scalar_left_promoted[complex.Complex, f32, complex.Complex](scalar,
+		values)!
+	assert subtracted.dtype() == .complex128
+	assert subtracted.get_nth(0).re == -1.25
+	assert subtracted.get_nth(0).im == 0.5
+	assert subtracted.get_nth(1).re == 2.25
+	assert subtracted.get_nth(1).im == 0.5
+
+	added := vtl.add_scalar_left_promoted[complex.Complex, f32, complex.Complex](scalar, values)!
+	assert added.get_nth(0).re == 1.75
+	assert added.get_nth(0).im == 0.5
+	assert added.get_nth(1).re == -1.75
+	assert added.get_nth(1).im == 0.5
+
+	multiplied := vtl.multiply_scalar_left_promoted[complex.Complex, f32, complex.Complex](scalar,
+		values)!
+	assert multiplied.get_nth(0).re == 0.375
+	assert multiplied.get_nth(0).im == 0.75
+	assert multiplied.get_nth(1).re == -0.5
+	assert multiplied.get_nth(1).im == -1.0
+
+	divided := vtl.divide_scalar_left_promoted[complex.Complex, f32, complex.Complex](scalar,
+		values)!
+	assert math.abs(divided.get_nth(0).re - 1.0 / 6.0) < 1e-12
+	assert math.abs(divided.get_nth(0).im - 1.0 / 3.0) < 1e-12
+	assert divided.get_nth(1).re == -0.125
+	assert divided.get_nth(1).im == -0.25
+
+	if _ := vtl.remainder_scalar_left_promoted[complex.Complex, f32, complex.Complex](scalar,
+		values) {
+		assert false, 'complex remainder must be rejected when the scalar is on the left'
+	} else {
+		assert err.msg().contains('remainder')
+	}
+}
+
 fn test_weak_float_scalar_promotes_integer_tensor_to_float64() ! {
 	values := vtl.from_1d[i8]([10, -5])!
 	added := vtl.add_scalar_promoted[f64, i8, f64](values, 0.5)!

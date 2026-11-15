@@ -79,6 +79,36 @@ pub fn remainder_scalar_promoted[R, T, U](a &Tensor[T], scalar U) !&Tensor[R] {
 	return scalar_promoted[R, T, U](a, scalar, .remainder)
 }
 
+// add_scalar_left_promoted adds a tensor to a weak numeric or complex scalar
+// using NumPy-style promotion.
+pub fn add_scalar_left_promoted[R, T, U](scalar U, a &Tensor[T]) !&Tensor[R] {
+	return scalar_left_promoted[R, T, U](scalar, a, .add)
+}
+
+// subtract_scalar_left_promoted subtracts a tensor from a weak scalar using
+// NumPy-style promotion.
+pub fn subtract_scalar_left_promoted[R, T, U](scalar U, a &Tensor[T]) !&Tensor[R] {
+	return scalar_left_promoted[R, T, U](scalar, a, .subtract)
+}
+
+// multiply_scalar_left_promoted multiplies a tensor by a weak scalar using
+// NumPy-style promotion.
+pub fn multiply_scalar_left_promoted[R, T, U](scalar U, a &Tensor[T]) !&Tensor[R] {
+	return scalar_left_promoted[R, T, U](scalar, a, .multiply)
+}
+
+// divide_scalar_left_promoted performs NumPy-style true division with a weak
+// scalar as the numerator.
+pub fn divide_scalar_left_promoted[R, T, U](scalar U, a &Tensor[T]) !&Tensor[R] {
+	return scalar_left_promoted[R, T, U](scalar, a, .divide)
+}
+
+// remainder_scalar_left_promoted returns the NumPy-style remainder of a weak
+// scalar and tensor. Complex operands are unsupported.
+pub fn remainder_scalar_left_promoted[R, T, U](scalar U, a &Tensor[T]) !&Tensor[R] {
+	return scalar_left_promoted[R, T, U](scalar, a, .remainder)
+}
+
 @[inline]
 fn binary_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation PromotedBinaryOperation) !&Tensor[R] {
 	$if R is complex.Complex {
@@ -225,6 +255,14 @@ fn binary_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation PromotedBinary
 }
 
 fn scalar_promoted[R, T, U](a &Tensor[T], scalar U, operation PromotedBinaryOperation) !&Tensor[R] {
+	return scalar_promoted_impl[R, T, U](a, scalar, operation, false)
+}
+
+fn scalar_left_promoted[R, T, U](scalar U, a &Tensor[T], operation PromotedBinaryOperation) !&Tensor[R] {
+	return scalar_promoted_impl[R, T, U](a, scalar, operation, true)
+}
+
+fn scalar_promoted_impl[R, T, U](a &Tensor[T], scalar U, operation PromotedBinaryOperation, scalar_on_left bool) !&Tensor[R] {
 	$if R is complex.Complex {
 		if operation == .remainder {
 			return error('promoted remainder does not support complex values')
@@ -237,8 +275,13 @@ fn scalar_promoted[R, T, U](a &Tensor[T], scalar U, operation PromotedBinaryOper
 		right_scalar := cast_promoted_value[U, R](scalar)
 		mut result := empty[R](a.shape, memory: .row_major)
 		for index in 0 .. a.size {
-			x := left.data.data[index]
-			result.data.data[index] = complex_promoted_value(x, right_scalar, operation)!
+			if scalar_on_left {
+				result.data.data[index] = complex_promoted_value(right_scalar, left.data.data[index],
+					operation)!
+			} else {
+				result.data.data[index] = complex_promoted_value(left.data.data[index],
+					right_scalar, operation)!
+			}
 		}
 		return result
 	} $else $if R is $int || R is $float {
@@ -254,8 +297,11 @@ fn scalar_promoted[R, T, U](a &Tensor[T], scalar U, operation PromotedBinaryOper
 		}
 		left := cast_promoted_tensor_values[T, R](a)!
 		right_scalar := cast_promoted_value[U, R](scalar)
-		right := from_array[R]([right_scalar], [])!
-		return binary_promoted[R, R, R](left, right, operation)
+		scalar_tensor := from_array[R]([right_scalar], [])!
+		if scalar_on_left {
+			return binary_promoted[R, R, R](scalar_tensor, left, operation)
+		}
+		return binary_promoted[R, R, R](left, scalar_tensor, operation)
 	} $else {
 		return error('weak-scalar promoted arithmetic requires a real numeric output dtype')
 	}

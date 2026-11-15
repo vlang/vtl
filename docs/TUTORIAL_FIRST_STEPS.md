@@ -165,7 +165,9 @@ assert float_remainders.to_array() == [1.0, -1.0]
 ```
 
 The `*_scalar_promoted` variants apply NumPy-style weak scalar promotion to
-real numeric tensors. Floating tensors retain their dtype with boolean,
+real numeric tensors, with the tensor on the left. The matching
+`*_scalar_left_promoted` variants accept the scalar first and preserve operand
+order. Floating tensors retain their dtype with boolean,
 integer, or floating scalars. Integer tensors retain their dtype for in-range
 integer and boolean scalars, while floating scalars promote the result to
 `f64`; an out-of-range integer scalar returns an error. Integer true division
@@ -189,6 +191,9 @@ integers := vtl.from_1d[i8]([10, -5])!
 fractional := vtl.add_scalar_promoted[f64, i8, f64](integers, 0.5)!
 assert fractional.dtype() == .float64
 assert fractional.to_array() == [10.5, -4.5]
+
+left_difference := vtl.subtract_scalar_left_promoted[f64, i8, int](12, integers)!
+assert left_difference.to_array() == [2.0, 17.0]
 
 complex_values := vtl.add_scalar_promoted[complex.Complex, f32, complex.Complex](values,
 	complex.complex(0.25, 0.5))!
