@@ -21,6 +21,29 @@ fn test_nan_sum_product_and_extrema_ignore_nan() ! {
 	assert math.is_nan(nanmax(empty))
 }
 
+fn test_nan_sum_product_global_keepdims_and_typed_accumulators() ! {
+	values := vtl.from_array([f32(2), f32(math.nan()), f32(3)], [1, 3])!
+	sum_kept := nansum_with_keepdims(values, true)!
+	product_kept := nanprod_with_keepdims(values, true)!
+	assert sum_kept.shape == [1, 1]
+	assert sum_kept.get_nth(0) == 5.0
+	assert product_kept.shape == [1, 1]
+	assert product_kept.get_nth(0) == 6.0
+	assert nansum_with_keepdims(values, false)!.shape == []int{}
+	assert nanprod_as_with_keepdims[f32, f64](values, true)!.get_nth(0) == 6.0
+	assert nansum_as_with_keepdims[f32, f64](vtl.from_1d([f32(math.nan())])!, true)!.get_nth(0) == 0.0
+
+	empty := vtl.empty[f32]([2, 0])
+	assert nansum_with_keepdims(empty, true)!.shape == [1, 1]
+	assert nanprod_with_keepdims(empty, true)!.get_nth(0) == 1.0
+
+	scalar_nan := vtl.from_array[f32]([f32(math.nan())], []int{})!
+	assert nansum_with_keepdims(scalar_nan, true)!.get_nth(0) == 0.0
+	assert nanprod_with_keepdims(scalar_nan, true)!.get_nth(0) == 1.0
+	assert nansum_as_with_keepdims[f32, f64](scalar_nan, true)!.get_nth(0) == 0.0
+	assert nanprod_as_with_keepdims[f32, f64](scalar_nan, false)!.get_nth(0) == 1.0
+}
+
 fn test_nan_axis_sum_product_and_extrema_shapes_and_empty_slices() ! {
 	values := vtl.from_array([1.0, math.nan(), 3.0, 4.0, 5.0, 6.0], [2, 3])!
 	assert nansum_axis(values, 1)!.to_array() == [4.0, 15.0]

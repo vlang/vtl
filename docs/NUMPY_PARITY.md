@@ -407,8 +407,8 @@ elements; an empty output caused only by an unreduced dimension remains empty.
 
 | Family | Axes / `keepdims` | Output type | NaNs | Empty reduction |
 |--------|-----------------|-------------|------|-----------------|
-| `sum` / `product` | G/A/M; KD on A/M; A=() is identity | T; `_as` selects U | Propagate | Identities 0 / 1 |
-| `nansum` / `nanprod` | G/A/M; KD on A/M | f64; `_as` selects U | Skip | Identities 0 / 1 |
+| `sum` / `product` | G; KD via `sum_with_keepdims` / `prod_with_keepdims`; A/M; A=() is identity | T; `_as` selects U | Propagate | Identities 0 / 1 |
+| `nansum` / `nanprod` | G; KD via `nansum_with_keepdims` / `nanprod_with_keepdims`; A/M | f64; `_as` selects U | Skip | Identities 0 / 1 |
 | `min` / `max` | G/A/M; A retains by default; `*_axis_with_keepdims`; M takes KD | T | Propagate first NaN | G returns 0; empty reduced A errors |
 | `nanmin` / `nanmax` | G/A/M; retained/squeezed A; `*_axis_with_keepdims` | f64; `_as` selects U | Skip | No valid values -> NaN; `_as` U must be float |
 | `mean` / `variance` / `std` | G/A/M; KD on tensor A/M forms | mean T; var/std f64; `_as` selects U | Propagate | See moments details below |

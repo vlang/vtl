@@ -71,7 +71,7 @@ fn test_mean() {
 	assert tst_res(o.str(), '37.708000')
 }
 
-fn test_complex_scalar_sum_product_and_mean() {
+fn test_complex_scalar_sum_product_and_mean() ! {
 	values := vtl.from_1d([
 		cmplx.Complex{ re: 1, im: 2 },
 		cmplx.Complex{ re: 3, im: 4 },
@@ -79,13 +79,38 @@ fn test_complex_scalar_sum_product_and_mean() {
 	assert sum(values) == cmplx.Complex{ re: 4, im: 6 }
 	assert prod(values) == cmplx.Complex{ re: -5, im: 10 }
 	assert mean(values) == cmplx.Complex{ re: 2, im: 3 }
+	assert sum_with_keepdims(values, true)!.get_nth(0) == cmplx.Complex{ re: 4, im: 6 }
+	assert prod_with_keepdims(values, true)!.shape == [1]
 
 	empty := vtl.from_1d([]cmplx.Complex{})!
 	assert sum(empty) == cmplx.Complex{ re: 0, im: 0 }
 	assert prod(empty) == cmplx.Complex{ re: 1, im: 0 }
+	assert sum_with_keepdims(empty, true)!.get_nth(0) == cmplx.Complex{ re: 0, im: 0 }
+	assert prod_with_keepdims(empty, true)!.get_nth(0) == cmplx.Complex{ re: 1, im: 0 }
 	empty_mean := mean(empty)
 	assert math.is_nan(empty_mean.re)
 	assert math.is_nan(empty_mean.im)
+}
+
+fn test_global_sum_product_keepdims_shapes_and_empty_identities() ! {
+	values := vtl.from_array([1, 2, 3, 4], [2, 2])!
+	sum_kept := sum_with_keepdims(values, true)!
+	product_kept := prod_with_keepdims(values, true)!
+	assert sum_kept.shape == [1, 1]
+	assert sum_kept.to_array() == [10]
+	assert product_kept.shape == [1, 1]
+	assert product_kept.to_array() == [24]
+	assert sum_with_keepdims(values, false)!.shape == []int{}
+	assert prod_with_keepdims(values, false)!.get_nth(0) == 24
+
+	empty := vtl.empty[int]([2, 0])
+	assert sum_with_keepdims(empty, true)!.shape == [1, 1]
+	assert sum_with_keepdims(empty, true)!.get_nth(0) == 0
+	assert prod_with_keepdims(empty, true)!.get_nth(0) == 1
+
+	scalar := vtl.from_array[int]([7], []int{})!
+	assert sum_with_keepdims(scalar, true)!.shape == []int{}
+	assert prod_with_keepdims(scalar, true)!.get_nth(0) == 7
 }
 
 fn test_quantile_linear_interpolates_and_sorts_copy() {
