@@ -16,6 +16,16 @@ fn test_variance_and_std_explicit_dtype_global() ! {
 	}
 }
 
+fn test_global_moment_accumulator_dtype_keepdims() ! {
+	values := vtl.from_array([f32(1), 2, 3], [1, 3])!
+	variance_kept := variance_as_with_keepdims[f32, f64](values, 0, true)!
+	std_kept := std_as_with_keepdims[f32, f64](values, 0, true)!
+	assert variance_kept.shape == [1, 1]
+	assert math.abs(variance_kept.get_nth(0) - 2.0 / 3.0) < 1e-12
+	assert math.abs(std_kept.get_nth(0) - math.sqrt(2.0 / 3.0)) < 1e-12
+	assert variance_as_with_keepdims[f32, f64](values, 0, false)!.shape == []int{}
+}
+
 fn test_variance_and_std_explicit_dtype_axis_reductions() ! {
 	values := vtl.from_array([f32(1), 2, 3, 4, 5, 6, 7, 8], [2, 2, 2])!
 	axis := variance_along_axis_as[f32, f64](values, -1, 1, true)!
@@ -67,6 +77,21 @@ fn test_nan_moments_explicit_dtype_global() ! {
 	if _ := nanvariance_as[f32, f64](values, -1) {
 		assert false, 'negative ddof must return an error'
 	}
+}
+
+fn test_nan_moment_accumulator_dtype_global_keepdims() ! {
+	values := vtl.from_array([f32(1), f32(math.nan()), 3, 5], [2, 2])!
+	mean_kept := nanmean_as_with_keepdims[f32, f64](values, true)!
+	variance_kept := nanvariance_as_with_keepdims[f32, f64](values, 0, true)!
+	std_kept := nanstd_as_with_keepdims[f32, f64](values, 0, true)!
+	assert mean_kept.shape == [1, 1]
+	assert mean_kept.get_nth(0) == 3.0
+	assert math.abs(variance_kept.get_nth(0) - 8.0 / 3.0) < 1e-12
+	assert math.abs(std_kept.get_nth(0) - math.sqrt(8.0 / 3.0)) < 1e-12
+
+	all_nan := vtl.from_1d([f32(math.nan())])!
+	assert math.is_nan(nanmean_as_with_keepdims[f32, f64](all_nan, true)!.get_nth(0))
+	assert math.is_nan(nanvariance_as_with_keepdims[f32, f64](all_nan, 0, true)!.get_nth(0))
 }
 
 fn test_nan_moments_explicit_dtype_axis_reductions() ! {

@@ -20,6 +20,26 @@ fn test_variance_is_stable_for_values_with_large_offset() {
 	assert math.abs(variance(data, VarianceData{})! - 1.25) < 1e-6
 }
 
+fn test_global_moments_keepdims_shapes_and_empty_behavior() ! {
+	values := vtl.from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [2, 3])!
+	mean_kept := mean_with_keepdims(values, true)!
+	variance_kept := variance_with_keepdims(values, 0, true)!
+	std_kept := std_with_keepdims(values, 0, true)!
+	assert mean_kept.shape == [1, 1]
+	assert mean_kept.get_nth(0) == 3.5
+	assert math.abs(variance_kept.get_nth(0) - 35.0 / 12.0) < 1e-12
+	assert math.abs(std_kept.get_nth(0) - math.sqrt(35.0 / 12.0)) < 1e-12
+	assert mean_with_keepdims(values, false)!.shape == []int{}
+	assert variance_with_keepdims(values, 1, false)!.shape == []int{}
+	if _ := variance_with_keepdims(values, 6, true) {
+		assert false, 'global variance must reject insufficient observations'
+	}
+
+	empty := vtl.empty[f64]([2, 0])
+	assert mean_with_keepdims(empty, true)!.shape == [1, 1]
+	assert mean_with_keepdims(empty, true)!.get_nth(0) == 0.0
+}
+
 fn test_variance_rejects_undefined_inputs() {
 	empty := vtl.from_1d([]f64{})!
 	assert_variance_error(empty, VarianceData{})

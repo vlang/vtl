@@ -206,7 +206,25 @@ NumPy-style axis-removed output shape.
 gradients along selected axes; elementwise logical AND/OR/XOR/NOT; integer
 bitwise AND/OR/XOR/invert and scalar left/right shifts. Gradients support
 uniform spacing or monotonic non-uniform coordinates and first/second-order
-boundary differences. Same-dtype `floor_divide` and `floor_divide_scalar`
+boundary differences. `atan2_promoted`, `sqrt_promoted`, `cbrt_promoted`,
+`exp_promoted`, `exp2_promoted`, `expm1_promoted`, `log_promoted`,
+`log2_promoted`, `log10_promoted`, `log1p_promoted`, `sin_promoted`,
+`cos_promoted`, and `tan_promoted`, the inverse-trigonometric functions, and
+the direct and inverse hyperbolic functions provide NumPy-style
+floating-point outputs for real numeric or boolean inputs. They return f64
+for f64 or 32-bit-and-wider integer inputs, otherwise f32.
+The same dtype rules apply to the broadcasted binary `copysign_promoted`,
+`hypot_promoted`, `logaddexp_promoted`, `logaddexp2_promoted`, and
+`nextafter_promoted`.
+`rint_promoted` follows the same floating output rules and uses ties-to-even;
+`floor_promoted`, `ceil_promoted`, and `trunc_promoted` preserve the input
+dtype, including exact large integer values.
+NumPy float16 results for booleans and 8-bit integers are widened because VTL
+has no float16. The legacy same-dtype `Tensor.atan2()`, `Tensor.sqrt()`, and
+`Tensor.cbrt()` methods preserve their generic input dtype; use the promoted
+functions for integer or mixed-dtype results. Complex and string inputs are
+unsupported.
+Same-dtype `floor_divide` and `floor_divide_scalar`
 round signed quotients toward negative infinity, preserve input dtype, return
 zero for integer zero divisors, and follow IEEE results for floating-point
 zero divisors. Mixed-dtype promotion remains tracked in
@@ -232,6 +250,17 @@ See
 [implementation](../math_promoted.v), [forward tests](../tests/core/math_promoted_remainder_test.v),
 [gradient tests](../autograd_tests/gates_remainder_test.v), and
 [dtype conversion tutorial](./TUTORIAL_FIRST_STEPS.md#numeric-dtype-conversion).
+
+**Remaining ufunc gaps:** same-dtype methods exist for `abs`, `sign`, extrema,
+`fmod`, `pow`, and `frexp`/`modf`/`ldexp`, but NumPy's
+mixed-dtype, broadcast, and edge-case contracts are not fully covered. Unary
+`abs`/`sign` and the multi-output decomposition functions still need broader
+dtype and special-value differential tests; promoted mixed-input variants
+remain for `maximum`/`minimum`/`fmax`/`fmin`, `fmod`, `pow`, and `ldexp`.
+`erf`/`erfc`, `gamma`, and `log_gamma` are useful VTL math APIs beyond NumPy
+core ufunc parity. The general NumPy ufunc `out` and `where` execution protocol
+is tracked separately in
+[#783](https://github.com/vlang/vtl/issues/783).
 
 Promoted tensor-to-tensor result dtypes are:
 
@@ -416,8 +445,8 @@ elements; an empty output caused only by an unreduced dimension remains empty.
 | `nansum` / `nanprod` | G; KD via `nansum_with_keepdims` / `nanprod_with_keepdims`; A/M | f64; `_as` selects U | Skip | Identities 0 / 1 |
 | `min` / `max` | G/A/M; A retains by default; `*_axis_with_keepdims`; M takes KD | T | Propagate first NaN | G returns 0; empty reduced A errors |
 | `nanmin` / `nanmax` | G/A/M; retained/squeezed A; `*_axis_with_keepdims` | f64; `_as` selects U | Skip | No valid values -> NaN; `_as` U must be float |
-| `mean` / `variance` / `std` | G/A/M; KD on tensor A/M forms | mean T; var/std f64; `_as` selects U | Propagate | See moments details below |
-| `nanmean` / `nanvar` / `nanstd` | G/A/M; KD on tensor A/M forms | f64; `_as` selects U | Skip | NaN if empty, invalid, or under-sampled |
+| `mean` / `variance` / `std` | G; KD via `*_with_keepdims`; A/M; KD on A/M | mean T; var/std f64; `_as` selects U | Propagate | See moments details below |
+| `nanmean` / `nanvar` / `nanstd` | G; KD via `*_with_keepdims`; A/M; KD on A/M | f64; `_as` selects U | Skip | NaN if empty, invalid, or under-sampled |
 | `argmin` / `argmax` | G flat; KD `*_flat_with_keepdims`; A `*_axis_with_keepdims` | int | First NaN; `nanarg*` skips | Empty/no-valid reductions error |
 | `median` / quantiles | G/A/M; KD forms; multi-q prepends q axis | f64 | Ordinary forms propagate; `nan*` skips | Median NaN; quantile errors |
 | Weighted average / quantiles | G/A/M; KD; multi-q adds q axis | f64; weighted-average `_as` selects U | Average propagates; `nan` skips | Empty/zero-weight errors |

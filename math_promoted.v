@@ -46,6 +46,335 @@ pub fn floor_divide_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
 	return binary_promoted[R, T, U](a, b, .floor_divide)
 }
 
+// sqrt_promoted computes elementwise square roots for real numeric or boolean
+// tensors. It returns float64 for float64 and >=32-bit integer inputs, and
+// float32 otherwise; NumPy float16 results are widened because VTL does not
+// support float16.
+pub fn sqrt_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.sqrt)
+}
+
+// cbrt_promoted computes elementwise cube roots using the same output dtype
+// rules as sqrt_promoted.
+pub fn cbrt_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.cbrt)
+}
+
+// exp_promoted computes elementwise exponential values using the same output
+// dtype rules as sqrt_promoted.
+pub fn exp_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.exp)
+}
+
+// exp2_promoted computes elementwise powers of two using the same output dtype
+// rules as sqrt_promoted.
+pub fn exp2_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.exp2)
+}
+
+// expm1_promoted computes exp(x)-1 accurately near zero using the same output
+// dtype rules as sqrt_promoted.
+pub fn expm1_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.expm1)
+}
+
+// log_promoted computes elementwise natural logarithms using the same output
+// dtype rules as sqrt_promoted.
+pub fn log_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.log)
+}
+
+// log2_promoted computes elementwise base-two logarithms using the same output
+// dtype rules as sqrt_promoted.
+pub fn log2_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.log2)
+}
+
+// log10_promoted computes elementwise base-ten logarithms using the same output
+// dtype rules as sqrt_promoted.
+pub fn log10_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.log10)
+}
+
+// log1p_promoted computes log(1+x) accurately near zero using the same output
+// dtype rules as sqrt_promoted.
+pub fn log1p_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.log1p)
+}
+
+// sin_promoted computes elementwise sine values using the same output dtype
+// rules as sqrt_promoted.
+pub fn sin_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.sin)
+}
+
+// cos_promoted computes elementwise cosine values using the same output dtype
+// rules as sqrt_promoted.
+pub fn cos_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.cos)
+}
+
+// tan_promoted computes elementwise tangent values using the same output dtype
+// rules as sqrt_promoted.
+pub fn tan_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.tan)
+}
+
+// asin_promoted computes elementwise inverse sine values using the same output
+// dtype rules as sqrt_promoted.
+pub fn asin_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.asin)
+}
+
+// acos_promoted computes elementwise inverse cosine values using the same
+// output dtype rules as sqrt_promoted.
+pub fn acos_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.acos)
+}
+
+// atan_promoted computes elementwise inverse tangent values using the same
+// output dtype rules as sqrt_promoted.
+pub fn atan_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.atan)
+}
+
+// sinh_promoted computes elementwise hyperbolic sine values using the same
+// output dtype rules as sqrt_promoted.
+pub fn sinh_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.sinh)
+}
+
+// cosh_promoted computes elementwise hyperbolic cosine values using the same
+// output dtype rules as sqrt_promoted.
+pub fn cosh_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.cosh)
+}
+
+// tanh_promoted computes elementwise hyperbolic tangent values using the same
+// output dtype rules as sqrt_promoted.
+pub fn tanh_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.tanh)
+}
+
+// degrees_promoted converts radians to degrees with NumPy-style float output
+// promotion.
+pub fn degrees_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.degrees)
+}
+
+// radians_promoted converts degrees to radians with NumPy-style float output
+// promotion.
+pub fn radians_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.radians)
+}
+
+// asinh_promoted computes elementwise inverse hyperbolic sine using the same
+// output dtype rules as sqrt_promoted.
+pub fn asinh_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.asinh)
+}
+
+// acosh_promoted computes elementwise inverse hyperbolic cosine using the same
+// output dtype rules as sqrt_promoted.
+pub fn acosh_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.acosh)
+}
+
+// atanh_promoted computes elementwise inverse hyperbolic tangent using the
+// same output dtype rules as sqrt_promoted.
+pub fn atanh_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.atanh)
+}
+
+// rint_promoted rounds elementwise to the nearest integer using ties-to-even
+// and the floating output dtype rules of sqrt_promoted.
+pub fn rint_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.round_to_even)
+}
+
+// floor_promoted returns elementwise floors while preserving the input dtype.
+pub fn floor_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_dtype_preserving_ufunc_promoted[R, T](t, math.floor)
+}
+
+// ceil_promoted returns elementwise ceilings while preserving the input dtype.
+pub fn ceil_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_dtype_preserving_ufunc_promoted[R, T](t, math.ceil)
+}
+
+// trunc_promoted truncates elementwise toward zero while preserving the input
+// dtype.
+pub fn trunc_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_dtype_preserving_ufunc_promoted[R, T](t, math.trunc)
+}
+
+fn unary_dtype_preserving_ufunc_promoted[R, T](t &Tensor[T], operation fn (f64) f64) !&Tensor[R] {
+	input_dtype := dtype_of[T]()
+	if !(is_real_numeric_dtype(input_dtype) || input_dtype == .boolean) {
+		return error('promoted rounding supports only real numeric and boolean tensors')
+	}
+	if dtype_of[R]() != input_dtype {
+		return error('output dtype ${dtype_of[R]()} does not match input dtype ${input_dtype}')
+	}
+
+	mut result := empty[R](t.shape, memory: .row_major)
+	$if R is bool {
+		$if T is bool {
+			for index in 0 .. t.size {
+				result.data.data[index] = t.get_nth[T](index)
+			}
+		} $else {
+			return error('rounding output dtype must match the input dtype')
+		}
+	} $else $if R is $int || R is $float {
+		for index in 0 .. t.size {
+			value := t.get_nth[T](index)
+			converted := cast_promoted_value[T, R](value)
+			if is_integer_dtype(input_dtype) || input_dtype == .boolean {
+				result.data.data[index] = converted
+			} else {
+				result.data.data[index] = R(operation(f64(converted)))
+			}
+		}
+	} $else {
+		return error('promoted rounding output must be real numeric or boolean')
+	}
+	return result
+}
+
+fn unary_real_ufunc_promoted[R, T](t &Tensor[T], operation fn (f64) f64) !&Tensor[R] {
+	input_dtype := dtype_of[T]()
+	if !(is_real_numeric_dtype(input_dtype) || input_dtype == .boolean) {
+		return error('promoted unary math supports only real numeric and boolean tensors')
+	}
+	mut expected_dtype := DType.float32
+	if numpy_float_ufunc_uses_f64(input_dtype) {
+		expected_dtype = .float64
+	}
+	if dtype_of[R]() != expected_dtype {
+		return error('output dtype ${dtype_of[R]()} does not match unary math result dtype ${expected_dtype}')
+	}
+
+	mut result := empty[R](t.shape, memory: .row_major)
+	for index in 0 .. t.size {
+		value := cast_promoted_value[T, R](t.get_nth[T](index))
+		result.data.data[index] = R(operation(f64(value)))
+	}
+	return result
+}
+
+// atan2_promoted computes elementwise atan2 for real numeric or boolean
+// tensors. It returns float64 when either input is float64 or a >=32-bit
+// integer; other results use float32. NumPy float16 results for booleans and
+// <=8-bit integers are widened because VTL does not support float16.
+pub fn atan2_promoted[R, T, U](y &Tensor[T], x &Tensor[U]) !&Tensor[R] {
+	return binary_real_ufunc_promoted[R, T, U](y, x, math.atan2, 'atan2')
+}
+
+// copysign_promoted applies the sign bit of a real numeric or boolean tensor
+// to another tensor's magnitude, with NumPy-style float output promotion.
+pub fn copysign_promoted[R, T, U](magnitude &Tensor[T], sign &Tensor[U]) !&Tensor[R] {
+	return binary_real_ufunc_promoted[R, T, U](magnitude, sign, math.copysign, 'copysign')
+}
+
+// nextafter_promoted steps one representable output value from x toward y.
+// The f32 path uses f32 nextafter semantics instead of rounding an f64 step.
+pub fn nextafter_promoted[R, T, U](x &Tensor[T], y &Tensor[U]) !&Tensor[R] {
+	$if R is f32 {
+		return binary_real_ufunc_promoted[R, T, U](x, y, nextafter32_as_f64, 'nextafter')
+	} $else {
+		return binary_real_ufunc_promoted[R, T, U](x, y, math.nextafter, 'nextafter')
+	}
+}
+
+// heaviside_promoted returns 0 for negative x1, 1 for positive x1, and x2
+// for zero x1, using NumPy-style float output promotion.
+pub fn heaviside_promoted[R, T, U](x1 &Tensor[T], x2 &Tensor[U]) !&Tensor[R] {
+	return binary_real_ufunc_promoted[R, T, U](x1, x2, heaviside_value, 'heaviside')
+}
+
+// hypot_promoted computes elementwise hypotenuses with NumPy-style float
+// output promotion and broadcasting.
+pub fn hypot_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
+	return binary_real_ufunc_promoted[R, T, U](a, b, math.hypot, 'hypot')
+}
+
+// logaddexp_promoted computes log(exp(a)+exp(b)) stably with NumPy-style
+// floating output promotion and broadcasting.
+pub fn logaddexp_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
+	return binary_real_ufunc_promoted[R, T, U](a, b, logaddexp_value, 'logaddexp')
+}
+
+// logaddexp2_promoted computes log2(2^a+2^b) stably with NumPy-style
+// floating output promotion and broadcasting.
+pub fn logaddexp2_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
+	return binary_real_ufunc_promoted[R, T, U](a, b, logaddexp2_value, 'logaddexp2')
+}
+
+fn binary_real_ufunc_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation fn (f64, f64) f64, name string) !&Tensor[R] {
+	a_dtype := dtype_of[T]()
+	b_dtype := dtype_of[U]()
+	if !(is_real_numeric_dtype(a_dtype) || a_dtype == .boolean)
+		|| !(is_real_numeric_dtype(b_dtype) || b_dtype == .boolean) {
+		return error('promoted ${name} supports only real numeric and boolean tensors')
+	}
+	mut expected_dtype := DType.float32
+	if numpy_float_ufunc_uses_f64(a_dtype) || numpy_float_ufunc_uses_f64(b_dtype) {
+		expected_dtype = .float64
+	}
+	if dtype_of[R]() != expected_dtype {
+		return error('output dtype ${dtype_of[R]()} does not match ${name} result dtype ${expected_dtype}')
+	}
+
+	shape := broadcast_shapes(a.shape, b.shape)!
+	left := a.broadcast_to(shape)!
+	right := b.broadcast_to(shape)!
+	mut result := empty[R](shape, memory: .row_major)
+	left_is_flat := left.size == result.size && left.is_row_major_contiguous()
+	right_is_flat := right.size == result.size && right.is_row_major_contiguous()
+	for index in 0 .. result.size {
+		left_offset := if left_is_flat {
+			index
+		} else if a.size == 1 {
+			0
+		} else {
+			broadcast_tensor_offset(index, shape, left.strides)
+		}
+		right_offset := if right_is_flat {
+			index
+		} else if b.size == 1 {
+			0
+		} else {
+			broadcast_tensor_offset(index, shape, right.strides)
+		}
+		left_value := cast_promoted_value[T, R](left.data.data[left_offset])
+		right_value := cast_promoted_value[U, R](right.data.data[right_offset])
+		result.data.data[index] = R(operation(f64(left_value), f64(right_value)))
+	}
+	return result
+}
+
+fn numpy_float_ufunc_uses_f64(dtype DType) bool {
+	return dtype == .float64 || (is_integer_dtype(dtype) && dtype_bits(dtype) >= 32)
+}
+
+fn nextafter32_as_f64(x f64, y f64) f64 {
+	return f64(math.nextafter32(f32(x), f32(y)))
+}
+
+fn heaviside_value(x1 f64, x2 f64) f64 {
+	if math.is_nan(x1) {
+		return x1
+	}
+	if x1 < 0.0 {
+		return 0.0
+	}
+	if x1 > 0.0 {
+		return 1.0
+	}
+	return x2
+}
+
 // remainder_promoted returns the element-wise NumPy remainder of real numeric
 // tensors after dtype promotion and broadcasting. Complex inputs are rejected.
 // Integer zero divisors produce zero; floating-point zero divisors produce NaN.
