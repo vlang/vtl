@@ -112,6 +112,22 @@ Complex and string inputs are unsupported. The same-dtype
 `Tensor.atan2()` method remains available for compatibility; use the promoted
 function when NumPy-style integer or mixed-dtype output is needed.
 
+## Promoted binary numeric functions
+
+`hypot_promoted`, `logaddexp_promoted`, and `logaddexp2_promoted` broadcast
+real numeric or boolean operands and use the same floating output dtype rules
+as `atan2_promoted`. The log-add-exp variants use stable calculations for
+large-magnitude inputs:
+
+```v
+import vtl
+
+a := vtl.from_1d[i16]([1000, -1000])!
+b := vtl.from_1d[f32]([1000.0, -1000.0])!
+values := vtl.logaddexp_promoted[f32, i16, f32](a, b)!
+println(values.to_array())
+```
+
 ## Floor division
 
 `Tensor.floor_divide()` broadcasts same-dtype real integer or floating-point

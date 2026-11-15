@@ -249,44 +249,66 @@ fn unary_real_ufunc_promoted[R, T](t &Tensor[T], operation fn (f64) f64) !&Tenso
 // integer; other results use float32. NumPy float16 results for booleans and
 // <=8-bit integers are widened because VTL does not support float16.
 pub fn atan2_promoted[R, T, U](y &Tensor[T], x &Tensor[U]) !&Tensor[R] {
-	y_dtype := dtype_of[T]()
-	x_dtype := dtype_of[U]()
-	if !(is_real_numeric_dtype(y_dtype) || y_dtype == .boolean)
-		|| !(is_real_numeric_dtype(x_dtype) || x_dtype == .boolean) {
-		return error('promoted atan2 supports only real numeric and boolean tensors')
+	return binary_real_ufunc_promoted[R, T, U](y, x, math.atan2, 'atan2')
+}
+
+// hypot_promoted computes elementwise hypotenuses with NumPy-style float
+// output promotion and broadcasting.
+pub fn hypot_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
+	return binary_real_ufunc_promoted[R, T, U](a, b, math.hypot, 'hypot')
+}
+
+// logaddexp_promoted computes log(exp(a)+exp(b)) stably with NumPy-style
+// floating output promotion and broadcasting.
+pub fn logaddexp_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
+	return binary_real_ufunc_promoted[R, T, U](a, b, logaddexp_value, 'logaddexp')
+}
+
+// logaddexp2_promoted computes log2(2^a+2^b) stably with NumPy-style
+// floating output promotion and broadcasting.
+pub fn logaddexp2_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
+	return binary_real_ufunc_promoted[R, T, U](a, b, logaddexp2_value, 'logaddexp2')
+}
+
+fn binary_real_ufunc_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation fn (f64, f64) f64, name string) !&Tensor[R] {
+	a_dtype := dtype_of[T]()
+	b_dtype := dtype_of[U]()
+	if !(is_real_numeric_dtype(a_dtype) || a_dtype == .boolean)
+		|| !(is_real_numeric_dtype(b_dtype) || b_dtype == .boolean) {
+		return error('promoted ${name} supports only real numeric and boolean tensors')
 	}
 	mut expected_dtype := DType.float32
-	if numpy_float_ufunc_uses_f64(y_dtype) || numpy_float_ufunc_uses_f64(x_dtype) {
+	if numpy_float_ufunc_uses_f64(a_dtype) || numpy_float_ufunc_uses_f64(b_dtype) {
 		expected_dtype = .float64
 	}
 	if dtype_of[R]() != expected_dtype {
-		return error('output dtype ${dtype_of[R]()} does not match atan2 result dtype ${expected_dtype}')
+		return error('output dtype ${dtype_of[R]()} does not match ${name} result dtype ${expected_dtype}')
 	}
 
-	shape := broadcast_shapes(y.shape, x.shape)!
-	y_values := y.broadcast_to(shape)!
-	x_values := x.broadcast_to(shape)!
+	shape := broadcast_shapes(a.shape, b.shape)!
+	left := a.broadcast_to(shape)!
+	right := b.broadcast_to(shape)!
 	mut result := empty[R](shape, memory: .row_major)
-	y_is_flat := y_values.size == result.size && y_values.is_row_major_contiguous()
-	x_is_flat := x_values.size == result.size && x_values.is_row_major_contiguous()
+	left_is_flat := left.size == result.size && left.is_row_major_contiguous()
+	right_is_flat := right.size == result.size && right.is_row_major_contiguous()
 	for index in 0 .. result.size {
-		y_offset := if y_is_flat {
+		left_offset := if left_is_flat {
 			index
-		} else if y.size == 1 {
+		} else if a.size == 1 {
 			0
 		} else {
-			broadcast_tensor_offset(index, shape, y_values.strides)
+			broadcast_tensor_offset(index, shape, left.strides)
 		}
-		x_offset := if x_is_flat {
+		right_offset := if right_is_flat {
 			index
-		} else if x.size == 1 {
+		} else if b.size == 1 {
 			0
 		} else {
-			broadcast_tensor_offset(index, shape, x_values.strides)
+			broadcast_tensor_offset(index, shape, right.strides)
 		}
-		y_value := cast_promoted_value[T, R](y_values.data.data[y_offset])
-		x_value := cast_promoted_value[U, R](x_values.data.data[x_offset])
-		result.data.data[index] = R(math.atan2(f64(y_value), f64(x_value)))
+		left_value := cast_promoted_value[T, R](left.data.data[left_offset])
+		right_value := cast_promoted_value[U, R](right.data.data[right_offset])
+		result.data.data[index] = R(operation(f64(left_value), f64(right_value)))
 	}
 	return result
 }

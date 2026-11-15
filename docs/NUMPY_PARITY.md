@@ -213,6 +213,8 @@ boundary differences. `atan2_promoted`, `sqrt_promoted`, `cbrt_promoted`,
 the direct and inverse hyperbolic functions provide NumPy-style
 floating-point outputs for real numeric or boolean inputs. They return f64
 for f64 or 32-bit-and-wider integer inputs, otherwise f32.
+The same dtype rules apply to the broadcasted binary `hypot_promoted`,
+`logaddexp_promoted`, and `logaddexp2_promoted`.
 `rint_promoted` follows the same floating output rules and uses ties-to-even;
 `floor_promoted`, `ceil_promoted`, and `trunc_promoted` preserve the input
 dtype, including exact large integer values.
