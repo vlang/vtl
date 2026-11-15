@@ -195,6 +195,16 @@ complex_values := vtl.add_scalar_promoted[complex.Complex, f32, complex.Complex]
 assert complex_values.dtype() == .complex128
 assert complex_values.get_nth(0).re == 1.75
 assert complex_values.get_nth(0).im == 0.5
+
+complex_array := vtl.from_1d[complex.Complex]([
+	complex.complex(1.0, 2.0),
+	complex.complex(-1.0, 1.0),
+])!
+real_array := vtl.from_1d[f32]([1.0, 2.0])!
+mixed_sum := vtl.add_promoted[complex.Complex, complex.Complex, f32](complex_array,
+	real_array)!
+assert mixed_sum.get_nth(1).re == 1.0
+assert mixed_sum.get_nth(1).im == 1.0
 ```
 
 Same-dtype tensors support elementwise arithmetic operators with broadcasting.

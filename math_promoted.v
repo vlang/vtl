@@ -11,42 +11,43 @@ enum PromotedBinaryOperation {
 	remainder
 }
 
-// add_promoted adds real numeric tensors after converting both operands to
+// add_promoted adds numeric tensors after converting both operands to
 // the explicitly selected NumPy-style promoted dtype. The output type R must
 // match promote_types(dtype_of[T](), dtype_of[U]()).
 pub fn add_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
 	return binary_promoted[R, T, U](a, b, .add)
 }
 
-// subtract_promoted subtracts real numeric tensors after converting both
+// subtract_promoted subtracts numeric tensors after converting both
 // operands to the explicitly selected NumPy-style promoted dtype. The output
 // type R must match promote_types(dtype_of[T](), dtype_of[U]()).
 pub fn subtract_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
 	return binary_promoted[R, T, U](a, b, .subtract)
 }
 
-// multiply_promoted multiplies real numeric tensors after converting both
+// multiply_promoted multiplies numeric tensors after converting both
 // operands to the explicitly selected NumPy-style promoted dtype. The output
 // type R must match promote_types(dtype_of[T](), dtype_of[U]()).
 pub fn multiply_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
 	return binary_promoted[R, T, U](a, b, .multiply)
 }
 
-// divide_promoted performs NumPy-style true division for real numeric tensors
-// and booleans. The output dtype is float32 only when the promoted input dtype
-// is float32; otherwise it is float64. Inputs are broadcast before division.
+// divide_promoted performs NumPy-style true division for numeric tensors and
+// booleans. Complex inputs produce complex128; real inputs produce float32 only
+// when the promoted input dtype is float32, and float64 otherwise.
 pub fn divide_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
 	return binary_promoted[R, T, U](a, b, .divide)
 }
 
 // remainder_promoted returns the element-wise NumPy remainder of real numeric
-// tensors after dtype promotion and broadcasting. Integer zero divisors produce
-// zero; floating-point zero divisors produce NaN.
+// tensors after dtype promotion and broadcasting. Complex inputs are rejected.
+// Integer zero divisors produce zero; floating-point zero divisors produce NaN.
 pub fn remainder_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
 	return binary_promoted[R, T, U](a, b, .remainder)
 }
 
-// add_scalar_promoted adds a weak numeric scalar using NumPy-style promotion.
+// add_scalar_promoted adds a weak numeric or complex scalar using NumPy-style
+// promotion.
 // R must be the inferred result dtype; this explicit type is required by V's
 // statically typed generic return values.
 pub fn add_scalar_promoted[R, T, U](a &Tensor[T], scalar U) !&Tensor[R] {
@@ -72,14 +73,61 @@ pub fn divide_scalar_promoted[R, T, U](a &Tensor[T], scalar U) !&Tensor[R] {
 }
 
 // remainder_scalar_promoted returns the NumPy-style remainder of a tensor and
-// weak numeric scalar. R must be the inferred result dtype.
+// weak numeric scalar. Complex operands are unsupported; R must be the inferred
+// result dtype.
 pub fn remainder_scalar_promoted[R, T, U](a &Tensor[T], scalar U) !&Tensor[R] {
 	return scalar_promoted[R, T, U](a, scalar, .remainder)
 }
 
 @[inline]
 fn binary_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation PromotedBinaryOperation) !&Tensor[R] {
-	$if R is $int || R is $float {
+	$if R is complex.Complex {
+		if operation == .remainder {
+			return error('promoted remainder does not support complex values')
+		}
+		left_dtype := dtype_of[T]()
+		right_dtype := dtype_of[U]()
+		if !is_complex_numeric_dtype(left_dtype) || !is_complex_numeric_dtype(right_dtype) {
+			return error('complex promoted arithmetic requires numeric or boolean tensors')
+		}
+		promoted_dtype := promote_types(left_dtype, right_dtype)!
+		expected := if operation == .divide && promoted_dtype != .complex128 {
+			division_result_dtype(promoted_dtype)
+		} else {
+			promoted_dtype
+		}
+		if dtype_of[R]() != expected {
+			return error('output dtype ${dtype_of[R]()} does not match operation result dtype ${expected}')
+		}
+		shape := broadcast_shapes(a.shape, b.shape)!
+		left := a.broadcast_to(shape)!
+		right := b.broadcast_to(shape)!
+		mut result := empty[R](shape, memory: .row_major)
+		left_is_singleton := a.size == 1
+		right_is_singleton := b.size == 1
+		left_is_flat := left.size == result.size && left.is_row_major_contiguous()
+		right_is_flat := right.size == result.size && right.is_row_major_contiguous()
+		for index in 0 .. result.size {
+			left_offset := if left_is_flat {
+				index
+			} else if left_is_singleton {
+				0
+			} else {
+				broadcast_tensor_offset(index, shape, left.strides)
+			}
+			right_offset := if right_is_flat {
+				index
+			} else if right_is_singleton {
+				0
+			} else {
+				broadcast_tensor_offset(index, shape, right.strides)
+			}
+			x := cast_promoted_value[T, R](left.data.data[left_offset])
+			y := cast_promoted_value[U, R](right.data.data[right_offset])
+			result.data.data[index] = complex_promoted_value(x, y, operation)!
+		}
+		return result
+	} $else $if R is $int || R is $float {
 		left_dtype := dtype_of[T]()
 		right_dtype := dtype_of[U]()
 		left_supported := is_real_numeric_dtype(left_dtype)
@@ -190,13 +238,7 @@ fn scalar_promoted[R, T, U](a &Tensor[T], scalar U, operation PromotedBinaryOper
 		mut result := empty[R](a.shape, memory: .row_major)
 		for index in 0 .. a.size {
 			x := left.data.data[index]
-			result.data.data[index] = match operation {
-				.add { x + right_scalar }
-				.subtract { x - right_scalar }
-				.multiply { x * right_scalar }
-				.divide { x / right_scalar }
-				.remainder { panic('complex remainder is unsupported') }
-			}
+			result.data.data[index] = complex_promoted_value(x, right_scalar, operation)!
 		}
 		return result
 	} $else $if R is $int || R is $float {
@@ -230,6 +272,16 @@ fn weak_complex_scalar_result_dtype[T, U]() !DType {
 		return error('complex weak-scalar arithmetic supports numeric and boolean operands')
 	}
 	return .complex128
+}
+
+fn complex_promoted_value(x complex.Complex, y complex.Complex, operation PromotedBinaryOperation) !complex.Complex {
+	return match operation {
+		.add { x + y }
+		.subtract { x - y }
+		.multiply { x * y }
+		.divide { x / y }
+		.remainder { return error('promoted remainder does not support complex values') }
+	}
 }
 
 fn weak_scalar_result_dtype[T, U](array_dtype DType, scalar U) !DType {
@@ -322,6 +374,10 @@ fn division_result_dtype(promoted_dtype DType) DType {
 
 fn is_float_dtype(dtype DType) bool {
 	return dtype == .float32 || dtype == .float64
+}
+
+fn is_complex_numeric_dtype(dtype DType) bool {
+	return dtype == .complex128 || is_real_numeric_dtype(dtype) || dtype == .boolean
 }
 
 fn is_integer_dtype(dtype DType) bool {

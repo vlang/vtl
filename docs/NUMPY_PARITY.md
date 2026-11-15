@@ -211,16 +211,17 @@ round signed quotients toward negative infinity, preserve input dtype, return
 zero for integer zero divisors, and follow IEEE results for floating-point
 zero divisors. Mixed-dtype promotion remains tracked in
 [#717](https://github.com/vlang/vtl/issues/717). `add_promoted`, `subtract_promoted`, and
-`multiply_promoted` accept mixed real numeric dtypes, broadcast their inputs,
-and validate an explicitly selected output dtype against `promote_types`.
-`divide_promoted` performs NumPy-style true division for mixed real numeric and
-boolean tensors, broadcasts inputs, and returns `float32` only when the
-promoted input dtype is `float32`; other supported combinations return
-`float64`.
+`multiply_promoted` accept mixed real and complex numeric dtypes, broadcast
+their inputs, and validate an explicitly selected output dtype against
+`promote_types`. `divide_promoted` performs NumPy-style true division for mixed
+real numeric, complex, and boolean tensors, broadcasts inputs, and returns
+`complex128` when either input is complex; real inputs return `float32` only
+when the promoted input dtype is `float32`, and `float64` otherwise.
 `remainder_promoted` performs NumPy-style remainder with mixed integer and
 floating-point dtypes and broadcasting. Nonzero results follow the divisor's
 sign; signed zero follows the divisor; integer zero divisors produce zero and
-floating-point zero divisors produce NaN. Floating-point autograd is available
+floating-point zero divisors produce NaN; complex inputs are rejected.
+Floating-point autograd is available
 through `Variable.remainder` for f32/f64: the divisor gradient uses
 `-floor(a / b) * grad`, including at exact multiples, and broadcast gradients
 are reduced to each input shape. Non-finite values follow the forward
@@ -231,6 +232,15 @@ See
 [implementation](../math_promoted.v), [forward tests](../tests/core/math_promoted_remainder_test.v),
 [gradient tests](../autograd_tests/gates_remainder_test.v), and
 [dtype conversion tutorial](./TUTORIAL_FIRST_STEPS.md#numeric-dtype-conversion).
+
+Promoted tensor-to-tensor result dtypes are:
+
+| Tensor operands | Add/subtract/multiply | True divide | Remainder |
+|-----------------|-----------------------|-------------|-----------|
+| Real numeric pair | `promote_types` | f32 if promoted dtype is f32; else f64 | `promote_types` |
+| Complex128 with numeric, bool, or complex128 | complex128 | complex128 | unsupported |
+| Boolean pair | unsupported | f64 | unsupported |
+
 The `add_scalar_promoted`, `subtract_scalar_promoted`,
 `multiply_scalar_promoted`, `divide_scalar_promoted`, and
 `remainder_scalar_promoted` variants apply NumPy-style weak scalar promotion
@@ -300,10 +310,10 @@ per-element closure and sum-type boxing. On this machine (1M f64, `-prod`)
 
 **Remaining:** audit unary/binary function families and complete the missing
 NumPy ufunc coverage in [#777](https://github.com/vlang/vtl/issues/777).
-Promoted tensor-to-tensor arithmetic still lacks complex operands and broader
-operation coverage. Automatic output-dtype selection is not provided: callers
-select the statically typed result parameter, which VTL validates against the
-promotion contract in [#717](https://github.com/vlang/vtl/issues/717).
+Promoted arithmetic still lacks broader operation coverage. Automatic
+output-dtype selection is not provided: callers select the statically typed
+result parameter, which VTL validates against the promotion contract in
+[#717](https://github.com/vlang/vtl/issues/717).
 
 ### Reductions and statistics
 
