@@ -280,6 +280,12 @@ pub fn nextafter_promoted[R, T, U](x &Tensor[T], y &Tensor[U]) !&Tensor[R] {
 	}
 }
 
+// heaviside_promoted returns 0 for negative x1, 1 for positive x1, and x2
+// for zero x1, using NumPy-style float output promotion.
+pub fn heaviside_promoted[R, T, U](x1 &Tensor[T], x2 &Tensor[U]) !&Tensor[R] {
+	return binary_real_ufunc_promoted[R, T, U](x1, x2, heaviside_value, 'heaviside')
+}
+
 // hypot_promoted computes elementwise hypotenuses with NumPy-style float
 // output promotion and broadcasting.
 pub fn hypot_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
@@ -347,6 +353,19 @@ fn numpy_float_ufunc_uses_f64(dtype DType) bool {
 
 fn nextafter32_as_f64(x f64, y f64) f64 {
 	return f64(math.nextafter32(f32(x), f32(y)))
+}
+
+fn heaviside_value(x1 f64, x2 f64) f64 {
+	if math.is_nan(x1) {
+		return x1
+	}
+	if x1 < 0.0 {
+		return 0.0
+	}
+	if x1 > 0.0 {
+		return 1.0
+	}
+	return x2
 }
 
 // remainder_promoted returns the element-wise NumPy remainder of real numeric
