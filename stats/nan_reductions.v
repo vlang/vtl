@@ -20,6 +20,20 @@ pub fn nanprod[T](t &vtl.Tensor[T]) f64 {
 	return nan_reduce_scalar[T](t, .product)
 }
 
+// nansum_with_keepdims returns the NaN-aware global sum as a tensor, optionally
+// retaining the input rank with dimensions of one. Otherwise, it has scalar
+// shape.
+pub fn nansum_with_keepdims[T](t &vtl.Tensor[T], keepdims bool) !&vtl.Tensor[f64] {
+	return flat_reduction_result[f64](nansum[T](t), t.rank(), keepdims)
+}
+
+// nanprod_with_keepdims returns the NaN-aware global product as a tensor,
+// optionally retaining the input rank with dimensions of one. Otherwise, it
+// has scalar shape.
+pub fn nanprod_with_keepdims[T](t &vtl.Tensor[T], keepdims bool) !&vtl.Tensor[f64] {
+	return flat_reduction_result[f64](nanprod[T](t), t.rank(), keepdims)
+}
+
 // nansum_as adds non-NaN values using an explicitly selected accumulator
 // type. Empty and all-NaN inputs return the additive identity.
 pub fn nansum_as[T, U](t &vtl.Tensor[T]) U {
@@ -30,6 +44,16 @@ pub fn nansum_as[T, U](t &vtl.Tensor[T]) U {
 // accumulator type. Empty and all-NaN inputs return the multiplicative identity.
 pub fn nanprod_as[T, U](t &vtl.Tensor[T]) U {
 	return nan_reduce_scalar_as[T, U](t, true)
+}
+
+// nansum_as_with_keepdims returns the NaN-aware global sum accumulated in U.
+pub fn nansum_as_with_keepdims[T, U](t &vtl.Tensor[T], keepdims bool) !&vtl.Tensor[U] {
+	return flat_reduction_result[U](nansum_as[T, U](t), t.rank(), keepdims)
+}
+
+// nanprod_as_with_keepdims returns the NaN-aware global product accumulated in U.
+pub fn nanprod_as_with_keepdims[T, U](t &vtl.Tensor[T], keepdims bool) !&vtl.Tensor[U] {
+	return flat_reduction_result[U](nanprod_as[T, U](t), t.rank(), keepdims)
 }
 
 // nanmin returns the minimum non-NaN element, or NaN if none exists.

@@ -11,6 +11,18 @@ fn test_explicit_accumulator_dtype_controls_global_sums_and_products() {
 	assert product_as[f32, f64](vtl.from_1d([]f32{})!) == 1.0
 }
 
+fn test_explicit_accumulator_dtype_global_keepdims_shapes() ! {
+	values := vtl.from_array([f32(1e8), 1, -1e8], [1, 3])!
+	sum_kept := sum_as_with_keepdims[f32, f64](values, true)!
+	product_kept := product_as_with_keepdims[f32, f64](values, true)!
+	assert sum_kept.shape == [1, 1]
+	assert sum_kept.get_nth(0) == 1.0
+	assert product_kept.shape == [1, 1]
+	assert product_kept.get_nth(0) == -1e16
+	assert sum_as_with_keepdims[f32, f64](values, false)!.shape == []int{}
+	assert product_as_with_keepdims[f32, f64](vtl.from_1d([]f32{})!, true)!.get_nth(0) == 1.0
+}
+
 fn test_explicit_accumulator_dtype_axis_reductions_and_shapes() ! {
 	values := vtl.from_array([f32(1), 2, 3, 4, 5, 6, 7, 8], [2, 2, 2])!
 	sums := sum_along_axes_as[f32, f64](values, [0, -1], false)!

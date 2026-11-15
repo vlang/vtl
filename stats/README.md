@@ -28,6 +28,10 @@ Use `sum_as[T, U]`, `product_as[T, U]`, and the `_along_axis_as` or
 For example, summing an `f32` tensor into `f64` reduces rounding error during
 accumulation. `mean_as` and its axis variants, along with typed variance and
 standard-deviation APIs, offer the same control for statistical moments.
+`sum_with_keepdims` and `prod_with_keepdims` return a tensor for a flattened
+global reduction, optionally retaining the input rank with all dimensions set
+to one (or scalar shape when false); their `_as_with_keepdims` counterparts
+also select accumulator type.
 `average_as`, `average_axis_as`, `average_along_axis_as`, and
 `average_along_axes_as` select the weighted-average accumulator and output type.
 Other reductions retain their documented output types.
@@ -63,7 +67,9 @@ NaN-aware reductions `nansum`, `nanprod`, `nanmin`, and `nanmax` ignore NaN
 values and promote results to `f64`. Their `_axis` variants reduce one axis
 and remove it; `_axis_keepdims` variants retain it with length one. Empty or
 all-NaN sums and products use identities `0` and `1`. Empty or all-NaN minima
-and maxima return NaN.
+and maxima return NaN. `nansum_with_keepdims` and `nanprod_with_keepdims`
+provide tensor results for flattened reductions, with typed
+`*_as_with_keepdims` variants for explicit accumulator selection.
 
 `histogram(data, bins)` infers a finite range from any numeric tensor and
 returns a `Histogram` with `counts` and `bin_edges`. Empty input uses `[0, 1]`;
