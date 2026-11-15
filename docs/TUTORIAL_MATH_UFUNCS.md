@@ -28,6 +28,23 @@ Complex and string inputs are unsupported. The same-dtype `Tensor.sqrt()` and
 `Tensor.cbrt()` methods remain available for compatibility; use the promoted
 functions when NumPy-style integer output is needed.
 
+## Promoted exponential and logarithm
+
+`vtl.exp_promoted[R, T](values)` and `vtl.log_promoted[R, T](values)` share the
+promoted real-output dtype rules: f64 for f64 or 32-bit-and-wider integer
+inputs, and f32 otherwise. They preserve IEEE domain results, such as `-inf`
+for `log(0)` and `NaN` for logarithms of negative values.
+
+```v
+import vtl
+
+values := vtl.from_1d[i16]([0, 1])!
+exponents := vtl.exp_promoted[f32, i16](values)!
+logs := vtl.log_promoted[f32, i16](values)!
+println(exponents.to_array())
+println(logs.to_array()) // [-inf, 0.0]
+```
+
 ## Promoted arctangent with two arguments
 
 `vtl.atan2_promoted[R, T, U](y, x)` broadcasts real numeric or boolean tensors

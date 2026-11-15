@@ -53,6 +53,18 @@ pub fn cbrt_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
 	return unary_real_ufunc_promoted[R, T](t, math.cbrt)
 }
 
+// exp_promoted computes elementwise exponential values using the same output
+// dtype rules as sqrt_promoted.
+pub fn exp_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.exp)
+}
+
+// log_promoted computes elementwise natural logarithms using the same output
+// dtype rules as sqrt_promoted.
+pub fn log_promoted[R, T](t &Tensor[T]) !&Tensor[R] {
+	return unary_real_ufunc_promoted[R, T](t, math.log)
+}
+
 fn unary_real_ufunc_promoted[R, T](t &Tensor[T], operation fn (f64) f64) !&Tensor[R] {
 	input_dtype := dtype_of[T]()
 	if !(is_real_numeric_dtype(input_dtype) || input_dtype == .boolean) {
