@@ -341,7 +341,8 @@ broadcast same-dtype operands while handling IEEE infinities and NaNs. See the
 `Tensor.modf` returns fractional then integral parts, matching NumPy's output
 order, and `Tensor.frexp` returns floating-point mantissas with integer base-2
 exponents. The `ldexp` function reconstructs values and broadcasts mantissas
-against integer exponent tensors. These decomposition ufuncs support f32/f64;
+against integer exponent tensors. `ldexp_scalar` and `ldexp_scalar_left` also
+cover scalar exponents and mantissas. These decomposition ufuncs support f32/f64;
 see the [math ufunc tutorial](./TUTORIAL_MATH_UFUNCS.md) and
 [`math_decomposition` example](../examples/math_decomposition/README.md).
 Elementwise `max`/`min` match NumPy's NaN-propagating `maximum`/`minimum`, and

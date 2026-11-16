@@ -277,6 +277,10 @@ println(exponent.to_array())
 println(reconstructed.to_array())
 ```
 
+For scalar inputs, use `vtl.ldexp_scalar(mantissa_tensor, exponent)` or
+`vtl.ldexp_scalar_left(mantissa, exponent_tensor)`. The results preserve the
+mantissa's f32/f64 dtype and support empty tensors.
+
 The mantissa keeps the input f32/f64 type. Exponents use `Tensor[int]`.
 `modf` and `frexp` reject non-floating tensors; `ldexp` rejects non-floating
 mantissas. All three functions preserve logical tensor order, including views.
