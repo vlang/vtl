@@ -63,7 +63,10 @@ model.mse_loss() // loss function
 `Sequential` starts in training mode. Call `model.eval()` before evaluation to
 disable dropout and make BatchNorm use its running statistics; call
 `model.train()` before resuming training. These methods set module behavior and
-are independent of whether the input tensor requires gradients.
+are independent of whether the input tensor requires gradients. For inference
+without graph construction, also set the shared autograd context's `no_grad`
+flag; `eval()` alone does not disable gradient recording. See the
+[autograd tutorial](./TUTORIAL_AUTOGRAD.md#gradient-accumulation).
 
 ```v
 import vtl
