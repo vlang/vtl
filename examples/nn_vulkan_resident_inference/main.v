@@ -1,3 +1,4 @@
+import os
 import vtl
 import vtl.autograd
 import vtl.nn.models
@@ -13,6 +14,10 @@ fn main() {
 
 	input := ctx.variable(vtl.from_array([f32(-2), -0.5, 0.25, 3], [4])!,
 		requires_grad: false)
-	output := model.forward_vulkan_inference(input) or { panic('Vulkan inference failed: ${err}') }
+	output := model.forward_vulkan_inference(input) or {
+		eprintln('Vulkan inference failed: ${err}')
+		os.exit(1)
+		return
+	}
 	println(output.value.to_array())
 }

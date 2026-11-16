@@ -31,19 +31,34 @@ pub mut:
 // vulkan exposes this operation as part of the public API.
 pub fn (cpu &CpuStorage[T]) vulkan(params VulkanParams) !&VulkanStorage[T] {
 	mut device := params.device
+	owns_device := isnil(device)
 
-	if isnil(device) {
+	if owns_device {
 		device = vulkan.new_device()!
 	}
 
 	arr := cpu.data
 	size := u64(arr.len) * u64(sizeof(T))
-	mut buf := device.buffer(vulkan.DeviceSize(size))!
+	mut buf := device.buffer(vulkan.DeviceSize(size)) or {
+		allocation_error := err
+		if owns_device {
+			device.release() or {
+				return error('${allocation_error}; additionally failed to release owned Vulkan device: ${err}')
+			}
+		}
+		return allocation_error
+	}
 	mut raw := []u8{len: int(size)}
 	unsafe { C.memcpy(raw.data, arr.data, size) }
 	buf.load(raw) or {
+		upload_error := err
 		buf.release()
-		return err
+		if owns_device {
+			device.release() or {
+				return error('${upload_error}; additionally failed to release owned Vulkan device: ${err}')
+			}
+		}
+		return upload_error
 	}
 	return &VulkanStorage[T]{
 		data:   buf
