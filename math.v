@@ -1333,6 +1333,19 @@ pub fn (t &Tensor[T]) sqrt[T]() &Tensor[T] {
 	})
 }
 
+// reciprocal returns the elementwise floating-point reciprocal.
+pub fn (t &Tensor[T]) reciprocal[T]() !&Tensor[T] {
+	$if T is f32 || T is f64 {
+		mut result := empty[T](t.shape.clone(), memory: .row_major)
+		for flat_index in 0 .. t.size {
+			result.data.data[flat_index] = T(1.0 / f64(t.get_nth(flat_index)))
+		}
+		return result
+	} $else {
+		return error('reciprocal requires an f32 or f64 tensor')
+	}
+}
+
 // tan returns the elementwise tan of an tensor
 
 // tan exposes this operation as part of the public API.

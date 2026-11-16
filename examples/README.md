@@ -92,6 +92,7 @@ CIFAR examples for CI-safe checks.
 | [digitize](./digitize) | Assign values to monotonic bins and find insertion positions | `v run ./vtl/examples/digitize/main.v` |
 | [clip](./clip) | Clamp a tensor with broadcastable per-element bounds in one pass | `v run ./vtl/examples/clip/main.v` |
 | [round_decimals](./round_decimals) | Round floating-point tensors to positive or negative decimal places | `v run ./vtl/examples/round_decimals/main.v` |
+| [reciprocal](./reciprocal) | Compute floating-point reciprocals with IEEE zero and infinity behavior | `v run ./vtl/examples/reciprocal/main.v` |
 | [math_decomposition](./math_decomposition) | Split and reconstruct binary floating-point values | `v run ./vtl/examples/math_decomposition/main.v` |
 | [math_log_domain](./math_log_domain) | Combine log values stably and inspect floating-point sign bits | `v run ./vtl/examples/math_log_domain/main.v` |
 | [nan_to_num](./nan_to_num) | Replace NaN and infinities before numerical processing | `v run ./vtl/examples/nan_to_num/main.v` |

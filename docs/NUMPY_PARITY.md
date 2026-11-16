@@ -207,7 +207,10 @@ NumPy-style axis-removed output shape.
 gradients along selected axes; elementwise logical AND/OR/XOR/NOT; integer
 bitwise AND/OR/XOR/invert and scalar left/right shifts. Gradients support
 uniform spacing or monotonic non-uniform coordinates and first/second-order
-boundary differences. `atan2_promoted`, `sqrt_promoted`, `cbrt_promoted`,
+boundary differences. `Tensor.reciprocal()` computes `1/x` for f32/f64
+tensors, preserves shape and dtype, and follows IEEE signs for zeros and
+infinities. Integer and complex inputs are intentionally unsupported.
+`atan2_promoted`, `sqrt_promoted`, `cbrt_promoted`,
 `exp_promoted`, `exp2_promoted`, `expm1_promoted`, `log_promoted`,
 `log2_promoted`, `log10_promoted`, `log1p_promoted`, `sin_promoted`,
 `cos_promoted`, and `tan_promoted`, the inverse-trigonometric functions, and
