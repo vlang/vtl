@@ -96,6 +96,43 @@ fn test_inference_checkpoint_round_trip() ! {
 	assert actual == expected
 }
 
+fn test_inference_checkpoint_save_replaces_existing_file() ! {
+	dir := inference_checkpoint_test_dir()!
+	defer {
+		os.rmdir_all(dir) or {}
+	}
+	path := os.join_path(dir, 'model.json')
+	mut model := inference_checkpoint_test_model(autograd.ctx[f64]())
+	model.save_inference_checkpoint(path)!
+	original := os.read_file(path)!
+
+	model.info.layers[1].variables()[0].value.set_nth(0, 0.75)
+	model.save_inference_checkpoint(path)!
+
+	assert os.read_file(path)! != original
+	entries := os.ls(dir)!
+	assert entries == ['model.json']
+}
+
+fn test_inference_checkpoint_save_cleans_temporary_file_on_replace_failure() ! {
+	dir := inference_checkpoint_test_dir()!
+	defer {
+		os.rmdir_all(dir) or {}
+	}
+	path := os.join_path(dir, 'occupied')
+	os.mkdir(path)!
+	marker := os.join_path(path, 'keep')
+	os.write_file(marker, 'unchanged')!
+	model := inference_checkpoint_test_model(autograd.ctx[f64]())
+	if _ := model.save_inference_checkpoint(path) {
+		assert false, 'saving over a directory must fail'
+	}
+	assert os.read_file(marker)! == 'unchanged'
+	assert os.ls(path)! == ['keep']
+	entries := os.ls(dir)!
+	assert entries == ['occupied']
+}
+
 fn test_inference_checkpoint_rejects_bad_schema_version_and_dtype() ! {
 	dir := inference_checkpoint_test_dir()!
 	defer {

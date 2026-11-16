@@ -3,6 +3,7 @@ module models
 import json2
 import math
 import os
+import rand
 import vtl
 
 const inference_checkpoint_format = 'vtl.sequential.inference'
@@ -134,7 +135,39 @@ pub fn (nn &Sequential[T]) save_inference_checkpoint(path string) ! {
 		dtype:   dtype
 		layers:  serialized_layers
 	}
-	os.write_file(path, json2.encode(checkpoint))!
+	inference_checkpoint_write_atomically(path, json2.encode(checkpoint))!
+}
+
+fn inference_checkpoint_write_atomically(path string, contents string) ! {
+	temporary_path := os.join_path_single(os.dir(path),
+		'.${os.file_name(path)}-${rand.uuid_v4()}')
+	os.write_file(temporary_path, contents) or {
+		write_error := err
+		if os.exists(temporary_path) {
+			os.rm(temporary_path) or {
+				return error('inference checkpoint: write failed (${write_error.msg()}) and temporary-file cleanup failed (${err.msg()})')
+			}
+		}
+		return write_error
+	}
+	inference_checkpoint_replace_file(temporary_path, path) or {
+		replace_error := err
+		os.rm(temporary_path) or {
+			return error('inference checkpoint: replacement failed (${replace_error.msg()}) and temporary-file cleanup failed (${err.msg()})')
+		}
+		return replace_error
+	}
+}
+
+fn inference_checkpoint_replace_file(source string, destination string) ! {
+	if os.is_dir(destination) {
+		return error('inference checkpoint: destination path is a directory')
+	}
+	$if windows {
+		inference_checkpoint_replace_file_windows(source, destination)!
+	} $else {
+		os.rename(source, destination)!
+	}
 }
 
 // load_inference_checkpoint validates a versioned CPU inference checkpoint
