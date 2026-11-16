@@ -41,7 +41,10 @@ pub fn (cpu &CpuStorage[T]) vulkan(params VulkanParams) !&VulkanStorage[T] {
 	mut buf := device.buffer(vulkan.DeviceSize(size))!
 	mut raw := []u8{len: int(size)}
 	unsafe { C.memcpy(raw.data, arr.data, size) }
-	buf.load(raw)!
+	buf.load(raw) or {
+		buf.release()
+		return err
+	}
 	return &VulkanStorage[T]{
 		data:   buf
 		length: arr.len

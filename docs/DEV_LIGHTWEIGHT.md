@@ -73,6 +73,7 @@ vscoped v run ./vtl/examples/nn_cifar10_vulkan/main.v
 # Vulkan f32 GPU full stack (Linear + Conv2D + ReLU + Adam)
 VJOBS=1 vscoped env VTL_USE_VULKAN=1 v -prod -d vulkan run ./vtl/examples/nn_cifar10_vulkan/main.v
 VJOBS=1 vscoped env VTL_USE_VULKAN=1 v -prod -d vulkan test ./vtl/nn/f32_vulkan_training_smoke_d_vulkan_test.v
+VJOBS=1 vscoped env VTL_USE_VULKAN=1 VTL_TEST_VULKAN=1 v -prod -d vulkan test ./vtl/nn/models/sequential_vulkan_residency_d_vulkan_test.v
 VJOBS=1 vscoped env VTL_USE_VULKAN=1 v -prod -d vulkan test \
   ./vtl/nn/internal/conv2d_vulkan_forward_f32_d_vulkan_test.v \
   ./vtl/nn/internal/conv2d_vulkan_backward_f32_d_vulkan_test.v \

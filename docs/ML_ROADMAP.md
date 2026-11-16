@@ -116,7 +116,7 @@ corruption was fixed in main (PR [#409](https://github.com/vlang/vtl/pull/409)).
 
 | Priority | Issue | Topic |
 |----------|-------|--------|
-| P2 | [#797](https://github.com/vlang/vtl/issues/797) | Vulkan: preserve activations across sequential layers |
+| P2 | [#797](https://github.com/vlang/vtl/issues/797) | Vulkan: preserve activations across sequential layers (initial ReLU/Sigmoid eval slice; backward, Linear/Conv2D residency, and benchmark remain) |
 
 ## Performance engineering backlog
 

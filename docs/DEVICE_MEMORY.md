@@ -85,3 +85,13 @@ Current Vulkan f32 stack:
 | Conv2D forward/backward | VSL Vulkan im2col + GEMM (same-padding) |
 | ReLU/Sigmoid | VSL Vulkan compute shaders |
 | Adam | VSL Vulkan fused `adam_step` shader |
+
+`Sequential[f32].forward_vulkan_inference` is an explicit eval/no-grad path
+that keeps adjacent ReLU and Sigmoid activations in one `VulkanTensor`. It
+downloads before unsupported layers and uses the ordinary Sequential path if
+Vulkan is disabled. Vulkan device, upload, dispatch, or readback errors
+propagate rather than silently switching execution paths. It does not change
+generic tensor/device dispatch or support backward propagation. The VSL
+dispatch API currently waits for each Vulkan kernel, so this slice removes
+intermediate host transfers, not per-layer queue synchronization. See the
+[resident inference example](../examples/nn_vulkan_resident_inference/README.md).
