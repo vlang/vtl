@@ -155,6 +155,33 @@ heaviside_result := vtl.heaviside_promoted[f32, f32, i8](x1, x2)!
 println(heaviside_result.to_array())
 ```
 
+## Promoted elementwise extrema
+
+`maximum_promoted`, `minimum_promoted`, `fmax_promoted`, and `fmin_promoted`
+broadcast numeric, boolean, or complex tensor pairs and use `promote_types` for
+the output dtype. `maximum` and `minimum` propagate NaNs; `fmax` and `fmin`
+ignore one NaN operand. Integer comparisons remain exact when promotion
+produces an integer dtype; floating-point ties follow NumPy's signed-zero
+behavior. Pass the expected result type explicitly; weak-scalar extrema remain
+tracked in [#717](https://github.com/vlang/vtl/issues/717).
+
+```v
+import math
+import vtl
+
+values := vtl.from_array[i16]([1, 7, -2, 4], [2, 2])!
+limits := vtl.from_1d[f32]([0.0, 5.0])!
+maximum := vtl.maximum_promoted[f32, i16, f32](values, limits)!
+minimum := vtl.minimum_promoted[f32, i16, f32](values, limits)!
+
+with_nan := vtl.from_1d[f32]([math.nan(), 4.0])!
+fallback := vtl.from_1d[i16]([2, 5])!
+finite_maximum := vtl.fmax_promoted[f32, f32, i16](with_nan, fallback)!
+println(maximum.to_array())
+println(minimum.to_array())
+println(finite_maximum.to_array()) // [2.0, 5.0]
+```
+
 ## Promoted fmod
 
 `fmod_promoted` applies the remainder operation whose nonzero results take the
@@ -249,6 +276,10 @@ println(mantissa.to_array())
 println(exponent.to_array())
 println(reconstructed.to_array())
 ```
+
+For scalar inputs, use `vtl.ldexp_scalar(mantissa_tensor, exponent)` or
+`vtl.ldexp_scalar_left(mantissa, exponent_tensor)`. The results preserve the
+mantissa's f32/f64 dtype and support empty tensors.
 
 The mantissa keeps the input f32/f64 type. Exponents use `Tensor[int]`.
 `modf` and `frexp` reject non-floating tensors; `ldexp` rejects non-floating
