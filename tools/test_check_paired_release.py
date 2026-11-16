@@ -23,6 +23,15 @@ class PairedReleaseValidationTests(unittest.TestCase):
             "v0.2.0-beta.1",
         )
 
+    def test_accepts_legacy_unprefixed_vsl_dependency_version(self):
+        manifest = VTL_MANIFEST.replace(
+            "vsl@v0.2.0-beta.1", "vsl@0.2.0-beta.1"
+        )
+        self.assertEqual(
+            validate_pair(manifest, "v0.2.0-beta.1", VSL_MANIFEST),
+            "v0.2.0-beta.1",
+        )
+
     def test_rejects_vtl_tag_that_differs_from_manifest(self):
         with self.assertRaisesRegex(ValueError, "must match its manifest version"):
             validate_pair(VTL_MANIFEST, "v0.2.0", VSL_MANIFEST)

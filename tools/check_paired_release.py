@@ -48,9 +48,11 @@ def validate_pair(vtl_contents, vtl_tag, vsl_contents=None):
     if len(vsl_dependencies) != 1:
         raise ValueError("VTL manifest must declare exactly one versioned VSL dependency")
     expected_dependency = f"vsl@{vtl_tag}"
-    if vsl_dependencies[0] != expected_dependency:
+    legacy_dependency = f"vsl@{vtl_version}"
+    if vsl_dependencies[0] not in (expected_dependency, legacy_dependency):
         raise ValueError(
-            f"VTL dependency {vsl_dependencies[0]!r} must be {expected_dependency!r}"
+            f"VTL dependency {vsl_dependencies[0]!r} must be {expected_dependency!r} "
+            f"(legacy manifests may use {legacy_dependency!r})"
         )
 
     if vsl_contents is not None:
@@ -60,7 +62,7 @@ def validate_pair(vtl_contents, vtl_tag, vsl_contents=None):
                 f"VSL manifest version {vsl_version!r} must match VTL version "
                 f"{vtl_version!r}"
             )
-    return vsl_dependencies[0].removeprefix("vsl@")
+    return expected_tag
 
 
 def main():

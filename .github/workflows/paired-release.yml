@@ -28,6 +28,12 @@ jobs:
       VTL_CANDIDATE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.vtl_tag || github.ref_name }}
 
     steps:
+      - name: Checkout release validation tools
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: vtl-tools
+
       - name: Checkout VTL candidate
         uses: actions/checkout@v4
         with:
@@ -35,12 +41,12 @@ jobs:
           path: vtl
 
       - name: Test release-pair validation
-        run: python3 vtl/tools/test_check_paired_release.py
+        run: python3 vtl-tools/tools/test_check_paired_release.py
 
       - name: Validate VTL manifest and resolve exact VSL tag
         id: vtl_manifest
         run: |
-          python3 vtl/tools/check_paired_release.py \
+          python3 vtl-tools/tools/check_paired_release.py \
             --vtl-tag "$VTL_CANDIDATE_TAG" \
             --vtl-manifest vtl/v.mod \
             --github-output "$GITHUB_OUTPUT"
@@ -54,7 +60,7 @@ jobs:
 
       - name: Validate both candidate manifests
         run: |
-          python3 vtl/tools/check_paired_release.py \
+          python3 vtl-tools/tools/check_paired_release.py \
             --vtl-tag "$VTL_CANDIDATE_TAG" \
             --vtl-manifest vtl/v.mod \
             --vsl-manifest vsl/v.mod
