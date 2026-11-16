@@ -11,6 +11,7 @@ enum PromotedBinaryOperation {
 	floor_divide
 	fmod
 	remainder
+	power
 }
 
 // add_promoted adds numeric tensors after converting both operands to
@@ -32,6 +33,15 @@ pub fn subtract_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
 // type R must match promote_types(dtype_of[T](), dtype_of[U]()).
 pub fn multiply_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
 	return binary_promoted[R, T, U](a, b, .multiply)
+}
+
+// pow_promoted computes elementwise powers after broadcasting and converting
+// operands to promote_types(dtype_of[T](), dtype_of[U]()). Integer powers keep
+// exact-width wrapping arithmetic and reject negative integer exponents.
+// Complex operands are unsupported; 64-bit integers cannot be combined with a
+// floating output because conversion could lose integer precision.
+pub fn pow_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
+	return binary_promoted[R, T, U](a, b, .power)
 }
 
 // divide_promoted performs NumPy-style true division for numeric tensors and
@@ -478,7 +488,24 @@ pub fn fmod_scalar_left_promoted[R, T, U](scalar U, a &Tensor[T]) !&Tensor[R] {
 
 @[inline]
 fn binary_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation PromotedBinaryOperation) !&Tensor[R] {
-	$if R is complex.Complex {
+	$if R is bool {
+		if operation != .power {
+			return error('promoted arithmetic requires a numeric output dtype')
+		}
+		$if T is bool && U is bool {
+			if promote_types(dtype_of[T](), dtype_of[U]())! != .boolean {
+				return error('promoted power output dtype does not match input promotion')
+			}
+			return a.map_pair_values(b, fn (x bool, y bool) bool {
+				return if y { x } else { true }
+			})
+		} $else {
+			return error('boolean promoted power requires two boolean inputs')
+		}
+	} $else $if R is complex.Complex {
+		if operation == .power {
+			return error('promoted power does not support complex values')
+		}
 		if operation == .remainder {
 			return error('promoted remainder does not support complex values')
 		}
@@ -534,11 +561,11 @@ fn binary_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation PromotedBinary
 		left_dtype := dtype_of[T]()
 		right_dtype := dtype_of[U]()
 		left_supported := is_real_numeric_dtype(left_dtype)
-			|| (operation == .divide && left_dtype == .boolean)
+			|| ((operation == .divide || operation == .power) && left_dtype == .boolean)
 		right_supported := is_real_numeric_dtype(right_dtype)
-			|| (operation == .divide && right_dtype == .boolean)
+			|| ((operation == .divide || operation == .power) && right_dtype == .boolean)
 		if !left_supported || !right_supported {
-			return error('promoted arithmetic supports only real numeric tensors and division of booleans')
+			return error('promoted arithmetic supports only real numeric tensors and boolean power or division')
 		}
 		promoted_dtype := promote_types(left_dtype, right_dtype)!
 		expected := if operation == .divide {
@@ -548,6 +575,11 @@ fn binary_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation PromotedBinary
 		}
 		if dtype_of[R]() != expected {
 			return error('output dtype ${dtype_of[R]()} does not match operation result dtype ${expected}')
+		}
+		if operation == .power && is_float_dtype(expected)
+			&& ((is_integer_dtype(left_dtype) && dtype_bits(left_dtype) >= 64)
+				|| (is_integer_dtype(right_dtype) && dtype_bits(right_dtype) >= 64)) {
+			return error('promoted power rejects 64-bit integer inputs with floating output to avoid precision loss')
 		}
 		if operation == .divide && !is_float_dtype(dtype_of[R]()) {
 			return error('promoted division requires a floating-point output dtype')
@@ -614,6 +646,10 @@ fn binary_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation PromotedBinary
 			}
 			x := cast_promoted_value[T, R](left.data.data[left_offset])
 			y := cast_promoted_value[U, R](right.data.data[right_offset])
+			if operation == .power {
+				result.data.data[index] = numpy_power(x, y)!
+				continue
+			}
 			result.data.data[index] = match operation {
 				.add { x + y }
 				.subtract { x - y }
@@ -622,6 +658,7 @@ fn binary_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation PromotedBinary
 				.floor_divide { numpy_floor_divide[R](x, y) }
 				.fmod { numpy_fmod[R](x, y) }
 				.remainder { return error('promoted remainder dispatch failed') }
+				.power { return error('promoted power dispatch failed') }
 			}
 		}
 		return result
@@ -711,6 +748,35 @@ fn complex_promoted_value(x complex.Complex, y complex.Complex, operation Promot
 		.floor_divide { return error('promoted floor division does not support complex values') }
 		.fmod { return error('promoted fmod does not support complex values') }
 		.remainder { return error('promoted remainder does not support complex values') }
+		.power { return error('promoted power does not support complex values') }
+	}
+}
+
+@[inline]
+fn numpy_power[T](base T, exponent T) !T {
+	$if T is bool {
+		return if exponent { base } else { true }
+	} $else $if T is $int {
+		if is_signed_integer_dtype(dtype_of[T]()) && exponent < T(0) {
+			return error('negative exponents are not allowed for integer power')
+		}
+		mut result := T(1)
+		mut remaining := exponent
+		mut factor := base
+		for remaining > T(0) {
+			if remaining % T(2) != T(0) {
+				result *= factor
+			}
+			remaining /= T(2)
+			if remaining > T(0) {
+				factor *= factor
+			}
+		}
+		return result
+	} $else $if T is $float {
+		return T(math.pow(f64(base), f64(exponent)))
+	} $else {
+		return error('promoted power supports only boolean, real integer, and floating-point values')
 	}
 }
 

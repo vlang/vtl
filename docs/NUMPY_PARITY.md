@@ -240,6 +240,13 @@ when the promoted input dtype is `float32`, and `float64` otherwise.
 floating-point dtypes and broadcasting. Nonzero results follow the divisor's
 sign; signed zero follows the divisor; integer zero divisors produce zero and
 floating-point zero divisors produce NaN; complex inputs are rejected.
+`pow_promoted` broadcasts mixed real numeric tensors and validates its explicit
+output dtype against `promote_types`. Integer powers retain exact-width
+wrapping arithmetic and reject negative integer exponents. Floating results
+preserve IEEE special values and signed zero. Complex and string inputs are
+unsupported; 64-bit integer operands are rejected when promotion requires a
+floating result to avoid silent precision loss. Boolean pairs return boolean
+values under VTL's existing promotion contract (NumPy returns `int8`).
 `fmod_promoted` and its weak-scalar variants preserve the sign-of-dividend
 remainder rule across promoted real numeric dtypes and broadcasting. Integer
 operations retain exact-width arithmetic; zero divisors and signed minimum
@@ -259,11 +266,11 @@ See
 [dtype conversion tutorial](./TUTORIAL_FIRST_STEPS.md#numeric-dtype-conversion).
 
 **Remaining ufunc gaps:** same-dtype methods exist for `abs`, `sign`, extrema,
-`pow`, and `frexp`/`modf`/`ldexp`, but NumPy's
+and `frexp`/`modf`/`ldexp`, but NumPy's
 mixed-dtype, broadcast, and edge-case contracts are not fully covered. Unary
 `abs`/`sign` and the multi-output decomposition functions still need broader
 dtype and special-value differential tests; promoted mixed-input variants
-remain for `maximum`/`minimum`/`fmax`/`fmin`, `pow`, and `ldexp`.
+remain for `maximum`/`minimum`/`fmax`/`fmin` and `ldexp`.
 `erf`/`erfc`, `gamma`, and `log_gamma` are useful VTL math APIs beyond NumPy
 core ufunc parity. The general NumPy ufunc `out` and `where` execution protocol
 is tracked separately in
@@ -271,11 +278,16 @@ is tracked separately in
 
 Promoted tensor-to-tensor result dtypes are:
 
-| Tensor operands | Add/subtract/multiply | True divide | Floor divide | Fmod | Remainder |
-|-----------------|-----------------------|-------------|--------------|------|-----------|
-| Real numeric pair | `promote_types` | f32 if promoted dtype is f32; else f64 | `promote_types` | `promote_types` | `promote_types` |
-| Complex128 with numeric, bool, or complex128 | complex128 | complex128 | unsupported | unsupported | unsupported |
-| Boolean pair | unsupported | f64 | unsupported | unsupported | unsupported |
+| Tensor operands | Add/subtract/multiply | Power | True divide | Floor divide | Fmod | Remainder |
+|-----------------|-----------------------|-------|-------------|--------------|------|-----------|
+| Real numeric pair | `promote_types` | `promote_types` | f32 if promoted dtype is f32; else f64 | `promote_types` | `promote_types` | `promote_types` |
+| Complex128 with numeric, bool, or complex128 | complex128 | unsupported | complex128 | unsupported | unsupported | unsupported |
+| Boolean pair | unsupported | bool | f64 | unsupported | unsupported | unsupported |
+
+`pow_promoted` rejects 64-bit integer operands when `promote_types` selects a
+floating output, and rejects negative exponents when the result dtype is
+integer. Boolean pairs use VTL's existing `promote_types` result (`bool`), not
+NumPy's `int8` result.
 
 The `add_scalar_promoted`, `subtract_scalar_promoted`,
 `multiply_scalar_promoted`, `divide_scalar_promoted`,

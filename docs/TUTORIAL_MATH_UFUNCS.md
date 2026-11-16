@@ -41,6 +41,26 @@ Complex and string inputs are unsupported. The same-dtype `Tensor.sqrt()` and
 `Tensor.cbrt()` methods remain available for compatibility; use the promoted
 functions when NumPy-style integer output is needed.
 
+## Promoted tensor power
+
+`vtl.pow_promoted[R, T, U](bases, exponents)` broadcasts its tensor operands
+and requires `R` to match `promote_types(dtype_of[T](), dtype_of[U]())`.
+Integer results use exact-width wrapping arithmetic; a negative integer
+exponent returns an error. Floating results preserve IEEE special values and
+signed-zero behavior. A 64-bit integer operand paired with a floating output
+is rejected rather than silently rounded. Complex and string inputs are
+unsupported. Boolean pairs follow the existing promotion contract and return
+boolean values, while NumPy currently returns `int8` for boolean power.
+
+```v
+import vtl
+
+bases := vtl.from_2d[i16]([[2], [3]])!
+exponents := vtl.from_1d[f32]([2.0, 3.0, 0.0])!
+values := vtl.pow_promoted[f32, i16, f32](bases, exponents)!
+println(values.to_array()) // [4.0, 8.0, 1.0, 9.0, 27.0, 1.0]
+```
+
 ## Promoted exponential and logarithm
 
 `vtl.exp_promoted[R, T](values)` and `vtl.log_promoted[R, T](values)`, along
