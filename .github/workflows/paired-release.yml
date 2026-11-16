@@ -1,0 +1,94 @@
+name: Paired VTL/VSL release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      vtl_tag:
+        description: Existing VTL candidate tag to validate
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: paired-release-${{ github.event_name == 'workflow_dispatch' && inputs.vtl_tag || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  candidate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      TERM: xterm
+      VJOBS: '2'
+      VTL_CANDIDATE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.vtl_tag || github.ref_name }}
+
+    steps:
+      - name: Checkout VTL candidate
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.vtl_tag || github.ref }}
+          path: vtl
+
+      - name: Test release-pair validation
+        run: python3 vtl/tools/test_check_paired_release.py
+
+      - name: Validate VTL manifest and resolve exact VSL tag
+        id: vtl_manifest
+        run: |
+          python3 vtl/tools/check_paired_release.py \
+            --vtl-tag "$VTL_CANDIDATE_TAG" \
+            --vtl-manifest vtl/v.mod \
+            --github-output "$GITHUB_OUTPUT"
+
+      - name: Checkout exact VSL candidate
+        uses: actions/checkout@v4
+        with:
+          repository: vlang/vsl
+          ref: ${{ steps.vtl_manifest.outputs.vsl_tag }}
+          path: vsl
+
+      - name: Validate both candidate manifests
+        run: |
+          python3 vtl/tools/check_paired_release.py \
+            --vtl-tag "$VTL_CANDIDATE_TAG" \
+            --vtl-manifest vtl/v.mod \
+            --vsl-manifest vsl/v.mod
+
+      - name: Setup V
+        uses: vlang/setup-v@663cc08827d1fc0532ee755b4dedbb183c11d06a # v1.7
+        with:
+          version: ba41fa121b738a1a694e0050401a45d2376e09b9
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get -qq install \
+            gfortran \
+            libxi-dev \
+            libxcursor-dev \
+            mesa-common-dev \
+            liblapacke-dev \
+            libopenblas-dev \
+            libgc-dev \
+            libgl1-mesa-dev \
+            libopenmpi-dev \
+            libhdf5-dev \
+            hdf5-tools \
+            opencl-headers
+
+      - name: Install candidate modules
+        run: |
+          mkdir -p ~/.vmodules
+          mv vtl ~/.vmodules/vtl
+          mv vsl ~/.vmodules/vsl
+
+      - name: Run VTL scoped tests against exact VSL tag
+        run: |
+          cd ~/.vmodules
+          env HOME="$HOME" PATH="$PATH" VJOBS=2 TERM="$TERM" \
+            "$HOME/.vmodules/vtl/bin/test"
