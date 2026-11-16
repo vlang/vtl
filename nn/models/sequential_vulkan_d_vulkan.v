@@ -8,7 +8,7 @@ import vsl.vulkan
 
 struct VulkanInferenceSession {
 mut:
-	device   &vulkan.Device       = unsafe { nil }
+	device   &vulkan.Device         = unsafe { nil }
 	resident &vtl.VulkanTensor[f32] = unsafe { nil }
 }
 
