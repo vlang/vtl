@@ -61,6 +61,12 @@ fn test_square_into_reuses_output_and_supports_strided_views() ! {
 
 	assert output_view.to_array() == [1, 9, 4, 16]
 	assert output_base.to_array() == [1, 4, 9, 16]
+
+	mut gapped_base := vtl.full[int]([6], -1)
+	gapped_parent := gapped_base.slice([0, 4])!
+	mut gapped_output := gapped_parent.as_strided([2, 2], [3, 1])!
+	input_matrix.square_into(mut gapped_output)!
+	assert gapped_base.to_array() == [1, 4, -1, 9, 16, -1]
 }
 
 fn test_square_into_snapshots_overlapping_views() ! {
@@ -72,6 +78,28 @@ fn test_square_into_snapshots_overlapping_views() ! {
 
 	assert output.to_array() == [1, 4, 9, 16]
 	assert storage.to_array() == [1, 1, 4, 9, 16]
+}
+
+fn test_square_into_rejects_internally_overlapping_output_views() ! {
+	input := vtl.from_2d([[1, 2], [3, 4]])!
+
+	mut zero_stride_base := vtl.from_1d[int]([10, 20, 30, 40])!
+	mut zero_stride_output := zero_stride_base.as_strided([2, 2], [0, 1])!
+	if _ := input.square_into(mut zero_stride_output) {
+		assert false, 'square_into must reject zero-stride output dimensions'
+	} else {
+		assert err.msg().contains('non-overlapping')
+		assert zero_stride_base.to_array() == [10, 20, 30, 40]
+	}
+
+	mut overlapping_base := vtl.from_1d[int]([10, 20, 30, 40])!
+	mut overlapping_output := overlapping_base.as_strided([2, 2], [1, 1])!
+	if _ := input.square_into(mut overlapping_output) {
+		assert false, 'square_into must reject overlapping nonzero strides'
+	} else {
+		assert err.msg().contains('non-overlapping')
+		assert overlapping_base.to_array() == [10, 20, 30, 40]
+	}
 }
 
 fn test_square_into_validates_shape_and_handles_empty_tensors() ! {
