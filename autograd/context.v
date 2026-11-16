@@ -99,6 +99,13 @@ pub fn register[T](name string, gate voidptr, backward BackwardFn, result &Varia
 	if parents.len == 0 {
 		return error(@FN + ': it is needed to specify at least one parent')
 	}
+	if parents[0].context.no_grad {
+		mut operation_result := result
+		operation_result.requires_grad = false
+		operation_result.grad = operation_result.value
+		operation_result.grad_buffer_fresh = false
+		return
+	}
 
 	mut operation_result := result
 	prepare_result_gradient[T](mut operation_result)
