@@ -341,6 +341,8 @@ Elementwise `max`/`min` match NumPy's NaN-propagating `maximum`/`minimum`, and
 `fmax`/`fmin` ignore a single NaN operand. These operations broadcast and
 support boolean, integer, floating-point, and complex tensors; floating-point
 zero ties follow each NumPy ufunc's sign behavior.
+`Tensor.abs()` preserves integer values without converting through `f64`;
+the minimum signed integer retains its fixed-width value, matching NumPy.
 `fmod` follows NumPy's sign-of-dividend remainder rule. Integer inputs use
 exact-width arithmetic, including values beyond float64's exact-integer range;
 integer zero divisors and signed minimum modulo `-1` produce zero. Floating
