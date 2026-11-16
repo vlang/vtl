@@ -21,8 +21,16 @@ fn test_abs_preserves_large_integer_precision() {
 
 fn test_abs_preserves_signed_minimum() {
 	minimum := i64(-9_223_372_036_854_775_807) - 1
+	minimum_i32 := i32(-2_147_483_647) - 1
+	minimum_i16 := i16(-32_767) - 1
 	assert vtl.from_1d[i64]([minimum])!.abs().to_array() == [minimum]
+	assert vtl.from_1d[i32]([minimum_i32])!.abs().to_array() == [minimum_i32]
+	assert vtl.from_1d[i16]([minimum_i16])!.abs().to_array() == [minimum_i16]
 	assert vtl.from_1d[i8]([-128])!.abs().to_array() == [-128]
+	assert vtl.from_1d[int]([min_int])!.abs().to_array() == [min_int]
+	assert vtl.from_1d[u32]([4_000_000_000])!.abs().to_array() == [4_000_000_000]
+	assert vtl.from_1d[u16]([65_535])!.abs().to_array() == [65_535]
+	assert vtl.from_1d[u8]([255])!.abs().to_array() == [255]
 }
 
 fn test_abs_preserves_float_ieee_behavior() {
