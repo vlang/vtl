@@ -269,6 +269,28 @@ core ufunc parity. The general NumPy ufunc `out` and `where` execution protocol
 is tracked separately in
 [#783](https://github.com/vlang/vtl/issues/783).
 
+#### Ufunc execution protocol
+
+The following table distinguishes existing related APIs from NumPy's
+per-ufunc execution protocol. “Planned” means the NumPy protocol is not
+implemented yet; it does not imply behavior beyond the listed APIs. VTL has
+not declared any protocol below intentionally unsupported.
+
+| NumPy protocol | VTL status | Current contract |
+|---------------|------------|------------------|
+| Operand broadcasting | Partial | Many elementwise functions broadcast inputs; support and dtype behavior are operation-specific. |
+| Strided input views | Partial | Many elementwise functions follow logical tensor iteration; support and output layout remain operation-specific. |
+| `out=` | Planned | Elementwise functions return newly allocated tensors; callers cannot supply a result buffer. |
+| `where=` mask | Planned | Ufuncs do not accept execution masks. `vtl.where(condition, x, y)` is a separate selection operation and evaluates both value tensors first. |
+| `casting=` | Partial | Promoted functions take an explicit output type and validate it against promotion rules; NumPy's per-call casting modes are not exposed. |
+| Output aliasing and overlap | Planned | There is no general ufunc output buffer or overlap contract. |
+| Empty inputs | Partial | Behavior is defined by each named operation; there is no shared ufunc-method contract. |
+| `ufunc.reduce` | Partial | `Tensor.reduce` accepts an initial value and callback, and named reductions provide operation-specific axis APIs; NumPy ufunc methods such as `add.reduce` are not exposed. |
+| `ufunc.accumulate` | Partial | Named `cumsum`/`cumprod` APIs provide scans; arbitrary ufunc accumulations are not exposed. |
+| `ufunc.reduceat` | Planned | No corresponding segmented ufunc reduction API. |
+| `ufunc.outer` | Partial | `la.outer` is a separate vector outer-product operation, not a generic elementwise ufunc method. |
+| `ufunc.at` | Planned | No NumPy-style indexed in-place ufunc update protocol. |
+
 Promoted tensor-to-tensor result dtypes are:
 
 | Tensor operands | Add/subtract/multiply | True divide | Floor divide | Fmod | Remainder |

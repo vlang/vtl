@@ -286,3 +286,17 @@ println(signed.to_array())
 
 See the [stable log-domain example](../examples/math_log_domain/README.md) and
 the [NumPy parity tracker](./NUMPY_PARITY.md#math-and-ufuncs).
+
+## Ufunc execution arguments and methods
+
+Elementwise functions currently return new tensors. They do not accept NumPy's
+`out=`, masked `where=`, or per-call `casting=` arguments. The separate
+`vtl.where(condition, x, y)` function selects between already-computed tensors;
+it is not a lazy ufunc mask and does not reuse an output buffer.
+
+Use the named reduction and scan APIs, such as `sum`, `cumsum`, and `cumprod`,
+for their documented behavior. `Tensor.reduce` provides a callback-based
+reduction, but VTL does not expose NumPy's per-ufunc methods such as
+`add.reduce`, `ufunc.reduceat`, or `ufunc.at`. See the
+[ufunc execution capability table](./NUMPY_PARITY.md#ufunc-execution-protocol)
+for current support and planned work.
