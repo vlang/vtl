@@ -12,7 +12,64 @@ VERSION_PATTERN = re.compile(
 )
 
 
+def strip_comments(contents):
+    """Remove V-style comments without altering quoted manifest values."""
+    cleaned = []
+    quote = None
+    escaped = False
+    block_comment_depth = 0
+    index = 0
+    while index < len(contents):
+        char = contents[index]
+        next_char = contents[index + 1] if index + 1 < len(contents) else ""
+        if block_comment_depth:
+            if char == "*" and next_char == "/":
+                cleaned.extend("  ")
+                index += 2
+                block_comment_depth -= 1
+                continue
+            if char == "/" and next_char == "*":
+                cleaned.extend("  ")
+                index += 2
+                block_comment_depth += 1
+                continue
+            cleaned.append("\n" if char == "\n" else " ")
+            index += 1
+            continue
+        if quote is not None:
+            cleaned.append(char)
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == quote:
+                quote = None
+            index += 1
+            continue
+        if char in ("'", '"'):
+            quote = char
+            cleaned.append(char)
+            index += 1
+            continue
+        if char == "/" and next_char == "/":
+            while index < len(contents) and contents[index] != "\n":
+                cleaned.append(" ")
+                index += 1
+            continue
+        if char == "/" and next_char == "*":
+            cleaned.extend("  ")
+            index += 2
+            block_comment_depth = 1
+            continue
+        cleaned.append(char)
+        index += 1
+    if block_comment_depth:
+        raise ValueError("manifest contains an unterminated block comment")
+    return "".join(cleaned)
+
+
 def parse_manifest(contents, label):
+    contents = strip_comments(contents)
     versions = re.findall(
         r"""(?m)^\s*version\s*:\s*(['"])(.*?)\1\s*$""", contents
     )

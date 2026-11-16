@@ -6,6 +6,7 @@ from check_paired_release import validate_pair
 VTL_MANIFEST = """Module {
     name: 'vtl'
     version: '0.2.0-beta.1'
+    repo_url: 'https://github.com/vlang/vtl'
     dependencies: ['vsl@v0.2.0-beta.1']
 }
 """
@@ -31,6 +32,35 @@ class PairedReleaseValidationTests(unittest.TestCase):
             validate_pair(manifest, "v0.2.0-beta.1", VSL_MANIFEST),
             "v0.2.0-beta.1",
         )
+
+    def test_rejects_vsl_dependency_only_in_line_comment(self):
+        manifest = VTL_MANIFEST.replace(
+            "dependencies: ['vsl@v0.2.0-beta.1']",
+            "dependencies: [\n        // 'vsl@v0.2.0-beta.1'\n    ]",
+        )
+        with self.assertRaisesRegex(ValueError, "exactly one versioned VSL"):
+            validate_pair(manifest, "v0.2.0-beta.1")
+
+    def test_rejects_vsl_dependency_only_in_block_comment(self):
+        for comments in (
+            "/* 'vsl@v0.2.0-beta.1' */",
+            "/* outer /* nested */ 'vsl@v0.2.0-beta.1' */",
+        ):
+            manifest = VTL_MANIFEST.replace(
+                "dependencies: ['vsl@v0.2.0-beta.1']",
+                f"dependencies: [{comments}]",
+            )
+            with self.subTest(comments=comments):
+                with self.assertRaisesRegex(ValueError, "exactly one versioned VSL"):
+                    validate_pair(manifest, "v0.2.0-beta.1")
+
+    def test_rejects_version_field_only_in_comment(self):
+        manifest = VTL_MANIFEST.replace(
+            "version: '0.2.0-beta.1'",
+            "// version: '0.2.0-beta.1'",
+        )
+        with self.assertRaisesRegex(ValueError, "exactly one quoted version field"):
+            validate_pair(manifest, "v0.2.0-beta.1")
 
     def test_rejects_vtl_tag_that_differs_from_manifest(self):
         with self.assertRaisesRegex(ValueError, "must match its manifest version"):
