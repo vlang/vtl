@@ -280,10 +280,10 @@ not declared any protocol below intentionally unsupported.
 |---------------|------------|------------------|
 | Operand broadcasting | Partial | Many elementwise functions broadcast inputs; support and dtype behavior are operation-specific. |
 | Strided input views | Partial | Many elementwise functions follow logical tensor iteration; support and output layout remain operation-specific. |
-| `out=` | Planned | Elementwise functions return newly allocated tensors; callers cannot supply a result buffer. |
+| `out=` | Partial | `Tensor.square_into` reuses a same-shaped output, including strided views; other elementwise functions return newly allocated tensors. |
 | `where=` mask | Planned | Ufuncs do not accept execution masks. `vtl.where(condition, x, y)` is a separate selection operation and evaluates both value tensors first. |
 | `casting=` | Partial | Promoted functions take an explicit output type and validate it against promotion rules; NumPy's per-call casting modes are not exposed. |
-| Output aliasing and overlap | Planned | There is no general ufunc output buffer or overlap contract. |
+| Output aliasing and overlap | Partial | `square_into` snapshots input values when storage overlaps; other ufuncs have no general overlap contract. |
 | Empty inputs | Partial | Behavior is defined by each named operation; there is no shared ufunc-method contract. |
 | `ufunc.reduce` | Partial | `Tensor.reduce` accepts an initial value and callback, and named reductions provide operation-specific axis APIs; NumPy ufunc methods such as `add.reduce` are not exposed. |
 | `ufunc.accumulate` | Partial | Named `cumsum`/`cumprod` APIs provide scans; arbitrary ufunc accumulations are not exposed. |

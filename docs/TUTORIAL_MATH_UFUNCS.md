@@ -289,14 +289,26 @@ the [NumPy parity tracker](./NUMPY_PARITY.md#math-and-ufuncs).
 
 ## Ufunc execution arguments and methods
 
-Elementwise functions currently return new tensors. They do not accept NumPy's
-`out=`, masked `where=`, or per-call `casting=` arguments. The separate
-`vtl.where(condition, x, y)` function selects between already-computed tensors;
-it is not a lazy ufunc mask and does not reuse an output buffer.
+`Tensor.square_into(mut out)` is the first output-buffer path. It requires the
+same shape and dtype as the input, reuses the supplied tensor, supports strided
+output views, and snapshots input values if input and output storage overlap.
+Other elementwise functions still return new tensors; VTL does not yet have a
+shared NumPy `out=` protocol, masked `where=`, or per-call `casting=`.
 
-Use the named reduction and scan APIs, such as `sum`, `cumsum`, and `cumprod`,
-for their documented behavior. `Tensor.reduce` provides a callback-based
-reduction, but VTL does not expose NumPy's per-ufunc methods such as
-`add.reduce`, `ufunc.reduceat`, or `ufunc.at`. See the
+```v
+import vtl
+
+values := vtl.from_1d[f64]([1.5, -2.0])!
+mut output := vtl.zeros[f64]([2])
+reused := values.square_into(mut output)!
+println(reused.to_array()) // [2.25, 4.0]
+```
+
+The separate `vtl.where(condition, x, y)` function selects between
+already-computed tensors; it is not a lazy ufunc mask and does not reuse an
+output buffer. Use the named reduction and scan APIs, such as `sum`, `cumsum`,
+and `cumprod`, for their documented behavior. `Tensor.reduce` provides a
+callback-based reduction, but VTL does not expose NumPy's per-ufunc methods such
+as `add.reduce`, `ufunc.reduceat`, or `ufunc.at`. See the
 [ufunc execution capability table](./NUMPY_PARITY.md#ufunc-execution-protocol)
 for current support and planned work.

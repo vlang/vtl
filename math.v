@@ -1159,14 +1159,60 @@ pub fn (a &Tensor[T]) pow[T](b &Tensor[T]) !&Tensor[T] {
 pub fn (t &Tensor[T]) square[T]() !&Tensor[T] {
 	$if T is bool {
 		return t.map_values(fn [T](value T) T {
-			return value
+			return square_value[T](value)
 		})
 	} $else $if T is $int || T is $float || T is vcomplex.Complex {
 		return t.map_values(fn [T](value T) T {
-			return value * value
+			return square_value[T](value)
 		})
 	} $else {
 		return error('square supports only numeric and boolean tensors')
+	}
+}
+
+// square_into writes the elementwise square to a same-shaped output tensor.
+// Overlapping input and output storage is safe; input values are snapshotted
+// before any writes.
+pub fn (t &Tensor[T]) square_into[T](mut out Tensor[T]) !&Tensor[T] {
+	if out.shape != t.shape {
+		return error('square_into output shape ${out.shape} must match input shape ${t.shape}')
+	}
+	$if T is bool {
+		return square_values_into[T](t, mut out)
+	} $else $if T is $int || T is $float || T is vcomplex.Complex {
+		return square_values_into[T](t, mut out)
+	} $else {
+		return error('square_into supports only numeric and boolean tensors')
+	}
+}
+
+fn square_values_into[T](t &Tensor[T], mut out Tensor[T]) &Tensor[T] {
+	overlaps := tensor_shares_storage[T, T](t, &out)
+	mut source_values := []T{}
+	if overlaps {
+		source_values = t.to_array()
+	}
+	if !overlaps && t.is_row_major_contiguous() && out.is_row_major_contiguous()
+		&& t.data.data.len == t.size && out.data.data.len == out.size {
+		for i in 0 .. t.size {
+			out.data.data[i] = square_value[T](t.data.data[i])
+		}
+		return out
+	}
+	for i in 0 .. t.size {
+		value := if overlaps { source_values[i] } else { t.get_nth(i) }
+		out.set_nth[T](i, square_value[T](value))
+	}
+	return out
+}
+
+fn square_value[T](value T) T {
+	$if T is bool {
+		return value
+	} $else $if T is $int || T is $float || T is vcomplex.Complex {
+		return value * value
+	} $else {
+		return value
 	}
 }
 

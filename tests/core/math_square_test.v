@@ -44,3 +44,58 @@ fn test_square_supports_complex_and_rejects_strings() ! {
 		assert false, 'square must reject string tensors'
 	}
 }
+
+fn test_square_into_reuses_output_and_supports_strided_views() ! {
+	values := vtl.from_1d[int]([1, 2, 3])!
+	mut output := vtl.full[int]([3], -1)
+	result := values.square_into(mut output)!
+
+	assert result.data == output.data
+	assert output.to_array() == [1, 4, 9]
+
+	input_matrix := vtl.from_2d([[1, 2], [3, 4]])!
+	input_view := input_matrix.transpose([1, 0])!
+	mut output_base := vtl.zeros[int]([2, 2])
+	mut output_view := output_base.transpose([1, 0])!
+	input_view.square_into(mut output_view)!
+
+	assert output_view.to_array() == [1, 9, 4, 16]
+	assert output_base.to_array() == [1, 4, 9, 16]
+}
+
+fn test_square_into_snapshots_overlapping_views() ! {
+	mut storage := vtl.from_1d[int]([1, 2, 3, 4, 0])!
+	input := storage.slice([0, 4])!
+	mut output := storage.slice([1, 5])!
+
+	input.square_into(mut output)!
+
+	assert output.to_array() == [1, 4, 9, 16]
+	assert storage.to_array() == [1, 1, 4, 9, 16]
+}
+
+fn test_square_into_validates_shape_and_handles_empty_tensors() ! {
+	values := vtl.from_1d[int]([2, 3])!
+	mut wrong_shape := vtl.full[int]([1], 7)
+	if _ := values.square_into(mut wrong_shape) {
+		assert false, 'square_into must reject a mismatched output shape'
+	} else {
+		assert err.msg().contains('shape')
+		assert wrong_shape.to_array() == [7]
+	}
+
+	empty_input := vtl.empty[f32]([2, 0])
+	mut empty_output := vtl.empty[f32]([2, 0])
+	result := empty_input.square_into(mut empty_output)!
+	assert result.shape == [2, 0]
+	assert result.size == 0
+
+	strings := vtl.from_1d(['not numeric'])!
+	mut string_output := vtl.from_1d(['unchanged'])!
+	if _ := strings.square_into(mut string_output) {
+		assert false, 'square_into must reject string tensors'
+	} else {
+		assert err.msg().contains('numeric')
+		assert string_output.to_array() == ['unchanged']
+	}
+}
