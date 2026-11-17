@@ -173,6 +173,7 @@ systemd-run --user --scope --property=MemoryMax=4G --property=MemorySwapMax=0 \
 ```
 
 See [DEV_LIGHTWEIGHT.md](docs/DEV_LIGHTWEIGHT.md) for memory-safe subsets in CI.
+See [PAIRED_RELEASES.md](docs/PAIRED_RELEASES.md) for VTL/VSL candidate release validation.
 
 ## Documentation
 
