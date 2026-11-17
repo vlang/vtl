@@ -246,6 +246,12 @@ operations retain exact-width arithmetic; zero divisors and signed minimum
 modulo `-1` produce zero. Floating-point operations use `math.fmod`, including
 IEEE NaN results and signed-zero preservation. Boolean and complex inputs are
 unsupported.
+`maximum_promoted`, `minimum_promoted`, `fmax_promoted`, and `fmin_promoted`
+broadcast mixed numeric, boolean, or complex tensor pairs using `promote_types`.
+The first pair propagates NaNs; the latter pair ignores one NaN operand. Integer
+comparisons retain exactness when promotion produces an integer dtype, and
+floating-point tie handling matches NumPy's signed-zero rules. Weak-scalar
+extrema remain part of #717.
 Floating-point autograd is available
 through `Variable.remainder` for f32/f64: the divisor gradient uses
 `-floor(a / b) * grad`, including at exact multiples, and broadcast gradients
@@ -263,7 +269,8 @@ See
 mixed-dtype, broadcast, and edge-case contracts are not fully covered. Unary
 `abs`/`sign` and the multi-output decomposition functions still need broader
 dtype and special-value differential tests; promoted mixed-input variants
-remain for `maximum`/`minimum`/`fmax`/`fmin`, `pow`, and `ldexp`.
+remain for `pow` and `ldexp`. The new promoted extrema functions cover tensor
+pairs; weak-scalar extrema remain tracked by [#717](https://github.com/vlang/vtl/issues/717).
 `erf`/`erfc`, `gamma`, and `log_gamma` are useful VTL math APIs beyond NumPy
 core ufunc parity. The general NumPy ufunc `out` and `where` execution protocol
 is tracked separately in
@@ -334,13 +341,16 @@ broadcast same-dtype operands while handling IEEE infinities and NaNs. See the
 `Tensor.modf` returns fractional then integral parts, matching NumPy's output
 order, and `Tensor.frexp` returns floating-point mantissas with integer base-2
 exponents. The `ldexp` function reconstructs values and broadcasts mantissas
-against integer exponent tensors. These decomposition ufuncs support f32/f64;
+against integer exponent tensors. `ldexp_scalar` and `ldexp_scalar_left` also
+cover scalar exponents and mantissas. These decomposition ufuncs support f32/f64;
 see the [math ufunc tutorial](./TUTORIAL_MATH_UFUNCS.md) and
 [`math_decomposition` example](../examples/math_decomposition/README.md).
 Elementwise `max`/`min` match NumPy's NaN-propagating `maximum`/`minimum`, and
 `fmax`/`fmin` ignore a single NaN operand. These operations broadcast and
 support boolean, integer, floating-point, and complex tensors; floating-point
 zero ties follow each NumPy ufunc's sign behavior.
+`Tensor.abs()` preserves integer values without converting through `f64`;
+the minimum signed integer retains its fixed-width value, matching NumPy.
 `fmod` follows NumPy's sign-of-dividend remainder rule. Integer inputs use
 exact-width arithmetic, including values beyond float64's exact-integer range;
 integer zero divisors and signed minimum modulo `-1` produce zero. Floating
