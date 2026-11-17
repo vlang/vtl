@@ -329,11 +329,11 @@ their dtype; integer arrays retain their dtype for in-range integer or boolean
 scalars and promote to f64 for floating scalars. Boolean arrays with boolean
 scalars remain boolean; other numeric scalars use `promote_types`. Complex
 inputs produce complex128. `maximum`/`minimum` propagate NaNs, while `fmax`/
-`fmin` ignore one NaN and return the left operand when both are NaN. For real
-zero ties, `fmax` selects positive zero and `fmin` selects negative zero
-regardless of operand order; `maximum`/`minimum` retain their ordinary
-operand-order tie behavior. The output type is explicit and validated against
-the inferred result dtype.
+`fmin` ignore one NaN and return the left operand when both are NaN. For
+opposite-sign real zero ties, `fmax` selects positive zero and `fmin` selects
+negative zero regardless of operand order; same-sign zero ties retain their
+sign. `maximum`/`minimum` retain their ordinary operand-order tie behavior.
+The output type is explicit and validated against the inferred result dtype.
 `nan_to_num` replaces NaN with zero and infinities with finite type limits for
 f32/f64 tensors and replaces non-finite real and imaginary components
 independently for complex128 tensors, with optional custom replacements.

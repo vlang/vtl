@@ -287,6 +287,21 @@ fn test_weak_scalar_extrema_follow_nan_and_signed_zero_rules() ! {
 	assert math.signbit(fmaximum_right.get_nth(1))
 	assert math.signbit(fminimum_left.get_nth(0))
 	assert math.signbit(fminimum_left.get_nth(1))
+
+	negative_zeros := vtl.from_1d[f64]([-0.0, -0.0])!
+	positive_zeros := vtl.from_1d[f64]([0.0, 0.0])!
+	fmaximum_negative := vtl.fmax_scalar_promoted[f64, f64, f64](negative_zeros, -0.0)!
+	fminimum_negative := vtl.fmin_scalar_left_promoted[f64, f64, f64](-0.0, negative_zeros)!
+	fmaximum_positive := vtl.fmax_scalar_left_promoted[f64, f64, f64](0.0, positive_zeros)!
+	fminimum_positive := vtl.fmin_scalar_promoted[f64, f64, f64](positive_zeros, 0.0)!
+	assert math.signbit(fmaximum_negative.get_nth(0))
+	assert math.signbit(fmaximum_negative.get_nth(1))
+	assert math.signbit(fminimum_negative.get_nth(0))
+	assert math.signbit(fminimum_negative.get_nth(1))
+	assert !math.signbit(fmaximum_positive.get_nth(0))
+	assert !math.signbit(fmaximum_positive.get_nth(1))
+	assert !math.signbit(fminimum_positive.get_nth(0))
+	assert !math.signbit(fminimum_positive.get_nth(1))
 }
 
 fn test_weak_scalar_extrema_support_boolean_and_complex_values() ! {
