@@ -269,8 +269,8 @@ See
 mixed-dtype, broadcast, and edge-case contracts are not fully covered. Unary
 `abs`/`sign` and the multi-output decomposition functions still need broader
 dtype and special-value differential tests; promoted mixed-input variants
-remain for `pow` and `ldexp`. The new promoted extrema functions cover tensor
-pairs; weak-scalar extrema remain tracked by [#717](https://github.com/vlang/vtl/issues/717).
+remain for `pow` and `ldexp`. Promoted extrema cover tensor pairs and weak
+scalars through the APIs below.
 `erf`/`erfc`, `gamma`, and `log_gamma` are useful VTL math APIs beyond NumPy
 core ufunc parity. The general NumPy ufunc `out` and `where` execution protocol
 is tracked separately in
@@ -321,6 +321,19 @@ decimal places using ties-to-even, matching NumPy `round` for the supported
 same-dtype inputs; integer tensors are copied unchanged. VTL preserves finite
 inputs rather than overflowing when an extreme positive decimal position
 would overflow its intermediate scale.
+
+Weak-scalar extrema are exposed as `maximum_scalar_promoted`,
+`minimum_scalar_promoted`, `fmax_scalar_promoted`, and `fmin_scalar_promoted`,
+with corresponding `*_scalar_left_promoted` forms. Floating arrays retain
+their dtype; integer arrays retain their dtype for in-range integer or boolean
+scalars and promote to f64 for floating scalars. Boolean arrays with boolean
+scalars remain boolean; other numeric scalars use `promote_types`. Complex
+inputs produce complex128. `maximum`/`minimum` propagate NaNs, while `fmax`/
+`fmin` ignore one NaN and return the left operand when both are NaN. For
+opposite-sign real zero ties, `fmax` selects positive zero and `fmin` selects
+negative zero regardless of operand order; same-sign zero ties retain their
+sign. `maximum`/`minimum` retain their ordinary operand-order tie behavior.
+The output type is explicit and validated against the inferred result dtype.
 `nan_to_num` replaces NaN with zero and infinities with finite type limits for
 f32/f64 tensors and replaces non-finite real and imaginary components
 independently for complex128 tensors, with optional custom replacements.
