@@ -66,6 +66,51 @@ fn test_ldexp_broadcasts_mantissas_and_exponents() ! {
 	assert result.to_array() == [1.0, 2.0, 4.0, -0.5, -1.0, -2.0]
 }
 
+fn test_ldexp_accepts_scalar_exponents_and_preserves_special_values() ! {
+	mantissa := vtl.from_1d[f32]([0.5, -0.0, math.inf(1), math.nan()])!
+	result := vtl.ldexp_scalar[f32](mantissa, 2)!
+
+	assert result.dtype() == .float32
+	assert result.get_nth(0) == f32(2.0)
+	assert math.signbit(result.get_nth(1))
+	assert result.get_nth(2) == f32(math.inf(1))
+	assert math.is_nan(result.get_nth(3))
+
+	scalar_mantissa := vtl.from_array[f64]([0.5], [])!
+	scalar_result := vtl.ldexp_scalar(scalar_mantissa, 1)!
+	assert scalar_result.shape.len == 0
+	assert scalar_result.get_nth(0) == 1.0
+
+	empty := vtl.from_array[f64]([]f64{}, [0])!
+	assert vtl.ldexp_scalar[f64](empty, 3)!.shape == [0]
+}
+
+fn test_ldexp_accepts_scalar_mantissas_and_empty_exponent_tensors() ! {
+	exponent := vtl.from_1d([1, 2, -1])!
+	result := vtl.ldexp_scalar_left[f64](0.5, exponent)!
+	assert result.dtype() == .float64
+	assert result.to_array() == [1.0, 2.0, 0.25]
+
+	scalar_exponent := vtl.from_array[int]([2], [])!
+	scalar_result := vtl.ldexp_scalar_left(0.5, scalar_exponent)!
+	assert scalar_result.shape.len == 0
+	assert scalar_result.get_nth(0) == 2.0
+
+	empty_exponent := vtl.from_array[int]([]int{}, [0])!
+	empty_result := vtl.ldexp_scalar_left[f64](0.5, empty_exponent)!
+	assert empty_result.shape == [0]
+	assert empty_result.size == 0
+}
+
+fn test_ldexp_scalar_rejects_non_floating_mantissas() ! {
+	mantissa := vtl.from_1d[i32]([1, 2])!
+	vtl.ldexp_scalar[i32](mantissa, 1) or {
+		assert err.msg().contains('f32 or f64')
+		return
+	}
+	assert false, 'expected ldexp to reject integer mantissas'
+}
+
 fn test_modf_rejects_non_floating_tensors() ! {
 	input := vtl.from_1d([1, 2, 3])!
 	input.modf() or {

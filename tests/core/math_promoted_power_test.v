@@ -103,11 +103,14 @@ fn test_pow_promoted_checks_output_dtype_and_rejects_lossy_or_unsupported_inputs
 	}
 }
 
-fn test_pow_promoted_boolean_pair_uses_existing_promotion_contract() ! {
+fn test_pow_promoted_boolean_pair_returns_numpy_int8() ! {
 	bases := vtl.from_1d([false, true, true, false])!
 	exponents := vtl.from_1d([false, false, true, true])!
 
-	result := vtl.pow_promoted[bool, bool, bool](bases, exponents)!
-	assert result.dtype() == .boolean
-	assert result.to_array() == [true, true, true, false]
+	result := vtl.pow_promoted[i8, bool, bool](bases, exponents)!
+	assert result.dtype() == .int8
+	assert result.to_array() == [i8(1), 1, 1, 0]
+	if _ := vtl.pow_promoted[bool, bool, bool](bases, exponents) {
+		assert false, 'boolean power results must use NumPy int8 dtype'
+	}
 }

@@ -35,11 +35,12 @@ pub fn multiply_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
 	return binary_promoted[R, T, U](a, b, .multiply)
 }
 
-// pow_promoted computes elementwise powers after broadcasting and converting
-// operands to promote_types(dtype_of[T](), dtype_of[U]()). Integer powers keep
-// exact-width wrapping arithmetic and reject negative integer exponents.
-// Complex operands are unsupported; 64-bit integers cannot be combined with a
-// floating output because conversion could lose integer precision.
+// pow_promoted computes elementwise powers after broadcasting. Numeric pairs
+// use promote_types(dtype_of[T](), dtype_of[U]()); boolean pairs return int8,
+// matching NumPy. Integer powers keep exact-width wrapping arithmetic and
+// reject negative integer exponents. Complex operands are unsupported;
+// 64-bit integers cannot be combined with a floating output because conversion
+// could lose integer precision.
 pub fn pow_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
 	return binary_promoted[R, T, U](a, b, .power)
 }
@@ -317,6 +318,30 @@ pub fn hypot_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
 	return binary_real_ufunc_promoted[R, T, U](a, b, math.hypot, 'hypot')
 }
 
+// maximum_promoted returns the broadcasted maximum after NumPy-style dtype
+// promotion. NaNs propagate, and equal values follow NumPy's operand ordering.
+pub fn maximum_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
+	return binary_extrema_promoted[R, T, U](a, b, true, false, 'maximum')
+}
+
+// minimum_promoted returns the broadcasted minimum after NumPy-style dtype
+// promotion. NaNs propagate, and equal values follow NumPy's operand ordering.
+pub fn minimum_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
+	return binary_extrema_promoted[R, T, U](a, b, false, false, 'minimum')
+}
+
+// fmax_promoted returns the broadcasted maximum while ignoring one NaN operand.
+// The output dtype follows NumPy-style promotion.
+pub fn fmax_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
+	return binary_extrema_promoted[R, T, U](a, b, true, true, 'fmax')
+}
+
+// fmin_promoted returns the broadcasted minimum while ignoring one NaN operand.
+// The output dtype follows NumPy-style promotion.
+pub fn fmin_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
+	return binary_extrema_promoted[R, T, U](a, b, false, true, 'fmin')
+}
+
 // logaddexp_promoted computes log(exp(a)+exp(b)) stably with NumPy-style
 // floating output promotion and broadcasting.
 pub fn logaddexp_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
@@ -327,6 +352,47 @@ pub fn logaddexp_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
 // floating output promotion and broadcasting.
 pub fn logaddexp2_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
 	return binary_real_ufunc_promoted[R, T, U](a, b, logaddexp2_value, 'logaddexp2')
+}
+
+fn binary_extrema_promoted[R, T, U](a &Tensor[T], b &Tensor[U], want_max bool, ignore_nan bool, name string) !&Tensor[R] {
+	left_dtype := dtype_of[T]()
+	right_dtype := dtype_of[U]()
+	if !is_complex_numeric_dtype(left_dtype) || !is_complex_numeric_dtype(right_dtype) {
+		return error('promoted ${name} supports only numeric and boolean tensors')
+	}
+	expected_dtype := promote_types(left_dtype, right_dtype)!
+	if dtype_of[R]() != expected_dtype {
+		return error('output dtype ${dtype_of[R]()} does not match ${name} result dtype ${expected_dtype}')
+	}
+
+	shape := broadcast_shapes(a.shape, b.shape)!
+	left := a.broadcast_to(shape)!
+	right := b.broadcast_to(shape)!
+	mut result := empty[R](shape, memory: .row_major)
+	left_is_singleton := a.size == 1
+	right_is_singleton := b.size == 1
+	left_is_flat := left.size == result.size && left.is_row_major_contiguous()
+	right_is_flat := right.size == result.size && right.is_row_major_contiguous()
+	for index in 0 .. result.size {
+		left_offset := if left_is_flat {
+			index
+		} else if left_is_singleton {
+			0
+		} else {
+			broadcast_tensor_offset(index, shape, left.strides)
+		}
+		right_offset := if right_is_flat {
+			index
+		} else if right_is_singleton {
+			0
+		} else {
+			broadcast_tensor_offset(index, shape, right.strides)
+		}
+		x := cast_promoted_value[T, R](left.data.data[left_offset])
+		y := cast_promoted_value[U, R](right.data.data[right_offset])
+		result.data.data[index] = numpy_extreme[R](x, y, want_max, ignore_nan)
+	}
+	return result
 }
 
 fn binary_real_ufunc_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation fn (f64, f64) f64, name string) !&Tensor[R] {
@@ -489,19 +555,7 @@ pub fn fmod_scalar_left_promoted[R, T, U](scalar U, a &Tensor[T]) !&Tensor[R] {
 @[inline]
 fn binary_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation PromotedBinaryOperation) !&Tensor[R] {
 	$if R is bool {
-		if operation != .power {
-			return error('promoted arithmetic requires a numeric output dtype')
-		}
-		$if T is bool && U is bool {
-			if promote_types(dtype_of[T](), dtype_of[U]())! != .boolean {
-				return error('promoted power output dtype does not match input promotion')
-			}
-			return a.map_pair_values(b, fn (x bool, y bool) bool {
-				return if y { x } else { true }
-			})
-		} $else {
-			return error('boolean promoted power requires two boolean inputs')
-		}
+		return error('promoted arithmetic requires a numeric output dtype')
 	} $else $if R is complex.Complex {
 		if operation == .power {
 			return error('promoted power does not support complex values')
@@ -568,7 +622,9 @@ fn binary_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation PromotedBinary
 			return error('promoted arithmetic supports only real numeric tensors and boolean power or division')
 		}
 		promoted_dtype := promote_types(left_dtype, right_dtype)!
-		expected := if operation == .divide {
+		expected := if operation == .power && left_dtype == .boolean && right_dtype == .boolean {
+			DType.int8
+		} else if operation == .divide {
 			division_result_dtype(promoted_dtype)
 		} else {
 			promoted_dtype
@@ -947,6 +1003,10 @@ fn cast_promoted_value[T, R](value T) R {
 				re: f64(value)
 				im: 0.0
 			}
+		}
+	} $else $if R is bool {
+		$if T is bool {
+			return value
 		}
 	} $else $if R is $int || R is $float {
 		$if T is bool {

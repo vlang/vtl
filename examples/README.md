@@ -95,6 +95,8 @@ CIFAR examples for CI-safe checks.
 | [math_decomposition](./math_decomposition) | Split and reconstruct binary floating-point values | `v run ./vtl/examples/math_decomposition/main.v` |
 | [math_log_domain](./math_log_domain) | Combine log values stably and inspect floating-point sign bits | `v run ./vtl/examples/math_log_domain/main.v` |
 | [pow_promoted](./pow_promoted) | Broadcast tensor powers with explicit result dtype promotion | `v run ./vtl/examples/pow_promoted/main.v` |
+| [scalar_extrema](./math_promoted_extrema_scalars) | NumPy-style weak-scalar extrema | `v run ./vtl/examples/math_promoted_extrema_scalars/main.v` |
+| [math_promoted_extrema](./math_promoted_extrema) | Compare mixed-dtype tensors with NumPy-style extrema and NaN rules | `v run ./vtl/examples/math_promoted_extrema/main.v` |
 | [nan_to_num](./nan_to_num) | Replace NaN and infinities before numerical processing | `v run ./vtl/examples/nan_to_num/main.v` |
 | [bitwise](./bitwise) | Broadcast integer masks and shift flag bits | `v run ./vtl/examples/bitwise/main.v` |
 | [take_nd](./take_nd) | Gather along an axis while preserving a multidimensional index shape | `v run ./vtl/examples/take_nd/main.v` |
@@ -114,7 +116,11 @@ CIFAR examples for CI-safe checks.
 | [nn_gru](./nn_gru) | GRU sequence forward and autograd backward | CPU |
 | [nn_group_norm](./nn_group_norm) | Channel-first GroupNorm in Sequential with affine parameters | CPU |
 | [nn_rms_norm](./nn_rms_norm) | Trailing-dimension RMSNorm with optional autograd weight | CPU |
+| [sequential_inference_checkpoint.v](./sequential_inference_checkpoint.v) | Train a CPU Sequential model, reload weights, and infer | CPU |
 | [nn_mnist](./nn_mnist) | MNIST training path | Dataset download/cache |
+
+See the [CPU Sequential inference checkpoint guide](../docs/TUTORIAL_INFERENCE_CHECKPOINT.md)
+for the versioned format's supported architecture and validation guarantees.
 
 ## CIFAR-10 release examples
 

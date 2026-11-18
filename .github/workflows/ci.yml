@@ -51,6 +51,9 @@ jobs:
         with:
           path: vtl
 
+      - name: Test paired release validator
+        run: python3 vtl/tools/test_check_paired_release.py
+
       - name: Setup V
         id: setup_v
         if: ${{ success() && !cancelled() && steps.checkout_vtl.outcome == 'success' }}
