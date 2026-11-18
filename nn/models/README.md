@@ -54,6 +54,14 @@ definitions, per-layer weight maps, optimizer metadata, and checkpoint
 metadata; tensor weights are base64 encoded. Loading rejects a version
 mismatch.
 
+For versioned, inference-only CPU weights, use
+`save_inference_checkpoint(path)` and `load_inference_checkpoint(path)` on a
+prebuilt `Sequential`. This separate data-only JSON format currently supports
+f32/f64 `input`, `linear`, and `relu` layers and validates architecture,
+dtype, shapes, and finite values before loading. It does not store optimizer
+state or support training resume; see the
+[inference checkpoint guide](../../docs/TUTORIAL_INFERENCE_CHECKPOINT.md).
+
 ```v ignore
 import vtl.nn.models
 import vtl.nn.optimizers
