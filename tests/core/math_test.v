@@ -11,6 +11,37 @@ fn test_abs() {
 	assert result.array_equal(expected)
 }
 
+fn test_abs_preserves_large_integer_precision() {
+	values := vtl.from_1d[i64]([-9_007_199_254_740_993, 9_007_199_254_740_993])!
+	assert values.abs().to_array() == [9_007_199_254_740_993, 9_007_199_254_740_993]
+
+	unsigned := vtl.from_1d[u64]([9_007_199_254_740_993])!
+	assert unsigned.abs().to_array() == [9_007_199_254_740_993]
+}
+
+fn test_abs_preserves_signed_minimum() {
+	minimum := i64(-9_223_372_036_854_775_807) - 1
+	minimum_i32 := i32(-2_147_483_647) - 1
+	minimum_i16 := i16(-32_767) - 1
+	assert vtl.from_1d[i64]([minimum])!.abs().to_array() == [minimum]
+	assert vtl.from_1d[i32]([minimum_i32])!.abs().to_array() == [minimum_i32]
+	assert vtl.from_1d[i16]([minimum_i16])!.abs().to_array() == [minimum_i16]
+	assert vtl.from_1d[i8]([-128])!.abs().to_array() == [-128]
+	assert vtl.from_1d[int]([min_int])!.abs().to_array() == [min_int]
+	assert vtl.from_1d[u32]([4_000_000_000])!.abs().to_array() == [4_000_000_000]
+	assert vtl.from_1d[u16]([65_535])!.abs().to_array() == [65_535]
+	assert vtl.from_1d[u8]([255])!.abs().to_array() == [255]
+}
+
+fn test_abs_preserves_float_ieee_behavior() {
+	values := vtl.from_1d[f64]([-0.0, math.nan(), -2.5])!
+	result := values.abs()
+	assert !math.signbit(result.get_nth(0))
+	assert math.is_nan(result.get_nth(1))
+	assert result.get_nth(2) == 2.5
+	assert vtl.from_1d[f32]([-2.5])!.abs().get_nth(0) == f32(2.5)
+}
+
 fn test_sign_and_heaviside() {
 	values := vtl.from_1d([-2.0, -0.0, 0.0, 3.0])!
 	assert values.sign().array_equal(vtl.from_1d([-1.0, 0.0, 0.0, 1.0])!)
