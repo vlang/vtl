@@ -93,6 +93,31 @@ pub fn logaddexp[T](a &Tensor[T], b &Tensor[T]) !&Tensor[T] {
 	}
 }
 
+// logaddexp_scalar computes log(exp(x) + exp(scalar)) elementwise with a
+// stable form, preserving the tensor's shape and f32/f64 dtype.
+pub fn logaddexp_scalar[T](tensor &Tensor[T], scalar T) !&Tensor[T] {
+	return logaddexp_scalar_impl[T](tensor, scalar, false)
+}
+
+// logaddexp_scalar_left computes log(exp(scalar) + exp(x)) elementwise with a
+// stable form, preserving the tensor's shape and f32/f64 dtype.
+pub fn logaddexp_scalar_left[T](scalar T, tensor &Tensor[T]) !&Tensor[T] {
+	return logaddexp_scalar_impl[T](tensor, scalar, true)
+}
+
+fn logaddexp_scalar_impl[T](tensor &Tensor[T], scalar T, scalar_on_left bool) !&Tensor[T] {
+	$if T is f32 || T is f64 {
+		return tensor.map_values(fn [scalar, scalar_on_left] [T](value T) T {
+			if scalar_on_left {
+				return T(logaddexp_value(f64(scalar), f64(value)))
+			}
+			return T(logaddexp_value(f64(value), f64(scalar)))
+		})
+	} $else {
+		return error('logaddexp scalar operations require f32 or f64 values of the same type')
+	}
+}
+
 // logaddexp2 computes log2(2^a + 2^b) elementwise using a stable form.
 // The f32/f64 operands broadcast to a common output shape.
 pub fn logaddexp2[T](a &Tensor[T], b &Tensor[T]) !&Tensor[T] {

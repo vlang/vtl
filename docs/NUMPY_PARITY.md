@@ -250,6 +250,12 @@ operations retain exact-width arithmetic; zero divisors and signed minimum
 modulo `-1` produce zero. Floating-point operations use `math.fmod`, including
 IEEE NaN results and signed-zero preservation. Boolean and complex inputs are
 unsupported.
+`maximum_promoted`, `minimum_promoted`, `fmax_promoted`, and `fmin_promoted`
+broadcast mixed numeric, boolean, or complex tensor pairs using `promote_types`.
+The first pair propagates NaNs; the latter pair ignores one NaN operand. Integer
+comparisons retain exactness when promotion produces an integer dtype, and
+floating-point tie handling matches NumPy's signed-zero rules. Weak-scalar
+extrema remain part of #717.
 Floating-point autograd is available
 through `Variable.remainder` for f32/f64: the divisor gradient uses
 `-floor(a / b) * grad`, including at exact multiples, and broadcast gradients
@@ -267,7 +273,8 @@ See
 mixed-dtype, broadcast, and edge-case contracts are not fully covered. Unary
 `abs`/`sign` and the multi-output decomposition functions still need broader
 dtype and special-value differential tests; promoted mixed-input variants
-remain for `maximum`/`minimum`/`fmax`/`fmin`, `pow`, and `ldexp`.
+remain for `pow` and `ldexp`. Promoted extrema cover tensor pairs and weak
+scalars through the APIs below.
 `erf`/`erfc`, `gamma`, and `log_gamma` are useful VTL math APIs beyond NumPy
 core ufunc parity. The general NumPy ufunc `out` and `where` execution protocol
 is tracked separately in
@@ -318,6 +325,19 @@ decimal places using ties-to-even, matching NumPy `round` for the supported
 same-dtype inputs; integer tensors are copied unchanged. VTL preserves finite
 inputs rather than overflowing when an extreme positive decimal position
 would overflow its intermediate scale.
+
+Weak-scalar extrema are exposed as `maximum_scalar_promoted`,
+`minimum_scalar_promoted`, `fmax_scalar_promoted`, and `fmin_scalar_promoted`,
+with corresponding `*_scalar_left_promoted` forms. Floating arrays retain
+their dtype; integer arrays retain their dtype for in-range integer or boolean
+scalars and promote to f64 for floating scalars. Boolean arrays with boolean
+scalars remain boolean; other numeric scalars use `promote_types`. Complex
+inputs produce complex128. `maximum`/`minimum` propagate NaNs, while `fmax`/
+`fmin` ignore one NaN and return the left operand when both are NaN. For
+opposite-sign real zero ties, `fmax` selects positive zero and `fmin` selects
+negative zero regardless of operand order; same-sign zero ties retain their
+sign. `maximum`/`minimum` retain their ordinary operand-order tie behavior.
+The output type is explicit and validated against the inferred result dtype.
 `nan_to_num` replaces NaN with zero and infinities with finite type limits for
 f32/f64 tensors and replaces non-finite real and imaginary components
 independently for complex128 tensors, with optional custom replacements.
@@ -338,13 +358,16 @@ broadcast same-dtype operands while handling IEEE infinities and NaNs. See the
 `Tensor.modf` returns fractional then integral parts, matching NumPy's output
 order, and `Tensor.frexp` returns floating-point mantissas with integer base-2
 exponents. The `ldexp` function reconstructs values and broadcasts mantissas
-against integer exponent tensors. These decomposition ufuncs support f32/f64;
+against integer exponent tensors. `ldexp_scalar` and `ldexp_scalar_left` also
+cover scalar exponents and mantissas. These decomposition ufuncs support f32/f64;
 see the [math ufunc tutorial](./TUTORIAL_MATH_UFUNCS.md) and
 [`math_decomposition` example](../examples/math_decomposition/README.md).
 Elementwise `max`/`min` match NumPy's NaN-propagating `maximum`/`minimum`, and
 `fmax`/`fmin` ignore a single NaN operand. These operations broadcast and
 support boolean, integer, floating-point, and complex tensors; floating-point
 zero ties follow each NumPy ufunc's sign behavior.
+`Tensor.abs()` preserves integer values without converting through `f64`;
+the minimum signed integer retains its fixed-width value, matching NumPy.
 `fmod` follows NumPy's sign-of-dividend remainder rule. Integer inputs use
 exact-width arithmetic, including values beyond float64's exact-integer range;
 integer zero divisors and signed minimum modulo `-1` produce zero. Floating

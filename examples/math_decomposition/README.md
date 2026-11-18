@@ -2,7 +2,7 @@
 
 This example demonstrates NumPy-style fractional/integral decomposition with
 `modf`, binary mantissa/exponent decomposition with `frexp`, and reconstruction
-with broadcastable `ldexp`.
+with broadcastable `ldexp`, including scalar mantissas and exponents.
 
 Run it from the V modules directory:
 

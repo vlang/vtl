@@ -119,6 +119,40 @@ assert x.grad.to_array() == [1.0, 8.0, 0.0]
 Gradients accumulate across calls.  Zero them before each training step
 (the optimizer handles this automatically in the `Sequential` model).
 
+For inference, disable graph recording on the variables' context. This is
+separate from `Sequential.eval()`, which only changes mode-aware layers such as
+dropout and batch normalization:
+
+```v
+import vtl
+import vtl.autograd
+import vtl.nn.models
+
+mut ctx := autograd.ctx[f64]()
+mut model := models.sequential_from_ctx[f64](ctx)
+model.input([2])
+model.linear(1)
+model.eval()
+
+input := ctx.variable(vtl.from_array([1.0, 2.0], [1, 2])!)
+previous_no_grad := ctx.no_grad
+ctx.no_grad = true
+defer {
+	ctx.no_grad = previous_no_grad
+}
+prediction := model.forward(input)!
+ctx.no_grad = previous_no_grad
+assert ctx.len() == 0
+assert !prediction.is_grad_needed()
+```
+
+Operations created while `ctx.no_grad` is true are not added to the autograd
+graph and their results do not require gradients, even after the context flag
+is restored. Do not call `backprop()` on such results expecting gradients for
+their inputs. Restore the saved value immediately after successful inference
+so training can resume in the same function; `defer` handles errors, and
+restoring the previous value preserves nested calls.
+
 ## Unary element-wise gates
 
 VTL provides differentiable unary element-wise operations via `Variable` methods:

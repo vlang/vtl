@@ -56,3 +56,15 @@ pub fn ldexp[T](mantissa &Tensor[T], exponent &Tensor[int]) !&Tensor[T] {
 		return error('ldexp requires an f32 or f64 mantissa tensor')
 	}
 }
+
+// ldexp_scalar scales a floating-point mantissa tensor by one integer exponent.
+pub fn ldexp_scalar[T](mantissa &Tensor[T], exponent int) !&Tensor[T] {
+	exponent_tensor := from_array[int]([exponent], [])!
+	return ldexp[T](mantissa, exponent_tensor)
+}
+
+// ldexp_scalar_left scales one floating-point mantissa by an exponent tensor.
+pub fn ldexp_scalar_left[T](mantissa T, exponent &Tensor[int]) !&Tensor[T] {
+	mantissa_tensor := from_array[T]([mantissa], [])!
+	return ldexp[T](mantissa_tensor, exponent)
+}
