@@ -1168,11 +1168,43 @@ systemd-run --user --scope --property=MemoryMax=4G --property=MemorySwapMax=0 \
 
 </section>
 
+		<section id="fmax_scalar_left_promoted" class="doc-node">
+			<div class="title"><h2>fn fmax_scalar_left_promoted <a href="#fmax_scalar_left_promoted">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/math_promoted_scalar_extrema.v#L36"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">fmax_scalar_left_promoted</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">,</span> <span class="token type_name">T</span><span class="token punctuation">,</span> <span class="token type_name">U</span><span class="token punctuation">]</span><span class="token punctuation">(</span>scalar <span class="token type_name">U</span><span class="token punctuation">,</span> a <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">]</span></code></pre>
+<p>fmax_scalar_left_promoted ignores a single NaN operand with the scalar on the left.</p>
+
+</section>
+
+		<section id="fmax_scalar_promoted" class="doc-node">
+			<div class="title"><h2>fn fmax_scalar_promoted <a href="#fmax_scalar_promoted">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/math_promoted_scalar_extrema.v#L30"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">fmax_scalar_promoted</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">,</span> <span class="token type_name">T</span><span class="token punctuation">,</span> <span class="token type_name">U</span><span class="token punctuation">]</span><span class="token punctuation">(</span>a <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> scalar <span class="token type_name">U</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">]</span></code></pre>
+<p>fmax_scalar_promoted ignores a single NaN operand, like numpy.fmax.</p>
+
+</section>
+
 		<section id="fmin_promoted" class="doc-node">
 			<div class="title"><h2>fn fmin_promoted <a href="#fmin_promoted">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/math_promoted.v#L330"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token function">fmin_promoted</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">,</span> <span class="token type_name">T</span><span class="token punctuation">,</span> <span class="token type_name">U</span><span class="token punctuation">]</span><span class="token punctuation">(</span>a <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> b <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">U</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">]</span></code></pre>
 <p>fmin_promoted returns the broadcasted minimum while ignoring one NaN operand. The output dtype follows NumPy-style promotion.</p>
+
+</section>
+
+		<section id="fmin_scalar_left_promoted" class="doc-node">
+			<div class="title"><h2>fn fmin_scalar_left_promoted <a href="#fmin_scalar_left_promoted">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/math_promoted_scalar_extrema.v#L47"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">fmin_scalar_left_promoted</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">,</span> <span class="token type_name">T</span><span class="token punctuation">,</span> <span class="token type_name">U</span><span class="token punctuation">]</span><span class="token punctuation">(</span>scalar <span class="token type_name">U</span><span class="token punctuation">,</span> a <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">]</span></code></pre>
+<p>fmin_scalar_left_promoted ignores a single NaN operand with the scalar on the left.</p>
+
+</section>
+
+		<section id="fmin_scalar_promoted" class="doc-node">
+			<div class="title"><h2>fn fmin_scalar_promoted <a href="#fmin_scalar_promoted">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/math_promoted_scalar_extrema.v#L41"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">fmin_scalar_promoted</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">,</span> <span class="token type_name">T</span><span class="token punctuation">,</span> <span class="token type_name">U</span><span class="token punctuation">]</span><span class="token punctuation">(</span>a <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> scalar <span class="token type_name">U</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">]</span></code></pre>
+<p>fmin_scalar_promoted ignores a single NaN operand, like numpy.fmin.</p>
 
 </section>
 
@@ -1452,7 +1484,7 @@ systemd-run --user --scope --property=MemoryMax=4G --property=MemorySwapMax=0 \
 </section>
 
 		<section id="logaddexp2" class="doc-node">
-			<div class="title"><h2>fn logaddexp2 <a href="#logaddexp2">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/math_log_domain.v#L98"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn logaddexp2 <a href="#logaddexp2">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/math_log_domain.v#L123"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token function">logaddexp2</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>a <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> b <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
 <p>logaddexp2 computes log2(2^a + 2^b) elementwise using a stable form. The f32/f64 operands broadcast to a common output shape.</p>
@@ -1472,6 +1504,22 @@ systemd-run --user --scope --property=MemoryMax=4G --property=MemorySwapMax=0 \
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token function">logaddexp_promoted</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">,</span> <span class="token type_name">T</span><span class="token punctuation">,</span> <span class="token type_name">U</span><span class="token punctuation">]</span><span class="token punctuation">(</span>a <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> b <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">U</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">]</span></code></pre>
 <p>logaddexp_promoted computes log(exp(a)+exp(b)) stably with NumPy-style floating output promotion and broadcasting.</p>
+
+</section>
+
+		<section id="logaddexp_scalar" class="doc-node">
+			<div class="title"><h2>fn logaddexp_scalar <a href="#logaddexp_scalar">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/math_log_domain.v#L98"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">logaddexp_scalar</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>tensor <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> scalar <span class="token type_name">T</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+<p>logaddexp_scalar computes log(exp(x) + exp(scalar)) elementwise with a stable form, preserving the tensor's shape and f32/f64 dtype.</p>
+
+</section>
+
+		<section id="logaddexp_scalar_left" class="doc-node">
+			<div class="title"><h2>fn logaddexp_scalar_left <a href="#logaddexp_scalar_left">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/math_log_domain.v#L104"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">logaddexp_scalar_left</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>scalar <span class="token type_name">T</span><span class="token punctuation">,</span> tensor <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+<p>logaddexp_scalar_left computes log(exp(scalar) + exp(x)) elementwise with a stable form, preserving the tensor's shape and f32/f64 dtype.</p>
 
 </section>
 
@@ -1515,6 +1563,22 @@ systemd-run --user --scope --property=MemoryMax=4G --property=MemorySwapMax=0 \
 
 </section>
 
+		<section id="maximum_scalar_left_promoted" class="doc-node">
+			<div class="title"><h2>fn maximum_scalar_left_promoted <a href="#maximum_scalar_left_promoted">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/math_promoted_scalar_extrema.v#L13"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">maximum_scalar_left_promoted</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">,</span> <span class="token type_name">T</span><span class="token punctuation">,</span> <span class="token type_name">U</span><span class="token punctuation">]</span><span class="token punctuation">(</span>scalar <span class="token type_name">U</span><span class="token punctuation">,</span> a <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">]</span></code></pre>
+<p>maximum_scalar_left_promoted applies maximum with the scalar as the left operand, preserving operand order for ties and NaNs.</p>
+
+</section>
+
+		<section id="maximum_scalar_promoted" class="doc-node">
+			<div class="title"><h2>fn maximum_scalar_promoted <a href="#maximum_scalar_promoted">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/math_promoted_scalar_extrema.v#L7"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">maximum_scalar_promoted</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">,</span> <span class="token type_name">T</span><span class="token punctuation">,</span> <span class="token type_name">U</span><span class="token punctuation">]</span><span class="token punctuation">(</span>a <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> scalar <span class="token type_name">U</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">]</span></code></pre>
+<p>maximum_scalar_promoted applies NumPy-style maximum to a tensor and weak scalar. R must match the inferred weak-scalar result dtype.</p>
+
+</section>
+
 		<section id="meshgrid" class="doc-node">
 			<div class="title"><h2>fn meshgrid <a href="#meshgrid">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/creation.v#L13"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -1536,6 +1600,22 @@ systemd-run --user --scope --property=MemoryMax=4G --property=MemorySwapMax=0 \
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token function">minimum_promoted</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">,</span> <span class="token type_name">T</span><span class="token punctuation">,</span> <span class="token type_name">U</span><span class="token punctuation">]</span><span class="token punctuation">(</span>a <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> b <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">U</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">]</span></code></pre>
 <p>minimum_promoted returns the broadcasted minimum after NumPy-style dtype promotion. NaNs propagate, and equal values follow NumPy's operand ordering.</p>
+
+</section>
+
+		<section id="minimum_scalar_left_promoted" class="doc-node">
+			<div class="title"><h2>fn minimum_scalar_left_promoted <a href="#minimum_scalar_left_promoted">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/math_promoted_scalar_extrema.v#L25"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">minimum_scalar_left_promoted</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">,</span> <span class="token type_name">T</span><span class="token punctuation">,</span> <span class="token type_name">U</span><span class="token punctuation">]</span><span class="token punctuation">(</span>scalar <span class="token type_name">U</span><span class="token punctuation">,</span> a <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">]</span></code></pre>
+<p>minimum_scalar_left_promoted applies minimum with the scalar as the left operand, preserving operand order for ties and NaNs.</p>
+
+</section>
+
+		<section id="minimum_scalar_promoted" class="doc-node">
+			<div class="title"><h2>fn minimum_scalar_promoted <a href="#minimum_scalar_promoted">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/math_promoted_scalar_extrema.v#L19"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">minimum_scalar_promoted</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">,</span> <span class="token type_name">T</span><span class="token punctuation">,</span> <span class="token type_name">U</span><span class="token punctuation">]</span><span class="token punctuation">(</span>a <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> scalar <span class="token type_name">U</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">]</span></code></pre>
+<p>minimum_scalar_promoted applies NumPy-style minimum to a tensor and weak scalar. R must match the inferred weak-scalar result dtype.</p>
 
 </section>
 
@@ -6064,7 +6144,7 @@ systemd-run --user --scope --property=MemoryMax=4G --property=MemorySwapMax=0 \
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 17 Nov 2026 11:04:58</div>
+						<div class="footer">Powered by vdoc. Generated on: 18 Nov 2026 05:51:36</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_vtl">README</a></li>
 <li class="open"><a href="#abs">fn abs</a>        <ul>
@@ -6319,7 +6399,19 @@ systemd-run --user --scope --property=MemoryMax=4G --property=MemorySwapMax=0 \
 <li class="open"><a href="#fmax_promoted">fn fmax_promoted</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#fmax_scalar_left_promoted">fn fmax_scalar_left_promoted</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#fmax_scalar_promoted">fn fmax_scalar_promoted</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#fmin_promoted">fn fmin_promoted</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#fmin_scalar_left_promoted">fn fmin_scalar_left_promoted</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#fmin_scalar_promoted">fn fmin_scalar_promoted</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#fmod_promoted">fn fmod_promoted</a>        <ul>
@@ -6433,6 +6525,12 @@ systemd-run --user --scope --property=MemoryMax=4G --property=MemorySwapMax=0 \
 <li class="open"><a href="#logaddexp_promoted">fn logaddexp_promoted</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#logaddexp_scalar">fn logaddexp_scalar</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#logaddexp_scalar_left">fn logaddexp_scalar_left</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#logistic">fn logistic</a>        <ul>
 </ul>
 </li>
@@ -6448,6 +6546,12 @@ systemd-run --user --scope --property=MemoryMax=4G --property=MemorySwapMax=0 \
 <li class="open"><a href="#maximum_promoted">fn maximum_promoted</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#maximum_scalar_left_promoted">fn maximum_scalar_left_promoted</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#maximum_scalar_promoted">fn maximum_scalar_promoted</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#meshgrid">fn meshgrid</a>        <ul>
 </ul>
 </li>
@@ -6455,6 +6559,12 @@ systemd-run --user --scope --property=MemoryMax=4G --property=MemorySwapMax=0 \
 </ul>
 </li>
 <li class="open"><a href="#minimum_promoted">fn minimum_promoted</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#minimum_scalar_left_promoted">fn minimum_scalar_left_promoted</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#minimum_scalar_promoted">fn minimum_scalar_promoted</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#mixed_index">fn mixed_index</a>        <ul>

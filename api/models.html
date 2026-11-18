@@ -158,6 +158,7 @@ model<span class="token punctuation">.</span><span class="token function">linear
 model<span class="token punctuation">.</span><span class="token function">mse_loss</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>Use <code>forward</code> for inference and the model's loss/backpropagation methods for training; consult <a href="https://github.com/vlang/vtl/blob/master/nn/models/sequential.v"><code>sequential.v</code></a> for exact method signatures.</p>
 <p><code>save(path)</code> writes model weights. <code>save_checkpoint(path, epoch, loss)</code> also stores epoch/loss metadata; <code>load_weights(path)</code> loads into an already-built compatible model and <code>Sequential.load_checkpoint[T](path)</code> reads checkpoint metadata. For resumable Adam training, build the optimizer with the model's parameters and use <code>save_training_checkpoint(path, epoch, loss, optimizer)</code>; restore into a compatible model and a built Adam optimizer with <code>load_training_checkpoint(path, mut optimizer)</code>. This stores Adam's scalar configuration and first/second moments alongside model weights and metadata. For SGD with momentum, use <code>save_sgd_training_checkpoint</code> and <code>load_sgd_training_checkpoint</code>; these store the scalar configuration, momentum buffers, and first-step initialization state. For AdamW, use <code>save_adamw_training_checkpoint</code> and <code>load_adamw_training_checkpoint</code> to store its scalar configuration and first/second moments. For RMSProp, use <code>save_rmsprop_training_checkpoint</code> and <code>load_rmsprop_training_checkpoint</code>; these store its scalar configuration and squared-gradient buffers. For AdaGrad, use <code>save_adagrad_training_checkpoint</code> and <code>load_adagrad_training_checkpoint</code>; these store its scalar configuration and accumulated squared gradients. For NAdam and RAdam, use the corresponding <code>save_nadam_training_checkpoint</code> / <code>load_nadam_training_checkpoint</code> and <code>save_radam_training_checkpoint</code> / <code>load_radam_training_checkpoint</code> methods; these persist the step schedule, scalar configuration, and both moments. The custom optimizer types, device remapping, and cross-version migration are not supported by this API yet. The JSON format has version <code>1.0</code>, ordered layer definitions, per-layer weight maps, optimizer metadata, and checkpoint metadata; tensor weights are base64 encoded. Loading rejects a version mismatch.</p>
+<p>For versioned, inference-only CPU weights, use <code>save_inference_checkpoint(path)</code> and <code>load_inference_checkpoint(path)</code> on a prebuilt <code>Sequential</code>. This separate data-only JSON format currently supports f32/f64 <code>input</code>, <code>linear</code>, and <code>relu</code> layers and validates architecture, dtype, shapes, and finite values before loading. It does not store optimizer state or support training resume; see the <a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_INFERENCE_CHECKPOINT.md">inference checkpoint guide</a>.</p>
 <pre><code class="language-v"><span class="token keyword">import</span> <span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token module_">nn</span><span class="token punctuation">.</span><span class="token module_">models</span>
 <span class="token keyword">import</span> <span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token module_">nn</span><span class="token punctuation">.</span><span class="token module_">optimizers</span>
 
@@ -576,6 +577,22 @@ epoch<span class="token punctuation">,</span> loss <span class="token operator">
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> ls <span class="token type_name">SequentialInfo</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">kl_div_loss</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
 <p>kl_div_loss sets the loss function to KL divergence loss.</p>
+
+</section>
+
+		<section id="Sequential[T].save_inference_checkpoint" class="doc-node">
+			<div class="title"><h2>fn (Sequential[T]) save_inference_checkpoint <a href="#Sequential[T].save_inference_checkpoint">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/models/inference_checkpoint.v#L104"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>nn <span class="token operator">&amp;</span><span class="token type_name">Sequential</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">save_inference_checkpoint</span><span class="token punctuation">(</span>path <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<p>save_inference_checkpoint stores CPU inference weights and the supported Sequential architecture in a versioned, data-only JSON format. It does not store optimizer state or training-resume metadata.</p>
+
+</section>
+
+		<section id="Sequential[T].load_inference_checkpoint" class="doc-node">
+			<div class="title"><h2>fn (Sequential[T]) load_inference_checkpoint <a href="#Sequential[T].load_inference_checkpoint">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/models/inference_checkpoint.v#L175"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> nn <span class="token type_name">Sequential</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">load_inference_checkpoint</span><span class="token punctuation">(</span>path <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<p>load_inference_checkpoint validates a versioned CPU inference checkpoint against this already-constructed Sequential model before copying any weights.</p>
 
 </section>
 
@@ -1165,7 +1182,7 @@ epoch<span class="token punctuation">,</span> loss <span class="token operator">
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 17 Nov 2026 11:04:58</div>
+						<div class="footer">Powered by vdoc. Generated on: 18 Nov 2026 05:51:36</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_models">README</a></li>
 <li class="open"><a href="#sequential">fn sequential</a>        <ul>
@@ -1235,7 +1252,9 @@ epoch<span class="token punctuation">,</span> loss <span class="token operator">
 <li><a href="#SequentialInfo[T].kl_div_loss">fn kl_div_loss</a></li>
 </ul>
 </li>
-<li class="open"><a href="#Sequential[T].input">type Sequential[T]</a>        <ul>
+<li class="open"><a href="#Sequential[T].save_inference_checkpoint">type Sequential[T]</a>        <ul>
+<li><a href="#Sequential[T].save_inference_checkpoint">fn save_inference_checkpoint</a></li>
+<li><a href="#Sequential[T].load_inference_checkpoint">fn load_inference_checkpoint</a></li>
 <li><a href="#Sequential[T].input">fn input</a></li>
 <li><a href="#Sequential[T].linear">fn linear</a></li>
 <li><a href="#Sequential[T].maxpool2d">fn maxpool2d</a></li>
