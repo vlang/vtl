@@ -206,6 +206,36 @@ println(right_scalar.to_array()) // [-2.0, 2.0]
 println(left_scalar.to_array()) // [3.0, 3.0]
 ```
 
+## Promoted scalar extrema
+
+`maximum_scalar_promoted`, `minimum_scalar_promoted`, `fmax_scalar_promoted`,
+and `fmin_scalar_promoted` apply NumPy-style extrema to a tensor and weak
+scalar. The matching `*_scalar_left_promoted` forms preserve the scalar as the
+left operand. Floating tensors retain their dtype; integer tensors retain their
+dtype for in-range integer or boolean scalars and promote to f64 for floating
+scalars. Boolean tensors with boolean scalars remain boolean, while numeric
+scalars promote with the boolean dtype. Complex inputs produce complex128.
+Out-of-range integer scalars and mismatched explicit output types return
+errors.
+
+`maximum` and `minimum` propagate NaNs. `fmax` and `fmin` ignore one NaN
+operand, returning the left operand when both are NaN. The functions preserve
+NumPy's signed-zero and operand-order behavior:
+
+```v
+import math
+import vtl
+
+values := vtl.from_1d[f32]([f32(math.nan()), -0.0, 1.5])!
+maximum := vtl.maximum_scalar_promoted[f32, f32, f64](values, 0.25)!
+fmaximum := vtl.fmax_scalar_left_promoted[f32, f32, f64](0.25, values)!
+println(maximum.to_array()) // [NaN, 0.25, 1.5]
+println(fmaximum.to_array()) // [0.25, 0.25, 1.5]
+```
+
+The output dtype is explicit because V requires statically selected generic
+return types; it is checked against the inferred weak-scalar result dtype.
+
 ## Floor division
 
 `Tensor.floor_divide()` broadcasts same-dtype real integer or floating-point
