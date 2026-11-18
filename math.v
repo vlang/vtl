@@ -207,8 +207,13 @@ fn broadcast_tensor_offset(index int, shape []int, strides []int) int {
 @[inline]
 pub fn (t &Tensor[T]) abs[T]() &Tensor[T] {
 	return t.map_values(fn [T](x T) T {
-		// TODO: Figure out a way to do this without casting to f64
-		return cast[T](math.abs(td(x).f64()))
+		$if T is i8 || T is i16 || T is i32 || T is i64 || T is int {
+			return if x < 0 { -x } else { x }
+		} $else $if T is u8 || T is u16 || T is u32 || T is u64 {
+			return x
+		} $else {
+			return cast[T](math.abs(td(x).f64()))
+		}
 	})
 }
 
