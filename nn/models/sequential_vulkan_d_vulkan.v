@@ -36,10 +36,10 @@ fn (mut session VulkanInferenceSession) release() ! {
 // forward_vulkan_inference keeps adjacent supported f32 activations resident.
 // Other layers use their ordinary Sequential forward implementation.
 pub fn (mut nn Sequential[f32]) forward_vulkan_inference(input &autograd.Variable[f32]) !&autograd.Variable[f32] {
+	validate_vulkan_inference[f32](nn, input)!
 	if !layers.vulkan_linear_enabled() {
 		return nn.forward(input)
 	}
-	validate_vulkan_inference[f32](nn, input)!
 
 	mut session := VulkanInferenceSession{}
 	output := nn.forward_vulkan_inference_resident(input, mut session) or {
