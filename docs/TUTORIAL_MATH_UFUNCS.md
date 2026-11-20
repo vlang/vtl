@@ -125,6 +125,25 @@ are `asinh_promoted`, `acosh_promoted`, and `atanh_promoted`. All preserve the
 floating-point domain behavior of the underlying operations; the trigonometric
 functions take angles in radians.
 
+## Normalized sinc
+
+`Tensor.sinc()` computes NumPy's normalized sinc,
+`sin(pi*x)/(pi*x)`, elementwise.
+It returns `1` for both positive and negative zero and NaN for NaN or either
+infinity. The method accepts only f32 and f64 tensors and preserves the input
+shape and dtype. Unlike NumPy, it does not accept integer tensors or promote
+them to a floating dtype.
+
+```v
+import vtl
+
+values := vtl.from_1d[f64]([0.0, 0.5, 1.0, -0.5])!
+result := values.sinc()!
+println(result.to_array()) // [1.0, 0.6366..., ~0.0, 0.6366...]
+```
+
+See the [sinc example](../examples/sinc/README.md) for a runnable version.
+
 ## Promoted arctangent with two arguments
 
 `vtl.atan2_promoted[R, T, U](y, x)` broadcasts real numeric or boolean tensors

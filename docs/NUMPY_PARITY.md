@@ -207,13 +207,17 @@ NumPy-style axis-removed output shape.
 gradients along selected axes; elementwise logical AND/OR/XOR/NOT; integer
 bitwise AND/OR/XOR/invert and scalar left/right shifts. Gradients support
 uniform spacing or monotonic non-uniform coordinates and first/second-order
-boundary differences. `atan2_promoted`, `sqrt_promoted`, `cbrt_promoted`,
-`exp_promoted`, `exp2_promoted`, `expm1_promoted`, `log_promoted`,
+boundary differences. `Tensor.sinc()` computes `sin(pi*x)/(pi*x)`, defines
+both signed zeros as `1`, and propagates NaN for NaN or infinite inputs. It
+accepts only f32/f64 tensors and preserves their dtype and shape; unlike NumPy,
+it does not promote integer inputs. Promoted math functions include
+`atan2_promoted`, `sqrt_promoted`, `cbrt_promoted`, `exp_promoted`,
+`exp2_promoted`, `expm1_promoted`, `log_promoted`,
 `log2_promoted`, `log10_promoted`, `log1p_promoted`, `sin_promoted`,
-`cos_promoted`, and `tan_promoted`, the inverse-trigonometric functions, and
-the direct and inverse hyperbolic functions provide NumPy-style
-floating-point outputs for real numeric or boolean inputs. They return f64
-for f64 or 32-bit-and-wider integer inputs, otherwise f32.
+`cos_promoted`, and `tan_promoted`, plus the inverse-trigonometric and direct
+and inverse hyperbolic functions. They provide NumPy-style floating-point
+outputs for real numeric or boolean inputs, returning f64 for f64 or
+32-bit-and-wider integer inputs, and f32 otherwise.
 The same dtype rules apply to the broadcasted binary `copysign_promoted`,
 `hypot_promoted`, `logaddexp_promoted`, `logaddexp2_promoted`, and
 `nextafter_promoted`.
