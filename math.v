@@ -1280,6 +1280,31 @@ pub fn (t &Tensor[T]) sin[T]() &Tensor[T] {
 	})
 }
 
+// sinc returns sin(pi*x)/(pi*x) elementwise, with a value of 1 at either
+// signed zero. Only f32 and f64 tensors are supported; the input dtype and
+// shape are preserved.
+pub fn (t &Tensor[T]) sinc[T]() !&Tensor[T] {
+	$if T is f32 || T is f64 {
+		mut result := empty[T](t.shape.clone(), memory: .row_major)
+		for flat_index in 0 .. t.size {
+			value := f64(t.get_nth(flat_index))
+			if value == 0.0 {
+				result.data.data[flat_index] = T(1.0)
+				continue
+			}
+			if math.is_nan(value) || math.is_inf(value, 1) || math.is_inf(value, -1) {
+				result.data.data[flat_index] = T(math.nan())
+				continue
+			}
+			pi_x := math.pi * value
+			result.data.data[flat_index] = T(math.sin(pi_x) / pi_x)
+		}
+		return result
+	} $else {
+		return error('sinc requires an f32 or f64 tensor')
+	}
+}
+
 // sinh returns the elementwise sinh of an tensor
 
 // sinh exposes this operation as part of the public API.

@@ -210,13 +210,17 @@ uniform spacing or monotonic non-uniform coordinates and first/second-order
 boundary differences. `Tensor.reciprocal()` computes `1/x` for f32/f64
 tensors, preserves shape and dtype, and follows IEEE signs for zeros and
 infinities. Integer and complex inputs are intentionally unsupported.
-`atan2_promoted`, `sqrt_promoted`, `cbrt_promoted`,
-`exp_promoted`, `exp2_promoted`, `expm1_promoted`, `log_promoted`,
+`Tensor.sinc()` computes `sin(pi*x)/(pi*x)`, defines
+both signed zeros as `1`, and propagates NaN for NaN or infinite inputs. It
+accepts only f32/f64 tensors and preserves their dtype and shape; unlike NumPy,
+it does not promote integer inputs. Promoted math functions include
+`atan2_promoted`, `sqrt_promoted`, `cbrt_promoted`, `exp_promoted`,
+`exp2_promoted`, `expm1_promoted`, `log_promoted`,
 `log2_promoted`, `log10_promoted`, `log1p_promoted`, `sin_promoted`,
-`cos_promoted`, and `tan_promoted`, the inverse-trigonometric functions, and
-the direct and inverse hyperbolic functions provide NumPy-style
-floating-point outputs for real numeric or boolean inputs. They return f64
-for f64 or 32-bit-and-wider integer inputs, otherwise f32.
+`cos_promoted`, and `tan_promoted`, plus the inverse-trigonometric and direct
+and inverse hyperbolic functions. They provide NumPy-style floating-point
+outputs for real numeric or boolean inputs, returning f64 for f64 or
+32-bit-and-wider integer inputs, and f32 otherwise.
 The same dtype rules apply to the broadcasted binary `copysign_promoted`,
 `hypot_promoted`, `logaddexp_promoted`, `logaddexp2_promoted`, and
 `nextafter_promoted`.
@@ -243,6 +247,13 @@ when the promoted input dtype is `float32`, and `float64` otherwise.
 floating-point dtypes and broadcasting. Nonzero results follow the divisor's
 sign; signed zero follows the divisor; integer zero divisors produce zero and
 floating-point zero divisors produce NaN; complex inputs are rejected.
+`pow_promoted` broadcasts mixed real numeric tensors and validates its explicit
+output dtype against the operation's NumPy result dtype: numeric pairs use
+`promote_types`, while boolean pairs return `int8`. Integer powers retain
+exact-width wrapping arithmetic and reject negative integer exponents. Floating
+results preserve IEEE special values and signed zero. Complex and string inputs
+are unsupported; 64-bit integer operands are rejected when promotion requires a
+floating result to avoid silent precision loss.
 `fmod_promoted` and its weak-scalar variants preserve the sign-of-dividend
 remainder rule across promoted real numeric dtypes and broadcasting. Integer
 operations retain exact-width arithmetic; zero divisors and signed minimum
@@ -268,12 +279,12 @@ See
 [dtype conversion tutorial](./TUTORIAL_FIRST_STEPS.md#numeric-dtype-conversion).
 
 **Remaining ufunc gaps:** same-dtype methods exist for `abs`, `sign`, extrema,
-`pow`, and `frexp`/`modf`/`ldexp`, but NumPy's
+and `frexp`/`modf`/`ldexp`, but NumPy's
 mixed-dtype, broadcast, and edge-case contracts are not fully covered. Unary
 `abs`/`sign` and the multi-output decomposition functions still need broader
 dtype and special-value differential tests; promoted mixed-input variants
-remain for `pow` and `ldexp`. Promoted extrema cover tensor pairs and weak
-scalars through the APIs below.
+remain for `ldexp`. Promoted extrema cover tensor pairs and weak scalars
+through the APIs below.
 `erf`/`erfc`, `gamma`, and `log_gamma` are useful VTL math APIs beyond NumPy
 core ufunc parity. The general NumPy ufunc `out` and `where` execution protocol
 is tracked separately in
@@ -281,11 +292,15 @@ is tracked separately in
 
 Promoted tensor-to-tensor result dtypes are:
 
-| Tensor operands | Add/subtract/multiply | True divide | Floor divide | Fmod | Remainder |
-|-----------------|-----------------------|-------------|--------------|------|-----------|
-| Real numeric pair | `promote_types` | f32 if promoted dtype is f32; else f64 | `promote_types` | `promote_types` | `promote_types` |
-| Complex128 with numeric, bool, or complex128 | complex128 | complex128 | unsupported | unsupported | unsupported |
-| Boolean pair | unsupported | f64 | unsupported | unsupported | unsupported |
+| Tensor operands | Add/subtract/multiply | Power | True divide | Floor divide | Fmod | Remainder |
+|-----------------|-----------------------|-------|-------------|--------------|------|-----------|
+| Real numeric pair | `promote_types` | `promote_types` | f32 if promoted dtype is f32; else f64 | `promote_types` | `promote_types` | `promote_types` |
+| Complex128 with numeric, bool, or complex128 | complex128 | unsupported | complex128 | unsupported | unsupported | unsupported |
+| Boolean pair | unsupported | int8 | f64 | unsupported | unsupported | unsupported |
+
+`pow_promoted` rejects 64-bit integer operands when `promote_types` selects a
+floating output, and rejects negative exponents when the result dtype is
+integer. Boolean pairs return `int8`, matching NumPy's result dtype.
 
 The `add_scalar_promoted`, `subtract_scalar_promoted`,
 `multiply_scalar_promoted`, `divide_scalar_promoted`,

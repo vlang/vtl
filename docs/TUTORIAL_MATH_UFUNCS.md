@@ -56,6 +56,26 @@ Complex and string inputs are unsupported. The same-dtype `Tensor.sqrt()` and
 `Tensor.cbrt()` methods remain available for compatibility; use the promoted
 functions when NumPy-style integer output is needed.
 
+## Promoted tensor power
+
+`vtl.pow_promoted[R, T, U](bases, exponents)` broadcasts its tensor operands
+and requires `R` to match NumPy's power result dtype: numeric pairs use
+`promote_types(dtype_of[T](), dtype_of[U]())`, while boolean pairs return
+`int8`. Integer results use exact-width wrapping arithmetic; a negative integer
+exponent returns an error. Floating results preserve IEEE special values and
+signed-zero behavior. A 64-bit integer operand paired with a floating output
+is rejected rather than silently rounded. Complex and string inputs are
+unsupported.
+
+```v
+import vtl
+
+bases := vtl.from_2d[i16]([[2], [3]])!
+exponents := vtl.from_1d[f32]([2.0, 3.0, 0.0])!
+values := vtl.pow_promoted[f32, i16, f32](bases, exponents)!
+println(values.to_array()) // [4.0, 8.0, 1.0, 9.0, 27.0, 1.0]
+```
+
 ## Promoted exponential and logarithm
 
 `vtl.exp_promoted[R, T](values)` and `vtl.log_promoted[R, T](values)`, along
@@ -119,6 +139,25 @@ and `atan_promoted`; the hyperbolic counterparts are `sinh_promoted`,
 are `asinh_promoted`, `acosh_promoted`, and `atanh_promoted`. All preserve the
 floating-point domain behavior of the underlying operations; the trigonometric
 functions take angles in radians.
+
+## Normalized sinc
+
+`Tensor.sinc()` computes NumPy's normalized sinc,
+`sin(pi*x)/(pi*x)`, elementwise.
+It returns `1` for both positive and negative zero and NaN for NaN or either
+infinity. The method accepts only f32 and f64 tensors and preserves the input
+shape and dtype. Unlike NumPy, it does not accept integer tensors or promote
+them to a floating dtype.
+
+```v
+import vtl
+
+values := vtl.from_1d[f64]([0.0, 0.5, 1.0, -0.5])!
+result := values.sinc()!
+println(result.to_array()) // [1.0, 0.6366..., ~0.0, 0.6366...]
+```
+
+See the [sinc example](../examples/sinc/README.md) for a runnable version.
 
 ## Promoted arctangent with two arguments
 
