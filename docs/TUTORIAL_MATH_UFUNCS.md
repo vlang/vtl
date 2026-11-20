@@ -17,6 +17,21 @@ squared := values.square()!
 println(squared.to_array()) // [2.25, 4.0]
 ```
 
+## Reciprocal
+
+`Tensor.reciprocal()` computes `1/x` elementwise for f32/f64 tensors and
+preserves the input shape and dtype. It follows IEEE behavior: signed zeros
+produce signed infinities, infinities produce signed zeros, and NaNs propagate.
+Integer and complex inputs are rejected rather than implicitly promoted.
+
+```v
+import vtl
+
+values := vtl.from_1d[f64]([0.5, -2.0, 4.0])!
+inverse := values.reciprocal()!
+println(inverse.to_array()) // [2.0, -0.5, 0.25]
+```
+
 ## Promoted square and cube roots
 
 `vtl.sqrt_promoted[R, T](values)` and `vtl.cbrt_promoted[R, T](values)` return
