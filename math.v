@@ -1164,14 +1164,117 @@ pub fn (a &Tensor[T]) pow[T](b &Tensor[T]) !&Tensor[T] {
 pub fn (t &Tensor[T]) square[T]() !&Tensor[T] {
 	$if T is bool {
 		return t.map_values(fn [T](value T) T {
-			return value
+			return square_value[T](value)
 		})
 	} $else $if T is $int || T is $float || T is vcomplex.Complex {
 		return t.map_values(fn [T](value T) T {
-			return value * value
+			return square_value[T](value)
 		})
 	} $else {
 		return error('square supports only numeric and boolean tensors')
+	}
+}
+
+// square_into writes the elementwise square to a same-shaped output tensor.
+// Internally overlapping or ambiguous output layouts are rejected. Overlapping
+// input and output storage is safe; input values are snapshotted before writes.
+pub fn (t &Tensor[T]) square_into[T](mut out Tensor[T]) !&Tensor[T] {
+	if out.shape != t.shape {
+		return error('square_into output shape ${out.shape} must match input shape ${t.shape}')
+	}
+	if tensor_has_possible_internal_overlap[T](&out) {
+		return error('square_into output must have a provably non-overlapping stride layout')
+	}
+	$if T is bool {
+		return square_values_into[T](t, mut out)
+	} $else $if T is $int || T is $float || T is vcomplex.Complex {
+		return square_values_into[T](t, mut out)
+	} $else {
+		return error('square_into supports only numeric and boolean tensors')
+	}
+}
+
+fn tensor_has_possible_internal_overlap[T](t &Tensor[T]) bool {
+	if t.size <= 1 {
+		return false
+	}
+	if t.shape.len != t.strides.len {
+		return true
+	}
+	mut axes := []int{}
+	min_int := -max_int - 1
+	for axis, dimension in t.shape {
+		if dimension <= 1 {
+			continue
+		}
+		stride := t.strides[axis]
+		if stride <= 0 || stride == min_int {
+			return true
+		}
+		axes << axis
+	}
+	for i in 1 .. axes.len {
+		axis := axes[i]
+		stride := if t.strides[axis] < 0 { -t.strides[axis] } else { t.strides[axis] }
+		mut position := i
+		for position > 0 {
+			previous_axis := axes[position - 1]
+			previous_stride := if t.strides[previous_axis] < 0 {
+				-t.strides[previous_axis]
+			} else {
+				t.strides[previous_axis]
+			}
+			if previous_stride <= stride {
+				break
+			}
+			axes[position] = previous_axis
+			position--
+		}
+		axes[position] = axis
+	}
+	mut max_offset := 0
+	for axis in axes {
+		raw_stride := t.strides[axis]
+		stride := if raw_stride < 0 { -raw_stride } else { raw_stride }
+		if stride <= max_offset {
+			return true
+		}
+		span := t.shape[axis] - 1
+		if span > 0 && stride > (max_int - max_offset) / span {
+			return true
+		}
+		max_offset += span * stride
+	}
+	return false
+}
+
+fn square_values_into[T](t &Tensor[T], mut out Tensor[T]) &Tensor[T] {
+	overlaps := tensor_shares_storage[T, T](t, &out)
+	mut source_values := []T{}
+	if overlaps {
+		source_values = t.to_array()
+	}
+	if !overlaps && t.is_row_major_contiguous() && out.is_row_major_contiguous()
+		&& t.data.data.len == t.size && out.data.data.len == out.size {
+		for i in 0 .. t.size {
+			out.data.data[i] = square_value[T](t.data.data[i])
+		}
+		return out
+	}
+	for i in 0 .. t.size {
+		value := if overlaps { source_values[i] } else { t.get_nth(i) }
+		out.set_nth[T](i, square_value[T](value))
+	}
+	return out
+}
+
+fn square_value[T](value T) T {
+	$if T is bool {
+		return value
+	} $else $if T is $int || T is $float || T is vcomplex.Complex {
+		return value * value
+	} $else {
+		return value
 	}
 }
 
