@@ -100,6 +100,16 @@ fn test_square_into_rejects_internally_overlapping_output_views() ! {
 		assert err.msg().contains('non-overlapping')
 		assert overlapping_base.to_array() == [10, 20, 30, 40]
 	}
+
+	mut negative_stride_base := vtl.from_1d[int]([10, 20, 30])!
+	mut negative_stride_output := negative_stride_base.as_strided([3], [-2])!
+	negative_values := vtl.from_1d[int]([1, 2, 3])!
+	if _ := negative_values.square_into(mut negative_stride_output) {
+		assert false, 'square_into must reject negative-stride output layouts'
+	} else {
+		assert err.msg().contains('non-overlapping')
+		assert negative_stride_base.to_array() == [10, 20, 30]
+	}
 }
 
 fn test_square_into_validates_shape_and_handles_empty_tensors() ! {

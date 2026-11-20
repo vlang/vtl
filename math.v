@@ -1208,7 +1208,7 @@ fn tensor_has_possible_internal_overlap[T](t &Tensor[T]) bool {
 			continue
 		}
 		stride := t.strides[axis]
-		if stride == 0 || stride == min_int {
+		if stride <= 0 || stride == min_int {
 			return true
 		}
 		axes << axis
