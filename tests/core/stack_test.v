@@ -160,6 +160,21 @@ fn test_expand_dims() {
 	assert result.array_equal(expected)
 }
 
+fn test_axis_insertion_rejects_out_of_range_axes() {
+	a := vtl.ones[f64]([2, 2])
+	_ := a.unsqueeze[f64](axis: 3) or {
+		assert err.msg() == 'axis out of range'
+		return
+	}
+	assert false, 'expected unsqueeze to reject an axis greater than rank'
+
+	_ := a.expand_dims[f64](axis: -4) or {
+		assert err.msg() == 'axis out of range'
+		return
+	}
+	assert false, 'expected expand_dims to reject an axis less than -rank-1'
+}
+
 fn test_axis_insertion_and_squeeze_preserve_transposed_storage() ! {
 	mut tensor := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
 	transposed := tensor.transpose([1, 0])!
