@@ -361,6 +361,20 @@ println(exponent.to_array())
 println(reconstructed.to_array())
 ```
 
+`vtl.frexp_promoted[R, T]` also accepts integer and boolean tensors, returning
+an f64 mantissa for those inputs (f32 inputs return f32 mantissas). The
+exponent tensor remains integer, and zero, infinity, NaN, and empty inputs
+retain NumPy's decomposition behavior:
+
+```v
+import vtl
+
+integers := vtl.from_1d[i16]([1, -2, 8])!
+mantissa, exponent := vtl.frexp_promoted[f64, i16](integers)!
+println(mantissa.to_array()) // [0.5, -0.5, 0.5]
+println(exponent.to_array()) // [1, 2, 4]
+```
+
 For scalar inputs, use `vtl.ldexp_scalar(mantissa_tensor, exponent)` or
 `vtl.ldexp_scalar_left(mantissa, exponent_tensor)`. The results preserve the
 mantissa's f32/f64 dtype and support empty tensors.
