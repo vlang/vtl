@@ -266,6 +266,9 @@ The first pair propagates NaNs; the latter pair ignores one NaN operand. Integer
 comparisons retain exactness when promotion produces an integer dtype, and
 floating-point tie handling matches NumPy's signed-zero rules. Weak-scalar
 extrema remain part of #717.
+`ldexp_promoted` broadcasts real numeric or boolean mantissas with integer or
+boolean exponents. Floating mantissas preserve f32/f64; integer and boolean
+mantissas produce f64, matching NumPy's available result loops.
 Floating-point autograd is available
 through `Variable.remainder` for f32/f64: the divisor gradient uses
 `-floor(a / b) * grad`, including at exact multiples, and broadcast gradients
