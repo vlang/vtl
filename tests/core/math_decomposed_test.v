@@ -49,6 +49,44 @@ fn test_frexp_preserves_f32_mantissa_dtype() ! {
 	assert integral.to_array() == [f32(0.0), f32(-12.0), f32(0.0), f32(-2.0)]
 }
 
+fn test_frexp_promoted_accepts_integer_and_boolean_inputs() ! {
+	integers := vtl.from_1d[i16]([1, -2, 0, 8])!
+	mantissa, exponent := vtl.frexp_promoted[f64, i16](integers)!
+	assert mantissa.dtype() == .float64
+	assert mantissa.to_array() == [0.5, -0.5, 0.0, 0.5]
+	assert exponent.to_array() == [1, 2, 0, 4]
+
+	booleans := vtl.from_1d([true, false])!
+	bool_mantissa, bool_exponent := vtl.frexp_promoted[f64, bool](booleans)!
+	assert bool_mantissa.to_array() == [0.5, 0.0]
+	assert bool_exponent.to_array() == [1, 0]
+}
+
+fn test_frexp_promoted_preserves_f32_and_ieee_special_values() ! {
+	input := vtl.from_1d[f32]([f32(0.0), f32(-0.0), f32(math.inf(1)), f32(math.nan())])!
+	mantissa, exponent := vtl.frexp_promoted[f32, f32](input)!
+	assert mantissa.dtype() == .float32
+	assert mantissa.get_nth(0) == f32(0.0) && !math.signbit(mantissa.get_nth(0))
+	assert mantissa.get_nth(1) == f32(0.0) && math.signbit(mantissa.get_nth(1))
+	assert mantissa.get_nth(2) == f32(math.inf(1))
+	assert math.is_nan(mantissa.get_nth(3))
+	assert exponent.to_array() == [0, 0, 0, 0]
+
+	empty := vtl.empty[i32]([0])
+	empty_mantissa, empty_exponent := vtl.frexp_promoted[f64, i32](empty)!
+	assert empty_mantissa.shape == [0]
+	assert empty_exponent.shape == [0]
+}
+
+fn test_frexp_promoted_validates_mantissa_dtype() ! {
+	input := vtl.from_1d[i32]([1])!
+	vtl.frexp_promoted[f32, i32](input) or {
+		assert err.msg().contains('mantissa dtype')
+		return
+	}
+	assert false, 'expected integer frexp inputs to produce f64 mantissas'
+}
+
 fn test_decomposition_uses_logical_order_for_strided_views() ! {
 	base := vtl.from_2d([[1.5, 2.5], [3.5, 4.5]])!
 	view := base.transpose([1, 0])!

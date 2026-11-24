@@ -36,6 +36,29 @@ pub fn (t &Tensor[T]) frexp[T]() !(&Tensor[T], &Tensor[int]) {
 	}
 }
 
+// frexp_promoted decomposes real numeric or boolean values into a floating
+// mantissa and an integer base-2 exponent. f32 inputs preserve f32 mantissas;
+// all other supported inputs produce f64 mantissas.
+pub fn frexp_promoted[R, T](t &Tensor[T]) !(&Tensor[R], &Tensor[int]) {
+	input_dtype := dtype_of[T]()
+	if !is_real_numeric_dtype(input_dtype) && input_dtype != .boolean {
+		return error('frexp requires a real numeric or boolean tensor')
+	}
+	expected_dtype := if input_dtype == .float32 { DType.float32 } else { DType.float64 }
+	if dtype_of[R]() != expected_dtype {
+		return error('mantissa dtype ${dtype_of[R]()} does not match frexp result dtype ${expected_dtype}')
+	}
+	mut mantissa := empty[R](t.shape.clone(), memory: .row_major)
+	mut exponent := empty[int](t.shape.clone(), memory: .row_major)
+	for flat_index in 0 .. t.size {
+		value := cast_promoted_value[T, f64](t.get_nth(flat_index))
+		fraction, power := math.frexp(value)
+		mantissa.data.data[flat_index] = cast_promoted_value[f64, R](fraction)
+		exponent.data.data[flat_index] = power
+	}
+	return mantissa, exponent
+}
+
 // ldexp scales each floating-point mantissa by 2 raised to the corresponding
 // integer exponent. The operands broadcast to a common shape.
 pub fn ldexp[T](mantissa &Tensor[T], exponent &Tensor[int]) !&Tensor[T] {
