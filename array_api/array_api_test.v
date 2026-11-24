@@ -4,13 +4,34 @@ import vtl
 
 fn test_capability_matrix_is_explicit_and_queryable() {
 	matrix := capability_matrix()
-	assert matrix.len == 6
+	assert matrix.len == 7
 	assert supports('zeros')
 	assert supports('reshape')
+	assert supports('where')
 	assert !supports('asarray')
 	assert !supports('matmul')
 	for capability in matrix {
 		assert capability.supported
+	}
+}
+
+fn test_where_broadcasts_condition_and_operands() {
+	condition := vtl.from_2d[bool]([[true], [false]])!
+	x := vtl.from_1d[int]([1, 2, 3])!
+	y := vtl.from_2d[int]([[10]])!
+
+	result := where(condition, x, y)!
+	assert result.shape == [2, 3]
+	assert result.to_array() == [1, 2, 3, 10, 10, 10]
+}
+
+fn test_where_rejects_incompatible_shapes() {
+	condition := vtl.from_1d[bool]([true, false])!
+	x := vtl.from_1d[int]([1, 2, 3])!
+	y := vtl.from_1d[int]([10, 20, 30])!
+
+	if _ := where(condition, x, y) {
+		assert false, 'where must reject incompatible broadcast shapes'
 	}
 }
 
