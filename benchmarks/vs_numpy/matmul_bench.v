@@ -1,6 +1,7 @@
 // End-to-end VTL matmul benchmark. Compile with -prod from ~/.vmodules, then run the binary.
 module main
 
+import os
 import time
 import vtl
 import vtl.la as vtl_la
@@ -8,6 +9,11 @@ import vtl.benchmarks.util as bu
 
 fn main() {
 	bu.print_header('VTL matmul benchmark (f64 + optional f32 CBLAS)')
+	$if vsl_blas_cblas || vsl_blas_generic_cblas {
+		println('backend: CBLAS; VJOBS=${env_value('VJOBS')}; OPENBLAS_NUM_THREADS=${env_value('OPENBLAS_NUM_THREADS')}')
+	} $else {
+		println('backend: pure-V; VJOBS=${env_value('VJOBS')}')
+	}
 	config := bu.BenchConfig{
 		sizes:       [128, 256, 512]
 		iterations:  10
@@ -29,6 +35,10 @@ fn main() {
 		}
 	}
 	println('\nNumPy baselines: numpy_matmul_baseline.py and numpy_matmul_f32_end_to_end.py')
+}
+
+fn env_value(name string) string {
+	return os.getenv_opt(name) or { 'unset' }
 }
 
 fn bench_matmul(n int, config bu.BenchConfig) ! {

@@ -19,3 +19,4 @@ vls.log
 examples/*/main
 examples/*/main.exe
 benchmarks/vs_numpy/matmul_bench
+benchmarks/vs_numpy/matmul_bench-cblas
