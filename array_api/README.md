@@ -1,8 +1,8 @@
 # `vtl.array_api`
 
 `vtl.array_api` is the explicit namespace for VTL's incrementally implemented
-Python Array API surface. It currently exposes creation and reshape operations plus broadcast-aware `where` selection and `matmul`, with a small
-capability matrix so consumers can select the namespace without
+Python Array API surface. It currently exposes creation and reshape operations plus broadcast-aware `where` selection, `matmul`, and scalar
+`clip`, with a small capability matrix so consumers can select the namespace without
 mistaking VTL-specific functions for standard operations.
 
 The supported specification target is `2024.12`. The matrix is intentionally
@@ -25,6 +25,7 @@ selected := xp.where(condition, positive, negative)!
 
 weights := xp.ones[f32]([3, 2])
 scores := xp.matmul(weights, weights.t()!)!
+bounded := xp.clip(scores, 0.0, 1.0)!
 ```
 
 This is not yet a complete conformance implementation. Consumers should check
