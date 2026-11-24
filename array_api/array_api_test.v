@@ -4,12 +4,13 @@ import vtl
 
 fn test_capability_matrix_is_explicit_and_queryable() {
 	matrix := capability_matrix()
-	assert matrix.len == 7
+	assert matrix.len == 8
 	assert supports('zeros')
 	assert supports('reshape')
 	assert supports('where')
+	assert supports('matmul')
 	assert !supports('asarray')
-	assert !supports('matmul')
+
 	for capability in matrix {
 		assert capability.supported
 	}
@@ -32,6 +33,25 @@ fn test_where_rejects_incompatible_shapes() {
 
 	if _ := where(condition, x, y) {
 		assert false, 'where must reject incompatible broadcast shapes'
+	}
+}
+
+fn test_matmul_supports_vectors_and_matrices() {
+	vector := vtl.from_1d[int]([1, 2, 3])!
+	matrix := vtl.from_2d[int]([[1, 2], [3, 4], [5, 6]])!
+
+	assert matmul(vector, matrix)!.shape == [2]
+	assert matmul(vector, matrix)!.to_array() == [22, 28]
+	got := matmul(matrix, matrix.t()!)!
+	assert got.to_array() == [5, 11, 17, 11, 25, 39, 17, 39, 61]
+}
+
+fn test_matmul_rejects_incompatible_shapes() {
+	left := vtl.from_2d[int]([[1, 2]])!
+	right := vtl.from_2d[int]([[1, 2]])!
+
+	if _ := matmul(left, right) {
+		assert false, 'matmul must reject incompatible inner dimensions'
 	}
 }
 
