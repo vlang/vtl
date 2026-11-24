@@ -66,6 +66,9 @@
 <div class="menu-row"><a href="./vtl.html">vtl</a></div>
 </li>
 <li class="open">
+<div class="menu-row"><a href="./array_api.html">array_api</a></div>
+</li>
+<li class="open">
 <div class="menu-row"><a href="./autograd.html">autograd</a></div>
 </li>
 <li class="open">
@@ -252,6 +255,11 @@ opt<span class="token punctuation">.</span><span class="token function">update</
 <td><code>vtl</code></td>
 <td>Tensor creation, slicing, broadcasting, reductions</td>
 <td><a href="https://github.com/vlang/vtl/blob/master/docs/TUTORIAL_FIRST_STEPS.md">First steps</a></td>
+</tr>
+<tr>
+<td><code>vtl.array_api</code></td>
+<td>Explicit, capability-discoverable Python Array API subset</td>
+<td><a href="https://github.com/vlang/vtl/blob/master/array_api/README.md">Array API namespace</a></td>
 </tr>
 <tr>
 <td>Complex tensors</td>
@@ -1232,6 +1240,14 @@ systemd-run --user --scope --property=MemoryMax=4G --property=MemorySwapMax=0 \
 
 </section>
 
+		<section id="frexp_promoted" class="doc-node">
+			<div class="title"><h2>fn frexp_promoted <a href="#frexp_promoted">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/math_decomposed.v#L65"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">frexp_promoted</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">,</span> <span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>t <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+<p>frexp_promoted decomposes real numeric or boolean values into a floating mantissa and an integer base-2 exponent. f32 inputs preserve f32 mantissas; all other supported inputs produce f64 mantissas.</p>
+
+</section>
+
 		<section id="from_1d" class="doc-node">
 			<div class="title"><h2>fn from_1d <a href="#from_1d">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/creation.v#L393"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -1404,15 +1420,23 @@ systemd-run --user --scope --property=MemoryMax=4G --property=MemorySwapMax=0 \
 </section>
 
 		<section id="ldexp" class="doc-node">
-			<div class="title"><h2>fn ldexp <a href="#ldexp">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/math_decomposed.v#L41"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn ldexp <a href="#ldexp">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/math_decomposed.v#L87"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token function">ldexp</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>mantissa <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> exponent <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
 <p>ldexp scales each floating-point mantissa by 2 raised to the corresponding integer exponent. The operands broadcast to a common shape.</p>
 
 </section>
 
+		<section id="ldexp_promoted" class="doc-node">
+			<div class="title"><h2>fn ldexp_promoted <a href="#ldexp_promoted">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/math_decomposed.v#L109"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">ldexp_promoted</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">,</span> <span class="token type_name">T</span><span class="token punctuation">,</span> <span class="token type_name">U</span><span class="token punctuation">]</span><span class="token punctuation">(</span>mantissa <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> exponent <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">U</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">]</span></code></pre>
+<p>ldexp_promoted applies NumPy-style dtype selection to real mantissas and integer exponents. Floating mantissas preserve f32/f64; integer and boolean mantissas produce f64.</p>
+
+</section>
+
 		<section id="ldexp_scalar" class="doc-node">
-			<div class="title"><h2>fn ldexp_scalar <a href="#ldexp_scalar">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/math_decomposed.v#L61"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn ldexp_scalar <a href="#ldexp_scalar">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/math_decomposed.v#L148"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token function">ldexp_scalar</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>mantissa <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> exponent <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
 <p>ldexp_scalar scales a floating-point mantissa tensor by one integer exponent.</p>
@@ -1420,7 +1444,7 @@ systemd-run --user --scope --property=MemoryMax=4G --property=MemorySwapMax=0 \
 </section>
 
 		<section id="ldexp_scalar_left" class="doc-node">
-			<div class="title"><h2>fn ldexp_scalar_left <a href="#ldexp_scalar_left">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/math_decomposed.v#L67"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn ldexp_scalar_left <a href="#ldexp_scalar_left">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/math_decomposed.v#L154"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token function">ldexp_scalar_left</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>mantissa <span class="token type_name">T</span><span class="token punctuation">,</span> exponent <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
 <p>ldexp_scalar_left scales one floating-point mantissa by an exponent tensor.</p>
@@ -1624,6 +1648,14 @@ systemd-run --user --scope --property=MemoryMax=4G --property=MemorySwapMax=0 \
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token function">mixed_index</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>t <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> indices <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token type_name">TensorIndex</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
 <p>mixed_index combines full slices, ranges, scalar integers, broadcasted coordinate tensors, ellipsis, and inserted size-one axes. Omitted trailing axes select the full axis. If every index is basic, the result is a view; if any coordinate tensor is used, the result is an independent row-major copy.</p>
+
+</section>
+
+		<section id="modf_promoted" class="doc-node">
+			<div class="title"><h2>fn modf_promoted <a href="#modf_promoted">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/math_decomposed.v#L25"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">modf_promoted</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">,</span> <span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>t <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">R</span><span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+<p>modf_promoted returns fractional and integral parts for real numeric or boolean values. f32 inputs preserve f32 outputs; all other inputs produce f64 outputs.</p>
 
 </section>
 
@@ -4750,7 +4782,7 @@ systemd-run --user --scope --property=MemoryMax=4G --property=MemorySwapMax=0 \
 </section>
 
 		<section id="Tensor[T].frexp" class="doc-node">
-			<div class="title"><h2>fn (Tensor[T]) frexp <a href="#Tensor[T].frexp">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/math_decomposed.v#L24"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (Tensor[T]) frexp <a href="#Tensor[T].frexp">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/math_decomposed.v#L47"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>t <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">frexp</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
 <p>frexp decomposes each f32/f64 value into a mantissa and base-2 exponent. The mantissa preserves the input floating-point type; exponents use int.</p>
@@ -6176,7 +6208,7 @@ systemd-run --user --scope --property=MemoryMax=4G --property=MemorySwapMax=0 \
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 24 Nov 2026 06:32:40</div>
+						<div class="footer">Powered by vdoc. Generated on: 24 Nov 2026 17:55:59</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_vtl">README</a></li>
 <li class="open"><a href="#abs">fn abs</a>        <ul>
@@ -6455,6 +6487,9 @@ systemd-run --user --scope --property=MemoryMax=4G --property=MemorySwapMax=0 \
 <li class="open"><a href="#fmod_scalar_promoted">fn fmod_scalar_promoted</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#frexp_promoted">fn frexp_promoted</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#from_1d">fn from_1d</a>        <ul>
 </ul>
 </li>
@@ -6519,6 +6554,9 @@ systemd-run --user --scope --property=MemoryMax=4G --property=MemorySwapMax=0 \
 </ul>
 </li>
 <li class="open"><a href="#ldexp">fn ldexp</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ldexp_promoted">fn ldexp_promoted</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#ldexp_scalar">fn ldexp_scalar</a>        <ul>
@@ -6600,6 +6638,9 @@ systemd-run --user --scope --property=MemoryMax=4G --property=MemorySwapMax=0 \
 </ul>
 </li>
 <li class="open"><a href="#mixed_index">fn mixed_index</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#modf_promoted">fn modf_promoted</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#multiply_promoted">fn multiply_promoted</a>        <ul>
