@@ -6,7 +6,7 @@ optimizers. Implementations on `main` include:
 | Category | Layers |
 | --- | --- |
 | Core | Input, Linear, Flatten, Embedding |
-| Convolution and pooling | Conv2D, MaxPool2D, Pool2D |
+| Convolution and pooling | Conv2D (including grouped and dilated CPU convolution), MaxPool2D, Pool2D |
 | Normalization and regularization | BatchNorm, GroupNorm, LayerNorm, RMSNorm, Dropout |
 | Recurrent and attention | GRU, LSTM, multi-head attention, positional encoding |
 | Activations | ReLU, Sigmoid, Tanh, Softmax, Leaky ReLU, ELU, GELU, Swish, Mish, Softplus, SELU, HardSwish |
