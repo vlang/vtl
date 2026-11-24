@@ -5,6 +5,7 @@ module array_api
 
 import vtl
 import vtl.la
+import vtl.stats
 
 // standard_version identifies the Array API specification targeted by this
 // namespace. It is intentionally separate from VTL's package version.
@@ -30,6 +31,8 @@ pub fn capability_matrix() []Capability {
 		Capability{'where', true},
 		Capability{'matmul', true},
 		Capability{'clip', true},
+		Capability{'sum', true},
+		Capability{'mean', true},
 	]
 }
 
@@ -86,4 +89,14 @@ pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
 // clip limits every array value to the inclusive scalar interval.
 pub fn clip[T](array &vtl.Tensor[T], min_value T, max_value T) !&vtl.Tensor[T] {
 	return array.clip(min_value, max_value)
+}
+
+// sum reduces all elements to a scalar in the input dtype.
+pub fn sum[T](array &vtl.Tensor[T]) T {
+	return stats.sum(array)
+}
+
+// mean reduces real numeric elements to an f64 scalar.
+pub fn mean[T](array &vtl.Tensor[T]) f64 {
+	return stats.mean_as[T, f64](array)
 }
