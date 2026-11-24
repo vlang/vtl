@@ -57,6 +57,47 @@ pub fn ldexp[T](mantissa &Tensor[T], exponent &Tensor[int]) !&Tensor[T] {
 	}
 }
 
+// ldexp_promoted applies NumPy-style dtype selection to real mantissas and
+// integer exponents. Floating mantissas preserve f32/f64; integer and boolean
+// mantissas produce f64.
+pub fn ldexp_promoted[R, T, U](mantissa &Tensor[T], exponent &Tensor[U]) !&Tensor[R] {
+	mantissa_dtype := dtype_of[T]()
+	exponent_dtype := dtype_of[U]()
+	if !is_real_numeric_dtype(mantissa_dtype) && mantissa_dtype != .boolean {
+		return error('ldexp requires a real numeric or boolean mantissa tensor')
+	}
+	if !is_integer_dtype(exponent_dtype) && exponent_dtype != .boolean {
+		return error('ldexp requires an integer or boolean exponent tensor')
+	}
+	expected_dtype := if mantissa_dtype == .float32 { DType.float32 } else { DType.float64 }
+	if dtype_of[R]() != expected_dtype {
+		return error('output dtype ${dtype_of[R]()} does not match ldexp result dtype ${expected_dtype}')
+	}
+	shape := broadcast_shapes(mantissa.shape, exponent.shape)!
+	mantissas := mantissa.broadcast_to(shape)!
+	exponents := exponent.broadcast_to(shape)!
+	mut result := empty[R](shape, memory: .row_major)
+	for flat_index in 0 .. result.size {
+		mantissa_offset := broadcast_tensor_offset(flat_index, shape, mantissas.strides)
+		exponent_offset := broadcast_tensor_offset(flat_index, shape, exponents.strides)
+		mantissa_value := cast_promoted_value[T, f64](mantissas.data.data[mantissa_offset])
+		exponent_value := ldexp_exponent_to_int[U](exponents.data.data[exponent_offset])
+		result.data.data[flat_index] = cast_promoted_value[f64, R](math.ldexp(mantissa_value, exponent_value))
+	}
+	return result
+}
+
+@[inline]
+fn ldexp_exponent_to_int[T](value T) int {
+	$if T is bool {
+		return if value { 1 } else { 0 }
+	} $else $if T is $int {
+		return int(value)
+	} $else {
+		panic('ldexp requires an integer or boolean exponent tensor')
+	}
+}
+
 // ldexp_scalar scales a floating-point mantissa tensor by one integer exponent.
 pub fn ldexp_scalar[T](mantissa &Tensor[T], exponent int) !&Tensor[T] {
 	exponent_tensor := from_array[int]([exponent], [])!

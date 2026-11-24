@@ -102,6 +102,49 @@ fn test_ldexp_accepts_scalar_mantissas_and_empty_exponent_tensors() ! {
 	assert empty_result.size == 0
 }
 
+fn test_ldexp_promoted_broadcasts_integer_mantissas_and_exponents() ! {
+	mantissa := vtl.from_2d[i16]([[1, 2], [3, 4]])!
+	exponent := vtl.from_1d[i8]([0, 1])!
+	result := vtl.ldexp_promoted[f64, i16, i8](mantissa, exponent)!
+
+	assert result.dtype() == .float64
+	assert result.shape == [2, 2]
+	assert result.to_array() == [1.0, 4.0, 3.0, 8.0]
+
+	empty_mantissa := vtl.from_array[f64]([]f64{}, [0])!
+	empty_exponent := vtl.from_array[i16]([2], [])!
+	empty_result := vtl.ldexp_promoted[f64, f64, i16](empty_mantissa, empty_exponent)!
+	assert empty_result.shape == [0]
+	assert empty_result.size == 0
+}
+
+fn test_ldexp_promoted_preserves_float32_and_special_values() ! {
+	mantissa := vtl.from_1d[f32]([0.5, -0.0, math.inf(1), math.nan()])!
+	exponent := vtl.from_array[bool]([true], [])!
+	result := vtl.ldexp_promoted[f32, f32, bool](mantissa, exponent)!
+
+	assert result.dtype() == .float32
+	assert result.get_nth(0) == f32(1.0)
+	assert math.signbit(result.get_nth(1))
+	assert result.get_nth(2) == f32(math.inf(1))
+	assert math.is_nan(result.get_nth(3))
+}
+
+fn test_ldexp_promoted_rejects_invalid_dtypes() ! {
+	mantissa := vtl.from_1d[f64]([1.0])!
+	float_exponent := vtl.from_1d[f32]([1.0])!
+	vtl.ldexp_promoted[f64, f64, f32](mantissa, float_exponent) or {
+		assert err.msg().contains('integer or boolean exponent')
+		return
+	}
+	assert false, 'expected floating-point exponents to be rejected'
+
+	exponent := vtl.from_1d([1])!
+	if _ := vtl.ldexp_promoted[f32, f64, int](mantissa, exponent) {
+		assert false, 'expected an f64 mantissa to require an f64 result'
+	}
+}
+
 fn test_ldexp_scalar_rejects_non_floating_mantissas() ! {
 	mantissa := vtl.from_1d[i32]([1, 2])!
 	vtl.ldexp_scalar[i32](mantissa, 1) or {
