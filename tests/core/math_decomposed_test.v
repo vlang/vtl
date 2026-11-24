@@ -18,6 +18,46 @@ fn test_modf_returns_fractional_then_integral_parts() ! {
 	assert math.signbit(integral.get_nth(3))
 }
 
+fn test_modf_promoted_accepts_integer_and_boolean_inputs() ! {
+	integers := vtl.from_1d[i16]([1, -2, 0, 8])!
+	fractional, integral := vtl.modf_promoted[f64, i16](integers)!
+	assert fractional.dtype() == .float64
+	assert fractional.to_array() == [0.0, -0.0, 0.0, 0.0]
+	assert integral.to_array() == [1.0, -2.0, 0.0, 8.0]
+	assert math.signbit(fractional.get_nth(1))
+
+	booleans := vtl.from_1d([true, false])!
+	bool_fractional, bool_integral := vtl.modf_promoted[f64, bool](booleans)!
+	assert bool_fractional.to_array() == [0.0, 0.0]
+	assert bool_integral.to_array() == [1.0, 0.0]
+}
+
+fn test_modf_promoted_preserves_f32_and_special_values() ! {
+	input := vtl.from_1d[f32]([f32(-0.0), f32(math.inf(1)), f32(math.nan())])!
+	fractional, integral := vtl.modf_promoted[f32, f32](input)!
+	assert fractional.dtype() == .float32
+	assert math.signbit(fractional.get_nth(0))
+	assert math.signbit(integral.get_nth(0))
+	assert math.is_nan(fractional.get_nth(1))
+	assert integral.get_nth(1) == f32(math.inf(1))
+	assert math.is_nan(fractional.get_nth(2))
+	assert math.is_nan(integral.get_nth(2))
+
+	empty := vtl.empty[i32]([0])
+	empty_fractional, empty_integral := vtl.modf_promoted[f64, i32](empty)!
+	assert empty_fractional.shape == [0]
+	assert empty_integral.shape == [0]
+}
+
+fn test_modf_promoted_validates_output_dtype() ! {
+	input := vtl.from_1d[i32]([1])!
+	vtl.modf_promoted[f32, i32](input) or {
+		assert err.msg().contains('output dtype')
+		return
+	}
+	assert false, 'expected integer modf inputs to produce f64 outputs'
+}
+
 fn test_frexp_and_ldexp_round_trip_f64() ! {
 	input := vtl.from_1d([0.0, -0.0, 0.75, -8.0, 1e-300, 1e300, math.inf(1), math.nan()])!
 	mantissa, exponent := input.frexp()!

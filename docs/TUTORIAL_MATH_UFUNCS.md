@@ -375,6 +375,16 @@ println(mantissa.to_array()) // [0.5, -0.5, 0.5]
 println(exponent.to_array()) // [1, 2, 4]
 ```
 
+For the same promotion behavior with fractional and integral decomposition,
+use `vtl.modf_promoted[R, T]`:
+
+```v
+integers := vtl.from_1d[i16]([1, -2, 8])!
+fractional, integral := vtl.modf_promoted[f64, i16](integers)!
+println(fractional.to_array()) // [0.0, -0.0, 0.0]
+println(integral.to_array()) // [1.0, -2.0, 8.0]
+```
+
 For scalar inputs, use `vtl.ldexp_scalar(mantissa_tensor, exponent)` or
 `vtl.ldexp_scalar_left(mantissa, exponent_tensor)`. The results preserve the
 mantissa's f32/f64 dtype and support empty tensors.

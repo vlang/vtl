@@ -272,6 +272,8 @@ mantissas produce f64, matching NumPy's available result loops.
 `frexp_promoted` accepts real numeric and boolean inputs, returning f32
 mantissas for f32 inputs and f64 mantissas otherwise, alongside integer
 exponents.
+`modf_promoted` accepts the same inputs and returns fractional and integral
+parts using the promoted floating dtype.
 Floating-point autograd is available
 through `Variable.remainder` for f32/f64: the divisor gradient uses
 `-floor(a / b) * grad`, including at exact multiples, and broadcast gradients
