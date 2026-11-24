@@ -4,6 +4,7 @@
 module array_api
 
 import vtl
+import vtl.la
 
 // standard_version identifies the Array API specification targeted by this
 // namespace. It is intentionally separate from VTL's package version.
@@ -27,6 +28,7 @@ pub fn capability_matrix() []Capability {
 		Capability{'arange', true},
 		Capability{'reshape', true},
 		Capability{'where', true},
+		Capability{'matmul', true},
 	]
 }
 
@@ -73,4 +75,9 @@ pub fn reshape[T](array &vtl.Tensor[T], shape []int) !&vtl.Tensor[T] {
 // where selects values from x or y according to a broadcastable condition.
 pub fn where[T](condition &vtl.Tensor[bool], x &vtl.Tensor[T], y &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	return vtl.where(condition, x, y)
+}
+
+// matmul computes matrix multiplication with Array API vector and batch rules.
+pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	return la.matmul(a, b)
 }
