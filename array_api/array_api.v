@@ -26,6 +26,7 @@ pub fn capability_matrix() []Capability {
 		Capability{'full', true},
 		Capability{'arange', true},
 		Capability{'reshape', true},
+		Capability{'where', true},
 	]
 }
 
@@ -67,4 +68,9 @@ pub fn arange[T](start f64, stop f64, step f64) !&vtl.Tensor[T] {
 // reshape returns an array with the requested shape, preserving its values.
 pub fn reshape[T](array &vtl.Tensor[T], shape []int) !&vtl.Tensor[T] {
 	return array.reshape(shape)
+}
+
+// where selects values from x or y according to a broadcastable condition.
+pub fn where[T](condition &vtl.Tensor[bool], x &vtl.Tensor[T], y &vtl.Tensor[T]) !&vtl.Tensor[T] {
+	return vtl.where(condition, x, y)
 }
