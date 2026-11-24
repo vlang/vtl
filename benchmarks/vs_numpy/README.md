@@ -722,6 +722,20 @@ backend: retain the pure-V comparison while adding a reproducible build against
 an actually threaded optimized CBLAS (for example OpenBLAS) before drawing
 thread-scaling conclusions.
 
+### OpenBLAS availability check (2026-11-24)
+
+Before using `-d vsl_blas_cblas`, confirm that a threaded OpenBLAS exists:
+`ldconfig -p | grep -i openblas` and `pacman -Qs openblas` (or the distro
+equivalent). On the Ryzen 9 5900X host, neither found OpenBLAS, `/usr/lib`
+contains only reference netlib `libblas`/`libcblas` 3.12.1, and the system
+NumPy 2.5.5 is linked against that same reference BLAS. Within a 2-CPU
+(`CPUQuota=200%`), 4 GiB scope, the generic-CBLAS VTL build at 512×512
+measured 7.6 GFLOPS (`f64` and `f32`) versus 28.6–29.2 GFLOPS (`f64`) and
+80.6–104.3 GFLOPS (`f32`) for pure-V; 2048×2048 `f32` CBLAS was 7.5–7.7 GFLOPS,
+matching system NumPy (7.1–7.5 GFLOPS). The comparison against NumPy's bundled
+OpenBLAS could not run offline (uv cache lacked a CPython 3.14 wheel), so no
+optimized-BLAS comparison is claimed.
+
 ## Earlier local CPU sample
 
 An earlier matched-input run on a Ryzen 9 5900X with V 0.5.2 `-prod` measured
