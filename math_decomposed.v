@@ -19,6 +19,29 @@ pub fn (t &Tensor[T]) modf[T]() !(&Tensor[T], &Tensor[T]) {
 	}
 }
 
+// modf_promoted returns fractional and integral parts for real numeric or
+// boolean values. f32 inputs preserve f32 outputs; all other inputs produce
+// f64 outputs.
+pub fn modf_promoted[R, T](t &Tensor[T]) !(&Tensor[R], &Tensor[R]) {
+	input_dtype := dtype_of[T]()
+	if !is_real_numeric_dtype(input_dtype) && input_dtype != .boolean {
+		return error('modf requires a real numeric or boolean tensor')
+	}
+	expected_dtype := if input_dtype == .float32 { DType.float32 } else { DType.float64 }
+	if dtype_of[R]() != expected_dtype {
+		return error('output dtype ${dtype_of[R]()} does not match modf result dtype ${expected_dtype}')
+	}
+	mut fractional := empty[R](t.shape.clone(), memory: .row_major)
+	mut integral := empty[R](t.shape.clone(), memory: .row_major)
+	for flat_index in 0 .. t.size {
+		value := cast_promoted_value[T, f64](t.get_nth(flat_index))
+		integer_part, fractional_part := math.modf(value)
+		fractional.data.data[flat_index] = cast_promoted_value[f64, R](fractional_part)
+		integral.data.data[flat_index] = cast_promoted_value[f64, R](integer_part)
+	}
+	return fractional, integral
+}
+
 // frexp decomposes each f32/f64 value into a mantissa and base-2 exponent.
 // The mantissa preserves the input floating-point type; exponents use int.
 pub fn (t &Tensor[T]) frexp[T]() !(&Tensor[T], &Tensor[int]) {
