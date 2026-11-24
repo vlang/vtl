@@ -10,10 +10,11 @@
 <link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to content</a>
 <header class="top">
   <div class="wrap top-in">
     <a class="brand" href="./">VTL <span class="tag">getting started</span></a>
-    <nav class="main">
+    <nav class="main" aria-label="Primary navigation">
       <a href="./">Home</a>
       <a href="./#parity">Parity</a>
       <a href="api/">API reference</a>
@@ -22,7 +23,7 @@
   </div>
 </header>
 
-<div class="wrap">
+<main id="main-content" class="wrap">
   <section>
     <h2>Install</h2>
     <p class="sub">You need a working <a href="https://vlang.io">V</a> installation. VTL depends on VSL, which <code>v install</code> resolves automatically.</p>
@@ -54,6 +55,7 @@ v -prod -o /tmp/tiny examples/nn_cifar10_tiny_synth/main.v
     <p>Then read the <a href="https://github.com/vlang/vtl/blob/main/docs/TUTORIAL_AUTOGRAD.md">autograd tutorial</a> and browse the <a href="api/">API reference</a> for layers, losses and optimizers.</p>
   </section>
 
+  </main>
   <footer>
     <div class="cols">
       <div><h4>VTL</h4><ul><li><a href="./">Home</a></li><li><a href="api/">API reference</a></li></ul></div>
@@ -61,6 +63,5 @@ v -prod -o /tmp/tiny examples/nn_cifar10_tiny_synth/main.v
       <div><h4>Family</h4><ul><li><a href="https://vlang.github.io/vsl">VSL — V Scientific Library</a></li><li><a href="https://vlang.io">V language</a></li></ul></div>
     </div>
   </footer>
-</div>
 </body>
 </html>

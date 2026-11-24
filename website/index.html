@@ -10,10 +10,11 @@
 <link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to content</a>
 <header class="top">
   <div class="wrap top-in">
     <a class="brand" href="./">VTL <span class="tag">v0.2.0-beta.1</span></a>
-    <nav class="main">
+    <nav class="main" aria-label="Primary navigation">
       <a href="getting-started.html">Getting started</a>
       <a href="#parity">Parity</a>
       <a href="#benchmarks">Benchmarks</a>
@@ -23,14 +24,20 @@
   </div>
 </header>
 
-<div class="wrap">
+<main id="main-content" class="wrap">
   <div class="hero">
     <div>
+      <div class="eyebrow">Typed tensors · reverse-mode autograd · V-native</div>
       <h1>Tensors, autograd and neural networks, <span class="hl">natively in V.</span></h1>
       <p class="lede">VTL is a pure-V tensor library for numerical computing and machine learning — N-dimensional arrays, reverse-mode autograd, and a full neural-network module, powered by VSL kernels on CPU, CUDA and Vulkan.</p>
       <div class="btns">
         <a class="btn primary" href="getting-started.html">Start building</a>
         <a class="btn" href="api/">Browse the API</a>
+      </div>
+      <div class="hero-meta" aria-label="Project highlights">
+        <span><strong>Data model</strong> generic tensors</span>
+        <span><strong>Gradients</strong> reverse mode</span>
+        <span><strong>Backend</strong> VSL-powered</span>
       </div>
     </div>
     <figure class="plot" aria-label="Training loss curve">
@@ -127,6 +134,7 @@ fn main() {
     <p class="note">Method: compile benchmarks with <code>-prod</code> first, then execute the binary — never <code>v run</code> for timings. Reproduce from the <a href="https://github.com/vlang/vtl/tree/main/benchmarks">benchmarks directory</a>.</p>
   </section>
 
+  </main>
   <footer>
     <div class="cols">
       <div>
@@ -155,6 +163,5 @@ fn main() {
       </div>
     </div>
   </footer>
-</div>
 </body>
 </html>
