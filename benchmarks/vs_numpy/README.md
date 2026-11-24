@@ -624,12 +624,12 @@ bounded; all V commands still run from `~/.vmodules`:
 
 ```bash
 cd ~/.vmodules
-systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=2 \
 	v -prod -o /tmp/vtl-f64-bench ./vtl/benchmarks/vs_numpy/f64/main/main.v
-systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-f64-bench
-systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=2 /tmp/vtl-f64-bench
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=2 \
 	v -prod -o /tmp/vtl-f32-bench ./vtl/benchmarks/vs_numpy/f32/main/main.v
-systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-f32-bench
+systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=2 /tmp/vtl-f32-bench
 ```
 
 Both programs use the same deterministic inputs as the NumPy baselines, three
@@ -637,9 +637,9 @@ warmups, ten timed calls, and an output sanity check. The combined benchmark
 below remains useful on machines with more compiler memory.
 
 ```bash
-systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=2 \
 	v -prod -o /tmp/vtl-matmul-bench ./vtl/benchmarks/vs_numpy/matmul_bench.v
-systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-matmul-bench
+systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=2 /tmp/vtl-matmul-bench
 ```
 
 ```bash
@@ -654,11 +654,11 @@ for sizes 128, 256, and 512. With CBLAS enabled, it measures sizes through
 both allocate a fresh result on each timed call and use the same inputs:
 
 ```bash
-systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=2 \
 	v -d vsl_blas_generic_cblas -prod -o /tmp/vtl-matmul-cblas \
 	./vtl/benchmarks/vs_numpy/matmul_bench.v
-systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 \
-	OPENBLAS_NUM_THREADS=2 /tmp/vtl-matmul-cblas
+systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=2 \
+	/tmp/vtl-matmul-cblas
 systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
 	OPENBLAS_NUM_THREADS=2 uv run --with numpy python \
 	./vtl/benchmarks/vs_numpy/numpy_matmul_baseline.py
@@ -675,6 +675,52 @@ With either CBLAS flag, VTL `f32` matrix multiplication dispatches to
 single-precision CBLAS `sgemm`; without those flags, it uses VSL's pure-V
 `sgemm` implementation. `f64` continues to use `dgemm`. The benchmark reports
 both `f64` and `f32` results for either backend.
+
+### Reproducible backend/thread matrix
+
+The benchmark prints the selected backend and thread environment. For a
+matched pure-V versus system-CBLAS comparison, compile each binary once and
+run each with `VJOBS=1` and `VJOBS=2` from `~/.vmodules`:
+
+```bash
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=2 \
+	v -no-parallel -cc gcc -prod -cflags "-march=native" \
+	-o ./vtl/benchmarks/vs_numpy/matmul_bench \
+	./vtl/benchmarks/vs_numpy/matmul_bench.v
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=2 \
+	v -no-parallel -cc gcc -d vsl_blas_generic_cblas -prod -cflags "-march=native" \
+	-o ./vtl/benchmarks/vs_numpy/matmul_bench-cblas \
+	./vtl/benchmarks/vs_numpy/matmul_bench.v
+
+for jobs in 1 2; do
+	systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -p CPUQuota=200% \
+		-- env VJOBS=$jobs ./vtl/benchmarks/vs_numpy/matmul_bench
+	systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -p CPUQuota=200% \
+		-- env VJOBS=$jobs ./vtl/benchmarks/vs_numpy/matmul_bench-cblas
+done
+```
+
+`VJOBS` controls the pure-V worker count. The generic system `libcblas`
+backend used here is not OpenBLAS and does not expose a matching runtime
+thread control; its `VJOBS=1` and `VJOBS=2` rows are therefore a control for
+the V process, not evidence of CBLAS scaling. Record the printed metadata,
+compiler flags, CPU, V version, and checksums with each run.
+
+On the Ryzen 9 5900X host, V 0.5.2 (`4a23b18`) and GCC 16.2.1, the matched
+512×512 results were:
+
+| backend | `VJOBS` | f64 GFLOPS | f32 GFLOPS |
+| --- | ---: | ---: | ---: |
+| pure-V | 1 | 18.73 | 41.66 |
+| pure-V | 2 | 29.77 | 100.84 |
+| system CBLAS (`libcblas`) | 1 | 7.71 | 7.85 |
+| system CBLAS (`libcblas`) | 2 | 7.29 | 7.57 |
+
+These are one host, one matrix shape, and one generic CBLAS library; they do
+not establish superiority. The immediate implementation target is the CPU GEMM
+backend: retain the pure-V comparison while adding a reproducible build against
+an actually threaded optimized CBLAS (for example OpenBLAS) before drawing
+thread-scaling conclusions.
 
 ## Earlier local CPU sample
 
