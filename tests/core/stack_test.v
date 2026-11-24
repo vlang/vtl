@@ -27,6 +27,54 @@ fn test_concatenate_rejects_axis_equal_to_rank() {
 	assert false, 'expected concatenate to reject axis equal to rank'
 }
 
+fn test_concatenate_rejects_empty_inputs() {
+	_ := vtl.concatenate[f64]([]&vtl.Tensor[f64]{}, axis: 0) or {
+		assert err.msg() == 'at least one tensor is required'
+		return
+	}
+	assert false, 'expected concatenate to reject empty inputs'
+}
+
+fn test_vstack_rejects_empty_inputs() {
+	_ := vtl.vstack[f64]([]&vtl.Tensor[f64]{}) or {
+		assert err.msg() == 'at least one tensor is required'
+		return
+	}
+	assert false, 'expected vstack to reject empty inputs'
+}
+
+fn test_hstack_rejects_empty_inputs() {
+	_ := vtl.hstack[f64]([]&vtl.Tensor[f64]{}) or {
+		assert err.msg() == 'at least one tensor is required'
+		return
+	}
+	assert false, 'expected hstack to reject empty inputs'
+}
+
+fn test_dstack_rejects_empty_inputs() {
+	_ := vtl.dstack[f64]([]&vtl.Tensor[f64]{}) or {
+		assert err.msg() == 'at least one tensor is required'
+		return
+	}
+	assert false, 'expected dstack to reject empty inputs'
+}
+
+fn test_column_stack_rejects_empty_inputs() {
+	_ := vtl.column_stack[f64]([]&vtl.Tensor[f64]{}) or {
+		assert err.msg() == 'at least one tensor is required'
+		return
+	}
+	assert false, 'expected column_stack to reject empty inputs'
+}
+
+fn test_stack_rejects_empty_inputs() {
+	_ := vtl.stack[f64]([]&vtl.Tensor[f64]{}, axis: 0) or {
+		assert err.msg() == 'at least one tensor is required'
+		return
+	}
+	assert false, 'expected stack to reject empty inputs'
+}
+
 fn test_vstack() {
 	a := vtl.ones[f64]([3])
 	b := vtl.zeros[f64]([2])
@@ -110,6 +158,21 @@ fn test_expand_dims() {
 	result := a.expand_dims[f64](axis: 1)!
 	expected := vtl.from_array([1.0, 1, 1, 1], [2, 1, 2])!
 	assert result.array_equal(expected)
+}
+
+fn test_axis_insertion_rejects_out_of_range_axes() {
+	a := vtl.ones[f64]([2, 2])
+	_ := a.unsqueeze[f64](axis: 3) or {
+		assert err.msg() == 'axis out of range'
+		return
+	}
+	assert false, 'expected unsqueeze to reject an axis greater than rank'
+
+	_ := a.expand_dims[f64](axis: -4) or {
+		assert err.msg() == 'axis out of range'
+		return
+	}
+	assert false, 'expected expand_dims to reject an axis less than -rank-1'
 }
 
 fn test_axis_insertion_and_squeeze_preserve_transposed_storage() ! {
