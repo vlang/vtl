@@ -1122,6 +1122,14 @@ epoch<span class="token punctuation">,</span> loss <span class="token operator">
 
 </section>
 
+		<section id="Sequential[f32].forward_vulkan_inference" class="doc-node">
+			<div class="title"><h2>fn (Sequential[f32]) forward_vulkan_inference <a href="#Sequential[f32].forward_vulkan_inference">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/models/sequential_vulkan_notd_vulkan.v#L7"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> nn <span class="token type_name">Sequential</span><span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">forward_vulkan_inference</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span></code></pre>
+<p>forward_vulkan_inference falls back to the ordinary CPU-capable path without a Vulkan-enabled build.</p>
+
+</section>
+
 		<section id="ModelMetadata" class="doc-node">
 			<div class="title"><h2>struct ModelMetadata <a href="#ModelMetadata">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/models/serialization.v#L25"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -1182,7 +1190,7 @@ epoch<span class="token punctuation">,</span> loss <span class="token operator">
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 20 Nov 2026 13:05:27</div>
+						<div class="footer">Powered by vdoc. Generated on: 24 Nov 2026 06:32:40</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_models">README</a></li>
 <li class="open"><a href="#sequential">fn sequential</a>        <ul>
@@ -1319,6 +1327,10 @@ epoch<span class="token punctuation">,</span> loss <span class="token operator">
 <li><a href="#Sequential[T].load_radam_training_checkpoint">fn load_radam_training_checkpoint</a></li>
 <li><a href="#Sequential[T].load_adamw_training_checkpoint">fn load_adamw_training_checkpoint</a></li>
 <li><a href="#Sequential[T].load_weights">fn load_weights</a></li>
+</ul>
+</li>
+<li class="open"><a href="#Sequential[f32].forward_vulkan_inference">type Sequential[f32]</a>        <ul>
+<li><a href="#Sequential[f32].forward_vulkan_inference">fn forward_vulkan_inference</a></li>
 </ul>
 </li>
 <li class="open"><a href="#ModelMetadata">struct ModelMetadata</a>        <ul>
