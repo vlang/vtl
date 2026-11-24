@@ -5,7 +5,7 @@ import vtl
 
 fn test_capability_matrix_is_explicit_and_queryable() {
 	matrix := capability_matrix()
-	assert matrix.len == 13
+	assert matrix.len == 16
 	assert supports('zeros')
 	assert supports('reshape')
 	assert supports('where')
@@ -15,6 +15,9 @@ fn test_capability_matrix_is_explicit_and_queryable() {
 	assert supports('mean')
 	assert supports('isclose')
 	assert supports('allclose')
+	assert supports('isfinite')
+	assert supports('isinf')
+	assert supports('isnan')
 	assert !supports('asarray')
 
 	for capability in matrix {
@@ -109,6 +112,14 @@ fn test_isclose_handles_nan_and_invalid_tolerances() {
 	if _ := allclose(nan, nan, -1.0, 1e-8, false) {
 		assert false, 'negative tolerances must fail'
 	}
+}
+
+fn test_finiteness_ufuncs_classify_special_values() {
+	input := vtl.from_1d[f64]([1.0, math.inf(1), math.nan()])!
+
+	assert isfinite(input).to_array() == [true, false, false]
+	assert isinf(input).to_array() == [false, true, false]
+	assert isnan(input).to_array() == [false, false, true]
 }
 
 fn test_creation_operations_match_vtl_values_and_shapes() {

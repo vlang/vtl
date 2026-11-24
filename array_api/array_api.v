@@ -35,6 +35,9 @@ pub fn capability_matrix() []Capability {
 		Capability{'mean', true},
 		Capability{'isclose', true},
 		Capability{'allclose', true},
+		Capability{'isfinite', true},
+		Capability{'isinf', true},
+		Capability{'isnan', true},
 	]
 }
 
@@ -111,4 +114,19 @@ pub fn isclose[T](a &vtl.Tensor[T], b &vtl.Tensor[T], rtol f64, atol f64, equal_
 // allclose reports whether all broadcasted values satisfy the tolerances.
 pub fn allclose[T](a &vtl.Tensor[T], b &vtl.Tensor[T], rtol f64, atol f64, equal_nan bool) !bool {
 	return a.allclose(b, rtol: rtol, atol: atol, equal_nan: equal_nan)
+}
+
+// isfinite returns true for values that are neither infinite nor NaN.
+pub fn isfinite[T](array &vtl.Tensor[T]) &vtl.Tensor[bool] {
+	return array.is_finite()
+}
+
+// isinf returns true for positive or negative infinite values.
+pub fn isinf[T](array &vtl.Tensor[T]) &vtl.Tensor[bool] {
+	return array.is_inf(0)
+}
+
+// isnan returns true for NaN values.
+pub fn isnan[T](array &vtl.Tensor[T]) &vtl.Tensor[bool] {
+	return array.is_nan()
 }
