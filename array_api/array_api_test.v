@@ -1,15 +1,18 @@
 module array_api
 
+import math
 import vtl
 
 fn test_capability_matrix_is_explicit_and_queryable() {
 	matrix := capability_matrix()
-	assert matrix.len == 9
+	assert matrix.len == 11
 	assert supports('zeros')
 	assert supports('reshape')
 	assert supports('where')
 	assert supports('matmul')
 	assert supports('clip')
+	assert supports('sum')
+	assert supports('mean')
 	assert !supports('asarray')
 
 	for capability in matrix {
@@ -69,6 +72,22 @@ fn test_clip_rejects_reversed_bounds() {
 	if _ := clip(input, 3, 1) {
 		assert false, 'clip must reject reversed bounds'
 	}
+}
+
+fn test_sum_and_mean_reduce_all_elements() {
+	input := vtl.from_2d[f64]([[1.0, 2.0], [3.0, 4.0]])!
+
+	assert sum(input) == 10.0
+	assert mean(input) == 2.5
+	assert sum(vtl.from_1d[int]([1, 2, 3])!) == 6
+	assert mean(vtl.from_1d[int]([1, 2, 3])!) == 2.0
+}
+
+fn test_reductions_handle_empty_arrays() {
+	empty := vtl.empty[f64]([0, 2])
+
+	assert math.is_nan(mean(empty))
+	assert sum(empty) == 0.0
 }
 
 fn test_creation_operations_match_vtl_values_and_shapes() {
