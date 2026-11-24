@@ -129,6 +129,7 @@ opt.update()!
 | Module | Purpose | Guide |
 |--------|---------|-------|
 | `vtl` | Tensor creation, slicing, broadcasting, reductions | [First steps](docs/TUTORIAL_FIRST_STEPS.md) |
+| `vtl.array_api` | Explicit, capability-discoverable Python Array API subset | [Array API namespace](array_api/README.md) |
 | Complex tensors | `math.complex.Complex` storage and elementwise arithmetic | [Complex tensors](docs/TUTORIAL_COMPLEX.md) |
 | `vtl.fft` | Real and complex FFTs via VSL PocketFFT | [FFT](docs/TUTORIAL_FFT.md) |
 | `vtl.csv` | Numeric CSV tensor input and output | [NumPy I/O](docs/TUTORIAL_NUMPY_IO.md) |
