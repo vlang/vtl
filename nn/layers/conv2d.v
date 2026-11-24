@@ -72,8 +72,12 @@ pub fn (layer &Conv2DLayer[T]) output_shape() []int {
 		pw := layer.config.padding[1]
 		sh := layer.config.stride[0]
 		sw := layer.config.stride[1]
-		out_h := (in_h - kh + 2 * ph) / sh + 1
-		out_w := (in_w - kw + 2 * pw) / sw + 1
+		dh := layer.config.dilation[0]
+		dw := layer.config.dilation[1]
+		effective_kh := dh * (kh - 1) + 1
+		effective_kw := dw * (kw - 1) + 1
+		out_h := (in_h - effective_kh + 2 * ph) / sh + 1
+		out_w := (in_w - effective_kw + 2 * pw) / sw + 1
 		return [layer.out_channels, out_h, out_w]
 	}
 	return [layer.out_channels, -1, -1]
