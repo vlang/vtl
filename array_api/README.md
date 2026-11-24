@@ -28,6 +28,7 @@ scores := xp.matmul(weights, weights.t()!)!
 bounded := xp.clip(scores, 0.0, 1.0)!
 total := xp.sum(bounded)
 average := xp.mean(bounded)
+close_mask := xp.isclose(bounded, bounded, 1e-5, 1e-8, false)!
 ```
 
 This is not yet a complete conformance implementation. Consumers should check

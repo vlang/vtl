@@ -5,7 +5,7 @@ import vtl
 
 fn test_capability_matrix_is_explicit_and_queryable() {
 	matrix := capability_matrix()
-	assert matrix.len == 11
+	assert matrix.len == 13
 	assert supports('zeros')
 	assert supports('reshape')
 	assert supports('where')
@@ -13,6 +13,8 @@ fn test_capability_matrix_is_explicit_and_queryable() {
 	assert supports('clip')
 	assert supports('sum')
 	assert supports('mean')
+	assert supports('isclose')
+	assert supports('allclose')
 	assert !supports('asarray')
 
 	for capability in matrix {
@@ -88,6 +90,25 @@ fn test_reductions_handle_empty_arrays() {
 
 	assert math.is_nan(mean(empty))
 	assert sum(empty) == 0.0
+}
+
+fn test_isclose_and_allclose_broadcast_values() {
+	left := vtl.from_2d[f64]([[1.0], [2.0]])!
+	right := vtl.from_1d[f64]([1.0, 2.00001])!
+
+	result := isclose(left, right, 1e-5, 1e-8, false)!
+	assert result.shape == [2, 2]
+	assert result.to_array() == [true, false, false, true]
+	assert allclose(left, left, 1e-5, 1e-8, false)!
+}
+
+fn test_isclose_handles_nan_and_invalid_tolerances() {
+	nan := vtl.from_1d[f64]([math.nan()])!
+	assert !isclose(nan, nan, 1e-5, 1e-8, false)!.get_nth(0)
+	assert isclose(nan, nan, 1e-5, 1e-8, true)!.get_nth(0)
+	if _ := allclose(nan, nan, -1.0, 1e-8, false) {
+		assert false, 'negative tolerances must fail'
+	}
 }
 
 fn test_creation_operations_match_vtl_values_and_shapes() {

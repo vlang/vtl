@@ -33,6 +33,8 @@ pub fn capability_matrix() []Capability {
 		Capability{'clip', true},
 		Capability{'sum', true},
 		Capability{'mean', true},
+		Capability{'isclose', true},
+		Capability{'allclose', true},
 	]
 }
 
@@ -99,4 +101,14 @@ pub fn sum[T](array &vtl.Tensor[T]) T {
 // mean reduces real numeric elements to an f64 scalar.
 pub fn mean[T](array &vtl.Tensor[T]) f64 {
 	return stats.mean_as[T, f64](array)
+}
+
+// isclose compares broadcasted values using relative and absolute tolerances.
+pub fn isclose[T](a &vtl.Tensor[T], b &vtl.Tensor[T], rtol f64, atol f64, equal_nan bool) !&vtl.Tensor[bool] {
+	return a.isclose(b, rtol: rtol, atol: atol, equal_nan: equal_nan)
+}
+
+// allclose reports whether all broadcasted values satisfy the tolerances.
+pub fn allclose[T](a &vtl.Tensor[T], b &vtl.Tensor[T], rtol f64, atol f64, equal_nan bool) !bool {
+	return a.allclose(b, rtol: rtol, atol: atol, equal_nan: equal_nan)
 }
