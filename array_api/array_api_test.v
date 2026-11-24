@@ -4,11 +4,12 @@ import vtl
 
 fn test_capability_matrix_is_explicit_and_queryable() {
 	matrix := capability_matrix()
-	assert matrix.len == 8
+	assert matrix.len == 9
 	assert supports('zeros')
 	assert supports('reshape')
 	assert supports('where')
 	assert supports('matmul')
+	assert supports('clip')
 	assert !supports('asarray')
 
 	for capability in matrix {
@@ -52,6 +53,21 @@ fn test_matmul_rejects_incompatible_shapes() {
 
 	if _ := matmul(left, right) {
 		assert false, 'matmul must reject incompatible inner dimensions'
+	}
+}
+
+fn test_clip_limits_values_and_preserves_shape() {
+	input := vtl.from_2d[f64]([[-2.0, 0.5, 4.0]])!
+	result := clip(input, 0.0, 1.0)!
+
+	assert result.shape == [1, 3]
+	assert result.to_array() == [0.0, 0.5, 1.0]
+}
+
+fn test_clip_rejects_reversed_bounds() {
+	input := vtl.from_1d[int]([1, 2, 3])!
+	if _ := clip(input, 3, 1) {
+		assert false, 'clip must reject reversed bounds'
 	}
 }
 

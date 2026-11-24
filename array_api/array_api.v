@@ -29,6 +29,7 @@ pub fn capability_matrix() []Capability {
 		Capability{'reshape', true},
 		Capability{'where', true},
 		Capability{'matmul', true},
+		Capability{'clip', true},
 	]
 }
 
@@ -80,4 +81,9 @@ pub fn where[T](condition &vtl.Tensor[bool], x &vtl.Tensor[T], y &vtl.Tensor[T])
 // matmul computes matrix multiplication with Array API vector and batch rules.
 pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	return la.matmul(a, b)
+}
+
+// clip limits every array value to the inclusive scalar interval.
+pub fn clip[T](array &vtl.Tensor[T], min_value T, max_value T) !&vtl.Tensor[T] {
+	return array.clip(min_value, max_value)
 }
