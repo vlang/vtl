@@ -269,6 +269,11 @@ pub fn (mut nn Sequential[T]) conv1d(out_channels int, kernel_size int, config l
 	nn.info.conv1d(out_channels, kernel_size, config)
 }
 
+// conv_transpose1d adds a transposed convolution over channel-first sequence input.
+pub fn (mut nn Sequential[T]) conv_transpose1d(out_channels int, kernel_size int, config layers.ConvTranspose1DConfig) {
+	nn.info.conv_transpose1d(out_channels, kernel_size, config)
+}
+
 // multihead_attention adds a new MultiHeadAttention layer to the network.
 pub fn (mut nn Sequential[T]) multihead_attention(embed_dim int, num_heads int) {
 	nn.info.multihead_attention(embed_dim, num_heads)

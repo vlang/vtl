@@ -17,6 +17,20 @@ fn test_conv1d_sequential_forward_backward() ! {
 	assert nn.info.layers[1].variables().len == 2
 }
 
+fn test_conv_transpose1d_sequential_forward_backward() ! {
+	ctx := autograd.ctx[f64]()
+	mut nn := sequential_from_ctx[f64](ctx)
+	nn.input([1, 2])
+	nn.conv_transpose1d(2, 3, layers.ConvTranspose1DConfig{})
+	mut input := ctx.variable(vtl.from_array([0.1, 0.2], [1, 1, 2])!)
+	mut output := nn.forward(input)!
+	assert nn.info.layers[1].output_shape() == [2, 4]
+	assert output.value.shape == [1, 2, 4]
+	output.backprop()!
+	assert input.grad.shape == input.value.shape
+	assert nn.info.layers[1].variables().len == 2
+}
+
 fn test_gru_sequential_forward_backward() ! {
 	ctx := autograd.ctx[f64]()
 	mut nn := sequential_from_ctx[f64](ctx)

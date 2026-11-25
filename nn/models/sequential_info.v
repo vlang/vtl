@@ -473,6 +473,30 @@ pub fn (mut ls SequentialInfo[T]) conv1d(out_channels int, kernel_size int, conf
 	})
 }
 
+// conv_transpose1d adds a transposed convolution using the previous layer's [channels, length] shape.
+pub fn (mut ls SequentialInfo[T]) conv_transpose1d(out_channels int, kernel_size int, config layers.ConvTranspose1DConfig) {
+	if ls.layers.len == 0 {
+		panic('conv_transpose1d requires an input layer')
+	}
+	shape := ls.layers[ls.layers.len - 1].output_shape()
+	if shape.len != 2 {
+		panic('conv_transpose1d expects the previous layer shape to be [channels, length]')
+	}
+	in_channels, input_length := shape[0], shape[1]
+	ls.add_layer(layers.conv_transpose1d_layer[T](ls.ctx, in_channels, out_channels,
+		kernel_size, config, input_length), 'ConvTranspose1DLayer', {
+		'in_channels':    in_channels
+		'out_channels':   out_channels
+		'kernel_size':    kernel_size
+		'stride':         config.stride
+		'padding':        config.padding
+		'output_padding': config.output_padding
+		'dilation':       config.dilation
+		'groups':         config.groups
+		'input_length':   input_length
+	})
+}
+
 // multihead_attention adds a new MultiHeadAttention layer to the network.
 pub fn (mut ls SequentialInfo[T]) multihead_attention(embed_dim int, num_heads int) {
 	ls.add_layer(layers.multihead_attention_layer[T](ls.ctx, embed_dim, num_heads),

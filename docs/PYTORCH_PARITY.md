@@ -93,8 +93,9 @@ graphs where feasible.
 
 ### Neural-network modules
 
-**VTL today:** `Sequential`, common activations, linear, convolutional,
-padding and pooling (including `pad1d`, `pad2d`, `pad3d`, `avgpool1d`, `avgpool2d`,
+**VTL today:** `Sequential`, common activations, linear, convolutional
+(including CPU `conv_transpose1d` with autograd), padding and pooling (including
+`pad1d`, `pad2d`, `pad3d`, `avgpool1d`, `avgpool2d`,
 `avgpool3d`, `maxpool1d`, `maxpool2d`, `maxpool3d`, and fixed-output `adaptive_avgpool1d`,
 `adaptive_avgpool2d`, `adaptive_avgpool3d`, `adaptive_maxpool1d`, and
 `adaptive_maxpool2d`, and `adaptive_maxpool3d`),
