@@ -291,3 +291,55 @@ pub fn adaptive_maxpool2d_backward[T](grad_out &vtl.Tensor[T], input &vtl.Tensor
 	}
 	return d_input
 }
+
+fn adaptive_avgpool1d_output_shape[T](input &vtl.Tensor[T], output_size int) ![]int {
+	if input.rank() != 3 {
+		return error('adaptive_avgpool1d expects a 3D input tensor')
+	}
+	if output_size <= 0 || input.shape[2] <= 0 {
+		return error('adaptive_avgpool1d expects positive dimensions')
+	}
+	return [input.shape[0], input.shape[1], output_size]
+}
+
+pub fn adaptive_avgpool1d_forward[T](input &vtl.Tensor[T], output_size int) !&vtl.Tensor[T] {
+	output_shape := adaptive_avgpool1d_output_shape[T](input, output_size)!
+	mut output := vtl.zeros[T](output_shape)
+	for batch in 0 .. input.shape[0] {
+		for channel in 0 .. input.shape[1] {
+			for out_i in 0 .. output_size {
+				start := (out_i * input.shape[2]) / output_size
+				end := ((out_i + 1) * input.shape[2] + output_size - 1) / output_size
+				mut sum := f64(0)
+				for in_i in start .. end {
+					sum += f64(input.get([batch, channel, in_i]))
+				}
+				output.set([batch, channel, out_i], vtl.cast[T](sum / f64(end - start)))
+			}
+		}
+	}
+	return output
+}
+
+pub fn adaptive_avgpool1d_backward[T](grad_out &vtl.Tensor[T], input &vtl.Tensor[T], output_size int) !&vtl.Tensor[T] {
+	output_shape := adaptive_avgpool1d_output_shape[T](input, output_size)!
+	if grad_out.shape != output_shape {
+		return error('adaptive_avgpool1d backward gradient shape does not match input and output size')
+	}
+	mut d_input := vtl.zeros_like[T](input)
+	for batch in 0 .. input.shape[0] {
+		for channel in 0 .. input.shape[1] {
+			for out_i in 0 .. output_size {
+				start := (out_i * input.shape[2]) / output_size
+				end := ((out_i + 1) * input.shape[2] + output_size - 1) / output_size
+				contribution := f64(grad_out.get([batch, channel, out_i])) / f64(end - start)
+				for in_i in start .. end {
+					index := [batch, channel, in_i]
+					value := f64(d_input.get(index)) + contribution
+					d_input.set(index, vtl.cast[T](value))
+				}
+			}
+		}
+	}
+	return d_input
+}

@@ -190,6 +190,10 @@ pub fn (mut nn Sequential[T]) adaptive_maxpool2d(output_size []int) {
 	nn.info.adaptive_maxpool2d(output_size)
 }
 
+pub fn (mut nn Sequential[T]) adaptive_avgpool1d(output_size int) {
+	nn.info.adaptive_avgpool1d(output_size)
+}
+
 // layer_norm adds a new LayerNorm layer to the network.
 pub fn (mut nn Sequential[T]) layer_norm(normalized_shape []int, config layers.LayerNormConfig) {
 	nn.info.layer_norm(normalized_shape, config)
