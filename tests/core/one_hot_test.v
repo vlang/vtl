@@ -27,6 +27,14 @@ fn test_one_hot_accepts_empty_indices() ! {
 	assert encoded.size == 0
 }
 
+fn test_one_hot_preserves_requested_memory_format() ! {
+	labels := vtl.from_1d([1, 0])!
+	encoded := vtl.one_hot(labels, 3, memory: .col_major)!
+	assert encoded.memory == .col_major
+	assert encoded.strides == [1, 2]
+	assert encoded.to_array() == [0, 1, 0, 1, 0, 0]
+}
+
 fn test_one_hot_rejects_invalid_class_count_and_indices() ! {
 	labels := vtl.from_1d([0, 3])!
 	for num_classes in [0, -1] {

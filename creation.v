@@ -170,7 +170,7 @@ pub fn identity[T](n int, params TensorData) &Tensor[T] {
 // output shape is indices.shape followed by num_classes; every index must be
 // in [0, num_classes). An empty index tensor returns an empty tensor with the
 // corresponding trailing class dimension.
-pub fn one_hot(indices &Tensor[int], num_classes int) !&Tensor[int] {
+pub fn one_hot(indices &Tensor[int], num_classes int, params TensorData) !&Tensor[int] {
 	if num_classes <= 0 {
 		return error('one_hot num_classes must be positive')
 	}
@@ -185,7 +185,7 @@ pub fn one_hot(indices &Tensor[int], num_classes int) !&Tensor[int] {
 			return error('one_hot class index ${class_index} is outside [0, ${num_classes})')
 		}
 	}
-	mut result := zeros[int](output_shape)
+	mut result := zeros[int](output_shape, params)
 	for flat_index in 0 .. indices.size {
 		class_index := indices.get_nth(flat_index)
 		result.set_nth(flat_index * num_classes + class_index, 1)
