@@ -89,7 +89,7 @@ graphs where feasible.
 
 **VTL today:** `Sequential`, common activations, linear, convolutional,
 padding and pooling (including `pad1d`, `pad2d`, `pad3d`, `avgpool1d`, `avgpool2d`,
-`avgpool3d`, `maxpool1d`, and fixed-output `adaptive_avgpool1d`,
+`avgpool3d`, `maxpool1d`, `maxpool2d`, `maxpool3d`, and fixed-output `adaptive_avgpool1d`,
 `adaptive_avgpool2d`, `adaptive_avgpool3d`, `adaptive_maxpool1d`, and
 `adaptive_maxpool2d`, and `adaptive_maxpool3d`),
 recurrent, attention, and normalization layers. Typed CPU LSTM layers support
