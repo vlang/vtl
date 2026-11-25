@@ -21,3 +21,12 @@ fn test_unary_ufunc_into_reuses_output_and_honors_where() ! {
 	})!
 	assert output.to_array() == [2.0, 10.0, 6.0]
 }
+
+fn test_binary_ufunc_into_reuses_output() ! {
+	left := from_array([1.0, 2.0], [2])!
+	right := from_array([3.0, 4.0], [2])!
+	output := ufunc_binary[f64](left, right, fn (a f64, b f64) f64 {
+		return a + b
+	})!
+	assert output.to_array() == [4.0, 6.0]
+}
