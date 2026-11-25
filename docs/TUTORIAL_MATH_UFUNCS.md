@@ -428,26 +428,35 @@ the [NumPy parity tracker](./NUMPY_PARITY.md#math-and-ufuncs).
 
 ## Ufunc execution arguments and methods
 
-`Tensor.square_into(mut out)` is the first output-buffer path. It requires the
-same shape and dtype as the input, reuses the supplied tensor, supports strided
-output views, and snapshots input values if input and output storage overlap.
-Other elementwise functions still return new tensors; VTL does not yet have a
-shared NumPy `out=` protocol, masked `where=`, or per-call `casting=`.
+VTL provides callback-based unary and binary execution helpers. The `*_into`
+variants require an output tensor with the exact result shape and mutate that
+caller-owned tensor. Binary operations broadcast their inputs:
 
 ```v
 import vtl
 
-values := vtl.from_1d[f64]([1.5, -2.0])!
-mut output := vtl.zeros[f64]([2])
-reused := values.square_into(mut output)!
-println(reused.to_array()) // [2.25, 4.0]
+left := vtl.from_array([1.0, 2.0], [2, 1])!
+right := vtl.from_array([10.0, 20.0, 30.0], [1, 3])!
+mut output := vtl.from_array([99.0, 99.0, 99.0, 99.0, 99.0, 99.0], [2, 3])!
+mask := vtl.from_array([true, false, true], [1, 3])!
+vtl.ufunc_binary_into[f64](left, right, output, mask, true, fn (a f64, b f64) f64 {
+	return a + b
+})!
+println(output.to_array()) // [11.0, 99.0, 31.0, 12.0, 99.0, 32.0]
 ```
 
-The separate `vtl.where(condition, x, y)` function selects between
-already-computed tensors; it is not a lazy ufunc mask and does not reuse an
-output buffer. Use the named reduction and scan APIs, such as `sum`, `cumsum`,
-and `cumprod`, for their documented behavior. `Tensor.reduce` provides a
-callback-based reduction, but VTL does not expose NumPy's per-ufunc methods such
-as `add.reduce`, `ufunc.reduceat`, or `ufunc.at`. See the
-[ufunc execution capability table](./NUMPY_PARITY.md#ufunc-execution-protocol)
-for current support and planned work.
+With `has_where: true`, the boolean mask must broadcast to—but not expand—the
+result shape; masked-out elements retain the values already in `output`.
+Operands and output share the same static element type. There is no `casting=`
+mode. Both into paths snapshot calculated values before writing, so aliased or
+overlapping views do not change later input reads.
+
+`ufunc_reduce` and `ufunc_accumulate` operate in logical flat row-major order;
+the axis variants preserve the corresponding axis semantics. All reduction and
+accumulate helpers require an explicit identity. `ufunc_reduceat` and
+`ufunc_outer` also use flattened logical values. `ufunc_at` mutates flattened
+positions sequentially, so repeated indices observe earlier updates in the
+same call.
+
+See the [ufunc execution capability table](./NUMPY_PARITY.md#ufunc-execution-protocol)
+for empty-input behavior and unsupported NumPy protocols.

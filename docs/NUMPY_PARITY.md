@@ -12,7 +12,6 @@ tests, documentation, and examples where users need them.
 |------|-------|
 | Numeric promotion and tensor creation | [#717](https://github.com/vlang/vtl/issues/717), [#718](https://github.com/vlang/vtl/issues/718) |
 | Ufunc and elementwise math coverage | [#777](https://github.com/vlang/vtl/issues/777) |
-| Ufunc execution methods and output/mask semantics | [#783](https://github.com/vlang/vtl/issues/783) |
 | Copy/view rules and indexing bounds | [#719](https://github.com/vlang/vtl/issues/719), [#720](https://github.com/vlang/vtl/issues/720) |
 | Reductions and complex support | [#721](https://github.com/vlang/vtl/issues/721), [#722](https://github.com/vlang/vtl/issues/722) |
 | Random streams and FFT parity | [#723](https://github.com/vlang/vtl/issues/723), [#724](https://github.com/vlang/vtl/issues/724) |
@@ -44,9 +43,9 @@ For neural-network and framework-level gaps relative to PyTorch, see the
   `ufunc_outer`, flattened `ufunc_reduceat`, axis-aware
   `ufunc_reduce_axis`/`ufunc_accumulate_axis`, and `ufunc_at` are also
   available. `ufunc_at` performs sequential indexed mutation with repeated-index
-  accumulation and prevalidates bounds. Casting modes, retained dimensions,
-  and complete NumPy aliasing/casting semantics remain open under
-  [#783](https://github.com/vlang/vtl/issues/783).
+  accumulation and prevalidates bounds. The helpers require one static element
+  type and explicit reduction identities; NumPy's casting modes and optional
+  retained dimensions are not exposed.
 - A power-series `Polynomial` API with ascending coefficients, Horner
   evaluation, tensor evaluation, arithmetic, derivative/integral, real
   linear and quadratic roots, and small least-squares fitting. Orthogonal
@@ -328,31 +327,30 @@ dtype and special-value differential tests; promoted mixed-input variants
 remain for `ldexp`. Promoted extrema cover tensor pairs and weak scalars
 through the APIs below.
 `erf`/`erfc`, `gamma`, and `log_gamma` are useful VTL math APIs beyond NumPy
-core ufunc parity. The general NumPy ufunc `out` and `where` execution protocol
-is tracked separately in
-[#783](https://github.com/vlang/vtl/issues/783).
+core ufunc parity. The shared `out`/`where` helper contract is documented in the
+[ufunc execution capability table](#ufunc-execution-protocol).
 
 #### Ufunc execution protocol
 
-The following table distinguishes existing related APIs from NumPy's
-per-ufunc execution protocol. “Planned” means the NumPy protocol is not
-implemented yet; it does not imply behavior beyond the listed APIs. VTL has
-not declared any protocol below intentionally unsupported.
+The following table defines the scope of VTL's shared callback-based helpers.
+“Supported” describes only the stated helper contract; “Partial” means a
+focused equivalent exists but does not implement NumPy's full ufunc-object
+protocol; “Unsupported” means no shared API is currently exposed.
 
 | NumPy protocol | VTL status | Current contract |
 |---------------|------------|------------------|
-| Operand broadcasting | Partial | Many elementwise functions broadcast inputs; support and dtype behavior are operation-specific. |
-| Strided input views | Partial | Many elementwise functions follow logical tensor iteration; support and output layout remain operation-specific. |
-| `out=` | Partial | `Tensor.square_into` reuses a same-shaped output, including strided views; other elementwise functions return newly allocated tensors. |
-| `where=` mask | Planned | Ufuncs do not accept execution masks. `vtl.where(condition, x, y)` is a separate selection operation and evaluates both value tensors first. |
-| `casting=` | Partial | Promoted functions take an explicit output type and validate it against promotion rules; NumPy's per-call casting modes are not exposed. |
-| Output aliasing and overlap | Partial | `square_into` snapshots input values when storage overlaps; other ufuncs have no general overlap contract. |
-| Empty inputs | Partial | Behavior is defined by each named operation; there is no shared ufunc-method contract. |
-| `ufunc.reduce` | Partial | `Tensor.reduce` accepts an initial value and callback, and named reductions provide operation-specific axis APIs; NumPy ufunc methods such as `add.reduce` are not exposed. |
-| `ufunc.accumulate` | Partial | Named `cumsum`/`cumprod` APIs provide scans; arbitrary ufunc accumulations are not exposed. |
-| `ufunc.reduceat` | Planned | No corresponding segmented ufunc reduction API. |
-| `ufunc.outer` | Partial | `la.outer` is a separate vector outer-product operation, not a generic elementwise ufunc method. |
-| `ufunc.at` | Planned | No NumPy-style indexed in-place ufunc update protocol. |
+| Operand broadcasting | Supported | `ufunc_binary` broadcasts operands and allocates the result; `ufunc_binary_into` requires `out` to match the broadcast result shape. Inputs use one shared element type. |
+| Strided input/output views | Supported | Unary/binary helpers and axis reductions use logical tensor order; caller-owned outputs may be strided views. |
+| `out=` | Supported | `ufunc_unary_into` and `ufunc_binary_into` write to and reuse caller-owned output tensors of the exact result shape. |
+| `where=` mask | Supported | `where` must broadcast to the result shape without expanding it; false positions preserve the supplied output's prior values. |
+| `casting=` | Unsupported | These helpers require the same `T` for operands and output. NumPy's per-call casting modes are not exposed; promoted arithmetic is covered separately by #717. |
+| Output aliasing and overlap | Supported | Unary/binary into paths calculate selected values before writing, so overlapping input/output views use the original input values. |
+| Empty inputs | Supported | Flat reduce returns its explicit identity; axis reduce returns that identity for empty reduced axes; accumulate preserves shape; reduceat rejects indices into empty inputs. |
+| `ufunc.reduce` | Partial | `ufunc_reduce` and `ufunc_reduce_axis` require an explicit identity; the flat variant follows logical row-major order. NumPy's optional initial/keepdims protocol is not exposed. |
+| `ufunc.accumulate` | Partial | Flat and axis variants require an explicit identity; axis scans preserve input shape. |
+| `ufunc.reduceat` | Partial | `ufunc_reduceat` reduces flattened logical segments, including NumPy's non-increasing-start rule; axis-wise segmented reduction is not exposed. |
+| `ufunc.outer` | Partial | `ufunc_outer` applies a callback to every pair of flattened logical values and returns a matrix; NumPy's general ufunc object protocol is not exposed. |
+| `ufunc.at` | Partial | `ufunc_at` mutates flattened logical positions sequentially, applies repeated indices in order, and validates all indices before mutation. |
 
 Promoted tensor-to-tensor result dtypes are:
 
