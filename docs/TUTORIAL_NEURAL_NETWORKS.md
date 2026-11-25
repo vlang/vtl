@@ -169,6 +169,7 @@ model.selu()
 | `l1_loss()` | `L1Loss` | Mean Absolute Error (MAE); zero subgradient at exact matches |
 | `hinge_loss()` | `HingeLoss` | Binary SVM hinge loss; targets must be -1 or +1 |
 | `focal_loss()` | `FocalLoss` | Binary focal loss for imbalanced classes; default logits, alpha 0.25, gamma 2 |
+| `poisson_nll_loss()` | `PoissonNLLLoss` | Poisson negative log likelihood; supports log-input and Stirling full-term modes |
 | `nll_loss(weight)` | `NLLLoss` | Negative Log Likelihood |
 | `kl_div_loss()` | `KLDivLoss` | KL Divergence D_KL(P‖Q) |
 
