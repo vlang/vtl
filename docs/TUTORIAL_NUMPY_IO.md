@@ -38,6 +38,27 @@ assert complex_loaded.to_array() == complex_values.to_array()
 The `write` function emits `.npy` v1.0 with little-endian numeric data.
 See [the runnable example](../examples/npy_round_trip) for a complete program.
 
+For large files, `npy.open_mapped[T](path)` opens a read-only memory mapping
+without copying or decoding the payload. `read_rows(start, end)` decodes the
+requested leading-axis range into a regular owned tensor; returned tensors stay
+valid after the mapping is closed.
+
+```v
+import vtl.npy
+
+mut mapped := npy.open_mapped[f64]('large_training.npy')!
+defer {
+	mapped.close()
+}
+batch := mapped.read_rows(0, 128)!
+```
+
+Mappings require a supported OS mapping implementation and a file that remains
+unchanged and untruncated while open. Call `close()` deterministically (for
+example with `defer`). VTL checks the file size before each row read, but
+concurrent modification is unsupported. Only read-only mappings are exposed;
+row results allocate memory proportional to the requested range.
+
 ## Numeric CSV tensors
 
 `vtl.csv` reads numeric fields into a rank-two tensor and writes rank-two

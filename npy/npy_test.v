@@ -21,6 +21,52 @@ fn test_npy_f64_round_trip_preserves_shape_and_values() {
 	assert loaded.to_array() == [1.5, -2.25, 3.0, 4.75]
 }
 
+fn test_npy_mapped_reads_rows_and_returns_owned_tensors() ! {
+	path := os.join_path(os.temp_dir(), 'vtl_npy_mapped_rows.npy')
+	defer {
+		os.rm(path) or {}
+	}
+	original := vtl.from_array[f64]([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], [3, 2])!
+	write(path, original)!
+	mut mapped := open_mapped[f64](path)!
+	defer {
+		mapped.close()
+	}
+	assert mapped.shape() == [3, 2]
+	assert mapped.size() == 6
+	first_row := mapped.read_rows(0, 1)!
+	last_rows := mapped.read_rows(1, 3)!
+	assert first_row.shape == [1, 2]
+	assert first_row.to_array() == [1.5, 2.5]
+	assert last_rows.to_array() == [3.5, 4.5, 5.5, 6.5]
+
+	mapped.close()
+	assert mapped.is_closed()
+	assert last_rows.to_array() == [3.5, 4.5, 5.5, 6.5]
+	if _ := mapped.read_rows(0, 1) {
+		assert false, 'closed mappings must reject reads'
+	}
+}
+
+fn test_npy_mapped_reads_big_endian_fortran_order_rows() ! {
+	path := os.join_path(os.temp_dir(), 'vtl_npy_mapped_big_endian_fortran.npy')
+	defer {
+		os.rm(path) or {}
+	}
+	mut payload := []u8{len: 24}
+	for i, value in [u32(1), 4, 2, 5, 3, 6] {
+		binary.little_endian_put_u32_at(mut payload, value, i * 4)
+		payload[i * 4], payload[i * 4 + 1], payload[i * 4 + 2], payload[i * 4 + 3] = payload[i * 4 + 3], payload[i * 4 + 2], payload[i * 4 + 1], payload[i * 4]
+	}
+	write_test_npy(path, 2, "{'descr': '>u4', 'fortran_order': True, 'shape': (2, 3), }", payload)
+	mut mapped := open_mapped[u32](path)!
+	defer {
+		mapped.close()
+	}
+	assert mapped.read_rows(0, 1)!.to_array() == [u32(1), 2, 3]
+	assert mapped.read_rows(1, 2)!.to_array() == [u32(4), 5, 6]
+}
+
 fn test_npy_integer_round_trip() {
 	path := os.join_path(os.temp_dir(), 'vtl_npy_integer_round_trip.npy')
 	defer {
@@ -213,6 +259,9 @@ fn test_npy_rejects_bad_magic_dtype_and_truncated_payload() {
 	}
 	write_test_npy(truncated_path, 1, "{'descr': '<f8', 'fortran_order': False, 'shape': (2,), }", [u8(0)])
 	assert_npy_read_error[f64](truncated_path)
+	if _ := open_mapped[f64](truncated_path) {
+		assert false, 'mapped reads must reject truncated payloads'
+	}
 }
 
 fn assert_npy_read_error[T](path string) {

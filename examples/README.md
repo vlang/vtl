@@ -36,7 +36,7 @@ CIFAR examples for CI-safe checks.
 | [autograd_scalar_loss](./autograd_scalar_loss) | Scalar sum/mean loss and backward pass | `v run ./vtl/examples/autograd_scalar_loss/main.v` |
 | [cross_entropy_unbatched](./cross_entropy_unbatched) | Unbatched logits and scalar labels | `v run ./vtl/examples/cross_entropy_unbatched/main.v` |
 | [nll_unbatched](./nll_unbatched) | PyTorch-style `[C]` NLL input, scalar class target, weighting, and autograd | `v run ./vtl/examples/nll_unbatched/main.v` |
-| [npy_round_trip](./npy_round_trip) | Read and write NumPy `.npy` arrays | `v run ./vtl/examples/npy_round_trip/main.v` |
+| [npy_round_trip](./npy_round_trip) | Read/write NumPy `.npy` arrays and read rows through a mapping | `v run ./vtl/examples/npy_round_trip/main.v` |
 | [npy_complex128](./npy_complex128) | Read and write NumPy complex128 `.npy` arrays | `v run ./vtl/examples/npy_complex128/main.v` |
 | [quantization_int8](./quantization_int8) | Calibrate and dequantize signed INT8 tensors | See [guide](../quantization/README.md) |
 | [csv_round_trip](./csv_round_trip) | Read/write numeric CSV and import NumPy text with missing-value handling | `v run ./vtl/examples/csv_round_trip/main.v` |

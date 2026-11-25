@@ -20,6 +20,15 @@ struct NpyDescriptor {
 	endian u8
 }
 
+struct NpyFileInfo {
+	data_offset   int
+	descriptor    NpyDescriptor
+	shape         []int
+	count         int
+	fortran_order bool
+	little_endian bool
+}
+
 // write writes a CPU tensor as an uncompressed NumPy .npy v1.0 file.
 // Numeric primitive types and row-major logical tensor order are supported.
 pub fn write[T](path string, tensor &vtl.Tensor[T]) ! {
@@ -70,6 +79,19 @@ pub fn read[T](path string) !&vtl.Tensor[T] {
 // read_bytes decodes a NumPy .npy v1.0, v2.0, or v3.0 payload into T.
 // The payload's dtype must have the same kind and width as T.
 pub fn read_bytes[T](bytes []u8) !&vtl.Tensor[T] {
+	expected := npy_type[T]() or { return err }
+	info := parse_npy_info(bytes, expected)!
+	mut tensor := vtl.empty[T](info.shape, memory: .row_major)
+	for i in 0 .. info.count {
+		source_index := if info.fortran_order { fortran_index(i, info.shape) } else { i }
+		offset := info.data_offset + source_index * info.descriptor.width
+		tensor.set_nth[T](i, npy_value_from_bytes[T](bytes, offset, info.descriptor.width,
+			info.little_endian))
+	}
+	return tensor
+}
+
+fn parse_npy_info(bytes []u8, expected NpyType) !NpyFileInfo {
 	if bytes.len < 10 || bytes[..6] != magic {
 		return error('npy.read: invalid NumPy magic prefix')
 	}
@@ -103,7 +125,6 @@ pub fn read_bytes[T](bytes []u8) !&vtl.Tensor[T] {
 	}
 	header := bytes[if major == 1 { 10 } else { 12 }..data_offset].bytestr()
 	descriptor := parse_descriptor(header)!
-	expected := npy_type[T]() or { return err }
 	if descriptor.kind != expected.kind || descriptor.width != expected.width {
 		return error('npy.read: dtype ${rune(descriptor.kind)}${descriptor.width} does not match requested V type')
 	}
@@ -121,23 +142,27 @@ pub fn read_bytes[T](bytes []u8) !&vtl.Tensor[T] {
 	if descriptor.endian == u8(`=`) {
 		little_endian = host_is_little_endian()
 	}
-	mut tensor := vtl.empty[T](shape, memory: .row_major)
-	for i in 0 .. count {
-		source_index := if fortran { fortran_index(i, shape) } else { i }
-		offset := data_offset + source_index * descriptor.width
-		$if T is vcomplex.Complex {
-			real_bits := read_bits(bytes, offset, 8, little_endian)
-			imag_bits := read_bits(bytes, offset + 8, 8, little_endian)
-			tensor.set_nth[T](i, T(vcomplex.Complex{
-				re: math.f64_from_bits(real_bits)
-				im: math.f64_from_bits(imag_bits)
-			}))
-		} $else {
-			bits := read_bits(bytes, offset, descriptor.width, little_endian)
-			tensor.set_nth[T](i, value_from_bits[T](bits))
-		}
+	return NpyFileInfo{
+		data_offset:   data_offset
+		descriptor:    descriptor
+		shape:         shape
+		count:         count
+		fortran_order: fortran
+		little_endian: little_endian
 	}
-	return tensor
+}
+
+fn npy_value_from_bytes[T](bytes []u8, offset int, width int, little_endian bool) T {
+	$if T is vcomplex.Complex {
+		real_bits := read_bits(bytes, offset, 8, little_endian)
+		imag_bits := read_bits(bytes, offset + 8, 8, little_endian)
+		return T(vcomplex.Complex{
+			re: math.f64_from_bits(real_bits)
+			im: math.f64_from_bits(imag_bits)
+		})
+	} $else {
+		return value_from_bits[T](read_bits(bytes, offset, width, little_endian))
+	}
 }
 
 fn npy_type[T]() !NpyType {

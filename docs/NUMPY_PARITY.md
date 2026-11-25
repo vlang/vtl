@@ -712,16 +712,17 @@ define reproducibility across runtime versions.
 
 **Current:** model serialization and dataset loaders; numeric CSV tensors with
 configurable delimiters/comments, headers, missing-value fills, and explicit
-element-type parsing;
-typed `.npy` and named `.npz` I/O with mixed supported dtypes. `.npy` accepts
-v1/v2/v3 headers, both byte orders, Fortran order, bool, f32/f64, complex128, and signed or unsigned
-integer widths when the requested V type matches.
+element-type parsing; typed `.npy` and named `.npz` I/O with mixed supported
+dtypes. `.npy` accepts v1/v2/v3 headers, both byte orders, Fortran order,
+bool, f32/f64, complex128, and signed or unsigned integer widths when the
+requested V type matches. Read-only `.npy` mappings expose leading-axis row
+ranges as owned tensors without decoding the full payload at open.
 `.npz` read/write also supports complex128 members.
 
-**Remaining:** support more text formats and dtypes, add memory-mapped arrays
-and optional HDF5 interoperability, and continue rejecting unsupported
-object/structured values. See [#726](https://github.com/vlang/vtl/issues/726) and
-[#779](https://github.com/vlang/vtl/issues/779).
+**Remaining:** support more text formats and dtypes, add optional HDF5
+interoperability, and continue rejecting unsupported object/structured values.
+Mapped reads currently copy the requested row range and do not support writes.
+See [#779](https://github.com/vlang/vtl/issues/779).
 
 ### Data types
 
