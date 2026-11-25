@@ -1,7 +1,8 @@
 # `vtl.array_api`
 
 `vtl.array_api` is the explicit namespace for VTL's incrementally implemented
-Python Array API surface. It currently exposes creation and reshape operations plus broadcast-aware `where` selection, `matmul`, and scalar
+Python Array API surface. It currently exposes creation, reshape, broadcasting,
+and transpose operations plus broadcast-aware `where` selection, `matmul`, and scalar
 `clip`, global `sum`, and global `mean`, with a small capability matrix so consumers can select the namespace without
 mistaking VTL-specific functions for standard operations.
 
@@ -17,6 +18,8 @@ import vtl.array_api as xp
 x := xp.arange[f32](0.0, 6.0, 1.0)!
 x = xp.reshape(x, [2, 3])!
 assert xp.supports('reshape')
+expanded := xp.broadcast_to(x, [4, 2, 3])!
+transposed := xp.transpose(expanded, 0, 2, 1)!
 
 condition := vtl.from_2d[bool]([[true], [false]])!
 positive := xp.ones[f32]([2, 3])

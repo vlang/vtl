@@ -28,6 +28,8 @@ pub fn capability_matrix() []Capability {
 		Capability{'full', true},
 		Capability{'arange', true},
 		Capability{'reshape', true},
+		Capability{'broadcast_to', true},
+		Capability{'transpose', true},
 		Capability{'where', true},
 		Capability{'matmul', true},
 		Capability{'clip', true},
@@ -79,6 +81,20 @@ pub fn arange[T](start f64, stop f64, step f64) !&vtl.Tensor[T] {
 // reshape returns an array with the requested shape, preserving its values.
 pub fn reshape[T](array &vtl.Tensor[T], shape []int) !&vtl.Tensor[T] {
 	return array.reshape(shape)
+}
+
+// broadcast_to expands an array to a compatible shape.
+pub fn broadcast_to[T](array &vtl.Tensor[T], shape []int) !&vtl.Tensor[T] {
+	return array.broadcast_to(shape)
+}
+
+// transpose permutes axes, reversing them when no explicit order is supplied.
+pub fn transpose[T](array &vtl.Tensor[T], axes ...int) !&vtl.Tensor[T] {
+	mut order := axes.clone()
+	if order.len == 0 {
+		order = []int{len: array.rank(), init: array.rank() - index - 1}
+	}
+	return array.transpose(order)
 }
 
 // where selects values from x or y according to a broadcastable condition.

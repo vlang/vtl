@@ -5,9 +5,11 @@ import vtl
 
 fn test_capability_matrix_is_explicit_and_queryable() {
 	matrix := capability_matrix()
-	assert matrix.len == 16
+	assert matrix.len == 18
 	assert supports('zeros')
 	assert supports('reshape')
+	assert supports('broadcast_to')
+	assert supports('transpose')
 	assert supports('where')
 	assert supports('matmul')
 	assert supports('clip')
@@ -33,6 +35,24 @@ fn test_where_broadcasts_condition_and_operands() {
 	result := where(condition, x, y)!
 	assert result.shape == [2, 3]
 	assert result.to_array() == [1, 2, 3, 10, 10, 10]
+}
+
+fn test_broadcast_to_and_transpose_follow_array_api_shapes() {
+	input := vtl.from_2d[int]([[1, 2, 3]])!
+	broadcasted := broadcast_to(input, [2, 3])!
+	assert broadcasted.shape == [2, 3]
+	assert broadcasted.to_array() == [1, 2, 3, 1, 2, 3]
+
+	matrix := vtl.from_2d[int]([[1, 2], [3, 4]])!
+	assert transpose(matrix)!.to_array() == [1, 3, 2, 4]
+	assert transpose(matrix, 1, 0)!.to_array() == [1, 3, 2, 4]
+}
+
+fn test_transpose_rejects_invalid_axes() {
+	input := vtl.from_2d[int]([[1, 2], [3, 4]])!
+	if _ := transpose(input, 0, 0) {
+		assert false, 'transpose must reject duplicate axes'
+	}
 }
 
 fn test_where_rejects_incompatible_shapes() {
