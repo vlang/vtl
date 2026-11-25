@@ -30,5 +30,25 @@ fn test_polynomial_roots_and_fit() ! {
 	assert math.abs(ill_scaled_roots[0] + 1e8) < 1e-8
 	assert math.abs(ill_scaled_roots[1] + 1e-24) < 1e-32
 	fit := polynomial_fit([-1.0, 0.0, 1.0, 2.0], [2.0, 1.0, 2.0, 5.0], 2)!
-	assert fit.coefficients == [1.0, 0.0, 1.0]
+	assert math.abs(fit.coefficients[0] - 1.0) < 1e-12
+	assert math.abs(fit.coefficients[1]) < 1e-12
+	assert math.abs(fit.coefficients[2] - 1.0) < 1e-12
+}
+
+fn test_polynomial_fit_scales_large_inputs_and_rejects_invalid_data() ! {
+	x := [10000.0, 10001.0, 10002.0, 10003.0, 10004.0]
+	y := [9.0, 2.0, 1.0, 6.0, 17.0]
+	fit := polynomial_fit(x, y, 2)!
+	for i, value in x {
+		assert math.abs(fit.eval(value) - y[i]) < 1e-4
+	}
+	if _ := polynomial_fit([1.0, 1.0, 1.0], [1.0, 2.0, 3.0], 1) {
+		assert false, 'polynomial_fit must reject rank-deficient samples'
+	}
+	if _ := polynomial_fit([0.0, math.nan()], [1.0, 2.0], 1) {
+		assert false, 'polynomial_fit must reject non-finite x values'
+	}
+	if _ := polynomial_fit([0.0, 1.0], [1.0, math.inf(1)], 1) {
+		assert false, 'polynomial_fit must reject non-finite y values'
+	}
 }

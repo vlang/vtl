@@ -46,8 +46,9 @@ For neural-network and framework-level gaps relative to PyTorch, see the
   retained dimensions are not exposed.
 - A power-series `Polynomial` API with ascending coefficients, Horner
   evaluation, tensor evaluation, arithmetic, derivative/integral, real
-  linear and quadratic roots, and small least-squares fitting. Orthogonal
-  families and higher-degree robust root solving remain open. See the runnable
+  linear and quadratic roots, and least-squares fitting with a scaled
+  Vandermonde matrix and Householder QR. Orthogonal families and higher-degree
+  root solving remain open. See the runnable
   [polynomial fitting example](../examples/polynomial_fit/main.v).
 - Reverse-mode autograd, neural-network layers and losses, optimizers,
   datasets, CPU support, and selected CUDA/Vulkan operations. OpenCL/VCL

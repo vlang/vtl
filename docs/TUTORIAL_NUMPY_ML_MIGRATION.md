@@ -22,8 +22,9 @@ p(3): 10.0
 
 The corresponding APIs are `vtl.from_array`, `vtl.polynomial_fit`, and
 `Polynomial.eval`. Unlike NumPy's broader polynomial interface, VTL currently
-supports a documented subset; the fitting routine uses normal equations and is
-intended for small, well-conditioned problems. See the
+supports a documented subset. Fitting uses a domain-scaled Vandermonde matrix
+and Householder QR, then returns coefficients in the original power basis;
+conversion to that basis can still amplify errors on ill-conditioned data. See the
 [polynomial API notes](./NUMPY_PARITY.md#current-strengths).
 
 ## Transform samples and preserve gradients
@@ -93,7 +94,7 @@ unsupported cases.
 | NumPy / ML pattern | VTL path | Important difference |
 |---|---|---|
 | `ndarray` construction | `vtl.from_array(data, shape)` | Choose `f32` or `f64` explicitly; shape is explicit. |
-| `polyfit` / polynomial evaluation | `vtl.polynomial_fit` / `Polynomial.eval` | Only a small power-series subset is implemented; fitting is not robust for ill-conditioned inputs. |
+| `polyfit` / polynomial evaluation | `vtl.polynomial_fit` / `Polynomial.eval` | Only the power-series subset is implemented; fitting uses scaled QR, but conversion to original power coefficients can still amplify conditioning errors. |
 | Per-sample mapping | `vtl.vmap` or `vtl.autograd.vmap` | CPU-only today; callback output shape must be consistent. |
 | Mini-batch training | `Sequential`, losses, optimizers, and tensor slicing | Backend and gradient coverage are operation-specific. |
 | Inference checkpoint | `save_inference_checkpoint` / `load_inference_checkpoint` | CPU-only supported layer set; does not include optimizer state or package an executable. |

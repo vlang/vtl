@@ -118,8 +118,8 @@ pub fn (p Polynomial) roots() ![]f64 {
 	}
 }
 
-// polynomial_fit computes a least-squares power-series fit using normal
-// equations. It is intended for small, well-conditioned problems.
+// polynomial_fit computes a least-squares power-series fit with a scaled
+// Vandermonde matrix and Householder QR.
 pub fn polynomial_fit(x []f64, y []f64, degree int) !Polynomial {
 	if x.len != y.len || x.len == 0 {
 		return error('polynomial_fit requires equally sized non-empty samples')
@@ -127,46 +127,108 @@ pub fn polynomial_fit(x []f64, y []f64, degree int) !Polynomial {
 	if degree < 0 || degree >= x.len {
 		return error('polynomial_fit degree must be non-negative and smaller than sample count')
 	}
+	mut min_x := x[0]
+	mut max_x := x[0]
+	for value in x {
+		if math.is_nan(value) || math.is_inf(value, 0) {
+			return error('polynomial_fit requires finite x values')
+		}
+		min_x = math.min(min_x, value)
+		max_x = math.max(max_x, value)
+	}
+	for value in y {
+		if math.is_nan(value) || math.is_inf(value, 0) {
+			return error('polynomial_fit requires finite y values')
+		}
+	}
+	center := min_x / 2.0 + max_x / 2.0
+	mut scale := math.max(math.abs(min_x - center), math.abs(max_x - center))
+	if scale == 0 {
+		scale = 1.0
+	}
 	size := degree + 1
-	mut matrix := [][]f64{len: size}
-	for row in 0 .. size {
-		matrix[row] = []f64{len: size + 1}
-	}
-	for row in 0 .. size {
+	mut matrix := [][]f64{len: x.len}
+	for row, value in x {
+		matrix[row] = []f64{len: size}
+		normalized_x := (value - center) / scale
+		mut monomial := 1.0
 		for column in 0 .. size {
-			for _, value in x {
-				matrix[row][column] += math.pow(value, f64(row + column))
-			}
-		}
-		for sample, value in x {
-			matrix[row][size] += math.pow(value, f64(row)) * y[sample]
+			matrix[row][column] = monomial
+			monomial *= normalized_x
 		}
 	}
+	mut transformed_y := y.clone()
 	for pivot in 0 .. size {
-		mut pivot_row := pivot
-		for row in pivot + 1 .. size {
-			if math.abs(matrix[row][pivot]) > math.abs(matrix[pivot_row][pivot]) {
-				pivot_row = row
+		mut norm_squared := 0.0
+		for row in pivot .. x.len {
+			norm_squared += matrix[row][pivot] * matrix[row][pivot]
+		}
+		norm := math.sqrt(norm_squared)
+		if norm <= 1e-14 {
+			return error('polynomial_fit samples produce a rank-deficient system')
+		}
+		alpha := if matrix[pivot][pivot] >= 0 {
+			-norm
+		} else {
+			norm
+		}
+		mut reflector := []f64{len: x.len - pivot}
+		reflector[0] = matrix[pivot][pivot] - alpha
+		for row in pivot + 1 .. x.len {
+			reflector[row - pivot] = matrix[row][pivot]
+		}
+		mut reflector_norm_squared := 0.0
+		for value in reflector {
+			reflector_norm_squared += value * value
+		}
+		for column in pivot + 1 .. size {
+			mut dot := 0.0
+			for row in pivot .. x.len {
+				dot += reflector[row - pivot] * matrix[row][column]
+			}
+			factor := 2.0 * dot / reflector_norm_squared
+			for row in pivot .. x.len {
+				matrix[row][column] -= factor * reflector[row - pivot]
 			}
 		}
-		if math.abs(matrix[pivot_row][pivot]) < 1e-14 {
-			return error('polynomial_fit samples produce a singular system')
+		mut dot_y := 0.0
+		for row in pivot .. x.len {
+			dot_y += reflector[row - pivot] * transformed_y[row]
 		}
-		matrix[pivot], matrix[pivot_row] = matrix[pivot_row], matrix[pivot]
-		for row in pivot + 1 .. size {
-			factor := matrix[row][pivot] / matrix[pivot][pivot]
-			for column in pivot .. size + 1 {
-				matrix[row][column] -= factor * matrix[pivot][column]
-			}
+		factor_y := 2.0 * dot_y / reflector_norm_squared
+		for row in pivot .. x.len {
+			transformed_y[row] -= factor_y * reflector[row - pivot]
+		}
+		matrix[pivot][pivot] = alpha
+		for row in pivot + 1 .. x.len {
+			matrix[row][pivot] = 0.0
 		}
 	}
-	mut coefficients := []f64{len: size}
+	mut normalized_coefficients := []f64{len: size}
 	for row := size - 1; row >= 0; row-- {
-		coefficients[row] = matrix[row][size]
+		normalized_coefficients[row] = transformed_y[row]
 		for column in row + 1 .. size {
-			coefficients[row] -= matrix[row][column] * coefficients[column]
+			normalized_coefficients[row] -= matrix[row][column] * normalized_coefficients[column]
 		}
-		coefficients[row] /= matrix[row][row]
+		normalized_coefficients[row] /= matrix[row][row]
+	}
+
+	inverse_scale := 1.0 / scale
+	offset := -center / scale
+	mut coefficients := [normalized_coefficients[size - 1]]
+	for index := size - 2; index >= 0; index-- {
+		mut expanded := []f64{len: coefficients.len + 1}
+		for power, coefficient in coefficients {
+			expanded[power] += coefficient * offset
+			expanded[power + 1] += coefficient * inverse_scale
+		}
+		expanded[0] += normalized_coefficients[index]
+		coefficients = expanded.clone()
+	}
+	for coefficient in coefficients {
+		if math.is_nan(coefficient) || math.is_inf(coefficient, 0) {
+			return error('polynomial_fit coefficients overflowed during conversion to the power basis')
+		}
 	}
 	return polynomial(coefficients)
 }
