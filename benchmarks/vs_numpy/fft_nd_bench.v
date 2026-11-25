@@ -23,21 +23,39 @@ fn main() {
 	axis_input := make_input(axis_shape)!
 	axis_result := benchmark_axis(axis_input, 1, 5)!
 	print_result('batched_rfft_axis', '64x512', 5, axis_result)
+	axis_strided_input := make_strided_input(axis_shape)!
+	axis_strided_result := benchmark_axis(axis_strided_input, 1, 5)!
+	print_result('batched_rfft_axis_stride2', '64x512', 5, axis_strided_result)
 	axis_input_f32 := make_input_f32(axis_shape)!
 	axis_result_f32 := benchmark_axis_f32(axis_input_f32, 1, 5)!
 	print_result('batched_rfft_axis_f32', '64x512', 5, axis_result_f32)
 	axis_result_f32_generic := benchmark_axis_generic_f32(axis_input_f32, 1, 5)!
 	print_result('batched_rfft_axis_f32_generic', '64x512', 5, axis_result_f32_generic)
+	axis_strided_input_f32 := make_strided_input_f32(axis_shape)!
+	axis_strided_result_f32 := benchmark_axis_f32(axis_strided_input_f32, 1, 5)!
+	print_result('batched_rfft_axis_f32_stride2', '64x512', 5, axis_strided_result_f32)
+	axis_strided_result_f32_generic := benchmark_axis_generic_f32(axis_strided_input_f32, 1,
+		5)!
+	print_result('batched_rfft_axis_f32_generic_stride2', '64x512', 5,
+		axis_strided_result_f32_generic)
 
 	nd_shape := [32, 32, 64]
 	nd_input := make_input(nd_shape)!
 	nd_result := benchmark_nd(nd_input, 3)!
 	print_result('rfftn_3d', '32x32x64', 3, nd_result)
+	nd_strided_input := make_strided_input(nd_shape)!
+	nd_strided_result := benchmark_nd(nd_strided_input, 3)!
+	print_result('rfftn_3d_stride2', '32x32x64', 3, nd_strided_result)
 	nd_input_f32 := make_input_f32(nd_shape)!
 	nd_result_f32 := benchmark_nd_f32(nd_input_f32, 3)!
 	print_result('rfftn_3d_f32', '32x32x64', 3, nd_result_f32)
 	nd_result_f32_generic := benchmark_nd_generic_f32(nd_input_f32, 3)!
 	print_result('rfftn_3d_f32_generic', '32x32x64', 3, nd_result_f32_generic)
+	nd_strided_input_f32 := make_strided_input_f32(nd_shape)!
+	nd_strided_result_f32 := benchmark_nd_f32(nd_strided_input_f32, 3)!
+	print_result('rfftn_3d_f32_stride2', '32x32x64', 3, nd_strided_result_f32)
+	nd_strided_result_f32_generic := benchmark_nd_generic_f32(nd_strided_input_f32, 3)!
+	print_result('rfftn_3d_f32_generic_stride2', '32x32x64', 3, nd_strided_result_f32_generic)
 }
 
 fn make_input(shape []int) !&vtl.Tensor[f64] {
@@ -53,6 +71,33 @@ fn make_input(shape []int) !&vtl.Tensor[f64] {
 	return vtl.from_array[f64](values, shape)
 }
 
+fn make_strided_input(shape []int) !&vtl.Tensor[f64] {
+	last_axis := shape.len - 1
+	mut base_shape := shape.clone()
+	base_shape[last_axis] *= 2
+	mut size := 1
+	for dimension in base_shape {
+		size *= dimension
+	}
+	mut values := []f64{len: size}
+	logical_size := size / 2
+	for i in 0 .. logical_size {
+		outer := i / shape[last_axis]
+		inner := i % shape[last_axis]
+		offset := outer * base_shape[last_axis] + inner * 2
+		x := f64(i)
+		values[offset] = math.sin(x * 0.0017) + 0.25 * math.cos(x * 0.0023)
+	}
+	base := vtl.from_array[f64](values, base_shape)!
+	if shape.len == 2 {
+		return base.slice([]int{}, [0, base_shape[last_axis], 2])
+	}
+	if shape.len == 3 {
+		return base.slice([]int{}, []int{}, [0, base_shape[last_axis], 2])
+	}
+	return error('strided FFT benchmark only supports two- or three-dimensional shapes')
+}
+
 fn make_input_f32(shape []int) !&vtl.Tensor[f32] {
 	mut size := 1
 	for dimension in shape {
@@ -64,6 +109,33 @@ fn make_input_f32(shape []int) !&vtl.Tensor[f32] {
 		values[i] = f32(math.sin(x * 0.0017) + 0.25 * math.cos(x * 0.0023))
 	}
 	return vtl.from_array[f32](values, shape)
+}
+
+fn make_strided_input_f32(shape []int) !&vtl.Tensor[f32] {
+	last_axis := shape.len - 1
+	mut base_shape := shape.clone()
+	base_shape[last_axis] *= 2
+	mut size := 1
+	for dimension in base_shape {
+		size *= dimension
+	}
+	mut values := []f32{len: size}
+	logical_size := size / 2
+	for i in 0 .. logical_size {
+		outer := i / shape[last_axis]
+		inner := i % shape[last_axis]
+		offset := outer * base_shape[last_axis] + inner * 2
+		x := f64(i)
+		values[offset] = f32(math.sin(x * 0.0017) + 0.25 * math.cos(x * 0.0023))
+	}
+	base := vtl.from_array[f32](values, base_shape)!
+	if shape.len == 2 {
+		return base.slice([]int{}, [0, base_shape[last_axis], 2])
+	}
+	if shape.len == 3 {
+		return base.slice([]int{}, []int{}, [0, base_shape[last_axis], 2])
+	}
+	return error('strided FFT benchmark only supports two- or three-dimensional shapes')
 }
 
 fn benchmark_axis(input &vtl.Tensor[f64], axis int, iterations int) !BenchmarkResult {

@@ -44,6 +44,28 @@ fn test_real_f32_fft_reads_strided_input_in_logical_order() ! {
 	}
 }
 
+fn test_real_f32_axis_and_nd_read_strided_final_axes() ! {
+	base := vtl.from_array[f32]([1, 99, 2, 99, 3, 99, 4, 99, 5, 99, 6, 99, 7, 99, 8, 99],
+		[2, 8])!
+	strided := base.slice([]int{}, [0, 8, 2])!
+	contiguous := vtl.from_array[f32](strided.to_array(), strided.shape)!
+	assert !strided.is_row_major_contiguous()
+	axis_result := rfft_axis_f32(strided, -1)!
+	axis_expected := rfft_axis_f32(contiguous, -1)!
+	assert axis_result.shape == axis_expected.shape
+	for i in 0 .. axis_expected.size {
+		assert math.abs(axis_result.get_nth(i).re - axis_expected.get_nth(i).re) < 1e-5
+		assert math.abs(axis_result.get_nth(i).im - axis_expected.get_nth(i).im) < 1e-5
+	}
+	nd_result := rfftn_f32(strided)!
+	nd_expected := rfftn_f32(contiguous)!
+	assert nd_result.shape == nd_expected.shape
+	for i in 0 .. nd_expected.size {
+		assert math.abs(nd_result.get_nth(i).re - nd_expected.get_nth(i).re) < 1e-5
+		assert math.abs(nd_result.get_nth(i).im - nd_expected.get_nth(i).im) < 1e-5
+	}
+}
+
 fn test_reusable_real_f32_fft_plan() ! {
 	input := vtl.from_1d[f32]([1, 0, 0, 0])!
 	mut plan := create_rfft_f32_plan(input.size)!

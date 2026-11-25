@@ -228,6 +228,14 @@ pub fn rfft_axis[T](input &vtl.Tensor[T], axis int) !&vtl.Tensor[complex.Complex
 				unsafe {
 					C.memcpy(line.data, &input.data.data[line_offset], axis_length * sizeof(T))
 				}
+			} else if axis_index == input.rank() - 1 && input.strides[axis_index] > 1
+				&& fft_strides_are_nonnegative(input.strides) {
+				decode_fft_axis_line(line_index, input.shape, axis_index, mut index)
+				index[axis_index] = 0
+				line_offset := fft_line_offset(index, input.strides)
+				for position in 0 .. axis_length {
+					line[position] = input.data.data[line_offset + position * input.strides[axis_index]]
+				}
 			} else {
 				decode_fft_axis_line(line_index, input.shape, axis_index, mut index)
 				for position in 0 .. axis_length {
@@ -383,6 +391,13 @@ pub fn rfftn[T](input &vtl.Tensor[T]) !&vtl.Tensor[complex.Complex] {
 				line_offset := line_index * last_length
 				unsafe {
 					C.memcpy(line.data, &input.data.data[line_offset], last_length * sizeof(T))
+				}
+			} else if input.strides[last_axis] > 1 && fft_strides_are_nonnegative(input.strides) {
+				decode_row_major_index(line_index, input.shape[..last_axis], mut index)
+				index[last_axis] = 0
+				line_offset := fft_line_offset(index, input.strides)
+				for position in 0 .. last_length {
+					line[position] = input.data.data[line_offset + position * input.strides[last_axis]]
 				}
 			} else {
 				decode_row_major_index(line_index, input.shape[..last_axis], mut index)
@@ -654,6 +669,23 @@ fn decode_fft_axis_line(line_index int, shape []int, axis int, mut index []int) 
 		index[dimension] = remainder % shape[dimension]
 		remainder /= shape[dimension]
 	}
+}
+
+fn fft_line_offset(index []int, strides []int) int {
+	mut offset := 0
+	for axis, coordinate in index {
+		offset += coordinate * strides[axis]
+	}
+	return offset
+}
+
+fn fft_strides_are_nonnegative(strides []int) bool {
+	for stride in strides {
+		if stride < 0 {
+			return false
+		}
+	}
+	return true
 }
 
 fn multidimensional_fft(input &vtl.Tensor[complex.Complex], inverse bool) !&vtl.Tensor[complex.Complex] {

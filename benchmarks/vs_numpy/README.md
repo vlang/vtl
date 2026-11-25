@@ -1019,12 +1019,13 @@ matched run on the target machine.
 ## Batched-axis and N-D real FFT
 
 This benchmark measures `rfft_axis` on a `[64, 512]` batched tensor and `rfftn`
-on a `[32, 32, 64]` tensor for both f64 and f32 inputs. The two programs use
-matching deterministic inputs, three warmups, seven timed batches, and 5 or 3
-transforms per batch. Each reports a weighted spectrum checksum and maximum
-round-trip error. The timed operation includes plan creation and output
-allocation. Run three alternating process pairs for a local comparison, from
-`~/.vmodules`:
+on a `[32, 32, 64]` tensor. The contiguous cases cover f64 and f32; the
+stride-2 cases also cover both dtypes, with dedicated and generic VTL f32
+wrappers. The two programs use matching deterministic inputs, three warmups,
+seven timed batches, and 5 or 3 transforms per batch. Each reports a weighted
+spectrum checksum and maximum round-trip error. The timed operation includes
+plan creation and output allocation. Run three alternating process pairs for a
+local comparison, from `~/.vmodules`:
 
 ```bash
 systemd-run --user --scope --quiet -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=1 \
@@ -1049,6 +1050,33 @@ The contiguous final-axis packing fast path improved VTL by 2.57x for the
 batched-axis case and 1.60x for the N-D case. NumPy remains 2.10x and 2.01x
 faster, respectively. Weighted checksums agree within `3e-6` absolute; the
 small difference reflects floating-point reduction order.
+
+For stride-2 f64 views, the benchmark first measured the indexed fallback, then
+the direct positive-stride gather path. Three alternating process pairs on the
+same host and software setup produced these process-median results:
+
+| f64 transform | VTL initial indexed fallback, us | VTL direct gather, us | NumPy, us | VTL / NumPy max round-trip error |
+| --- | ---: | ---: | ---: | ---: |
+| Batched axis, `[64, 512]`, stride 2 | 252.219 (241.629-262.090) | 127.157 (124.298-151.465) | 48.652 (48.509-48.926) | 1.110e-15 / 1.110e-15 |
+| N-D, `[32, 32, 64]`, stride 2 | 1257.609 (1249.654-1309.182) | 961.144 (944.773-997.813) | 466.464 (445.140-473.086) | 1.332e-15 / 1.110e-15 |
+
+The strided gather path improves VTL by about 2.0x for the batched-axis view
+and 1.3x for the N-D view. The f64 weighted checksums agree within `3e-6`
+absolute, but VTL remains about 2.61x and 2.06x slower than NumPy, respectively.
+
+The stride-2 f32-input cases measured:
+
+| f32-input transform | VTL mode, us | NumPy, us | VTL / NumPy max round-trip error |
+| --- | ---: | ---: | ---: |
+| Batched axis, dedicated `_f32` | 169.413 (167.265-169.757) | 60.670 (60.508-61.570) | 7.153e-7 / 3.576e-7 |
+| Batched axis, generic `f32` | 126.426 (125.732-130.119) | 60.670 (60.508-61.570) | 4.181e-7 / 3.576e-7 |
+| N-D, dedicated `_f32` | 1155.707 (1144.759-1415.712) | 345.730 (342.371-346.923) | 7.153e-7 / 4.768e-7 |
+| N-D, generic `f32` | 992.239 (989.634-992.436) | 345.730 (342.371-346.923) | 3.005e-7 / 4.768e-7 |
+
+The f32 rows use the same NumPy f32-input baseline. VTL's dedicated path
+returns complex32/f32, while its generic wrapper and NumPy return
+complex128/f64, so these are not equivalent-precision timing comparisons.
+These CPU measurements expose remaining gaps and do not establish parity.
 
 | f32-input transform | VTL mode (median, range), us | NumPy (median, range), us | VTL / NumPy max round-trip error |
 | --- | ---: | ---: | ---: |

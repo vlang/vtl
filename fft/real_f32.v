@@ -95,6 +95,13 @@ pub fn rfft_axis_f32(input &vtl.Tensor[f32], axis int) !&vtl.Tensor[Complex32] {
 			unsafe {
 				C.memcpy(line.data, &input.data.data[line_offset], axis_length * sizeof(f32))
 			}
+		} else if axis_index == input.rank() - 1 && input.strides[axis_index] > 1
+			&& fft_strides_are_nonnegative(input.strides) {
+			index[axis_index] = 0
+			line_offset := fft_line_offset(index, input.strides)
+			for position in 0 .. axis_length {
+				line[position] = input.data.data[line_offset + position * input.strides[axis_index]]
+			}
 		} else {
 			for position in 0 .. axis_length {
 				index[axis_index] = position

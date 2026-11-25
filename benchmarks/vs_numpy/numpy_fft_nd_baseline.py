@@ -8,10 +8,14 @@ import numpy as np
 SAMPLE_COUNT = 7
 WARMUP_RUNS = 3
 CASES = (
-    ("batched_rfft_axis_f64", (64, 512), 1, 5, np.float64),
-    ("batched_rfft_axis_f32", (64, 512), 1, 5, np.float32),
-    ("rfftn_3d_f64", (32, 32, 64), None, 3, np.float64),
-    ("rfftn_3d_f32", (32, 32, 64), None, 3, np.float32),
+    ("batched_rfft_axis_f64", (64, 512), 1, 5, np.float64, False),
+    ("batched_rfft_axis_f32", (64, 512), 1, 5, np.float32, False),
+    ("rfftn_3d_f64", (32, 32, 64), None, 3, np.float64, False),
+    ("rfftn_3d_f32", (32, 32, 64), None, 3, np.float32, False),
+    ("batched_rfft_axis_f64_stride2", (64, 512), 1, 5, np.float64, True),
+    ("batched_rfft_axis_f32_stride2", (64, 512), 1, 5, np.float32, True),
+    ("rfftn_3d_f64_stride2", (32, 32, 64), None, 3, np.float64, True),
+    ("rfftn_3d_f32_stride2", (32, 32, 64), None, 3, np.float32, True),
 )
 
 
@@ -57,8 +61,13 @@ def benchmark(
 
 def main() -> None:
     print("transform,shape,iterations,samples,median_us,min_us,max_us,max_abs_error,checksum")
-    for name, shape, axis, iterations, dtype in CASES:
+    for name, shape, axis, iterations, dtype, strided in CASES:
         source = make_input(shape, dtype)
+        if strided:
+            base_shape = (*shape[:-1], shape[-1] * 2)
+            base = np.zeros(base_shape, dtype=dtype)
+            base[..., ::2] = source
+            source = base[..., ::2]
         median, minimum, maximum, error, checksum = benchmark(source, axis, iterations)
         print(
             f"{name},{'x'.join(map(str, shape))},{iterations},{SAMPLE_COUNT},"

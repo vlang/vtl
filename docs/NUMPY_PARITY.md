@@ -704,15 +704,21 @@ inputs, including offset views, against their contiguous logical-order
 equivalents. Paired real and complex FFT benchmarks now cover contiguous and
 stride-2 inputs at four sizes, with analytic error checks and repeated timings;
 the benchmark README records a reproducible 16,384-element comparison and
-matched batched-axis / three-dimensional f64 workloads. Contiguous final-axis
-packing uses a direct-copy fast path, with before/after timings recorded.
+matched batched-axis / three-dimensional f64 workloads in contiguous and
+stride-2 layouts. Current strided batched/N-D measurements show the correctness
+checksums agree for f64, but VTL remains slower than NumPy. A positive
+non-unit final-axis stride now uses direct gathers instead of per-element
+multidimensional indexing, improving measured stride-2 f64 batched and N-D
+times by about 2.0x and 1.3x. Dedicated and generic f32 stride-2 cases also
+have benchmark coverage; their timings remain slower and are not
+equivalent-precision comparisons with NumPy.
 Generic real f32 transform and normalization wrappers return complex128, and
 their inverse wrappers return f64; dedicated `_f32` variants return complex32
 and f32 respectively. Tests cover these dtype contracts for selected-axis,
 2-D, and N-D transforms.
 
-**Remaining:** extend performance evidence to strided batched/N-D transforms
-and complete the dtype audit across every public FFT wrapper.
+**Remaining:** improve the measured f64/f32 strided performance gap and
+complete the dtype audit across every public FFT wrapper.
 
 ### Random
 
