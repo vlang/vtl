@@ -61,6 +61,18 @@ For neural-network and framework-level gaps relative to PyTorch, see the
 
 ## NumPy domains
 
+### Ufunc execution protocol
+
+| NumPy protocol | VTL status |
+|---|---|
+| Unary/binary elementwise execution | `ufunc_unary`, `ufunc_binary`; binary operands broadcast |
+| Preallocated `out` | `ufunc_unary_into`, `ufunc_binary_into`; result shape must be supplied exactly |
+| `where` | Supported for `*_into`; masks broadcast to, but cannot enlarge, the result shape; false entries preserve `out` |
+| `reduce` / `accumulate` | `ufunc_reduce`, `ufunc_accumulate` for flattened logical row-major order; axis variants are `ufunc_reduce_axis` and `ufunc_accumulate_axis` |
+| `reduceat` / `outer` / `at` | `ufunc_reduceat` is flattened, `ufunc_outer` uses flattened operands, `ufunc_at` mutates flattened indices sequentially |
+| Casting modes | Not implemented; input/output types are the same generic type |
+| NumPy error-state controls and `where`-masked allocation semantics | Not implemented |
+
 ### Array creation
 
 **Current:** zeros, ones, full, eye, range, sequence, arrays, and Vandermonde
