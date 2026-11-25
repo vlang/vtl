@@ -22,7 +22,7 @@ tests, documentation, and examples where users need them.
 | OpenCL compute and neural-network dispatch | [#750](https://github.com/vlang/vtl/issues/750) |
 | Sparse tensor operations | [#746](https://github.com/vlang/vtl/issues/746) |
 | Non-numeric dtypes and array interoperability | [#747](https://github.com/vlang/vtl/issues/747), [#748](https://github.com/vlang/vtl/issues/748) |
-| NumPy polynomial families and fitting | [#773](https://github.com/vlang/vtl/issues/773) |
+| NumPy polynomial families and fitting | [#773](https://github.com/vlang/vtl/issues/773) (power-series subset implemented) |
 
 For neural-network and framework-level gaps relative to PyTorch, see the
 [PyTorch parity tracker](./PYTORCH_PARITY.md).
@@ -33,6 +33,10 @@ For neural-network and framework-level gaps relative to PyTorch, see the
   axis swapping, and view-preserving `moveaxis`/`rollaxis`.
 - Elementwise math, reductions, mapping, stacking, splitting, random values,
   statistics, and linear algebra through VSL.
+- A power-series `Polynomial` API with ascending coefficients, Horner
+  evaluation, tensor evaluation, arithmetic, derivative/integral, real
+  linear and quadratic roots, and small least-squares fitting. Orthogonal
+  families and higher-degree robust root solving remain open.
 - Reverse-mode autograd, neural-network layers and losses, optimizers,
   datasets, CPU support, and selected CUDA/Vulkan operations. OpenCL/VCL
   currently covers tensor transfer and an `add_scalar` smoke example; VTL
