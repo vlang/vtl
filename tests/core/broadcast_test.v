@@ -104,3 +104,17 @@ fn test_broadcast_to_rejects_lower_rank_and_negative_dimensions() {
 		assert err.msg().contains('negative dimensions')
 	}
 }
+
+fn test_broadcast_to_is_a_writable_storage_sharing_view() ! {
+	mut singleton := vtl.from_array([1, 2], [2, 1])!
+	mut broadcast := singleton.broadcast_to([2, 3])!
+	broadcast.set([1, 2], 20)
+	assert singleton.get([1, 0]) == 20
+	assert broadcast.get([1, 0]) == 20
+
+	mut input := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
+	mut transposed := input.transpose([1, 0])!
+	mut expanded := transposed.broadcast_to([4, 3, 2])!
+	expanded.set([3, 2, 1], 60)
+	assert input.get([1, 2]) == 60
+}

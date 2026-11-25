@@ -108,6 +108,9 @@ contiguous input, and copies when another layout cannot be reshaped as that
 view; tests cover transposed and column-major values as well as storage sharing.
 `transpose`, `moveaxis`, `squeeze`, `unsqueeze`, and `expand_dims` preserve
 shared storage as views, including for transposed input.
+Basic `slice`, `slice_hilo`, and `mixed_index` selections are writable,
+storage-sharing views; advanced coordinate and boolean indexing return copies.
+Mutation tests cover slice views on contiguous and transposed inputs.
 `split` returns storage-sharing slices, including when splitting a transposed
 input. `diagonal_readonly` provides a storage-sharing diagonal view that
 exposes only read operations and returns copied shape/value arrays.
@@ -122,8 +125,10 @@ to each trailing matrix.
 
 **Current:** `broadcast_to`, `broadcast2`, `broadcast3`, and `broadcast_n`
 create zero-copy views, validate incompatible shapes, and follow NumPy's
-zero-dimension rules. Tests cover empty inputs, rank mismatches, and invalid
-target dimensions.
+zero-dimension rules. These views are writable: writes through broadcasted
+coordinates update their source, and zero-stride dimensions alias the same
+source element. Tests cover empty inputs, invalid shapes, and mutation through
+contiguous and transposed sources.
 
 **Remaining:** continue the aliasing audit for manipulation APIs not listed
 above. `broadcast_to` views remain writable, and the existing `diagonal` API
