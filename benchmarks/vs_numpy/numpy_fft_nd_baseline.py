@@ -8,15 +8,17 @@ import numpy as np
 SAMPLE_COUNT = 7
 WARMUP_RUNS = 3
 CASES = (
-    ("batched_rfft_axis", (64, 512), 1, 5),
-    ("rfftn_3d", (32, 32, 64), None, 3),
+    ("batched_rfft_axis_f64", (64, 512), 1, 5, np.float64),
+    ("batched_rfft_axis_f32", (64, 512), 1, 5, np.float32),
+    ("rfftn_3d_f64", (32, 32, 64), None, 3, np.float64),
+    ("rfftn_3d_f32", (32, 32, 64), None, 3, np.float32),
 )
 
 
-def make_input(shape: tuple[int, ...]) -> np.ndarray:
+def make_input(shape: tuple[int, ...], dtype: type[np.floating]) -> np.ndarray:
     positions = np.arange(np.prod(shape), dtype=np.float64)
     values = np.sin(positions * 0.0017) + 0.25 * np.cos(positions * 0.0023)
-    return values.reshape(shape)
+    return values.astype(dtype).reshape(shape)
 
 
 def transform(source: np.ndarray, axis: int | None) -> np.ndarray:
@@ -55,8 +57,8 @@ def benchmark(
 
 def main() -> None:
     print("transform,shape,iterations,samples,median_us,min_us,max_us,max_abs_error,checksum")
-    for name, shape, axis, iterations in CASES:
-        source = make_input(shape)
+    for name, shape, axis, iterations, dtype in CASES:
+        source = make_input(shape, dtype)
         median, minimum, maximum, error, checksum = benchmark(source, axis, iterations)
         print(
             f"{name},{'x'.join(map(str, shape))},{iterations},{SAMPLE_COUNT},"

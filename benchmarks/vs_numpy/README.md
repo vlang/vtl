@@ -1019,11 +1019,12 @@ matched run on the target machine.
 ## Batched-axis and N-D real FFT
 
 This benchmark measures `rfft_axis` on a `[64, 512]` batched tensor and `rfftn`
-on a `[32, 32, 64]` tensor. The two programs use matching deterministic f64
-inputs, three warmups, seven timed batches, and 5 or 3 transforms per batch.
-Each reports a weighted spectrum checksum and maximum round-trip error. The
-timed operation includes plan creation and output allocation. Run three
-alternating process pairs for a local comparison, from `~/.vmodules`:
+on a `[32, 32, 64]` tensor for both f64 and f32 inputs. The two programs use
+matching deterministic inputs, three warmups, seven timed batches, and 5 or 3
+transforms per batch. Each reports a weighted spectrum checksum and maximum
+round-trip error. The timed operation includes plan creation and output
+allocation. Run three alternating process pairs for a local comparison, from
+`~/.vmodules`:
 
 ```bash
 systemd-run --user --scope --quiet -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=1 \
@@ -1039,16 +1040,25 @@ On 2026-11-25, three alternating process runs on an AMD Ryzen 9 5900X with V
 0.5.2 (`7f5b9a3`), GCC 16.2.1, VTL using VSL `d60f9c36`, and NumPy 2.5.5
 measured:
 
-| Transform | VTL before (median, range), us | VTL direct-pack fast path (median, range), us | NumPy (median, range), us | VTL max round-trip error | NumPy max round-trip error |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| Batched axis, `[64, 512]` | 268.213 (267.502-271.547) | 110.487 (94.713-118.580) | 47.932 (47.275-49.431) | 1.110e-15 | 1.110e-15 |
-| N-D, `[32, 32, 64]` | 1450.163 (1447.281-1452.501) | 897.815 (871.986-950.451) | 475.231 (463.448-476.169) | 1.332e-15 | 1.110e-15 |
+| f64 transform | VTL before (median, range), us | VTL direct-pack (median, range), us | NumPy (median, range), us | VTL / NumPy max round-trip error |
+| --- | ---: | ---: | ---: | ---: |
+| Batched axis, `[64, 512]` | 268.213 (267.502-271.547) | 128.725 (111.404-131.725) | 48.928 (48.806-49.071) | 1.110e-15 / 1.110e-15 |
+| N-D, `[32, 32, 64]` | 1450.163 (1447.281-1452.501) | 868.651 (857.012-1006.081) | 444.463 (443.939-445.034) | 1.332e-15 / 1.110e-15 |
 
-The contiguous final-axis packing fast path improved VTL by 2.43x for the
-batched-axis case and 1.62x for the N-D case. NumPy remains 2.30x and 1.89x
+The contiguous final-axis packing fast path improved VTL by 2.08x for the
+batched-axis case and 1.67x for the N-D case. NumPy remains 2.63x and 1.95x
 faster, respectively. Weighted checksums agree within `3e-6` absolute; the
-small difference reflects floating-point reduction order. These are narrow
-f64 CPU comparisons and do not establish overall parity.
+small difference reflects floating-point reduction order.
+
+| f32-input transform | VTL dedicated `_f32` (median, range), us | NumPy (median, range), us | VTL / NumPy max round-trip error |
+| --- | ---: | ---: | ---: |
+| Batched axis, `[64, 512]` | 141.930 (137.544-144.148) | 196.786 (196.351-201.431) | 7.153e-7 / 3.576e-7 |
+| N-D, `[32, 32, 64]` | 1095.690 (1094.448-1098.168) | 1279.257 (1273.934-1290.251) | 7.153e-7 / 4.768e-7 |
+
+The f32 results are not an equivalent-precision comparison: VTL's dedicated
+paths return complex32 and reconstruct f32, while NumPy's FFT returns
+complex128 and reconstructs f64. These CPU microbenchmarks do not establish
+overall performance parity.
 
 ### Reference large-array results
 

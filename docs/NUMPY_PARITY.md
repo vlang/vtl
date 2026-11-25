@@ -711,9 +711,9 @@ their inverse wrappers return f64; dedicated `_f32` variants return complex32
 and f32 respectively. Tests cover these dtype contracts for selected-axis,
 2-D, and N-D transforms.
 
-**Remaining:** extend performance evidence to strided and f32 batched/N-D
-transforms, then finish the dtype-promotion audit across every public FFT
-wrapper.
+**Remaining:** extend performance evidence to strided batched/N-D transforms
+and equivalent-precision generic f32 comparisons, then finish the dtype audit
+across every public FFT wrapper.
 
 ### Random
 
