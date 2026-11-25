@@ -187,6 +187,30 @@ fn test_promote_types_for_matching_numeric_kinds() {
 	assert vtl.promote_types(.string, .string)! == .string
 }
 
+fn test_promote_types_are_symmetric_and_idempotent_for_numeric_dtypes() ! {
+	dtypes := [
+		vtl.DType.boolean,
+		.int8,
+		.int16,
+		.int32,
+		.int64,
+		.native_int,
+		.uint8,
+		.uint16,
+		.uint32,
+		.uint64,
+		.float32,
+		.float64,
+		.complex128,
+	]
+	for left in dtypes {
+		assert vtl.promote_types(left, left)! == left
+		for right in dtypes {
+			assert vtl.promote_types(left, right)! == vtl.promote_types(right, left)!
+		}
+	}
+}
+
 fn test_promote_types_prefers_fixed_width_for_native_integer_ties() ! {
 	assert vtl.promote_types(.int64, .native_int)! == .int64
 	assert vtl.promote_types(.native_int, .int64)! == .int64
