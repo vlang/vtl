@@ -222,6 +222,10 @@ pub fn (mut nn Sequential[T]) pad1d(padding []int, mode vtl.PadMode, constant T)
 	nn.info.pad1d(padding, mode, constant)
 }
 
+pub fn (mut nn Sequential[T]) pad3d(padding []int, mode vtl.PadMode, constant T) {
+	nn.info.pad3d(padding, mode, constant)
+}
+
 // layer_norm adds a new LayerNorm layer to the network.
 pub fn (mut nn Sequential[T]) layer_norm(normalized_shape []int, config layers.LayerNormConfig) {
 	nn.info.layer_norm(normalized_shape, config)

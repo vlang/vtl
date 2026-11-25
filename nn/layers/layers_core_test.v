@@ -228,6 +228,17 @@ fn test_pad1d_forward_and_backward() ! {
 	assert input.grad.to_array() == [1.0, 1.0, 1.0]
 }
 
+fn test_pad3d_forward_and_backward() ! {
+	c := core_ctx[f64]()
+	input := core_variable[f64](c, [1.0], [1, 1, 1, 1, 1])!
+	layer := pad3d_layer[f64](c, [1, 1, 1, 1], [1, 1, 1, 1, 1, 1], .constant, 0.0)
+	mut output := layer.forward(input)!
+	assert layer.output_shape() == [1, 3, 3, 3]
+	assert output.value.to_array().filter(it == 1.0).len == 1
+	output.backprop()!
+	assert input.grad.to_array() == [1.0]
+}
+
 // Embedding layer: output shape and variables
 
 fn test_embedding_output_shape() {

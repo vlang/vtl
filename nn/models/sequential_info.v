@@ -359,6 +359,20 @@ pub fn (mut ls SequentialInfo[T]) pad1d(padding []int, mode vtl.PadMode, constan
 		})
 }
 
+pub fn (mut ls SequentialInfo[T]) pad3d(padding []int, mode vtl.PadMode, constant T) {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.add_layer(layers.pad3d_layer[T](ls.ctx, shape, padding, mode, constant),
+		'Pad3DLayer', {
+			'left':   padding[0]
+			'right':  padding[1]
+			'top':    padding[2]
+			'bottom': padding[3]
+			'front':  padding[4]
+			'back':   padding[5]
+		})
+}
+
 // layer_norm adds a new LayerNorm layer to the network.
 pub fn (mut ls SequentialInfo[T]) layer_norm(normalized_shape []int, config layers.LayerNormConfig) {
 	mut layer_config := map[string]int{}
