@@ -5,7 +5,7 @@ import vtl
 
 fn test_capability_matrix_is_explicit_and_queryable() {
 	matrix := capability_matrix()
-	assert matrix.len == 23
+	assert matrix.len == 27
 	assert supports('zeros')
 	assert supports('reshape')
 	assert supports('broadcast_to')
@@ -25,6 +25,10 @@ fn test_capability_matrix_is_explicit_and_queryable() {
 	assert supports('isfinite')
 	assert supports('isinf')
 	assert supports('isnan')
+	assert supports('std')
+	assert supports('var')
+	assert supports('median')
+	assert supports('quantile')
 	assert !supports('asarray')
 
 	for capability in matrix {
@@ -111,6 +115,14 @@ fn test_sum_and_mean_reduce_all_elements() {
 	assert mean(input) == 2.5
 	assert sum(vtl.from_1d[int]([1, 2, 3])!) == 6
 	assert mean(vtl.from_1d[int]([1, 2, 3])!) == 2.0
+}
+
+fn test_array_api_statistical_ufuncs() ! {
+	input := vtl.from_array[f64]([1.0, 2.0, 3.0, 4.0], [4])!
+	assert std(input, 0)! == 1.118033988749895
+	assert var(input, 0)! == 1.25
+	assert median(input) == 2.5
+	assert quantile(input, 0.75)! == 3.25
 }
 
 fn test_array_api_reductions_cover_common_scalar_operations() {

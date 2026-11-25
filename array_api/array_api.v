@@ -40,6 +40,10 @@ pub fn capability_matrix() []Capability {
 		Capability{'all', true},
 		Capability{'any', true},
 		Capability{'mean', true},
+		Capability{'std', true},
+		Capability{'var', true},
+		Capability{'median', true},
+		Capability{'quantile', true},
 		Capability{'isclose', true},
 		Capability{'allclose', true},
 		Capability{'isfinite', true},
@@ -151,6 +155,26 @@ pub fn any_[T](array &vtl.Tensor[T]) bool {
 // mean reduces real numeric elements to an f64 scalar.
 pub fn mean[T vtl.Real](array &vtl.Tensor[T]) f64 {
 	return stats.mean_as[T, f64](array)
+}
+
+// std computes the population standard deviation of all elements.
+pub fn std[T vtl.Real](array &vtl.Tensor[T], ddof int) !f64 {
+	return stats.std_as[T, f64](array, ddof)
+}
+
+// var computes the variance of all elements.
+pub fn var[T vtl.Real](array &vtl.Tensor[T], ddof int) !f64 {
+	return stats.variance_as[T, f64](array, ddof)
+}
+
+// median computes the median of all elements.
+pub fn median[T](array &vtl.Tensor[T]) f64 {
+	return stats.median(array)
+}
+
+// quantile computes a linear-interpolated quantile of all elements.
+pub fn quantile[T](array &vtl.Tensor[T], q f64) !f64 {
+	return stats.quantile_linear(array, q)
 }
 
 // isclose compares broadcasted values using relative and absolute tolerances.

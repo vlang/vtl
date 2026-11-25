@@ -227,6 +227,9 @@ The same dtype rules apply to the broadcasted binary `copysign_promoted`,
 `rint_promoted` follows the same floating output rules and uses ties-to-even;
 `floor_promoted`, `ceil_promoted`, and `trunc_promoted` preserve the input
 dtype, including exact large integer values.
+The explicit `vtl.array_api` namespace also exposes whole-array `std`, `var`,
+`median`, and linear-interpolated `quantile` reductions with documented
+`ddof` handling.
 NumPy float16 results for booleans and 8-bit integers are widened because VTL
 has no float16. The legacy same-dtype `Tensor.atan2()`, `Tensor.sqrt()`, and
 `Tensor.cbrt()` methods preserve their generic input dtype; use the promoted
