@@ -493,6 +493,19 @@ pub fn (mut generator RandomGenerator) pareto(shape_parameter f64, shape []int) 
 	return from_array[f64](values, shape)
 }
 
+// power returns samples from NumPy's power distribution on [0, 1] using the
+// given positive shape parameter and this generator's independent stream.
+pub fn (mut generator RandomGenerator) power(shape_parameter f64, shape []int) !&Tensor[f64] {
+	validate_power_shape(shape_parameter)!
+	mut values := []f64{len: size_from_shape(shape)}
+	exponent := 1 / shape_parameter
+	for i in 0 .. values.len {
+		u := generator.rng.f64_in_range(0.0, 1.0)!
+		values[i] = math.pow(u, exponent)
+	}
+	return from_array[f64](values, shape)
+}
+
 // rayleigh returns samples from a Rayleigh distribution with non-negative
 // scale and this generator's independent stream.
 pub fn (mut generator RandomGenerator) rayleigh(scale f64, shape []int) !&Tensor[f64] {
@@ -1097,6 +1110,18 @@ pub fn pareto(shape_parameter f64, shape []int, params TensorData) !&Tensor[f64]
 	return from_array[f64](values, shape, params)
 }
 
+// power returns samples from NumPy's power distribution on [0, 1] using VTL's global stream.
+pub fn power(shape_parameter f64, shape []int, params TensorData) !&Tensor[f64] {
+	validate_power_shape(shape_parameter)!
+	mut values := []f64{len: size_from_shape(shape)}
+	exponent := 1 / shape_parameter
+	for i in 0 .. values.len {
+		u := rand.f64_in_range(0.0, 1.0)!
+		values[i] = math.pow(u, exponent)
+	}
+	return from_array[f64](values, shape, params)
+}
+
 // rayleigh returns samples from a Rayleigh distribution using VTL's global stream.
 pub fn rayleigh(scale f64, shape []int, params TensorData) !&Tensor[f64] {
 	validate_location_scale(0, scale, 'rayleigh')!
@@ -1131,6 +1156,12 @@ fn validate_location_scale(location f64, scale f64, distribution string) ! {
 fn validate_pareto_shape(shape_parameter f64) ! {
 	if shape_parameter <= 0 || math.is_nan(shape_parameter) || math.is_inf(shape_parameter, 0) {
 		return error('pareto: shape parameter must be finite and positive')
+	}
+}
+
+fn validate_power_shape(shape_parameter f64) ! {
+	if shape_parameter <= 0 || math.is_nan(shape_parameter) || math.is_inf(shape_parameter, 0) {
+		return error('power: shape parameter must be finite and positive')
 	}
 }
 

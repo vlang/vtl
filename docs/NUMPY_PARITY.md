@@ -711,24 +711,26 @@ the dtype-promotion audit across all public FFT wrappers.
 **Current:** global uniform, normal, Bernoulli, binomial, negative-binomial,
 geometric, hypergeometric,
 exponential, Gumbel, Laplace, Logistic, Cauchy, Wald (inverse Gaussian),
-Pareto, Rayleigh, triangular, Poisson,
+Pareto, power, Rayleigh, triangular, Poisson,
 Weibull, lognormal, gamma, beta, Dirichlet, chi-square, Student's t, and F
 tensors; `random_seed`;
 independent seeded `RandomGenerator` streams for f64 uniform, normal, lognormal,
-Gumbel, Laplace, Logistic, Cauchy, Wald, Pareto, Rayleigh, triangular, gamma, beta,
+Gumbel, Laplace, Logistic, Cauchy, Wald, Pareto, power, Rayleigh, triangular, gamma, beta,
 Dirichlet, exponential, Poisson, Weibull, chi-square, Student's t, F,
 hypergeometric, negative-binomial, multivariate normal with positive-semidefinite
 covariance matrices, and boolean Bernoulli; integer
 uniform, binomial/geometric/multinomial/Poisson; uniform and weighted population choice
 over flattened values or complete slices along a selected axis;
 and integer, first-axis, or selected-axis tensor permutations.
-The generator's `vonmises(location, concentration, shape)` returns wrapped
+The generator's `power(shape_parameter, shape)` samples NumPy's power density
+`a*x^(a-1)` on `[0, 1]` by inverse transform, with mean `a/(a+1)` and variance
+`a/((a+1)^2*(a+2))`. Its `vonmises(location, concentration, shape)` returns wrapped
 angles in `[-pi, pi)` and uses Best-Fisher rejection sampling for concentration
 through `1e16`; concentrations at or below `1e-150` use the uniform limit to
 avoid underflow.
 
-**Remaining:** add other less common NumPy distributions and
-define reproducibility across runtime versions.
+**Remaining:** add the other NumPy distributions not listed above and define
+reproducibility guarantees across V runtime versions.
 
 ### Input and output
 

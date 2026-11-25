@@ -238,3 +238,38 @@ fn test_random_generator_vonmises_is_seeded_and_matches_circular_moments() ! {
 	generator.free()
 	replay.free()
 }
+
+fn test_random_generator_power_is_seeded_and_matches_moments() ! {
+	mut generator := new_random_generator(2027)
+	values := generator.power(2.0, [8192])!
+	assert values.shape == [8192]
+	mut total := 0.0
+	for value in values.to_array() {
+		assert value >= 0 && value <= 1
+		total += value
+	}
+	mean := total / 8192.0
+	mut squared_deviations := 0.0
+	for value in values.to_array() {
+		squared_deviations += (value - mean) * (value - mean)
+	}
+	variance := squared_deviations / 8192.0
+	// Power(2) has mean 2/3 and variance 1/18.
+	assert math.abs(mean - 2.0 / 3.0) < 0.012
+	assert math.abs(variance - 1.0 / 18.0) < 0.004
+
+	mut replay := new_random_generator(2027)
+	assert values.array_equal(replay.power(2.0, [8192])!)
+	assert generator.power(1.0, [0])!.shape == [0]
+	if _ := generator.power(0.0, [1]) {
+		assert false, 'power must reject a non-positive shape parameter'
+	}
+	if _ := generator.power(math.nan(), [1]) {
+		assert false, 'power must reject a NaN shape parameter'
+	}
+	if _ := generator.power(math.inf(1), [1]) {
+		assert false, 'power must reject an infinite shape parameter'
+	}
+	generator.free()
+	replay.free()
+}

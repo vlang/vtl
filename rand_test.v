@@ -234,14 +234,19 @@ fn test_global_location_scale_distributions_are_seeded_and_validated() ! {
 fn test_global_pareto_rayleigh_and_triangular_are_seeded_and_validated() ! {
 	random_seed(9404)
 	pareto_values := pareto(3.0, [4096], TensorData{})!
+	power_values := power(2.0, [4096], TensorData{})!
 	rayleigh_values := rayleigh(2.0, [4096], TensorData{})!
 	triangular_values := triangular(0.0, 1.0, 3.0, [4096], TensorData{})!
 	random_seed(9404)
 	assert pareto_values.array_equal(pareto(3.0, [4096], TensorData{})!)
+	assert power_values.array_equal(power(2.0, [4096], TensorData{})!)
 	assert rayleigh_values.array_equal(rayleigh(2.0, [4096], TensorData{})!)
 	assert triangular_values.array_equal(triangular(0.0, 1.0, 3.0, [4096], TensorData{})!)
 	for value in pareto_values.to_array() {
 		assert value >= 0 && !math.is_nan(value) && !math.is_inf(value, 0)
+	}
+	for value in power_values.to_array() {
+		assert value >= 0 && value <= 1 && !math.is_nan(value) && !math.is_inf(value, 0)
 	}
 	for value in rayleigh_values.to_array() {
 		assert value >= 0 && !math.is_nan(value) && !math.is_inf(value, 0)
@@ -250,11 +255,15 @@ fn test_global_pareto_rayleigh_and_triangular_are_seeded_and_validated() ! {
 		assert value >= 0 && value <= 3 && !math.is_nan(value) && !math.is_inf(value, 0)
 	}
 	assert math.abs(sample_mean_for_test(pareto_values.to_array()) - 0.5) < 0.1
+	assert math.abs(sample_mean_for_test(power_values.to_array()) - 2.0 / 3.0) < 0.02
 	assert math.abs(sample_mean_for_test(rayleigh_values.to_array()) - 2 * math.sqrt(math.pi / 2)) < 0.08
 	assert math.abs(sample_mean_for_test(triangular_values.to_array()) - 4.0 / 3.0) < 0.05
 	assert rayleigh(0.0, [2], TensorData{})!.to_array() == [0.0, 0.0]
 	if _ := pareto(math.inf(1), [1], TensorData{}) {
 		assert false, 'pareto must reject non-finite shape parameters'
+	}
+	if _ := power(0.0, [1], TensorData{}) {
+		assert false, 'power must reject non-positive shape parameters'
 	}
 	if _ := rayleigh(math.nan(), [1], TensorData{}) {
 		assert false, 'rayleigh must reject NaN scale'

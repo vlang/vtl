@@ -39,6 +39,7 @@ fn main() {
 	robust_noise := validation_rng.laplace(0.0, 0.05, [4])!
 	logistic_scores := validation_rng.logistic(0.0, 1.0, [4])!
 	heavy_tail_noise := training_rng.pareto(3.0, [4])!
+	power_law_samples := training_rng.power(2.0, [4])!
 	wind_speeds := validation_rng.rayleigh(2.0, [4])!
 	triangular_priors := training_rng.triangular(0.0, 0.5, 1.0, [4])!
 	circular_samples := validation_rng.vonmises(0.0, 2.0, [4])!
@@ -71,6 +72,7 @@ fn main() {
 	println('Laplace robust noise: ${robust_noise.to_array()}')
 	println('Logistic score noise: ${logistic_scores.to_array()}')
 	println('Pareto heavy-tail noise: ${heavy_tail_noise.to_array()}')
+	println('Power-distribution samples: ${power_law_samples.to_array()}')
 	println('Rayleigh wind speeds: ${wind_speeds.to_array()}')
 	println('Triangular prior samples: ${triangular_priors.to_array()}')
 	println('Von Mises circular samples: ${circular_samples.to_array()}')
