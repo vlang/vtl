@@ -31,6 +31,22 @@ fn test_binary_ufunc_into_reuses_output() ! {
 	assert output.to_array() == [4.0, 6.0]
 }
 
+fn test_binary_ufunc_broadcasts_operands_and_where_mask() ! {
+	left := from_array([1.0, 2.0], [2, 1])!
+	right := from_array([10.0, 20.0, 30.0], [1, 3])!
+	output := from_array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [2, 3])!
+	mask := from_array([true, false, true], [1, 3])!
+	ufunc_binary_into[f64](left, right, output, mask, true, fn (a f64, b f64) f64 {
+		return a + b
+	})!
+	assert output.to_array() == [11.0, 0.0, 31.0, 12.0, 0.0, 32.0]
+	broadcast_output := ufunc_binary[f64](left, right, fn (a f64, b f64) f64 {
+		return a + b
+	})!
+	assert broadcast_output.shape == [2, 3]
+	assert broadcast_output.to_array() == [11.0, 21.0, 31.0, 12.0, 22.0, 32.0]
+}
+
 fn test_ufunc_reduce_and_accumulate_use_logical_flat_order() ! {
 	input := from_array([1.0, 2.0, 3.0, 4.0], [2, 2])!
 	assert ufunc_reduce[f64](input, 0.0, fn (a f64, b f64) f64 {

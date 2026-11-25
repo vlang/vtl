@@ -8,35 +8,69 @@ pub fn ufunc_unary[T](input &Tensor[T], operation fn (T) T) !&Tensor[T] {
 
 // ufunc_unary_into preserves masked-out values in the caller-owned output.
 pub fn ufunc_unary_into[T](input &Tensor[T], output &Tensor[T], where_mask &Tensor[bool], has_where bool, operation fn (T) T) ! {
-	if input.shape != output.shape {
+	if has_where && where_mask == unsafe { nil } {
+		return error('ufunc_unary_into where mask cannot be nil')
+	}
+	shape := input.shape.clone()
+	if output.shape != shape {
 		return error('ufunc_unary_into output shape must match input shape')
 	}
-	if has_where && (where_mask == unsafe { nil } || where_mask.shape != input.shape) {
-		return error('ufunc_unary_into where mask must match input shape')
+	if has_where && broadcast_shapes(shape, where_mask.shape)! != shape {
+		return error('ufunc_unary_into where mask cannot expand input shape')
 	}
-	for i in 0 .. input.size() {
-		if !has_where || where_mask.get_nth(i) {
-			output.set_nth(i, operation(input.get_nth(i)))
+	input_values := input.broadcast_to(shape)!
+	mut mask_values := unsafe { &Tensor[bool](nil) }
+	if has_where {
+		mask_values = where_mask.broadcast_to(shape)!
+	}
+	mut values := []T{len: output.size()}
+	for i in 0 .. output.size() {
+		if !has_where || mask_values.get_nth(i) {
+			values[i] = operation(input_values.get_nth(i))
+		}
+	}
+	for i in 0 .. output.size() {
+		if !has_where || mask_values.get_nth(i) {
+			output.set_nth(i, values[i])
 		}
 	}
 }
 
 pub fn ufunc_binary[T](left &Tensor[T], right &Tensor[T], operation fn (T, T) T) !&Tensor[T] {
-	mut output := zeros_like[T](left)
+	shape := broadcast_shapes(left.shape, right.shape)!
+	mut output := zeros[T](shape)
 	ufunc_binary_into[T](left, right, output, unsafe { nil }, false, operation)!
 	return output
 }
 
 pub fn ufunc_binary_into[T](left &Tensor[T], right &Tensor[T], output &Tensor[T], where_mask &Tensor[bool], has_where bool, operation fn (T, T) T) ! {
-	if left.shape != right.shape || left.shape != output.shape {
-		return error('ufunc_binary_into operands and output must have identical shapes')
+	shape := broadcast_shapes(left.shape, right.shape)!
+	if has_where {
+		if where_mask == unsafe { nil } {
+			return error('ufunc_binary_into where mask cannot be nil')
+		}
+		if broadcast_shapes(shape, where_mask.shape)! != shape {
+			return error('ufunc_binary_into where mask cannot expand operand shape')
+		}
 	}
-	if has_where && (where_mask == unsafe { nil } || where_mask.shape != left.shape) {
-		return error('ufunc_binary_into where mask must match operand shape')
+	if output.shape != shape {
+		return error('ufunc_binary_into output shape must equal broadcast result shape')
 	}
-	for i in 0 .. left.size() {
-		if !has_where || where_mask.get_nth(i) {
-			output.set_nth(i, operation(left.get_nth(i), right.get_nth(i)))
+	left_values := left.broadcast_to(shape)!
+	right_values := right.broadcast_to(shape)!
+	mut mask_values := unsafe { &Tensor[bool](nil) }
+	if has_where {
+		mask_values = where_mask.broadcast_to(shape)!
+	}
+	mut values := []T{len: output.size()}
+	for i in 0 .. output.size() {
+		if !has_where || mask_values.get_nth(i) {
+			values[i] = operation(left_values.get_nth(i), right_values.get_nth(i))
+		}
+	}
+	for i in 0 .. output.size() {
+		if !has_where || mask_values.get_nth(i) {
+			output.set_nth(i, values[i])
 		}
 	}
 }
