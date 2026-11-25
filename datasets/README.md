@@ -21,6 +21,39 @@ sample order. A non-positive `batch_size` produces an empty loader.
 `reset()` between epochs to advance the deterministic shuffle order from the
 configured seed.
 
+`TransformPipeline[T]` composes tensor transforms in order and propagates the
+first transform error. Apply it to a sample or batch tensor; transforms receive
+the preceding transform's output, and an empty pipeline returns its input.
+Transforms that should preserve their input must return a new tensor rather
+than mutating the input. For batch transforms, call the pipeline from a custom
+collation callback installed with `DataLoader.set_collate_fn`.
+
+```v
+import vtl
+import vtl.datasets
+
+fn center(input &vtl.Tensor[f64]) !&vtl.Tensor[f64] {
+	mut output := vtl.zeros[f64](input.shape)
+	for i in 0 .. input.size {
+		output.set_nth(i, input.get_nth(i) - 1.0)
+	}
+	return output
+}
+
+fn scale(input &vtl.Tensor[f64]) !&vtl.Tensor[f64] {
+	mut output := vtl.zeros[f64](input.shape)
+	for i in 0 .. input.size {
+		output.set_nth(i, input.get_nth(i) * 0.5)
+	}
+	return output
+}
+
+pipeline := datasets.TransformPipeline.new[f64]([center, scale])
+sample := vtl.from_1d([1.0, 3.0])!
+transformed := pipeline.apply(sample)!
+assert transformed.to_array() == [0.0, 1.0]
+```
+
 For custom sample order, `new_data_loader_with_sampler_checked` and
 `new_data_loader_with_labels_and_sampler_checked` accept samplers from
 `vtl.nn.data`. Built-in options include sequential, random, subset-random,

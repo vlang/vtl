@@ -4,6 +4,47 @@ import vtl
 import vtl.nn.data as nn_data
 import math
 
+fn test_transform_pipeline_applies_transforms_in_order() ! {
+	input := vtl.from_1d([1.0, 2, 3])!
+	pipeline := TransformPipeline.new[f64]([add_one_transform, double_transform])
+	output := pipeline.apply(input)!
+	assert output.to_array() == [4.0, 6, 8]
+	assert input.to_array() == [1.0, 2, 3]
+}
+
+fn test_transform_pipeline_propagates_errors_and_accepts_empty_pipeline() ! {
+	input := vtl.from_1d([1.0, 2])!
+	empty_pipeline := TransformPipeline.new[f64]([]TensorTransform[f64]{})
+	assert empty_pipeline.apply(input)! == input
+
+	pipeline := TransformPipeline.new[f64]([add_one_transform, failing_transform, double_transform])
+	pipeline.apply(input) or {
+		assert err.msg() == 'transform failed'
+		return
+	}
+	assert false, 'transform errors must stop the pipeline'
+}
+
+fn add_one_transform(input &vtl.Tensor[f64]) !&vtl.Tensor[f64] {
+	mut output := vtl.zeros[f64](input.shape)
+	for i in 0 .. input.size {
+		output.set_nth(i, input.get_nth(i) + 1)
+	}
+	return output
+}
+
+fn double_transform(input &vtl.Tensor[f64]) !&vtl.Tensor[f64] {
+	mut output := vtl.zeros[f64](input.shape)
+	for i in 0 .. input.size {
+		output.set_nth(i, input.get_nth(i) * 2)
+	}
+	return output
+}
+
+fn failing_transform(_ &vtl.Tensor[f64]) !&vtl.Tensor[f64] {
+	return error('transform failed')
+}
+
 fn test_contiguous_batches_are_zero_copy_views() ! {
 	mut data := vtl.from_array([1.0, 2, 3, 4, 5, 6, 7, 8], [4, 2])!
 	loader := new_data_loader[f64](data, DataLoaderConfig{
