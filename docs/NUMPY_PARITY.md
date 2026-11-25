@@ -338,9 +338,11 @@ See
 [gradient tests](../autograd_tests/gates_remainder_test.v), and
 [dtype conversion tutorial](./TUTORIAL_FIRST_STEPS.md#numeric-dtype-conversion).
 
-**Remaining ufunc gaps:** complex `pow` remains unsupported, and unary
-`abs`/`sign` plus multi-output `frexp`/`modf` still need broader differential
-coverage across supported dtypes and special values. Promoted `float_power`
+**Remaining ufunc gaps:** complex `pow` remains unsupported. Unary `abs`/`sign`
+and multi-output `frexp`/`modf` have reference-driven coverage for supported
+dtypes, signed zero, non-finite values, scalar and empty shapes, and strided
+logical order; continue expanding the dtype/special-value cross-product.
+Promoted `float_power`
 now covers real numeric and boolean tensor pairs, broadcasting, empty and
 scalar-shaped inputs, negative integer exponents, and IEEE edge cases.
 Promoted mixed-input `ldexp` covers real or boolean mantissas and integer or

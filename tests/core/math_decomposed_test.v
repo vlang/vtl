@@ -134,6 +134,25 @@ fn test_decomposition_uses_logical_order_for_strided_views() ! {
 	assert fractional.shape == [2, 2]
 	assert fractional.to_array() == [0.5, 0.5, 0.5, 0.5]
 	assert integral.to_array() == [1.0, 3.0, 2.0, 4.0]
+	mantissa, exponent := view.frexp()!
+	assert mantissa.to_array() == [0.75, 0.875, 0.625, 0.5625]
+	assert exponent.to_array() == [1, 2, 2, 3]
+}
+
+fn test_decomposition_preserves_scalar_and_empty_shapes() ! {
+	scalar := vtl.from_array[f64]([-2.75], [])!
+	fractional, integral := scalar.modf()!
+	mantissa, exponent := scalar.frexp()!
+	assert fractional.shape == [] && fractional.get_nth(0) == -0.75
+	assert integral.shape == [] && integral.get_nth(0) == -2.0
+	assert mantissa.shape == [] && mantissa.get_nth(0) == -0.6875
+	assert exponent.shape == [] && exponent.get_nth(0) == 2
+
+	empty := vtl.empty[f64]([0])
+	empty_fractional, empty_integral := empty.modf()!
+	empty_mantissa, empty_exponent := empty.frexp()!
+	assert empty_fractional.shape == [0] && empty_integral.shape == [0]
+	assert empty_mantissa.shape == [0] && empty_exponent.shape == [0]
 }
 
 fn test_ldexp_broadcasts_mantissas_and_exponents() ! {
