@@ -39,7 +39,7 @@ pub fn multiply_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
 // pow_promoted computes elementwise powers after broadcasting. Numeric pairs
 // use promote_types(dtype_of[T](), dtype_of[U]()); boolean pairs return int8,
 // matching NumPy. Integer powers keep exact-width wrapping arithmetic and
-// reject negative integer exponents. Complex operands are unsupported;
+// reject negative integer exponents. Complex pairs use the principal branch;
 // 64-bit integers cannot be combined with a floating output because conversion
 // could lose integer precision.
 pub fn pow_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
@@ -564,9 +564,6 @@ fn binary_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation PromotedBinary
 	$if R is bool {
 		return error('promoted arithmetic requires a numeric output dtype')
 	} $else $if R is complex.Complex {
-		if operation == .power {
-			return error('promoted power does not support complex values')
-		}
 		if operation == .float_power {
 			return error('promoted float_power does not support complex values')
 		}
@@ -820,10 +817,10 @@ fn complex_promoted_value(x complex.Complex, y complex.Complex, operation Promot
 		.subtract { x - y }
 		.multiply { x * y }
 		.divide { x / y }
+		.power { complex_power_value(x, y) }
 		.floor_divide { return error('promoted floor division does not support complex values') }
 		.fmod { return error('promoted fmod does not support complex values') }
 		.remainder { return error('promoted remainder does not support complex values') }
-		.power { return error('promoted power does not support complex values') }
 		.float_power { return error('promoted float_power does not support complex values') }
 	}
 }

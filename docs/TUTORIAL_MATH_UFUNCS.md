@@ -64,8 +64,10 @@ and requires `R` to match NumPy's power result dtype: numeric pairs use
 `int8`. Integer results use exact-width wrapping arithmetic; a negative integer
 exponent returns an error. Floating results preserve IEEE special values and
 signed-zero behavior. A 64-bit integer operand paired with a floating output
-is rejected rather than silently rounded. Complex and string inputs are
-unsupported.
+is rejected rather than silently rounded. Complex inputs use the principal
+branch and return complex128, including branch-cut behavior for negative real
+bases with signed-zero imaginary components. String inputs are unsupported;
+`float_power_promoted` remains real-only.
 
 ```v
 import vtl
@@ -74,6 +76,24 @@ bases := vtl.from_2d[i16]([[2], [3]])!
 exponents := vtl.from_1d[f32]([2.0, 3.0, 0.0])!
 values := vtl.pow_promoted[f32, i16, f32](bases, exponents)!
 println(values.to_array()) // [4.0, 8.0, 1.0, 9.0, 27.0, 1.0]
+```
+
+Complex powers also use explicit output promotion:
+
+```v
+import math.complex
+import vtl
+
+bases := vtl.from_1d[complex.Complex]([
+	complex.complex(-1.0, 0.0),
+	complex.complex(-1.0, -0.0),
+])!
+exponents := vtl.from_1d[complex.Complex]([
+	complex.complex(0.5, 0.0),
+	complex.complex(0.5, 0.0),
+])!
+roots := vtl.pow_promoted[complex.Complex, complex.Complex, complex.Complex](bases, exponents)!
+println(roots.to_array()) // approximately [+i, -i]
 ```
 
 ## Promoted exponential and logarithm

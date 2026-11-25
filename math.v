@@ -1196,9 +1196,13 @@ pub fn (a &Tensor[T]) nextafter32[T](b &Tensor[T]) !&Tensor[T] {
 @[inline]
 pub fn (a &Tensor[T]) pow[T](b &Tensor[T]) !&Tensor[T] {
 	return a.nmap[T]([b], fn [T](xs []T, _ []int) T {
-		x := xs[0]
-		y := xs[1]
-		return cast[T](math.pow(td(x).f64(), td(y).f64()))
+		$if T is vcomplex.Complex {
+			return complex_power_value(xs[0], xs[1])
+		} $else {
+			x := xs[0]
+			y := xs[1]
+			return cast[T](math.pow(td(x).f64(), td(y).f64()))
+		}
 	})
 }
 

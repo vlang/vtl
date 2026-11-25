@@ -295,12 +295,14 @@ when the promoted input dtype is `float32`, and `float64` otherwise.
 floating-point dtypes and broadcasting. Nonzero results follow the divisor's
 sign; signed zero follows the divisor; integer zero divisors produce zero and
 floating-point zero divisors produce NaN; complex inputs are rejected.
-`pow_promoted` broadcasts mixed real numeric tensors and validates its explicit
-output dtype against the operation's NumPy result dtype: numeric pairs use
-`promote_types`, while boolean pairs return `int8`. Integer powers retain
+`pow_promoted` broadcasts mixed real numeric or complex tensors and validates
+its explicit output dtype against the operation's NumPy result dtype: numeric
+pairs use `promote_types`, while boolean pairs return `int8`. Integer powers retain
 exact-width wrapping arithmetic and reject negative integer exponents. Floating
-results preserve IEEE special values and signed zero. Complex and string inputs
-are unsupported; 64-bit integer operands are rejected when promotion requires a
+results preserve IEEE special values and signed zero. Complex operands return
+complex128 and use the principal branch, including signed-zero branch cuts and
+zero, NaN, infinity, overflow-safe magnitude cases. String inputs are
+unsupported; 64-bit integer operands are rejected when promotion requires a
 floating result to avoid silent precision loss.
 `float_power_promoted` provides the NumPy `float_power` contract for real
 numeric and boolean tensor pairs: it always returns f64, including for f32
@@ -338,10 +340,10 @@ See
 [gradient tests](../autograd_tests/gates_remainder_test.v), and
 [dtype conversion tutorial](./TUTORIAL_FIRST_STEPS.md#numeric-dtype-conversion).
 
-**Remaining ufunc gaps:** complex `pow` remains unsupported. Unary `abs`/`sign`
-and multi-output `frexp`/`modf` have reference-driven coverage for supported
-dtypes, signed zero, non-finite values, scalar and empty shapes, and strided
-logical order; continue expanding the dtype/special-value cross-product.
+**Remaining ufunc gaps:** continue expanding differential coverage for unary
+`abs`/`sign` and multi-output `frexp`/`modf` across the supported dtype and
+special-value cross-product. These operations already cover signed zero,
+non-finite values, scalar and empty shapes, and strided logical order.
 Promoted `float_power`
 now covers real numeric and boolean tensor pairs, broadcasting, empty and
 scalar-shaped inputs, negative integer exponents, and IEEE edge cases.
