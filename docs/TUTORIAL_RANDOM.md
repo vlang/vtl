@@ -42,6 +42,7 @@ validation_mask := validation_rng.bernoulli(0.8, [128])!
 waiting_times := validation_rng.geometric(0.1, [128])!
 training_indices := vtl.from_1d([0, 1, 2, 3, 4, 5, 6, 7])!
 batch_indices := training_rng.choice[int](training_indices, 4, false)!
+rank_samples := training_rng.zipf(4.0, [128])!
 sampling_weights := vtl.from_1d([1.0, 1.0, 3.0, 1.0, 1.0, 1.0, 1.0, 1.0])!
 weighted_indices := training_rng.choice_weighted[int](training_indices, sampling_weights, 4, true)!
 epoch_order := training_rng.permutation(8)!
@@ -71,6 +72,9 @@ shape)` returns the positive number of Bernoulli trials up to the first success.
 `choice(population, size, replace)` samples from the population in flattened
 logical order and can enforce unique sampled positions. `permutation(size)`
 returns every integer from zero to `size - 1` exactly once in a seeded order.
+`zipf(exponent, shape)` samples positive integer ranks with probability
+proportional to `rank^(-exponent)`; the finite exponent must be greater than
+one, and samples are bounded by the platform's maximum `int`.
 `choice_weighted(population, weights, size, replace)` samples in proportion to
 finite non-negative weights and can sample without replacement.
 `multinomial(trials, probabilities, sample_shape)` returns one count per
@@ -136,9 +140,9 @@ data-pipeline example in
 [`examples/random_generator/main.v`](../examples/random_generator/main.v).
 
 VTL also provides global tensor constructors for uniform range, normal,
-Bernoulli, binomial, geometric, hypergeometric, von Mises, exponential, Poisson,
-Weibull, lognormal, Gamma, Beta, Dirichlet, chi-square, Student's t, and F
-distributions.
+Bernoulli, binomial, geometric, hypergeometric, Zipf, von Mises, exponential,
+Poisson, Weibull, lognormal, Gamma, Beta, Dirichlet, chi-square, Student's t,
+and F distributions.
 The global hypergeometric API uses the same population parameters:
 
 ```v

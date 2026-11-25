@@ -749,6 +749,18 @@ pub fn (mut generator RandomGenerator) geometric(probability f64, shape []int) !
 	return result
 }
 
+// zipf samples positive integers from a Zipf distribution on this generator's
+// independent stream. The exponent must be finite and greater than one.
+pub fn (mut generator RandomGenerator) zipf(exponent f64, shape []int) !&Tensor[int] {
+	validate_zipf_exponent(exponent)!
+	mut values := []int{len: size_from_shape(shape)}
+	mut rng := generator.rng
+	for i in 0 .. values.len {
+		values[i] = sample_zipf(exponent, mut rng)!
+	}
+	return from_array[int](values, shape)
+}
+
 // poisson returns integer event counts with the given finite, non-negative
 // expected rate using this generator's independent stream.
 pub fn (mut generator RandomGenerator) poisson(lambda f64, shape []int) !&Tensor[int] {
@@ -1404,6 +1416,17 @@ pub fn geometric(probability f64, shape []int, params TensorData) !&Tensor[int] 
 	return result
 }
 
+// zipf samples positive integers from a Zipf distribution on VTL's global RNG.
+pub fn zipf(exponent f64, shape []int, params TensorData) !&Tensor[int] {
+	validate_zipf_exponent(exponent)!
+	mut result := zeros[int](shape, params)
+	mut rng := rand.get_current_rng()
+	for i in 0 .. result.size {
+		result.set_nth(i, sample_zipf(exponent, mut rng)!)
+	}
+	return result
+}
+
 // negative_binomial counts failures before n successes on VTL's global
 // random stream. n may be any finite positive real value.
 pub fn negative_binomial(n f64, probability f64, shape []int, params TensorData) !&Tensor[int] {
@@ -1429,6 +1452,36 @@ fn validate_geometric_probability(probability f64) ! {
 		0) {
 		return error('geometric: probability must be finite and in (0, 1]')
 	}
+}
+
+fn validate_zipf_exponent(exponent f64) ! {
+	if exponent <= 1 || math.is_nan(exponent) || math.is_inf(exponent, 0) {
+		return error('zipf: exponent must be finite and greater than one')
+	}
+}
+
+fn sample_zipf(exponent f64, mut rng &rand.PRNG) !int {
+	if exponent >= 1025 {
+		// Avoid overflow in 2^(a-1); the probability of a value above one is negligible.
+		return 1
+	}
+	exponent_minus_one := exponent - 1.0
+	b := math.pow(2.0, exponent_minus_one)
+	minimum_uniform := math.pow(f64(max_int), -exponent_minus_one)
+	for _ in 0 .. 10000 {
+		u01 := rng.f64_in_range(0.0, 1.0)!
+		u := u01 * minimum_uniform + (1.0 - u01)
+		v := rng.f64_in_range(0.0, 1.0)!
+		x := math.floor(math.pow(u, -1.0 / exponent_minus_one))
+		if x >= f64(max_int) || x < 1.0 {
+			continue
+		}
+		t := math.pow(1.0 + 1.0 / x, exponent_minus_one)
+		if v * x * (t - 1.0) / (b - 1.0) <= t / b {
+			return int(x)
+		}
+	}
+	return error('zipf: rejection sampler did not converge')
 }
 
 fn geometric_sample(probability f64, uniform_value f64) int {

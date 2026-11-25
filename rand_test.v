@@ -246,6 +246,35 @@ fn test_global_multivariate_hypergeometric_is_seeded_and_validated() ! {
 	}
 }
 
+fn test_global_zipf_is_seeded_and_matches_moments() ! {
+	random_seed(753)
+	values := zipf(4.0, [8192], TensorData{})!
+	random_seed(753)
+	assert values.array_equal(zipf(4.0, [8192], TensorData{})!)
+	mut total := 0
+	mut ones := 0
+	for value in values.to_array() {
+		assert value >= 1
+		total += value
+		if value == 1 {
+			ones++
+		}
+	}
+	assert math.abs(f64(total) / f64(values.size) - 1.1106265353261488) < 0.03
+	assert math.abs(f64(ones) / f64(values.size) - 0.9239384029215902) < 0.015
+	assert zipf(1025.0, [4], TensorData{})!.to_array() == [1, 1, 1, 1]
+	assert zipf(4.0, [0], TensorData{})!.shape == [0]
+	if _ := zipf(1.0, [1], TensorData{}) {
+		assert false, 'zipf must reject an exponent at or below one'
+	}
+	if _ := zipf(math.nan(), [1], TensorData{}) {
+		assert false, 'zipf must reject a NaN exponent'
+	}
+	if _ := zipf(math.inf(1), [1], TensorData{}) {
+		assert false, 'zipf must reject an infinite exponent'
+	}
+}
+
 fn test_global_statistical_distributions_are_seeded_and_validated() ! {
 	random_seed(702)
 	gamma_samples := gamma(2.0, 3.0, [4096], TensorData{})!

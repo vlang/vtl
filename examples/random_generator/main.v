@@ -9,6 +9,7 @@ fn main() {
 	training_features := training_rng.normal([4, 3], vtl.NormalTensorData{ mu: 0.0, sigma: 1.0 })!
 	validation_mask := validation_rng.bernoulli(0.75, [4])!
 	waiting_times := validation_rng.geometric(0.1, [4])!
+	rank_samples := training_rng.zipf(4.0, [4])!
 	training_indices := vtl.from_1d([0, 1, 2, 3, 4, 5, 6, 7])!
 	batch_indices := training_rng.choice[int](training_indices, 4, false)!
 	weights := vtl.from_1d([1.0, 1.0, 3.0, 1.0, 1.0, 1.0, 1.0, 1.0])!
@@ -59,6 +60,7 @@ fn main() {
 	println('Training feature mean: ${stats.mean(training_features)}')
 	println('Validation mask: ${validation_mask.to_array()}')
 	println('Validation waiting times: ${waiting_times.to_array()}')
+	println('Power-law rank samples: ${rank_samples.to_array()}')
 	println('Sampled training indices: ${batch_indices.to_array()}')
 	println('Weighted training indices: ${weighted_indices.to_array()}')
 	println('Multinomial class counts: ${class_counts.to_array()}')

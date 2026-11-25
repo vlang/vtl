@@ -180,6 +180,37 @@ fn test_random_generator_supports_multivariate_hypergeometric_sampling() ! {
 	replay.free()
 }
 
+fn test_random_generator_zipf_is_seeded_and_matches_moments() ! {
+	mut generator := new_random_generator(753)
+	values := generator.zipf(4.0, [8192])!
+	mut total := 0
+	mut ones := 0
+	for value in values.to_array() {
+		assert value >= 1
+		total += value
+		if value == 1 {
+			ones++
+		}
+	}
+	assert math.abs(f64(total) / f64(values.size) - 1.1106265353261488) < 0.03
+	assert math.abs(f64(ones) / f64(values.size) - 0.9239384029215902) < 0.015
+	mut replay := new_random_generator(753)
+	assert values.array_equal(replay.zipf(4.0, [8192])!)
+	assert generator.zipf(1025.0, [4])!.to_array() == [1, 1, 1, 1]
+	assert generator.zipf(4.0, [0])!.shape == [0]
+	if _ := generator.zipf(1.0, [1]) {
+		assert false, 'zipf must reject an exponent at or below one'
+	}
+	if _ := generator.zipf(math.nan(), [1]) {
+		assert false, 'zipf must reject a NaN exponent'
+	}
+	if _ := generator.zipf(math.inf(1), [1]) {
+		assert false, 'zipf must reject an infinite exponent'
+	}
+	generator.free()
+	replay.free()
+}
+
 fn test_random_generator_cauchy_is_seeded_and_matches_quartiles() ! {
 	mut generator := new_random_generator(4242)
 	values := generator.cauchy(1.0, 2.0, [4096])!
