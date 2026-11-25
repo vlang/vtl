@@ -125,6 +125,14 @@ fn test_array_api_statistical_ufuncs() ! {
 	assert quantile(input, 0.75)! == 3.25
 }
 
+fn test_array_api_axis_statistical_ufuncs() ! {
+	input := vtl.from_2d[f64]([[1.0, 2.0], [3.0, 4.0]])!
+	assert std_axis(input, 0, 0, false)!.to_array() == [1.0, 1.0]
+	assert var_axis(input, 1, 0, false)!.to_array() == [0.25, 0.25]
+	assert median_axis(input, 0, true)!.to_array() == [2.0, 3.0]
+	assert quantile_axis(input, 0.5, 1, true)!.to_array() == [1.5, 3.5]
+}
+
 fn test_array_api_reductions_cover_common_scalar_operations() {
 	input := vtl.from_2d[int]([[1, 2], [3, 4]])!
 

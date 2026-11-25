@@ -177,6 +177,29 @@ pub fn quantile[T](array &vtl.Tensor[T], q f64) !f64 {
 	return stats.quantile_linear(array, q)
 }
 
+// std_axis reduces standard deviation along one axis.
+pub fn std_axis[T vtl.Real](array &vtl.Tensor[T], axis int, ddof int, keepdims bool) !&vtl.Tensor[f64] {
+	return stats.std_along_axis_as[T, f64](array, axis, ddof, keepdims)
+}
+
+// var_axis reduces variance along one axis.
+pub fn var_axis[T vtl.Real](array &vtl.Tensor[T], axis int, ddof int, keepdims bool) !&vtl.Tensor[f64] {
+	return stats.variance_along_axis_as[T, f64](array, axis, ddof, keepdims)
+}
+
+// median_axis reduces median along one axis.
+pub fn median_axis[T](array &vtl.Tensor[T], axis int, keepdims bool) !&vtl.Tensor[f64] {
+	return stats.median_axis_keepdims(array, axis, keepdims)
+}
+
+// quantile_axis reduces a linear-interpolated quantile along one axis.
+pub fn quantile_axis[T](array &vtl.Tensor[T], q f64, axis int, keepdims bool) !&vtl.Tensor[f64] {
+	if keepdims {
+		return stats.quantile_axis[T](array, q, axis)
+	}
+	return stats.quantile_axis_squeeze[T](array, q, axis)
+}
+
 // isclose compares broadcasted values using relative and absolute tolerances.
 pub fn isclose[T](a &vtl.Tensor[T], b &vtl.Tensor[T], rtol f64, atol f64, equal_nan bool) !&vtl.Tensor[bool] {
 	return a.isclose(b, rtol: rtol, atol: atol, equal_nan: equal_nan)
