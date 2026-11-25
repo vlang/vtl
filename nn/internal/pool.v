@@ -555,3 +555,63 @@ pub fn adaptive_maxpool3d_backward[T](grad_out &vtl.Tensor[T], input &vtl.Tensor
 	}
 	return d_input
 }
+
+fn pool1d_output_shape[T](input &vtl.Tensor[T], kernel int, padding int, stride int) ![]int {
+	if input.rank() != 3 {
+		return error('avgpool1d expects a 3D input tensor')
+	}
+	if kernel <= 0 || stride <= 0 || padding < 0 {
+		return error('avgpool1d expects positive kernel and stride and non-negative padding')
+	}
+	output_size := (input.shape[2] - kernel + 2 * padding) / stride + 1
+	if output_size <= 0 {
+		return error('avgpool1d parameters produce an empty output')
+	}
+	return [input.shape[0], input.shape[1], output_size]
+}
+
+pub fn avgpool1d_forward[T](input &vtl.Tensor[T], kernel int, padding int, stride int) !&vtl.Tensor[T] {
+	output_shape := pool1d_output_shape[T](input, kernel, padding, stride)!
+	mut output := vtl.zeros[T](output_shape)
+	for batch in 0 .. input.shape[0] {
+		for channel in 0 .. input.shape[1] {
+			for out_i in 0 .. output_shape[2] {
+				start := out_i * stride - padding
+				mut sum := f64(0)
+				for offset in 0 .. kernel {
+					index := start + offset
+					if index >= 0 && index < input.shape[2] {
+						sum += f64(input.get([batch, channel, index]))
+					}
+				}
+				output.set([batch, channel, out_i], vtl.cast[T](sum / f64(kernel)))
+			}
+		}
+	}
+	return output
+}
+
+pub fn avgpool1d_backward[T](grad_out &vtl.Tensor[T], input &vtl.Tensor[T], kernel int, padding int, stride int) !&vtl.Tensor[T] {
+	output_shape := pool1d_output_shape[T](input, kernel, padding, stride)!
+	if grad_out.shape != output_shape {
+		return error('avgpool1d backward gradient shape does not match expected output')
+	}
+	mut d_input := vtl.zeros_like[T](input)
+	for batch in 0 .. input.shape[0] {
+		for channel in 0 .. input.shape[1] {
+			for out_i in 0 .. output_shape[2] {
+				start := out_i * stride - padding
+				contribution := f64(grad_out.get([batch, channel, out_i])) / f64(kernel)
+				for offset in 0 .. kernel {
+					index := start + offset
+					if index >= 0 && index < input.shape[2] {
+						position := [batch, channel, index]
+						value := f64(d_input.get(position)) + contribution
+						d_input.set(position, vtl.cast[T](value))
+					}
+				}
+			}
+		}
+	}
+	return d_input
+}

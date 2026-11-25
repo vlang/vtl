@@ -75,3 +75,12 @@ fn test_adaptive_maxpool3d_forward_and_backward() ! {
 	gradient := adaptive_maxpool3d_backward[f64](grad_out, input, [1, 1, 1])!
 	assert gradient.to_array() == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]
 }
+
+fn test_avgpool1d_forward_and_backward() ! {
+	input := vtl.from_array[f64]([1.0, 2.0, 3.0, 4.0], [1, 1, 4])!
+	result := avgpool1d_forward[f64](input, 2, 0, 2)!
+	assert result.to_array() == [1.5, 3.5]
+	grad_out := vtl.ones[f64]([1, 1, 2])
+	gradient := avgpool1d_backward[f64](grad_out, input, 2, 0, 2)!
+	assert gradient.to_array() == [0.5, 0.5, 0.5, 0.5]
+}
