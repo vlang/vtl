@@ -91,7 +91,9 @@ jobs:
             echo '### NumPy reduced SVD'
             env HOME="$HOME" PATH="$PATH" VJOBS=2 OPENBLAS_NUM_THREADS=2 python3 vtl/benchmarks/vs_numpy/numpy_svd_baseline.py
             echo '## Contiguous sum and mean'
+            echo '### VTL contiguous sum/mean'
             run_v_benchmark vtl-stats vtl/benchmarks/vs_numpy/stats_bench.v
+            echo '### NumPy contiguous sum/mean'
             env HOME="$HOME" PATH="$PATH" VJOBS=2 OPENBLAS_NUM_THREADS=2 python3 vtl/benchmarks/vs_numpy/numpy_stats_baseline.py
             echo '## Cumulative sum and product'
             run_v_benchmark vtl-cumulative vtl/benchmarks/vs_numpy/cumulative_bench.v

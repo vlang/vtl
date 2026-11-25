@@ -27,6 +27,10 @@ SVD_SIZES = (16, 32, 64, 128)
 SVD_ROW = re.compile(
     r"^\s*(\d+)x(\d+)\s*\|\s*([0-9.eE+-]+)\s*\|\s*([0-9.eE+-]+)\s*$"
 )
+STAT_ROW = re.compile(
+    r"^\s*(vtl|numpy)_(sum|mean)\s*\|\s*(\d+)\s*\|\s*([0-9.eE+-]+)\s*\|\s*checksum=([0-9.eE+-]+)\s*$"
+)
+STAT_SIZES = (100_000, 1_000_000)
 
 
 def find_gflops(report: str, pattern: re.Pattern[str], label: str) -> float:
@@ -103,6 +107,85 @@ def svd_benchmark_group(report: str, backend: str, heading: str) -> dict[str, ob
     }
 
 
+def find_stat_rows(
+    report: str, heading: str, source: str
+) -> dict[tuple[str, int], tuple[float, float]]:
+    marker = f"### {heading}"
+    if report.count(marker) != 1:
+        raise ValueError(f"expected one {source} statistics section, found {report.count(marker)}")
+
+    section = report.split(marker, maxsplit=1)[1]
+    next_heading = re.search(r"^#{2,3} ", section, flags=re.MULTILINE)
+    if next_heading is not None:
+        section = section[: next_heading.start()]
+
+    results: dict[tuple[str, int], tuple[float, float]] = {}
+    for line in section.splitlines():
+        match = STAT_ROW.match(line)
+        if match is None or match.group(1) != source:
+            continue
+        operation, size = match.group(2), int(match.group(3))
+        mean_ms, checksum = float(match.group(4)), float(match.group(5))
+        key = (operation, size)
+        if size not in STAT_SIZES:
+            raise ValueError(f"unexpected {source} {operation} size {size}")
+        if key in results:
+            raise ValueError(f"duplicate {source} {operation} result for size {size}")
+        if not math.isfinite(mean_ms) or mean_ms <= 0.0:
+            raise ValueError(f"{source} {operation} time for size {size} must be finite and positive")
+        if not math.isfinite(checksum):
+            raise ValueError(f"{source} {operation} checksum for size {size} must be finite")
+        results[key] = (mean_ms, checksum)
+
+    expected = {(operation, size) for operation in ("sum", "mean") for size in STAT_SIZES}
+    if results.keys() != expected:
+        raise ValueError(
+            f"expected {source} sum/mean results for sizes {STAT_SIZES}, "
+            f"found {tuple(sorted(results))}"
+        )
+    return results
+
+
+def statistics_benchmark_group(report: str) -> dict[str, object]:
+    vtl_rows = find_stat_rows(report, "VTL contiguous sum/mean", "vtl")
+    numpy_rows = find_stat_rows(report, "NumPy contiguous sum/mean", "numpy")
+    results = []
+    for operation in ("sum", "mean"):
+        for size in STAT_SIZES:
+            vtl_ms, vtl_checksum = vtl_rows[(operation, size)]
+            numpy_ms, numpy_checksum = numpy_rows[(operation, size)]
+            checksum_error = abs(vtl_checksum - numpy_checksum)
+            checksum_tolerance = 1e-8 * max(1.0, abs(numpy_checksum))
+            if checksum_error > checksum_tolerance:
+                raise ValueError(
+                    f"{operation} checksum mismatch at size {size}: "
+                    f"VTL {vtl_checksum}, NumPy {numpy_checksum}"
+                )
+            slowdown = numpy_ms / vtl_ms
+            if not math.isfinite(slowdown):
+                raise ValueError(f"{operation} slowdown at size {size} is not finite")
+            results.append(
+                {
+                    "operation": operation,
+                    "dtype": "f64",
+                    "shape": [size],
+                    "vtl_mean_ms": vtl_ms,
+                    "numpy_mean_ms": numpy_ms,
+                    "numpy_over_vtl": slowdown,
+                    "vtl_checksum": vtl_checksum,
+                    "numpy_checksum": numpy_checksum,
+                    "checksum_abs_error": checksum_error,
+                    "correctness_status": "pass",
+                }
+            )
+    return {
+        "benchmark": "contiguous-statistics",
+        "unit": "ms",
+        "baseline": "numpy",
+        "results": results,
+    }
+
+
 def check_report(path: Path, annotate: bool = False, json_path: Path | None = None) -> int:
     try:
         report = path.read_text(encoding="utf-8")
@@ -141,6 +224,7 @@ def check_report(path: Path, annotate: bool = False, json_path: Path | None = No
                     },
                     svd_benchmark_group(report, "pure-v", "VTL reduced SVD pure-V"),
                     svd_benchmark_group(report, "lapacke", "VTL reduced SVD LAPACKE"),
+                    statistics_benchmark_group(report),
                 ],
             }
             json_path.write_text(

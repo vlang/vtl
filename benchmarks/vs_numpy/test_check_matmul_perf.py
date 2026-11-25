@@ -31,6 +31,16 @@ numpy gemm_f32 512x512 | 1.8 ms | 210.0 GFLOPS | 1.0
 32x32    | 0.5 | 20.0
 64x64    | 0.75 | 30.0
 128x128  | 1.0 | 40.0
+### VTL contiguous sum/mean
+vtl_sum | 100000 | 1.0 | checksum=500.0
+vtl_mean | 100000 | 1.0 | checksum=5.0
+vtl_sum | 1000000 | 2.0 | checksum=5000.0
+vtl_mean | 1000000 | 2.0 | checksum=5.0
+### NumPy contiguous sum/mean
+numpy_sum | 100000 | 0.5 | checksum=500.0
+numpy_mean | 100000 | 0.5 | checksum=5.0
+numpy_sum | 1000000 | 1.0 | checksum=5000.0
+numpy_mean | 1000000 | 1.0 | checksum=5.0
 """
 
 
@@ -108,7 +118,7 @@ class MatmulPerformanceBudgetTest(unittest.TestCase):
                     },
                 ],
             )
-            self.assertEqual(len(benchmarks), 3)
+            self.assertEqual(len(benchmarks), 4)
             self.assertEqual(benchmarks[1]["benchmark"], "reduced-svd")
             self.assertEqual(benchmarks[1]["baseline"], "numpy")
             self.assertEqual(benchmarks[1]["results"][0]["backend"], "pure-v")
@@ -116,12 +126,28 @@ class MatmulPerformanceBudgetTest(unittest.TestCase):
             self.assertEqual(benchmarks[1]["results"][0]["numpy_over_vtl"], 0.25)
             self.assertEqual(benchmarks[2]["results"][0]["backend"], "lapacke")
             self.assertEqual(benchmarks[2]["results"][0]["numpy_over_vtl"], 0.5)
+            self.assertEqual(benchmarks[3]["benchmark"], "contiguous-statistics")
+            self.assertEqual(len(benchmarks[3]["results"]), 4)
+            self.assertEqual(benchmarks[3]["results"][0]["correctness_status"], "pass")
 
     def test_json_requires_complete_svd_matrix(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             report_path = Path(directory) / "report.md"
             json_path = Path(directory) / "results.json"
             report_path.write_text(make_report(120.0, 200.0).replace("128x128  | 4.0 | 40.0\n", ""), encoding="utf-8")
+            with redirect_stdout(StringIO()), redirect_stderr(StringIO()):
+                self.assertEqual(check_report(report_path, json_path=json_path), 2)
+            self.assertFalse(json_path.exists())
+
+    def test_json_rejects_mismatched_stats_checksums(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            report_path = Path(directory) / "report.md"
+            json_path = Path(directory) / "results.json"
+            report = make_report(120.0, 200.0).replace(
+                "numpy_sum | 100000 | 0.5 | checksum=500.0",
+                "numpy_sum | 100000 | 0.5 | checksum=600.0",
+            )
+            report_path.write_text(report, encoding="utf-8")
             with redirect_stdout(StringIO()), redirect_stderr(StringIO()):
                 self.assertEqual(check_report(report_path, json_path=json_path), 2)
             self.assertFalse(json_path.exists())
