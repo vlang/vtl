@@ -96,6 +96,25 @@ roots := vtl.pow_promoted[complex.Complex, complex.Complex, complex.Complex](bas
 println(roots.to_array()) // approximately [+i, -i]
 ```
 
+For weak scalar exponents, use `pow_scalar_promoted` with the tensor as the base
+or `pow_scalar_left_promoted` with the scalar as the base. Both preserve
+operand order, apply scalar-aware dtype promotion, and support real or complex
+values. Boolean-to-boolean power returns `int8`; negative exponents with an
+integer result and conversions of 64-bit integers to floating output return
+errors.
+
+```v
+import vtl
+
+bases := vtl.from_1d[i8]([2, 3])!
+integer_powers := vtl.pow_scalar_promoted[i8, i8, i16](bases, 3)!
+println(integer_powers.to_array()) // [8, 27]
+
+exponents := vtl.from_1d[i16]([-2, 3])!
+fractional_powers := vtl.pow_scalar_left_promoted[f64, i16, f64](0.5, exponents)!
+println(fractional_powers.to_array()) // [4.0, 0.125]
+```
+
 ## Promoted exponential and logarithm
 
 `vtl.exp_promoted[R, T](values)` and `vtl.log_promoted[R, T](values)`, along

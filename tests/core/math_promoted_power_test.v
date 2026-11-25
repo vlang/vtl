@@ -210,3 +210,35 @@ fn test_pow_promoted_boolean_pair_returns_numpy_int8() ! {
 		assert false, 'boolean power results must use NumPy int8 dtype'
 	}
 }
+
+fn test_pow_weak_scalar_promoted_preserves_order_dtype_and_edge_cases() ! {
+	bases := vtl.from_1d[i8]([2, 3])!
+	right_scalar := vtl.pow_scalar_promoted[i8, i8, i16](bases, 3)!
+	assert right_scalar.to_array() == [i8(8), 27]
+
+	exponents := vtl.from_1d[i16]([-2, 3])!
+	left_scalar := vtl.pow_scalar_left_promoted[f64, i16, f64](0.5, exponents)!
+	assert left_scalar.dtype() == .float64
+	assert left_scalar.to_array() == [4.0, 0.125]
+
+	boolean_bases := vtl.from_1d([false, true])!
+	boolean_power := vtl.pow_scalar_promoted[i8, bool, bool](boolean_bases, true)!
+	assert boolean_power.dtype() == .int8
+	assert boolean_power.to_array() == [i8(0), 1]
+
+	complex_bases := vtl.from_1d[complex.Complex]([complex.complex(-1.0, 0.0)])!
+	complex_power := vtl.pow_scalar_promoted[complex.Complex, complex.Complex, f64](complex_bases, 0.5)!
+	assert math.abs(complex_power.get_nth(0).re) < 1e-12
+	assert math.abs(complex_power.get_nth(0).im - 1.0) < 1e-12
+
+	if _ := vtl.pow_scalar_promoted[f64, i8, i16](bases, 3) {
+		assert false, 'weak-scalar power must validate the requested output dtype'
+	}
+	if _ := vtl.pow_scalar_promoted[i16, i16, i16](exponents, -1) {
+		assert false, 'integer weak-scalar power must reject negative exponents'
+	}
+	large_integer := vtl.from_1d[i64]([9007199254740993])!
+	if _ := vtl.pow_scalar_promoted[f64, i64, f64](large_integer, 0.5) {
+		assert false, 'weak-scalar power must reject lossy 64-bit integer conversion'
+	}
+}

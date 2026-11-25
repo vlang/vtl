@@ -177,6 +177,10 @@ type `R`; VTL validates it against the inferred result dtype.
 Complex tensors keep `complex128` with real or complex scalars. A complex
 scalar promotes real numeric and boolean tensors to `complex128`; complex
 remainder is unsupported.
+`pow_scalar_promoted` and `pow_scalar_left_promoted` provide weak-scalar
+elementwise powers in either operand order. Boolean power returns `int8`;
+negative integer exponents and floating outputs that would lose a 64-bit
+integer operand are rejected.
 
 ```v
 import math.complex
@@ -194,6 +198,9 @@ assert fractional.to_array() == [10.5, -4.5]
 
 left_difference := vtl.subtract_scalar_left_promoted[f64, i8, int](12, integers)!
 assert left_difference.to_array() == [2.0, 17.0]
+
+powers := vtl.pow_scalar_promoted[i8, i8, i16](integers, 2)!
+assert powers.to_array() == [100, 25]
 
 complex_values := vtl.add_scalar_promoted[complex.Complex, f32, complex.Complex](values,
 	complex.complex(0.25, 0.5))!

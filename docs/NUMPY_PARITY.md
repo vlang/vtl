@@ -391,9 +391,13 @@ Promoted tensor-to-tensor result dtypes are:
 `pow_promoted` rejects 64-bit integer operands when `promote_types` selects a
 floating output, and rejects negative exponents when the result dtype is
 integer. Boolean pairs return `int8`, matching NumPy's result dtype.
+`pow_scalar_promoted` and `pow_scalar_left_promoted` apply weak-scalar
+promotion in both operand orders; they also return `int8` for boolean power,
+reject negative integer exponents, and reject lossy 64-bit integer conversion
+to floating outputs.
 
 The `add_scalar_promoted`, `subtract_scalar_promoted`,
-`multiply_scalar_promoted`, `divide_scalar_promoted`,
+`multiply_scalar_promoted`, `pow_scalar_promoted`, `divide_scalar_promoted`,
 `remainder_scalar_promoted`, and `fmod_scalar_promoted` variants, as well as
 the corresponding `floor_divide_scalar_promoted` form, apply NumPy-style
 weak scalar promotion with the tensor as the left operand. Matching
@@ -415,15 +419,16 @@ zero divisors.
 
 Weak-scalar result dtypes for the supported arithmetic are:
 
-| Array dtype | Scalar dtype | Add/subtract/multiply | True divide | Floor divide | Fmod | Remainder |
-|-------------|--------------|-----------------------|-------------|--------------|------|-----------|
-| f32 / f64 | real numeric or bool | array dtype | array dtype for floats | array dtype | array dtype | array dtype |
-| integer | in-range integer or bool | array dtype | f64 | array dtype | array dtype | array dtype |
-| integer | real float | f64 | f64 | f64 | f64 | f64 |
-| real numeric or bool | complex128 | complex128 | complex128 | unsupported | unsupported | unsupported |
-| complex128 | real numeric, bool, or complex128 | complex128 | complex128 | unsupported | unsupported | unsupported |
+| Array dtype | Scalar dtype | Add/subtract/multiply | Power | True divide | Floor divide | Fmod | Remainder |
+|-------------|--------------|-----------------------|-------|-------------|--------------|------|-----------|
+| f32 / f64 | real numeric or bool | array dtype | array dtype | array dtype for floats | array dtype | array dtype | array dtype |
+| integer | in-range integer or bool | array dtype | array dtype | f64 | array dtype | array dtype | array dtype |
+| integer | real float | f64 | f64 | f64 | f64 | f64 | f64 |
+| real numeric or bool | complex128 | complex128 | complex128 | complex128 | unsupported | unsupported | unsupported |
+| complex128 | real numeric, bool, or complex128 | complex128 | complex128 | complex128 | unsupported | unsupported | unsupported |
 
 An out-of-range integer scalar is an error rather than an implicit wrap.
+Boolean-to-boolean power returns `int8` rather than the boolean input dtype.
 `round_decimals` rounds real floating-point tensors to positive or negative
 decimal places using ties-to-even, matching NumPy `round` for the supported
 same-dtype inputs; integer tensors are copied unchanged. VTL preserves finite

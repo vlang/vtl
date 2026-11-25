@@ -493,6 +493,13 @@ pub fn multiply_scalar_promoted[R, T, U](a &Tensor[T], scalar U) !&Tensor[R] {
 	return scalar_promoted[R, T, U](a, scalar, .multiply)
 }
 
+// pow_scalar_promoted raises each tensor value to a weak numeric or complex
+// scalar exponent using NumPy-style promotion. R must match the inferred output
+// dtype; negative integer exponents are rejected.
+pub fn pow_scalar_promoted[R, T, U](a &Tensor[T], scalar U) !&Tensor[R] {
+	return scalar_promoted[R, T, U](a, scalar, .power)
+}
+
 // divide_scalar_promoted performs true division by a weak numeric scalar using
 // NumPy-style promotion. R must be the inferred result dtype.
 pub fn divide_scalar_promoted[R, T, U](a &Tensor[T], scalar U) !&Tensor[R] {
@@ -533,6 +540,13 @@ pub fn subtract_scalar_left_promoted[R, T, U](scalar U, a &Tensor[T]) !&Tensor[R
 // NumPy-style promotion.
 pub fn multiply_scalar_left_promoted[R, T, U](scalar U, a &Tensor[T]) !&Tensor[R] {
 	return scalar_left_promoted[R, T, U](scalar, a, .multiply)
+}
+
+// pow_scalar_left_promoted raises a weak numeric or complex scalar to each
+// tensor value using NumPy-style promotion. R must match the inferred output
+// dtype; negative integer exponents are rejected.
+pub fn pow_scalar_left_promoted[R, T, U](scalar U, a &Tensor[T]) !&Tensor[R] {
+	return scalar_left_promoted[R, T, U](scalar, a, .power)
 }
 
 // divide_scalar_left_promoted performs NumPy-style true division with a weak
@@ -777,14 +791,25 @@ fn scalar_promoted_impl[R, T, U](a &Tensor[T], scalar U, operation PromotedBinar
 		return result
 	} $else $if R is $int || R is $float {
 		array_dtype := dtype_of[T]()
-		result_dtype := weak_scalar_result_dtype[T, U](array_dtype, scalar)!
+		result_dtype := if operation == .power && array_dtype == .boolean && dtype_of[U]() == .boolean {
+			DType.boolean
+		} else {
+			weak_scalar_result_dtype[T, U](array_dtype, scalar)!
+		}
 		expected := if operation == .divide {
 			division_result_dtype(result_dtype)
+		} else if operation == .power && array_dtype == .boolean && dtype_of[U]() == .boolean {
+			DType.int8
 		} else {
 			result_dtype
 		}
 		if dtype_of[R]() != expected {
 			return error('output dtype ${dtype_of[R]()} does not match weak-scalar result dtype ${expected}')
+		}
+		if operation == .power && is_float_dtype(expected)
+			&& ((is_integer_dtype(array_dtype) && dtype_bits(array_dtype) >= 64)
+				|| (is_integer_dtype(dtype_of[U]()) && dtype_bits(dtype_of[U]()) >= 64)) {
+			return error('promoted power rejects 64-bit integer inputs with floating output to avoid precision loss')
 		}
 		left := cast_promoted_tensor_values[T, R](a)!
 		right_scalar := cast_promoted_value[U, R](scalar)
