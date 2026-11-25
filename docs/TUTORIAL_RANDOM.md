@@ -59,8 +59,10 @@ sampled_color_counts := training_rng.multivariate_hypergeometric(available_color
 arrival_counts := validation_rng.poisson(3.5, [128])!
 lifetimes := validation_rng.weibull(1.5, [128])!
 chi_square_samples := validation_rng.chi_square(5.0, [128])!
+noncentral_chi_square_samples := validation_rng.noncentral_chi_square(5.0, 2.0, [128])!
 test_statistics := validation_rng.student_t(7.0, [128])!
 variance_ratios := validation_rng.f_distribution(5.0, 10.0, [128])!
+noncentral_variance_ratios := validation_rng.noncentral_f(5.0, 10.0, 2.0, [128])!
 class_probabilities := vtl.from_1d([0.6, 0.3, 0.1])!
 class_counts := training_rng.multinomial(12, class_probabilities, [128])!
 waiting_durations := validation_rng.exponential(0.5, [128])!
@@ -115,6 +117,9 @@ returning only zeros.
 `f_distribution(numerator_df, denominator_df, shape)` sample the corresponding
 statistical distributions. Their degrees of freedom and Weibull shape must be
 finite and positive. All distributions advance only their owning generator.
+`noncentral_chi_square(df, noncentrality, shape)` and
+`noncentral_f(numerator_df, denominator_df, noncentrality, shape)` require
+finite positive degrees of freedom and finite non-negative noncentrality.
 `vonmises(location, concentration, shape)` wraps angles into `[-pi, pi)` and
 uses Best-Fisher rejection sampling, with the uniform limit for near-zero
 concentration. Its parameterization matches NumPy's
@@ -146,7 +151,8 @@ data-pipeline example in
 VTL also provides global tensor constructors for uniform range, normal,
 Bernoulli, binomial, geometric, hypergeometric, Zipf, logarithmic-series, von
 Mises, exponential, Poisson, Weibull, lognormal, Gamma, Beta, Dirichlet,
-chi-square, Student's t, and F distributions.
+chi-square, noncentral chi-square, Student's t, F, and noncentral F
+distributions.
 The global hypergeometric API uses the same population parameters:
 
 ```v
@@ -175,8 +181,11 @@ the same without-replacement semantics as the independent-generator method.
 
 `gamma(alpha, scale, shape,
 params)`, `beta(alpha, beta, shape, params)`, `chi_square(df, shape, params)`,
+`noncentral_chi_square(df, noncentrality, shape, params)`,
 `student_t(df, shape, params)`, and `f_distribution(numerator_df,
-denominator_df, shape, params)` use the global stream reset by `random_seed`.
+denominator_df, shape, params)` and
+`noncentral_f(numerator_df, denominator_df, noncentrality, shape, params)` use
+the global stream reset by `random_seed`.
 `lognormal(mean, sigma, shape, params)` samples exponentiated normal values;
 `dirichlet(alpha, sample_shape, params)` appends its category axis after the
 requested sample dimensions.

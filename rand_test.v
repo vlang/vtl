@@ -314,6 +314,66 @@ fn test_global_logseries_is_seeded_and_matches_moments() ! {
 	}
 }
 
+fn test_global_noncentral_distributions_are_seeded_and_match_moments() ! {
+	random_seed(755)
+	chi_samples := noncentral_chi_square(4.0, 3.0, [8192], TensorData{})!
+	mut chi_total := 0.0
+	for value in chi_samples.to_array() {
+		assert value >= 0 && !math.is_nan(value) && !math.is_inf(value, 0)
+		chi_total += value
+	}
+	assert math.abs(chi_total / 8192.0 - 7.0) < 0.2
+	random_seed(755)
+	assert chi_samples.array_equal(noncentral_chi_square(4.0, 3.0, [8192],
+		TensorData{})!)
+
+	random_seed(756)
+	small_df := noncentral_chi_square(0.5, 2.0, [8192], TensorData{})!
+	mut small_df_total := 0.0
+	for value in small_df.to_array() {
+		assert value >= 0 && !math.is_nan(value) && !math.is_inf(value, 0)
+		small_df_total += value
+	}
+	assert math.abs(small_df_total / 8192.0 - 2.5) < 0.16
+
+	random_seed(757)
+	central := noncentral_chi_square(4.0, 0.0, [64], TensorData{})!
+	random_seed(757)
+	assert central.array_equal(chi_square(4.0, [64], TensorData{})!)
+
+	random_seed(758)
+	f_samples := noncentral_f(5.0, 30.0, 4.0, [8192], TensorData{})!
+	mut f_total := 0.0
+	for value in f_samples.to_array() {
+		assert value >= 0 && !math.is_nan(value) && !math.is_inf(value, 0)
+		f_total += value
+	}
+	assert math.abs(f_total / 8192.0 - (30.0 * 9.0 / (5.0 * 28.0))) < 0.06
+	random_seed(758)
+	assert f_samples.array_equal(noncentral_f(5.0, 30.0, 4.0, [8192],
+		TensorData{})!)
+	random_seed(759)
+	central_f := noncentral_f(5.0, 30.0, 0.0, [64], TensorData{})!
+	random_seed(759)
+	assert central_f.array_equal(f_distribution(5.0, 30.0, [64], TensorData{})!)
+
+	if _ := noncentral_chi_square(0.0, 1.0, [1], TensorData{}) {
+		assert false, 'noncentral_chi_square must reject non-positive degrees of freedom'
+	}
+	if _ := noncentral_chi_square(2.0, -1.0, [1], TensorData{}) {
+		assert false, 'noncentral_chi_square must reject negative noncentrality'
+	}
+	if _ := noncentral_chi_square(2.0, math.nan(), [1], TensorData{}) {
+		assert false, 'noncentral_chi_square must reject NaN noncentrality'
+	}
+	if _ := noncentral_f(5.0, 0.0, 1.0, [1], TensorData{}) {
+		assert false, 'noncentral_f must reject non-positive denominator degrees of freedom'
+	}
+	if _ := noncentral_f(5.0, 30.0, -1.0, [1], TensorData{}) {
+		assert false, 'noncentral_f must reject negative noncentrality'
+	}
+}
+
 fn test_global_statistical_distributions_are_seeded_and_validated() ! {
 	random_seed(702)
 	gamma_samples := gamma(2.0, 3.0, [4096], TensorData{})!

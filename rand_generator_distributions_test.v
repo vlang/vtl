@@ -252,6 +252,105 @@ fn test_random_generator_logseries_is_seeded_and_matches_moments() ! {
 	replay.free()
 }
 
+fn test_random_generator_noncentral_distributions_are_seeded_and_match_moments() ! {
+	mut generator := new_random_generator(755)
+	chi_samples := generator.noncentral_chi_square(4.0, 3.0, [8192])!
+	mut chi_total := 0.0
+	for value in chi_samples.to_array() {
+		assert value >= 0 && !math.is_nan(value) && !math.is_inf(value, 0)
+		chi_total += value
+	}
+	assert math.abs(chi_total / 8192.0 - 7.0) < 0.2
+	mut replay := new_random_generator(755)
+	assert chi_samples.array_equal(replay.noncentral_chi_square(4.0, 3.0, [8192])!)
+
+	mut small_df_rng := new_random_generator(756)
+	small_df := small_df_rng.noncentral_chi_square(0.5, 2.0, [8192])!
+	mut small_df_total := 0.0
+	for value in small_df.to_array() {
+		assert value >= 0 && !math.is_nan(value) && !math.is_inf(value, 0)
+		small_df_total += value
+	}
+	assert math.abs(small_df_total / 8192.0 - 2.5) < 0.16
+
+	mut central_rng := new_random_generator(757)
+	central := central_rng.noncentral_chi_square(4.0, 0.0, [64])!
+	mut chi_rng := new_random_generator(757)
+	assert central.array_equal(chi_rng.chi_square(4.0, [64])!)
+
+	mut f_rng := new_random_generator(758)
+	f_samples := f_rng.noncentral_f(5.0, 30.0, 4.0, [8192])!
+	mut f_total := 0.0
+	for value in f_samples.to_array() {
+		assert value >= 0 && !math.is_nan(value) && !math.is_inf(value, 0)
+		f_total += value
+	}
+	assert math.abs(f_total / 8192.0 - (30.0 * 9.0 / (5.0 * 28.0))) < 0.06
+	mut f_replay := new_random_generator(758)
+	assert f_samples.array_equal(f_replay.noncentral_f(5.0, 30.0, 4.0, [8192])!)
+	mut central_f_rng := new_random_generator(759)
+	central_f := central_f_rng.noncentral_f(5.0, 30.0, 0.0, [64])!
+	mut f_distribution_rng := new_random_generator(759)
+	assert central_f.array_equal(f_distribution_rng.f_distribution(5.0, 30.0, [64])!)
+
+	if _ := generator.noncentral_chi_square(0.0, 1.0, [1]) {
+		assert false, 'noncentral_chi_square must reject non-positive degrees of freedom'
+	}
+	if _ := generator.noncentral_chi_square(2.0, -1.0, [1]) {
+		assert false, 'noncentral_chi_square must reject negative noncentrality'
+	}
+	if _ := generator.noncentral_chi_square(2.0, math.nan(), [1]) {
+		assert false, 'noncentral_chi_square must reject NaN noncentrality'
+	}
+	if _ := generator.noncentral_f(5.0, 0.0, 1.0, [1]) {
+		assert false, 'noncentral_f must reject non-positive denominator degrees of freedom'
+	}
+	if _ := generator.noncentral_f(5.0, 30.0, -1.0, [1]) {
+		assert false, 'noncentral_f must reject negative noncentrality'
+	}
+	generator.free()
+	replay.free()
+	small_df_rng.free()
+	central_rng.free()
+	chi_rng.free()
+	f_rng.free()
+	f_replay.free()
+	central_f_rng.free()
+	f_distribution_rng.free()
+}
+
+fn test_random_generator_distribution_calls_do_not_interfere_across_streams() ! {
+	mut affected := new_random_generator(760)
+	mut control := new_random_generator(760)
+	mut other := new_random_generator(761)
+
+	expected_zipf := control.zipf(4.0, [16])!
+	_ := other.zipf(3.0, [32])!
+	random_seed(762)
+	_ := zipf(4.0, [32], TensorData{})!
+	assert expected_zipf.array_equal(affected.zipf(4.0, [16])!)
+
+	expected_logseries := control.logseries(0.5, [16])!
+	_ := other.logseries(0.2, [32])!
+	_ := logseries(0.5, [32], TensorData{})!
+	assert expected_logseries.array_equal(affected.logseries(0.5, [16])!)
+
+	expected_chi_square := control.noncentral_chi_square(4.0, 3.0, [16])!
+	_ := other.noncentral_chi_square(4.0, 2.0, [32])!
+	_ := noncentral_chi_square(4.0, 3.0, [32], TensorData{})!
+	assert expected_chi_square.array_equal(affected.noncentral_chi_square(4.0, 3.0,
+		[16])!)
+
+	expected_f := control.noncentral_f(5.0, 30.0, 4.0, [16])!
+	_ := other.noncentral_f(5.0, 20.0, 3.0, [32])!
+	_ := noncentral_f(5.0, 30.0, 4.0, [32], TensorData{})!
+	assert expected_f.array_equal(affected.noncentral_f(5.0, 30.0, 4.0, [16])!)
+
+	affected.free()
+	control.free()
+	other.free()
+}
+
 fn test_random_generator_cauchy_is_seeded_and_matches_quartiles() ! {
 	mut generator := new_random_generator(4242)
 	values := generator.cauchy(1.0, 2.0, [4096])!

@@ -36,8 +36,10 @@ fn main() {
 	arrival_counts := validation_rng.poisson(3.5, [4])!
 	lifetimes := validation_rng.weibull(1.5, [4])!
 	chi_square_samples := validation_rng.chi_square(5.0, [4])!
+	noncentral_chi_square_samples := validation_rng.noncentral_chi_square(5.0, 2.0, [4])!
 	test_statistics := validation_rng.student_t(7.0, [4])!
 	variance_ratios := validation_rng.f_distribution(5.0, 10.0, [4])!
+	noncentral_variance_ratios := validation_rng.noncentral_f(5.0, 10.0, 2.0, [4])!
 	waiting_durations := validation_rng.exponential(0.5, [4])!
 	extreme_value_noise := training_rng.gumbel(0.0, 1.0, [4])!
 	robust_noise := validation_rng.laplace(0.0, 0.05, [4])!
@@ -81,8 +83,10 @@ fn main() {
 	println('Poisson arrival counts: ${arrival_counts.to_array()}')
 	println('Weibull lifetimes: ${lifetimes.to_array()}')
 	println('Chi-square samples: ${chi_square_samples.to_array()}')
+	println('Noncentral chi-square samples: ${noncentral_chi_square_samples.to_array()}')
 	println('Student t samples: ${test_statistics.to_array()}')
 	println('F-distribution ratios: ${variance_ratios.to_array()}')
+	println('Noncentral F-distribution ratios: ${noncentral_variance_ratios.to_array()}')
 	println('Exponential waiting durations: ${waiting_durations.to_array()}')
 	println('Gumbel extreme-value noise: ${extreme_value_noise.to_array()}')
 	println('Laplace robust noise: ${robust_noise.to_array()}')

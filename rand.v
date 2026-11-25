@@ -839,6 +839,19 @@ pub fn (mut generator RandomGenerator) chi_square(degrees_of_freedom f64, shape 
 	return from_array[f64](values, shape)
 }
 
+// noncentral_chi_square returns samples from a noncentral chi-square
+// distribution using this generator's independent stream.
+pub fn (mut generator RandomGenerator) noncentral_chi_square(degrees_of_freedom f64, noncentrality f64, shape []int) !&Tensor[f64] {
+	validate_noncentral_distribution_parameters(degrees_of_freedom, noncentrality,
+		'noncentral_chi_square')!
+	mut rng := generator.rng
+	mut values := []f64{len: size_from_shape(shape)}
+	for i in 0 .. values.len {
+		values[i] = sample_noncentral_chi_square(degrees_of_freedom, noncentrality, mut rng)!
+	}
+	return from_array[f64](values, shape)
+}
+
 // student_t returns samples from the standard Student's t distribution.
 pub fn (mut generator RandomGenerator) student_t(degrees_of_freedom f64, shape []int) !&Tensor[f64] {
 	validate_degrees_of_freedom(degrees_of_freedom, 'student_t')!
@@ -867,6 +880,23 @@ pub fn (mut generator RandomGenerator) f_distribution(numerator_df f64, denomina
 		denominator := sample_gamma(denominator_df / 2, 2, mut rng)!
 		if denominator <= 0 {
 			return error('f_distribution: sampled denominator underflowed to zero')
+		}
+		values[i] = (numerator / numerator_df) / (denominator / denominator_df)
+	}
+	return from_array[f64](values, shape)
+}
+
+// noncentral_f returns samples from a noncentral F distribution.
+pub fn (mut generator RandomGenerator) noncentral_f(numerator_df f64, denominator_df f64, noncentrality f64, shape []int) !&Tensor[f64] {
+	validate_degrees_of_freedom(denominator_df, 'noncentral_f')!
+	validate_noncentral_distribution_parameters(numerator_df, noncentrality, 'noncentral_f')!
+	mut rng := generator.rng
+	mut values := []f64{len: size_from_shape(shape)}
+	for i in 0 .. values.len {
+		numerator := sample_noncentral_chi_square(numerator_df, noncentrality, mut rng)!
+		denominator := sample_gamma(denominator_df / 2, 2, mut rng)!
+		if denominator <= 0 {
+			return error('noncentral_f: sampled denominator underflowed to zero')
 		}
 		values[i] = (numerator / numerator_df) / (denominator / denominator_df)
 	}
@@ -1101,6 +1131,31 @@ fn sample_gamma(alpha f64, scale f64, mut rng &rand.PRNG) !f64 {
 		}
 	}
 	return error('gamma: rejection sampler did not converge')
+}
+
+fn validate_noncentral_distribution_parameters(degrees_of_freedom f64, noncentrality f64, distribution string) ! {
+	validate_degrees_of_freedom(degrees_of_freedom, distribution)!
+	if noncentrality < 0 || math.is_nan(noncentrality) || math.is_inf(noncentrality, 0) {
+		return error('${distribution}: noncentrality must be finite and non-negative')
+	}
+	if degrees_of_freedom <= 1 && noncentrality / 2 >= f64(max_int) {
+		return error('${distribution}: noncentrality is too large for the Poisson sampler')
+	}
+}
+
+fn sample_noncentral_chi_square(degrees_of_freedom f64, noncentrality f64, mut rng &rand.PRNG) !f64 {
+	if noncentrality == 0 {
+		return sample_gamma(degrees_of_freedom / 2, 2, mut rng)
+	}
+	if degrees_of_freedom > 1 {
+		central := sample_gamma((degrees_of_freedom - 1) / 2, 2, mut rng)!
+		normal_sample := rng.normal(config.NormalConfigStruct{})!
+		shifted := normal_sample + math.sqrt(noncentrality)
+		return central + shifted * shifted
+	}
+	poisson_count := sample_poisson(noncentrality / 2, mut rng)!
+	effective_degrees_of_freedom := degrees_of_freedom + 2 * f64(poisson_count)
+	return sample_gamma(effective_degrees_of_freedom / 2, 2, mut rng)
 }
 
 fn gamma_candidate(d f64, c f64, x f64, uniform_value f64) (f64, bool) {
@@ -1923,6 +1978,20 @@ pub fn chi_square(degrees_of_freedom f64, shape []int, params TensorData) !&Tens
 	return result
 }
 
+// noncentral_chi_square returns samples from a noncentral chi-square
+// distribution using VTL's global random stream.
+pub fn noncentral_chi_square(degrees_of_freedom f64, noncentrality f64, shape []int, params TensorData) !&Tensor[f64] {
+	validate_noncentral_distribution_parameters(degrees_of_freedom, noncentrality,
+		'noncentral_chi_square')!
+	mut result := zeros[f64](shape, params)
+	mut rng := rand.get_current_rng()
+	for i in 0 .. result.size {
+		result.set_nth(i, sample_noncentral_chi_square(degrees_of_freedom, noncentrality,
+			mut rng)!)
+	}
+	return result
+}
+
 // student_t returns samples from the standard Student's t distribution using
 // VTL's global random stream.
 pub fn student_t(degrees_of_freedom f64, shape []int, params TensorData) !&Tensor[f64] {
@@ -1950,6 +2019,24 @@ pub fn f_distribution(numerator_df f64, denominator_df f64, shape []int, params 
 		denominator := sample_gamma_global(denominator_df / 2, 2)!
 		if denominator <= 0 {
 			return error('f_distribution: sampled denominator underflowed to zero')
+		}
+		result.set_nth(i, (numerator / numerator_df) / (denominator / denominator_df))
+	}
+	return result
+}
+
+// noncentral_f returns samples from a noncentral F distribution using VTL's
+// global random stream.
+pub fn noncentral_f(numerator_df f64, denominator_df f64, noncentrality f64, shape []int, params TensorData) !&Tensor[f64] {
+	validate_degrees_of_freedom(denominator_df, 'noncentral_f')!
+	validate_noncentral_distribution_parameters(numerator_df, noncentrality, 'noncentral_f')!
+	mut result := zeros[f64](shape, params)
+	mut rng := rand.get_current_rng()
+	for i in 0 .. result.size {
+		numerator := sample_noncentral_chi_square(numerator_df, noncentrality, mut rng)!
+		denominator := sample_gamma(denominator_df / 2, 2, mut rng)!
+		if denominator <= 0 {
+			return error('noncentral_f: sampled denominator underflowed to zero')
 		}
 		result.set_nth(i, (numerator / numerator_df) / (denominator / denominator_df))
 	}

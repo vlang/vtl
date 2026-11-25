@@ -42,6 +42,12 @@ fn test_random_generator_snapshot_serializes_and_restores_exact_stream_state() !
 	mut restored_again := new_random_generator_from_state(state)!
 	assert generator.uniform(-1.0, 1.0, [16])!.array_equal(restored_again.uniform(-1.0,
 		1.0, [16])!)
+	assert generator.zipf(4.0, [16])!.array_equal(restored_again.zipf(4.0, [16])!)
+	assert generator.logseries(0.5, [16])!.array_equal(restored_again.logseries(0.5, [16])!)
+	assert generator.noncentral_chi_square(4.0, 2.0, [16])!.array_equal(restored_again.noncentral_chi_square(4.0,
+		2.0, [16])!)
+	assert generator.noncentral_f(5.0, 30.0, 2.0, [16])!.array_equal(restored_again.noncentral_f(5.0,
+		30.0, 2.0, [16])!)
 	if _ := new_random_generator_from_state(RandomGeneratorState{ version: 0 }) {
 		assert false, 'generator restore must reject unsupported snapshot versions'
 	}
