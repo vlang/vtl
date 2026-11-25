@@ -17,6 +17,7 @@ CIFAR examples for CI-safe checks.
 | [diag](./diag) | Construct and extract offset diagonals, including N-D diagonal views | `v run ./vtl/examples/diag/main.v` |
 | [kron](./kron) | Build NumPy-style Kronecker products from tensors of any rank | `v run ./vtl/examples/kron/main.v` |
 | [vander](./vander) | Build polynomial features from powers of a vector | `v run ./vtl/examples/vander/main.v` |
+| [polynomial_fit](./polynomial_fit) | Fit and evaluate a degree-2 polynomial with CPU `f64` tensors | `v run ./vtl/examples/polynomial_fit/main.v` |
 | [one_hot](./one_hot) | Encode integer class labels as one-hot tensors | `v run ./vtl/examples/one_hot/main.v` |
 | [complex_tensors](./complex_tensors) | Create `complex128` tensors and use elementwise arithmetic | `v run ./vtl/examples/complex_tensors/main.v` |
 | [einsum_complex](./einsum_complex) | Contract complex tensors with Einstein summation | `v run ./vtl/examples/einsum_complex/main.v` |
@@ -25,6 +26,7 @@ CIFAR examples for CI-safe checks.
 | [vtl_basic_usage](./vtl_basic_usage) | Tensor creation and basic operations | `v run ./vtl/examples/vtl_basic_usage/main.v` |
 | [vtl_vandermont](./vtl_vandermont) | Matrix construction and LA utilities | `v run ./vtl/examples/vtl_vandermont/main.v` |
 | [autograd_backprop](./autograd_backprop) | Manual autograd/backprop flow | `v run ./vtl/examples/autograd_backprop/main.v` |
+| [pytorch_migration](./pytorch_migration/main.v) | Compare a tensor/autograd example and differentiable `vmap` with familiar NumPy/PyTorch patterns | `v run ./vtl/examples/pytorch_migration/main.v` |
 | [autograd_gather](./autograd_gather) | Gather gradients with repeated-index accumulation | `v run ./vtl/examples/autograd_gather/main.v` |
 | [autograd_mixed_index](./autograd_mixed_index) | Backpropagate through mixed indexing with repeated coordinates | `v run ./vtl/examples/autograd_mixed_index/main.v` |
 | [autograd_nan_to_num](./autograd_nan_to_num) | Sanitize non-finite values and mask their gradients | `v run ./vtl/examples/autograd_nan_to_num/main.v` |
@@ -118,7 +120,7 @@ CIFAR examples for CI-safe checks.
 | [nn_gru](./nn_gru) | GRU sequence forward and autograd backward | CPU |
 | [nn_group_norm](./nn_group_norm) | Channel-first GroupNorm in Sequential with affine parameters | CPU |
 | [nn_rms_norm](./nn_rms_norm) | Trailing-dimension RMSNorm with optional autograd weight | CPU |
-| [sequential_inference_checkpoint.v](./sequential_inference_checkpoint.v) | Train a CPU Sequential model, reload weights, and infer | CPU |
+| [sequential_inference_checkpoint.v](./sequential_inference_checkpoint.v) | Train, save a CPU `f64` Sequential checkpoint, reload it, and infer | CPU |
 | [nn_mnist](./nn_mnist) | MNIST training path | Dataset download/cache |
 
 See the [CPU Sequential inference checkpoint guide](../docs/TUTORIAL_INFERENCE_CHECKPOINT.md)

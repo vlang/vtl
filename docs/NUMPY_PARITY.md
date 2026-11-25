@@ -18,7 +18,7 @@ tests, documentation, and examples where users need them.
 | Random streams and FFT parity | [#723](https://github.com/vlang/vtl/issues/723), [#724](https://github.com/vlang/vtl/issues/724) |
 | Array I/O formats | [#725][i725], [#726][i726], [#779][i779] |
 | Masked autograd and structured data | [#727](https://github.com/vlang/vtl/issues/727), [#728](https://github.com/vlang/vtl/issues/728) |
-| Backend benchmarks and learning examples | [#729](https://github.com/vlang/vtl/issues/729), [#730](https://github.com/vlang/vtl/issues/730) |
+| Backend benchmarks | [#729](https://github.com/vlang/vtl/issues/729) |
 | OpenCL compute and neural-network dispatch | [#750](https://github.com/vlang/vtl/issues/750) |
 | Sparse tensor operations | [#746](https://github.com/vlang/vtl/issues/746) |
 | Non-numeric dtypes and array interoperability | [#747](https://github.com/vlang/vtl/issues/747), [#748](https://github.com/vlang/vtl/issues/748) |
@@ -791,10 +791,16 @@ preserving numerical behavior.
 
 ### Learning and examples
 
-**Current:** autograd, neural networks, optimizers, datasets, and tutorials.
+**Current:** deterministic CPU examples cover polynomial fitting, differentiable
+functional transforms, mini-batch classification, and inference checkpoints.
+The [NumPy and classical ML migration tutorial](./TUTORIAL_NUMPY_ML_MIGRATION.md)
+links each workflow to a runnable example, expected output, and its supported
+semantics.
 
-**Remaining:** add end-to-end examples for classical ML, transforms, batching,
-checkpointing, and deployment.
+**Remaining:** broaden classical ML evaluation beyond the small polynomial
+example and define deployment formats beyond the limited CPU inference
+checkpoint. These examples do not establish full NumPy, scikit-learn, or
+production-deployment parity.
 
 The NumPy `.npy` format stores dtype, shape, and memory order alongside binary
 data; `.npz` is a ZIP container of `.npy` files. VTL's `.npz` reader supports

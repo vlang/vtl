@@ -1,12 +1,14 @@
 module main
 
 import os
+import rand
 import vtl
 import vtl.autograd
 import vtl.nn.models
 import vtl.nn.optimizers
 
 fn main() {
+	rand.seed([u32(42), u32(0)])
 	train_ctx := autograd.ctx[f64]()
 	mut model := models.sequential_from_ctx[f64](train_ctx)
 	model.input([2])
