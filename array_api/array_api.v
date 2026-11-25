@@ -118,22 +118,22 @@ pub fn clip[T](array &vtl.Tensor[T], min_value T, max_value T) !&vtl.Tensor[T] {
 }
 
 // sum reduces all elements to a scalar in the input dtype.
-pub fn sum[T](array &vtl.Tensor[T]) T {
+pub fn sum[T vtl.Real](array &vtl.Tensor[T]) T {
 	return stats.sum(array)
 }
 
 // prod reduces all elements to a product in the input dtype.
-pub fn prod[T](array &vtl.Tensor[T]) T {
+pub fn prod[T vtl.Real](array &vtl.Tensor[T]) T {
 	return stats.prod(array)
 }
 
 // min reduces all elements to their minimum in the input dtype.
-pub fn min[T](array &vtl.Tensor[T]) T {
+pub fn min[T vtl.Real](array &vtl.Tensor[T]) T {
 	return stats.min(array)
 }
 
 // max reduces all elements to their maximum in the input dtype.
-pub fn max[T](array &vtl.Tensor[T]) T {
+pub fn max[T vtl.Real](array &vtl.Tensor[T]) T {
 	return stats.max(array)
 }
 
@@ -149,7 +149,7 @@ pub fn any_[T](array &vtl.Tensor[T]) bool {
 }
 
 // mean reduces real numeric elements to an f64 scalar.
-pub fn mean[T](array &vtl.Tensor[T]) f64 {
+pub fn mean[T vtl.Real](array &vtl.Tensor[T]) f64 {
 	return stats.mean_as[T, f64](array)
 }
 

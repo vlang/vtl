@@ -11,6 +11,10 @@ conservative: an operation is listed only after its semantics have focused
 regression coverage. Unsupported operations are not re-exported from this
 namespace.
 
+Numeric reductions (`sum`, `prod`, `min`, `max`, and `mean`) accept VTL's
+`vtl.Real` constraint, so unsupported element types are rejected at compile
+time.
+
 ```v
 import vtl
 import vtl.array_api as xp
