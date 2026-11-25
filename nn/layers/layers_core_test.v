@@ -97,6 +97,18 @@ fn test_avgpool_backward_propagates_input_gradients() ! {
 	assert input.grad.to_array() == [0.25, 0.5, 0.25, 0.5, 1.0, 0.5, 0.25, 0.5, 0.25]
 }
 
+fn test_adaptive_avgpool_forward_and_backward() ! {
+	c := core_ctx[f64]()
+	input := core_variable[f64](c, [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0],
+		[1, 1, 3, 3])!
+	layer := adaptive_avgpool2d_layer[f64](c, [1, 3, 3], [2, 2])
+	assert layer.output_shape() == [1, 2, 2]
+	mut output := layer.forward(input)!
+	assert output.value.to_array() == [3.0, 4.0, 6.0, 7.0]
+	output.backprop()!
+	assert input.grad.to_array() == [0.25, 0.5, 0.25, 0.5, 1.0, 0.5, 0.25, 0.5, 0.25]
+}
+
 // Embedding layer: output shape and variables
 
 fn test_embedding_output_shape() {

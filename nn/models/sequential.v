@@ -181,6 +181,11 @@ pub fn (mut nn Sequential[T]) global_avgpool2d() {
 	nn.info.global_avgpool2d()
 }
 
+// adaptive_avgpool2d adds a fixed-output adaptive average-pooling layer.
+pub fn (mut nn Sequential[T]) adaptive_avgpool2d(output_size []int) {
+	nn.info.adaptive_avgpool2d(output_size)
+}
+
 // layer_norm adds a new LayerNorm layer to the network.
 pub fn (mut nn Sequential[T]) layer_norm(normalized_shape []int, config layers.LayerNormConfig) {
 	nn.info.layer_norm(normalized_shape, config)
