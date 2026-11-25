@@ -1112,6 +1112,22 @@
 
 </section>
 
+		<section id="maxpool3d" class="doc-node">
+			<div class="title"><h2>fn maxpool3d <a href="#maxpool3d">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/internal/layers.v#L114"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">maxpool3d</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> kernel <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> padding <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> stride <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span></code></pre>
+
+
+</section>
+
+		<section id="maxpool3d_backward" class="doc-node">
+			<div class="title"><h2>fn maxpool3d_backward <a href="#maxpool3d_backward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/internal/layers.v#L183"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">maxpool3d_backward</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> max_indices <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span><span class="token punctuation">,</span> grad_output <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
 		<section id="mish" class="doc-node">
 			<div class="title"><h2>fn mish <a href="#mish">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/internal/activation.v#L295"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <div class="attributes"><div class="attribute">@[inline]</div></div>
@@ -1151,6 +1167,22 @@
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token function">nll_backward</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>gradient <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> input <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> weight <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> ignore_index <span class="token builtin">int</span><span class="token punctuation">,</span> reduction <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
 <p>nll_backward computes the gradient of NLL w.r.t. input (log-probabilities).</p>
+
+</section>
+
+		<section id="poisson_nll" class="doc-node">
+			<div class="title"><h2>fn poisson_nll <a href="#poisson_nll">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/internal/loss.v#L951"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">poisson_nll</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> log_input <span class="token builtin">bool</span><span class="token punctuation">,</span> full <span class="token builtin">bool</span><span class="token punctuation">,</span> eps <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+<p>poisson_nll computes the mean Poisson negative log-likelihood.</p>
+
+</section>
+
+		<section id="poisson_nll_backward" class="doc-node">
+			<div class="title"><h2>fn poisson_nll_backward <a href="#poisson_nll_backward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/internal/loss.v#L981"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">poisson_nll_backward</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>gradient <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> input <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> log_input <span class="token builtin">bool</span><span class="token punctuation">,</span> eps <span class="token builtin">f64</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+
 
 </section>
 
@@ -1367,7 +1399,7 @@
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 25 Nov 2026 06:37:06</div>
+						<div class="footer">Powered by vdoc. Generated on: 25 Nov 2026 06:49:45</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_internal">README</a></li>
 <li class="open"><a href="#adaptive_avgpool1d_backward">fn adaptive_avgpool1d_backward</a>        <ul>
@@ -1703,6 +1735,12 @@
 <li class="open"><a href="#maxpool2d_backward_with_input">fn maxpool2d_backward_with_input</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#maxpool3d">fn maxpool3d</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#maxpool3d_backward">fn maxpool3d_backward</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#mish">fn mish</a>        <ul>
 </ul>
 </li>
@@ -1716,6 +1754,12 @@
 </ul>
 </li>
 <li class="open"><a href="#nll_backward">fn nll_backward</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#poisson_nll">fn poisson_nll</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#poisson_nll_backward">fn poisson_nll_backward</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#relu">fn relu</a>        <ul>

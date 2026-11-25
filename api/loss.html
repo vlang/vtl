@@ -342,6 +342,14 @@ loss_value<span class="token punctuation">.</span><span class="token function">b
 
 </section>
 
+		<section id="poisson_nll_loss" class="doc-node">
+			<div class="title"><h2>fn poisson_nll_loss <a href="#poisson_nll_loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/additional.v#L88"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">poisson_nll_loss</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>config <span class="token type_name">PoissonNLLLossConfig</span><span class="token punctuation">)</span> <span class="token module_">types</span><span class="token punctuation">.</span><span class="token type_name">Loss</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
 		<section id="sigmoid_cross_entropy_loss" class="doc-node">
 			<div class="title"><h2>fn sigmoid_cross_entropy_loss <a href="#sigmoid_cross_entropy_loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/sigmoid_cross_entropy.v#L13"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -407,7 +415,7 @@ loss_value<span class="token punctuation">.</span><span class="token function">b
 </section>
 
 		<section id="FocalLoss[T].loss" class="doc-node">
-			<div class="title"><h2>fn (FocalLoss[T]) loss <a href="#FocalLoss[T].loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/additional.v#L76"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (FocalLoss[T]) loss <a href="#FocalLoss[T].loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/additional.v#L109"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>l <span class="token operator">&amp;</span><span class="token type_name">FocalLoss</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">loss</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
 
@@ -467,6 +475,14 @@ loss_value<span class="token punctuation">.</span><span class="token function">b
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>l <span class="token operator">&amp;</span><span class="token type_name">NLLLoss</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">loss</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
 <p>loss exposes this operation as part of the public API.</p>
+
+</section>
+
+		<section id="PoissonNLLLoss[T].loss" class="doc-node">
+			<div class="title"><h2>fn (PoissonNLLLoss[T]) loss <a href="#PoissonNLLLoss[T].loss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/additional.v#L93"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>l <span class="token operator">&amp;</span><span class="token type_name">PoissonNLLLoss</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">loss</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> target <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+
 
 </section>
 
@@ -735,6 +751,30 @@ out <span class="token operator">:=</span> l<span class="token punctuation">.</s
 
 </section>
 
+		<section id="PoissonNLLLoss" class="doc-node">
+			<div class="title"><h2>struct PoissonNLLLoss <a href="#PoissonNLLLoss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/additional.v#L84"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token type_name">PoissonNLLLoss</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	config <span class="token type_name">PoissonNLLLossConfig</span>
+<span class="token punctuation">}</span></code></pre>
+
+
+</section>
+
+		<section id="PoissonNLLLossConfig" class="doc-node">
+			<div class="title"><h2>struct PoissonNLLLossConfig <a href="#PoissonNLLLossConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/additional.v#L77"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[params]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token type_name">PoissonNLLLossConfig</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	log_input <span class="token builtin">bool</span> <span class="token operator">=</span> <span class="token boolean">true</span>
+	full      <span class="token builtin">bool</span>
+	eps       <span class="token builtin">f64</span> <span class="token operator">=</span> <span class="token number">1e-8</span>
+<span class="token punctuation">}</span></code></pre>
+
+
+</section>
+
 		<section id="SigmoidCrossEntropyLoss" class="doc-node">
 			<div class="title"><h2>struct SigmoidCrossEntropyLoss <a href="#SigmoidCrossEntropyLoss">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/loss/sigmoid_cross_entropy.v#L10"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -782,7 +822,7 @@ result <span class="token operator">:=</span> objective<span class="token punctu
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 25 Nov 2026 06:37:06</div>
+						<div class="footer">Powered by vdoc. Generated on: 25 Nov 2026 06:49:45</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_loss">README</a></li>
 <li class="open"><a href="#bce_loss">fn bce_loss</a>        <ul>
@@ -828,6 +868,9 @@ result <span class="token operator">:=</span> objective<span class="token punctu
 </ul>
 </li>
 <li class="open"><a href="#nll_loss_with_options">fn nll_loss_with_options</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#poisson_nll_loss">fn poisson_nll_loss</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#sigmoid_cross_entropy_loss">fn sigmoid_cross_entropy_loss</a>        <ul>
@@ -886,6 +929,10 @@ result <span class="token operator">:=</span> objective<span class="token punctu
 </li>
 <li class="open"><a href="#NLLLoss[T].loss">type NLLLoss[T]</a>        <ul>
 <li><a href="#NLLLoss[T].loss">fn loss</a></li>
+</ul>
+</li>
+<li class="open"><a href="#PoissonNLLLoss[T].loss">type PoissonNLLLoss[T]</a>        <ul>
+<li><a href="#PoissonNLLLoss[T].loss">fn loss</a></li>
 </ul>
 </li>
 <li class="open"><a href="#SigmoidCrossEntropyLoss[T].loss">type SigmoidCrossEntropyLoss[T]</a>        <ul>
@@ -949,6 +996,12 @@ result <span class="token operator">:=</span> objective<span class="token punctu
 </ul>
 </li>
 <li class="open"><a href="#NLLLossOptions">struct NLLLossOptions</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#PoissonNLLLoss">struct PoissonNLLLoss</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#PoissonNLLLossConfig">struct PoissonNLLLossConfig</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#SigmoidCrossEntropyLoss">struct SigmoidCrossEntropyLoss</a>        <ul>
