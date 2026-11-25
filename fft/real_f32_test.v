@@ -75,6 +75,32 @@ fn test_real_f32_axis_and_nd_transforms_round_trip() ! {
 	}
 }
 
+fn test_real_f32_generic_and_dedicated_nd_dtype_contracts() ! {
+	input := vtl.from_array[f32]([1, 0, 0, 0, 1, 0, 0, 0], [2, 2, 2])!
+	generic_axis := rfft_axis[f32](input, -1)!
+	generic_nd := rfftn[f32](input)!
+	generic_2d := rfft2[f32](vtl.from_array[f32]([1, 0, 0, 0], [2, 2])!)!
+	assert typeof(generic_axis.get_nth(0).re).name == 'f64'
+	assert typeof(generic_nd.get_nth(0).re).name == 'f64'
+	assert typeof(generic_2d.get_nth(0).re).name == 'f64'
+
+	dedicated_axis := rfft_axis_f32(input, -1)!
+	dedicated_nd := rfftn_f32(input)!
+	dedicated_2d := rfft2_f32(vtl.from_array[f32]([1, 0, 0, 0], [2, 2])!)!
+	assert typeof(dedicated_axis.get_nth(0).re).name == 'f32'
+	assert typeof(dedicated_nd.get_nth(0).re).name == 'f32'
+	assert typeof(dedicated_2d.get_nth(0).re).name == 'f32'
+
+	generic_normalized := rfftn_norm[f32](input, .ortho)!
+	dedicated_normalized := rfftn_norm_f32(input, .ortho)!
+	assert typeof(generic_normalized.get_nth(0).re).name == 'f64'
+	assert typeof(dedicated_normalized.get_nth(0).re).name == 'f32'
+	generic_restored := irfftn(generic_normalized, input.shape)!
+	dedicated_restored := irfftn_f32(dedicated_normalized, input.shape)!
+	assert typeof(generic_restored.get_nth(0)).name == 'f64'
+	assert typeof(dedicated_restored.get_nth(0)).name == 'f32'
+}
+
 fn test_real_f32_fft_normalization_matches_numpy_modes() ! {
 	input := vtl.from_1d[f32]([1, 0, 0, 0])!
 	backward := rfft_norm_f32(input, .backward)!

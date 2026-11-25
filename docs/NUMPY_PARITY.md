@@ -703,10 +703,16 @@ f64 complex return type. Tests cover strided real f64/f32 and complex f32
 inputs, including offset views, against their contiguous logical-order
 equivalents. Paired real and complex FFT benchmarks now cover contiguous and
 stride-2 inputs at four sizes, with analytic error checks and repeated timings;
-the benchmark README records a reproducible 16,384-element comparison.
+the benchmark README records a reproducible 16,384-element comparison and
+matched batched-axis / three-dimensional f64 workloads.
+Generic real f32 transform and normalization wrappers return complex128, and
+their inverse wrappers return f64; dedicated `_f32` variants return complex32
+and f32 respectively. Tests cover these dtype contracts for selected-axis,
+2-D, and N-D transforms.
 
-**Remaining:** extend performance evidence to batched/N-D transforms and finish
-the dtype-promotion audit across all public FFT wrappers.
+**Remaining:** extend performance evidence to strided and f32 batched/N-D
+transforms, then finish the dtype-promotion audit across every public FFT
+wrapper.
 
 ### Random
 

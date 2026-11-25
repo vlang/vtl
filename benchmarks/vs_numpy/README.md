@@ -1016,6 +1016,39 @@ systemd-run --user --scope --quiet -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuot
 This benchmark reports measurements but does not claim a speedup before a
 matched run on the target machine.
 
+## Batched-axis and N-D real FFT
+
+This benchmark measures `rfft_axis` on a `[64, 512]` batched tensor and `rfftn`
+on a `[32, 32, 64]` tensor. The two programs use matching deterministic f64
+inputs, three warmups, seven timed batches, and 5 or 3 transforms per batch.
+Each reports a weighted spectrum checksum and maximum round-trip error. The
+timed operation includes plan creation and output allocation. Run three
+alternating process pairs for a local comparison, from `~/.vmodules`:
+
+```bash
+systemd-run --user --scope --quiet -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=1 \
+	v -no-parallel -prod -o /tmp/vtl-fft-nd-bench ./vtl/benchmarks/vs_numpy/fft_nd_bench.v
+systemd-run --user --scope -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=1 \
+	/tmp/vtl-fft-nd-bench
+systemd-run --user --scope --quiet -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% -- \
+	env OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 \
+	./vtl/benchmarks/vs_numpy/numpy_fft_nd_baseline.py
+```
+
+On 2026-11-25, three alternating process runs on an AMD Ryzen 9 5900X with V
+0.5.2 (`7f5b9a3`), GCC 16.2.1, VTL using VSL `d60f9c36`, and NumPy 2.5.5
+measured:
+
+| Transform | VTL median (range), us | NumPy median (range), us | VTL max round-trip error | NumPy max round-trip error |
+| --- | ---: | ---: | ---: | ---: |
+| Batched axis, `[64, 512]` | 268.213 (267.502-271.547) | 48.032 (48.006-48.959) | 1.110e-15 | 1.110e-15 |
+| N-D, `[32, 32, 64]` | 1450.163 (1447.281-1452.501) | 467.063 (466.335-469.571) | 1.332e-15 | 1.110e-15 |
+
+NumPy was 5.58x faster for the batched-axis case and 3.11x faster for the
+N-D case on this host. The weighted checksums agree within `3e-6` absolute;
+the small difference reflects floating-point reduction order. These results
+are narrow f64 CPU comparisons and do not establish overall parity.
+
 ### Reference large-array results
 
 On 2026-11-25, three alternating independent process runs per implementation
