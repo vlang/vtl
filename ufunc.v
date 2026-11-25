@@ -103,3 +103,21 @@ pub fn ufunc_reduceat[T](input &Tensor[T], indices []int, operation fn (T, T) T)
 	}
 	return output
 }
+
+// ufunc_at mutates flat logical positions in sequence. Repeated indices are
+// applied repeatedly, and updates may contain one broadcast value or one
+// value per index. Bounds are validated before the first mutation.
+pub fn ufunc_at[T](mut target &Tensor[T], indices []int, updates []T, operation fn (T, T) T) ! {
+	if updates.len != 1 && updates.len != indices.len {
+		return error('ufunc_at updates must contain one value or match index count')
+	}
+	for index in indices {
+		if index < 0 || index >= target.size() {
+			return error('ufunc_at index ${index} is out of bounds')
+		}
+	}
+	for i, index in indices {
+		update := updates[if updates.len == 1 { 0 } else { i }]
+		target.set_nth(index, operation(target.get_nth(index), update))
+	}
+}

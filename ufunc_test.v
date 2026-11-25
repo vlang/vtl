@@ -61,3 +61,18 @@ fn test_ufunc_outer_and_reduceat() ! {
 	})!
 	assert reduced.to_array() == [3.0, 3.0, 12.0]
 }
+
+fn test_ufunc_at_applies_repeated_indices_in_order_and_validates_atomically() ! {
+	mut target := from_array([1.0, 2.0, 3.0], [3])!
+	ufunc_at[f64](mut target, [1, 1, 2], [4.0, 5.0, 6.0], fn (a f64, b f64) f64 {
+		return a + b
+	})!
+	assert target.to_array() == [1.0, 11.0, 9.0]
+	ufunc_at[f64](mut target, [0, 3], [1.0], fn (a f64, b f64) f64 {
+		return a + b
+	}) or {
+		assert target.to_array() == [1.0, 11.0, 9.0]
+		return
+	}
+	assert false, 'ufunc_at must reject out-of-bounds indices'
+}

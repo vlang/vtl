@@ -38,8 +38,10 @@ For neural-network and framework-level gaps relative to PyTorch, see the
   `out` tensors and exact-shape `where` masks; masked entries preserve their
   preallocated output values. `ufunc_reduce` and `ufunc_accumulate` currently
   operate in logical flat row-major order and accept an explicit identity.
-  `ufunc_outer` and flattened `ufunc_reduceat` are also available. Broadcasting
-  operands/masks, casting modes, axis reductions, and indexed `at` remain open under
+  `ufunc_outer` and flattened `ufunc_reduceat` are also available.
+  `ufunc_at` performs sequential indexed mutation with repeated-index
+  accumulation and prevalidates bounds. Broadcasting operands/masks, casting
+  modes, and axis reductions remain open under
   [#783](https://github.com/vlang/vtl/issues/783).
 - A power-series `Polynomial` API with ascending coefficients, Horner
   evaluation, tensor evaluation, arithmetic, derivative/integral, real
