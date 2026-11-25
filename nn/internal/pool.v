@@ -674,3 +674,54 @@ pub fn maxpool1d_backward[T](grad_out &vtl.Tensor[T], input &vtl.Tensor[T], kern
 	}
 	return d_input
 }
+
+fn pool3d_output_shape[T](input &vtl.Tensor[T], kernel []int, padding []int, stride []int) ![]int {
+	if input.rank() != 5 || kernel.len != 3 || padding.len != 3 || stride.len != 3 {
+		return error('avgpool3d expects a 5D input and three kernel, padding, and stride values')
+	}
+	for i in 0 .. 3 {
+		if kernel[i] <= 0 || stride[i] <= 0 || padding[i] < 0 {
+			return error('avgpool3d expects positive kernel and stride and non-negative padding')
+		}
+	}
+	output := [
+		(input.shape[2] - kernel[0] + 2 * padding[0]) / stride[0] + 1,
+		(input.shape[3] - kernel[1] + 2 * padding[1]) / stride[1] + 1,
+		(input.shape[4] - kernel[2] + 2 * padding[2]) / stride[2] + 1,
+	]
+	if output.any(it <= 0) {
+		return error('avgpool3d parameters produce an empty output')
+	}
+	return [input.shape[0], input.shape[1], output[0], output[1], output[2]]
+}
+
+pub fn avgpool3d_forward[T](input &vtl.Tensor[T], kernel []int, padding []int, stride []int) !&vtl.Tensor[T] {
+	output_shape := pool3d_output_shape[T](input, kernel, padding, stride)!
+	mut output := vtl.zeros[T](output_shape)
+	for b in 0 .. input.shape[0] {
+		for c in 0 .. input.shape[1] {
+			for od in 0 .. output_shape[2] {
+				for oh in 0 .. output_shape[3] {
+					for ow in 0 .. output_shape[4] {
+						mut sum := f64(0)
+						for kd in 0 .. kernel[0] {
+							for kh in 0 .. kernel[1] {
+								for kw in 0 .. kernel[2] {
+									id := od * stride[0] - padding[0] + kd
+									ih := oh * stride[1] - padding[1] + kh
+									iw := ow * stride[2] - padding[2] + kw
+									if id >= 0 && id < input.shape[2] && ih >= 0 && ih < input.shape[3] && iw >= 0 && iw < input.shape[4] {
+										sum += f64(input.get([b, c, id, ih, iw]))
+									}
+								}
+							}
+						}
+						volume := kernel[0] * kernel[1] * kernel[2]
+						output.set([b, c, od, oh, ow], vtl.cast[T](sum / f64(volume)))
+					}
+				}
+			}
+		}
+	}
+	return output
+}

@@ -116,6 +116,13 @@ fn test_avgpool1d_padding_includes_zero_border_in_mean() ! {
 	assert gradient.to_array() == [0.6666666666666666, 0.6666666666666666]
 }
 
+fn test_avgpool3d_forward_supports_kernel_stride_and_padding() ! {
+	input := vtl.ones[f64]([1, 1, 2, 2, 2])
+	result := avgpool3d_forward[f64](input, [2, 2, 2], [0, 0, 0], [1, 1, 1])!
+	assert result.shape == [1, 1, 1, 1, 1]
+	assert result.to_array() == [1.0]
+}
+
 fn test_maxpool1d_ties_route_gradient_to_first_maximum() ! {
 	input := vtl.from_array[f64]([2.0, 2.0, 1.0, 0.0], [1, 1, 4])!
 	grad_out := vtl.ones[f64]([1, 1, 2])
