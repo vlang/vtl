@@ -47,6 +47,7 @@ weighted_indices := training_rng.choice_weighted[int](training_indices, sampling
 epoch_order := training_rng.permutation(8)!
 shuffled_rows := training_rng.permutation_tensor(training_features)!
 positive_noise := training_rng.gamma(2.0, 0.5, [128])!
+circular_angles := training_rng.vonmises(1.0, 2.0, [128])!
 beta_samples := training_rng.beta(2.0, 5.0, [128])!
 positive_scales := training_rng.lognormal(0.0, 0.25, [128])!
 event_counts := training_rng.binomial(12, 0.25, [128])!
@@ -101,25 +102,40 @@ returning only zeros.
 `f_distribution(numerator_df, denominator_df, shape)` sample the corresponding
 statistical distributions. Their degrees of freedom and Weibull shape must be
 finite and positive. All distributions advance only their owning generator.
+`vonmises(location, concentration, shape)` wraps angles into `[-pi, pi)` and
+uses Best-Fisher rejection sampling, with the uniform limit for near-zero
+concentration. Its parameterization matches NumPy's
+`Generator.vonmises(mu, kappa, size)` (`location = mu`,
+`concentration = kappa`); its random sequence is not cross-library identical.
 These methods return errors for invalid distribution parameters. Streams are
 reproducible with the same V/VTL versions, seed, and sequence of calls;
 cross-version compatibility is not guaranteed. See the complete data-pipeline
 example in [`examples/random_generator/main.v`](../examples/random_generator/main.v).
 
 VTL also provides global tensor constructors for uniform range, normal,
-Bernoulli, binomial, geometric, hypergeometric, exponential, Poisson, Weibull, lognormal,
-Gamma, Beta, Dirichlet, chi-square, Student's t, and F distributions.
+Bernoulli, binomial, geometric, hypergeometric, von Mises, exponential, Poisson,
+Weibull, lognormal, Gamma, Beta, Dirichlet, chi-square, Student's t, and F
+distributions.
 The global hypergeometric API uses the same population parameters:
 
 ```v
+import math
 import vtl
 
 vtl.random_seed(7)
 counts := vtl.hypergeometric(20, 80, 10, [8], vtl.TensorData{})!
+angles := vtl.vonmises(1.0, 2.0, [8], vtl.TensorData{})!
 for count in counts.to_array() {
 	assert count >= 0 && count <= 10
 }
+for angle in angles.to_array() {
+	assert angle >= -math.pi && angle < math.pi
+}
 ```
+
+`vtl.vonmises(location, concentration, shape, params)` samples circular values
+from the global stream, reset by `random_seed`; the location must be finite
+and concentration must be finite and non-negative.
 
 `gamma(alpha, scale, shape,
 params)`, `beta(alpha, beta, shape, params)`, `chi_square(df, shape, params)`,

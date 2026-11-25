@@ -11,11 +11,9 @@ tests, documentation, and examples where users need them.
 | Area | Issue |
 |------|-------|
 | Numeric promotion and tensor creation | [#717](https://github.com/vlang/vtl/issues/717), [#718](https://github.com/vlang/vtl/issues/718) |
-| Ufunc and elementwise math coverage | [#777](https://github.com/vlang/vtl/issues/777) |
-| Copy/view rules and indexing bounds | [#719](https://github.com/vlang/vtl/issues/719), [#720](https://github.com/vlang/vtl/issues/720) |
-| Reductions and complex support | [#721](https://github.com/vlang/vtl/issues/721), [#722](https://github.com/vlang/vtl/issues/722) |
-| Random streams and FFT parity | [#723](https://github.com/vlang/vtl/issues/723), [#724](https://github.com/vlang/vtl/issues/724) |
-| Array I/O formats | [#726][i726], [#779][i779] |
+| Reductions and complex support | [#722](https://github.com/vlang/vtl/issues/722) |
+| Random streams | [#723](https://github.com/vlang/vtl/issues/723) |
+| Array I/O formats | [#779][i779] |
 | Masked autograd and structured data | [#727](https://github.com/vlang/vtl/issues/727), [#728](https://github.com/vlang/vtl/issues/728) |
 | Backend benchmarks | [#729](https://github.com/vlang/vtl/issues/729) |
 | OpenCL compute and neural-network dispatch | [#750](https://github.com/vlang/vtl/issues/750) |
@@ -479,8 +477,8 @@ per-element closure and sum-type boxing. On this machine (1M f64, `-prod`)
 `exp` improved from 12.1 ms to 4.7 ms per iteration (NumPy: ~3.3 ms) and
 `sin` measures 15.5 ms against NumPy's ~12.8 ms.
 
-**Remaining:** audit unary/binary function families and complete the missing
-NumPy ufunc coverage in [#777](https://github.com/vlang/vtl/issues/777).
+**Remaining:** continue expanding differential coverage for unary `abs`/`sign`
+and multi-output `frexp`/`modf` across supported dtypes and special values.
 Promoted arithmetic still lacks broader operation coverage. Automatic
 output-dtype selection is not provided: callers select the statically typed
 result parameter, which VTL validates against the promotion contract in
@@ -726,7 +724,7 @@ complete the dtype audit across every public FFT wrapper.
 ### Random
 
 **Current:** global uniform, normal, Bernoulli, binomial, negative-binomial,
-geometric, hypergeometric,
+geometric, hypergeometric, von Mises,
 exponential, Gumbel, Laplace, Logistic, Cauchy, Wald (inverse Gaussian),
 Pareto, power, Rayleigh, triangular, Poisson,
 Weibull, lognormal, gamma, beta, Dirichlet, chi-square, Student's t, and F

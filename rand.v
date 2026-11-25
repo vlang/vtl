@@ -524,6 +524,26 @@ pub fn (mut generator RandomGenerator) rayleigh(scale f64, shape []int) !&Tensor
 // vonmises returns angles in [-pi, pi) from a circular distribution with the
 // given location and non-negative concentration using this generator's stream.
 pub fn (mut generator RandomGenerator) vonmises(location f64, concentration f64, shape []int) !&Tensor[f64] {
+	validate_vonmises_parameters(location, concentration)!
+	mut values := []f64{len: size_from_shape(shape)}
+	for i in 0 .. values.len {
+		values[i] = sample_vonmises(location, concentration, mut generator.rng)!
+	}
+	return from_array[f64](values, shape)
+}
+
+// vonmises returns angles in [-pi, pi) from VTL's global random stream.
+pub fn vonmises(location f64, concentration f64, shape []int, params TensorData) !&Tensor[f64] {
+	validate_vonmises_parameters(location, concentration)!
+	mut rng := rand.get_current_rng()
+	mut values := []f64{len: size_from_shape(shape)}
+	for i in 0 .. values.len {
+		values[i] = sample_vonmises(location, concentration, mut rng)!
+	}
+	return from_array[f64](values, shape, params)
+}
+
+fn validate_vonmises_parameters(location f64, concentration f64) ! {
 	if math.is_nan(location) || math.is_inf(location, 0) || concentration < 0
 		|| math.is_nan(concentration) || math.is_inf(concentration, 0) {
 		return error('vonmises: location must be finite and concentration must be finite and non-negative')
@@ -531,35 +551,30 @@ pub fn (mut generator RandomGenerator) vonmises(location f64, concentration f64,
 	if concentration > 1e16 {
 		return error('vonmises: concentration above 1e16 exceeds stable sampling precision')
 	}
-	mut values := []f64{len: size_from_shape(shape)}
+}
+
+fn sample_vonmises(location f64, concentration f64, mut rng &rand.PRNG) !f64 {
 	if concentration <= 1e-150 {
-		for i in 0 .. values.len {
-			u := open_unit_interval(generator.rng.f64_in_range(0.0, 1.0)!)
-			values[i] = wrap_vonmises_angle(location + 2 * math.pi * u - math.pi)
-		}
-		return from_array[f64](values, shape)
+		u := open_unit_interval(rng.f64_in_range(0.0, 1.0)!)
+		return wrap_vonmises_angle(location + 2 * math.pi * u - math.pi)
 	}
 	s := math.sqrt(1 + 4 * concentration * concentration)
 	a := 1 + s
 	b := 2 * a * concentration / ((s + 1) * (a + math.sqrt(2 * a)))
 	r := (1 + b * b) / (2 * b)
-	for i in 0 .. values.len {
-		for {
-			u1 := open_unit_interval(generator.rng.f64_in_range(0.0, 1.0)!)
-			z := math.cos(math.pi * u1)
-			f := math.max(-1.0, math.min(1.0, (1 + r * z) / (r + z)))
-			c := concentration * (r - f)
-			u2 := open_unit_interval(generator.rng.f64_in_range(0.0, 1.0)!)
-			if c * (2 - c) <= u2 && math.log(c / u2) + 1 - c < 0 {
-				continue
-			}
-			u3 := open_unit_interval(generator.rng.f64_in_range(0.0, 1.0)!)
-			direction := if u3 > 0.5 { 1.0 } else { -1.0 }
-			values[i] = wrap_vonmises_angle(location + direction * math.acos(f))
-			break
+	for {
+		u1 := open_unit_interval(rng.f64_in_range(0.0, 1.0)!)
+		z := math.cos(math.pi * u1)
+		f := math.max(-1.0, math.min(1.0, (1 + r * z) / (r + z)))
+		c := concentration * (r - f)
+		u2 := open_unit_interval(rng.f64_in_range(0.0, 1.0)!)
+		if c * (2 - c) <= u2 && math.log(c / u2) + 1 - c < 0 {
+			continue
 		}
+		u3 := open_unit_interval(rng.f64_in_range(0.0, 1.0)!)
+		direction := if u3 > 0.5 { 1.0 } else { -1.0 }
+		return wrap_vonmises_angle(location + direction * math.acos(f))
 	}
-	return from_array[f64](values, shape)
 }
 
 fn wrap_vonmises_angle(angle f64) f64 {

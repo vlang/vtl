@@ -56,6 +56,51 @@ fn test_global_negative_binomial_is_seeded_and_validated() ! {
 	}
 }
 
+fn test_global_vonmises_is_seeded_and_matches_circular_moments() ! {
+	random_seed(914)
+	values := vonmises(1.0, 2.0, [8192], TensorData{})!
+	assert values.shape == [8192]
+	random_seed(914)
+	assert values.array_equal(vonmises(1.0, 2.0, [8192], TensorData{})!)
+	mut cosine_total := 0.0
+	mut sine_total := 0.0
+	for value in values.to_array() {
+		assert value >= -math.pi && value < math.pi
+		cosine_total += math.cos(value - 1.0)
+		sine_total += math.sin(value - 1.0)
+	}
+	assert math.abs(cosine_total / 8192.0 - 0.697774657964008) < 0.03
+	assert math.abs(sine_total / 8192.0) < 0.03
+
+	random_seed(915)
+	uniform := vonmises(0.0, 0.0, [8192], TensorData{})!
+	mut uniform_cosine_total := 0.0
+	mut uniform_sine_total := 0.0
+	for value in uniform.to_array() {
+		uniform_cosine_total += math.cos(value)
+		uniform_sine_total += math.sin(value)
+	}
+	assert math.abs(uniform_cosine_total / 8192.0) < 0.03
+	assert math.abs(uniform_sine_total / 8192.0) < 0.03
+	assert vonmises(0.5, 1.0, [0], TensorData{})!.shape == [0]
+	if _ := vonmises(math.inf(1), 1.0, [1], TensorData{}) {
+		assert false, 'vonmises must reject a non-finite location'
+	}
+	if _ := vonmises(0.0, -1.0, [1], TensorData{}) {
+		assert false, 'vonmises must reject negative concentration'
+	}
+	if _ := vonmises(0.0, 1e17, [1], TensorData{}) {
+		assert false, 'vonmises must reject concentration beyond its stable range'
+	}
+	mut independent := new_random_generator(916)
+	mut replay := new_random_generator(916)
+	random_seed(917)
+	_ := vonmises(0.0, 2.0, [8], TensorData{})!
+	assert independent.uniform(0.0, 1.0, [8])!.array_equal(replay.uniform(0.0, 1.0, [8])!)
+	independent.free()
+	replay.free()
+}
+
 fn test_random_i32_values_stay_within_requested_range() {
 	random_seed(42)
 	values := random[i32](-20, 20, [32], TensorData{})
