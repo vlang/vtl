@@ -773,8 +773,11 @@ reductions are separate and do not automatically treat NaN as masked data.
 
 **Current:** not supported as a general tensor feature.
 
-**Remaining:** decide whether this belongs in VTL or a companion
-table/dataframe package.
+**Proposed boundary:** keep heterogeneous records outside `Tensor[T]` and
+place future table conversion in a companion package. Conversion should select
+named fields explicitly into homogeneous tensors, preserve row order, and
+reject unsupported layouts or implicit casts. This proposal awaits maintainer
+review; see [ADR-0001](./adr/0001-structured-array-boundary.md).
 
 ### Performance and devices
 
