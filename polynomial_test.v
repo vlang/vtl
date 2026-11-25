@@ -11,6 +11,14 @@ fn test_polynomial_evaluation_arithmetic_and_calculus() ! {
 	assert p.integral(4.0).coefficients == [4.0, 1.0, 1.0, 1.0]
 }
 
+fn test_polynomial_evaluates_tensor_shapes() ! {
+	p := polynomial([1.0, 2.0])!
+	input := from_array([-1.0, 0.0, 2.0, 3.0], [2, 2])!
+	output := p.eval_tensor(input)!
+	assert output.shape == [2, 2]
+	assert output.to_array() == [-1.0, 1.0, 5.0, 7.0]
+}
+
 fn test_polynomial_roots_and_fit() ! {
 	quadratic := polynomial([2.0, -3.0, 1.0])!
 	roots := quadratic.roots()!
