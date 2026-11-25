@@ -182,6 +182,30 @@
 </table>
 <p>DataLoader returns a view when a batch's sample indices form a contiguous range. Shuffled, non-contiguous batches allocate tensors to preserve the requested sample order. A non-positive <code>batch_size</code> produces an empty loader.</p>
 <p><code>DataLoaderConfig</code> defaults to <code>batch_size: 32</code>, <code>shuffle: true</code>, and <code>drop_last: true</code>. These differ from PyTorch's defaults (<code>1</code>, <code>false</code>, and <code>false</code>), so set all three explicitly when porting a training pipeline. Call <code>reset()</code> between epochs to advance the deterministic shuffle order from the configured seed.</p>
+<p><code>TransformPipeline[T]</code> composes tensor transforms in order and propagates the first transform error. Apply it to a sample or batch tensor; transforms receive the preceding transform's output, and an empty pipeline returns its input. Transforms that should preserve their input must return a new tensor rather than mutating the input. For batch transforms, call the pipeline from a custom collation callback installed with <code>DataLoader.set_collate_fn</code>.</p>
+<pre><code class="language-v"><span class="token keyword">import</span> <span class="token module_">vtl</span>
+<span class="token keyword">import</span> <span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token module_">datasets</span>
+
+<span class="token keyword">fn</span> <span class="token function">center</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+    <span class="token keyword">mut</span> output <span class="token operator">:=</span> <span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token function">zeros</span><span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span>input<span class="token punctuation">.</span>shape<span class="token punctuation">)</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token number">0</span> <span class="token punctuation">..</span> input<span class="token punctuation">.</span>size <span class="token punctuation">{</span>
+        output<span class="token punctuation">.</span><span class="token function">set_nth</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> input<span class="token punctuation">.</span><span class="token function">get_nth</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1.0</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> output
+<span class="token punctuation">}</span>
+
+<span class="token keyword">fn</span> <span class="token function">scale</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+    <span class="token keyword">mut</span> output <span class="token operator">:=</span> <span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token function">zeros</span><span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span>input<span class="token punctuation">.</span>shape<span class="token punctuation">)</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token number">0</span> <span class="token punctuation">..</span> input<span class="token punctuation">.</span>size <span class="token punctuation">{</span>
+        output<span class="token punctuation">.</span><span class="token function">set_nth</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> input<span class="token punctuation">.</span><span class="token function">get_nth</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">0.5</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> output
+<span class="token punctuation">}</span>
+
+pipeline <span class="token operator">:=</span> <span class="token module_">datasets</span><span class="token punctuation">.</span><span class="token type_name">TransformPipeline</span><span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">[</span>center<span class="token punctuation">,</span> scale<span class="token punctuation">]</span><span class="token punctuation">)</span>
+sample <span class="token operator">:=</span> <span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token function">from_1d</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">1.0</span><span class="token punctuation">,</span> <span class="token number">3.0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token operator">!</span>
+transformed <span class="token operator">:=</span> pipeline<span class="token punctuation">.</span><span class="token function">apply</span><span class="token punctuation">(</span>sample<span class="token punctuation">)</span><span class="token operator">!</span>
+<span class="token keyword">assert</span> transformed<span class="token punctuation">.</span><span class="token function">to_array</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token punctuation">[</span><span class="token number">0.0</span><span class="token punctuation">,</span> <span class="token number">1.0</span><span class="token punctuation">]</span></code></pre>
 <p>For custom sample order, <code>new_data_loader_with_sampler_checked</code> and <code>new_data_loader_with_labels_and_sampler_checked</code> accept samplers from <code>vtl.nn.data</code>. Built-in options include sequential, random, subset-random, weighted, and fixed batch sampling. Wrap a sampler with <code>FixedBatchSampler</code> to choose batch boundaries and <code>drop_last</code> explicitly. Call <code>reset_checked()</code> between epochs when using a sampler; it reports errors from custom sampler implementations.</p>
 <p>For custom batch construction, install a <code>CollateFn[T]</code> with <code>DataLoader.set_collate_fn</code> and call <code>collated_batch(i)</code> or <code>for_each_collated(...)</code>. The callback receives the source feature tensor, an optional labels tensor, and a copy of the sample indices selected for that batch. It returns a <code>CollatedBatch[T]</code> containing the output features and optional labels. This supports dense tensor collation such as transforms, padding, filtering, and reordering; it does not model arbitrary Python objects or nested sample structures. See the <a href="https://github.com/vlang/vtl/blob/master/examples/datasets_custom_collate/main.v">custom collation example</a>.</p>
 <p><code>load_imdb()</code> returns the full 25,000 review training and test splits. Use <code>load_imdb_with_config</code> for a smaller, class-balanced subset. Review features remain raw strings; labels are binary (<code>1</code> positive, <code>0</code> negative).</p>
@@ -423,6 +447,14 @@ v run ./vtl/examples/nn_cifar10_tiny_synth/main.v
 
 </section>
 
+		<section id="TransformPipeline.new" class="doc-node">
+			<div class="title"><h2>fn TransformPipeline.new <a href="#TransformPipeline.new">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/transforms.v#L15"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token type_name">TransformPipeline</span><span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>transforms <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token type_name">TensorTransform</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token type_name">TransformPipeline</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+<p>TransformPipeline.new creates a pipeline and snapshots the transform list.</p>
+
+</section>
+
 		<section id="CollateFn" class="doc-node">
 			<div class="title"><h2>type CollateFn <a href="#CollateFn">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/dataloader.v#L64"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -548,6 +580,22 @@ v run ./vtl/examples/nn_cifar10_tiny_synth/main.v
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>dl <span class="token operator">&amp;</span><span class="token type_name">DataLoader</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">mini_batch_count</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">int</span></code></pre>
 <p>mini_batch_count returns the total number of batches in one epoch.</p>
+
+</section>
+
+		<section id="TensorTransform" class="doc-node">
+			<div class="title"><h2>type TensorTransform <a href="#TensorTransform">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/transforms.v#L7"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">type</span> <span class="token type_name">TensorTransform</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span>input <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+<p>TensorTransform maps one tensor to another and may report a transformation error. It can be applied to an individual sample or a complete batch.</p>
+
+</section>
+
+		<section id="TransformPipeline[T].apply" class="doc-node">
+			<div class="title"><h2>fn (TransformPipeline[T]) apply <a href="#TransformPipeline[T].apply">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/transforms.v#L23"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>pipeline <span class="token operator">&amp;</span><span class="token type_name">TransformPipeline</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">apply</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+<p>apply passes the output of each transform to the next one. An empty pipeline returns the input unchanged; a transform error stops the pipeline.</p>
 
 </section>
 
@@ -726,8 +774,18 @@ v run ./vtl/examples/nn_cifar10_tiny_synth/main.v
 
 </section>
 
+		<section id="TransformPipeline" class="doc-node">
+			<div class="title"><h2>struct TransformPipeline <a href="#TransformPipeline">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/transforms.v#L10"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token type_name">TransformPipeline</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	transforms <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token type_name">TensorTransform</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+<p>TransformPipeline applies tensor transforms in their configured order.</p>
 
-						<div class="footer">Powered by vdoc. Generated on: 25 Nov 2026 06:49:45</div>
+</section>
+
+
+						<div class="footer">Powered by vdoc. Generated on: 25 Nov 2026 10:46:33</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_datasets">README</a></li>
 <li class="open"><a href="#Constants">Constants</a></li>
@@ -776,6 +834,9 @@ v run ./vtl/examples/nn_cifar10_tiny_synth/main.v
 <li class="open"><a href="#tokenize_text">fn tokenize_text</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#TransformPipeline.new">fn TransformPipeline.new</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#CollateFn">type CollateFn</a>        <ul>
 </ul>
 </li>
@@ -798,6 +859,13 @@ v run ./vtl/examples/nn_cifar10_tiny_synth/main.v
 <li><a href="#DataLoader[T].for_each_collated">fn for_each_collated</a></li>
 <li><a href="#DataLoader[T].split">fn split</a></li>
 <li><a href="#DataLoader[T].mini_batch_count">fn mini_batch_count</a></li>
+</ul>
+</li>
+<li class="open"><a href="#TensorTransform">type TensorTransform</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#TransformPipeline[T].apply">type TransformPipeline[T]</a>        <ul>
+<li><a href="#TransformPipeline[T].apply">fn apply</a></li>
 </ul>
 </li>
 <li class="open"><a href="#Cifar10Config">struct Cifar10Config</a>        <ul>
@@ -831,6 +899,9 @@ v run ./vtl/examples/nn_cifar10_tiny_synth/main.v
 <li><a href="#TextVocabulary.index">fn index</a></li>
 <li><a href="#TextVocabulary.encode">fn encode</a></li>
 <li><a href="#TextVocabulary.decode">fn decode</a></li>
+</ul>
+</li>
+<li class="open"><a href="#TransformPipeline">struct TransformPipeline</a>        <ul>
 </ul>
 </li>
 </ul></div>

@@ -438,6 +438,22 @@ norm <span class="token operator">:=</span> <span class="token module_">layers</
 
 </section>
 
+		<section id="conv_transpose1d_layer" class="doc-node">
+			<div class="title"><h2>fn conv_transpose1d_layer <a href="#conv_transpose1d_layer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/conv_transpose1d.v#L31"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">conv_transpose1d_layer</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>ctx <span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Context</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> in_channels <span class="token builtin">int</span><span class="token punctuation">,</span> out_channels <span class="token builtin">int</span><span class="token punctuation">,</span> kernel_size <span class="token builtin">int</span><span class="token punctuation">,</span> config <span class="token type_name">ConvTranspose1DConfig</span><span class="token punctuation">,</span> input_length <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token module_">types</span><span class="token punctuation">.</span><span class="token type_name">Layer</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="conv_transpose2d_layer" class="doc-node">
+			<div class="title"><h2>fn conv_transpose2d_layer <a href="#conv_transpose2d_layer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/conv_transpose2d.v#L31"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">conv_transpose2d_layer</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>ctx <span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Context</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> in_channels <span class="token builtin">int</span><span class="token punctuation">,</span> out_channels <span class="token builtin">int</span><span class="token punctuation">,</span> kernel_size <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">,</span> config <span class="token type_name">ConvTranspose2DConfig</span><span class="token punctuation">,</span> input_shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token module_">types</span><span class="token punctuation">.</span><span class="token type_name">Layer</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
 		<section id="cuda_linear_enabled" class="doc-node">
 			<div class="title"><h2>fn cuda_linear_enabled <a href="#cuda_linear_enabled">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/cuda_config.v#L11"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <div class="attributes"><div class="attribute">@[inline]</div></div>
@@ -1595,6 +1611,54 @@ norm <span class="token operator">:=</span> <span class="token module_">layers</
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span><span class="token type_name">Conv2DLayer</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">forward</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
 <p>forward exposes this operation as part of the public API.</p>
+
+</section>
+
+		<section id="ConvTranspose1DLayer[T].output_shape" class="doc-node">
+			<div class="title"><h2>fn (ConvTranspose1DLayer[T]) output_shape <a href="#ConvTranspose1DLayer[T].output_shape">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/conv_transpose1d.v#L52"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span><span class="token type_name">ConvTranspose1DLayer</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">output_shape</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span></code></pre>
+
+
+</section>
+
+		<section id="ConvTranspose1DLayer[T].variables" class="doc-node">
+			<div class="title"><h2>fn (ConvTranspose1DLayer[T]) variables <a href="#ConvTranspose1DLayer[T].variables">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/conv_transpose1d.v#L61"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span><span class="token type_name">ConvTranspose1DLayer</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">variables</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="ConvTranspose1DLayer[T].forward" class="doc-node">
+			<div class="title"><h2>fn (ConvTranspose1DLayer[T]) forward <a href="#ConvTranspose1DLayer[T].forward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/conv_transpose1d.v#L65"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span><span class="token type_name">ConvTranspose1DLayer</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">forward</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="ConvTranspose2DLayer[T].output_shape" class="doc-node">
+			<div class="title"><h2>fn (ConvTranspose2DLayer[T]) output_shape <a href="#ConvTranspose2DLayer[T].output_shape">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/conv_transpose2d.v#L65"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span><span class="token type_name">ConvTranspose2DLayer</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">output_shape</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span></code></pre>
+
+
+</section>
+
+		<section id="ConvTranspose2DLayer[T].variables" class="doc-node">
+			<div class="title"><h2>fn (ConvTranspose2DLayer[T]) variables <a href="#ConvTranspose2DLayer[T].variables">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/conv_transpose2d.v#L78"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span><span class="token type_name">ConvTranspose2DLayer</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">variables</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+
+
+</section>
+
+		<section id="ConvTranspose2DLayer[T].forward" class="doc-node">
+			<div class="title"><h2>fn (ConvTranspose2DLayer[T]) forward <a href="#ConvTranspose2DLayer[T].forward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/conv_transpose2d.v#L82"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token operator">&amp;</span><span class="token type_name">ConvTranspose2DLayer</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">forward</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+
 
 </section>
 
@@ -2917,6 +2981,74 @@ norm <span class="token operator">:=</span> <span class="token module_">layers</
 
 </section>
 
+		<section id="ConvTranspose1DConfig" class="doc-node">
+			<div class="title"><h2>struct ConvTranspose1DConfig <a href="#ConvTranspose1DConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/conv_transpose1d.v#L10"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[params]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token type_name">ConvTranspose1DConfig</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	stride         <span class="token builtin">int</span> <span class="token operator">=</span> <span class="token number">1</span>
+	padding        <span class="token builtin">int</span>
+	output_padding <span class="token builtin">int</span>
+	dilation       <span class="token builtin">int</span> <span class="token operator">=</span> <span class="token number">1</span>
+	groups         <span class="token builtin">int</span> <span class="token operator">=</span> <span class="token number">1</span>
+<span class="token punctuation">}</span></code></pre>
+
+
+</section>
+
+		<section id="ConvTranspose1DLayer" class="doc-node">
+			<div class="title"><h2>struct ConvTranspose1DLayer <a href="#ConvTranspose1DLayer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/conv_transpose1d.v#L19"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token type_name">ConvTranspose1DLayer</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	in_channels  <span class="token builtin">int</span>
+	out_channels <span class="token builtin">int</span>
+	kernel_size  <span class="token builtin">int</span>
+	input_length <span class="token builtin">int</span>
+	config       <span class="token type_name">ConvTranspose1DConfig</span>
+<span class="token keyword">pub</span> <span class="token keyword">mut</span><span class="token punctuation">:</span>
+	weight <span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	bias   <span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+
+
+</section>
+
+		<section id="ConvTranspose2DConfig" class="doc-node">
+			<div class="title"><h2>struct ConvTranspose2DConfig <a href="#ConvTranspose2DConfig">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/conv_transpose2d.v#L10"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[params]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token type_name">ConvTranspose2DConfig</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	stride         <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span>
+	padding        <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span>
+	output_padding <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">]</span>
+	dilation       <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">]</span>
+	groups         <span class="token builtin">int</span>   <span class="token operator">=</span> <span class="token number">1</span>
+<span class="token punctuation">}</span></code></pre>
+
+
+</section>
+
+		<section id="ConvTranspose2DLayer" class="doc-node">
+			<div class="title"><h2>struct ConvTranspose2DLayer <a href="#ConvTranspose2DLayer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/conv_transpose2d.v#L19"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token type_name">ConvTranspose2DLayer</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	in_channels  <span class="token builtin">int</span>
+	out_channels <span class="token builtin">int</span>
+	kernel_size  <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
+	input_shape  <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
+	config       <span class="token type_name">ConvTranspose2DConfig</span>
+<span class="token keyword">pub</span> <span class="token keyword">mut</span><span class="token punctuation">:</span>
+	weight <span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	bias   <span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+
+
+</section>
+
 		<section id="DropoutLayer" class="doc-node">
 			<div class="title"><h2>struct DropoutLayer <a href="#DropoutLayer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/layers/dropout.v#L19"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -3494,7 +3626,7 @@ norm <span class="token operator">:=</span> <span class="token module_">layers</
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 25 Nov 2026 06:49:45</div>
+						<div class="footer">Powered by vdoc. Generated on: 25 Nov 2026 10:46:34</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_layers">README</a></li>
 <li class="open"><a href="#adaptive_avgpool1d_gate">fn adaptive_avgpool1d_gate</a>        <ul>
@@ -3582,6 +3714,12 @@ norm <span class="token operator">:=</span> <span class="token module_">layers</
 </ul>
 </li>
 <li class="open"><a href="#conv2d_layer">fn conv2d_layer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#conv_transpose1d_layer">fn conv_transpose1d_layer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#conv_transpose2d_layer">fn conv_transpose2d_layer</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#cuda_linear_enabled">fn cuda_linear_enabled</a>        <ul>
@@ -3954,6 +4092,18 @@ norm <span class="token operator">:=</span> <span class="token module_">layers</
 <li><a href="#Conv2DLayer[T].forward">fn forward</a></li>
 </ul>
 </li>
+<li class="open"><a href="#ConvTranspose1DLayer[T].output_shape">type ConvTranspose1DLayer[T]</a>        <ul>
+<li><a href="#ConvTranspose1DLayer[T].output_shape">fn output_shape</a></li>
+<li><a href="#ConvTranspose1DLayer[T].variables">fn variables</a></li>
+<li><a href="#ConvTranspose1DLayer[T].forward">fn forward</a></li>
+</ul>
+</li>
+<li class="open"><a href="#ConvTranspose2DLayer[T].output_shape">type ConvTranspose2DLayer[T]</a>        <ul>
+<li><a href="#ConvTranspose2DLayer[T].output_shape">fn output_shape</a></li>
+<li><a href="#ConvTranspose2DLayer[T].variables">fn variables</a></li>
+<li><a href="#ConvTranspose2DLayer[T].forward">fn forward</a></li>
+</ul>
+</li>
 <li class="open"><a href="#DropoutLayer[T].output_shape">type DropoutLayer[T]</a>        <ul>
 <li><a href="#DropoutLayer[T].output_shape">fn output_shape</a></li>
 <li><a href="#DropoutLayer[T].variables">fn variables</a></li>
@@ -4271,6 +4421,18 @@ norm <span class="token operator">:=</span> <span class="token module_">layers</
 </ul>
 </li>
 <li class="open"><a href="#Conv2DLayer">struct Conv2DLayer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ConvTranspose1DConfig">struct ConvTranspose1DConfig</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ConvTranspose1DLayer">struct ConvTranspose1DLayer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ConvTranspose2DConfig">struct ConvTranspose2DConfig</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#ConvTranspose2DLayer">struct ConvTranspose2DLayer</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#DropoutLayer">struct DropoutLayer</a>        <ul>

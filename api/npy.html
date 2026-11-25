@@ -150,8 +150,16 @@
 
 </section>
 
+		<section id="open_mapped" class="doc-node">
+			<div class="title"><h2>fn open_mapped <a href="#open_mapped">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/npy/mapped.v#L21"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">open_mapped</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>path <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token type_name">MappedNpy</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+<p>open_mapped maps a supported .npy file without copying or decoding its payload. Call close when finished; the mapped file must not be modified or truncated while it is open.</p>
+
+</section>
+
 		<section id="read" class="doc-node">
-			<div class="title"><h2>fn read <a href="#read">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/npy/npy.v#L65"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn read <a href="#read">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/npy/npy.v#L74"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token function">read</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>path <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
 <p>read reads a NumPy .npy v1.0, v2.0, or v3.0 array into T. The file dtype must have the same kind and width as T. Both byte orders and Fortran-order files are converted to VTL's row-major logical tensor layout.</p>
@@ -159,7 +167,7 @@
 </section>
 
 		<section id="read_bytes" class="doc-node">
-			<div class="title"><h2>fn read_bytes <a href="#read_bytes">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/npy/npy.v#L72"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn read_bytes <a href="#read_bytes">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/npy/npy.v#L81"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token function">read_bytes</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>bytes <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">u8</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
 <p>read_bytes decodes a NumPy .npy v1.0, v2.0, or v3.0 payload into T. The payload's dtype must have the same kind and width as T.</p>
@@ -167,7 +175,7 @@
 </section>
 
 		<section id="to_bytes" class="doc-node">
-			<div class="title"><h2>fn to_bytes <a href="#to_bytes">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/npy/npy.v#L31"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn to_bytes <a href="#to_bytes">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/npy/npy.v#L40"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token function">to_bytes</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>tensor <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">u8</span></code></pre>
 <p>to_bytes encodes a CPU tensor as an uncompressed NumPy .npy v1.0 payload.</p>
@@ -175,17 +183,76 @@
 </section>
 
 		<section id="write" class="doc-node">
-			<div class="title"><h2>fn write <a href="#write">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/npy/npy.v#L25"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn write <a href="#write">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/npy/npy.v#L34"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token function">write</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>path <span class="token builtin">string</span><span class="token punctuation">,</span> tensor <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
 <p>write writes a CPU tensor as an uncompressed NumPy .npy v1.0 file. Numeric primitive types and row-major logical tensor order are supported.</p>
 
 </section>
 
+		<section id="MappedNpy[T].shape" class="doc-node">
+			<div class="title"><h2>fn (MappedNpy[T]) shape <a href="#MappedNpy[T].shape">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/npy/mapped.v#L42"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>mapped <span class="token operator">&amp;</span><span class="token type_name">MappedNpy</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">shape</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span></code></pre>
+<p>shape returns a copy of the mapped array's shape.</p>
 
-						<div class="footer">Powered by vdoc. Generated on: 25 Nov 2026 06:49:45</div>
+</section>
+
+		<section id="MappedNpy[T].size" class="doc-node">
+			<div class="title"><h2>fn (MappedNpy[T]) size <a href="#MappedNpy[T].size">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/npy/mapped.v#L47"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>mapped <span class="token operator">&amp;</span><span class="token type_name">MappedNpy</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">int</span></code></pre>
+<p>size returns the total number of logical elements.</p>
+
+</section>
+
+		<section id="MappedNpy[T].is_closed" class="doc-node">
+			<div class="title"><h2>fn (MappedNpy[T]) is_closed <a href="#MappedNpy[T].is_closed">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/npy/mapped.v#L52"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>mapped <span class="token operator">&amp;</span><span class="token type_name">MappedNpy</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">is_closed</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">bool</span></code></pre>
+<p>is_closed reports whether close has released the mapped region.</p>
+
+</section>
+
+		<section id="MappedNpy[T].read_rows" class="doc-node">
+			<div class="title"><h2>fn (MappedNpy[T]) read_rows <a href="#MappedNpy[T].read_rows">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/npy/mapped.v#L57"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>mapped <span class="token operator">&amp;</span><span class="token type_name">MappedNpy</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">read_rows</span><span class="token punctuation">(</span>start <span class="token builtin">int</span><span class="token punctuation">,</span> end <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+<p>read_rows decodes rows [start, end) along the leading axis into owned storage.</p>
+
+</section>
+
+		<section id="MappedNpy[T].close" class="doc-node">
+			<div class="title"><h2>fn (MappedNpy[T]) close <a href="#MappedNpy[T].close">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/npy/mapped.v#L96"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> mapped <span class="token type_name">MappedNpy</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<p>close releases the mapping. Decoded tensors returned by read_rows remain valid. Closing more than once is safe.</p>
+
+</section>
+
+		<section id="MappedNpy" class="doc-node">
+			<div class="title"><h2>struct MappedNpy <a href="#MappedNpy">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/npy/mapped.v#L9"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<div class="attributes"><div class="attribute">@[heap]</div></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token type_name">MappedNpy</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<span class="token keyword">mut</span><span class="token punctuation">:</span>
+	mapping       <span class="token operator">&amp;</span><span class="token module_">os</span><span class="token punctuation">.</span><span class="token type_name">Mmap</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	path          <span class="token builtin">string</span>
+	mapped_length <span class="token builtin">u64</span>
+	info          <span class="token type_name">NpyFileInfo</span>
+	closed        <span class="token builtin">bool</span>
+<span class="token punctuation">}</span></code></pre>
+<p>MappedNpy provides read-only, row-wise access to a mapped .npy file. Each returned tensor owns its decoded values and remains valid after close.</p>
+
+</section>
+
+
+						<div class="footer">Powered by vdoc. Generated on: 25 Nov 2026 10:46:34</div>
 					</div>
-					<div class="doc-toc"><ul><li class="open"><a href="#read">fn read</a>        <ul>
+					<div class="doc-toc"><ul><li class="open"><a href="#open_mapped">fn open_mapped</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#read">fn read</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#read_bytes">fn read_bytes</a>        <ul>
@@ -195,6 +262,17 @@
 </ul>
 </li>
 <li class="open"><a href="#write">fn write</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#MappedNpy[T].shape">type MappedNpy[T]</a>        <ul>
+<li><a href="#MappedNpy[T].shape">fn shape</a></li>
+<li><a href="#MappedNpy[T].size">fn size</a></li>
+<li><a href="#MappedNpy[T].is_closed">fn is_closed</a></li>
+<li><a href="#MappedNpy[T].read_rows">fn read_rows</a></li>
+<li><a href="#MappedNpy[T].close">fn close</a></li>
+</ul>
+</li>
+<li class="open"><a href="#MappedNpy">struct MappedNpy</a>        <ul>
 </ul>
 </li>
 </ul></div>

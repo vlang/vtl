@@ -547,6 +547,14 @@ matches <span class="token operator">:=</span> <span class="token module_">autog
 
 </section>
 
+		<section id="vmap" class="doc-node">
+			<div class="title"><h2>fn vmap <a href="#vmap">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/autograd/functional.v#L7"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">vmap</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>f <span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token operator">&amp;</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> input <span class="token operator">&amp;</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> in_dim <span class="token builtin">int</span><span class="token punctuation">,</span> out_dim <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+<p>vmap applies a differentiable variable function independently over one input axis and stacks the results along the requested output axis.</p>
+
+</section>
+
 		<section id="CacheParam" class="doc-node">
 			<div class="title"><h2>interface CacheParam <a href="#CacheParam">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/autograd/gate.v#L6"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -2098,7 +2106,7 @@ y <span class="token operator">:=</span> x<span class="token punctuation">.</spa
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 25 Nov 2026 06:49:45</div>
+						<div class="footer">Powered by vdoc. Generated on: 25 Nov 2026 10:46:33</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_autograd">README</a></li>
 <li class="open"><a href="#abs_gate">fn abs_gate</a>        <ul>
@@ -2234,6 +2242,9 @@ y <span class="token operator">:=</span> x<span class="token punctuation">.</spa
 </ul>
 </li>
 <li class="open"><a href="#variable_take_gpu_activation_input">fn variable_take_gpu_activation_input</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#vmap">fn vmap</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#CacheParam">interface CacheParam</a>        <ul>
