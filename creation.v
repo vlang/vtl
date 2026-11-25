@@ -99,6 +99,7 @@ pub struct VandermondeData {
 pub:
 	n          int = -1
 	increasing bool
+	memory     MemoryFormat = .row_major
 }
 
 // vander returns a Vandermonde matrix built from a one-dimensional input.
@@ -117,18 +118,18 @@ pub fn vander[T](input &Tensor[T], params VandermondeData) !&Tensor[T] {
 	if columns > 0 && input.size > max_int / columns {
 		return error('vander output shape overflows the maximum tensor size')
 	}
-	mut result := empty[T]([input.size, columns], memory: .row_major)
+	mut result := empty[T]([input.size, columns], memory: params.memory)
 	for row in 0 .. input.size {
 		value := input.get_nth(row)
 		mut power := cast[T](1)
 		if params.increasing {
 			for column in 0 .. columns {
-				result.data.data[row * columns + column] = power
+				result.data.data[row * result.strides[0] + column * result.strides[1]] = power
 				power *= value
 			}
 		} else {
 			for column := columns - 1; column >= 0; column-- {
-				result.data.data[row * columns + column] = power
+				result.data.data[row * result.strides[0] + column * result.strides[1]] = power
 				power *= value
 			}
 		}

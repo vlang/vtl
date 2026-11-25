@@ -324,6 +324,7 @@ fn test_vander_matches_numpy_power_order_and_dimensions() ! {
 	input := vtl.from_1d([1, 2, 3])!
 	descending := vtl.vander(input)!
 	assert descending.shape == [3, 3]
+	assert descending.is_row_major()
 	assert descending.to_array() == [1, 1, 1, 4, 2, 1, 9, 3, 1]
 
 	increasing := vtl.vander(input, increasing: true)!
@@ -333,6 +334,11 @@ fn test_vander_matches_numpy_power_order_and_dimensions() ! {
 	assert custom.shape == [3, 2]
 	assert custom.to_array() == [1, 1, 2, 1, 3, 1]
 	assert vtl.vander(input, n: 0)!.shape == [3, 0]
+
+	column_major := vtl.vander(input, memory: .col_major)!
+	assert column_major.is_col_major()
+	assert column_major.get([1, 0]) == 4
+	assert column_major.get([2, 2]) == 1
 }
 
 fn test_vander_rejects_invalid_input() {

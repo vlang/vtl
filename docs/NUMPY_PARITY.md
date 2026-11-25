@@ -92,11 +92,13 @@ matrices; `arange` with start/stop/step; endpoint-aware `linspace`; configurable
 `logspace`; 2-D `meshgrid` and N-D `meshgrid_n` with `xy` and `ij` indexing;
 dense stacked coordinates through `indices` and broadcastable per-axis sparse
 coordinates through `indices_sparse`. VTL also provides `one_hot` for ML labels,
-appending a class dimension and validating class bounds. Element dtype is
+appending a class dimension and validating class bounds. `vander` supports
+descending or increasing powers, a custom column count, and selectable memory
+format. Element dtype is
 selected through each constructor's generic type argument. Constructors that
 accept `TensorData`, `LinspaceData`, or `LogspaceData` accept a memory format;
 creation tests verify column-major layout for scalar-fill, sequence, coordinate,
-and label constructors.
+label, and Vandermonde constructors.
 Flat `from_array` values follow the requested physical memory order; nested
 `from_2d` rows remain logical row-major values and are rearranged for
 column-major storage.
