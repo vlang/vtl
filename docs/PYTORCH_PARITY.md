@@ -94,12 +94,12 @@ graphs where feasible.
 ### Neural-network modules
 
 **VTL today:** `Sequential`, common activations, linear, convolutional
-(including CPU `conv_transpose1d` and `conv_transpose2d` with autograd), padding and pooling (including
-`pad1d`, `pad2d`, `pad3d`, `avgpool1d`, `avgpool2d`,
-`avgpool3d`, `maxpool1d`, `maxpool2d`, `maxpool3d`, and fixed-output `adaptive_avgpool1d`,
-`adaptive_avgpool2d`, `adaptive_avgpool3d`, `adaptive_maxpool1d`, and
-`adaptive_maxpool2d`, and `adaptive_maxpool3d`),
-recurrent, attention, and normalization layers. Typed CPU LSTM layers support
+(including CPU `conv_transpose1d` and `conv_transpose2d` with autograd), padding
+and pooling (`pad1d`/`pad2d`/`pad3d`, `avgpool1d`/`avgpool2d`/`avgpool3d`,
+`maxpool1d`/`maxpool2d`/`maxpool3d`, and fixed-output `adaptive_avgpool1d`/
+`adaptive_avgpool2d`/`adaptive_avgpool3d` and `adaptive_maxpool1d`/
+`adaptive_maxpool2d`/`adaptive_maxpool3d`), recurrent, attention, and
+normalization layers. Typed CPU LSTM layers support
 stacked hidden/cell state through `forward_with_state`; typed CPU GRU layers
 support an explicit initial and final hidden state. Their default input layouts
 differ: LSTM is `[batch, sequence, features]`, while GRU is
@@ -108,6 +108,11 @@ differ: LSTM is `[batch, sequence, features]`, while GRU is
 `[batch, sequence, features]` input; `Sequential.gru` keeps the sequence-first
 layout. See the
 [NN tutorial](./TUTORIAL_NEURAL_NETWORKS.md).
+
+The listed padding, pooling, and transposed-convolution layer wrappers execute
+on CPU with CPU autograd. Their presence in `Sequential` does not imply CUDA,
+Vulkan, or OpenCL dispatch; accelerator support must be verified per backend
+and operation.
 
 GroupNorm supports channel-first `[batch, channels, ...]` inputs, per-channel
 affine parameters, and CPU input/parameter gradients. RMSNorm normalizes trailing
