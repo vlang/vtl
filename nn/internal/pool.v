@@ -225,3 +225,69 @@ pub fn adaptive_avgpool2d_backward[T](grad_out &vtl.Tensor[T], input &vtl.Tensor
 	}
 	return d_input
 }
+
+pub fn adaptive_maxpool2d_forward[T](input &vtl.Tensor[T], output_size []int) !&vtl.Tensor[T] {
+	output_shape := adaptive_avgpool2d_output_shape[T](input, output_size)!
+	mut output := vtl.zeros[T](output_shape)
+	for batch in 0 .. input.shape[0] {
+		for channel in 0 .. input.shape[1] {
+			for out_h in 0 .. output_size[0] {
+				start_h := (out_h * input.shape[2]) / output_size[0]
+				end_h := ((out_h + 1) * input.shape[2] + output_size[0] - 1) / output_size[0]
+				for out_w in 0 .. output_size[1] {
+					start_w := (out_w * input.shape[3]) / output_size[1]
+					end_w := ((out_w + 1) * input.shape[3] + output_size[1] - 1) / output_size[1]
+					mut maximum := f64(input.get([batch, channel, start_h, start_w]))
+					for in_h in start_h .. end_h {
+						for in_w in start_w .. end_w {
+							value := f64(input.get([batch, channel, in_h, in_w]))
+							if value > maximum {
+								maximum = value
+							}
+						}
+					}
+					output.set([batch, channel, out_h, out_w], vtl.cast[T](maximum))
+				}
+			}
+		}
+	}
+	return output
+}
+
+pub fn adaptive_maxpool2d_backward[T](grad_out &vtl.Tensor[T], input &vtl.Tensor[T], output_size []int) !&vtl.Tensor[T] {
+	output_shape := adaptive_avgpool2d_output_shape[T](input, output_size)!
+	if grad_out.shape != output_shape {
+		return error('adaptive_maxpool2d backward gradient shape does not match input and output size')
+	}
+	mut d_input := vtl.zeros_like[T](input)
+	for batch in 0 .. input.shape[0] {
+		for channel in 0 .. input.shape[1] {
+			for out_h in 0 .. output_size[0] {
+				start_h := (out_h * input.shape[2]) / output_size[0]
+				end_h := ((out_h + 1) * input.shape[2] + output_size[0] - 1) / output_size[0]
+				for out_w in 0 .. output_size[1] {
+					start_w := (out_w * input.shape[3]) / output_size[1]
+					end_w := ((out_w + 1) * input.shape[3] + output_size[1] - 1) / output_size[1]
+					mut max_h := start_h
+					mut max_w := start_w
+					mut maximum := f64(input.get([batch, channel, start_h, start_w]))
+					for in_h in start_h .. end_h {
+						for in_w in start_w .. end_w {
+							value := f64(input.get([batch, channel, in_h, in_w]))
+							if value > maximum {
+								maximum = value
+								max_h = in_h
+								max_w = in_w
+							}
+						}
+					}
+					index := [batch, channel, max_h, max_w]
+					value := f64(d_input.get(index)) + f64(grad_out.get([batch, channel, out_h,
+						out_w]))
+					d_input.set(index, vtl.cast[T](value))
+				}
+			}
+		}
+	}
+	return d_input
+}

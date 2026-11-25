@@ -109,6 +109,17 @@ fn test_adaptive_avgpool_forward_and_backward() ! {
 	assert input.grad.to_array() == [0.25, 0.5, 0.25, 0.5, 1.0, 0.5, 0.25, 0.5, 0.25]
 }
 
+fn test_adaptive_maxpool_forward_and_backward() ! {
+	c := core_ctx[f64]()
+	input := core_variable[f64](c, [1.0, 5.0, 3.0, 4.0, 2.0, 6.0, 7.0, 8.0, 0.0],
+		[1, 1, 3, 3])!
+	layer := adaptive_maxpool2d_layer[f64](c, [1, 3, 3], [2, 2])
+	mut output := layer.forward(input)!
+	assert output.value.to_array() == [5.0, 6.0, 8.0, 8.0]
+	output.backprop()!
+	assert input.grad.to_array() == [0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 2.0, 0.0]
+}
+
 // Embedding layer: output shape and variables
 
 fn test_embedding_output_shape() {

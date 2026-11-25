@@ -29,3 +29,12 @@ fn test_adaptive_avgpool2d_rejects_invalid_output_size() ! {
 		assert false
 	}
 }
+
+fn test_adaptive_maxpool2d_forward_and_backward() ! {
+	input := vtl.from_array[f64]([1.0, 5.0, 3.0, 4.0, 2.0, 6.0, 7.0, 8.0, 0.0], [1, 1, 3, 3])!
+	result := adaptive_maxpool2d_forward[f64](input, [2, 2])!
+	assert result.to_array() == [5.0, 6.0, 8.0, 8.0]
+	grad_out := vtl.ones[f64]([1, 1, 2, 2])
+	gradient := adaptive_maxpool2d_backward[f64](grad_out, input, [2, 2])!
+	assert gradient.to_array() == [0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 2.0, 0.0]
+}

@@ -264,6 +264,16 @@ pub fn (mut ls SequentialInfo[T]) adaptive_avgpool2d(output_size []int) {
 		})
 }
 
+pub fn (mut ls SequentialInfo[T]) adaptive_maxpool2d(output_size []int) {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.add_layer(layers.adaptive_maxpool2d_layer[T](ls.ctx, shape, output_size),
+		'AdaptiveMaxPool2DLayer', {
+			'output_h': output_size[0]
+			'output_w': output_size[1]
+		})
+}
+
 // layer_norm adds a new LayerNorm layer to the network.
 pub fn (mut ls SequentialInfo[T]) layer_norm(normalized_shape []int, config layers.LayerNormConfig) {
 	mut layer_config := map[string]int{}
