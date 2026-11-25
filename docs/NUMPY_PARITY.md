@@ -300,6 +300,10 @@ exact-width wrapping arithmetic and reject negative integer exponents. Floating
 results preserve IEEE special values and signed zero. Complex and string inputs
 are unsupported; 64-bit integer operands are rejected when promotion requires a
 floating result to avoid silent precision loss.
+`float_power_promoted` provides the NumPy `float_power` contract for real
+numeric and boolean tensor pairs: it always returns f64, including for f32
+inputs, and allows negative integer exponents. Inputs are converted to f64, so
+large integers may lose precision just as they do with NumPy.
 `fmod_promoted` and its weak-scalar variants preserve the sign-of-dividend
 remainder rule across promoted real numeric dtypes and broadcasting. Integer
 operations retain exact-width arithmetic; zero divisors and signed minimum
@@ -332,14 +336,13 @@ See
 [gradient tests](../autograd_tests/gates_remainder_test.v), and
 [dtype conversion tutorial](./TUTORIAL_FIRST_STEPS.md#numeric-dtype-conversion).
 
-**Remaining ufunc gaps:** same-dtype methods exist for `abs`, `sign`, extrema,
-and `frexp`/`modf`/`ldexp`, but NumPy's
-mixed-dtype, broadcast, and edge-case contracts are not fully covered. Unary
-`abs`/`sign` and the multi-output decomposition functions still need broader
-dtype and special-value differential tests; promoted mixed-input variants
-for `ldexp` now cover real or boolean mantissas and integer or boolean
-exponents, with dtype validation and broadcasting. Promoted extrema cover
-tensor pairs and weak scalars through the APIs below.
+**Remaining ufunc gaps:** complex `pow` remains unsupported, and unary
+`abs`/`sign` plus multi-output `frexp`/`modf` still need broader differential
+coverage across supported dtypes and special values. Promoted `float_power`
+now covers real numeric and boolean tensor pairs, broadcasting, empty and
+scalar-shaped inputs, negative integer exponents, and IEEE edge cases.
+Promoted mixed-input `ldexp` covers real or boolean mantissas and integer or
+boolean exponents; promoted extrema cover tensor pairs and weak scalars.
 `erf`/`erfc`, `gamma`, and `log_gamma` are useful VTL math APIs beyond NumPy
 core ufunc parity. The shared `out`/`where` helper contract is documented in the
 [ufunc execution capability table](#ufunc-execution-protocol).
@@ -368,11 +371,11 @@ protocol; “Unsupported” means no shared API is currently exposed.
 
 Promoted tensor-to-tensor result dtypes are:
 
-| Tensor operands | Add/subtract/multiply | Power | True divide | Floor divide | Fmod | Remainder |
-|-----------------|-----------------------|-------|-------------|--------------|------|-----------|
-| Real numeric pair | `promote_types` | `promote_types` | f32 if promoted dtype is f32; else f64 | `promote_types` | `promote_types` | `promote_types` |
-| Complex128 with numeric, bool, or complex128 | complex128 | unsupported | complex128 | unsupported | unsupported | unsupported |
-| Boolean pair | unsupported | int8 | f64 | unsupported | unsupported | unsupported |
+| Tensor operands | Add/subtract/multiply | Power | Float power | True divide | Floor divide | Fmod | Remainder |
+|-----------------|-----------------------|-------|-------------|--------------|--------------|------|-----------|
+| Real numeric pair | `promote_types` | `promote_types` | f64 | f32 if promoted dtype is f32; else f64 | `promote_types` | `promote_types` | `promote_types` |
+| Complex128 with numeric, bool, or complex128 | complex128 | unsupported | unsupported | complex128 | unsupported | unsupported | unsupported |
+| Boolean pair | unsupported | int8 | f64 | f64 | unsupported | unsupported | unsupported |
 
 `pow_promoted` rejects 64-bit integer operands when `promote_types` selects a
 floating output, and rejects negative exponents when the result dtype is
