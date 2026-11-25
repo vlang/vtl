@@ -16,8 +16,10 @@ v run ./vtl/examples/polynomial_fit/main.v
 ```
 
 ```text
-ascending coefficients: [1.0, 0.0, 1.0]
+ascending coefficients: [1.0, approximately 0.0, 1.0]
 p(3): 10.0
+ascending Chebyshev coefficients: [2.375, approximately 1.5, 1.125]
+Chebyshev p(3): 10.0
 ```
 
 The corresponding APIs are `vtl.from_array`, `vtl.polynomial_fit`, and
@@ -26,6 +28,14 @@ supports a documented subset. Fitting uses a domain-scaled Vandermonde matrix
 and Householder QR, then returns coefficients in the original power basis;
 conversion to that basis can still amplify errors on ill-conditioned data. See the
 [polynomial API notes](./NUMPY_PARITY.md#current-strengths).
+
+`vtl.Chebyshev` stores first-kind coefficients in ascending order and supports
+scalar/tensor evaluation, arithmetic, calculus, roots up to degree two, and
+conversion to/from power series. Supply an explicit `domain` and `window`;
+evaluation maps the input domain linearly into the window. Polynomial APIs
+currently use `f64`. `vtl.chebyshev_fit` fits in that mapped coordinate and
+returns the Chebyshev coefficients. The runnable fitting example demonstrates
+both bases.
 
 ## Transform samples and preserve gradients
 
@@ -94,7 +104,7 @@ unsupported cases.
 | NumPy / ML pattern | VTL path | Important difference |
 |---|---|---|
 | `ndarray` construction | `vtl.from_array(data, shape)` | Choose `f32` or `f64` explicitly; shape is explicit. |
-| `polyfit` / polynomial evaluation | `vtl.polynomial_fit` / `Polynomial.eval` | Only the power-series subset is implemented; fitting uses scaled QR, but conversion to original power coefficients can still amplify conditioning errors. |
+| Polynomial fitting/evaluation | `vtl.polynomial_fit`, `vtl.chebyshev_fit`, and `Polynomial.eval` | Power series and first-kind Chebyshev are supported; fitting uses scaled QR, but conversion to original power coefficients can still amplify conditioning errors. |
 | Per-sample mapping | `vtl.vmap` or `vtl.autograd.vmap` | CPU-only today; callback output shape must be consistent. |
 | Mini-batch training | `Sequential`, losses, optimizers, and tensor slicing | Backend and gradient coverage are operation-specific. |
 | Inference checkpoint | `save_inference_checkpoint` / `load_inference_checkpoint` | CPU-only supported layer set; does not include optimizer state or package an executable. |

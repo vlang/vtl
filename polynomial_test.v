@@ -52,3 +52,50 @@ fn test_polynomial_fit_scales_large_inputs_and_rejects_invalid_data() ! {
 		assert false, 'polynomial_fit must reject non-finite y values'
 	}
 }
+
+fn test_chebyshev_evaluation_conversion_calculus_and_fit() ! {
+	domain := [f64(-2.0), 2.0]!
+	window := [f64(-1.0), 1.0]!
+	p := chebyshev([1.0, 2.0, 3.0], domain, window)!
+	assert p.degree() == 2
+	assert p.eval(-2.0) == 2.0
+	assert p.eval(0.0) == -2.0
+	assert p.eval(2.0) == 6.0
+	assert p.to_polynomial()!.coefficients == [-2.0, 1.0, 1.5]
+	round_trip := chebyshev_from_polynomial(p.to_polynomial()!, domain, window)!
+	for index, value in p.coefficients {
+		assert math.abs(round_trip.coefficients[index] - value) < 1e-12
+	}
+	input := from_array[f64]([0.0, 2.0], [1, 2])!
+	assert p.eval_tensor(input)!.to_array() == [-2.0, 6.0]
+	derivative := p.derivative()!
+	assert math.abs(derivative.eval(0.0) - 1.0) < 1e-12
+	assert math.abs(derivative.eval(1.0) - 4.0) < 1e-12
+	integral := p.integral(0.0)!
+	for x in [-2.0, -0.5, 1.0, 2.0] {
+		assert math.abs(integral.derivative()!.eval(x) - p.eval(x)) < 1e-10
+	}
+	roots := p.roots()!
+	assert roots.len == 2
+	for root in roots {
+		assert math.abs(p.eval(root)) < 1e-12
+	}
+	assert p.add(p)!.eval(1.0) == 1.0
+	assert p.mul(p)!.eval(0.0) == 4.0
+
+	x := [-2.0, -1.0, 0.0, 1.0, 2.0]
+	y := [2.0, -1.5, -2.0, 0.5, 6.0]
+	fitted := chebyshev_fit(x, y, 2, domain, window)!
+	for index, value in p.coefficients {
+		assert math.abs(fitted.coefficients[index] - value) < 1e-10
+	}
+	if _ := chebyshev([1.0], [1.0, 1.0]!, window) {
+		assert false, 'chebyshev must reject zero-width domains'
+	}
+	if _ := chebyshev([1.0], domain, [0.0, math.inf(1)]!) {
+		assert false, 'chebyshev must reject non-finite windows'
+	}
+	if _ := p.add(chebyshev([1.0], [0.0, 2.0]!, window)!) {
+		assert false, 'chebyshev arithmetic must reject mismatched domains'
+	}
+}

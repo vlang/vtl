@@ -118,6 +118,228 @@ pub fn (p Polynomial) roots() ![]f64 {
 	}
 }
 
+// Chebyshev stores coefficients in ascending first-kind basis order:
+// coefficients[i] multiplies T_i after mapping domain to window.
+pub struct Chebyshev {
+pub:
+	coefficients []f64
+	domain       [2]f64
+	window       [2]f64
+}
+
+pub fn chebyshev(coefficients []f64, domain [2]f64, window [2]f64) !Chebyshev {
+	validate_polynomial_mapping(domain, window, 'chebyshev')!
+	if coefficients.len == 0 {
+		return error('chebyshev requires at least one coefficient')
+	}
+	mut trimmed := coefficients.clone()
+	for trimmed.len > 1 && trimmed[trimmed.len - 1] == 0 {
+		trimmed.delete_last()
+	}
+	return Chebyshev{
+		coefficients: trimmed
+		domain:       domain
+		window:       window
+	}
+}
+
+pub fn (p Chebyshev) degree() int {
+	return p.coefficients.len - 1
+}
+
+pub fn (p Chebyshev) eval(x f64) f64 {
+	mapped_x := p.window[0] + (x - p.domain[0]) * (p.window[1] - p.window[0]) /
+		(p.domain[1] - p.domain[0])
+	mut next := 0.0
+	mut next_next := 0.0
+	for index := p.coefficients.len - 1; index >= 1; index-- {
+		current := 2.0 * mapped_x * next - next_next + p.coefficients[index]
+		next_next = next
+		next = current
+	}
+	return mapped_x * next - next_next + p.coefficients[0]
+}
+
+pub fn (p Chebyshev) eval_tensor(input &Tensor[f64]) !&Tensor[f64] {
+	return input.nmap([input], fn [p] (values []f64, _ []int) f64 {
+		return p.eval(values[0])
+	})
+}
+
+pub fn (p Chebyshev) to_polynomial() !Polynomial {
+	validate_polynomial_mapping(p.domain, p.window, 'chebyshev')!
+	if p.coefficients.len == 0 {
+		return error('chebyshev requires at least one coefficient')
+	}
+	offset := p.window[0] - p.domain[0] * (p.window[1] - p.window[0]) /
+		(p.domain[1] - p.domain[0])
+	scale := (p.window[1] - p.window[0]) / (p.domain[1] - p.domain[0])
+	if math.is_nan(offset) || math.is_inf(offset, 0) || math.is_nan(scale) || math.is_inf(scale, 0) {
+		return error('chebyshev: domain mapping overflowed during power-basis conversion')
+	}
+	mut previous := Polynomial{ coefficients: [1.0] }
+	mut result := scale_polynomial(previous, p.coefficients[0])
+	if p.coefficients.len == 1 {
+		for coefficient in result.coefficients {
+			if math.is_nan(coefficient) || math.is_inf(coefficient, 0) {
+				return error('chebyshev: coefficients overflowed during power-basis conversion')
+			}
+		}
+		return polynomial(result.coefficients)
+	}
+	mut current := Polynomial{ coefficients: [offset, scale] }
+	result = result.add(scale_polynomial(current, p.coefficients[1]))
+	for index in 2 .. p.coefficients.len {
+		next := polynomial_multiply_affine(current, 2.0 * scale, 2.0 * offset).add(scale_polynomial(previous,
+			-1.0))
+		result = result.add(scale_polynomial(next, p.coefficients[index]))
+		previous = current
+		current = next
+	}
+	for coefficient in result.coefficients {
+		if math.is_nan(coefficient) || math.is_inf(coefficient, 0) {
+			return error('chebyshev: coefficients overflowed during power-basis conversion')
+		}
+	}
+	return polynomial(result.coefficients)
+}
+
+pub fn (p Chebyshev) derivative() !Chebyshev {
+	ordinary := p.to_polynomial()!.derivative()
+	return chebyshev_from_polynomial(ordinary, p.domain, p.window)
+}
+
+pub fn (p Chebyshev) integral(constant f64) !Chebyshev {
+	ordinary := p.to_polynomial()!.integral(constant)
+	return chebyshev_from_polynomial(ordinary, p.domain, p.window)
+}
+
+pub fn (p Chebyshev) roots() ![]f64 {
+	return p.to_polynomial()!.roots()
+}
+
+pub fn (p Chebyshev) add(other Chebyshev) !Chebyshev {
+	if p.domain != other.domain || p.window != other.window {
+		return error('chebyshev addition requires matching domain and window')
+	}
+	size := if p.coefficients.len > other.coefficients.len {
+		p.coefficients.len
+	} else {
+		other.coefficients.len
+	}
+	mut coefficients := []f64{len: size}
+	for index in 0 .. size {
+		if index < p.coefficients.len {
+			coefficients[index] += p.coefficients[index]
+		}
+		if index < other.coefficients.len {
+			coefficients[index] += other.coefficients[index]
+		}
+	}
+	return chebyshev(coefficients, p.domain, p.window)
+}
+
+pub fn (p Chebyshev) mul(other Chebyshev) !Chebyshev {
+	if p.domain != other.domain || p.window != other.window {
+		return error('chebyshev multiplication requires matching domain and window')
+	}
+	left := p.to_polynomial()!
+	right := other.to_polynomial()!
+	return chebyshev_from_polynomial(left.mul(right), p.domain, p.window)
+}
+
+pub fn chebyshev_from_polynomial(p Polynomial, domain [2]f64, window [2]f64) !Chebyshev {
+	validate_polynomial_mapping(domain, window, 'chebyshev_from_polynomial')!
+	if p.coefficients.len == 0 {
+		return error('chebyshev_from_polynomial requires at least one coefficient')
+	}
+	scale := (domain[1] - domain[0]) / (window[1] - window[0])
+	offset := domain[0] - window[0] * scale
+	if math.is_nan(offset) || math.is_inf(offset, 0) || math.is_nan(scale) || math.is_inf(scale, 0) {
+		return error('chebyshev_from_polynomial: domain mapping overflowed during conversion')
+	}
+	normalized_polynomial := polynomial(p.coefficients)!
+	polynomial_in_window := polynomial_compose_affine(normalized_polynomial, scale, offset)
+	degree := polynomial_in_window.degree()
+	mut basis := []Polynomial{len: degree + 1}
+	basis[0] = Polynomial{ coefficients: [1.0] }
+	if degree > 0 {
+		basis[1] = Polynomial{ coefficients: [0.0, 1.0] }
+	}
+	for index in 2 .. degree + 1 {
+		basis[index] = polynomial_multiply_affine(basis[index - 1], 2.0, 0.0).add(scale_polynomial(basis[index - 2], -1.0))
+	}
+	mut residual := polynomial_in_window.coefficients.clone()
+	mut coefficients := []f64{len: degree + 1}
+	for index := degree; index >= 0; index-- {
+		leading := basis[index].coefficients[index]
+		coefficients[index] = residual[index] / leading
+		for power in 0 .. index + 1 {
+			residual[power] -= coefficients[index] * basis[index].coefficients[power]
+		}
+	}
+	for coefficient in coefficients {
+		if math.is_nan(coefficient) || math.is_inf(coefficient, 0) {
+			return error('chebyshev_from_polynomial: coefficients overflowed during conversion')
+		}
+	}
+	return chebyshev(coefficients, domain, window)
+}
+
+pub fn chebyshev_fit(x []f64, y []f64, degree int, domain [2]f64, window [2]f64) !Chebyshev {
+	validate_polynomial_mapping(domain, window, 'chebyshev_fit')!
+	mut mapped_x := []f64{len: x.len}
+	for index, value in x {
+		mapped_x[index] = window[0] + (value - domain[0]) * (window[1] - window[0]) /
+			(domain[1] - domain[0])
+	}
+	fitted := polynomial_fit(mapped_x, y, degree)!
+	in_window_basis := chebyshev_from_polynomial(fitted, window, window)!
+	return chebyshev(in_window_basis.coefficients, domain, window)
+}
+
+fn validate_polynomial_mapping(domain [2]f64, window [2]f64, operation string) ! {
+	for value in [domain[0], domain[1], window[0], window[1]] {
+		if math.is_nan(value) || math.is_inf(value, 0) {
+			return error('${operation}: domain and window bounds must be finite')
+		}
+	}
+	domain_width := domain[1] - domain[0]
+	window_width := window[1] - window[0]
+	if domain_width == 0 || window_width == 0 || math.is_inf(domain_width, 0)
+		|| math.is_inf(window_width, 0) {
+		return error('${operation}: domain and window widths must be finite and non-zero')
+	}
+}
+
+fn polynomial_multiply_affine(p Polynomial, linear f64, constant f64) Polynomial {
+	mut coefficients := []f64{len: p.coefficients.len + 1}
+	for index, value in p.coefficients {
+		coefficients[index] += value * constant
+		coefficients[index + 1] += value * linear
+	}
+	return Polynomial{ coefficients: coefficients }
+}
+
+fn polynomial_compose_affine(p Polynomial, linear f64, constant f64) Polynomial {
+	mut result := Polynomial{ coefficients: [p.coefficients[p.coefficients.len - 1]] }
+	for index := p.coefficients.len - 2; index >= 0; index-- {
+		result = polynomial_multiply_affine(result, linear, constant)
+		mut coefficients := result.coefficients.clone()
+		coefficients[0] += p.coefficients[index]
+		result = Polynomial{ coefficients: coefficients }
+	}
+	return result
+}
+
+fn scale_polynomial(p Polynomial, factor f64) Polynomial {
+	mut coefficients := p.coefficients.clone()
+	for index in 0 .. coefficients.len {
+		coefficients[index] *= factor
+	}
+	return Polynomial{ coefficients: coefficients }
+}
+
 // polynomial_fit computes a least-squares power-series fit with a scaled
 // Vandermonde matrix and Householder QR.
 pub fn polynomial_fit(x []f64, y []f64, degree int) !Polynomial {
