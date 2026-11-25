@@ -93,3 +93,23 @@ fn test_maxpool1d_forward_and_backward() ! {
 	gradient := maxpool1d_backward[f64](grad_out, input, 2, 0, 2)!
 	assert gradient.to_array() == [0.0, 1.0, 0.0, 1.0]
 }
+
+fn test_pool1d_rejects_invalid_parameters() {
+	input := vtl.ones[f64]([1, 1, 4])
+	if _ := avgpool1d_forward[f64](input, 0, 0, 1) {
+		assert false
+	}
+	if _ := maxpool1d_forward[f64](input, 2, 0, 0) {
+		assert false
+	}
+	if _ := avgpool1d_forward[f64](input, 5, 0, 1) {
+		assert false
+	}
+}
+
+fn test_maxpool1d_ties_route_gradient_to_first_maximum() ! {
+	input := vtl.from_array[f64]([2.0, 2.0, 1.0, 0.0], [1, 1, 4])!
+	grad_out := vtl.ones[f64]([1, 1, 2])
+	gradient := maxpool1d_backward[f64](grad_out, input, 2, 0, 2)!
+	assert gradient.to_array() == [1.0, 0.0, 1.0, 0.0]
+}
