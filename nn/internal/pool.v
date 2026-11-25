@@ -725,3 +725,38 @@ pub fn avgpool3d_forward[T](input &vtl.Tensor[T], kernel []int, padding []int, s
 	}
 	return output
 }
+
+pub fn avgpool3d_backward[T](grad_out &vtl.Tensor[T], input &vtl.Tensor[T], kernel []int, padding []int, stride []int) !&vtl.Tensor[T] {
+	output_shape := pool3d_output_shape[T](input, kernel, padding, stride)!
+	if grad_out.shape != output_shape {
+		return error('avgpool3d backward gradient shape does not match expected output')
+	}
+	mut d_input := vtl.zeros_like[T](input)
+	for b in 0 .. input.shape[0] {
+		for c in 0 .. input.shape[1] {
+			for od in 0 .. output_shape[2] {
+				for oh in 0 .. output_shape[3] {
+					for ow in 0 .. output_shape[4] {
+						volume := f64(kernel[0] * kernel[1] * kernel[2])
+						contribution := f64(grad_out.get([b, c, od, oh, ow])) / volume
+						for kd in 0 .. kernel[0] {
+							for kh in 0 .. kernel[1] {
+								for kw in 0 .. kernel[2] {
+									id := od * stride[0] - padding[0] + kd
+									ih := oh * stride[1] - padding[1] + kh
+									iw := ow * stride[2] - padding[2] + kw
+									if id >= 0 && id < input.shape[2] && ih >= 0 && ih < input.shape[3] && iw >= 0 && iw < input.shape[4] {
+										position := [b, c, id, ih, iw]
+										value := f64(d_input.get(position)) + contribution
+										d_input.set(position, vtl.cast[T](value))
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return d_input
+}

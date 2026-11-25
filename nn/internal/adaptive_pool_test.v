@@ -123,6 +123,13 @@ fn test_avgpool3d_forward_supports_kernel_stride_and_padding() ! {
 	assert result.to_array() == [1.0]
 }
 
+fn test_avgpool3d_backward_distributes_gradients() ! {
+	input := vtl.ones[f64]([1, 1, 2, 2, 2])
+	grad_out := vtl.ones[f64]([1, 1, 1, 1, 1])
+	result := avgpool3d_backward[f64](grad_out, input, [2, 2, 2], [0, 0, 0], [1, 1, 1])!
+	assert result.to_array() == [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125]
+}
+
 fn test_maxpool1d_ties_route_gradient_to_first_maximum() ! {
 	input := vtl.from_array[f64]([2.0, 2.0, 1.0, 0.0], [1, 1, 4])!
 	grad_out := vtl.ones[f64]([1, 1, 2])
