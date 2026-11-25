@@ -23,7 +23,7 @@ neural network module.
 | Unique values and occurrence counts | [Unique values](./TUTORIAL_UNIQUE.md) |
 | Missing values and masked reductions | [Masked data](./TUTORIAL_MASKED_DATA.md) |
 | Gather and indexed updates | [Indexing and scatter](./TUTORIAL_INDEXING.md) |
-| Broadcasting, maps, reductions | [Broadcasting](./TUTORIAL_BROADCASTING.md), [Map/reduce](./TUTORIAL_MAP_REDUCE.md), [Reductions](./TUTORIAL_REDUCTIONS.md), `vtl.vmap` and `vtl.autograd.vmap` |
+| Broadcasting, maps, reductions | [Broadcasting](./TUTORIAL_BROADCASTING.md), [Map/reduce](./TUTORIAL_MAP_REDUCE.md), [Reductions](./TUTORIAL_REDUCTIONS.md), [Functional transforms](./TUTORIAL_FUNCTIONAL_TRANSFORMS.md) |
 | Random tensors and reproducibility | [Random numbers](./TUTORIAL_RANDOM.md) |
 | Histograms and binning | [Histograms](./TUTORIAL_HISTOGRAMS.md) |
 | Fourier transforms | [FFT and normalization modes](./TUTORIAL_FFT.md) |
