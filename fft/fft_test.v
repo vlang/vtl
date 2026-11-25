@@ -107,6 +107,10 @@ fn test_rfft_plan_reuses_workspace_for_strided_inputs() ! {
 	offset_view := offset_base.slice([1, 5])!
 	assert offset_view.is_row_major_contiguous()
 	assert plan.forward(offset_view)!.array_equal(expected)
+	strided_offset_base := vtl.from_1d([f64(99), 1, 99, 0, 99, -1, 99, 0, 99])!
+	strided_offset := strided_offset_base.slice([1, 9, 2])!
+	assert !strided_offset.is_row_major_contiguous()
+	assert plan.forward(strided_offset)!.array_equal(expected)
 }
 
 fn test_rfft_plan_rejects_use_after_destroy() ! {

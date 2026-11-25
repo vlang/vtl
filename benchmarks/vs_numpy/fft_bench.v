@@ -13,24 +13,30 @@ const sample_count = 7
 
 fn main() {
 	println('VTL real f64 rfft forward transform')
-	println('size,iterations,samples,median_us,min_us,max_us,max_abs_error,checksum')
-	for size in sizes {
-		iterations := iterations_for(size)
-		result := benchmark_rfft(size, iterations) or {
-			eprintln('rfft benchmark failed for n=${size}: ${err}')
-			exit(1)
+	println('layout,size,iterations,samples,median_us,min_us,max_us,max_abs_error,checksum')
+	for strided in [false, true] {
+		layout := if strided { 'strided' } else { 'contiguous' }
+		for size in sizes {
+			iterations := iterations_for(size)
+			result := benchmark_rfft(size, iterations, strided) or {
+				eprintln('rfft benchmark failed for n=${size}: ${err}')
+				exit(1)
+			}
+			println('${layout},${size},${iterations},${sample_count},${result.median_us:.3f},${result.min_us:.3f},${result.max_us:.3f},${result.max_abs_error:.6e},${result.checksum:.6f}')
 		}
-		println('${size},${iterations},${sample_count},${result.median_us:.3f},${result.min_us:.3f},${result.max_us:.3f},${result.max_abs_error:.6e},${result.checksum:.6f}')
 	}
 	println('VTL real f32-input rfft with complex f32 output')
-	println('size,iterations,samples,median_us,min_us,max_us,max_abs_error,checksum')
-	for size in sizes {
-		iterations := iterations_for(size)
-		result := benchmark_rfft_f32(size, iterations) or {
-			eprintln('f32 rfft benchmark failed for n=${size}: ${err}')
-			exit(1)
+	println('layout,size,iterations,samples,median_us,min_us,max_us,max_abs_error,checksum')
+	for strided in [false, true] {
+		layout := if strided { 'strided' } else { 'contiguous' }
+		for size in sizes {
+			iterations := iterations_for(size)
+			result := benchmark_rfft_f32(size, iterations, strided) or {
+				eprintln('f32 rfft benchmark failed for n=${size}: ${err}')
+				exit(1)
+			}
+			println('${layout},${size},${iterations},${sample_count},${result.median_us:.3f},${result.min_us:.3f},${result.max_us:.3f},${result.max_abs_error:.6e},${result.checksum:.6f}')
 		}
-		println('${size},${iterations},${sample_count},${result.median_us:.3f},${result.min_us:.3f},${result.max_us:.3f},${result.max_abs_error:.6e},${result.checksum:.6f}')
 	}
 }
 
@@ -51,13 +57,18 @@ fn iterations_for(size int) int {
 	}
 }
 
-fn benchmark_rfft(size int, iterations int) !BenchmarkResult {
-	mut values := []f64{len: size}
+fn benchmark_rfft(size int, iterations int, strided bool) !BenchmarkResult {
+	input_size := if strided { size * 2 } else { size }
+	mut values := []f64{len: input_size}
 	for i in 0 .. size {
 		x := f64(i) / f64(size)
-		values[i] = math.sin(2.0 * math.pi * 7.0 * x) + 0.25 * math.cos(2.0 * math.pi * 31.0 * x)
+		offset := if strided { i * 2 } else { i }
+		values[offset] = math.sin(2.0 * math.pi * 7.0 * x) + 0.25 * math.cos(2.0 * math.pi * 31.0 * x)
 	}
-	input := vtl.from_1d[f64](values)!
+	mut input := vtl.from_1d[f64](values)!
+	if strided {
+		input = input.slice([0, input_size, 2])!
+	}
 	mut plan := fft.create_rfft_plan[f64](size)!
 	defer {
 		plan.destroy()
@@ -85,13 +96,18 @@ fn benchmark_rfft(size int, iterations int) !BenchmarkResult {
 	}
 }
 
-fn benchmark_rfft_f32(size int, iterations int) !BenchmarkResult {
-	mut values := []f32{len: size}
+fn benchmark_rfft_f32(size int, iterations int, strided bool) !BenchmarkResult {
+	input_size := if strided { size * 2 } else { size }
+	mut values := []f32{len: input_size}
 	for i in 0 .. size {
 		x := f64(i) / f64(size)
-		values[i] = f32(math.sin(2.0 * math.pi * 7.0 * x) + 0.25 * math.cos(2.0 * math.pi * 31.0 * x))
+		offset := if strided { i * 2 } else { i }
+		values[offset] = f32(math.sin(2.0 * math.pi * 7.0 * x) + 0.25 * math.cos(2.0 * math.pi * 31.0 * x))
 	}
-	input := vtl.from_1d[f32](values)!
+	mut input := vtl.from_1d[f32](values)!
+	if strided {
+		input = input.slice([0, input_size, 2])!
+	}
 	mut plan := fft.create_rfft_f32_plan(size)!
 	defer {
 		plan.destroy()

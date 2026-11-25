@@ -692,11 +692,14 @@ backends.
 `rfft`/`rfftn` and inverses; reusable real plans; `fftfreq`/`rfftfreq` and
 `fftshift`/`ifftshift`; NumPy's `backward`/`forward`/`ortho` normalization.
 Dedicated `_f32` real APIs preserve f32 output; generic `rfft[f32]` retains its
-f64 complex return type. Tests compare strided f32 real and complex inputs with
-their contiguous logical-order equivalents.
+f64 complex return type. Tests cover strided real f64/f32 and complex f32
+inputs, including offset views, against their contiguous logical-order
+equivalents. Paired real and complex FFT benchmarks now cover contiguous and
+stride-2 inputs at four sizes, with analytic error checks and repeated timings;
+the benchmark README records a reproducible 16,384-element comparison.
 
-**Remaining:** benchmark large/strided arrays and complete the dtype-promotion
-audit.
+**Remaining:** extend performance evidence to batched/N-D transforms and finish
+the dtype-promotion audit across all public FFT wrappers.
 
 ### Random
 

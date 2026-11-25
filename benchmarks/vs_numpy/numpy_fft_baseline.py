@@ -49,13 +49,19 @@ def benchmark(source: np.ndarray) -> tuple[float, float, float, float, float]:
 def main() -> None:
     for label, dtype in (("f64", np.float64), ("f32 input", np.float32)):
         print(f"NumPy real {label} rfft forward transform")
-        print("size,iterations,samples,median_us,min_us,max_us,max_abs_error,checksum")
-        for size in SIZES:
-            median_us, min_us, max_us, max_abs_error, checksum = benchmark(signal(size, dtype))
-            print(
-                f"{size},{ITERATIONS[size]},{SAMPLE_COUNT},{median_us:.3f},"
-                f"{min_us:.3f},{max_us:.3f},{max_abs_error:.6e},{checksum:.6f}"
-            )
+        print("layout,size,iterations,samples,median_us,min_us,max_us,max_abs_error,checksum")
+        for layout in ("contiguous", "strided"):
+            for size in SIZES:
+                source = signal(size, dtype)
+                if layout == "strided":
+                    interleaved = np.zeros(size * 2, dtype=dtype)
+                    interleaved[::2] = source
+                    source = interleaved[::2]
+                median_us, min_us, max_us, max_abs_error, checksum = benchmark(source)
+                print(
+                    f"{layout},{size},{ITERATIONS[size]},{SAMPLE_COUNT},{median_us:.3f},"
+                    f"{min_us:.3f},{max_us:.3f},{max_abs_error:.6e},{checksum:.6f}"
+                )
 
 
 if __name__ == "__main__":

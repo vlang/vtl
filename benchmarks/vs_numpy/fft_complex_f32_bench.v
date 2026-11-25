@@ -12,20 +12,23 @@ const sample_count = 7
 
 fn main() {
 	println('VTL complex f32 FFT forward transform')
-	println('size,iterations,samples,median_us,min_us,max_us,max_abs_error,checksum')
-	for size in sizes {
-		iterations := if size <= 1024 {
-			50
-		} else if size <= 4096 {
-			20
-		} else {
-			10
+	println('layout,size,iterations,samples,median_us,min_us,max_us,max_abs_error,checksum')
+	for strided in [false, true] {
+		layout := if strided { 'strided' } else { 'contiguous' }
+		for size in sizes {
+			iterations := if size <= 1024 {
+				50
+			} else if size <= 4096 {
+				20
+			} else {
+				10
+			}
+			result := benchmark_fft_f32(size, iterations, strided) or {
+				eprintln('complex f32 FFT benchmark failed for n=${size}: ${err}')
+				exit(1)
+			}
+			println('${layout},${size},${iterations},${sample_count},${result.median_us:.3f},${result.min_us:.3f},${result.max_us:.3f},${result.max_abs_error:.6e},${result.checksum:.6f}')
 		}
-		result := benchmark_fft_f32(size, iterations) or {
-			eprintln('complex f32 FFT benchmark failed for n=${size}: ${err}')
-			exit(1)
-		}
-		println('${size},${iterations},${sample_count},${result.median_us:.3f},${result.min_us:.3f},${result.max_us:.3f},${result.max_abs_error:.6e},${result.checksum:.6f}')
 	}
 }
 
@@ -37,16 +40,21 @@ struct BenchmarkResult {
 	checksum      f64
 }
 
-fn benchmark_fft_f32(size int, iterations int) !BenchmarkResult {
-	mut values := []fft.Complex32{len: size}
+fn benchmark_fft_f32(size int, iterations int, strided bool) !BenchmarkResult {
+	input_size := if strided { size * 2 } else { size }
+	mut values := []fft.Complex32{len: input_size}
 	for i in 0 .. size {
 		x := f64(i) / f64(size)
-		values[i] = fft.Complex32{
+		offset := if strided { i * 2 } else { i }
+		values[offset] = fft.Complex32{
 			re: f32(math.sin(2.0 * math.pi * 7.0 * x))
 			im: f32(0.25 * math.cos(2.0 * math.pi * 31.0 * x))
 		}
 	}
-	input := vtl.from_1d[fft.Complex32](values)!
+	mut input := vtl.from_1d[fft.Complex32](values)!
+	if strided {
+		input = input.slice([0, input_size, 2])!
+	}
 	for _ in 0 .. 3 {
 		_ := fft.fft_f32(input)!
 	}

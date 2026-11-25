@@ -236,6 +236,11 @@ pub fn irfft2_f32(input &vtl.Tensor[Complex32], shape []int) !&vtl.Tensor[f32] {
 fn copy_real_f32(input &vtl.Tensor[f32], mut packed []f32) {
 	if input.is_row_major_contiguous() {
 		unsafe { C.memcpy(packed.data, input.data.data.data, input.size * sizeof(f32)) }
+	} else if input.rank() == 1 && input.strides[0] > 0 {
+		stride := input.strides[0]
+		for i in 0 .. input.size {
+			packed[i] = input.data.get(i * stride)
+		}
 	} else {
 		for i in 0 .. input.size {
 			packed[i] = input.get_nth(i)

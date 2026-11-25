@@ -10,11 +10,15 @@ SIZES = (256, 1024, 4096, 16384)
 SAMPLE_COUNT = 7
 
 
-def benchmark(size: int, iterations: int) -> tuple[float, float, float, float, float]:
+def benchmark(size: int, iterations: int, strided: bool) -> tuple[float, float, float, float, float]:
     positions = np.arange(size, dtype=np.float64) / size
     values = np.empty(size, dtype=np.complex64)
     values.real = np.sin(2.0 * math.pi * 7.0 * positions).astype(np.float32)
     values.imag = (0.25 * np.cos(2.0 * math.pi * 31.0 * positions)).astype(np.float32)
+    if strided:
+        interleaved = np.zeros(size * 2, dtype=np.complex64)
+        interleaved[::2] = values
+        values = interleaved[::2]
     for _ in range(3):
         np.fft.fft(values)
     expected = np.zeros(size, dtype=np.complex128)
@@ -39,14 +43,17 @@ def benchmark(size: int, iterations: int) -> tuple[float, float, float, float, f
 
 def main() -> None:
     print("NumPy complex64 FFT forward transform (NumPy promotes to complex128)")
-    print("size,iterations,samples,median_us,min_us,max_us,max_abs_error,checksum")
-    for size in SIZES:
-        iterations = 50 if size <= 1024 else 20 if size <= 4096 else 10
-        median_us, min_us, max_us, max_abs_error, checksum = benchmark(size, iterations)
-        print(
-            f"{size},{iterations},{SAMPLE_COUNT},{median_us:.3f},"
-            f"{min_us:.3f},{max_us:.3f},{max_abs_error:.6e},{checksum:.6f}"
-        )
+    print("layout,size,iterations,samples,median_us,min_us,max_us,max_abs_error,checksum")
+    for layout in ("contiguous", "strided"):
+        for size in SIZES:
+            iterations = 50 if size <= 1024 else 20 if size <= 4096 else 10
+            median_us, min_us, max_us, max_abs_error, checksum = benchmark(
+                size, iterations, layout == "strided"
+            )
+            print(
+                f"{layout},{size},{iterations},{SAMPLE_COUNT},{median_us:.3f},"
+                f"{min_us:.3f},{max_us:.3f},{max_abs_error:.6e},{checksum:.6f}"
+            )
 
 
 if __name__ == "__main__":
