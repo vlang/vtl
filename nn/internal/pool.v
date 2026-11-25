@@ -615,3 +615,62 @@ pub fn avgpool1d_backward[T](grad_out &vtl.Tensor[T], input &vtl.Tensor[T], kern
 	}
 	return d_input
 }
+
+pub fn maxpool1d_forward[T](input &vtl.Tensor[T], kernel int, padding int, stride int) !&vtl.Tensor[T] {
+	output_shape := pool1d_output_shape[T](input, kernel, padding, stride)!
+	mut output := vtl.zeros[T](output_shape)
+	for batch in 0 .. input.shape[0] {
+		for channel in 0 .. input.shape[1] {
+			for out_i in 0 .. output_shape[2] {
+				start := out_i * stride - padding
+				mut maximum := f64(0)
+				mut found := false
+				for offset in 0 .. kernel {
+					index := start + offset
+					if index >= 0 && index < input.shape[2] {
+						value := f64(input.get([batch, channel, index]))
+						if !found || value > maximum {
+							maximum = value
+							found = true
+						}
+					}
+				}
+				output.set([batch, channel, out_i], vtl.cast[T](maximum))
+			}
+		}
+	}
+	return output
+}
+
+pub fn maxpool1d_backward[T](grad_out &vtl.Tensor[T], input &vtl.Tensor[T], kernel int, padding int, stride int) !&vtl.Tensor[T] {
+	output_shape := pool1d_output_shape[T](input, kernel, padding, stride)!
+	if grad_out.shape != output_shape {
+		return error('maxpool1d backward gradient shape does not match expected output')
+	}
+	mut d_input := vtl.zeros_like[T](input)
+	for batch in 0 .. input.shape[0] {
+		for channel in 0 .. input.shape[1] {
+			for out_i in 0 .. output_shape[2] {
+				start := out_i * stride - padding
+				mut max_index := -1
+				mut maximum := f64(0)
+				for offset in 0 .. kernel {
+					index := start + offset
+					if index >= 0 && index < input.shape[2] {
+						value := f64(input.get([batch, channel, index]))
+						if max_index < 0 || value > maximum {
+							maximum = value
+							max_index = index
+						}
+					}
+				}
+				if max_index >= 0 {
+					position := [batch, channel, max_index]
+					value := f64(d_input.get(position)) + f64(grad_out.get([batch, channel, out_i]))
+					d_input.set(position, vtl.cast[T](value))
+				}
+			}
+		}
+	}
+	return d_input
+}

@@ -799,3 +799,93 @@ pub fn (g &AvgPool1DGate[T]) cache(mut result autograd.Variable[T], args ...auto
 		else {}
 	}
 }
+
+pub struct MaxPool1DLayer[T] {
+	kernel      int
+	padding     int
+	stride      int
+	input_shape []int
+}
+
+pub fn maxpool1d_layer[T](ctx &autograd.Context[T], input_shape []int, kernel int, padding int, stride int) types.Layer[T] {
+	layer := &MaxPool1DLayer[T]{
+		kernel:      kernel
+		padding:     padding
+		stride:      stride
+		input_shape: input_shape.clone()
+	}
+	return types.layer[T](voidptr(layer), max_pool1_d_layer_output_shape_dispatch[T],
+		max_pool1_d_layer_variables_dispatch[T], max_pool1_d_layer_forward_dispatch[T])
+}
+
+pub fn (layer &MaxPool1DLayer[T]) output_shape() []int {
+	return [layer.input_shape[0],
+		(layer.input_shape[1] - layer.kernel + 2 * layer.padding) / layer.stride + 1]
+}
+
+pub fn (layer &MaxPool1DLayer[T]) variables() []&autograd.Variable[T] {
+	return []
+}
+
+pub fn (layer &MaxPool1DLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
+	output := internal.maxpool1d_forward[T](input.value, layer.kernel, layer.padding, layer.stride)!
+	mut result := input.context.variable(output)
+	if input.requires_grad {
+		gate := maxpool1d_gate[T](input.value, layer.kernel, layer.padding, layer.stride)
+		gate.cache(mut result, input)!
+	}
+	return result
+}
+
+fn max_pool1_d_layer_output_shape_dispatch[T](layer voidptr) []int {
+	return unsafe { (&MaxPool1DLayer[T](layer)).output_shape() }
+}
+
+fn max_pool1_d_layer_variables_dispatch[T](layer voidptr) []voidptr {
+	vars := unsafe { (&MaxPool1DLayer[T](layer)).variables() }
+	return types.variable_ptrs_to_voidptrs[T](vars)
+}
+
+fn max_pool1_d_layer_forward_dispatch[T](layer voidptr, input voidptr) !voidptr {
+	typed_input := unsafe { &autograd.Variable[T](input) }
+	result := unsafe { (&MaxPool1DLayer[T](layer)).forward(typed_input)! }
+	return voidptr(result)
+}
+
+pub struct MaxPool1DGate[T] {
+	input   &vtl.Tensor[T] = unsafe { nil }
+	kernel  int
+	padding int
+	stride  int
+}
+
+pub fn maxpool1d_gate[T](input &vtl.Tensor[T], kernel int, padding int, stride int) &MaxPool1DGate[T] {
+	return &MaxPool1DGate[T]{
+		input:   input
+		kernel:  kernel
+		padding: padding
+		stride:  stride
+	}
+}
+
+pub fn (g &MaxPool1DGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
+	grad := internal.maxpool1d_backward[T](payload.variable.grad, g.input, g.kernel, g.padding, g.stride)!
+	return [grad]
+}
+
+fn max_pool1_d_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &autograd.Payload[T](payload) }
+	tensors := unsafe { (&MaxPool1DGate[T](gate)).backward(typed_payload)! }
+	return autograd.tensor_ptrs_to_voidptrs[T](tensors)
+}
+
+pub fn (g &MaxPool1DGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
+	a := args[0]
+	match a {
+		autograd.Variable[T] {
+			autograd.register[T]('MaxPool1D', voidptr(g), max_pool1_d_gate_backward_dispatch[T],
+				result, [a])!
+		}
+		else {}
+	}
+}

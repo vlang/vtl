@@ -88,7 +88,7 @@ graphs where feasible.
 ### Neural-network modules
 
 **VTL today:** `Sequential`, common activations, linear, convolutional,
-average-pooling (including `avgpool1d` and fixed-output `adaptive_avgpool1d`,
+pooling (including `avgpool1d`, `maxpool1d`, and fixed-output `adaptive_avgpool1d`,
 `adaptive_avgpool2d`, `adaptive_avgpool3d`, `adaptive_maxpool1d`, and
 `adaptive_maxpool2d`, and `adaptive_maxpool3d`),
 recurrent, attention, and normalization layers. Typed CPU LSTM layers support
