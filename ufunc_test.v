@@ -46,3 +46,18 @@ fn test_ufunc_reduce_and_accumulate_use_logical_flat_order() ! {
 		return a + b
 	}) == 7.0
 }
+
+fn test_ufunc_outer_and_reduceat() ! {
+	left := from_array([1.0, 2.0], [2])!
+	right := from_array([10.0, 20.0, 30.0], [3])!
+	outer := ufunc_outer[f64](left, right, fn (a f64, b f64) f64 {
+		return a * b
+	})!
+	assert outer.shape == [2, 3]
+	assert outer.to_array() == [10.0, 20.0, 30.0, 20.0, 40.0, 60.0]
+	input := from_array([1.0, 2.0, 3.0, 4.0, 5.0], [5])!
+	reduced := ufunc_reduceat[f64](input, [0, 2, 2], fn (a f64, b f64) f64 {
+		return a + b
+	})!
+	assert reduced.to_array() == [3.0, 3.0, 12.0]
+}

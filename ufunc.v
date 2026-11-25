@@ -62,3 +62,44 @@ pub fn ufunc_accumulate[T](input &Tensor[T], identity T, operation fn (T, T) T) 
 	}
 	return output
 }
+
+// ufunc_outer computes operation(left[i], right[j]) for every flattened
+// logical pair and returns a matrix of shape [left.size, right.size].
+pub fn ufunc_outer[T](left &Tensor[T], right &Tensor[T], operation fn (T, T) T) !&Tensor[T] {
+	mut output := zeros[T]([left.size(), right.size()])
+	for i in 0 .. left.size() {
+		for j in 0 .. right.size() {
+			output.set([i, j], operation(left.get_nth(i), right.get_nth(j)))
+		}
+	}
+	return output
+}
+
+// ufunc_reduceat applies a segmented reduction in flattened logical order.
+// Each start must be in bounds; non-increasing adjacent starts select one
+// element, following NumPy's reduceat segment rule.
+pub fn ufunc_reduceat[T](input &Tensor[T], indices []int, operation fn (T, T) T) !&Tensor[T] {
+	if indices.len == 0 {
+		return error('ufunc_reduceat requires at least one index')
+	}
+	mut output := zeros[T]([indices.len])
+	for segment, start in indices {
+		if start < 0 || start >= input.size() {
+			return error('ufunc_reduceat index ${start} is out of bounds')
+		}
+		mut end := input.size()
+		if segment + 1 < indices.len {
+			next := indices[segment + 1]
+			if next < 0 || next > input.size() {
+				return error('ufunc_reduceat index ${next} is out of bounds')
+			}
+			end = if next <= start { start + 1 } else { next }
+		}
+		mut result := input.get_nth(start)
+		for i in start + 1 .. end {
+			result = operation(result, input.get_nth(i))
+		}
+		output.set_nth(segment, result)
+	}
+	return output
+}
