@@ -107,6 +107,15 @@ fn test_pool1d_rejects_invalid_parameters() {
 	}
 }
 
+fn test_avgpool1d_padding_includes_zero_border_in_mean() ! {
+	input := vtl.from_array[f64]([2.0, 4.0], [1, 1, 2])!
+	result := avgpool1d_forward[f64](input, 3, 1, 1)!
+	assert result.to_array() == [2.0, 2.0]
+	grad_out := vtl.ones[f64]([1, 1, 2])
+	gradient := avgpool1d_backward[f64](grad_out, input, 3, 1, 1)!
+	assert gradient.to_array() == [0.6666666666666666, 0.6666666666666666]
+}
+
 fn test_maxpool1d_ties_route_gradient_to_first_maximum() ! {
 	input := vtl.from_array[f64]([2.0, 2.0, 1.0, 0.0], [1, 1, 4])!
 	grad_out := vtl.ones[f64]([1, 1, 2])
