@@ -1,0 +1,5 @@
+# Generated from NumPy savetxt output; comment line added to exercise comment handling.
+feature;measurement
+1.250000000000000000e+00;2.500000000000000000e+00
+3.750000000000000000e+00;nan
+5.000000000000000000e+00;6.250000000000000000e+00

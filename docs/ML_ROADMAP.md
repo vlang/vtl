@@ -67,7 +67,6 @@ itemized status is in the [main roadmap](../ROADMAP.md#phase-5--opencl-backend).
 | [#722](https://github.com/vlang/vtl/issues/722) | feat: expand complex tensor and linear algebra coverage |
 | [#723](https://github.com/vlang/vtl/issues/723) | feat: complete NumPy random distributions and generator streams |
 | [#724](https://github.com/vlang/vtl/issues/724) | perf: validate FFT dtype and strided-array parity |
-| [#725](https://github.com/vlang/vtl/issues/725) | feat(io): add NumPy text array interoperability |
 | [#726](https://github.com/vlang/vtl/issues/726) | feat(io): add memory-mapped NumPy array access |
 | [#727](https://github.com/vlang/vtl/issues/727) | feat: connect masked arrays to autograd and neural networks |
 | [#728](https://github.com/vlang/vtl/issues/728) | feat: define structured-array and table interoperability scope |

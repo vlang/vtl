@@ -8,12 +8,14 @@ import vtl
 // CsvReadConfig controls numeric CSV tensor loading.
 pub struct CsvReadConfig {
 pub:
-	delimiter   u8 = `,`
-	comment     u8 = `#`
-	skip_header bool
-	skip_rows   int
-	use_cols    []int
-	max_rows    int = -1
+	delimiter      u8 = `,`
+	comment        u8 = `#`
+	skip_header    bool
+	skip_rows      int
+	use_cols       []int
+	max_rows       int = -1
+	missing_values []string
+	fill_value     string
 }
 
 // CsvWriteConfig controls CSV serialization of rank-two tensors.
@@ -91,8 +93,18 @@ pub fn read[T](path string, config CsvReadConfig) !&vtl.Tensor[T] {
 		}
 		column_count = selected.len
 		for column, field in selected {
-			values << parse_value[T](field) or {
-				return error('csv.read: invalid value at row ${row_count}, column ${column}: ${err}')
+			clean := field.trim_space()
+			if config.missing_values.any(it == clean) {
+				if config.fill_value == '' {
+					return error('csv.read: missing value at row ${row_count}, column ${column} requires fill_value')
+				}
+				values << parse_value[T](config.fill_value) or {
+					return error('csv.read: invalid fill_value ${config.fill_value}: ${err}')
+				}
+			} else {
+				values << parse_value[T](clean) or {
+					return error('csv.read: invalid value at row ${row_count}, column ${column}: ${err}')
+				}
 			}
 		}
 		row_count++

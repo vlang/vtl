@@ -25,4 +25,13 @@ fn main() {
 	os.write_file(without_final_newline, '6.0,70.5')!
 	single := csv.read[f64](without_final_newline, csv.CsvReadConfig{})!
 	println('single record: ${single.to_array()}')
+	numpy_fixture := os.join_path(os.dir(@FILE), '../../csv/testdata/numpy_text_missing.csv')
+	imported := csv.read[f32](numpy_fixture, csv.CsvReadConfig{
+		delimiter:      `;`
+		comment:        `#`
+		skip_header:    true
+		missing_values: ['nan']
+		fill_value:     '-1'
+	})!
+	println('NumPy fixture with missing-value fill: ${imported.to_array()}')
 }

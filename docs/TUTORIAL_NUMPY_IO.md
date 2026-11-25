@@ -43,16 +43,22 @@ See [the runnable example](../examples/npy_round_trip) for a complete program.
 `vtl.csv` reads numeric fields into a rank-two tensor and writes rank-two
 tensors as CSV. It supports quoted fields through V's standard CSV parser,
 configurable delimiters and comments, headers, skipped rows, selected columns,
-and a row limit. Read each tensor with its expected V element type; CSV itself
-does not store dtype or shape metadata.
+missing-value markers, and a row limit. Select the destination dtype with the
+generic type (`read[f32]` or `read[f64]`); CSV itself does not store dtype or
+shape metadata. A missing marker is matched after trimming whitespace and
+requires an explicit `fill_value`, which is parsed as the requested element
+type. Invalid values, invalid fill values, and ragged rows return errors.
 
 ```v
 import vtl.csv
 
 features := csv.read[f64]('training.csv', csv.CsvReadConfig{
-	skip_header: true
-	use_cols:    [0, 2]
-	max_rows:    1000
+	delimiter:      `;`
+	skip_header:    true
+	use_cols:       [0, 2]
+	max_rows:       1000
+	missing_values: ['NA', 'nan']
+	fill_value:     '0'
 })!
 csv.write('features.csv', features, csv.CsvWriteConfig{
 	header: ['height', 'weight']
@@ -60,7 +66,7 @@ csv.write('features.csv', features, csv.CsvWriteConfig{
 ```
 
 See [the CSV round-trip example](../examples/csv_round_trip) for a runnable
-program.
+program that also reads a NumPy-generated fixture with a missing-value marker.
 
 ## Compressed `.npz` archives
 

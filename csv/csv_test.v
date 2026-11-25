@@ -46,6 +46,51 @@ fn test_csv_reads_single_record_without_line_ending() ! {
 	assert values.to_array() == [1.5, 2.5]
 }
 
+fn test_csv_reads_numpy_text_fixture_with_missing_values_and_explicit_dtype() ! {
+	path := os.join_path(os.dir(@FILE), 'testdata', 'numpy_text_missing.csv')
+	values := read[f64](path, CsvReadConfig{
+		delimiter:      `;`
+		comment:        `#`
+		skip_header:    true
+		missing_values: ['nan']
+		fill_value:     '-1'
+	})!
+	assert values.shape == [3, 2]
+	assert values.to_array() == [1.25, 2.5, 3.75, -1.0, 5.0, 6.25]
+
+	single_precision := read[f32](path, CsvReadConfig{
+		delimiter:      `;`
+		comment:        `#`
+		skip_header:    true
+		missing_values: ['nan']
+		fill_value:     '-1'
+	})!
+	single_precision_values := single_precision.to_array()
+	for index, expected in [1.25, 2.5, 3.75, -1.0, 5.0, 6.25] {
+		difference := f64(single_precision_values[index]) - expected
+		assert difference > -1e-6 && difference < 1e-6
+	}
+}
+
+fn test_csv_missing_values_require_a_valid_fill_value() ! {
+	path := os.join_path(os.dir(@FILE), 'testdata', 'numpy_text_missing.csv')
+	if _ := read[f64](path, CsvReadConfig{
+		delimiter:      `;`
+		skip_header:    true
+		missing_values: ['nan']
+	}) {
+		assert false, 'missing values must not silently become zero'
+	}
+	if _ := read[f64](path, CsvReadConfig{
+		delimiter:      `;`
+		skip_header:    true
+		missing_values: ['nan']
+		fill_value:     'not-a-number'
+	}) {
+		assert false, 'fill_value must parse as the requested tensor element type'
+	}
+}
+
 fn test_csv_write_round_trip_with_quoted_header() ! {
 	path := os.join_path(os.temp_dir(), 'vtl_csv_write_${os.getpid()}.csv')
 	defer {
