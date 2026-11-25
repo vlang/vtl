@@ -109,6 +109,105 @@ fn avg_pool2_d_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidp
 	return autograd.tensor_ptrs_to_voidptrs[T](tensors)
 }
 
+// AveragePool3DLayer applies 3D average pooling over a 5D input.
+//
+// Input:    `[batch, channels, D, H, W]`
+// Output:   `[batch, channels, out_D, out_H, out_W]`
+pub struct AveragePool3DLayer[T] {
+	kernel      []int
+	padding     []int
+	stride      []int
+	input_shape []int
+}
+
+// avgpool3d_layer creates an AveragePool3DLayer.
+pub fn avgpool3d_layer[T](ctx &autograd.Context[T], input_shape []int, kernel []int, padding []int, stride []int) types.Layer[T] {
+	layer := &AveragePool3DLayer[T]{
+		kernel:      kernel.clone()
+		padding:     padding.clone()
+		stride:      stride.clone()
+		input_shape: input_shape.clone()
+	}
+	return types.layer[T](voidptr(layer), average_pool3_d_layer_output_shape_dispatch[T],
+		average_pool3_d_layer_variables_dispatch[T], average_pool3_d_layer_forward_dispatch[T])
+}
+
+pub fn (layer &AveragePool3DLayer[T]) output_shape() []int {
+	return [
+		layer.input_shape[0],
+		(layer.input_shape[1] - layer.kernel[0] + 2 * layer.padding[0]) / layer.stride[0] + 1,
+		(layer.input_shape[2] - layer.kernel[1] + 2 * layer.padding[1]) / layer.stride[1] + 1,
+		(layer.input_shape[3] - layer.kernel[2] + 2 * layer.padding[2]) / layer.stride[2] + 1,
+	]
+}
+
+pub fn (layer &AveragePool3DLayer[T]) variables() []&autograd.Variable[T] {
+	return []
+}
+
+pub fn (layer &AveragePool3DLayer[T]) forward(input &autograd.Variable[T]) !&autograd.Variable[T] {
+	output := internal.avgpool3d_forward[T](input.value, layer.kernel, layer.padding, layer.stride)!
+	mut result := input.context.variable(output)
+	if input.requires_grad {
+		gate := avgpool3d_gate[T](input.value, layer.kernel, layer.padding, layer.stride)
+		gate.cache(mut result, input)!
+	}
+	return result
+}
+
+fn average_pool3_d_layer_output_shape_dispatch[T](layer voidptr) []int {
+	return unsafe { (&AveragePool3DLayer[T](layer)).output_shape() }
+}
+
+fn average_pool3_d_layer_variables_dispatch[T](layer voidptr) []voidptr {
+	vars := unsafe { (&AveragePool3DLayer[T](layer)).variables() }
+	return types.variable_ptrs_to_voidptrs[T](vars)
+}
+
+fn average_pool3_d_layer_forward_dispatch[T](layer voidptr, input voidptr) !voidptr {
+	typed_input := unsafe { &autograd.Variable[T](input) }
+	result := unsafe { (&AveragePool3DLayer[T](layer)).forward(typed_input)! }
+	return voidptr(result)
+}
+
+pub struct AvgPool3DGate[T] {
+	input   &vtl.Tensor[T] = unsafe { nil }
+	kernel  []int
+	padding []int
+	stride  []int
+}
+
+pub fn avgpool3d_gate[T](input &vtl.Tensor[T], kernel []int, padding []int, stride []int) &AvgPool3DGate[T] {
+	return &AvgPool3DGate[T]{
+		input:   input
+		kernel:  kernel
+		padding: padding
+		stride:  stride
+	}
+}
+
+pub fn (g &AvgPool3DGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
+	grad := internal.avgpool3d_backward[T](payload.variable.grad, g.input, g.kernel, g.padding, g.stride)!
+	return [grad]
+}
+
+fn avg_pool3_d_gate_backward_dispatch[T](gate voidptr, payload voidptr) ![]voidptr {
+	typed_payload := unsafe { &autograd.Payload[T](payload) }
+	tensors := unsafe { (&AvgPool3DGate[T](gate)).backward(typed_payload)! }
+	return autograd.tensor_ptrs_to_voidptrs[T](tensors)
+}
+
+pub fn (g &AvgPool3DGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
+	a := args[0]
+	match a {
+		autograd.Variable[T] {
+			autograd.register[T]('AvgPool3D', voidptr(g), avg_pool3_d_gate_backward_dispatch[T],
+				result, [a])!
+		}
+		else {}
+	}
+}
+
 // cache exposes this operation as part of the public API.
 pub fn (g &AvgPool2DGate[T]) cache(mut result autograd.Variable[T], args ...autograd.CacheParam) ! {
 	a := args[0]

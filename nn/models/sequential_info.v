@@ -249,6 +249,23 @@ pub fn (mut ls SequentialInfo[T]) avgpool2d(kernel []int, padding []int, stride 
 		})
 }
 
+pub fn (mut ls SequentialInfo[T]) avgpool3d(kernel []int, padding []int, stride []int) {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.add_layer(layers.avgpool3d_layer[T](ls.ctx, shape, kernel, padding, stride),
+		'AvgPool3DLayer', {
+			'kernel_d':  kernel[0]
+			'kernel_h':  kernel[1]
+			'kernel_w':  kernel[2]
+			'padding_d': padding[0]
+			'padding_h': padding[1]
+			'padding_w': padding[2]
+			'stride_d':  stride[0]
+			'stride_h':  stride[1]
+			'stride_w':  stride[2]
+		})
+}
+
 // global_avgpool2d adds a new GlobalAveragePool2D layer to the network.
 pub fn (mut ls SequentialInfo[T]) global_avgpool2d() {
 	ls.add_layer(layers.global_avgpool2d_layer[T](ls.ctx), 'GlobalAvgPool2DLayer', {})
