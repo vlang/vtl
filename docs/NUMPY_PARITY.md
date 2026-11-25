@@ -313,6 +313,9 @@ floating result to avoid silent precision loss.
 numeric and boolean tensor pairs: it always returns f64, including for f32
 inputs, and allows negative integer exponents. Inputs are converted to f64, so
 large integers may lose precision just as they do with NumPy.
+`float_power_scalar_promoted` and `float_power_scalar_left_promoted` provide
+the same contract with weak scalar operands in either order; complex values
+remain unsupported.
 `fmod_promoted` and its weak-scalar variants preserve the sign-of-dividend
 remainder rule across promoted real numeric dtypes and broadcasting. Integer
 operations retain exact-width arithmetic; zero divisors and signed minimum

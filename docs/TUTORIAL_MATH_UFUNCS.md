@@ -115,6 +115,11 @@ fractional_powers := vtl.pow_scalar_left_promoted[f64, i16, f64](0.5, exponents)
 println(fractional_powers.to_array()) // [4.0, 0.125]
 ```
 
+For NumPy's always-`f64` `float_power` behavior with a scalar, use
+`float_power_scalar_promoted` or `float_power_scalar_left_promoted`. These
+accept real numeric and boolean values, allow negative integer exponents, and
+reject complex inputs.
+
 ## Promoted exponential and logarithm
 
 `vtl.exp_promoted[R, T](values)` and `vtl.log_promoted[R, T](values)`, along

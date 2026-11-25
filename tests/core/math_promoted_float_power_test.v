@@ -79,3 +79,24 @@ fn test_float_power_promoted_handles_scalar_and_empty_broadcasts_and_rejects_bad
 		assert false, 'float_power must reject string inputs'
 	}
 }
+
+fn test_float_power_weak_scalar_promoted_preserves_order_and_float64_output() ! {
+	bases := vtl.from_1d[i16]([2, -2])!
+	right_scalar := vtl.float_power_scalar_promoted(bases, -1)!
+	assert right_scalar.dtype() == .float64
+	assert right_scalar.to_array() == [0.5, -0.5]
+
+	exponents := vtl.from_1d[i8]([-1, 3])!
+	left_scalar := vtl.float_power_scalar_left_promoted(2.0, exponents)!
+	assert left_scalar.dtype() == .float64
+	assert left_scalar.to_array() == [0.5, 8.0]
+
+	boolean_bases := vtl.from_1d([false, true])!
+	boolean_result := vtl.float_power_scalar_promoted(boolean_bases, 2)!
+	assert boolean_result.to_array() == [0.0, 1.0]
+
+	complex_scalar := complex.complex(2.0, 0.0)
+	if _ := vtl.float_power_scalar_promoted(bases, complex_scalar) {
+		assert false, 'float_power weak scalars must reject complex values'
+	}
+}

@@ -52,6 +52,18 @@ pub fn float_power_promoted[T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[f64] {
 	return binary_promoted[f64, T, U](a, b, .float_power)
 }
 
+// float_power_scalar_promoted raises tensor values to a weak real numeric or
+// boolean scalar and always returns float64.
+pub fn float_power_scalar_promoted[T, U](a &Tensor[T], scalar U) !&Tensor[f64] {
+	return float_power_scalar_impl[T, U](a, scalar, false)
+}
+
+// float_power_scalar_left_promoted raises a weak real numeric or boolean scalar
+// to tensor values and always returns float64.
+pub fn float_power_scalar_left_promoted[T, U](scalar U, a &Tensor[T]) !&Tensor[f64] {
+	return float_power_scalar_impl[T, U](a, scalar, true)
+}
+
 // divide_promoted performs NumPy-style true division for numeric tensors and
 // booleans. Complex inputs produce complex128; real inputs produce float32 only
 // when the promoted input dtype is float32, and float64 otherwise.
@@ -759,6 +771,21 @@ fn scalar_promoted[R, T, U](a &Tensor[T], scalar U, operation PromotedBinaryOper
 
 fn scalar_left_promoted[R, T, U](scalar U, a &Tensor[T], operation PromotedBinaryOperation) !&Tensor[R] {
 	return scalar_promoted_impl[R, T, U](a, scalar, operation, true)
+}
+
+fn float_power_scalar_impl[T, U](a &Tensor[T], scalar U, scalar_on_left bool) !&Tensor[f64] {
+	array_dtype := dtype_of[T]()
+	scalar_dtype := dtype_of[U]()
+	if !(is_real_numeric_dtype(array_dtype) || array_dtype == .boolean)
+		|| !(is_real_numeric_dtype(scalar_dtype) || scalar_dtype == .boolean) {
+		return error('promoted float_power supports only real numeric and boolean scalars and tensors')
+	}
+	left := cast_promoted_tensor_values[T, f64](a)!
+	right := from_array[f64]([cast_promoted_value[U, f64](scalar)], [])!
+	if scalar_on_left {
+		return binary_promoted[f64, f64, f64](right, left, .float_power)
+	}
+	return binary_promoted[f64, f64, f64](left, right, .float_power)
 }
 
 fn scalar_promoted_impl[R, T, U](a &Tensor[T], scalar U, operation PromotedBinaryOperation, scalar_on_left bool) !&Tensor[R] {
