@@ -167,6 +167,18 @@ fn test_avgpool3d_forward_and_backward() ! {
 	assert input.grad.to_array() == [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125]
 }
 
+fn test_maxpool3d_forward_and_backward() ! {
+	c := core_ctx[f64]()
+	input := core_variable[f64](c, [1.0, 8.0, 3.0, 4.0, 5.0, 6.0, 7.0, 2.0],
+		[1, 1, 2, 2, 2])!
+	layer := maxpool3d_layer[f64](c, [1, 2, 2, 2], [2, 2, 2], [0, 0, 0], [1, 1, 1])
+	assert layer.output_shape() == [1, 1, 1, 1]
+	mut output := layer.forward(input)!
+	assert output.value.to_array() == [8.0]
+	output.backprop()!
+	assert input.grad.to_array() == [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+}
+
 fn test_adaptive_maxpool3d_forward_and_backward() ! {
 	c := core_ctx[f64]()
 	input := core_variable[f64](c, [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0],

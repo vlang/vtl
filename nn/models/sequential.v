@@ -180,6 +180,10 @@ pub fn (mut nn Sequential[T]) avgpool3d(kernel []int, padding []int, stride []in
 	nn.info.avgpool3d(kernel, padding, stride)
 }
 
+pub fn (mut nn Sequential[T]) maxpool3d(kernel []int, padding []int, stride []int) {
+	nn.info.maxpool3d(kernel, padding, stride)
+}
+
 // global_avgpool2d adds a new GlobalAveragePool2D layer to the network.
 pub fn (mut nn Sequential[T]) global_avgpool2d() {
 	nn.info.global_avgpool2d()

@@ -266,6 +266,13 @@ pub fn (mut ls SequentialInfo[T]) avgpool3d(kernel []int, padding []int, stride 
 		})
 }
 
+pub fn (mut ls SequentialInfo[T]) maxpool3d(kernel []int, padding []int, stride []int) {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.add_layer(layers.maxpool3d_layer[T](ls.ctx, shape, kernel, padding, stride),
+		'MaxPool3DLayer', {})
+}
+
 // global_avgpool2d adds a new GlobalAveragePool2D layer to the network.
 pub fn (mut ls SequentialInfo[T]) global_avgpool2d() {
 	ls.add_layer(layers.global_avgpool2d_layer[T](ls.ctx), 'GlobalAvgPool2DLayer', {})
