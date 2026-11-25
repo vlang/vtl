@@ -106,7 +106,13 @@ pub fn (p Polynomial) roots() ![]f64 {
 				return [-b / (2.0 * a)]
 			}
 			root := math.sqrt(discriminant)
-			return [(-b - root) / (2.0 * a), (-b + root) / (2.0 * a)]
+			// Use the product of roots for the second root to avoid cancellation.
+			if b >= 0 {
+				q := -0.5 * (b + root)
+				return [q / a, c / q]
+			}
+			q := -0.5 * (b - root)
+			return [c / q, q / a]
 		}
 		else { return error('roots currently supports degree up to two') }
 	}

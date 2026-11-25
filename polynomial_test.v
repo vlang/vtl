@@ -24,6 +24,11 @@ fn test_polynomial_roots_and_fit() ! {
 	roots := quadratic.roots()!
 	assert math.abs(roots[0] - 1.0) < 1e-12
 	assert math.abs(roots[1] - 2.0) < 1e-12
+	repeated_roots := polynomial([1.0, -2.0, 1.0])!.roots()!
+	assert repeated_roots == [1.0]
+	ill_scaled_roots := polynomial([1e-16, 1e8, 1.0])!.roots()!
+	assert math.abs(ill_scaled_roots[0] + 1e8) < 1e-8
+	assert math.abs(ill_scaled_roots[1] + 1e-24) < 1e-32
 	fit := polynomial_fit([-1.0, 0.0, 1.0, 2.0], [2.0, 1.0, 2.0, 5.0], 2)!
 	assert fit.coefficients == [1.0, 0.0, 1.0]
 }
