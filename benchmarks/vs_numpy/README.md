@@ -1042,23 +1042,26 @@ measured:
 
 | f64 transform | VTL before (median, range), us | VTL direct-pack (median, range), us | NumPy (median, range), us | VTL / NumPy max round-trip error |
 | --- | ---: | ---: | ---: | ---: |
-| Batched axis, `[64, 512]` | 268.213 (267.502-271.547) | 128.725 (111.404-131.725) | 48.928 (48.806-49.071) | 1.110e-15 / 1.110e-15 |
-| N-D, `[32, 32, 64]` | 1450.163 (1447.281-1452.501) | 868.651 (857.012-1006.081) | 444.463 (443.939-445.034) | 1.332e-15 / 1.110e-15 |
+| Batched axis, `[64, 512]` | 268.213 (267.502-271.547) | 104.417 (94.568-167.955) | 49.799 (48.797-50.586) | 1.110e-15 / 1.110e-15 |
+| N-D, `[32, 32, 64]` | 1450.163 (1447.281-1452.501) | 908.629 (882.844-961.467) | 451.596 (449.822-467.425) | 1.332e-15 / 1.110e-15 |
 
-The contiguous final-axis packing fast path improved VTL by 2.08x for the
-batched-axis case and 1.67x for the N-D case. NumPy remains 2.63x and 1.95x
+The contiguous final-axis packing fast path improved VTL by 2.57x for the
+batched-axis case and 1.60x for the N-D case. NumPy remains 2.10x and 2.01x
 faster, respectively. Weighted checksums agree within `3e-6` absolute; the
 small difference reflects floating-point reduction order.
 
-| f32-input transform | VTL dedicated `_f32` (median, range), us | NumPy (median, range), us | VTL / NumPy max round-trip error |
+| f32-input transform | VTL mode (median, range), us | NumPy (median, range), us | VTL / NumPy max round-trip error |
 | --- | ---: | ---: | ---: |
-| Batched axis, `[64, 512]` | 141.930 (137.544-144.148) | 196.786 (196.351-201.431) | 7.153e-7 / 3.576e-7 |
-| N-D, `[32, 32, 64]` | 1095.690 (1094.448-1098.168) | 1279.257 (1273.934-1290.251) | 7.153e-7 / 4.768e-7 |
+| Batched axis, dedicated `_f32` | 175.870 (169.642-219.798) | 199.997 (199.286-200.049) | 7.153e-7 / 3.576e-7 |
+| Batched axis, generic `f32` | 100.015 (96.690-100.301) | 199.997 (199.286-200.049) | 4.181e-7 / 3.576e-7 |
+| N-D, dedicated `_f32` | 1204.414 (1196.533-1490.618) | 1310.632 (1294.415-1311.500) | 7.153e-7 / 4.768e-7 |
+| N-D, generic `f32` | 897.194 (892.468-953.516) | 1310.632 (1294.415-1311.500) | 3.005e-7 / 4.768e-7 |
 
-The f32 results are not an equivalent-precision comparison: VTL's dedicated
-paths return complex32 and reconstruct f32, while NumPy's FFT returns
-complex128 and reconstructs f64. These CPU microbenchmarks do not establish
-overall performance parity.
+All f32 timings use the same NumPy f32-input baseline. VTL's dedicated paths
+return complex32/f32, while its generic wrappers and NumPy return
+complex128/f64. The f32 results therefore are not equivalent-precision
+comparisons. These CPU microbenchmarks do not establish overall performance
+parity.
 
 ### Reference large-array results
 
