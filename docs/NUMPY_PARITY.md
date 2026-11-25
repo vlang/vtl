@@ -88,16 +88,17 @@ coordinates through `indices_sparse`. VTL also provides `one_hot` for ML labels,
 appending a class dimension and validating class bounds. Element dtype is
 selected through each constructor's generic type argument. Constructors that
 accept `TensorData`, `LinspaceData`, or `LogspaceData` accept a memory format;
-creation tests verify column-major layout for the scalar-fill and sequence
-families.
+creation tests verify column-major layout for scalar-fill, sequence, and
+coordinate-grid constructors.
 Flat `from_array` values follow the requested physical memory order; nested
 `from_2d` rows remain logical row-major values and are rearranged for
 column-major storage.
 
-**Remaining:** constructor APIs do not expose a common device option. `meshgrid`,
-`meshgrid_n`, `indices`, `indices_sparse`, and `one_hot` currently use their
-fixed row-major layout. Document and validate those differences, edge cases,
-and device support as the storage/device model evolves.
+**Remaining:** constructors do not expose a common device option; creation
+allocates CPU tensors, with explicit transfers or backend-specific APIs used
+for supported accelerators. `one_hot` remains fixed to row-major layout.
+Document and validate these differences, edge cases, and device support as the
+storage/device model evolves.
 
 ### Shape and manipulation
 

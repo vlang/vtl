@@ -190,6 +190,11 @@ fn test_coordinate_and_label_constructors_use_row_major_layout() ! {
 	x_grid, y_grid := vtl.meshgrid(x, y)!
 	assert x_grid.memory == .row_major
 	assert y_grid.memory == .row_major
+	x_grid_column, y_grid_column := vtl.meshgrid(x, y, memory: .col_major)!
+	assert x_grid_column.memory == .col_major
+	assert y_grid_column.memory == .col_major
+	assert x_grid_column.to_array() == [1, 2, 1, 2, 1, 2]
+	assert y_grid_column.to_array() == [3, 3, 4, 4, 5, 5]
 
 	grids := vtl.meshgrid_n([x, y], .ij)!
 	assert grids[0].memory == .row_major

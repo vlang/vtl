@@ -10,13 +10,13 @@ pub enum MeshgridIndexing {
 
 // meshgrid builds dense two-dimensional XY coordinate grids from two vectors.
 // The output shape is [len(y), len(x)], matching NumPy's default indexing="xy".
-pub fn meshgrid[T](x &Tensor[T], y &Tensor[T]) !(&Tensor[T], &Tensor[T]) {
+pub fn meshgrid[T](x &Tensor[T], y &Tensor[T], params TensorData) !(&Tensor[T], &Tensor[T]) {
 	if x.rank() != 1 || y.rank() != 1 {
 		return error('meshgrid expects two one-dimensional tensors')
 	}
 	shape := [y.size(), x.size()]
-	mut x_grid := empty[T](shape, memory: .row_major)
-	mut y_grid := empty[T](shape, memory: .row_major)
+	mut x_grid := empty[T](shape, params)
+	mut y_grid := empty[T](shape, params)
 	for row in 0 .. y.size() {
 		for col in 0 .. x.size() {
 			x_grid.set([row, col], x.get_nth(col))
@@ -29,7 +29,7 @@ pub fn meshgrid[T](x &Tensor[T], y &Tensor[T]) !(&Tensor[T], &Tensor[T]) {
 // meshgrid_n builds one dense coordinate tensor for each one-dimensional
 // input. With `xy`, the first two dimensions are swapped, matching NumPy's
 // default indexing convention. `ij` preserves the input axis order.
-pub fn meshgrid_n[T](vectors []&Tensor[T], indexing MeshgridIndexing) ![]&Tensor[T] {
+pub fn meshgrid_n[T](vectors []&Tensor[T], indexing MeshgridIndexing, params TensorData) ![]&Tensor[T] {
 	if vectors.len == 0 {
 		return error('meshgrid_n expects at least one vector')
 	}
@@ -66,7 +66,7 @@ pub fn meshgrid_n[T](vectors []&Tensor[T], indexing MeshgridIndexing) ![]&Tensor
 	}
 	mut grids := []&Tensor[T]{cap: vectors.len}
 	for _ in vectors {
-		grids << empty[T](shape, memory: .row_major)
+		grids << empty[T](shape, params)
 	}
 	for flat_index in 0 .. total_size {
 		mut output_index := []int{len: shape.len}

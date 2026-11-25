@@ -38,6 +38,16 @@ assert column_major.to_array() == [1, 2, 3, 4, 5, 6]
 assert column_major.get([0, 1]) == 2
 ```
 
+Coordinate-grid constructors accept the same `memory:` option:
+
+```v
+import vtl
+
+coordinates := vtl.indices([2, 3], memory: .col_major)!
+assert coordinates.memory == .col_major
+assert coordinates.get([1, 1, 2]) == 2
+```
+
 ## Tensor Creation
 
 The canonical way to create a tensor is to use the `vtl.from_*` functions.
