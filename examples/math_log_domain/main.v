@@ -24,5 +24,6 @@ fn main() {
 	println('copysign: ${signed_weights.to_array()}')
 	println('sign bits: ${probability_signs.signbit() or { panic(err) }.to_array()}')
 	println('complex sign: ${complex_signs.sign().to_array()}')
+	println('complex classification: real=${complex_signs.is_real().to_array()}, complex=${complex_signs.is_complex().to_array()}')
 	println('base-2 log sum: ${vtl.logaddexp2(log_weights, reference) or { panic(err) }.to_array()}')
 }
