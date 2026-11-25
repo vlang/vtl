@@ -324,8 +324,9 @@ and `frexp`/`modf`/`ldexp`, but NumPy's
 mixed-dtype, broadcast, and edge-case contracts are not fully covered. Unary
 `abs`/`sign` and the multi-output decomposition functions still need broader
 dtype and special-value differential tests; promoted mixed-input variants
-remain for `ldexp`. Promoted extrema cover tensor pairs and weak scalars
-through the APIs below.
+for `ldexp` now cover real or boolean mantissas and integer or boolean
+exponents, with dtype validation and broadcasting. Promoted extrema cover
+tensor pairs and weak scalars through the APIs below.
 `erf`/`erfc`, `gamma`, and `log_gamma` are useful VTL math APIs beyond NumPy
 core ufunc parity. The shared `out`/`where` helper contract is documented in the
 [ufunc execution capability table](#ufunc-execution-protocol).

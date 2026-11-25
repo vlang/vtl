@@ -208,6 +208,19 @@ fn test_ldexp_promoted_preserves_float32_and_special_values() ! {
 	assert math.is_nan(result.get_nth(3))
 }
 
+fn test_ldexp_promoted_saturates_large_unsigned_exponents() ! {
+	mantissa := vtl.from_1d[f64]([0.5, -0.5])!
+	exponent := vtl.from_array[u64]([u64(max_int) + 1], [])!
+	result := vtl.ldexp_promoted[f64, f64, u64](mantissa, exponent)!
+
+	assert result.get_nth(0) == math.inf(1)
+	assert result.get_nth(1) == math.inf(-1)
+
+	signed_exponent := vtl.from_array[i64]([1], [])!
+	signed_result := vtl.ldexp_promoted[f64, f64, i64](mantissa, signed_exponent)!
+	assert signed_result.to_array() == [1.0, -1.0]
+}
+
 fn test_ldexp_promoted_rejects_invalid_dtypes() ! {
 	mantissa := vtl.from_1d[f64]([1.0])!
 	float_exponent := vtl.from_1d[f32]([1.0])!

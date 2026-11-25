@@ -135,8 +135,22 @@ pub fn ldexp_promoted[R, T, U](mantissa &Tensor[T], exponent &Tensor[U]) !&Tenso
 
 @[inline]
 fn ldexp_exponent_to_int[T](value T) int {
+	// Clamping wider exponents preserves floating overflow/underflow without integer wrap.
 	$if T is bool {
 		return if value { 1 } else { 0 }
+	} $else $if T is i64 {
+		if value > i64(max_int) {
+			return max_int
+		}
+		if value < i64(min_int) {
+			return min_int
+		}
+		return int(value)
+	} $else $if T is u32 || T is u64 {
+		if u64(value) > u64(max_int) {
+			return max_int
+		}
+		return int(value)
 	} $else $if T is $int {
 		return int(value)
 	} $else {
