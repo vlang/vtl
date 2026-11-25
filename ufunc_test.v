@@ -76,3 +76,16 @@ fn test_ufunc_at_applies_repeated_indices_in_order_and_validates_atomically() ! 
 	}
 	assert false, 'ufunc_at must reject out-of-bounds indices'
 }
+
+fn test_ufunc_axis_reduce_and_accumulate() ! {
+	input := from_array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], [2, 3])!
+	reduced := ufunc_reduce_axis[f64](input, -1, 0.0, fn (a f64, b f64) f64 {
+		return a + b
+	})!
+	assert reduced.shape == [2]
+	assert reduced.to_array() == [6.0, 15.0]
+	accumulated := ufunc_accumulate_axis[f64](input, 0, 0.0, fn (a f64, b f64) f64 {
+		return a + b
+	})!
+	assert accumulated.to_array() == [1.0, 2.0, 3.0, 5.0, 7.0, 9.0]
+}

@@ -63,6 +63,73 @@ pub fn ufunc_accumulate[T](input &Tensor[T], identity T, operation fn (T, T) T) 
 	return output
 }
 
+pub fn ufunc_reduce_axis[T](input &Tensor[T], axis int, identity T, operation fn (T, T) T) !&Tensor[T] {
+	rank := input.rank()
+	mut axis_index := axis
+	if axis_index < 0 {
+		axis_index += rank
+	}
+	if axis_index < 0 || axis_index >= rank {
+		return error('ufunc_reduce_axis axis ${axis} is out of range for rank ${rank}')
+	}
+	mut output_shape := input.shape.clone()
+	output_shape.delete(axis_index)
+	mut output := zeros[T](output_shape)
+	for flat in 0 .. output.size() {
+		mut output_index := []int{len: output_shape.len}
+		decode_flat_coordinate(flat, output_shape, mut output_index)
+		mut input_index := []int{len: rank}
+		for out_axis, value in output_index {
+			input_index[if out_axis < axis_index { out_axis } else { out_axis + 1 }] = value
+		}
+		mut reduced := identity
+		for axis_value in 0 .. input.shape[axis_index] {
+			input_index[axis_index] = axis_value
+			reduced = operation(reduced, input.get(input_index))
+		}
+		output.set_nth(flat, reduced)
+	}
+	return output
+}
+
+pub fn ufunc_accumulate_axis[T](input &Tensor[T], axis int, identity T, operation fn (T, T) T) !&Tensor[T] {
+	rank := input.rank()
+	mut axis_index := axis
+	if axis_index < 0 {
+		axis_index += rank
+	}
+	if axis_index < 0 || axis_index >= rank {
+		return error('ufunc_accumulate_axis axis ${axis} is out of range for rank ${rank}')
+	}
+	mut output := zeros_like[T](input)
+	mut line_shape := input.shape.clone()
+	line_shape.delete(axis_index)
+	line_count := ufunc_shape_size(line_shape)
+	for flat in 0 .. line_count {
+		mut line_index := []int{len: line_shape.len}
+		decode_flat_coordinate(flat, line_shape, mut line_index)
+		mut input_index := []int{len: rank}
+		for line_axis, value in line_index {
+			input_index[if line_axis < axis_index { line_axis } else { line_axis + 1 }] = value
+		}
+		mut accumulator := identity
+		for axis_value in 0 .. input.shape[axis_index] {
+			input_index[axis_index] = axis_value
+			accumulator = operation(accumulator, input.get(input_index))
+			output.set(input_index, accumulator)
+		}
+	}
+	return output
+}
+
+fn ufunc_shape_size(shape []int) int {
+	mut size := 1
+	for dimension in shape {
+		size *= dimension
+	}
+	return size
+}
+
 // ufunc_outer computes operation(left[i], right[j]) for every flattened
 // logical pair and returns a matrix of shape [left.size, right.size].
 pub fn ufunc_outer[T](left &Tensor[T], right &Tensor[T], operation fn (T, T) T) !&Tensor[T] {
