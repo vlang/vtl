@@ -19,7 +19,6 @@ tests, documentation, and examples where users need them.
 | OpenCL compute and neural-network dispatch | [#750](https://github.com/vlang/vtl/issues/750) |
 | Sparse tensor operations | [#746](https://github.com/vlang/vtl/issues/746) |
 | Non-numeric dtypes and array interoperability | [#747](https://github.com/vlang/vtl/issues/747), [#748](https://github.com/vlang/vtl/issues/748) |
-| NumPy polynomial families and fitting | [#773](https://github.com/vlang/vtl/issues/773) (power series, Chebyshev, Legendre, Hermite, and HermiteE subsets implemented) |
 
 For neural-network and framework-level gaps relative to PyTorch, see the
 [PyTorch parity tracker](./PYTORCH_PARITY.md).

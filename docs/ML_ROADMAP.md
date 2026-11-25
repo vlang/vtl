@@ -84,7 +84,6 @@ itemized status is in the [main roadmap](../ROADMAP.md#phase-5--opencl-backend).
 | [#750](https://github.com/vlang/vtl/issues/750) | feat(opencl): expand tensor compute and neural-network dispatch |
 | [#758](https://github.com/vlang/vtl/issues/758) | feat(cuda): keep optimizer state resident across training steps |
 | [#771](https://github.com/vlang/vtl/issues/771) | perf: add matched VTL and PyTorch benchmarks |
-| [#773](https://github.com/vlang/vtl/issues/773) | feat: add NumPy polynomial families and fitting |
 | [#779](https://github.com/vlang/vtl/issues/779) | feat(io): add optional HDF5 tensor interoperability |
 | [#784](https://github.com/vlang/vtl/issues/784) | feat(autograd): add functional tensor transforms |
 | [#792](https://github.com/vlang/vtl/issues/792) | feat(quantization): add INT8 tensor and inference support |
