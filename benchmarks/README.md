@@ -2,6 +2,14 @@
 
 Lightweight performance harness comparing VTL to external baselines (NumPy / PyTorch).
 
+## Pull-request reports
+
+The scoped `benchmark-pr-comment` workflow posts a bounded Markdown summary and
+uploads the full report with a JSON artifact. The JSON schema currently covers
+the f32/f64 512×512 CPU GEMM regression budget; other matrix results remain in
+the Markdown report. Only those two GEMM cases enforce the 3× slowdown budget.
+These checks do not establish library-wide performance parity.
+
 ## Run locally
 
 Compile benchmark programs with `-prod`, then execute the produced binary in a

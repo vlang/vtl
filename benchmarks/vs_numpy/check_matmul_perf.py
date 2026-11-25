@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 import sys
 from pathlib import Path
@@ -33,7 +34,7 @@ def find_gflops(report: str, pattern: re.Pattern[str], label: str) -> float:
     return values[0]
 
 
-def check_report(path: Path, annotate: bool = False) -> int:
+def check_report(path: Path, annotate: bool = False, json_path: Path | None = None) -> int:
     try:
         report = path.read_text(encoding="utf-8")
         failures: list[str] = []
@@ -49,6 +50,25 @@ def check_report(path: Path, annotate: bool = False) -> int:
             )
             if slowdown > MAX_SLOWDOWN:
                 failures.append(f"{dtype} slowdown {slowdown:.2f}x exceeds {MAX_SLOWDOWN:.1f}x")
+
+        if json_path is not None:
+            payload = {
+                "schema_version": 1,
+                "benchmark": "cpu-gemm",
+                "max_slowdown": MAX_SLOWDOWN,
+                "results": [
+                    {
+                        "dtype": dtype,
+                        "shape": [512, 512],
+                        "vtl_gflops": vtl_gflops,
+                        "numpy_gflops": numpy_gflops,
+                        "slowdown": slowdown,
+                        "status": "fail" if slowdown > MAX_SLOWDOWN else "pass",
+                    }
+                    for dtype, vtl_gflops, numpy_gflops, slowdown in results
+                ],
+            }
+            json_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
         if annotate:
             summary = [
@@ -82,12 +102,31 @@ def check_report(path: Path, annotate: bool = False) -> int:
 
 def main() -> int:
     arguments = sys.argv[1:]
-    annotate = arguments[:1] == ["--annotate"]
-    report_arguments = arguments[1:] if annotate else arguments
-    if len(report_arguments) != 1:
-        print(f"usage: {Path(sys.argv[0]).name} [--annotate] REPORT.md", file=sys.stderr)
+    annotate = False
+    json_path: Path | None = None
+    report_path: Path | None = None
+    index = 0
+    while index < len(arguments):
+        argument = arguments[index]
+        if argument == "--annotate" and not annotate:
+            annotate = True
+            index += 1
+        elif argument == "--json-out" and json_path is None and index + 1 < len(arguments):
+            json_path = Path(arguments[index + 1])
+            index += 2
+        elif report_path is None:
+            report_path = Path(argument)
+            index += 1
+        else:
+            report_path = None
+            break
+    if report_path is None or index != len(arguments):
+        print(
+            f"usage: {Path(sys.argv[0]).name} [--annotate] [--json-out RESULTS.json] REPORT.md",
+            file=sys.stderr,
+        )
         return 2
-    return check_report(Path(report_arguments[0]), annotate=annotate)
+    return check_report(report_path, annotate=annotate, json_path=json_path)
 
 
 if __name__ == "__main__":

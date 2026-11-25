@@ -102,11 +102,22 @@ jobs:
             env HOME="$HOME" PATH="$PATH" VJOBS=2 OPENBLAS_NUM_THREADS=2 python3 vtl/benchmarks/vs_numpy/numpy_linear_bias_reduction_baseline.py
           } 2>&1 | tee "$report_file"
 
-      - name: Add matmul ratios to benchmark report
-        run: python3 vtl/benchmarks/vs_numpy/check_matmul_perf.py --annotate vs_numpy_pr.md
+      - name: Add matmul ratios and machine-readable results
+        run: python3 vtl/benchmarks/vs_numpy/check_matmul_perf.py --annotate --json-out vs_numpy_pr.json vs_numpy_pr.md
 
       - name: Prepare bounded benchmark comment
         run: python3 vtl/benchmarks/vs_numpy/prepare_pr_comment.py vs_numpy_pr.md vs_numpy_pr_comment.md
+
+      - name: Upload benchmark report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vtl-vs-numpy-${{ github.run_id }}
+          path: |
+            vs_numpy_pr.md
+            vs_numpy_pr.json
+          if-no-files-found: warn
+          retention-days: 30
 
       - name: Post sticky PR comment
         if: github.event.pull_request.head.repo.full_name == github.repository
