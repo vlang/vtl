@@ -22,6 +22,10 @@ ascending Chebyshev coefficients: [2.375, approximately 1.5, 1.125]
 Chebyshev p(3): 10.0
 ascending Legendre coefficients: [2.0, approximately 1.5, 1.5]
 Legendre p(3): 10.0
+ascending Hermite coefficients: [approximately 2.375, 0.75, 0.5625]
+Hermite p(3): 10.0
+ascending HermiteE coefficients: [3.5, approximately 1.5, 2.25]
+HermiteE p(3): 10.0
 ```
 
 The corresponding APIs are `vtl.from_array`, `vtl.polynomial_fit`, and
@@ -31,13 +35,16 @@ and Householder QR, then returns coefficients in the original power basis;
 conversion to that basis can still amplify errors on ill-conditioned data. See the
 [polynomial API notes](./NUMPY_PARITY.md#current-strengths).
 
-`vtl.Chebyshev` and `vtl.Legendre` store coefficients in ascending basis order
-and support scalar/tensor evaluation, arithmetic, calculus, roots up to degree
-two, and conversion to/from power series. Supply an explicit `domain` and
-`window`; evaluation maps the input domain linearly into the window. Polynomial
-APIs currently use `f64`. `vtl.chebyshev_fit` and `vtl.legendre_fit` fit in
-that mapped coordinate and return orthogonal-basis coefficients. The runnable
-fitting example demonstrates power, Chebyshev, and Legendre series.
+`vtl.Chebyshev`, `vtl.Legendre`, `vtl.Hermite`, and `vtl.HermiteE` store
+ascending coefficients and support scalar/tensor evaluation, arithmetic,
+calculus, real roots up to degree two with multiplicity, and conversion to/from
+power series. The
+Hermite APIs distinguish physicists' (`hermite`) and probabilists' (`hermite_e`)
+conventions. Supply an explicit `domain` and `window`; evaluation maps the
+input domain linearly into the window. Polynomial APIs currently use `f64`.
+The matching `*_fit` functions fit in that mapped coordinate and return
+orthogonal-basis coefficients. The runnable fitting example demonstrates all
+four families alongside the power-series API.
 
 ## Transform samples and preserve gradients
 

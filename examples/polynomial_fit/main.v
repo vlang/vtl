@@ -16,4 +16,10 @@ fn main() {
 	legendre_fit := vtl.legendre_fit(x, y, 2, domain, window)!
 	println('ascending Legendre coefficients: ${legendre_fit.coefficients}')
 	println('Legendre p(3): ${legendre_fit.eval(3.0)}')
+	hermite_fit := vtl.hermite_fit(x, y, 2, domain, window)!
+	println('ascending Hermite coefficients: ${hermite_fit.coefficients}')
+	println('Hermite p(3): ${hermite_fit.eval(3.0)}')
+	hermite_e_fit := vtl.hermite_e_fit(x, y, 2, domain, window)!
+	println('ascending HermiteE coefficients: ${hermite_e_fit.coefficients}')
+	println('HermiteE p(3): ${hermite_e_fit.eval(3.0)}')
 }

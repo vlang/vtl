@@ -103,7 +103,8 @@ pub fn (p Polynomial) roots() ![]f64 {
 				return []f64{}
 			}
 			if discriminant == 0.0 {
-				return [-b / (2.0 * a)]
+				root := -b / (2.0 * a)
+				return [root, root]
 			}
 			root := math.sqrt(discriminant)
 			// Use the product of roots for the second root to avoid cancellation.
@@ -485,6 +486,325 @@ pub fn legendre_fit(x []f64, y []f64, degree int, domain [2]f64, window [2]f64) 
 	fitted := polynomial_fit(mapped_x, y, degree)!
 	in_window_basis := legendre_from_polynomial(fitted, window, window)!
 	return legendre(in_window_basis.coefficients, domain, window)
+}
+
+enum HermiteFamily {
+	physicists
+	probabilists
+}
+
+// Hermite stores physicists' Hermite coefficients in ascending basis order.
+pub struct Hermite {
+pub:
+	coefficients []f64
+	domain       [2]f64
+	window       [2]f64
+}
+
+pub fn hermite(coefficients []f64, domain [2]f64, window [2]f64) !Hermite {
+	validate_polynomial_mapping(domain, window, 'hermite')!
+	return Hermite{
+		coefficients: new_orthogonal_coefficients(coefficients, 'hermite')!
+		domain:       domain
+		window:       window
+	}
+}
+
+pub fn (p Hermite) degree() int {
+	return p.coefficients.len - 1
+}
+
+pub fn (p Hermite) eval(x f64) f64 {
+	mapped_x := map_polynomial_domain(x, p.domain, p.window)
+	return hermite_series_eval(p.coefficients, mapped_x, .physicists)
+}
+
+pub fn (p Hermite) eval_tensor(input &Tensor[f64]) !&Tensor[f64] {
+	return input.nmap([input], fn [p] (values []f64, _ []int) f64 {
+		return p.eval(values[0])
+	})
+}
+
+pub fn (p Hermite) to_polynomial() !Polynomial {
+	return orthogonal_series_to_polynomial(p.coefficients, p.domain, p.window, .physicists,
+		'hermite')
+}
+
+pub fn (p Hermite) derivative() !Hermite {
+	ordinary := p.to_polynomial()!.derivative()
+	coefficients := orthogonal_series_from_polynomial(ordinary, p.domain, p.window, .physicists,
+		'hermite_from_polynomial')!
+	return hermite(coefficients, p.domain, p.window)
+}
+
+pub fn (p Hermite) integral(constant f64) !Hermite {
+	ordinary := p.to_polynomial()!.integral(constant)
+	coefficients := orthogonal_series_from_polynomial(ordinary, p.domain, p.window, .physicists,
+		'hermite_from_polynomial')!
+	return hermite(coefficients, p.domain, p.window)
+}
+
+pub fn (p Hermite) roots() ![]f64 {
+	return p.to_polynomial()!.roots()
+}
+
+pub fn (p Hermite) add(other Hermite) !Hermite {
+	coefficients := add_orthogonal_coefficients(p.coefficients, other.coefficients, p.domain,
+		p.window, other.domain, other.window, 'hermite')!
+	return hermite(coefficients, p.domain, p.window)
+}
+
+pub fn (p Hermite) mul(other Hermite) !Hermite {
+	if p.domain != other.domain || p.window != other.window {
+		return error('hermite multiplication requires matching domain and window')
+	}
+	product := p.to_polynomial()!.mul(other.to_polynomial()!)
+	coefficients := orthogonal_series_from_polynomial(product, p.domain, p.window, .physicists,
+		'hermite_from_polynomial')!
+	return hermite(coefficients, p.domain, p.window)
+}
+
+pub fn hermite_from_polynomial(p Polynomial, domain [2]f64, window [2]f64) !Hermite {
+	coefficients := orthogonal_series_from_polynomial(p, domain, window, .physicists,
+		'hermite_from_polynomial')!
+	return hermite(coefficients, domain, window)
+}
+
+pub fn hermite_fit(x []f64, y []f64, degree int, domain [2]f64, window [2]f64) !Hermite {
+	coefficients := orthogonal_series_fit(x, y, degree, domain, window, .physicists, 'hermite_fit')!
+	return hermite(coefficients, domain, window)
+}
+
+// HermiteE stores probabilists' Hermite coefficients in ascending basis order.
+pub struct HermiteE {
+pub:
+	coefficients []f64
+	domain       [2]f64
+	window       [2]f64
+}
+
+pub fn hermite_e(coefficients []f64, domain [2]f64, window [2]f64) !HermiteE {
+	validate_polynomial_mapping(domain, window, 'hermite_e')!
+	return HermiteE{
+		coefficients: new_orthogonal_coefficients(coefficients, 'hermite_e')!
+		domain:       domain
+		window:       window
+	}
+}
+
+pub fn (p HermiteE) degree() int {
+	return p.coefficients.len - 1
+}
+
+pub fn (p HermiteE) eval(x f64) f64 {
+	mapped_x := map_polynomial_domain(x, p.domain, p.window)
+	return hermite_series_eval(p.coefficients, mapped_x, .probabilists)
+}
+
+pub fn (p HermiteE) eval_tensor(input &Tensor[f64]) !&Tensor[f64] {
+	return input.nmap([input], fn [p] (values []f64, _ []int) f64 {
+		return p.eval(values[0])
+	})
+}
+
+pub fn (p HermiteE) to_polynomial() !Polynomial {
+	return orthogonal_series_to_polynomial(p.coefficients, p.domain, p.window, .probabilists,
+		'hermite_e')
+}
+
+pub fn (p HermiteE) derivative() !HermiteE {
+	ordinary := p.to_polynomial()!.derivative()
+	coefficients := orthogonal_series_from_polynomial(ordinary, p.domain, p.window, .probabilists,
+		'hermite_e_from_polynomial')!
+	return hermite_e(coefficients, p.domain, p.window)
+}
+
+pub fn (p HermiteE) integral(constant f64) !HermiteE {
+	ordinary := p.to_polynomial()!.integral(constant)
+	coefficients := orthogonal_series_from_polynomial(ordinary, p.domain, p.window, .probabilists,
+		'hermite_e_from_polynomial')!
+	return hermite_e(coefficients, p.domain, p.window)
+}
+
+pub fn (p HermiteE) roots() ![]f64 {
+	return p.to_polynomial()!.roots()
+}
+
+pub fn (p HermiteE) add(other HermiteE) !HermiteE {
+	coefficients := add_orthogonal_coefficients(p.coefficients, other.coefficients, p.domain,
+		p.window, other.domain, other.window, 'hermite_e')!
+	return hermite_e(coefficients, p.domain, p.window)
+}
+
+pub fn (p HermiteE) mul(other HermiteE) !HermiteE {
+	if p.domain != other.domain || p.window != other.window {
+		return error('hermite_e multiplication requires matching domain and window')
+	}
+	product := p.to_polynomial()!.mul(other.to_polynomial()!)
+	coefficients := orthogonal_series_from_polynomial(product, p.domain, p.window, .probabilists,
+		'hermite_e_from_polynomial')!
+	return hermite_e(coefficients, p.domain, p.window)
+}
+
+pub fn hermite_e_from_polynomial(p Polynomial, domain [2]f64, window [2]f64) !HermiteE {
+	coefficients := orthogonal_series_from_polynomial(p, domain, window, .probabilists,
+		'hermite_e_from_polynomial')!
+	return hermite_e(coefficients, domain, window)
+}
+
+pub fn hermite_e_fit(x []f64, y []f64, degree int, domain [2]f64, window [2]f64) !HermiteE {
+	coefficients := orthogonal_series_fit(x, y, degree, domain, window, .probabilists,
+		'hermite_e_fit')!
+	return hermite_e(coefficients, domain, window)
+}
+
+fn new_orthogonal_coefficients(coefficients []f64, family string) ![]f64 {
+	if coefficients.len == 0 {
+		return error('${family} requires at least one coefficient')
+	}
+	mut trimmed := coefficients.clone()
+	for trimmed.len > 1 && trimmed[trimmed.len - 1] == 0 {
+		trimmed.delete_last()
+	}
+	return trimmed
+}
+
+fn map_polynomial_domain(x f64, domain [2]f64, window [2]f64) f64 {
+	return window[0] + (x - domain[0]) * (window[1] - window[0]) / (domain[1] - domain[0])
+}
+
+fn hermite_series_eval(coefficients []f64, x f64, family HermiteFamily) f64 {
+	if coefficients.len == 1 {
+		return coefficients[0]
+	}
+	mut previous := 1.0
+	mut current := if family == .physicists { 2.0 * x } else { x }
+	mut result := coefficients[0] + coefficients[1] * current
+	for index in 2 .. coefficients.len {
+		linear_factor := if family == .physicists { 2.0 } else { 1.0 }
+		lower_factor := if family == .physicists {
+			2.0 * f64(index - 1)
+		} else {
+			f64(index - 1)
+		}
+		next := linear_factor * x * current - lower_factor * previous
+		result += coefficients[index] * next
+		previous = current
+		current = next
+	}
+	return result
+}
+
+fn orthogonal_series_to_polynomial(coefficients []f64, domain [2]f64, window [2]f64, family HermiteFamily, name string) !Polynomial {
+	validate_polynomial_mapping(domain, window, name)!
+	if coefficients.len == 0 {
+		return error('${name}: coefficients must not be empty')
+	}
+	scale := (window[1] - window[0]) / (domain[1] - domain[0])
+	offset := window[0] - domain[0] * scale
+	if math.is_nan(offset) || math.is_inf(offset, 0) || math.is_nan(scale) || math.is_inf(scale, 0) {
+		return error('${name}: domain mapping overflowed during conversion')
+	}
+	mut previous := Polynomial{ coefficients: [1.0] }
+	mut result := scale_polynomial(previous, coefficients[0])
+	if coefficients.len > 1 {
+		linear_factor := if family == .physicists { 2.0 } else { 1.0 }
+		mut current := Polynomial{
+			coefficients: [linear_factor * offset, linear_factor * scale]
+		}
+		result = result.add(scale_polynomial(current, coefficients[1]))
+		for index in 2 .. coefficients.len {
+			lower_factor := if family == .physicists {
+				2.0 * f64(index - 1)
+			} else {
+				f64(index - 1)
+			}
+			next := polynomial_multiply_affine(current, linear_factor * scale,
+				linear_factor * offset).add(scale_polynomial(previous, -lower_factor))
+			result = result.add(scale_polynomial(next, coefficients[index]))
+			previous = current
+			current = next
+		}
+	}
+	for coefficient in result.coefficients {
+		if math.is_nan(coefficient) || math.is_inf(coefficient, 0) {
+			return error('${name}: coefficients overflowed during power-basis conversion')
+		}
+	}
+	return polynomial(result.coefficients)
+}
+
+fn orthogonal_series_from_polynomial(p Polynomial, domain [2]f64, window [2]f64, family HermiteFamily, name string) ![]f64 {
+	validate_polynomial_mapping(domain, window, name)!
+	if p.coefficients.len == 0 {
+		return error('${name}: polynomial coefficients must not be empty')
+	}
+	scale := (domain[1] - domain[0]) / (window[1] - window[0])
+	offset := domain[0] - window[0] * scale
+	if math.is_nan(offset) || math.is_inf(offset, 0) || math.is_nan(scale) || math.is_inf(scale, 0) {
+		return error('${name}: domain mapping overflowed during conversion')
+	}
+	normalized_polynomial := polynomial(p.coefficients)!
+	polynomial_in_window := polynomial_compose_affine(normalized_polynomial, scale, offset)
+	degree := polynomial_in_window.degree()
+	mut basis := []Polynomial{len: degree + 1}
+	basis[0] = Polynomial{ coefficients: [1.0] }
+	if degree > 0 {
+		linear_factor := if family == .physicists { 2.0 } else { 1.0 }
+		basis[1] = Polynomial{ coefficients: [0.0, linear_factor] }
+	}
+	for index in 2 .. degree + 1 {
+		linear_factor := if family == .physicists { 2.0 } else { 1.0 }
+		lower_factor := if family == .physicists {
+			2.0 * f64(index - 1)
+		} else {
+			f64(index - 1)
+		}
+		basis[index] = polynomial_multiply_affine(basis[index - 1], linear_factor,
+			0.0).add(scale_polynomial(basis[index - 2], -lower_factor))
+	}
+	mut residual := polynomial_in_window.coefficients.clone()
+	mut coefficients := []f64{len: degree + 1}
+	for index := degree; index >= 0; index-- {
+		leading := basis[index].coefficients[index]
+		coefficients[index] = residual[index] / leading
+		for power in 0 .. index + 1 {
+			residual[power] -= coefficients[index] * basis[index].coefficients[power]
+		}
+	}
+	for coefficient in coefficients {
+		if math.is_nan(coefficient) || math.is_inf(coefficient, 0) {
+			return error('${name}: coefficients overflowed during conversion')
+		}
+	}
+	return coefficients
+}
+
+fn orthogonal_series_fit(x []f64, y []f64, degree int, domain [2]f64, window [2]f64, family HermiteFamily, name string) ![]f64 {
+	validate_polynomial_mapping(domain, window, name)!
+	mut mapped_x := []f64{len: x.len}
+	for index, value in x {
+		mapped_x[index] = map_polynomial_domain(value, domain, window)
+	}
+	fitted := polynomial_fit(mapped_x, y, degree)!
+	return orthogonal_series_from_polynomial(fitted, window, window, family, name)
+}
+
+fn add_orthogonal_coefficients(left []f64, right []f64, left_domain [2]f64, left_window [2]f64, right_domain [2]f64, right_window [2]f64, name string) ![]f64 {
+	if left_domain != right_domain || left_window != right_window {
+		return error('${name} addition requires matching domain and window')
+	}
+	size := if left.len > right.len { left.len } else { right.len }
+	mut coefficients := []f64{len: size}
+	for index in 0 .. size {
+		if index < left.len {
+			coefficients[index] += left[index]
+		}
+		if index < right.len {
+			coefficients[index] += right[index]
+		}
+	}
+	return coefficients
 }
 
 fn validate_polynomial_mapping(domain [2]f64, window [2]f64, operation string) ! {
