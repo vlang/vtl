@@ -31,7 +31,7 @@ neural network module.
 | INT8 tensor quantization | [Quantization API](../quantization/README.md), [runnable example](../examples/quantization_int8/main.v) |
 | Linear algebra and norms | [Linear algebra](./TUTORIAL_LINEAR_ALGEBRA.md), [Advanced LA](./TUTORIAL_ADVANCED_LA.md) |
 | Autograd | [Autograd](./TUTORIAL_AUTOGRAD.md) |
-| Neural networks | [Tutorial](./TUTORIAL_NEURAL_NETWORKS.md), [Checkpoints](./TUTORIAL_INFERENCE_CHECKPOINT.md), [Optimizers](./TUTORIAL_OPTIMIZERS.md) |
+| Neural networks | [Tutorial](./TUTORIAL_NEURAL_NETWORKS.md), [PyTorch migration](./TUTORIAL_PYTORCH_MIGRATION.md), [Checkpoints](./TUTORIAL_INFERENCE_CHECKPOINT.md), [Optimizers](./TUTORIAL_OPTIMIZERS.md) |
 | Datasets and examples | [Datasets](../datasets/README.md), [Examples catalog](../examples/README.md) |
 | DataLoader sampling | [Subset sampler example](../examples/dataloader_sampler/README.md), [PyTorch parity](./PYTORCH_PARITY.md#data-pipeline) |
 | GPU/dev workflow | [Device memory](./DEVICE_MEMORY.md), [Lightweight development](./DEV_LIGHTWEIGHT.md) |
