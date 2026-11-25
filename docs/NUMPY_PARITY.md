@@ -708,10 +708,11 @@ matched batched-axis / three-dimensional f64 workloads in contiguous and
 stride-2 layouts. Current strided batched/N-D measurements show the correctness
 checksums agree for f64, but VTL remains slower than NumPy. A positive
 non-unit final-axis stride now uses direct gathers instead of per-element
-multidimensional indexing, improving measured stride-2 f64 batched and N-D
-times by about 2.0x and 1.3x. Dedicated and generic f32 stride-2 cases also
-have benchmark coverage; their timings remain slower and are not
-equivalent-precision comparisons with NumPy.
+multidimensional indexing, and complex-axis transforms gather directly from
+non-negative-stride storage. These paths improve measured stride-2 f64 batched
+and N-D times by about 2.0x and 1.7x versus the initial indexed fallback.
+Dedicated and generic f32 stride-2 cases also have benchmark coverage; their
+timings remain slower and are not equivalent-precision comparisons with NumPy.
 Generic real f32 transform and normalization wrappers return complex128, and
 their inverse wrappers return f64; dedicated `_f32` variants return complex32
 and f32 respectively. Tests cover these dtype contracts for selected-axis,

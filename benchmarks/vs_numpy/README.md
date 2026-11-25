@@ -1052,26 +1052,31 @@ faster, respectively. Weighted checksums agree within `3e-6` absolute; the
 small difference reflects floating-point reduction order.
 
 For stride-2 f64 views, the benchmark first measured the indexed fallback, then
-the direct positive-stride gather path. Three alternating process pairs on the
-same host and software setup produced these process-median results:
+the direct positive-stride real and complex-axis gather paths. Three
+alternating process pairs on the same host and software setup produced these
+process-median results:
 
 | f64 transform | VTL initial indexed fallback, us | VTL direct gather, us | NumPy, us | VTL / NumPy max round-trip error |
 | --- | ---: | ---: | ---: | ---: |
-| Batched axis, `[64, 512]`, stride 2 | 252.219 (241.629-262.090) | 127.157 (124.298-151.465) | 48.652 (48.509-48.926) | 1.110e-15 / 1.110e-15 |
-| N-D, `[32, 32, 64]`, stride 2 | 1257.609 (1249.654-1309.182) | 961.144 (944.773-997.813) | 466.464 (445.140-473.086) | 1.332e-15 / 1.110e-15 |
+| Batched axis, `[64, 512]`, stride 2 | 252.219 (241.629-262.090) | 126.601 (121.367-151.335) | 49.311 (49.209-49.702) | 1.110e-15 / 1.110e-15 |
+| N-D, `[32, 32, 64]`, stride 2 | 1257.609 (1249.654-1309.182) | 727.372 (723.010-729.813) | 454.991 (447.598-456.725) | 1.332e-15 / 1.110e-15 |
 
-The strided gather path improves VTL by about 2.0x for the batched-axis view
-and 1.3x for the N-D view. The f64 weighted checksums agree within `3e-6`
-absolute, but VTL remains about 2.61x and 2.06x slower than NumPy, respectively.
+The gather paths improve VTL by about 2.0x for the batched-axis view and 1.7x
+for the N-D view versus the initial indexed fallback. The f64 weighted
+checksums agree within `3e-6` absolute, but VTL remains about 2.57x and 1.60x
+slower than NumPy, respectively. With complex-axis gathers, the contiguous
+f64 `rfft_axis` median is 120.537 us (119.902-132.402) versus NumPy's 49.820 us
+(49.395-54.014); contiguous `rfftn` is 653.239 us (642.545-763.700) versus
+452.804 us (442.729-521.671).
 
 The stride-2 f32-input cases measured:
 
 | f32-input transform | VTL mode, us | NumPy, us | VTL / NumPy max round-trip error |
 | --- | ---: | ---: | ---: |
-| Batched axis, dedicated `_f32` | 169.413 (167.265-169.757) | 60.670 (60.508-61.570) | 7.153e-7 / 3.576e-7 |
-| Batched axis, generic `f32` | 126.426 (125.732-130.119) | 60.670 (60.508-61.570) | 4.181e-7 / 3.576e-7 |
-| N-D, dedicated `_f32` | 1155.707 (1144.759-1415.712) | 345.730 (342.371-346.923) | 7.153e-7 / 4.768e-7 |
-| N-D, generic `f32` | 992.239 (989.634-992.436) | 345.730 (342.371-346.923) | 3.005e-7 / 4.768e-7 |
+| Batched axis, dedicated `_f32` | 170.708 (166.047-186.017) | 61.286 (60.588-61.550) | 7.153e-7 / 3.576e-7 |
+| Batched axis, generic `f32` | 129.887 (127.310-170.393) | 61.286 (60.588-61.550) | 4.181e-7 / 3.576e-7 |
+| N-D, dedicated `_f32` | 819.228 (792.668-822.381) | 346.637 (341.925-348.370) | 7.153e-7 / 4.768e-7 |
+| N-D, generic `f32` | 740.089 (740.059-746.144) | 346.637 (341.925-348.370) | 3.005e-7 / 4.768e-7 |
 
 The f32 rows use the same NumPy f32-input baseline. VTL's dedicated path
 returns complex32/f32, while its generic wrapper and NumPy return
@@ -1080,10 +1085,10 @@ These CPU measurements expose remaining gaps and do not establish parity.
 
 | f32-input transform | VTL mode (median, range), us | NumPy (median, range), us | VTL / NumPy max round-trip error |
 | --- | ---: | ---: | ---: |
-| Batched axis, dedicated `_f32` | 175.870 (169.642-219.798) | 199.997 (199.286-200.049) | 7.153e-7 / 3.576e-7 |
-| Batched axis, generic `f32` | 100.015 (96.690-100.301) | 199.997 (199.286-200.049) | 4.181e-7 / 3.576e-7 |
-| N-D, dedicated `_f32` | 1204.414 (1196.533-1490.618) | 1310.632 (1294.415-1311.500) | 7.153e-7 / 4.768e-7 |
-| N-D, generic `f32` | 897.194 (892.468-953.516) | 1310.632 (1294.415-1311.500) | 3.005e-7 / 4.768e-7 |
+| Batched axis, dedicated `_f32` | 135.965 (134.622-141.365) | 198.218 (194.118-240.253) | 7.153e-7 / 3.576e-7 |
+| Batched axis, generic `f32` | 94.797 (94.252-117.594) | 198.218 (194.118-240.253) | 4.181e-7 / 3.576e-7 |
+| N-D, dedicated `_f32` | 743.509 (732.735-745.225) | 1282.085 (1270.683-1293.977) | 7.153e-7 / 4.768e-7 |
+| N-D, generic `f32` | 653.219 (647.201-671.430) | 1282.085 (1270.683-1293.977) | 3.005e-7 / 4.768e-7 |
 
 All f32 timings use the same NumPy f32-input baseline. VTL's dedicated paths
 return complex32/f32, while its generic wrappers and NumPy return

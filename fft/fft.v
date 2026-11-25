@@ -726,6 +726,8 @@ fn transform_complex_axis(input &vtl.Tensor[complex.Complex], axis int, inverse 
 	mut line := []f64{len: axis_length * 2}
 	mut index := []int{len: input.rank()}
 	line_count := input.size / axis_length
+	direct_access := fft_strides_are_nonnegative(input.strides)
+	output_axis_stride := product(input.shape[axis + 1..])
 	for line_index in 0 .. line_count {
 		mut remainder := line_index
 		for dimension := input.rank() - 1; dimension >= 0; dimension-- {
@@ -735,11 +737,20 @@ fn transform_complex_axis(input &vtl.Tensor[complex.Complex], axis int, inverse 
 			index[dimension] = remainder % input.shape[dimension]
 			remainder /= input.shape[dimension]
 		}
+		index[axis] = 0
+		input_line_offset := fft_line_offset(index, input.strides)
+		output_line_offset := row_major_index(index, input.shape)
 		for position in 0 .. axis_length {
-			index[axis] = position
-			value := input.get(index)
-			line[2 * position] = value.re
-			line[2 * position + 1] = value.im
+			if direct_access {
+				value := input.data.data[input_line_offset + position * input.strides[axis]]
+				line[2 * position] = value.re
+				line[2 * position + 1] = value.im
+			} else {
+				index[axis] = position
+				value := input.get(index)
+				line[2 * position] = value.re
+				line[2 * position + 1] = value.im
+			}
 		}
 		status := if inverse {
 			vsl_fft.backward_complex_f64(plan, mut line)
@@ -750,11 +761,14 @@ fn transform_complex_axis(input &vtl.Tensor[complex.Complex], axis int, inverse 
 			return error('fft backend failed to compute the transform')
 		}
 		for position in 0 .. axis_length {
-			index[axis] = position
-			output_index := row_major_index(index, input.shape)
 			factor := if inverse { f64(axis_length) } else { 1.0 }
-			output[output_index] = complex.complex(line[2 * position] / factor,
-				line[2 * position + 1] / factor)
+			value := complex.complex(line[2 * position] / factor, line[2 * position + 1] / factor)
+			if direct_access {
+				output[output_line_offset + position * output_axis_stride] = value
+			} else {
+				index[axis] = position
+				output[row_major_index(index, input.shape)] = value
+			}
 		}
 	}
 	return tensor_from_owned[complex.Complex](output, input.shape)
@@ -773,13 +787,24 @@ fn transform_complex_axis_f32(input &vtl.Tensor[Complex32], axis int, inverse bo
 	mut line := []f32{len: axis_length * 2}
 	mut index := []int{len: input.rank()}
 	line_count := input.size / axis_length
+	direct_access := fft_strides_are_nonnegative(input.strides)
+	output_axis_stride := product(input.shape[axis + 1..])
 	for line_index in 0 .. line_count {
 		decode_fft_axis_line(line_index, input.shape, axis, mut index)
+		index[axis] = 0
+		input_line_offset := fft_line_offset(index, input.strides)
+		output_line_offset := row_major_index(index, input.shape)
 		for position in 0 .. axis_length {
-			index[axis] = position
-			value := input.get(index)
-			line[2 * position] = value.re
-			line[2 * position + 1] = value.im
+			if direct_access {
+				value := input.data.data[input_line_offset + position * input.strides[axis]]
+				line[2 * position] = value.re
+				line[2 * position + 1] = value.im
+			} else {
+				index[axis] = position
+				value := input.get(index)
+				line[2 * position] = value.re
+				line[2 * position + 1] = value.im
+			}
 		}
 		status := if inverse {
 			vsl_fft.backward_complex_f32(plan, mut line)
@@ -790,12 +815,16 @@ fn transform_complex_axis_f32(input &vtl.Tensor[Complex32], axis int, inverse bo
 			return error('fft f32 backend failed to compute the transform')
 		}
 		for position in 0 .. axis_length {
-			index[axis] = position
-			output_index := row_major_index(index, input.shape)
 			factor := if inverse { f32(axis_length) } else { 1.0 }
-			output[output_index] = Complex32{
+			value := Complex32{
 				re: line[2 * position] / factor
 				im: line[2 * position + 1] / factor
+			}
+			if direct_access {
+				output[output_line_offset + position * output_axis_stride] = value
+			} else {
+				index[axis] = position
+				output[row_major_index(index, input.shape)] = value
 			}
 		}
 	}

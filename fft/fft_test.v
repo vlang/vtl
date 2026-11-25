@@ -84,6 +84,42 @@ fn test_rfft_axis_and_rfftn_read_strided_final_axes() ! {
 	}
 }
 
+fn test_complex_axis_and_nd_transforms_read_strided_views() ! {
+	base := vtl.from_array[complex.Complex]([
+		complex.complex(1, 0),
+		complex.complex(99, 99),
+		complex.complex(2, 1),
+		complex.complex(99, 99),
+		complex.complex(3, -1),
+		complex.complex(99, 99),
+		complex.complex(4, 2),
+		complex.complex(99, 99),
+		complex.complex(5, 1),
+		complex.complex(99, 99),
+		complex.complex(6, -2),
+		complex.complex(99, 99),
+		complex.complex(7, 3),
+		complex.complex(99, 99),
+		complex.complex(8, 0),
+		complex.complex(99, 99),
+	], [2, 8])!
+	strided := base.slice([]int{}, [0, 8, 2])!
+	contiguous := vtl.from_array[complex.Complex](strided.to_array(), strided.shape)!
+	assert !strided.is_row_major_contiguous()
+	axis_result := fft_axis(strided, 1)!
+	axis_expected := fft_axis(contiguous, 1)!
+	for i in 0 .. axis_result.size {
+		assert math.abs(axis_result.get_nth(i).re - axis_expected.get_nth(i).re) < 1e-12
+		assert math.abs(axis_result.get_nth(i).im - axis_expected.get_nth(i).im) < 1e-12
+	}
+	nd_result := fftn(strided)!
+	nd_expected := fftn(contiguous)!
+	for i in 0 .. nd_result.size {
+		assert math.abs(nd_result.get_nth(i).re - nd_expected.get_nth(i).re) < 1e-12
+		assert math.abs(nd_result.get_nth(i).im - nd_expected.get_nth(i).im) < 1e-12
+	}
+}
+
 fn test_rfft_accepts_f32_and_returns_f64_complex_values() ! {
 	input := vtl.from_1d([f32(1), 0, -1, 0])!
 
