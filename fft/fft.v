@@ -223,17 +223,28 @@ pub fn rfft_axis[T](input &vtl.Tensor[T], axis int) !&vtl.Tensor[complex.Complex
 		}
 		line_count := input.size / axis_length
 		for line_index in 0 .. line_count {
-			decode_fft_axis_line(line_index, input.shape, axis_index, mut index)
-			for position in 0 .. axis_length {
-				index[axis_index] = position
-				line[position] = T(input.get(index))
+			if axis_index == input.rank() - 1 && input.is_row_major_contiguous() {
+				line_offset := line_index * axis_length
+				unsafe {
+					C.memcpy(line.data, &input.data.data[line_offset], axis_length * sizeof(T))
+				}
+			} else {
+				decode_fft_axis_line(line_index, input.shape, axis_index, mut index)
+				for position in 0 .. axis_length {
+					index[axis_index] = position
+					line[position] = T(input.get(index))
+				}
 			}
 			if vsl_fft.forward_fft(plan, mut line) != 0 {
 				return error('rfft_axis backend failed to compute the forward transform')
 			}
 			for frequency in 0 .. frequency_count {
-				index[axis_index] = frequency
-				output_index := row_major_index(index, output_shape)
+				output_index := if axis_index == input.rank() - 1 {
+					line_index * frequency_count + frequency
+				} else {
+					index[axis_index] = frequency
+					row_major_index(index, output_shape)
+				}
 				if frequency == 0 {
 					output[output_index] = complex.complex(f64(line[0]), 0)
 				} else if axis_length % 2 == 0 && frequency == axis_length / 2 {
@@ -368,17 +379,23 @@ pub fn rfftn[T](input &vtl.Tensor[T]) !&vtl.Tensor[complex.Complex] {
 		}
 		line_count := input.size / last_length
 		for line_index in 0 .. line_count {
-			decode_row_major_index(line_index, input.shape[..last_axis], mut index)
-			for position in 0 .. last_length {
-				index[last_axis] = position
-				line[position] = T(input.get(index))
+			if input.is_row_major_contiguous() {
+				line_offset := line_index * last_length
+				unsafe {
+					C.memcpy(line.data, &input.data.data[line_offset], last_length * sizeof(T))
+				}
+			} else {
+				decode_row_major_index(line_index, input.shape[..last_axis], mut index)
+				for position in 0 .. last_length {
+					index[last_axis] = position
+					line[position] = T(input.get(index))
+				}
 			}
 			if vsl_fft.forward_fft(plan, mut line) != 0 {
 				return error('rfftn backend failed to compute the forward transform')
 			}
 			for frequency in 0 .. frequency_count {
-				index[last_axis] = frequency
-				output_index := row_major_index(index, output_shape)
+				output_index := line_index * frequency_count + frequency
 				if frequency == 0 {
 					compact[output_index] = complex.complex(f64(line[0]), 0)
 				} else if last_length % 2 == 0 && frequency == last_length / 2 {

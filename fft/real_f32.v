@@ -90,9 +90,16 @@ pub fn rfft_axis_f32(input &vtl.Tensor[f32], axis int) !&vtl.Tensor[Complex32] {
 	line_count := input.size / axis_length
 	for line_index in 0 .. line_count {
 		decode_fft_axis_line(line_index, input.shape, axis_index, mut index)
-		for position in 0 .. axis_length {
-			index[axis_index] = position
-			line[position] = input.get(index)
+		if axis_index == input.rank() - 1 && input.is_row_major_contiguous() {
+			line_offset := line_index * axis_length
+			unsafe {
+				C.memcpy(line.data, &input.data.data[line_offset], axis_length * sizeof(f32))
+			}
+		} else {
+			for position in 0 .. axis_length {
+				index[axis_index] = position
+				line[position] = input.get(index)
+			}
 		}
 		if vsl_fft.forward_fft(plan, mut line) != 0 {
 			return error('rfft_axis_f32 backend failed to compute the forward transform')

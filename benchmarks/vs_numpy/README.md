@@ -1039,15 +1039,16 @@ On 2026-11-25, three alternating process runs on an AMD Ryzen 9 5900X with V
 0.5.2 (`7f5b9a3`), GCC 16.2.1, VTL using VSL `d60f9c36`, and NumPy 2.5.5
 measured:
 
-| Transform | VTL median (range), us | NumPy median (range), us | VTL max round-trip error | NumPy max round-trip error |
-| --- | ---: | ---: | ---: | ---: |
-| Batched axis, `[64, 512]` | 268.213 (267.502-271.547) | 48.032 (48.006-48.959) | 1.110e-15 | 1.110e-15 |
-| N-D, `[32, 32, 64]` | 1450.163 (1447.281-1452.501) | 467.063 (466.335-469.571) | 1.332e-15 | 1.110e-15 |
+| Transform | VTL before (median, range), us | VTL direct-pack fast path (median, range), us | NumPy (median, range), us | VTL max round-trip error | NumPy max round-trip error |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Batched axis, `[64, 512]` | 268.213 (267.502-271.547) | 110.487 (94.713-118.580) | 47.932 (47.275-49.431) | 1.110e-15 | 1.110e-15 |
+| N-D, `[32, 32, 64]` | 1450.163 (1447.281-1452.501) | 897.815 (871.986-950.451) | 475.231 (463.448-476.169) | 1.332e-15 | 1.110e-15 |
 
-NumPy was 5.58x faster for the batched-axis case and 3.11x faster for the
-N-D case on this host. The weighted checksums agree within `3e-6` absolute;
-the small difference reflects floating-point reduction order. These results
-are narrow f64 CPU comparisons and do not establish overall parity.
+The contiguous final-axis packing fast path improved VTL by 2.43x for the
+batched-axis case and 1.62x for the N-D case. NumPy remains 2.30x and 1.89x
+faster, respectively. Weighted checksums agree within `3e-6` absolute; the
+small difference reflects floating-point reduction order. These are narrow
+f64 CPU comparisons and do not establish overall parity.
 
 ### Reference large-array results
 

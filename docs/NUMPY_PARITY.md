@@ -704,7 +704,8 @@ inputs, including offset views, against their contiguous logical-order
 equivalents. Paired real and complex FFT benchmarks now cover contiguous and
 stride-2 inputs at four sizes, with analytic error checks and repeated timings;
 the benchmark README records a reproducible 16,384-element comparison and
-matched batched-axis / three-dimensional f64 workloads.
+matched batched-axis / three-dimensional f64 workloads. Contiguous final-axis
+packing uses a direct-copy fast path, with before/after timings recorded.
 Generic real f32 transform and normalization wrappers return complex128, and
 their inverse wrappers return f64; dedicated `_f32` variants return complex32
 and f32 respectively. Tests cover these dtype contracts for selected-axis,
