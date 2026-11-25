@@ -83,9 +83,9 @@ reduces broadcast gradients to their input shapes, and follows PyTorch's
 
 `vtl.vmap` and `vtl.autograd.vmap` provide composable CPU transforms for mapping
 tensor or differentiable-variable functions over an input axis, with
-negative-axis support, output-axis insertion, shape validation, and functions
-that return either vectors or scalar-shaped tensors. They intentionally do not
-yet transform module state or randomness.
+negative-axis support, output-axis insertion relative to the callback result,
+shape validation, and functions that return either vectors or scalar-shaped
+tensors. They intentionally do not yet transform module state or randomness.
 
 **Next:** Expand operation coverage and add gradient APIs and graph controls
 comparable to `torch.autograd`, including higher-order gradients and retained

@@ -16,13 +16,8 @@ pub fn vmap[T](f fn (&Variable[T]) !&Variable[T], input &Variable[T], in_dim int
 	if input_axis < 0 || input_axis >= rank {
 		return error('vmap in_dim ${in_dim} is out of range for rank ${rank}')
 	}
-	mut output_axis := out_dim
-	if output_axis < 0 {
-		output_axis += rank
-	}
-	if output_axis < 0 || output_axis >= rank {
-		return error('vmap out_dim ${out_dim} is out of range for rank ${rank}')
-	}
+	mut output_axis := -1
+	mut expected_result_shape := []int{}
 	mut outputs := []&Variable[T]{cap: input.value.shape[input_axis]}
 	mut expected_shape := []int{}
 	for mapped_index in 0 .. input.value.shape[input_axis] {
@@ -32,6 +27,19 @@ pub fn vmap[T](f fn (&Variable[T]) !&Variable[T], input &Variable[T], in_dim int
 		}
 		sample := input.slice(...indices)!
 		result := f(sample)!
+		if mapped_index == 0 {
+			output_rank := result.value.shape.len + 1
+			output_axis = out_dim
+			if output_axis < 0 {
+				output_axis += output_rank
+			}
+			if output_axis < 0 || output_axis >= output_rank {
+				return error('vmap out_dim ${out_dim} is out of range for output rank ${output_rank}')
+			}
+			expected_result_shape = result.value.shape.clone()
+		} else if result.value.shape != expected_result_shape {
+			return error('vmap function returned inconsistent shapes')
+		}
 		mut expanded_shape := result.value.shape.clone()
 		expanded_shape.insert(output_axis, 1)
 		expanded := result.reshape(expanded_shape)!

@@ -19,3 +19,12 @@ fn test_vmap_maps_scalar_outputs() ! {
 	assert result.shape == [3, 1]
 	assert result.to_array() == [1.0, 2.0, 3.0]
 }
+
+fn test_vmap_out_dim_is_checked_against_function_output_rank() ! {
+	input := from_array([1.0, 2.0], [2, 1])!
+	result := vmap[f64](fn (sample &Tensor[f64]) !&Tensor[f64] {
+		return sample.reshape([1, 1])
+	}, input, 0, 2)!
+	assert result.shape == [1, 1, 2]
+	assert result.to_array() == [1.0, 2.0]
+}
