@@ -9,6 +9,11 @@ pub:
 	axis2  int = 1
 }
 
+// ReadOnlyDiagonalView exposes diagonal values without tensor mutators.
+pub struct ReadOnlyDiagonalView[T] {
+	backing &Tensor[T] = unsafe { nil }
+}
+
 // diagonal returns a view along the diagonal of two axes of an N-D tensor.
 // The selected axes are removed and the diagonal axis is appended to the
 // result, following NumPy's shape convention. The view shares input storage.
@@ -60,4 +65,42 @@ pub fn diagonal[T](input &Tensor[T], params DiagonalData) !&Tensor[T] {
 	}
 	result.ensure_memory()
 	return result
+}
+
+// diagonal_readonly returns a storage-sharing diagonal view with a read-only API.
+// The legacy diagonal function remains writable for compatibility.
+pub fn diagonal_readonly[T](input &Tensor[T], params DiagonalData) !&ReadOnlyDiagonalView[T] {
+	return &ReadOnlyDiagonalView[T]{
+		backing: diagonal[T](input, params)!
+	}
+}
+
+// shape returns a copy of the view shape.
+pub fn (view &ReadOnlyDiagonalView[T]) shape() []int {
+	return view.backing.shape.clone()
+}
+
+// rank returns the number of dimensions in the view.
+pub fn (view &ReadOnlyDiagonalView[T]) rank() int {
+	return view.backing.rank()
+}
+
+// size returns the number of elements in the view.
+pub fn (view &ReadOnlyDiagonalView[T]) size() int {
+	return view.backing.size()
+}
+
+// get reads the element at the given multidimensional index.
+pub fn (view &ReadOnlyDiagonalView[T]) get(index []int) T {
+	return view.backing.get(index)
+}
+
+// get_nth reads an element in logical row-major order.
+pub fn (view &ReadOnlyDiagonalView[T]) get_nth(index int) T {
+	return view.backing.get_nth(index)
+}
+
+// to_array returns a copy of the view's logical values.
+pub fn (view &ReadOnlyDiagonalView[T]) to_array() []T {
+	return view.backing.to_array()
 }

@@ -16,6 +16,18 @@ fn test_flip_supports_repeated_axes_and_strided_views() {
 	assert view.flip(1)!.to_array() == [2, 1, 0, 5, 4, 3]
 }
 
+fn test_flip_and_rot90_copy_transposed_inputs() ! {
+	source := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
+	transposed := source.transpose([1, 0])!
+	mut flipped := transposed.flip(0)!
+	flipped.set([0, 0], 99)
+	assert source.get([0, 0]) == 1
+
+	mut rotated := vtl.rot90(transposed)!
+	rotated.set([0, 0], 88)
+	assert source.get([0, 0]) == 1
+}
+
 fn test_flip_rejects_invalid_axis() {
 	t := vtl.ones[int]([2, 3])
 	if _ := t.flip(2) {

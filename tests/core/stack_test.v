@@ -35,6 +35,18 @@ fn test_concatenate_rejects_empty_inputs() {
 	assert false, 'expected concatenate to reject empty inputs'
 }
 
+fn test_concatenate_and_stack_copy_transposed_inputs() ! {
+	source := vtl.from_2d([[1, 2], [3, 4]])!
+	transposed := source.transpose([1, 0])!
+	mut concatenated := vtl.concatenate[int]([transposed], axis: 0)!
+	concatenated.set([0, 0], 99)
+	assert source.get([0, 0]) == 1
+
+	mut stacked := vtl.stack[int]([transposed], axis: 0)!
+	stacked.set([0, 0, 0], 88)
+	assert source.get([0, 0]) == 1
+}
+
 fn test_vstack_rejects_empty_inputs() {
 	_ := vtl.vstack[f64]([]&vtl.Tensor[f64]{}) or {
 		assert err.msg() == 'at least one tensor is required'

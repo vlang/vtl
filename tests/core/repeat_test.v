@@ -17,6 +17,18 @@ fn test_repeat_along_axes_and_on_strided_views() {
 	assert vtl.repeat_axis(view, 2, 1)!.to_array() == [1, 1, 2, 2, 3, 3, 4, 4]
 }
 
+fn test_repeat_and_tile_copy_strided_inputs() ! {
+	source := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
+	transposed := source.transpose([1, 0])!
+	mut repeated := vtl.repeat_axis(transposed, 2, 1)!
+	repeated.set([0, 0], 99)
+	assert source.get([0, 0]) == 1
+
+	mut tiled := vtl.tile(transposed, [1, 2])!
+	tiled.set([0, 0], 88)
+	assert source.get([0, 0]) == 1
+}
+
 fn test_repeat_zero_and_invalid_repeats_or_axis() {
 	t := vtl.from_1d([1, 2])!
 	assert vtl.repeat(t, 0)!.shape == [0]

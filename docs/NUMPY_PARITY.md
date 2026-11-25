@@ -109,7 +109,11 @@ view; tests cover transposed and column-major values as well as storage sharing.
 `transpose`, `moveaxis`, `squeeze`, `unsqueeze`, and `expand_dims` preserve
 shared storage as views, including for transposed input.
 `split` returns storage-sharing slices, including when splitting a transposed
-input.
+input. `diagonal_readonly` provides a storage-sharing diagonal view that
+exposes only read operations and returns copied shape/value arrays.
+`concatenate`, `stack`, `repeat`, `repeat_axis`, `tile`, `flip`, `rot90`,
+`pad`, and `flatten` return independent copies; mutation tests cover transposed
+inputs for these allocation-based operations.
 `ravel` shares storage for row-major contiguous input and copies other layouts;
 `flatten` always copies. Mutation tests verify these contracts for contiguous
 and transposed inputs.
@@ -122,9 +126,9 @@ zero-dimension rules. Tests cover empty inputs, rank mismatches, and invalid
 target dimensions.
 
 **Remaining:** continue the aliasing audit for manipulation APIs not listed
-above, including concatenation, splitting, repeats/tiles, flips/rotations, and
-padding. VTL diagonal views remain writable; NumPy exposes them as read-only by
-default, an intentional documented deviation pending a safe read-only model.
+above. `broadcast_to` views remain writable, and the existing `diagonal` API
+remains writable for compatibility; NumPy's read-only-by-default diagonal
+behavior is available through `diagonal_readonly` but not the legacy default.
 
 ### Indexing and set operations
 
