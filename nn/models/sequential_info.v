@@ -1,6 +1,7 @@
 module models
 
 import vtl.autograd
+import vtl
 import vtl.nn.layers
 import vtl.nn.loss
 import vtl.nn.types
@@ -333,6 +334,18 @@ pub fn (mut ls SequentialInfo[T]) maxpool1d(kernel int, padding int, stride int)
 			'kernel':  kernel
 			'padding': padding
 			'stride':  stride
+		})
+}
+
+pub fn (mut ls SequentialInfo[T]) pad2d(padding []int, mode vtl.PadMode, constant T) {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.add_layer(layers.pad2d_layer[T](ls.ctx, shape, padding, mode, constant),
+		'Pad2DLayer', {
+			'left':   padding[0]
+			'right':  padding[1]
+			'top':    padding[2]
+			'bottom': padding[3]
 		})
 }
 

@@ -214,6 +214,10 @@ pub fn (mut nn Sequential[T]) maxpool1d(kernel int, padding int, stride int) {
 	nn.info.maxpool1d(kernel, padding, stride)
 }
 
+pub fn (mut nn Sequential[T]) pad2d(padding []int, mode vtl.PadMode, constant T) {
+	nn.info.pad2d(padding, mode, constant)
+}
+
 // layer_norm adds a new LayerNorm layer to the network.
 pub fn (mut nn Sequential[T]) layer_norm(normalized_shape []int, config layers.LayerNormConfig) {
 	nn.info.layer_norm(normalized_shape, config)
