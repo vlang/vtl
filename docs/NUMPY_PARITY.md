@@ -124,16 +124,16 @@ Top-level `tril` and `triu` copy N-D inputs and apply NumPy's diagonal offset
 to each trailing matrix.
 
 **Current:** `broadcast_to`, `broadcast2`, `broadcast3`, and `broadcast_n`
-create zero-copy views, validate incompatible shapes, and follow NumPy's
-zero-dimension rules. These views are writable: writes through broadcasted
-coordinates update their source, and zero-stride dimensions alias the same
-source element. Tests cover empty inputs, invalid shapes, and mutation through
-contiguous and transposed sources.
+create writable zero-copy views, validate incompatible shapes, and follow
+NumPy's zero-dimension rules. Writes through broadcasted coordinates update
+their source, and zero-stride dimensions alias the same source element. Tests
+cover empty inputs, invalid shapes, and mutation through contiguous and
+transposed sources.
 
-**Remaining:** continue the aliasing audit for manipulation APIs not listed
-above. `broadcast_to` views remain writable, and the existing `diagonal` API
-remains writable for compatibility; NumPy's read-only-by-default diagonal
-behavior is available through `diagonal_readonly` but not the legacy default.
+**Known mutability difference:** NumPy exposes broadcast and diagonal views as
+read-only by default. VTL retains writable `broadcast_to` and legacy `diagonal`
+for compatibility; `diagonal_readonly` provides an explicit read-only
+alternative for diagonal access.
 
 ### Indexing and set operations
 
