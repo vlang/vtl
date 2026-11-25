@@ -204,6 +204,34 @@ pub fn (mut ls SequentialInfo[T]) conv2d(in_channels int, out_channels int, kern
 	})
 }
 
+// conv_transpose2d adds a transposed convolution using the previous layer's [channels, height, width] shape.
+pub fn (mut ls SequentialInfo[T]) conv_transpose2d(out_channels int, kernel_size []int, config layers.ConvTranspose2DConfig) {
+	if ls.layers.len == 0 {
+		panic('conv_transpose2d requires an input layer')
+	}
+	shape := ls.layers[ls.layers.len - 1].output_shape()
+	if shape.len != 3 {
+		panic('conv_transpose2d expects the previous layer shape to be [channels, height, width]')
+	}
+	in_channels := shape[0]
+	ls.add_layer(layers.conv_transpose2d_layer[T](ls.ctx, in_channels, out_channels,
+		kernel_size, config, shape), 'ConvTranspose2DLayer', {
+		'in_channels':      in_channels
+		'out_channels':     out_channels
+		'kernel_h':         kernel_size[0]
+		'kernel_w':         kernel_size[1]
+		'stride_h':         config.stride[0]
+		'stride_w':         config.stride[1]
+		'padding_h':        config.padding[0]
+		'padding_w':        config.padding[1]
+		'output_padding_h': config.output_padding[0]
+		'output_padding_w': config.output_padding[1]
+		'dilation_h':       config.dilation[0]
+		'dilation_w':       config.dilation[1]
+		'groups':           config.groups
+	})
+}
+
 // batchnorm1d adds a new BatchNorm1D layer to the network.
 pub fn (mut ls SequentialInfo[T]) batchnorm1d(num_features int, config layers.BatchNorm1DConfig) {
 	ls.add_layer(layers.batchnorm1d_layer[T](ls.ctx, num_features, config), 'BatchNorm1DLayer', {

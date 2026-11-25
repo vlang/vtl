@@ -151,6 +151,11 @@ pub fn (mut nn Sequential[T]) conv2d(in_channels int, out_channels int, kernel_s
 	nn.info.conv2d(in_channels, out_channels, kernel_size, config)
 }
 
+// conv_transpose2d adds a 2D transposed convolution over channel-first input.
+pub fn (mut nn Sequential[T]) conv_transpose2d(out_channels int, kernel_size []int, config layers.ConvTranspose2DConfig) {
+	nn.info.conv_transpose2d(out_channels, kernel_size, config)
+}
+
 // batchnorm1d adds a new BatchNorm1D layer to the network.
 pub fn (mut nn Sequential[T]) batchnorm1d(num_features int, config layers.BatchNorm1DConfig) {
 	nn.info.batchnorm1d(num_features, config)
