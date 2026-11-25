@@ -92,30 +92,208 @@ pub fn (p Polynomial) integral(constant f64) Polynomial {
 	return Polynomial{ coefficients: coefficients }
 }
 
+struct PolynomialRootEvaluation {
+	value        f64
+	absolute_sum f64
+}
+
+fn polynomial_root_evaluation(p Polynomial, x f64) !PolynomialRootEvaluation {
+	mut value := p.coefficients[p.coefficients.len - 1]
+	mut absolute_sum := math.abs(value)
+	for index := p.coefficients.len - 2; index >= 0; index-- {
+		value = value * x + p.coefficients[index]
+		absolute_sum = absolute_sum * math.abs(x) + math.abs(p.coefficients[index])
+		if !math.is_finite(value) || !math.is_finite(absolute_sum) {
+			return error('polynomial root evaluation overflowed')
+		}
+	}
+	return PolynomialRootEvaluation{
+		value:        value
+		absolute_sum: absolute_sum
+	}
+}
+
+fn polynomial_root_is_zero(evaluation PolynomialRootEvaluation, degree int) bool {
+	tolerance := evaluation.absolute_sum * f64(degree + 1) * 1.7763568394002505e-15
+	return math.is_finite(tolerance) && math.abs(evaluation.value) <= tolerance
+}
+
+fn polynomial_roots_match(a f64, b f64) bool {
+	scale := math.max(math.abs(a), math.abs(b))
+	return a == b || (scale > 0.0 && math.abs(a - b) <= scale * 8.881784197001252e-16)
+}
+
+fn bisect_polynomial_root(p Polynomial, left f64, right f64, left_value f64) !f64 {
+	mut low := left
+	mut high := right
+	mut low_value := left_value
+	for _ in 0 .. 128 {
+		midpoint := low * 0.5 + high * 0.5
+		if midpoint == low || midpoint == high {
+			break
+		}
+		midpoint_value := polynomial_root_evaluation(p, midpoint)!.value
+		if midpoint_value == 0.0 {
+			return midpoint
+		}
+		if (low_value < 0.0) != (midpoint_value < 0.0) {
+			high = midpoint
+		} else {
+			low = midpoint
+			low_value = midpoint_value
+		}
+	}
+	return low * 0.5 + high * 0.5
+}
+
+// roots returns finite real roots in ascending order, including multiplicity.
+// Complex roots are omitted; non-finite inputs, overflowing evaluations, and
+// numerically ambiguous multiplicities return errors.
 pub fn (p Polynomial) roots() ![]f64 {
+	if p.coefficients.len == 0 {
+		return error('polynomial roots require at least one coefficient')
+	}
+	mut normalized := Polynomial{ coefficients: p.coefficients.clone() }
+	normalized.trim()
+	if normalized.coefficients.len != p.coefficients.len {
+		return normalized.roots()
+	}
+	for coefficient in p.coefficients {
+		if !math.is_finite(coefficient) {
+			return error('polynomial roots require finite coefficients')
+		}
+	}
 	match p.degree() {
 		0 { return error('constant polynomial has no finite roots') }
-		1 { return [-p.coefficients[0] / p.coefficients[1]] }
+		1 {
+			root := -p.coefficients[0] / p.coefficients[1]
+			if !math.is_finite(root) {
+				return error('polynomial root overflowed')
+			}
+			return [root]
+		}
 		2 {
 			a, b, c := p.coefficients[2], p.coefficients[1], p.coefficients[0]
-			discriminant := b * b - 4.0 * a * c
+			scale := math.max(math.abs(a), math.max(math.abs(b), math.abs(c)))
+			scaled_a, scaled_b, scaled_c := a / scale, b / scale, c / scale
+			discriminant := scaled_b * scaled_b - 4.0 * scaled_a * scaled_c
+			discriminant_scale := scaled_b * scaled_b + 4.0 * math.abs(scaled_a * scaled_c)
+			discriminant_tolerance := discriminant_scale * 1.7763568394002505e-15
+			if !math.is_finite(discriminant) {
+				return error('quadratic root discriminant overflowed')
+			}
+			if discriminant != 0.0 && math.abs(discriminant) <= discriminant_tolerance {
+				return error('quadratic root multiplicity is numerically indeterminate')
+			}
 			if discriminant < 0.0 {
 				return []f64{}
 			}
 			if discriminant == 0.0 {
-				root := -b / (2.0 * a)
+				root := -scaled_b / (2.0 * scaled_a)
+				if !math.is_finite(root) {
+					return error('quadratic root overflowed')
+				}
 				return [root, root]
 			}
 			root := math.sqrt(discriminant)
 			// Use the product of roots for the second root to avoid cancellation.
 			if b >= 0 {
-				q := -0.5 * (b + root)
-				return [q / a, c / q]
+				q := -0.5 * (scaled_b + root)
+				mut roots := [q / scaled_a, scaled_c / q]
+				if !math.is_finite(roots[0]) || !math.is_finite(roots[1]) {
+					return error('quadratic root overflowed')
+				}
+				roots.sort()
+				return roots
 			}
-			q := -0.5 * (b - root)
-			return [c / q, q / a]
+			q := -0.5 * (scaled_b - root)
+			mut roots := [scaled_c / q, q / scaled_a]
+			if !math.is_finite(roots[0]) || !math.is_finite(roots[1]) {
+				return error('quadratic root overflowed')
+			}
+			roots.sort()
+			return roots
 		}
-		else { return error('roots currently supports degree up to two') }
+		else {
+			leading := math.abs(p.coefficients[p.coefficients.len - 1])
+			if leading == 0.0 || !math.is_finite(leading) {
+				return error('polynomial roots require a finite non-zero leading coefficient')
+			}
+			mut max_ratio := 0.0
+			for coefficient in p.coefficients[..p.coefficients.len - 1] {
+				ratio := math.abs(coefficient / leading)
+				if !math.is_finite(ratio) {
+					return error('polynomial root bound overflowed')
+				}
+				max_ratio = math.max(max_ratio, ratio)
+			}
+			bound := max_ratio + 1.0
+			if !math.is_finite(bound) {
+				return error('polynomial root bound overflowed')
+			}
+			critical_roots := p.derivative().roots()!
+			mut critical_points := []f64{cap: critical_roots.len}
+			for root in critical_roots {
+				if math.abs(root) > bound {
+					return error('polynomial derivative root exceeded the root bound')
+				}
+				mut duplicate := false
+				for point in critical_points {
+					if polynomial_roots_match(root, point) {
+						duplicate = true
+						break
+					}
+				}
+				if !duplicate {
+					critical_points << root
+				}
+			}
+			critical_points.sort()
+			mut points := []f64{cap: critical_points.len + 2}
+			mut values := []f64{cap: critical_points.len + 2}
+			mut points_are_roots := []bool{cap: critical_points.len + 2}
+			points << -bound
+			values << polynomial_root_evaluation(p, -bound)!.value
+			points_are_roots << false
+			mut roots := []f64{}
+			for point in critical_points {
+				evaluation := polynomial_root_evaluation(p, point)!
+				is_root := evaluation.value == 0.0
+				if !is_root && polynomial_root_is_zero(evaluation, p.degree()) {
+					return error('polynomial root multiplicity is numerically indeterminate')
+				}
+				points << point
+				values << evaluation.value
+				points_are_roots << is_root
+				if is_root {
+					mut multiplicity := 1
+					for derivative_root in critical_roots {
+						if polynomial_roots_match(point, derivative_root) {
+							multiplicity++
+						}
+					}
+					for _ in 0 .. multiplicity {
+						roots << point
+					}
+				}
+			}
+			points << bound
+			values << polynomial_root_evaluation(p, bound)!.value
+			points_are_roots << false
+			for index in 0 .. points.len - 1 {
+				if points_are_roots[index] || points_are_roots[index + 1] {
+					continue
+				}
+				left_value := values[index]
+				right_value := values[index + 1]
+				if (left_value < 0.0) != (right_value < 0.0) {
+					roots << bisect_polynomial_root(p, points[index], points[index + 1],
+						left_value)!
+				}
+			}
+			roots.sort()
+			return roots
+		}
 	}
 }
 

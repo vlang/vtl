@@ -37,8 +37,10 @@ conversion to that basis can still amplify errors on ill-conditioned data. See t
 
 `vtl.Chebyshev`, `vtl.Legendre`, `vtl.Hermite`, and `vtl.HermiteE` store
 ascending coefficients and support scalar/tensor evaluation, arithmetic,
-calculus, real roots up to degree two with multiplicity, and conversion to/from
-power series. The
+calculus, real roots of arbitrary degree with multiplicity, and conversion
+to/from power series. Complex roots are not exposed; root isolation can report
+an error if intermediate evaluations overflow or a repeated-root multiplicity
+cannot be resolved reliably in `f64`. The
 Hermite APIs distinguish physicists' (`hermite`) and probabilists' (`hermite_e`)
 conventions. Supply an explicit `domain` and `window`; evaluation maps the
 input domain linearly into the window. Polynomial APIs currently use `f64`.

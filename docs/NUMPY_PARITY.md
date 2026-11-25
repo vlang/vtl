@@ -47,8 +47,14 @@ For neural-network and framework-level gaps relative to PyTorch, see the
 - A power-series `Polynomial` API, first-kind `Chebyshev`, `Legendre`,
   physicists' `Hermite`, and probabilists' `HermiteE` APIs with ascending
   coefficients, scalar/tensor evaluation, arithmetic, derivative/integral,
-  real linear and quadratic roots with multiplicity, and conversion between
-  power and orthogonal bases. The Chebyshev conventions follow NumPy's
+  real roots of arbitrary degree with multiplicity, and conversion between
+  power and orthogonal bases. These series APIs are distinct from interpolation
+  and spline coverage tracked in [#522](https://github.com/vlang/vtl/issues/522).
+  The power-series API follows NumPy's
+  [Polynomial class](https://numpy.org/doc/stable/reference/generated/numpy.polynomial.polynomial.Polynomial.html),
+  [polyfit](https://numpy.org/doc/stable/reference/generated/numpy.polynomial.polynomial.polyfit.html),
+  and [polyroots](https://numpy.org/doc/stable/reference/generated/numpy.polynomial.polynomial.polyroots.html).
+  The Chebyshev conventions follow NumPy's
   [Chebyshev class](https://numpy.org/doc/stable/reference/generated/numpy.polynomial.chebyshev.Chebyshev.html)
   and [series module](https://numpy.org/doc/stable/reference/routines.polynomials.chebyshev.html);
   Legendre follows NumPy's
@@ -60,8 +66,11 @@ For neural-network and framework-level gaps relative to PyTorch, see the
   window.
   Least-squares fitting uses a scaled Vandermonde matrix and Householder QR;
   coefficients return in the original power basis, where conditioning can
-  still amplify errors. Higher-degree root solving and NumPy-generated
-  reference fixtures remain open. See the runnable
+  still amplify errors. Root isolation uses derivative critical points and
+  bisection; complex roots are not exposed, and numerically ambiguous
+  multiplicities return an error rather than a guessed result. Difficult
+  high-degree or ill-conditioned cases need broader NumPy-reference coverage.
+  See the runnable
   [polynomial fitting example](../examples/polynomial_fit/main.v).
 - Reverse-mode autograd, neural-network layers and losses, optimizers,
   datasets, CPU support, and selected CUDA/Vulkan operations. OpenCL/VCL

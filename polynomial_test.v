@@ -24,15 +24,67 @@ fn test_polynomial_roots_and_fit() ! {
 	roots := quadratic.roots()!
 	assert math.abs(roots[0] - 1.0) < 1e-12
 	assert math.abs(roots[1] - 2.0) < 1e-12
+	negative_leading_roots := polynomial([-2.0, 3.0, -1.0])!.roots()!
+	assert math.abs(negative_leading_roots[0] - 1.0) < 1e-12
+	assert math.abs(negative_leading_roots[1] - 2.0) < 1e-12
+	padded_roots := (Polynomial{ coefficients: [2.0, -3.0, 1.0, 0.0] }).roots()!
+	assert math.abs(padded_roots[0] - 1.0) < 1e-12
+	assert math.abs(padded_roots[1] - 2.0) < 1e-12
 	repeated_roots := polynomial([1.0, -2.0, 1.0])!.roots()!
 	assert repeated_roots == [1.0, 1.0]
+	if _ := polynomial([1.0 + 1e-15, 2.0, 1.0])!.roots() {
+		assert false, 'quadratic roots near a repeated root must report ambiguity'
+	}
 	ill_scaled_roots := polynomial([1e-16, 1e8, 1.0])!.roots()!
 	assert math.abs(ill_scaled_roots[0] + 1e8) < 1e-8
 	assert math.abs(ill_scaled_roots[1] + 1e-24) < 1e-32
+	large_coefficient_roots := polynomial([1.0, -2e200, 1e200])!.roots()!
+	assert math.abs(large_coefficient_roots[0] / 5e-201 - 1.0) < 1e-12
+	assert math.abs(large_coefficient_roots[1] - 2.0) < 1e-12
 	fit := polynomial_fit([-1.0, 0.0, 1.0, 2.0], [2.0, 1.0, 2.0, 5.0], 2)!
 	assert math.abs(fit.coefficients[0] - 1.0) < 1e-12
 	assert math.abs(fit.coefficients[1]) < 1e-12
 	assert math.abs(fit.coefficients[2] - 1.0) < 1e-12
+}
+
+fn test_polynomial_roots_isolate_real_roots_and_preserve_multiplicity() ! {
+	// Simple-root references are from NumPy 2.5.5; repeated roots assert exact
+	// algebraic multiplicity because NumPy's companion solver splits them.
+	three_real_roots := polynomial([6.0, -5.0, -2.0, 1.0])!.roots()!
+	assert three_real_roots.len == 3
+	assert math.abs(three_real_roots[0] + 2.0) < 1e-12
+	assert math.abs(three_real_roots[1] - 1.0) < 1e-12
+	assert math.abs(three_real_roots[2] - 3.0) < 1e-12
+
+	five_real_roots := polynomial([-12.0, 17.0, 20.5, -12.0, -2.5, 1.0])!.roots()!
+	for index, expected in [-3.0, -1.0, 0.5, 2.0, 4.0] {
+		assert math.abs(five_real_roots[index] - expected) < 1e-12
+	}
+
+	one_real_root := polynomial([1.0, 1.0, 0.0, 1.0])!.roots()!
+	assert one_real_root.len == 1
+	assert math.abs(one_real_root[0] + 0.6823278038280193) < 1e-12
+
+	repeated_roots := polynomial([4.0, -4.0, -3.0, 2.0, 1.0])!.roots()!
+	assert repeated_roots == [-2.0, -2.0, 1.0, 1.0]
+	triple_root := polynomial([-1.0, 3.0, -3.0, 1.0])!.roots()!
+	assert triple_root == [1.0, 1.0, 1.0]
+
+	assert polynomial([1.0, 0.0, 0.0, 0.0, 1.0])!.roots()!.len == 0
+	assert polynomial([1e-16, 0.0, 1.0, 0.0, 1.0])!.roots()!.len == 0
+	ill_conditioned := polynomial([0.0169, -0.364, 1.18, 2.4, 1.0])!.roots()!
+	assert ill_conditioned.len == 2
+	assert math.abs(ill_conditioned[0] - 0.05918435) < 1e-6
+	assert math.abs(ill_conditioned[1] - 0.16291652) < 1e-6
+	if _ := polynomial([math.nan(), 0.0, 0.0, 1.0])!.roots() {
+		assert false, 'polynomial roots must reject non-finite coefficients'
+	}
+	if _ := polynomial([1e308, 0.0, 0.0, 1.0])!.roots() {
+		assert false, 'polynomial roots must report overflowing evaluations'
+	}
+	if _ := polynomial([1e308, 1e-308])!.roots() {
+		assert false, 'polynomial roots must reject unrepresentable roots'
+	}
 }
 
 fn test_polynomial_fit_scales_large_inputs_and_rejects_invalid_data() ! {
