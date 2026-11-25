@@ -52,6 +52,14 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -qq -y libopenblas-dev liblapacke-dev gfortran python3 python3-numpy
 
+      - name: Record benchmark toolchain metadata
+        run: |
+          {
+            echo "VTL_V_VERSION=$(v version)"
+            echo "VTL_C_COMPILER=$(gcc --version | head -n 1)"
+            echo "VTL_NUMPY_VERSION=$(python3 -c 'import numpy; print(numpy.__version__)')"
+          } >> "$GITHUB_ENV"
+
       - name: Test benchmark report helpers
         run: python3 -m unittest discover -s vtl/benchmarks/vs_numpy -p 'test_*.py'
 

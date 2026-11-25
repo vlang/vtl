@@ -94,6 +94,12 @@ class MatmulPerformanceBudgetTest(unittest.TestCase):
 
             results = json.loads(json_path.read_text(encoding="utf-8"))
             self.assertEqual(results["schema_version"], 2)
+            self.assertIn("os", results["environment"])
+            self.assertIn("machine", results["environment"])
+            self.assertIn("logical_cpu_count", results["environment"])
+            self.assertIn("v_version", results["environment"])
+            self.assertIn("c_compiler", results["environment"])
+            self.assertIn("numpy_version", results["environment"])
             benchmarks = results["benchmarks"]
             self.assertEqual(benchmarks[0]["benchmark"], "cpu-gemm")
             self.assertEqual(benchmarks[0]["max_slowdown"], 3.0)

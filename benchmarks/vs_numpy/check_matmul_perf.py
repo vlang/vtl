@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import json
 import math
+import os
+import platform
 import re
 import sys
 from pathlib import Path
@@ -186,6 +188,19 @@ def statistics_benchmark_group(report: str) -> dict[str, object]:
     }
 
 
+def environment_metadata() -> dict[str, object]:
+    return {
+        "os": platform.platform(),
+        "machine": platform.machine(),
+        "processor": platform.processor() or None,
+        "logical_cpu_count": os.cpu_count(),
+        "python_version": platform.python_version(),
+        "v_version": os.environ.get("VTL_V_VERSION"),
+        "c_compiler": os.environ.get("VTL_C_COMPILER"),
+        "numpy_version": os.environ.get("VTL_NUMPY_VERSION"),
+    }
+
+
 def check_report(path: Path, annotate: bool = False, json_path: Path | None = None) -> int:
     try:
         report = path.read_text(encoding="utf-8")
@@ -206,6 +221,7 @@ def check_report(path: Path, annotate: bool = False, json_path: Path | None = No
         if json_path is not None:
             payload = {
                 "schema_version": 2,
+                "environment": environment_metadata(),
                 "benchmarks": [
                     {
                         "benchmark": "cpu-gemm",
