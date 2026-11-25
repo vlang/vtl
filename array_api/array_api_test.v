@@ -5,7 +5,7 @@ import vtl
 
 fn test_capability_matrix_is_explicit_and_queryable() {
 	matrix := capability_matrix()
-	assert matrix.len == 27
+	assert matrix.len == 31
 	assert supports('zeros')
 	assert supports('reshape')
 	assert supports('broadcast_to')
@@ -29,6 +29,10 @@ fn test_capability_matrix_is_explicit_and_queryable() {
 	assert supports('var')
 	assert supports('median')
 	assert supports('quantile')
+	assert supports('std_axis')
+	assert supports('var_axis')
+	assert supports('median_axis')
+	assert supports('quantile_axis')
 	assert !supports('asarray')
 
 	for capability in matrix {
