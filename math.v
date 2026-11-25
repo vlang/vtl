@@ -79,22 +79,64 @@ fn nan_to_num_component(value f64, nan f64, positive_infinity f64, negative_infi
 }
 
 // sign returns the elementwise sign of each value: -1, 0, or 1. Floating-point
-// NaNs remain NaN, matching NumPy's sign behavior.
+// NaNs remain NaN. Complex values return their normalized phase, matching
+// NumPy 2.0 and later.
 pub fn (t &Tensor[T]) sign[T]() &Tensor[T] {
-	return t.map_values(fn [T](value T) T {
-		$if T is f32 || T is f64 {
-			if math.is_nan(f64(value)) {
-				return value
+	$if T is vcomplex.Complex {
+		return t.map_values(fn (value vcomplex.Complex) vcomplex.Complex {
+			return complex_sign(value)
+		})
+	} $else {
+		return t.map_values(fn [T](value T) T {
+			$if T is f32 || T is f64 {
+				if math.is_nan(f64(value)) {
+					return value
+				}
+			}
+			if value < cast[T](0) {
+				return cast[T](-1)
+			}
+			if value > cast[T](0) {
+				return cast[T](1)
+			}
+			return cast[T](0)
+		})
+	}
+}
+
+fn complex_sign(value vcomplex.Complex) vcomplex.Complex {
+	if math.is_nan(value.re) || math.is_nan(value.im) {
+		return vcomplex.Complex{
+			re: math.nan()
+			im: math.nan()
+		}
+	}
+	real_infinite := math.is_inf(value.re, 0)
+	imag_infinite := math.is_inf(value.im, 0)
+	if real_infinite || imag_infinite {
+		if real_infinite && imag_infinite {
+			return vcomplex.Complex{
+				re: math.nan()
+				im: math.nan()
 			}
 		}
-		if value < cast[T](0) {
-			return cast[T](-1)
+		if real_infinite {
+			return vcomplex.Complex{
+				re: if math.signbit(value.re) { -1.0 } else { 1.0 }
+			}
 		}
-		if value > cast[T](0) {
-			return cast[T](1)
+		return vcomplex.Complex{
+			im: if math.signbit(value.im) { -1.0 } else { 1.0 }
 		}
-		return cast[T](0)
-	})
+	}
+	magnitude := math.hypot(value.re, value.im)
+	if magnitude == 0.0 {
+		return vcomplex.Complex{}
+	}
+	return vcomplex.Complex{
+		re: value.re / magnitude
+		im: value.im / magnitude
+	}
 }
 
 // heaviside returns 0 for negative values, 1 for positive values, and x1 for

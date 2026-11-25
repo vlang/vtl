@@ -246,7 +246,11 @@ NumPy-style axis-removed output shape.
 gradients along selected axes; elementwise logical AND/OR/XOR/NOT; integer
 bitwise AND/OR/XOR/invert and scalar left/right shifts. Gradients support
 uniform spacing or monotonic non-uniform coordinates and first/second-order
-boundary differences. `Tensor.reciprocal()` computes `1/x` for f32/f64
+boundary differences. `sign` normalizes complex values to their phase, matching
+NumPy 2.0+, returning zero for zero, `nan+nanj` if either component is NaN,
+the unit axis for a single infinite component, and `nan+nanj` for two infinite
+components.
+`Tensor.reciprocal()` computes `1/x` for f32/f64
 tensors, preserves shape and dtype, and follows IEEE signs for zeros and
 infinities. Integer and complex inputs are intentionally unsupported.
 `Tensor.sinc()` computes `sin(pi*x)/(pi*x)`, defines

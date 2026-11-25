@@ -1,6 +1,7 @@
 module main
 
 import math
+import math.complex as vcomplex
 import vtl
 
 fn main() {
@@ -9,10 +10,15 @@ fn main() {
 	combined := vtl.logaddexp(log_weights, reference) or { panic(err) }
 	probability_signs := vtl.from_1d([0.0, -0.0, -3.0, math.inf(-1)]) or { panic(err) }
 	signed_weights := vtl.copysign(log_weights.abs(), log_weights) or { panic(err) }
+	complex_signs := vtl.from_1d[vcomplex.Complex]([
+		vcomplex.Complex{ re: 3, im: 4 },
+		vcomplex.Complex{ re: -3, im: 4 },
+	]) or { panic(err) }
 
 	println('log weights: ${log_weights.to_array()}')
 	println('stable log sums: ${combined.to_array()}')
 	println('copysign: ${signed_weights.to_array()}')
 	println('sign bits: ${probability_signs.signbit() or { panic(err) }.to_array()}')
+	println('complex sign: ${complex_signs.sign().to_array()}')
 	println('base-2 log sum: ${vtl.logaddexp2(log_weights, reference) or { panic(err) }.to_array()}')
 }

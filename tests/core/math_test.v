@@ -62,6 +62,29 @@ fn test_sign_and_heaviside_preserve_nan() {
 	assert heavisides.get_nth(2) == 1.0
 }
 
+fn test_complex_sign_matches_numpy_phase_and_special_values() ! {
+	input := vtl.from_1d[vcomplex.Complex]([
+		vcomplex.Complex{ re: 3, im: 4 },
+		vcomplex.Complex{ re: -3, im: 4 },
+		vcomplex.Complex{},
+		vcomplex.Complex{ re: math.inf(1), im: -1 },
+		vcomplex.Complex{ re: 1, im: math.inf(-1) },
+		vcomplex.Complex{ re: math.inf(-1), im: math.inf(1) },
+		vcomplex.Complex{ re: math.nan(), im: 2 },
+		vcomplex.Complex{ re: 1, im: math.nan() },
+	])!
+	signs := input.sign()
+	assert signs.get_nth(0) == vcomplex.Complex{ re: 0.6, im: 0.8 }
+	assert signs.get_nth(1) == vcomplex.Complex{ re: -0.6, im: 0.8 }
+	assert signs.get_nth(2) == vcomplex.Complex{}
+	assert signs.get_nth(3) == vcomplex.Complex{ re: 1 }
+	assert signs.get_nth(4) == vcomplex.Complex{ im: -1 }
+	assert math.is_nan(signs.get_nth(5).re) && math.is_nan(signs.get_nth(5).im)
+	assert math.is_nan(signs.get_nth(6).re) && math.is_nan(signs.get_nth(6).im)
+	assert math.is_nan(signs.get_nth(7).re) && math.is_nan(signs.get_nth(7).im)
+	assert vtl.empty[vcomplex.Complex]([0]).sign().shape == [0]
+}
+
 fn test_clip_limits_values_and_preserves_type() {
 	ints := vtl.from_1d([-4, 2, 9])!
 	assert ints.clip(-1, 5)!.array_equal[int](vtl.from_1d([-1, 2, 5])!)
