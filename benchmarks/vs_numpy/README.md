@@ -976,17 +976,19 @@ when both benchmark commands produce timings.
 ## Real FFT
 
 ```bash
-systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+systemd-run --user --scope --quiet -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=1 \
 	v -prod -o /tmp/vtl-fft-bench ./vtl/benchmarks/vs_numpy/fft_bench.v
-systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-fft-bench
-systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
+systemd-run --user --scope -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% /tmp/vtl-fft-bench
+systemd-run --user --scope --quiet -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% \
 	uv run --with numpy python ./vtl/benchmarks/vs_numpy/numpy_fft_baseline.py
 ```
 
 The FFT benchmark covers real f64 and real f32 inputs with the same sizes and
-iteration counts in VTL and NumPy. For real f32, VTL's dedicated API returns
-complex f32 output while NumPy's `np.fft.rfft` promotes to complex128. Install
-NumPy in an isolated environment if needed, for example with
+iteration counts in VTL and NumPy. Each reports the median and range from
+seven timed batches, maximum absolute error against the analytic spectrum, and
+a weighted checksum. For real f32, VTL's dedicated API returns complex f32
+output while NumPy's `np.fft.rfft` promotes to complex128. Install NumPy in an
+isolated environment if needed, for example with
 `uv run --with numpy python ./vtl/benchmarks/vs_numpy/numpy_fft_baseline.py`.
 
 ## Complex f32 FFT
@@ -996,13 +998,15 @@ three warmups, and identical iteration counts. It measures the public VTL FFT
 path, including plan creation and output allocation, against NumPy's public
 `fft` call. NumPy currently promotes complex64 inputs to complex128 output, so
 the timings compare user-facing behavior rather than identical internal
-precision. Run both commands from `~/.vmodules`:
+precision. Each benchmark reports the median and range from seven timed
+batches, maximum absolute error against the analytic spectrum, and a weighted
+checksum. Run both commands from `~/.vmodules`:
 
 ```bash
-systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+systemd-run --user --scope --quiet -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=1 \
 	v -prod -o /tmp/vtl-fft-complex-f32-bench ./vtl/benchmarks/vs_numpy/fft_complex_f32_bench.v
-systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-fft-complex-f32-bench
-systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
+systemd-run --user --scope -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% /tmp/vtl-fft-complex-f32-bench
+systemd-run --user --scope --quiet -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% \
 	uv run --with numpy python ./vtl/benchmarks/vs_numpy/numpy_fft_complex_f32_baseline.py
 ```
 

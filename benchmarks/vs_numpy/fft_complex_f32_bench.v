@@ -8,10 +8,11 @@ import vtl
 import vtl.fft
 
 const sizes = [256, 1024, 4096, 16384]
+const sample_count = 7
 
 fn main() {
 	println('VTL complex f32 FFT forward transform')
-	println('size,iterations,mean_us,checksum')
+	println('size,iterations,samples,median_us,min_us,max_us,max_abs_error,checksum')
 	for size in sizes {
 		iterations := if size <= 1024 {
 			50
@@ -20,15 +21,23 @@ fn main() {
 		} else {
 			10
 		}
-		mean_us, checksum := benchmark_fft_f32(size, iterations) or {
+		result := benchmark_fft_f32(size, iterations) or {
 			eprintln('complex f32 FFT benchmark failed for n=${size}: ${err}')
 			exit(1)
 		}
-		println('${size},${iterations},${mean_us:.3f},${checksum:.6f}')
+		println('${size},${iterations},${sample_count},${result.median_us:.3f},${result.min_us:.3f},${result.max_us:.3f},${result.max_abs_error:.6e},${result.checksum:.6f}')
 	}
 }
 
-fn benchmark_fft_f32(size int, iterations int) !(f64, f64) {
+struct BenchmarkResult {
+	median_us     f64
+	min_us        f64
+	max_us        f64
+	max_abs_error f64
+	checksum      f64
+}
+
+fn benchmark_fft_f32(size int, iterations int) !BenchmarkResult {
 	mut values := []fft.Complex32{len: size}
 	for i in 0 .. size {
 		x := f64(i) / f64(size)
@@ -41,13 +50,54 @@ fn benchmark_fft_f32(size int, iterations int) !(f64, f64) {
 	for _ in 0 .. 3 {
 		_ := fft.fft_f32(input)!
 	}
-	mut checksum := 0.0
-	start := time.sys_mono_now()
-	for _ in 0 .. iterations {
-		result := fft.fft_f32(input)!
-		checksum += f64(result.get_nth(0).re)
+	mut timings := []f64{len: sample_count}
+	mut result := fft.fft_f32(input)!
+	for sample in 0 .. sample_count {
+		start := time.sys_mono_now()
+		for _ in 0 .. iterations {
+			result = fft.fft_f32(input)!
+		}
+		elapsed_ns := time.sys_mono_now() - start
+		timings[sample] = f64(elapsed_ns) / f64(iterations) / 1000.0
 	}
-	elapsed_ns := time.sys_mono_now() - start
-	mean_us := f64(elapsed_ns) / f64(iterations) / 1000.0
-	return mean_us, checksum
+	timings.sort()
+	return BenchmarkResult{
+		median_us:     timings[sample_count / 2]
+		min_us:        timings[0]
+		max_us:        timings[sample_count - 1]
+		max_abs_error: max_abs_fft_error_f32(size, result)
+		checksum:      weighted_fft_checksum_f32(result)
+	}
+}
+
+fn max_abs_fft_error_f32(size int, result &vtl.Tensor[fft.Complex32]) f64 {
+	mut maximum := 0.0
+	for i in 0 .. result.size {
+		expected_real := 0.0
+		expected_imag := if i == 7 {
+			-f64(size) / 2.0
+		} else if i == size - 7 {
+			f64(size) / 2.0
+		} else if i == 31 || i == size - 31 {
+			f64(size) / 8.0
+		} else {
+			0.0
+		}
+		value := result.get_nth(i)
+		absolute_error := math.hypot(f64(value.re) - expected_real, f64(value.im) - expected_imag)
+		if absolute_error > maximum {
+			maximum = absolute_error
+		}
+	}
+	return maximum
+}
+
+fn weighted_fft_checksum_f32(result &vtl.Tensor[fft.Complex32]) f64 {
+	mut checksum := 0.0
+	for i in 0 .. result.size {
+		value := result.get_nth(i)
+		weight := f64(i + 1)
+		checksum += weight * (f64(value.re) + 0.5 * f64(value.im))
+	}
+	return checksum
 }
