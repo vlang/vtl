@@ -275,6 +275,45 @@ fn test_global_zipf_is_seeded_and_matches_moments() ! {
 	}
 }
 
+fn test_global_logseries_is_seeded_and_matches_moments() ! {
+	random_seed(754)
+	values := logseries(0.5, [8192], TensorData{})!
+	random_seed(754)
+	assert values.array_equal(logseries(0.5, [8192], TensorData{})!)
+	mut total := 0
+	mut ones := 0
+	for value in values.to_array() {
+		assert value >= 1
+		total += value
+		if value == 1 {
+			ones++
+		}
+	}
+	assert math.abs(f64(total) / f64(values.size) - 1.4426950408889634) < 0.04
+	assert math.abs(f64(ones) / f64(values.size) - 0.7213475204444817) < 0.02
+	small_probability := logseries(0.01, [4096], TensorData{})!
+	mut small_total := 0
+	for value in small_probability.to_array() {
+		assert value >= 1
+		small_total += value
+	}
+	assert math.abs(f64(small_total) / f64(small_probability.size) -
+		(-0.01 / (0.99 * math.log(0.99)))) < 0.02
+	assert logseries(0.5, [0], TensorData{})!.shape == [0]
+	if _ := logseries(0.0, [1], TensorData{}) {
+		assert false, 'logseries must reject zero probability'
+	}
+	if _ := logseries(1.0, [1], TensorData{}) {
+		assert false, 'logseries must reject probability one'
+	}
+	if _ := logseries(math.nan(), [1], TensorData{}) {
+		assert false, 'logseries must reject a NaN probability'
+	}
+	if _ := logseries(math.inf(1), [1], TensorData{}) {
+		assert false, 'logseries must reject an infinite probability'
+	}
+}
+
 fn test_global_statistical_distributions_are_seeded_and_validated() ! {
 	random_seed(702)
 	gamma_samples := gamma(2.0, 3.0, [4096], TensorData{})!

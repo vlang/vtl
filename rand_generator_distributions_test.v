@@ -211,6 +211,47 @@ fn test_random_generator_zipf_is_seeded_and_matches_moments() ! {
 	replay.free()
 }
 
+fn test_random_generator_logseries_is_seeded_and_matches_moments() ! {
+	mut generator := new_random_generator(754)
+	values := generator.logseries(0.5, [8192])!
+	mut total := 0
+	mut ones := 0
+	for value in values.to_array() {
+		assert value >= 1
+		total += value
+		if value == 1 {
+			ones++
+		}
+	}
+	assert math.abs(f64(total) / f64(values.size) - 1.4426950408889634) < 0.04
+	assert math.abs(f64(ones) / f64(values.size) - 0.7213475204444817) < 0.02
+	mut replay := new_random_generator(754)
+	assert values.array_equal(replay.logseries(0.5, [8192])!)
+	small_probability := generator.logseries(0.01, [4096])!
+	mut small_total := 0
+	for value in small_probability.to_array() {
+		assert value >= 1
+		small_total += value
+	}
+	assert math.abs(f64(small_total) / f64(small_probability.size) -
+		(-0.01 / (0.99 * math.log(0.99)))) < 0.02
+	assert generator.logseries(0.5, [0])!.shape == [0]
+	if _ := generator.logseries(0.0, [1]) {
+		assert false, 'logseries must reject zero probability'
+	}
+	if _ := generator.logseries(1.0, [1]) {
+		assert false, 'logseries must reject probability one'
+	}
+	if _ := generator.logseries(math.nan(), [1]) {
+		assert false, 'logseries must reject a NaN probability'
+	}
+	if _ := generator.logseries(math.inf(1), [1]) {
+		assert false, 'logseries must reject an infinite probability'
+	}
+	generator.free()
+	replay.free()
+}
+
 fn test_random_generator_cauchy_is_seeded_and_matches_quartiles() ! {
 	mut generator := new_random_generator(4242)
 	values := generator.cauchy(1.0, 2.0, [4096])!

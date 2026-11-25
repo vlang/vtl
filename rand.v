@@ -761,6 +761,17 @@ pub fn (mut generator RandomGenerator) zipf(exponent f64, shape []int) !&Tensor[
 	return from_array[int](values, shape)
 }
 
+// logseries samples positive integers from a logarithmic-series distribution.
+pub fn (mut generator RandomGenerator) logseries(probability f64, shape []int) !&Tensor[int] {
+	validate_logseries_probability(probability)!
+	mut values := []int{len: size_from_shape(shape)}
+	mut rng := generator.rng
+	for i in 0 .. values.len {
+		values[i] = sample_logseries(probability, mut rng)!
+	}
+	return from_array[int](values, shape)
+}
+
 // poisson returns integer event counts with the given finite, non-negative
 // expected rate using this generator's independent stream.
 pub fn (mut generator RandomGenerator) poisson(lambda f64, shape []int) !&Tensor[int] {
@@ -1427,6 +1438,18 @@ pub fn zipf(exponent f64, shape []int, params TensorData) !&Tensor[int] {
 	return result
 }
 
+// logseries samples positive integers from a logarithmic-series distribution
+// using VTL's global random stream.
+pub fn logseries(probability f64, shape []int, params TensorData) !&Tensor[int] {
+	validate_logseries_probability(probability)!
+	mut result := zeros[int](shape, params)
+	mut rng := rand.get_current_rng()
+	for i in 0 .. result.size {
+		result.set_nth(i, sample_logseries(probability, mut rng)!)
+	}
+	return result
+}
+
 // negative_binomial counts failures before n successes on VTL's global
 // random stream. n may be any finite positive real value.
 pub fn negative_binomial(n f64, probability f64, shape []int, params TensorData) !&Tensor[int] {
@@ -1482,6 +1505,40 @@ fn sample_zipf(exponent f64, mut rng &rand.PRNG) !int {
 		}
 	}
 	return error('zipf: rejection sampler did not converge')
+}
+
+fn validate_logseries_probability(probability f64) ! {
+	if probability <= 0 || probability >= 1 || math.is_nan(probability) || math.is_inf(probability,
+		0) {
+		return error('logseries: probability must be finite and in (0, 1)')
+	}
+}
+
+fn sample_logseries(probability f64, mut rng &rand.PRNG) !int {
+	log_one_minus_probability := math.log1p(-probability)
+	for _ in 0 .. 10000 {
+		v := rng.f64_in_range(0.0, 1.0)!
+		if v >= probability {
+			return 1
+		}
+		u := rng.f64_in_range(0.0, 1.0)!
+		q := -math.expm1(log_one_minus_probability * u)
+		if v <= q * q {
+			if v == 0 || q == 0 {
+				continue
+			}
+			candidate := math.floor(1.0 + math.log(v) / math.log(q))
+			if candidate >= 1.0 && candidate < f64(max_int) {
+				return int(candidate)
+			}
+			continue
+		}
+		if v >= q {
+			return 1
+		}
+		return 2
+	}
+	return error('logseries: rejection sampler did not converge')
 }
 
 fn geometric_sample(probability f64, uniform_value f64) int {

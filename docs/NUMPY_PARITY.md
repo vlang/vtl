@@ -724,14 +724,14 @@ complete the dtype audit across every public FFT wrapper.
 ### Random
 
 **Current:** global uniform, normal, Bernoulli, binomial, negative-binomial,
-geometric, hypergeometric, multivariate hypergeometric, Zipf, von Mises,
-exponential, Gumbel, Laplace, Logistic, Cauchy, Wald (inverse Gaussian),
+geometric, hypergeometric, multivariate hypergeometric, Zipf, log-series, von
+Mises, exponential, Gumbel, Laplace, Logistic, Cauchy, Wald (inverse Gaussian),
 Pareto, power, Rayleigh, triangular, Poisson,
 Weibull, lognormal, gamma, beta, Dirichlet, chi-square, Student's t, and F
 tensors; `random_seed`;
 independent seeded `RandomGenerator` streams for f64 uniform, normal, lognormal,
 Gumbel, Laplace, Logistic, Cauchy, Wald, Pareto, power, Rayleigh, triangular,
-Zipf, gamma, beta,
+Zipf, log-series, gamma, beta,
 Dirichlet, exponential, Poisson, Weibull, chi-square, Student's t, F,
 hypergeometric, multivariate hypergeometric, negative-binomial, multivariate
 normal with positive-semidefinite covariance matrices, von Mises, and boolean
@@ -747,8 +747,8 @@ angles in `[-pi, pi)` and uses Best-Fisher rejection sampling for concentration
 through `1e16`; concentrations at or below `1e-150` use the uniform limit to
 avoid underflow.
 
-**Remaining:** add NumPy's log-series, noncentral chi-square, and noncentral F
-distributions. Zipf uses rejection sampling and has positive-integer support
+**Remaining:** add NumPy's noncentral chi-square and noncentral F distributions.
+Zipf uses rejection sampling and has positive-integer support
 bounded by the platform's maximum `int`. Independent generator snapshots replay
 exactly within a supported state version; distribution sequences are not
 guaranteed across V or VTL versions.
