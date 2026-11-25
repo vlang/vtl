@@ -4,6 +4,13 @@ This guide maps common CPU training patterns to VTL. VTL uses generic V
 numeric types, so choose `f32` or `f64` explicitly when creating the context
 and tensors.
 
+The runnable companion is
+[`examples/pytorch_migration/main.v`](../examples/pytorch_migration/main.v):
+
+```sh
+v run examples/pytorch_migration
+```
+
 ## Tensor and autograd
 
 PyTorch:
