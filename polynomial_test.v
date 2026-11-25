@@ -99,3 +99,52 @@ fn test_chebyshev_evaluation_conversion_calculus_and_fit() ! {
 		assert false, 'chebyshev arithmetic must reject mismatched domains'
 	}
 }
+
+fn test_legendre_evaluation_conversion_calculus_and_fit() ! {
+	domain := [f64(-2.0), 2.0]!
+	window := [f64(-1.0), 1.0]!
+	p := legendre([1.0, 2.0, 3.0], domain, window)!
+	assert p.degree() == 2
+	assert p.eval(-2.0) == 2.0
+	assert p.eval(0.0) == -0.5
+	assert p.eval(2.0) == 6.0
+	assert p.to_polynomial()!.coefficients == [-0.5, 1.0, 1.125]
+	round_trip := legendre_from_polynomial(p.to_polynomial()!, domain, window)!
+	for index, value in p.coefficients {
+		assert math.abs(round_trip.coefficients[index] - value) < 1e-12
+	}
+	cubic := legendre([0.5, -1.0, 2.0, 0.75], domain, window)!
+	cubic_round_trip := legendre_from_polynomial(cubic.to_polynomial()!, domain, window)!
+	for x in [-2.0, -1.2, 0.0, 1.3, 2.0] {
+		assert math.abs(cubic_round_trip.eval(x) - cubic.eval(x)) < 1e-12
+	}
+	input := from_array[f64]([0.0, 2.0], [1, 2])!
+	assert p.eval_tensor(input)!.to_array() == [-0.5, 6.0]
+	derivative := p.derivative()!
+	assert math.abs(derivative.eval(0.0) - 1.0) < 1e-12
+	assert math.abs(derivative.eval(1.0) - 3.25) < 1e-12
+	integral := p.integral(0.0)!
+	for x in [-2.0, -0.5, 1.0, 2.0] {
+		assert math.abs(integral.derivative()!.eval(x) - p.eval(x)) < 1e-10
+	}
+	roots := p.roots()!
+	assert roots.len == 2
+	for root in roots {
+		assert math.abs(p.eval(root)) < 1e-12
+	}
+	assert p.add(p)!.eval(1.0) == 3.25
+	assert math.abs(p.mul(p)!.eval(0.0) - 0.25) < 1e-12
+
+	x := [-2.0, -1.0, 0.0, 1.0, 2.0]
+	y := [2.0, -0.375, -0.5, 1.625, 6.0]
+	fitted := legendre_fit(x, y, 2, domain, window)!
+	for index, value in p.coefficients {
+		assert math.abs(fitted.coefficients[index] - value) < 1e-10
+	}
+	if _ := legendre([1.0], domain, [0.0, 0.0]!) {
+		assert false, 'legendre must reject zero-width windows'
+	}
+	if _ := p.add(legendre([1.0], [0.0, 2.0]!, window)!) {
+		assert false, 'legendre arithmetic must reject mismatched domains'
+	}
+}

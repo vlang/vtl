@@ -13,4 +13,7 @@ fn main() {
 	chebyshev_fit := vtl.chebyshev_fit(x, y, 2, domain, window)!
 	println('ascending Chebyshev coefficients: ${chebyshev_fit.coefficients}')
 	println('Chebyshev p(3): ${chebyshev_fit.eval(3.0)}')
+	legendre_fit := vtl.legendre_fit(x, y, 2, domain, window)!
+	println('ascending Legendre coefficients: ${legendre_fit.coefficients}')
+	println('Legendre p(3): ${legendre_fit.eval(3.0)}')
 }

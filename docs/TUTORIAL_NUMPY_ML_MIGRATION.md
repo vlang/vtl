@@ -20,6 +20,8 @@ ascending coefficients: [1.0, approximately 0.0, 1.0]
 p(3): 10.0
 ascending Chebyshev coefficients: [2.375, approximately 1.5, 1.125]
 Chebyshev p(3): 10.0
+ascending Legendre coefficients: [2.0, approximately 1.5, 1.5]
+Legendre p(3): 10.0
 ```
 
 The corresponding APIs are `vtl.from_array`, `vtl.polynomial_fit`, and
@@ -29,13 +31,13 @@ and Householder QR, then returns coefficients in the original power basis;
 conversion to that basis can still amplify errors on ill-conditioned data. See the
 [polynomial API notes](./NUMPY_PARITY.md#current-strengths).
 
-`vtl.Chebyshev` stores first-kind coefficients in ascending order and supports
-scalar/tensor evaluation, arithmetic, calculus, roots up to degree two, and
-conversion to/from power series. Supply an explicit `domain` and `window`;
-evaluation maps the input domain linearly into the window. Polynomial APIs
-currently use `f64`. `vtl.chebyshev_fit` fits in that mapped coordinate and
-returns the Chebyshev coefficients. The runnable fitting example demonstrates
-both bases.
+`vtl.Chebyshev` and `vtl.Legendre` store coefficients in ascending basis order
+and support scalar/tensor evaluation, arithmetic, calculus, roots up to degree
+two, and conversion to/from power series. Supply an explicit `domain` and
+`window`; evaluation maps the input domain linearly into the window. Polynomial
+APIs currently use `f64`. `vtl.chebyshev_fit` and `vtl.legendre_fit` fit in
+that mapped coordinate and return orthogonal-basis coefficients. The runnable
+fitting example demonstrates power, Chebyshev, and Legendre series.
 
 ## Transform samples and preserve gradients
 

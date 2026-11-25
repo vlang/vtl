@@ -19,7 +19,7 @@ tests, documentation, and examples where users need them.
 | OpenCL compute and neural-network dispatch | [#750](https://github.com/vlang/vtl/issues/750) |
 | Sparse tensor operations | [#746](https://github.com/vlang/vtl/issues/746) |
 | Non-numeric dtypes and array interoperability | [#747](https://github.com/vlang/vtl/issues/747), [#748](https://github.com/vlang/vtl/issues/748) |
-| NumPy polynomial families and fitting | [#773](https://github.com/vlang/vtl/issues/773) (power series and Chebyshev subset implemented) |
+| NumPy polynomial families and fitting | [#773](https://github.com/vlang/vtl/issues/773) (power series, Chebyshev, and Legendre subsets implemented) |
 
 For neural-network and framework-level gaps relative to PyTorch, see the
 [PyTorch parity tracker](./PYTORCH_PARITY.md).
@@ -44,16 +44,18 @@ For neural-network and framework-level gaps relative to PyTorch, see the
   accumulation and prevalidates bounds. The helpers require one static element
   type and explicit reduction identities; NumPy's casting modes and optional
   retained dimensions are not exposed.
-- A power-series `Polynomial` API and first-kind `Chebyshev` API with
+- A power-series `Polynomial` API, first-kind `Chebyshev`, and `Legendre` APIs with
   ascending coefficients, scalar/tensor evaluation, arithmetic,
   derivative/integral, real linear and quadratic roots, and conversion between
-  power and Chebyshev bases. The Chebyshev conventions follow NumPy's
+  power and orthogonal bases. The Chebyshev conventions follow NumPy's
   [Chebyshev class](https://numpy.org/doc/stable/reference/generated/numpy.polynomial.chebyshev.Chebyshev.html)
-  and [series module](https://numpy.org/doc/stable/reference/routines.polynomials.chebyshev.html).
-  `Chebyshev` maps an explicit input domain into an explicit window.
+  and [series module](https://numpy.org/doc/stable/reference/routines.polynomials.chebyshev.html);
+  Legendre follows NumPy's
+  [Legendre class](https://numpy.org/doc/stable/reference/generated/numpy.polynomial.legendre.Legendre.html).
+  Both orthogonal bases map an explicit input domain into an explicit window.
   Least-squares fitting uses a scaled Vandermonde matrix and Householder QR;
   coefficients return in the original power basis, where conditioning can
-  still amplify errors. Legendre/Hermite families and higher-degree root
+  still amplify errors. Hermite families and higher-degree root
   solving remain open. See the runnable
   [polynomial fitting example](../examples/polynomial_fit/main.v).
 - Reverse-mode autograd, neural-network layers and losses, optimizers,
