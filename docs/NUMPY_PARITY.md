@@ -33,6 +33,11 @@ For neural-network and framework-level gaps relative to PyTorch, see the
   axis swapping, and view-preserving `moveaxis`/`rollaxis`.
 - Elementwise math, reductions, mapping, stacking, splitting, random values,
   statistics, and linear algebra through VSL.
+- `ufunc_unary` and `ufunc_unary_into` define an allocation-free unary
+  execution path with caller-owned `out` tensors and exact-shape `where`
+  masks; masked entries preserve their preallocated output values. Binary
+  execution methods, broadcasting masks, casting modes, and reduction methods
+  remain open under [#783](https://github.com/vlang/vtl/issues/783).
 - A power-series `Polynomial` API with ascending coefficients, Horner
   evaluation, tensor evaluation, arithmetic, derivative/integral, real
   linear and quadratic roots, and small least-squares fitting. Orthogonal
