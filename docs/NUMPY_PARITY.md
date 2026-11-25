@@ -713,6 +713,10 @@ covariance matrices, and boolean Bernoulli; integer
 uniform, binomial/geometric/multinomial/Poisson; uniform and weighted population choice
 over flattened values or complete slices along a selected axis;
 and integer, first-axis, or selected-axis tensor permutations.
+The generator's `vonmises(location, concentration, shape)` returns wrapped
+angles in `[-pi, pi)` and uses Best-Fisher rejection sampling for concentration
+through `1e16`; concentrations at or below `1e-150` use the uniform limit to
+avoid underflow.
 
 **Remaining:** add other less common NumPy distributions and
 define reproducibility across runtime versions.

@@ -1,6 +1,5 @@
 module vtl
 
-import rand
 import math
 
 fn test_random_generator_supports_geometric_sampling() ! {
@@ -193,6 +192,48 @@ fn test_random_generator_wald_is_seeded_and_matches_moments() ! {
 	}
 	if _ := generator.wald(2.0, -1.0, [4]) {
 		assert false, 'wald must reject a non-positive scale'
+	}
+	generator.free()
+	replay.free()
+}
+
+fn test_random_generator_vonmises_is_seeded_and_matches_circular_moments() ! {
+	mut generator := new_random_generator(914)
+	values := generator.vonmises(1.0, 2.0, [8192])!
+	assert values.shape == [8192]
+	mut cosine_total := 0.0
+	mut sine_total := 0.0
+	for value in values.to_array() {
+		assert value >= -math.pi && value < math.pi
+		cosine_total += math.cos(value - 1.0)
+		sine_total += math.sin(value - 1.0)
+	}
+	assert math.abs(cosine_total / 8192.0 - 0.697774657964008) < 0.03
+	assert math.abs(sine_total / 8192.0) < 0.03
+	mut replay := new_random_generator(914)
+	assert values.array_equal(replay.vonmises(1.0, 2.0, [8192])!)
+
+	uniform := generator.vonmises(0.0, 0.0, [8192])!
+	mut uniform_cosine_total := 0.0
+	mut uniform_sine_total := 0.0
+	for value in uniform.to_array() {
+		uniform_cosine_total += math.cos(value)
+		uniform_sine_total += math.sin(value)
+	}
+	assert math.abs(uniform_cosine_total / 8192.0) < 0.03
+	assert math.abs(uniform_sine_total / 8192.0) < 0.03
+	assert generator.vonmises(0.5, 1.0, [0])!.shape == [0]
+	if _ := generator.vonmises(0.0, -1.0, [1]) {
+		assert false, 'vonmises must reject negative concentration'
+	}
+	if _ := generator.vonmises(0.0, math.nan(), [1]) {
+		assert false, 'vonmises must reject NaN concentration'
+	}
+	if _ := generator.vonmises(math.inf(1), 1.0, [1]) {
+		assert false, 'vonmises must reject non-finite location'
+	}
+	if _ := generator.vonmises(0.0, 1e17, [1]) {
+		assert false, 'vonmises must reject concentration beyond its stable range'
 	}
 	generator.free()
 	replay.free()

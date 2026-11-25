@@ -508,6 +508,55 @@ pub fn (mut generator RandomGenerator) rayleigh(scale f64, shape []int) !&Tensor
 	return from_array[f64](values, shape)
 }
 
+// vonmises returns angles in [-pi, pi) from a circular distribution with the
+// given location and non-negative concentration using this generator's stream.
+pub fn (mut generator RandomGenerator) vonmises(location f64, concentration f64, shape []int) !&Tensor[f64] {
+	if math.is_nan(location) || math.is_inf(location, 0) || concentration < 0
+		|| math.is_nan(concentration) || math.is_inf(concentration, 0) {
+		return error('vonmises: location must be finite and concentration must be finite and non-negative')
+	}
+	if concentration > 1e16 {
+		return error('vonmises: concentration above 1e16 exceeds stable sampling precision')
+	}
+	mut values := []f64{len: size_from_shape(shape)}
+	if concentration <= 1e-150 {
+		for i in 0 .. values.len {
+			u := open_unit_interval(generator.rng.f64_in_range(0.0, 1.0)!)
+			values[i] = wrap_vonmises_angle(location + 2 * math.pi * u - math.pi)
+		}
+		return from_array[f64](values, shape)
+	}
+	s := math.sqrt(1 + 4 * concentration * concentration)
+	a := 1 + s
+	b := 2 * a * concentration / ((s + 1) * (a + math.sqrt(2 * a)))
+	r := (1 + b * b) / (2 * b)
+	for i in 0 .. values.len {
+		for {
+			u1 := open_unit_interval(generator.rng.f64_in_range(0.0, 1.0)!)
+			z := math.cos(math.pi * u1)
+			f := math.max(-1.0, math.min(1.0, (1 + r * z) / (r + z)))
+			c := concentration * (r - f)
+			u2 := open_unit_interval(generator.rng.f64_in_range(0.0, 1.0)!)
+			if c * (2 - c) <= u2 && math.log(c / u2) + 1 - c < 0 {
+				continue
+			}
+			u3 := open_unit_interval(generator.rng.f64_in_range(0.0, 1.0)!)
+			direction := if u3 > 0.5 { 1.0 } else { -1.0 }
+			values[i] = wrap_vonmises_angle(location + direction * math.acos(f))
+			break
+		}
+	}
+	return from_array[f64](values, shape)
+}
+
+fn wrap_vonmises_angle(angle f64) f64 {
+	mut wrapped := math.fmod(angle + math.pi, 2 * math.pi)
+	if wrapped < 0 {
+		wrapped += 2 * math.pi
+	}
+	return wrapped - math.pi
+}
+
 // triangular returns samples from a triangular distribution defined by its
 // left endpoint, mode, right endpoint, and this generator's independent stream.
 pub fn (mut generator RandomGenerator) triangular(left f64, mode f64, right f64, shape []int) !&Tensor[f64] {

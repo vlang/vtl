@@ -41,6 +41,7 @@ fn main() {
 	heavy_tail_noise := training_rng.pareto(3.0, [4])!
 	wind_speeds := validation_rng.rayleigh(2.0, [4])!
 	triangular_priors := training_rng.triangular(0.0, 0.5, 1.0, [4])!
+	circular_samples := validation_rng.vonmises(0.0, 2.0, [4])!
 
 	println('Training batch shape: ${training_features.shape}')
 	println('Training feature mean: ${stats.mean(training_features)}')
@@ -72,6 +73,7 @@ fn main() {
 	println('Pareto heavy-tail noise: ${heavy_tail_noise.to_array()}')
 	println('Rayleigh wind speeds: ${wind_speeds.to_array()}')
 	println('Triangular prior samples: ${triangular_priors.to_array()}')
+	println('Von Mises circular samples: ${circular_samples.to_array()}')
 	println('Independent augmentation noise: ${noise.to_array()}')
 	println('Seeded integer offsets: ${integer_noise.to_array()}')
 
