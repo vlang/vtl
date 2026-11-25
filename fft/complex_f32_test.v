@@ -35,6 +35,24 @@ fn test_complex_f32_fft_preserves_imaginary_components() ! {
 	}
 }
 
+fn test_complex_f32_fft_reads_strided_input_in_logical_order() ! {
+	base := vtl.from_1d[fft.Complex32]([
+		fft.Complex32{ re: 1, im: 2 },
+		fft.Complex32{ re: 99 },
+		fft.Complex32{ re: 3, im: 4 },
+		fft.Complex32{ re: 99 },
+	])!
+	strided := base.slice([0, 4, 2])!
+	contiguous := vtl.from_1d[fft.Complex32](strided.to_array())!
+	assert !strided.is_row_major_contiguous()
+	strided_spectrum := fft.fft_f32(strided)!
+	contiguous_spectrum := fft.fft_f32(contiguous)!
+	for i in 0 .. strided_spectrum.size {
+		assert math.abs(strided_spectrum.get_nth(i).re - contiguous_spectrum.get_nth(i).re) < 1e-5
+		assert math.abs(strided_spectrum.get_nth(i).im - contiguous_spectrum.get_nth(i).im) < 1e-5
+	}
+}
+
 fn test_complex_f32_axis_and_nd_transforms_preserve_shape() ! {
 	input := vtl.from_array[fft.Complex32]([
 		fft.Complex32{ re: 1, im: 0 },

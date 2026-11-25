@@ -30,6 +30,20 @@ fn test_real_f32_fft_round_trips_odd_lengths() ! {
 	}
 }
 
+fn test_real_f32_fft_reads_strided_input_in_logical_order() ! {
+	base := vtl.from_1d[f32]([1, 99, 0, 99, -1, 99, 0, 99])!
+	strided := base.slice([0, 8, 2])!
+	contiguous := vtl.from_1d[f32](strided.to_array())!
+	assert !strided.is_row_major_contiguous()
+	strided_spectrum := rfft_f32(strided)!
+	contiguous_spectrum := rfft_f32(contiguous)!
+	assert strided_spectrum.shape == contiguous_spectrum.shape
+	for i in 0 .. strided_spectrum.size {
+		assert math.abs(strided_spectrum.get_nth(i).re - contiguous_spectrum.get_nth(i).re) < 1e-5
+		assert math.abs(strided_spectrum.get_nth(i).im - contiguous_spectrum.get_nth(i).im) < 1e-5
+	}
+}
+
 fn test_reusable_real_f32_fft_plan() ! {
 	input := vtl.from_1d[f32]([1, 0, 0, 0])!
 	mut plan := create_rfft_f32_plan(input.size)!
