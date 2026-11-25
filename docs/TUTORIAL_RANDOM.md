@@ -108,9 +108,27 @@ concentration. Its parameterization matches NumPy's
 `Generator.vonmises(mu, kappa, size)` (`location = mu`,
 `concentration = kappa`); its random sequence is not cross-library identical.
 These methods return errors for invalid distribution parameters. Streams are
-reproducible with the same V/VTL versions, seed, and sequence of calls;
-cross-version compatibility is not guaranteed. See the complete data-pipeline
-example in [`examples/random_generator/main.v`](../examples/random_generator/main.v).
+reproducible with the same VTL and V runtime versions, seed, and call sequence.
+Snapshot and serialize state to resume an independent stream:
+
+```v
+mut source := vtl.new_random_generator(42)
+_ := source.uniform(0.0, 1.0, [8])!
+snapshot := source.snapshot()
+serialized_state := snapshot.serialize()
+state := vtl.random_generator_state_from_json(serialized_state)!
+mut resumed := vtl.new_random_generator_from_state(state)!
+expected := source.normal([8], vtl.NormalTensorData{})!
+actual := resumed.normal([8], vtl.NormalTensorData{})!
+assert expected.array_equal(actual)
+source.free()
+resumed.free()
+```
+
+Snapshots are versioned and rejected when unsupported. Cross-version
+distribution-sequence compatibility is not guaranteed. See the complete
+data-pipeline example in
+[`examples/random_generator/main.v`](../examples/random_generator/main.v).
 
 VTL also provides global tensor constructors for uniform range, normal,
 Bernoulli, binomial, geometric, hypergeometric, von Mises, exponential, Poisson,

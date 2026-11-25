@@ -43,6 +43,13 @@ fn main() {
 	wind_speeds := validation_rng.rayleigh(2.0, [4])!
 	triangular_priors := training_rng.triangular(0.0, 0.5, 1.0, [4])!
 	circular_samples := validation_rng.vonmises(0.0, 2.0, [4])!
+	training_state := training_rng.snapshot()
+	serialized_state := training_state.serialize()
+	restored_state := vtl.random_generator_state_from_json(serialized_state)!
+	mut resumed_rng := vtl.new_random_generator_from_state(restored_state)!
+	next_noise := training_rng.normal([4], vtl.NormalTensorData{})!
+	replayed_noise := resumed_rng.normal([4], vtl.NormalTensorData{})!
+	assert next_noise.array_equal(replayed_noise)
 	vtl.random_seed(314)
 	global_circular_samples := vtl.vonmises(0.0, 2.0, [4], vtl.TensorData{})!
 
@@ -84,4 +91,5 @@ fn main() {
 
 	training_rng.free()
 	validation_rng.free()
+	resumed_rng.free()
 }

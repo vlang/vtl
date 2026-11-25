@@ -1,6 +1,8 @@
 module vtl
 
 import math
+import hash
+import json2
 import rand
 import rand.config
 import vsl.blas as vsl_blas
@@ -10,22 +12,164 @@ import vsl.lapack as vsl_lapack
 // experiments that must not modify or depend on V's global random state.
 pub struct RandomGenerator {
 mut:
-	rng &rand.PRNG
+	rng    &rand.PRNG
+	engine &VTLRandomPRNG
+}
+
+// RandomGeneratorState is a versioned snapshot of an independent random stream.
+pub struct RandomGeneratorState {
+pub:
+	version    int
+	state      u64
+	bytes_left int
+	buffer     u64
+}
+
+struct VTLRandomPRNG {
+mut:
+	state      u64
+	bytes_left int
+	buffer     u64
+}
+
+const random_generator_state_version = 1
+const random_generator_wyrand_increment = u64(0x2d358dccaa6c78a5)
+const random_generator_wyrand_xor = u64(0x8bb84b93962eacc9)
+
+pub fn (mut rng VTLRandomPRNG) seed(seed_data []u32) {
+	if seed_data.len != 2 {
+		panic('VTLRandomPRNG requires two u32 seed words')
+	}
+	rng.state = seed_data[0] | (u64(seed_data[1]) << 32)
+	rng.bytes_left = 0
+	rng.buffer = 0
+}
+
+@[inline]
+pub fn (mut rng VTLRandomPRNG) u8() u8 {
+	if rng.bytes_left >= 1 {
+		rng.bytes_left--
+		value := u8(rng.buffer)
+		rng.buffer >>= 8
+		return value
+	}
+	rng.buffer = rng.u64()
+	rng.bytes_left = 7
+	value := u8(rng.buffer)
+	rng.buffer >>= 8
+	return value
+}
+
+@[inline]
+pub fn (mut rng VTLRandomPRNG) u16() u16 {
+	if rng.bytes_left >= 2 {
+		rng.bytes_left -= 2
+		value := u16(rng.buffer)
+		rng.buffer >>= 16
+		return value
+	}
+	answer := rng.u64()
+	rng.buffer = answer >> 16
+	rng.bytes_left = 6
+	return u16(answer)
+}
+
+@[inline]
+pub fn (mut rng VTLRandomPRNG) u32() u32 {
+	if rng.bytes_left >= 4 {
+		rng.bytes_left -= 4
+		value := u32(rng.buffer)
+		rng.buffer >>= 32
+		return value
+	}
+	answer := rng.u64()
+	rng.buffer = answer >> 32
+	rng.bytes_left = 4
+	return u32(answer)
+}
+
+@[ignore_overflow; inline]
+pub fn (mut rng VTLRandomPRNG) u64() u64 {
+	rng.state += random_generator_wyrand_increment
+	return hash.wymum(rng.state ^ random_generator_wyrand_xor, rng.state)
+}
+
+@[inline]
+pub fn (mut rng VTLRandomPRNG) block_size() int {
+	return 64
+}
+
+pub fn (mut rng VTLRandomPRNG) free() {
 }
 
 // new_random_generator creates an independent generator initialized from seed.
 pub fn new_random_generator(seed int) RandomGenerator {
-	mut rng := rand.new_default(config.PRNGConfigStruct{
-		seed_: [u32(seed), 0]
-	})
+	mut engine := &VTLRandomPRNG{}
+	engine.seed([u32(seed), 0])
+	mut rng := &rand.PRNG(engine)
 	return RandomGenerator{
-		rng: rng
+		rng:    rng
+		engine: engine
 	}
 }
 
 // free releases the generator's underlying pseudorandom engine.
 pub fn (mut generator RandomGenerator) free() {
 	generator.rng.free()
+}
+
+// snapshot captures the generator's exact raw PRNG state for replay.
+pub fn (generator &RandomGenerator) snapshot() RandomGeneratorState {
+	return RandomGeneratorState{
+		version:    random_generator_state_version
+		state:      generator.engine.state
+		bytes_left: generator.engine.bytes_left
+		buffer:     generator.engine.buffer
+	}
+}
+
+// restore replaces this generator's raw PRNG state with a validated snapshot.
+pub fn (mut generator RandomGenerator) restore(state RandomGeneratorState) ! {
+	validate_random_generator_state(state)!
+	generator.engine.state = state.state
+	generator.engine.bytes_left = state.bytes_left
+	generator.engine.buffer = state.buffer
+}
+
+// serialize returns a versioned JSON snapshot of the generator state.
+pub fn (state RandomGeneratorState) serialize() string {
+	return json2.encode(state, json2.EncoderOptions{})
+}
+
+// random_generator_state_from_json parses and validates a serialized snapshot.
+pub fn random_generator_state_from_json(value string) !RandomGeneratorState {
+	state := json2.decode[RandomGeneratorState](value, json2.DecoderOptions{})!
+	validate_random_generator_state(state)!
+	return state
+}
+
+// new_random_generator_from_state restores an independent generator snapshot.
+pub fn new_random_generator_from_state(state RandomGeneratorState) !RandomGenerator {
+	validate_random_generator_state(state)!
+	mut engine := &VTLRandomPRNG{
+		state:      state.state
+		bytes_left: state.bytes_left
+		buffer:     state.buffer
+	}
+	mut rng := &rand.PRNG(engine)
+	return RandomGenerator{
+		rng:    rng
+		engine: engine
+	}
+}
+
+fn validate_random_generator_state(state RandomGeneratorState) ! {
+	if state.version != random_generator_state_version {
+		return error('random generator state: unsupported version ${state.version}')
+	}
+	if state.bytes_left < 0 || state.bytes_left > 7 {
+		return error('random generator state: buffered byte count must be between 0 and 7')
+	}
 }
 
 // uniform returns f64 values in the [minimum, maximum) range.

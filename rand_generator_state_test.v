@@ -2,6 +2,7 @@ module vtl
 
 import rand
 import math
+import rand.config
 
 fn test_random_generators_have_independent_reproducible_state() ! {
 	mut first := new_random_generator(42)
@@ -14,6 +15,44 @@ fn test_random_generators_have_independent_reproducible_state() ! {
 	first.free()
 	second.free()
 	replay.free()
+}
+
+fn test_random_generator_snapshot_serializes_and_restores_exact_stream_state() ! {
+	mut generator := new_random_generator(1234)
+	mut reference := rand.new_default(config.PRNGConfigStruct{
+		seed_: [u32(1234), 0]
+	})
+	assert generator.rng.u64() == reference.u64()
+	assert generator.rng.u8() == reference.u8()
+	assert generator.rng.u16() == reference.u16()
+	assert generator.rng.u32() == reference.u32()
+
+	state := generator.snapshot()
+	restored_state := random_generator_state_from_json(state.serialize())!
+	mut restored := new_random_generator_from_state(restored_state)!
+	assert generator.rng.u64() == restored.rng.u64()
+	assert generator.rng.u8() == restored.rng.u8()
+	assert generator.rng.u16() == restored.rng.u16()
+	assert generator.rng.u32() == restored.rng.u32()
+	expected := generator.normal([16], NormalTensorData{ sigma: 0.5 })!
+	actual := restored.normal([16], NormalTensorData{ sigma: 0.5 })!
+	assert expected.array_equal(actual)
+
+	generator.restore(state)!
+	mut restored_again := new_random_generator_from_state(state)!
+	assert generator.uniform(-1.0, 1.0, [16])!.array_equal(restored_again.uniform(-1.0,
+		1.0, [16])!)
+	if _ := new_random_generator_from_state(RandomGeneratorState{ version: 0 }) {
+		assert false, 'generator restore must reject unsupported snapshot versions'
+	}
+	if _ := random_generator_state_from_json('{"version":1,"state":0,"bytes_left":8,"buffer":0}') {
+		assert false, 'generator restore must reject invalid buffered-byte counts'
+	}
+
+	generator.free()
+	reference.free()
+	restored.free()
+	restored_again.free()
 }
 
 fn test_random_generator_supports_normal_and_bernoulli_distributions() ! {

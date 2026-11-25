@@ -733,7 +733,8 @@ independent seeded `RandomGenerator` streams for f64 uniform, normal, lognormal,
 Gumbel, Laplace, Logistic, Cauchy, Wald, Pareto, power, Rayleigh, triangular, gamma, beta,
 Dirichlet, exponential, Poisson, Weibull, chi-square, Student's t, F,
 hypergeometric, negative-binomial, multivariate normal with positive-semidefinite
-covariance matrices, and boolean Bernoulli; integer
+covariance matrices, von Mises, and boolean Bernoulli; versioned serialized
+generator-state snapshots; integer
 uniform, binomial/geometric/multinomial/Poisson; uniform and weighted population choice
 over flattened values or complete slices along a selected axis;
 and integer, first-axis, or selected-axis tensor permutations.
