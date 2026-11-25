@@ -98,27 +98,73 @@ fn test_real_f32_axis_and_nd_transforms_round_trip() ! {
 }
 
 fn test_real_f32_generic_and_dedicated_nd_dtype_contracts() ! {
+	vector := vtl.from_1d[f32]([1, 0, 0, 0])!
+	image := vtl.from_array[f32]([1, 0, 0, 0], [2, 2])!
 	input := vtl.from_array[f32]([1, 0, 0, 0, 1, 0, 0, 0], [2, 2, 2])!
-	generic_axis := rfft_axis[f32](input, -1)!
+	generic_1d := rfft[f32](vector)!
+	generic_1d_norm := rfft_norm[f32](vector, .ortho)!
+	generic_axis := rfft_axis[f32](image, 1)!
+	generic_axis_norm := rfft_axis_norm[f32](image, 1, .ortho)!
+	generic_2d_norm := rfft2_norm[f32](image, .ortho)!
 	generic_nd := rfftn[f32](input)!
-	generic_2d := rfft2[f32](vtl.from_array[f32]([1, 0, 0, 0], [2, 2])!)!
+	generic_nd_norm := rfftn_norm[f32](input, .ortho)!
+	generic_2d := rfft2[f32](image)!
+	assert typeof(generic_1d.get_nth(0).re).name == 'f64'
+	assert typeof(generic_1d_norm.get_nth(0).re).name == 'f64'
 	assert typeof(generic_axis.get_nth(0).re).name == 'f64'
+	assert typeof(generic_axis_norm.get_nth(0).re).name == 'f64'
+	assert typeof(generic_2d_norm.get_nth(0).re).name == 'f64'
 	assert typeof(generic_nd.get_nth(0).re).name == 'f64'
+	assert typeof(generic_nd_norm.get_nth(0).re).name == 'f64'
 	assert typeof(generic_2d.get_nth(0).re).name == 'f64'
 
-	dedicated_axis := rfft_axis_f32(input, -1)!
+	dedicated_1d := rfft_f32(vector)!
+	dedicated_1d_norm := rfft_norm_f32(vector, .ortho)!
+	dedicated_axis := rfft_axis_f32(image, 1)!
+	dedicated_axis_norm := rfft_axis_norm_f32(image, 1, .ortho)!
+	dedicated_2d_norm := rfft2_norm_f32(image, .ortho)!
 	dedicated_nd := rfftn_f32(input)!
-	dedicated_2d := rfft2_f32(vtl.from_array[f32]([1, 0, 0, 0], [2, 2])!)!
+	dedicated_nd_norm := rfftn_norm_f32(input, .ortho)!
+	dedicated_2d := rfft2_f32(image)!
+	assert typeof(dedicated_1d.get_nth(0).re).name == 'f32'
+	assert typeof(dedicated_1d_norm.get_nth(0).re).name == 'f32'
 	assert typeof(dedicated_axis.get_nth(0).re).name == 'f32'
+	assert typeof(dedicated_axis_norm.get_nth(0).re).name == 'f32'
+	assert typeof(dedicated_2d_norm.get_nth(0).re).name == 'f32'
 	assert typeof(dedicated_nd.get_nth(0).re).name == 'f32'
+	assert typeof(dedicated_nd_norm.get_nth(0).re).name == 'f32'
 	assert typeof(dedicated_2d.get_nth(0).re).name == 'f32'
 
-	generic_normalized := rfftn_norm[f32](input, .ortho)!
-	dedicated_normalized := rfftn_norm_f32(input, .ortho)!
-	assert typeof(generic_normalized.get_nth(0).re).name == 'f64'
-	assert typeof(dedicated_normalized.get_nth(0).re).name == 'f32'
-	generic_restored := irfftn(generic_normalized, input.shape)!
-	dedicated_restored := irfftn_f32(dedicated_normalized, input.shape)!
+	assert typeof(irfft(generic_1d, vector.size)!.get_nth(0)).name == 'f64'
+	assert typeof(irfft_axis(generic_axis_norm, 1, 2)!.get_nth(0)).name == 'f64'
+	assert typeof(irfft2(generic_2d_norm, image.shape)!.get_nth(0)).name == 'f64'
+	assert typeof(irfftn(generic_nd_norm, input.shape)!.get_nth(0)).name == 'f64'
+	assert typeof(irfft_norm(generic_1d_norm, vector.size, .ortho)!.get_nth(0)).name == 'f64'
+	assert typeof(irfft_axis_norm(generic_axis, 1, 2, .ortho)!.get_nth(0)).name == 'f64'
+	assert typeof(irfft2_norm(generic_2d, image.shape, .ortho)!.get_nth(0)).name == 'f64'
+	assert typeof(irfftn_norm(generic_nd, input.shape, .ortho)!.get_nth(0)).name == 'f64'
+	assert typeof(irfft_f32(dedicated_1d, vector.size)!.get_nth(0)).name == 'f32'
+	assert typeof(irfft_axis_f32(dedicated_axis_norm, 1, 2)!.get_nth(0)).name == 'f32'
+	assert typeof(irfft2_f32(dedicated_2d_norm, image.shape)!.get_nth(0)).name == 'f32'
+	assert typeof(irfftn_f32(dedicated_nd_norm, input.shape)!.get_nth(0)).name == 'f32'
+	assert typeof(irfft_norm_f32(dedicated_1d_norm, vector.size, .ortho)!.get_nth(0)).name == 'f32'
+	assert typeof(irfft_axis_norm_f32(dedicated_axis, 1, 2, .ortho)!.get_nth(0)).name == 'f32'
+	assert typeof(irfft2_norm_f32(dedicated_2d, image.shape, .ortho)!.get_nth(0)).name == 'f32'
+	assert typeof(irfftn_norm_f32(dedicated_nd, input.shape, .ortho)!.get_nth(0)).name == 'f32'
+
+	mut generic_plan := create_rfft_plan[f32](vector.size)!
+	defer {
+		generic_plan.destroy()
+	}
+	assert typeof(generic_plan.forward(vector)!.get_nth(0).re).name == 'f64'
+	mut dedicated_plan := create_rfft_f32_plan(vector.size)!
+	defer {
+		dedicated_plan.destroy()
+	}
+	assert typeof(dedicated_plan.forward(vector)!.get_nth(0).re).name == 'f32'
+
+	generic_restored := irfftn(generic_nd_norm, input.shape)!
+	dedicated_restored := irfftn_f32(dedicated_nd_norm, input.shape)!
 	assert typeof(generic_restored.get_nth(0)).name == 'f64'
 	assert typeof(dedicated_restored.get_nth(0)).name == 'f32'
 }
