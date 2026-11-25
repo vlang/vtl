@@ -29,6 +29,8 @@ fn main() {
 	event_counts := training_rng.binomial(12, 0.25, [4])!
 	failure_counts := training_rng.negative_binomial(4.0, 0.5, [4])!
 	sampled_good_counts := training_rng.hypergeometric(200, 800, 50, [4])!
+	color_population := vtl.from_1d([20, 30, 50])!
+	sampled_color_counts := training_rng.multivariate_hypergeometric(color_population, 10, [4])!
 	arrival_counts := validation_rng.poisson(3.5, [4])!
 	lifetimes := validation_rng.weibull(1.5, [4])!
 	chi_square_samples := validation_rng.chi_square(5.0, [4])!
@@ -71,6 +73,7 @@ fn main() {
 	println('Binomial event counts: ${event_counts.to_array()}')
 	println('Negative-binomial failure counts: ${failure_counts.to_array()}')
 	println('Hypergeometric good-item counts: ${sampled_good_counts.to_array()}')
+	println('Multivariate hypergeometric color counts: ${sampled_color_counts.to_array()}')
 	println('Poisson arrival counts: ${arrival_counts.to_array()}')
 	println('Weibull lifetimes: ${lifetimes.to_array()}')
 	println('Chi-square samples: ${chi_square_samples.to_array()}')

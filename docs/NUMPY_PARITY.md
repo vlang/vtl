@@ -724,7 +724,7 @@ complete the dtype audit across every public FFT wrapper.
 ### Random
 
 **Current:** global uniform, normal, Bernoulli, binomial, negative-binomial,
-geometric, hypergeometric, von Mises,
+geometric, hypergeometric, multivariate hypergeometric, von Mises,
 exponential, Gumbel, Laplace, Logistic, Cauchy, Wald (inverse Gaussian),
 Pareto, power, Rayleigh, triangular, Poisson,
 Weibull, lognormal, gamma, beta, Dirichlet, chi-square, Student's t, and F
@@ -732,8 +732,9 @@ tensors; `random_seed`;
 independent seeded `RandomGenerator` streams for f64 uniform, normal, lognormal,
 Gumbel, Laplace, Logistic, Cauchy, Wald, Pareto, power, Rayleigh, triangular, gamma, beta,
 Dirichlet, exponential, Poisson, Weibull, chi-square, Student's t, F,
-hypergeometric, negative-binomial, multivariate normal with positive-semidefinite
-covariance matrices, von Mises, and boolean Bernoulli; versioned serialized
+hypergeometric, multivariate hypergeometric, negative-binomial, multivariate
+normal with positive-semidefinite covariance matrices, von Mises, and boolean
+Bernoulli; versioned serialized
 generator-state snapshots; integer
 uniform, binomial/geometric/multinomial/Poisson; uniform and weighted population choice
 over flattened values or complete slices along a selected axis;
@@ -745,8 +746,10 @@ angles in `[-pi, pi)` and uses Best-Fisher rejection sampling for concentration
 through `1e16`; concentrations at or below `1e-150` use the uniform limit to
 avoid underflow.
 
-**Remaining:** add the other NumPy distributions not listed above and define
-reproducibility guarantees across V runtime versions.
+**Remaining:** add NumPy's log-series, Zipf, noncentral chi-square, and
+noncentral F distributions. Independent generator snapshots replay exactly
+within a supported state version; distribution sequences are not guaranteed
+across V or VTL versions.
 
 ### Input and output
 

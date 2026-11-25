@@ -52,6 +52,8 @@ beta_samples := training_rng.beta(2.0, 5.0, [128])!
 positive_scales := training_rng.lognormal(0.0, 0.25, [128])!
 event_counts := training_rng.binomial(12, 0.25, [128])!
 sampled_good_counts := training_rng.hypergeometric(20, 80, 10, [128])!
+available_colors := vtl.from_1d([20, 30, 50])!
+sampled_color_counts := training_rng.multivariate_hypergeometric(available_colors, 10, [128])!
 arrival_counts := validation_rng.poisson(3.5, [128])!
 lifetimes := validation_rng.weibull(1.5, [128])!
 chi_square_samples := validation_rng.chi_square(5.0, [128])!
@@ -89,6 +91,9 @@ in draws without replacement from a population split into good and bad items.
 Small draws use an inversion sampler; larger draws use HRUA rejection sampling,
 and the implementation samples the smaller of the requested draw and its
 complement.
+`multivariate_hypergeometric(colors, nsample, sample_shape)` samples category
+counts without replacement and appends the category axis to `sample_shape`;
+each output row sums to `nsample`, and no category count exceeds its population.
 `multivariate_normal(mean, covariance, sample_shape)` appends the variable
 dimension to `sample_shape`; both global and seeded-generator APIs accept
 positive-semidefinite covariance matrices, including singular ones. The
@@ -143,6 +148,9 @@ import vtl
 vtl.random_seed(7)
 counts := vtl.hypergeometric(20, 80, 10, [8], vtl.TensorData{})!
 angles := vtl.vonmises(1.0, 2.0, [8], vtl.TensorData{})!
+color_population := vtl.from_1d([20, 30, 50])!
+counts_by_color := vtl.multivariate_hypergeometric(color_population, 10, [8],
+	vtl.TensorData{})!
 for count in counts.to_array() {
 	assert count >= 0 && count <= 10
 }
@@ -154,6 +162,8 @@ for angle in angles.to_array() {
 `vtl.vonmises(location, concentration, shape, params)` samples circular values
 from the global stream, reset by `random_seed`; the location must be finite
 and concentration must be finite and non-negative.
+`vtl.multivariate_hypergeometric(colors, nsample, sample_shape, params)` uses
+the same without-replacement semantics as the independent-generator method.
 
 `gamma(alpha, scale, shape,
 params)`, `beta(alpha, beta, shape, params)`, `chi_square(df, shape, params)`,

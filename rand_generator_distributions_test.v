@@ -134,6 +134,52 @@ fn test_random_generator_supports_hypergeometric_sampling() ! {
 	replay.free()
 }
 
+fn test_random_generator_supports_multivariate_hypergeometric_sampling() ! {
+	mut generator := new_random_generator(752)
+	colors := from_1d([7, 11, 13])!
+	values := generator.multivariate_hypergeometric(colors, 12, [4096])!
+	assert values.shape == [4096, 3]
+	mut replay := new_random_generator(752)
+	assert values.array_equal(replay.multivariate_hypergeometric(colors, 12, [4096])!)
+	mut totals := [0, 0, 0]
+	for sample_index in 0 .. values.shape[0] {
+		mut sample_total := 0
+		for category in 0 .. colors.size {
+			value := values.get_nth(sample_index * colors.size + category)
+			assert value >= 0 && value <= colors.get_nth(category)
+			sample_total += value
+			totals[category] += value
+		}
+		assert sample_total == 12
+	}
+	assert math.abs(f64(totals[0]) / 4096.0 - 12.0 * 7.0 / 31.0) < 0.1
+	assert math.abs(f64(totals[1]) / 4096.0 - 12.0 * 11.0 / 31.0) < 0.1
+	assert math.abs(f64(totals[2]) / 4096.0 - 12.0 * 13.0 / 31.0) < 0.1
+	assert generator.multivariate_hypergeometric(colors, 0, [2])!.to_array() == [0, 0, 0, 0, 0,
+		0]
+	assert generator.multivariate_hypergeometric(colors, 31, [2])!.to_array() == [7, 11, 13, 7,
+		11, 13]
+	assert generator.multivariate_hypergeometric(colors, 4, [])!.shape == [3]
+	assert generator.multivariate_hypergeometric(colors, 4, [0])!.shape == [0, 3]
+	if _ := generator.multivariate_hypergeometric(from_1d([-1, 2])!, 1, [1]) {
+		assert false, 'multivariate hypergeometric must reject negative color counts'
+	}
+	if _ := generator.multivariate_hypergeometric(colors, 32, [1]) {
+		assert false, 'multivariate hypergeometric must reject draws larger than the population'
+	}
+	if _ := generator.multivariate_hypergeometric(from_array[int]([1, 2], [1, 2])!, 1, [1]) {
+		assert false, 'multivariate hypergeometric must require one-dimensional colors'
+	}
+	if _ := generator.multivariate_hypergeometric(from_1d([max_int, 1])!, 0, [1]) {
+		assert false, 'multivariate hypergeometric must reject total population overflow'
+	}
+	if _ := generator.multivariate_hypergeometric(colors, 1, [-1]) {
+		assert false, 'multivariate hypergeometric must reject negative sample dimensions'
+	}
+	generator.free()
+	replay.free()
+}
+
 fn test_random_generator_cauchy_is_seeded_and_matches_quartiles() ! {
 	mut generator := new_random_generator(4242)
 	values := generator.cauchy(1.0, 2.0, [4096])!

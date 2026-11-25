@@ -198,6 +198,54 @@ fn test_global_hypergeometric_is_seeded_and_validated() ! {
 	}
 }
 
+fn test_global_multivariate_hypergeometric_is_seeded_and_validated() ! {
+	colors := from_1d([7, 11, 13])!
+	random_seed(752)
+	values := multivariate_hypergeometric(colors, 12, [2048], TensorData{})!
+	assert values.shape == [2048, 3]
+	random_seed(752)
+	assert values.array_equal(multivariate_hypergeometric(colors, 12, [2048], TensorData{})!)
+	mut totals := [0, 0, 0]
+	for sample_index in 0 .. values.shape[0] {
+		mut sample_total := 0
+		for category in 0 .. colors.size {
+			value := values.get_nth(sample_index * colors.size + category)
+			assert value >= 0 && value <= colors.get_nth(category)
+			sample_total += value
+			totals[category] += value
+		}
+		assert sample_total == 12
+	}
+	assert math.abs(f64(totals[0]) / 2048.0 - 12.0 * 7.0 / 31.0) < 0.14
+	assert math.abs(f64(totals[1]) / 2048.0 - 12.0 * 11.0 / 31.0) < 0.14
+	assert math.abs(f64(totals[2]) / 2048.0 - 12.0 * 13.0 / 31.0) < 0.14
+	assert multivariate_hypergeometric(colors, 0, [2], TensorData{})!.to_array() == [
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+	]
+	assert multivariate_hypergeometric(colors, 31, [], TensorData{})!.to_array() == [
+		7,
+		11,
+		13,
+	]
+	assert multivariate_hypergeometric(from_1d[int]([]int{})!, 0, [2],
+		TensorData{})!.shape == [2, 0]
+	if _ := multivariate_hypergeometric(from_1d([-1, 2])!, 1, [1], TensorData{}) {
+		assert false, 'multivariate hypergeometric must reject negative color counts'
+	}
+	if _ := multivariate_hypergeometric(colors, 32, [1], TensorData{}) {
+		assert false, 'multivariate hypergeometric must reject draws larger than the population'
+	}
+	if _ := multivariate_hypergeometric(from_array[int]([1, 2], [1, 2])!, 1, [1],
+		TensorData{}) {
+		assert false, 'multivariate hypergeometric must require one-dimensional colors'
+	}
+}
+
 fn test_global_statistical_distributions_are_seeded_and_validated() ! {
 	random_seed(702)
 	gamma_samples := gamma(2.0, 3.0, [4096], TensorData{})!
