@@ -48,3 +48,12 @@ fn test_adaptive_avgpool1d_forward_and_backward() ! {
 	assert gradient.to_array() == [0.3333333333333333, 0.3333333333333333, 0.6666666666666666,
 		0.3333333333333333, 0.3333333333333333]
 }
+
+fn test_adaptive_maxpool1d_forward_and_backward() ! {
+	input := vtl.from_array[f64]([1.0, 5.0, 3.0, 4.0, 6.0], [1, 1, 5])!
+	result := adaptive_maxpool1d_forward[f64](input, 2)!
+	assert result.to_array() == [5.0, 6.0]
+	grad_out := vtl.ones[f64]([1, 1, 2])
+	gradient := adaptive_maxpool1d_backward[f64](grad_out, input, 2)!
+	assert gradient.to_array() == [0.0, 1.0, 0.0, 0.0, 1.0]
+}

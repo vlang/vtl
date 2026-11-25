@@ -89,8 +89,8 @@ graphs where feasible.
 
 **VTL today:** `Sequential`, common activations, linear, convolutional,
 average-pooling (including fixed-output `adaptive_avgpool1d`,
-`adaptive_avgpool2d`, and `adaptive_maxpool2d`), recurrent, attention, and
-normalization layers. Typed CPU LSTM layers support
+`adaptive_avgpool2d`, `adaptive_maxpool1d`, and `adaptive_maxpool2d`),
+recurrent, attention, and normalization layers. Typed CPU LSTM layers support
 stacked hidden/cell state through `forward_with_state`; typed CPU GRU layers
 support an explicit initial and final hidden state. Their default input layouts
 differ: LSTM is `[batch, sequence, features]`, while GRU is

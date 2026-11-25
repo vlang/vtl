@@ -343,3 +343,54 @@ pub fn adaptive_avgpool1d_backward[T](grad_out &vtl.Tensor[T], input &vtl.Tensor
 	}
 	return d_input
 }
+
+pub fn adaptive_maxpool1d_forward[T](input &vtl.Tensor[T], output_size int) !&vtl.Tensor[T] {
+	output_shape := adaptive_avgpool1d_output_shape[T](input, output_size)!
+	mut output := vtl.zeros[T](output_shape)
+	for batch in 0 .. input.shape[0] {
+		for channel in 0 .. input.shape[1] {
+			for out_i in 0 .. output_size {
+				start := (out_i * input.shape[2]) / output_size
+				end := ((out_i + 1) * input.shape[2] + output_size - 1) / output_size
+				mut maximum := f64(input.get([batch, channel, start]))
+				for in_i in start .. end {
+					value := f64(input.get([batch, channel, in_i]))
+					if value > maximum {
+						maximum = value
+					}
+				}
+				output.set([batch, channel, out_i], vtl.cast[T](maximum))
+			}
+		}
+	}
+	return output
+}
+
+pub fn adaptive_maxpool1d_backward[T](grad_out &vtl.Tensor[T], input &vtl.Tensor[T], output_size int) !&vtl.Tensor[T] {
+	output_shape := adaptive_avgpool1d_output_shape[T](input, output_size)!
+	if grad_out.shape != output_shape {
+		return error('adaptive_maxpool1d backward gradient shape does not match input and output size')
+	}
+	mut d_input := vtl.zeros_like[T](input)
+	for batch in 0 .. input.shape[0] {
+		for channel in 0 .. input.shape[1] {
+			for out_i in 0 .. output_size {
+				start := (out_i * input.shape[2]) / output_size
+				end := ((out_i + 1) * input.shape[2] + output_size - 1) / output_size
+				mut max_i := start
+				mut maximum := f64(input.get([batch, channel, start]))
+				for in_i in start .. end {
+					value := f64(input.get([batch, channel, in_i]))
+					if value > maximum {
+						maximum = value
+						max_i = in_i
+					}
+				}
+				index := [batch, channel, max_i]
+				value := f64(d_input.get(index)) + f64(grad_out.get([batch, channel, out_i]))
+				d_input.set(index, vtl.cast[T](value))
+			}
+		}
+	}
+	return d_input
+}
