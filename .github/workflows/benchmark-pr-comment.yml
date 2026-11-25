@@ -84,8 +84,11 @@ jobs:
             run_v_benchmark vtl-conv2d vtl/benchmarks/vs_numpy/conv2d_bench.v
             env HOME="$HOME" PATH="$PATH" VJOBS=2 OPENBLAS_NUM_THREADS=2 python3 vtl/benchmarks/vs_numpy/numpy_conv2d_baseline.py
             echo '## Reduced SVD vs NumPy'
+            echo '### VTL reduced SVD pure-V'
             run_v_benchmark vtl-svd-purev vtl/benchmarks/vs_numpy/svd_bench.v
+            echo '### VTL reduced SVD LAPACKE'
             run_v_benchmark vtl-svd-lapacke vtl/benchmarks/vs_numpy/svd_bench.v -d vsl_lapack_lapacke
+            echo '### NumPy reduced SVD'
             env HOME="$HOME" PATH="$PATH" VJOBS=2 OPENBLAS_NUM_THREADS=2 python3 vtl/benchmarks/vs_numpy/numpy_svd_baseline.py
             echo '## Contiguous sum and mean'
             run_v_benchmark vtl-stats vtl/benchmarks/vs_numpy/stats_bench.v

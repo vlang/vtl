@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import math
 import re
 import sys
 from pathlib import Path
@@ -22,6 +23,10 @@ CASES = (
         re.compile(r"^numpy gemm_f32 512x512\s*\|[^|]*\|\s*([0-9.eE+-]+)\s+GFLOPS\b"),
     ),
 )
+SVD_SIZES = (16, 32, 64, 128)
+SVD_ROW = re.compile(
+    r"^\s*(\d+)x(\d+)\s*\|\s*([0-9.eE+-]+)\s*\|\s*([0-9.eE+-]+)\s*$"
+)
 
 
 def find_gflops(report: str, pattern: re.Pattern[str], label: str) -> float:
@@ -29,9 +34,73 @@ def find_gflops(report: str, pattern: re.Pattern[str], label: str) -> float:
     values = [float(match.group(1)) for match in matches if match]
     if len(values) != 1:
         raise ValueError(f"expected one {label} 512x512 result, found {len(values)}")
-    if values[0] <= 0:
-        raise ValueError(f"{label} 512x512 GFLOPS must be positive, got {values[0]}")
+    if not math.isfinite(values[0]) or values[0] <= 0:
+        raise ValueError(f"{label} 512x512 GFLOPS must be finite and positive, got {values[0]}")
     return values[0]
+
+
+def find_svd_rows(report: str, heading: str, label: str) -> dict[int, tuple[float, float]]:
+    marker = f"### {heading}"
+    if report.count(marker) != 1:
+        raise ValueError(f"expected one {label} SVD section, found {report.count(marker)}")
+
+    section = report.split(marker, maxsplit=1)[1]
+    next_heading = re.search(r"^#{2,3} ", section, flags=re.MULTILINE)
+    if next_heading is not None:
+        section = section[: next_heading.start()]
+
+    results: dict[int, tuple[float, float]] = {}
+    for line in section.splitlines():
+        match = SVD_ROW.match(line)
+        if match is None:
+            continue
+        rows, columns = int(match.group(1)), int(match.group(2))
+        mean_ms, checksum = float(match.group(3)), float(match.group(4))
+        if rows != columns or rows not in SVD_SIZES:
+            raise ValueError(f"unexpected {label} SVD shape {rows}x{columns}")
+        if rows in results:
+            raise ValueError(f"duplicate {label} SVD result for {rows}x{rows}")
+        if not math.isfinite(mean_ms) or mean_ms <= 0.0:
+            raise ValueError(f"{label} SVD time for {rows}x{rows} must be finite and positive")
+        if not math.isfinite(checksum):
+            raise ValueError(f"{label} SVD checksum for {rows}x{rows} must be finite")
+        results[rows] = (mean_ms, checksum)
+
+    if tuple(sorted(results)) != SVD_SIZES:
+        raise ValueError(
+            f"expected {label} SVD results for sizes {SVD_SIZES}, found {tuple(sorted(results))}"
+        )
+    return results
+
+
+def svd_benchmark_group(report: str, backend: str, heading: str) -> dict[str, object]:
+    vtl_rows = find_svd_rows(report, heading, f"VTL {backend}")
+    numpy_rows = find_svd_rows(report, "NumPy reduced SVD", "NumPy")
+    results = []
+    for size in SVD_SIZES:
+        vtl_ms, vtl_checksum = vtl_rows[size]
+        numpy_ms, numpy_checksum = numpy_rows[size]
+        slowdown = numpy_ms / vtl_ms
+        if not math.isfinite(slowdown):
+            raise ValueError(f"SVD slowdown for {backend} at {size}x{size} is not finite")
+        results.append(
+            {
+                "backend": backend,
+                "dtype": "f64",
+                "shape": [size, size],
+                "vtl_mean_ms": vtl_ms,
+                "numpy_mean_ms": numpy_ms,
+                "numpy_over_vtl": slowdown,
+                "vtl_checksum": vtl_checksum,
+                "numpy_checksum": numpy_checksum,
+            }
+        )
+    return {
+        "benchmark": "reduced-svd",
+        "unit": "ms",
+        "baseline": "numpy",
+        "results": results,
+    }
 
 
 def check_report(path: Path, annotate: bool = False, json_path: Path | None = None) -> int:
@@ -53,22 +122,30 @@ def check_report(path: Path, annotate: bool = False, json_path: Path | None = No
 
         if json_path is not None:
             payload = {
-                "schema_version": 1,
-                "benchmark": "cpu-gemm",
-                "max_slowdown": MAX_SLOWDOWN,
-                "results": [
+                "schema_version": 2,
+                "benchmarks": [
                     {
-                        "dtype": dtype,
-                        "shape": [512, 512],
-                        "vtl_gflops": vtl_gflops,
-                        "numpy_gflops": numpy_gflops,
-                        "slowdown": slowdown,
-                        "status": "fail" if slowdown > MAX_SLOWDOWN else "pass",
-                    }
-                    for dtype, vtl_gflops, numpy_gflops, slowdown in results
+                        "benchmark": "cpu-gemm",
+                        "max_slowdown": MAX_SLOWDOWN,
+                        "results": [
+                            {
+                                "dtype": dtype,
+                                "shape": [512, 512],
+                                "vtl_gflops": vtl_gflops,
+                                "numpy_gflops": numpy_gflops,
+                                "slowdown": slowdown,
+                                "status": "fail" if slowdown > MAX_SLOWDOWN else "pass",
+                            }
+                            for dtype, vtl_gflops, numpy_gflops, slowdown in results
+                        ],
+                    },
+                    svd_benchmark_group(report, "pure-v", "VTL reduced SVD pure-V"),
+                    svd_benchmark_group(report, "lapacke", "VTL reduced SVD LAPACKE"),
                 ],
             }
-            json_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+            json_path.write_text(
+                json.dumps(payload, indent=2, allow_nan=False) + "\n", encoding="utf-8"
+            )
 
         if annotate:
             summary = [
