@@ -40,3 +40,25 @@ pub fn ufunc_binary_into[T](left &Tensor[T], right &Tensor[T], output &Tensor[T]
 		}
 	}
 }
+
+// ufunc_reduce applies a binary operation in logical row-major order.
+// The identity is returned unchanged for empty inputs.
+pub fn ufunc_reduce[T](input &Tensor[T], identity T, operation fn (T, T) T) T {
+	mut result := identity
+	for i in 0 .. input.size() {
+		result = operation(result, input.get_nth(i))
+	}
+	return result
+}
+
+// ufunc_accumulate returns the inclusive prefix operation in logical
+// row-major order, preserving the input shape.
+pub fn ufunc_accumulate[T](input &Tensor[T], identity T, operation fn (T, T) T) !&Tensor[T] {
+	mut output := zeros_like[T](input)
+	mut accumulator := identity
+	for i in 0 .. input.size() {
+		accumulator = operation(accumulator, input.get_nth(i))
+		output.set_nth(i, accumulator)
+	}
+	return output
+}

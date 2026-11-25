@@ -36,8 +36,11 @@ For neural-network and framework-level gaps relative to PyTorch, see the
 - `ufunc_unary`, `ufunc_unary_into`, `ufunc_binary`, and `ufunc_binary_into`
   define allocation-aware unary and binary execution paths with caller-owned
   `out` tensors and exact-shape `where` masks; masked entries preserve their
-  preallocated output values. Broadcasting masks, casting modes, and reduction
-  methods remain open under [#783](https://github.com/vlang/vtl/issues/783).
+  preallocated output values. `ufunc_reduce` and `ufunc_accumulate` currently
+  operate in logical flat row-major order and accept an explicit identity.
+  Broadcasting operands/masks, casting modes, axis reductions, `reduceat`,
+  `outer`, and indexed `at` remain open under
+  [#783](https://github.com/vlang/vtl/issues/783).
 - A power-series `Polynomial` API with ascending coefficients, Horner
   evaluation, tensor evaluation, arithmetic, derivative/integral, real
   linear and quadratic roots, and small least-squares fitting. Orthogonal
