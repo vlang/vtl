@@ -34,6 +34,11 @@ pub fn capability_matrix() []Capability {
 		Capability{'matmul', true},
 		Capability{'clip', true},
 		Capability{'sum', true},
+		Capability{'prod', true},
+		Capability{'min', true},
+		Capability{'max', true},
+		Capability{'all', true},
+		Capability{'any', true},
 		Capability{'mean', true},
 		Capability{'isclose', true},
 		Capability{'allclose', true},
@@ -115,6 +120,32 @@ pub fn clip[T](array &vtl.Tensor[T], min_value T, max_value T) !&vtl.Tensor[T] {
 // sum reduces all elements to a scalar in the input dtype.
 pub fn sum[T](array &vtl.Tensor[T]) T {
 	return stats.sum(array)
+}
+
+// prod reduces all elements to a product in the input dtype.
+pub fn prod[T](array &vtl.Tensor[T]) T {
+	return stats.prod(array)
+}
+
+// min reduces all elements to their minimum in the input dtype.
+pub fn min[T](array &vtl.Tensor[T]) T {
+	return stats.min(array)
+}
+
+// max reduces all elements to their maximum in the input dtype.
+pub fn max[T](array &vtl.Tensor[T]) T {
+	return stats.max(array)
+}
+
+// all reports whether every element is truthy.
+pub fn all[T](array &vtl.Tensor[T]) bool {
+	return array.all()
+}
+
+// any_ reports whether at least one element is truthy. The suffix is required
+// because `any` is a reserved V type name.
+pub fn any_[T](array &vtl.Tensor[T]) bool {
+	return array.any()
 }
 
 // mean reduces real numeric elements to an f64 scalar.

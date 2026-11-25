@@ -5,7 +5,7 @@ import vtl
 
 fn test_capability_matrix_is_explicit_and_queryable() {
 	matrix := capability_matrix()
-	assert matrix.len == 18
+	assert matrix.len == 23
 	assert supports('zeros')
 	assert supports('reshape')
 	assert supports('broadcast_to')
@@ -14,6 +14,11 @@ fn test_capability_matrix_is_explicit_and_queryable() {
 	assert supports('matmul')
 	assert supports('clip')
 	assert supports('sum')
+	assert supports('prod')
+	assert supports('min')
+	assert supports('max')
+	assert supports('all')
+	assert supports('any')
 	assert supports('mean')
 	assert supports('isclose')
 	assert supports('allclose')
@@ -106,6 +111,18 @@ fn test_sum_and_mean_reduce_all_elements() {
 	assert mean(input) == 2.5
 	assert sum(vtl.from_1d[int]([1, 2, 3])!) == 6
 	assert mean(vtl.from_1d[int]([1, 2, 3])!) == 2.0
+}
+
+fn test_array_api_reductions_cover_common_scalar_operations() {
+	input := vtl.from_2d[int]([[1, 2], [3, 4]])!
+
+	assert prod(input) == 24
+	assert min(input) == 1
+	assert max(input) == 4
+	assert all(vtl.from_1d[bool]([true, true])!)
+	assert !all(vtl.from_1d[bool]([true, false])!)
+	assert any_(vtl.from_1d[bool]([false, true])!)
+	assert !any_(vtl.from_1d[bool]([false, false])!)
 }
 
 fn test_reductions_handle_empty_arrays() {

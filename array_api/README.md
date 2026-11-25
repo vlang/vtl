@@ -3,7 +3,7 @@
 `vtl.array_api` is the explicit namespace for VTL's incrementally implemented
 Python Array API surface. It currently exposes creation, reshape, broadcasting,
 and transpose operations plus broadcast-aware `where` selection, `matmul`, and scalar
-`clip`, global `sum`, and global `mean`, with a small capability matrix so consumers can select the namespace without
+`clip`, global `sum`, `prod`, `min`, `max`, `all`, `any_`, and `mean`, with a small capability matrix so consumers can select the namespace without
 mistaking VTL-specific functions for standard operations.
 
 The supported specification target is `2024.12`. The matrix is intentionally
