@@ -474,6 +474,25 @@ fn test_focal_loss_negative_class_gradient() ! {
 	assert math.abs(pred.grad.get_nth(0) - want_grad) < 1e-12
 }
 
+fn test_poisson_nll_loss_forward_and_backward() ! {
+	c := ctx[f64]()
+	prediction := c.variable(vtl.from_1d([0.0, math.log(2.0)])!, requires_grad: true)
+	target := vtl.from_1d([1.0, 1.0])!
+	mut result := poisson_nll_loss[f64]().loss(prediction, target)!
+	assert math.abs(result.value.get_nth(0) - (1.0 + 2.0 - math.log(2.0)) / 2.0) < 1e-12
+	result.backprop()!
+	assert math.abs(prediction.grad.get_nth(0)) < 1e-12
+	assert math.abs(prediction.grad.get_nth(1) - (1.0 / 2.0)) < 1e-12
+}
+
+fn test_poisson_nll_loss_full_handles_zero_targets() ! {
+	c := ctx[f64]()
+	prediction := c.variable(vtl.from_1d([1.0])!, requires_grad: false)
+	target := vtl.from_1d([0.0])!
+	result := poisson_nll_loss[f64](full: true).loss(prediction, target)!
+	assert math.abs(result.value.get_nth(0) - math.exp(1.0)) < 1e-12
+}
+
 fn test_focal_loss_rejects_non_finite_parameters() {
 	c := ctx[f64]()
 	pred := variable[f64](c, [0.0], [1])!

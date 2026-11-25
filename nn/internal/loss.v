@@ -946,3 +946,53 @@ pub fn focal_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], target &
 	}
 	return vtl.from_array(values, input.shape.clone())
 }
+
+// poisson_nll computes the mean Poisson negative log-likelihood.
+pub fn poisson_nll[T](input &vtl.Tensor[T], target &vtl.Tensor[T], log_input bool, full bool, eps f64) !&vtl.Tensor[T] {
+	if input.shape != target.shape {
+		return error('PoissonNLL loss requires input and target with identical shapes')
+	}
+	if eps <= 0.0 {
+		return error('PoissonNLL epsilon must be positive')
+	}
+	mut total := 0.0
+	for i in 0 .. input.size() {
+		x := f64(input.get_nth(i))
+		y := f64(target.get_nth(i))
+		if !math.is_finite(x) || !math.is_finite(y) || y < 0.0 {
+			return error('PoissonNLL input and target must be finite and target must be non-negative')
+		}
+		value := if log_input {
+			math.exp(x) - y * x
+		} else {
+			if x < 0.0 {
+				return error('PoissonNLL input must be non-negative when log_input is false')
+			}
+			x - y * math.log(math.max(x, eps))
+		}
+		total += value
+		if full {
+			total += if y == 0.0 { -y } else { y * math.log(y) - y }
+		}
+	}
+	return vtl.from_1d([vtl.cast[T](total / f64(input.size()))])
+}
+
+pub fn poisson_nll_backward[T](gradient &vtl.Tensor[T], input &vtl.Tensor[T], target &vtl.Tensor[T], log_input bool, eps f64) !&vtl.Tensor[T] {
+	if input.shape != target.shape {
+		return error('PoissonNLL loss requires input and target with identical shapes')
+	}
+	upstream := f64(gradient.get([0])) / f64(input.size())
+	mut values := []T{len: input.size()}
+	for i in 0 .. input.size() {
+		x := f64(input.get_nth(i))
+		y := f64(target.get_nth(i))
+		derivative := if log_input {
+			math.exp(x) - y
+		} else {
+			1.0 - y / math.max(x, eps)
+		}
+		values[i] = vtl.cast[T](upstream * derivative)
+	}
+	return vtl.from_array(values, input.shape.clone())
+}
