@@ -227,7 +227,7 @@ fn matmul_complex(a &vtl.Tensor[vcomplex.Complex], b &vtl.Tensor[vcomplex.Comple
 		blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_re[a_start..], inner, b_im[b_start..], columns, 0.0, mut c_im, columns)
 		blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_im[a_start..], inner, b_re[b_start..], columns, 1.0, mut c_im, columns)
 		for i in 0 .. rows * columns {
-			result_data[result_start + i] = vcomplex.Complex{re: c_re[i], im: c_im[i]}
+			result_data[result_start + i] = vcomplex.Complex{ re: c_re[i], im: c_im[i] }
 		}
 	}
 	return vtl.from_array[vcomplex.Complex](result_data, result_shape)
