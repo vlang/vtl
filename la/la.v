@@ -192,6 +192,9 @@ fn matmul_complex(a &vtl.Tensor[vcomplex.Complex], b &vtl.Tensor[vcomplex.Comple
 	mut result_shape := batch_shape.clone()
 	result_shape << rows
 	result_shape << columns
+	if rows == 0 || columns == 0 || inner == 0 || batch_size == 0 {
+		return vtl.from_array[vcomplex.Complex]([]vcomplex.Complex{}, result_shape)
+	}
 	a_data := a.to_array()
 	b_data := b.to_array()
 	mut a_re := []f64{len: a_data.len}
