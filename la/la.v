@@ -1,6 +1,7 @@
 module la
 
 import vsl.la as vsl_la
+import vsl.blas
 import vtl
 import vtl.storage
 import math
@@ -193,20 +194,37 @@ fn matmul_complex(a &vtl.Tensor[vcomplex.Complex], b &vtl.Tensor[vcomplex.Comple
 	result_shape << columns
 	a_data := a.to_array()
 	b_data := b.to_array()
+	mut a_re := []f64{len: a_data.len}
+	mut a_im := []f64{len: a_data.len}
+	mut b_re := []f64{len: b_data.len}
+	mut b_im := []f64{len: b_data.len}
+	for i, value in a_data {
+		a_re[i] = value.re
+		a_im[i] = value.im
+	}
+	for i, value in b_data {
+		b_re[i] = value.re
+		b_im[i] = value.im
+	}
 	mut result_data := []vcomplex.Complex{len: batch_size * rows * columns}
 	for batch in 0 .. batch_size {
 		a_batch := matmul_broadcast_offset(batch, batch_shape, a_batch_shape)
 		b_batch := matmul_broadcast_offset(batch, batch_shape, b_batch_shape)
 		a_start := a_batch * rows * inner
 		b_start := b_batch * inner * columns
-		for row in 0 .. rows {
-			for column in 0 .. columns {
-				mut sum := vcomplex.Complex{}
-				for k in 0 .. inner {
-					sum += a_data[a_start + row * inner + k] * b_data[b_start + k * columns + column]
-				}
-				result_data[batch * rows * columns + row * columns + column] = sum
-			}
+		result_start := batch * rows * columns
+		mut c_re := []f64{len: rows * columns}
+		blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_re[a_start..], inner, b_re[b_start..], columns, 0.0, mut c_re, columns)
+		mut temp := []f64{len: rows * columns}
+		blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_im[a_start..], inner, b_im[b_start..], columns, 0.0, mut temp, columns)
+		for i in 0 .. rows * columns {
+			c_re[i] -= temp[i]
+		}
+		mut c_im := []f64{len: rows * columns}
+		blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_re[a_start..], inner, b_im[b_start..], columns, 0.0, mut c_im, columns)
+		blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_im[a_start..], inner, b_re[b_start..], columns, 1.0, mut c_im, columns)
+		for i in 0 .. rows * columns {
+			result_data[result_start + i] = vcomplex.Complex{re: c_re[i], im: c_im[i]}
 		}
 	}
 	return vtl.from_array[vcomplex.Complex](result_data, result_shape)
