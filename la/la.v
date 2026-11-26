@@ -208,6 +208,9 @@ fn matmul_complex(a &vtl.Tensor[vcomplex.Complex], b &vtl.Tensor[vcomplex.Comple
 	}
 	mut result_data := []vcomplex.Complex{len: batch_size * rows * columns}
 	for batch in 0 .. batch_size {
+		if rows == 0 || columns == 0 || inner == 0 {
+			continue
+		}
 		a_batch := matmul_broadcast_offset(batch, batch_shape, a_batch_shape)
 		b_batch := matmul_broadcast_offset(batch, batch_shape, b_batch_shape)
 		a_start := a_batch * rows * inner
