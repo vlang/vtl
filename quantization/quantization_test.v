@@ -50,6 +50,51 @@ fn test_per_channel_quantization_uses_channel_parameters() ! {
 	assert encoded.to_array() == [i8(1), 2, 3, 1, 2, 3]
 }
 
+fn test_linear_int8_f32_uses_per_output_channel_scales_and_preserves_batch_shape() ! {
+	input := vtl.from_array([f32(1), 2, -1, 0.5], [1, 2, 2])!
+	input_params := new_params(0.1, 3, -128, 127)!
+	weights := vtl.from_array([i8(55), -95, 97, 9], [2, 2])!
+	weight_params := new_per_channel_params([0.01, 0.02], [5, -3], -2, -128, 127)!
+	bias := vtl.from_array([f32(0.25), -0.5], [1, 2])!
+
+	output := linear_int8_f32(input, weights, input_params, weight_params, bias)!
+
+	assert output.shape == [1, 2, 2]
+	expected := [f32(-1.25), 1.98, -0.75, -2.38]
+	for i in 0 .. expected.len {
+		assert math.abs(f64(output.get_nth(i) - expected[i])) < 1e-5
+	}
+}
+
+fn test_linear_int8_f32_rejects_mismatched_metadata() ! {
+	input := vtl.from_array([f32(1), 2], [1, 2])!
+	input_params := new_params(0.1, 0, -128, 127)!
+	weights := vtl.from_array([i8(10), 20, 30, 40], [2, 2])!
+	bias := vtl.from_1d[f32]([0, 0])!
+	good_params := new_per_channel_params([0.1, 0.1], [0, 0], 0, -128, 127)!
+
+	mut axis_failed := false
+	linear_int8_f32(input, weights, input_params,
+		new_per_channel_params([0.1, 0.1], [0, 0], 1, -128, 127)!, bias) or {
+		axis_failed = true
+	}
+	assert axis_failed
+
+	mut bias_shape_failed := false
+	linear_int8_f32(input, weights, input_params, good_params,
+		vtl.from_array([f32(0), 0], [2, 1])!) or {
+		bias_shape_failed = true
+	}
+	assert bias_shape_failed
+
+	mut weight_range_failed := false
+	linear_int8_f32(input, weights, input_params,
+		new_per_channel_params([0.1, 0.1], [0, 0], 0, -128, 39)!, bias) or {
+		weight_range_failed = true
+	}
+	assert weight_range_failed
+}
+
 fn test_minmax_observer_calibrates_and_accumulates() ! {
 	mut observer := MinMaxObserver{}
 	mut uninitialized_failed := false

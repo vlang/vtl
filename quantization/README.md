@@ -8,13 +8,13 @@ q = clamp(round_to_even(x / scale + zero_point), qmin, qmax)
 x = (q - zero_point) * scale
 ```
 
-The initial API includes per-tensor and per-channel parameters, finite-value
-min/max calibration observers, and explicit f32/f64 quantize/dequantize entry
-points.
-Quantized results are ordinary `Tensor[i8]` values. This is a storage and
-calibration foundation; it does not yet provide integer Linear/Conv kernels,
-layer conversion, accelerator dispatch, or a performance claim. Those remain
-tracked by [issue #792](https://github.com/vlang/vtl/issues/792).
+The API includes per-tensor and per-channel parameters, finite-value min/max
+calibration observers, and explicit f32/f64 quantize/dequantize entry points.
+Quantized results are ordinary `Tensor[i8]` values. `linear_int8_f32` provides
+a CPU inference path with per-tensor activation quantization, per-output-channel
+weight quantization, i64 accumulation, and f32 output with bias. Quantized
+Conv, layer conversion, accelerator dispatch, and performance claims remain
+open under [issue #792](https://github.com/vlang/vtl/issues/792).
 
 See the runnable [INT8 quantization example](../examples/quantization_int8/main.v).
 

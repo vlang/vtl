@@ -61,11 +61,11 @@ tracked in [#750](https://github.com/vlang/vtl/issues/750).
 **Next:** Define a consistent dtype promotion and device model. Broaden backend
 coverage and test transfers, mixed precision, and device-specific behavior.
 
-VTL now has an opt-in `vtl.quantization` foundation for signed INT8 affine
-per-tensor and per-channel conversion, min/max calibration observers, and
-f32/f64 dequantization. Quantized Linear/Conv kernels, layer conversion, and
-accelerator execution are still open in [#792](https://github.com/vlang/vtl/issues/792);
-the current API makes no inference performance claim.
+VTL now has opt-in signed INT8 affine per-tensor/per-channel conversion,
+min/max calibration observers, and an f32-output quantized CPU Linear operator
+in `vtl.quantization`. Quantized Conv, layer conversion, accelerator execution,
+and measured inference performance remain open in
+[#792](https://github.com/vlang/vtl/issues/792).
 
 ### Autograd
 
