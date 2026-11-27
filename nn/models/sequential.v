@@ -347,12 +347,18 @@ pub fn (mut nn Sequential[T]) forward(train &autograd.Variable[T]) !&autograd.Va
 // batch normalization.
 pub fn (mut nn Sequential[T]) train() {
 	nn.training = true
+	for layer in nn.info.layers {
+		layer.set_training(true)
+	}
 }
 
 // eval enables evaluation behavior for mode-aware layers such as dropout and
 // batch normalization.
 pub fn (mut nn Sequential[T]) eval() {
 	nn.training = false
+	for layer in nn.info.layers {
+		layer.set_training(false)
+	}
 }
 
 // loss exposes this operation as part of the public API.

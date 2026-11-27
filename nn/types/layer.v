@@ -22,6 +22,17 @@ pub struct Layer[T] {
 	forward_fn       LayerForwardFn     = unsafe { nil }
 	forward_mode_fn  LayerForwardModeFn = unsafe { nil }
 	has_forward_mode bool
+	module_state     &Module[T] = unsafe { nil }
+	has_module_state bool
+}
+
+// layer_with_module_state attaches registered custom-module state to a layer.
+// The layer's own callbacks remain responsible for shape and forward behavior.
+pub fn layer_with_module_state[T](layer Layer[T], module &Module[T]) Layer[T] {
+	mut result := layer
+	result.module_state = module
+	result.has_module_state = true
+	return result
 }
 
 // layer_with_mode creates a typed wrapper for a layer whose behavior depends
@@ -68,7 +79,22 @@ pub fn (layer Layer[T]) variables() []&autograd.Variable[T] {
 	for ptr in ptrs {
 		vars << unsafe { &autograd.Variable[T](ptr) }
 	}
+	if layer.has_module_state {
+		for variable in layer.module_state.parameters() {
+			if variable !in vars {
+				vars << variable
+			}
+		}
+	}
 	return vars
+}
+
+// set_training updates attached module state recursively.
+pub fn (layer Layer[T]) set_training(training bool) {
+	if layer.has_module_state {
+		mut module := layer.module_state
+		module.set_training(training)
+	}
 }
 
 // forward runs a forward pass through the wrapped layer.

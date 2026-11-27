@@ -23,9 +23,11 @@ struct NamedModule[T] {
 }
 
 // Module stores named parameters, buffers, and child modules for user-defined
-// neural-network components. It is a state registry; forward and mode behavior
-// remain the responsibility of the custom component.
+// neural-network components. Forward behavior remains the responsibility of
+// the custom component; train/eval mode is tracked and propagated to children.
 pub struct Module[T] {
+pub:
+	training bool = true
 mut:
 	parameters []NamedParameter[T]
 	buffers    []NamedBuffer[T]
@@ -35,6 +37,25 @@ mut:
 // module creates an empty custom-module state registry.
 pub fn module[T]() &Module[T] {
 	return &Module[T]{}
+}
+
+// train enables training behavior for this module and all registered children.
+pub fn (mut module Module[T]) train() {
+	module.set_training(true)
+}
+
+// eval enables evaluation behavior for this module and all registered children.
+pub fn (mut module Module[T]) eval() {
+	module.set_training(false)
+}
+
+// set_training updates this module and every registered child recursively.
+pub fn (mut module Module[T]) set_training(training bool) {
+	module.training = training
+	for child in module.children {
+		mut child_module := child.module
+		child_module.set_training(training)
+	}
 }
 
 fn validate_module_name(name string) ! {

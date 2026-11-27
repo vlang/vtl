@@ -24,7 +24,13 @@ parameters, buffers, and children. `named_parameters` and `named_buffers`
 traverse nested registries depth-first using dotted names; `parameters` and
 `buffers` return their values without names. Cyclic child graphs are rejected.
 
-This registry does not yet provide custom forward/mode hooks or automatically
-adapt state to `Sequential`, optimizer construction, or checkpoint
-serialization. Existing `Layer[T]` wrappers and `Sequential` behavior are
-unchanged.
+Attach a registry to a callback-backed `Layer[T]` with
+`layer_with_module_state`. Its registered parameters are included by
+`Layer.variables`, so existing optimizers that build from
+`Sequential.info.layers` discover them. Registered buffers remain available
+from the module registry. `Sequential.train` and `Sequential.eval` also update
+the attached module and its registered children, while mode-aware layer
+callbacks continue to receive the sequential training flag.
+
+Custom-module checkpoint serialization and a higher-level forward API are not
+implemented yet.

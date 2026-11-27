@@ -138,10 +138,13 @@ BatchNorm3D (mode propagation and running-statistics behavior are covered by
 have no training-dependent statistics, matching PyTorch. The new
 `nn.types.Module[T]` state registry supports named parameter and buffer
 registration, recursive dotted-name traversal, duplicate-name validation, and
-cycle rejection. Custom forward/mode hooks, automatic `Sequential` and
-optimizer integration, and checkpoint serialization remain open. Stateful
-LSTM/GRU entry points are available today, but do not imply parity with the
-full `torch.nn` recurrent API or CUDA backward.
+cycle rejection. Attach it to a callback-backed `Layer[T]` with
+`layer_with_module_state` to expose registered parameters to existing optimizer
+builders and propagate train/eval state recursively. A higher-level custom
+forward API, custom-module checkpoint serialization, and a complete
+train/round-trip example remain open. Stateful LSTM/GRU entry points are
+available today, but do not imply parity with the full `torch.nn` recurrent
+API or CUDA backward.
 
 ### Losses and optimizers
 
