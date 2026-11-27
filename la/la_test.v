@@ -107,6 +107,21 @@ fn test_matmul_complex128_matrix_product() {
 	]
 }
 
+fn test_matmul_complex128_falls_back_when_three_product_overflows() {
+	a := vtl.from_array[vcomplex.Complex]([
+		vcomplex.Complex{ re: 1e154, im: 1e154 },
+	], [1, 1])!
+	b := vtl.from_array[vcomplex.Complex]([
+		vcomplex.Complex{ re: 1e154, im: 0 },
+	], [1, 1])!
+	result := matmul(a, b)!
+	value := result.to_array()[0]
+	assert math.is_finite(value.re)
+	assert math.is_finite(value.im)
+	assert value.re == 1e308
+	assert value.im == 1e308
+}
+
 fn test_matmul_complex128_vector_dot_does_not_conjugate() {
 	a := vtl.from_1d[vcomplex.Complex]([
 		vcomplex.Complex{ re: 1, im: 1 },

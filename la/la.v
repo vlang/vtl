@@ -173,6 +173,40 @@ pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	}
 }
 
+fn array_all_finite(values []f64) bool {
+	for value in values {
+		if !math.is_finite(value) {
+			return false
+		}
+	}
+	return true
+}
+
+fn three_product_results_finite(p1 []f64, p2 []f64, p3 []f64) bool {
+	for i in 0 .. p1.len {
+		re := p1[i] - p2[i]
+		im := p3[i] - p1[i] - p2[i]
+		if !math.is_finite(re) || !math.is_finite(im) {
+			return false
+		}
+	}
+	return true
+}
+
+fn complex_matmul_four_product(rows int, columns int, inner int, a_re []f64, a_im []f64, b_re []f64, b_im []f64) ([]f64, []f64) {
+	mut c_re := []f64{len: rows * columns}
+	mut c_im := []f64{len: rows * columns}
+	mut temp := []f64{len: rows * columns}
+	blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_re, inner, b_re, columns, 0.0, mut c_re, columns)
+	blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_im, inner, b_im, columns, 0.0, mut temp, columns)
+	for i in 0 .. rows * columns {
+		c_re[i] -= temp[i]
+	}
+	blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_re, inner, b_im, columns, 0.0, mut c_im, columns)
+	blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_im, inner, b_re, columns, 1.0, mut c_im, columns)
+	return c_re, c_im
+}
+
 fn matmul_complex(a &vtl.Tensor[vcomplex.Complex], b &vtl.Tensor[vcomplex.Complex]) !&vtl.Tensor[vcomplex.Complex] {
 	if a.rank() < 2 || b.rank() < 2 || a.shape[a.rank() - 1] != b.shape[b.rank() - 2] {
 		return error('Invalid shapes for matrix multiplication ${a.shape} and ${b.shape}')
@@ -234,9 +268,24 @@ fn matmul_complex(a &vtl.Tensor[vcomplex.Complex], b &vtl.Tensor[vcomplex.Comple
 		// p3 = (Re(A)+Im(A))(Re(B)+Im(B)); Re(C) = p1-p2, Im(C) = p3-p1-p2.
 		blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_re[a_start..], inner, b_re[b_start..], columns, 0.0, mut p1, columns)
 		blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_im[a_start..], inner, b_im[b_start..], columns, 0.0, mut p2, columns)
-		blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_sum, inner, b_sum, columns, 0.0, mut p3, columns)
-		for i in 0 .. rows * columns {
-			result_data[result_start + i] = vcomplex.Complex{ re: p1[i] - p2[i], im: p3[i] - p1[i] - p2[i] }
+		mut used_three_product := false
+		if array_all_finite(a_sum) && array_all_finite(b_sum) && array_all_finite(p1) && array_all_finite(p2) {
+			blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_sum, inner, b_sum, columns, 0.0, mut p3, columns)
+			if array_all_finite(p3) && three_product_results_finite(p1, p2, p3) {
+				for i in 0 .. rows * columns {
+					result_data[result_start + i] = vcomplex.Complex{ re: p1[i] - p2[i], im: p3[i] - p1[i] - p2[i] }
+				}
+				used_three_product = true
+			}
+		}
+		if !used_three_product {
+			// Fall back to four real products when summed operands or
+			// product intermediates overflow/non-finite; the 4-product
+			// form does not require (Re+Im) temporaries.
+			c_re4, c_im4 := complex_matmul_four_product(rows, columns, inner, a_re[a_start..], a_im[a_start..], b_re[b_start..], b_im[b_start..])
+			for i in 0 .. rows * columns {
+				result_data[result_start + i] = vcomplex.Complex{ re: c_re4[i], im: c_im4[i] }
+			}
 		}
 	}
 	return vtl.from_array[vcomplex.Complex](result_data, result_shape)
