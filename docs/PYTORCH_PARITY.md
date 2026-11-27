@@ -64,8 +64,8 @@ coverage and test transfers, mixed precision, and device-specific behavior.
 VTL now has opt-in signed INT8 affine per-tensor/per-channel conversion,
 min/max calibration observers, and an f32-output quantized CPU Linear operator
 in `vtl.quantization`. Quantized Conv, layer conversion, accelerator execution,
-and measured inference performance remain open in
-[#792](https://github.com/vlang/vtl/issues/792).
+and performance parity beyond the single local workload recorded in
+`quantization/README.md` remain open in [#792](https://github.com/vlang/vtl/issues/792).
 
 ### Autograd
 

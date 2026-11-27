@@ -13,10 +13,39 @@ calibration observers, and explicit f32/f64 quantize/dequantize entry points.
 Quantized results are ordinary `Tensor[i8]` values. `linear_int8_f32` provides
 a CPU inference path with per-tensor activation quantization, per-output-channel
 weight quantization, i64 accumulation, and f32 output with bias. Quantized
-Conv, layer conversion, accelerator dispatch, and performance claims remain
-open under [issue #792](https://github.com/vlang/vtl/issues/792).
+Conv, layer conversion, accelerator dispatch, and broad performance parity
+remain open under [issue #792](https://github.com/vlang/vtl/issues/792).
 
 See the runnable [INT8 quantization example](../examples/quantization_int8/main.v).
+The end-to-end f32-vs-INT8 latency and weight-payload benchmark is
+`../benchmarks/quantization_int8_bench.v`; compile with `-prod` from
+`~/.vmodules` and run the resulting binary separately under the memory limit
+documented in `docs/DEV_LIGHTWEIGHT.md`.
+
+The benchmark runs `[32, 256] x [512, 256]` with two warmups and eight timed
+calls per process. It includes activation quantization and output allocation in
+the INT8 timing, while weights are quantized before timing as they would be for
+inference. It reports the maximum absolute difference from the f32 result and
+weight tensor payload plus per-channel metadata; bias and V object overhead are
+excluded. On an AMD Ryzen 9 5900X with V 0.5.2 (`7f5b9a3`) and GCC 16.2.1,
+three independent runs measured a median 1.286x INT8/f32 speedup (per-run
+speedups 1.184x–1.427x), with maximum absolute error 0.015401. Weight payload
+was 524,288 bytes for f32 versus 131,072 bytes plus 8,192 bytes of per-channel
+metadata for INT8 (3.765x smaller including that metadata). This is one CPU,
+shape, and implementation only; it is not evidence of general PyTorch, NumPy,
+or accelerator performance parity.
+
+Run reproducibly from `~/.vmodules`:
+
+```sh
+systemd-run --user --scope --working-directory="$HOME/.vmodules" \
+  -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% -E VJOBS=1 -- \
+  v -no-parallel -prod -o /tmp/vtl-quantization-int8-bench \
+  ./vtl/benchmarks/quantization_int8_bench.v
+systemd-run --user --scope --working-directory="$HOME/.vmodules" \
+  -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% -- \
+  /tmp/vtl-quantization-int8-bench
+```
 
 Per-channel conversion accepts an axis and one scale/zero point per channel.
 Negative axes are normalized against the tensor rank. Conversion traverses
