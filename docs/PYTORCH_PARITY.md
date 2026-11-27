@@ -135,9 +135,11 @@ state API, recurrent dropout and variable-length packed sequences. `Sequential`
 supports `train()`/`eval()` behavior for Dropout, BatchNorm1D, BatchNorm2D and
 BatchNorm3D (mode propagation and running-statistics behavior are covered by
 `nn/models/sequential_normalization_test.v`); LayerNorm, GroupNorm and RMSNorm
-have no training-dependent statistics, matching PyTorch. Extending mode-aware
-behavior to custom modules remains open. Parameter and
-buffer registration and composable user-defined modules remain gaps. Stateful
+have no training-dependent statistics, matching PyTorch. The new
+`nn.types.Module[T]` state registry supports named parameter and buffer
+registration, recursive dotted-name traversal, duplicate-name validation, and
+cycle rejection. Custom forward/mode hooks, automatic `Sequential` and
+optimizer integration, and checkpoint serialization remain open. Stateful
 LSTM/GRU entry points are available today, but do not imply parity with the
 full `torch.nn` recurrent API or CUDA backward.
 
@@ -217,12 +219,15 @@ weighted draws with or without replacement, and the tensor-backed
 and `drop_last`. `DataLoader.set_collate_fn`, `collated_batch`, and
 `for_each_collated` support custom tensor collation from the selected source
 rows and optional labels.
+`vtl.datasets.TransformPipeline` composes fallible CPU tensor transforms in
+order for individual samples or batches; custom collation can use it for batch
+transforms.
 The dense tensor API returns feature and label tensors; it does not represent
 arbitrary Python objects or nested sample structures. Iterable datasets,
 worker processes, and pinned-memory loading remain unavailable.
 
-**Next:** Add composable transforms, worker and process loading, streaming
-datasets, generator injection, and stronger reproducibility controls. See the
+**Next:** Add worker and process loading, streaming datasets, generator
+injection, and stronger reproducibility controls. See the
 [custom collation example](../examples/datasets_custom_collate/main.v) and the
 [PyTorch data loading API](https://docs.pytorch.org/docs/stable/data.html)
 when porting a pipeline; specify VTL loader options explicitly because its

@@ -15,3 +15,16 @@ new components. Most application code can use constructors from
 The contracts are defined in [`layer.v`](layer.v), [`loss.v`](loss.v), and
 [`optimizer.v`](optimizer.v). Implementations should keep tensor shapes and
 context ownership consistent across forward and backward calls.
+
+`Module[T]` is a state registry for custom components. Register trainable
+`Variable[T]` values with `register_parameter`, non-trainable tensor state with
+`register_buffer`, and nested registries with `register_module`. Names must be
+non-empty, cannot contain dots, and must be unique within each module across
+parameters, buffers, and children. `named_parameters` and `named_buffers`
+traverse nested registries depth-first using dotted names; `parameters` and
+`buffers` return their values without names. Cyclic child graphs are rejected.
+
+This registry does not yet provide custom forward/mode hooks or automatically
+adapt state to `Sequential`, optimizer construction, or checkpoint
+serialization. Existing `Layer[T]` wrappers and `Sequential` behavior are
+unchanged.
