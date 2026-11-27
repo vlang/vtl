@@ -151,7 +151,7 @@
 <pre><code class="language-text">q = clamp(round_to_even(x / scale + zero_point), qmin, qmax)
 x = (q - zero_point) * scale
 </code></pre>
-<p>The initial API includes per-tensor and per-channel parameters, finite-value min/max calibration observers, and explicit f32/f64 quantize/dequantize entry points. Quantized results are ordinary <code>Tensor[i8]</code> values. This is a storage and calibration foundation; it does not yet provide integer Linear/Conv kernels, layer conversion, accelerator dispatch, or a performance claim. Those remain tracked by <a href="https://github.com/vlang/vtl/issues/792">issue #792</a>.</p>
+<p>The API includes per-tensor and per-channel parameters, finite-value min/max calibration observers, and explicit f32/f64 quantize/dequantize entry points. Quantized results are ordinary <code>Tensor[i8]</code> values. <code>linear_int8_f32</code> provides a CPU inference path with per-tensor activation quantization, per-output-channel weight quantization, i64 accumulation, and f32 output with bias. Quantized Conv, layer conversion, accelerator dispatch, and performance claims remain open under <a href="https://github.com/vlang/vtl/issues/792">issue #792</a>.</p>
 <p>See the runnable <a href="https://github.com/vlang/vtl/blob/master/examples/quantization_int8/main.v">INT8 quantization example</a>.</p>
 <p>Per-channel conversion accepts an axis and one scale/zero point per channel. Negative axes are normalized against the tensor rank. Conversion traverses logical tensor order, including strided views, and returns a row-major tensor with the same shape. Non-finite calibration or input values are errors rather than silently saturating NaNs or infinities.</p>
 <h2 id="validation">Validation</h2>
@@ -201,6 +201,14 @@ x = (q - zero_point) * scale
 
 </section>
 
+		<section id="linear_int8_f32" class="doc-node">
+			<div class="title"><h2>fn linear_int8_f32 <a href="#linear_int8_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/quantization/quantization.v#L153"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">linear_int8_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">,</span> weights <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token builtin">i8</span><span class="token punctuation">]</span><span class="token punctuation">,</span> input_params <span class="token type_name">QuantizationParams</span><span class="token punctuation">,</span> weight_params <span class="token type_name">PerChannelParams</span><span class="token punctuation">,</span> bias <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span></code></pre>
+<p>linear_int8_f32 runs a CPU affine-INT8 linear operator and returns f32 values. Weights use one per-channel parameter set along output-feature axis 0.</p>
+
+</section>
+
 		<section id="new_params" class="doc-node">
 			<div class="title"><h2>fn new_params <a href="#new_params">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/quantization/quantization.v#L26"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -210,7 +218,7 @@ x = (q - zero_point) * scale
 </section>
 
 		<section id="new_per_channel_min_max_observer" class="doc-node">
-			<div class="title"><h2>fn new_per_channel_min_max_observer <a href="#new_per_channel_min_max_observer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/quantization/quantization.v#L188"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn new_per_channel_min_max_observer <a href="#new_per_channel_min_max_observer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/quantization/quantization.v#L259"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token function">new_per_channel_min_max_observer</span><span class="token punctuation">(</span>axis <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token type_name">PerChannelMinMaxObserver</span></code></pre>
 <p>new_per_channel_min_max_observer creates a per-channel calibration observer.</p>
@@ -258,7 +266,7 @@ x = (q - zero_point) * scale
 </section>
 
 		<section id="MinMaxObserver" class="doc-node">
-			<div class="title"><h2>struct MinMaxObserver <a href="#MinMaxObserver">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/quantization/quantization.v#L152"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>struct MinMaxObserver <a href="#MinMaxObserver">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/quantization/quantization.v#L223"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">struct</span> <span class="token type_name">MinMaxObserver</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span> <span class="token keyword">mut</span><span class="token punctuation">:</span>
@@ -271,7 +279,7 @@ x = (q - zero_point) * scale
 </section>
 
 		<section id="MinMaxObserver.observe_f32" class="doc-node">
-			<div class="title"><h2>fn (MinMaxObserver) observe_f32 <a href="#MinMaxObserver.observe_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/quantization/quantization.v#L160"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (MinMaxObserver) observe_f32 <a href="#MinMaxObserver.observe_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/quantization/quantization.v#L231"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> observer <span class="token type_name">MinMaxObserver</span><span class="token punctuation">)</span> <span class="token function">observe_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
 <p>observe_f32 adds finite f32 tensor values to the calibration range.</p>
@@ -279,7 +287,7 @@ x = (q - zero_point) * scale
 </section>
 
 		<section id="MinMaxObserver.observe_f64" class="doc-node">
-			<div class="title"><h2>fn (MinMaxObserver) observe_f64 <a href="#MinMaxObserver.observe_f64">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/quantization/quantization.v#L165"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (MinMaxObserver) observe_f64 <a href="#MinMaxObserver.observe_f64">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/quantization/quantization.v#L236"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> observer <span class="token type_name">MinMaxObserver</span><span class="token punctuation">)</span> <span class="token function">observe_f64</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
 <p>observe_f64 adds finite f64 tensor values to the calibration range.</p>
@@ -287,7 +295,7 @@ x = (q - zero_point) * scale
 </section>
 
 		<section id="MinMaxObserver.params" class="doc-node">
-			<div class="title"><h2>fn (MinMaxObserver) params <a href="#MinMaxObserver.params">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/quantization/quantization.v#L170"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (MinMaxObserver) params <a href="#MinMaxObserver.params">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/quantization/quantization.v#L241"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>observer <span class="token operator">&amp;</span><span class="token type_name">MinMaxObserver</span><span class="token punctuation">)</span> <span class="token function">params</span><span class="token punctuation">(</span>qmin <span class="token builtin">i8</span><span class="token punctuation">,</span> qmax <span class="token builtin">i8</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token type_name">QuantizationParams</span></code></pre>
 <p>params derives affine quantization parameters from observed values.</p>
@@ -295,7 +303,7 @@ x = (q - zero_point) * scale
 </section>
 
 		<section id="PerChannelMinMaxObserver" class="doc-node">
-			<div class="title"><h2>struct PerChannelMinMaxObserver <a href="#PerChannelMinMaxObserver">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/quantization/quantization.v#L178"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>struct PerChannelMinMaxObserver <a href="#PerChannelMinMaxObserver">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/quantization/quantization.v#L249"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">struct</span> <span class="token type_name">PerChannelMinMaxObserver</span> <span class="token punctuation">{</span>
 <span class="token keyword">pub</span><span class="token punctuation">:</span>
@@ -310,7 +318,7 @@ x = (q - zero_point) * scale
 </section>
 
 		<section id="PerChannelMinMaxObserver.observe_f32" class="doc-node">
-			<div class="title"><h2>fn (PerChannelMinMaxObserver) observe_f32 <a href="#PerChannelMinMaxObserver.observe_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/quantization/quantization.v#L195"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (PerChannelMinMaxObserver) observe_f32 <a href="#PerChannelMinMaxObserver.observe_f32">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/quantization/quantization.v#L266"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> observer <span class="token type_name">PerChannelMinMaxObserver</span><span class="token punctuation">)</span> <span class="token function">observe_f32</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token builtin">f32</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
 <p>observe_f32 adds finite f32 values to matching channel ranges.</p>
@@ -318,7 +326,7 @@ x = (q - zero_point) * scale
 </section>
 
 		<section id="PerChannelMinMaxObserver.observe_f64" class="doc-node">
-			<div class="title"><h2>fn (PerChannelMinMaxObserver) observe_f64 <a href="#PerChannelMinMaxObserver.observe_f64">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/quantization/quantization.v#L200"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (PerChannelMinMaxObserver) observe_f64 <a href="#PerChannelMinMaxObserver.observe_f64">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/quantization/quantization.v#L271"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> observer <span class="token type_name">PerChannelMinMaxObserver</span><span class="token punctuation">)</span> <span class="token function">observe_f64</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
 <p>observe_f64 adds finite f64 values to matching channel ranges.</p>
@@ -326,7 +334,7 @@ x = (q - zero_point) * scale
 </section>
 
 		<section id="PerChannelMinMaxObserver.params" class="doc-node">
-			<div class="title"><h2>fn (PerChannelMinMaxObserver) params <a href="#PerChannelMinMaxObserver.params">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/quantization/quantization.v#L205"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (PerChannelMinMaxObserver) params <a href="#PerChannelMinMaxObserver.params">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/quantization/quantization.v#L276"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>observer <span class="token operator">&amp;</span><span class="token type_name">PerChannelMinMaxObserver</span><span class="token punctuation">)</span> <span class="token function">params</span><span class="token punctuation">(</span>qmin <span class="token builtin">i8</span><span class="token punctuation">,</span> qmax <span class="token builtin">i8</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token type_name">PerChannelParams</span></code></pre>
 <p>params derives one affine parameter set per observed channel.</p>
@@ -363,7 +371,7 @@ x = (q - zero_point) * scale
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 27 Nov 2026 06:51:10</div>
+						<div class="footer">Powered by vdoc. Generated on: 27 Nov 2026 06:55:58</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_quantization">README</a></li>
 <li class="open"><a href="#affine_params">fn affine_params</a>        <ul>
@@ -379,6 +387,9 @@ x = (q - zero_point) * scale
 </ul>
 </li>
 <li class="open"><a href="#dequantize_per_tensor_f64">fn dequantize_per_tensor_f64</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#linear_int8_f32">fn linear_int8_f32</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#new_params">fn new_params</a>        <ul>
