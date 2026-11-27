@@ -29,6 +29,9 @@ stacks matching feature and optional label shapes, and returns source errors.
 It snapshots each sample as it is read, so a source may reuse mutable buffers.
 `StreamSample.finished` ends iteration; `reset()` delegates replay to the
 source, which may return an error when it cannot rewind.
+Use `next_batch_with_transform_pipeline` for deterministic feature transforms
+or `next_batch_with_random_transforms` to apply random transforms with an
+explicit generator.
 
 `TransformPipeline[T]` composes tensor transforms in order and propagates the
 first transform error. Apply it to a sample or batch tensor; transforms receive

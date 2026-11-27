@@ -86,6 +86,18 @@ fn test_iterable_data_loader_snapshots_reused_sample_buffers() ! {
 	assert batch.features.to_array() == [0.0, 1]
 }
 
+fn test_iterable_data_loader_applies_deterministic_batch_transforms() ! {
+	mut source := &CounterStreamDataset{
+		limit: 2
+	}
+	mut loader := new_iterable_data_loader[f64](source, 2, false)!
+	pipeline := TransformPipeline.new[f64]([add_one_stream_transform, double_stream_transform])
+	batch := loader.next_batch_with_transform_pipeline(pipeline)!
+	assert batch.available
+	assert batch.features.to_array() == [2.0, 4, 4, 6]
+	assert batch.labels.to_array() == [0.0, 10]
+}
+
 fn test_iterable_data_loader_random_transforms_replay_with_injected_generator() ! {
 	mut source := &CounterStreamDataset{
 		limit: 2
@@ -195,6 +207,22 @@ fn add_stream_noise_transform(input &vtl.Tensor[f64], mut generator vtl.RandomGe
 	mut output := vtl.zeros[f64](input.shape)
 	for i in 0 .. input.size {
 		output.set_nth(i, input.get_nth(i) + noise.get_nth(i))
+	}
+	return output
+}
+
+fn add_one_stream_transform(input &vtl.Tensor[f64]) !&vtl.Tensor[f64] {
+	mut output := vtl.zeros[f64](input.shape)
+	for i in 0 .. input.size {
+		output.set_nth(i, input.get_nth(i) + 1)
+	}
+	return output
+}
+
+fn double_stream_transform(input &vtl.Tensor[f64]) !&vtl.Tensor[f64] {
+	mut output := vtl.zeros[f64](input.shape)
+	for i in 0 .. input.size {
+		output.set_nth(i, input.get_nth(i) * 2)
 	}
 	return output
 }
