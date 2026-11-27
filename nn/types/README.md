@@ -32,5 +32,7 @@ from the module registry. `Sequential.train` and `Sequential.eval` also update
 the attached module and its registered children, while mode-aware layer
 callbacks continue to receive the sequential training flag.
 
-Custom-module checkpoint serialization and a higher-level forward API are not
-implemented yet.
+Model saves and checkpoints persist registered parameters and buffers by name;
+`load_weights` restores them into an already-constructed custom module graph.
+The custom callbacks themselves are not serialized, so recreate the same model
+before loading. A higher-level forward API is not implemented yet.

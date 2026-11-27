@@ -41,7 +41,9 @@ mut:
 // SerializedLayer contains layer data for a single layer.
 struct SerializedLayer {
 mut:
-	weights map[string]string // base64 encoded
+	weights           map[string]string // base64 encoded
+	module_parameters map[string]string // named module parameters, base64 encoded
+	module_buffers    map[string]string // named module buffers, base64 encoded
 }
 
 // OptimizerData stores optimizer-specific state for serialization.
@@ -414,7 +416,15 @@ fn (nn &Sequential[T]) save_checkpoint_with_optimizer(path string, epoch int, lo
 		layer_type := nn.layer_type_at(i, layer)
 		mut config := nn.layer_config_at(i)
 		mut weights := map[string]string{}
+		mut module_parameters := map[string]string{}
+		mut module_buffers := map[string]string{}
 		vars := layer.variables()
+		for parameter in layer.registered_parameters() {
+			module_parameters[parameter.name] = encode_tensor[T](parameter.value.value)!
+		}
+		for buffer in layer.registered_buffers() {
+			module_buffers[buffer.name] = encode_tensor[T](buffer.value)!
+		}
 
 		// Capture input shape from previous layer or default
 		in_shape := if i > 0 {
@@ -558,7 +568,9 @@ fn (nn &Sequential[T]) save_checkpoint_with_optimizer(path string, epoch int, lo
 			config:     config
 		}
 		layer_data << SerializedLayer{
-			weights: weights
+			weights:           weights
+			module_parameters: module_parameters
+			module_buffers:    module_buffers
 		}
 	}
 
@@ -881,6 +893,7 @@ pub fn (nn &Sequential[T]) load_weights(path string) ! {
 		}
 
 		serialized := model.layer_data[i]
+		validate_registered_module_state_keys[T](layer, serialized, i)!
 		vars := layer.variables()
 		for j := 0; j < vars.len; j++ {
 			mut v := vars[j]
@@ -968,6 +981,52 @@ pub fn (nn &Sequential[T]) load_weights(path string) ! {
 					v.value.set_nth(k, tensor_data.get_nth(k))
 				}
 			}
+		}
+		restore_registered_module_state[T](layer, serialized)!
+	}
+}
+
+fn validate_registered_module_state_keys[T](layer types.Layer[T], serialized SerializedLayer, index int) ! {
+	parameters := layer.registered_parameters()
+	if serialized.module_parameters.len != parameters.len {
+		return error('Registered parameter count mismatch for layer ${index}: expected ${parameters.len}, got ${serialized.module_parameters.len}')
+	}
+	for parameter in parameters {
+		if parameter.name !in serialized.module_parameters {
+			return error('Missing registered parameter ${parameter.name} for layer ${index}')
+		}
+	}
+	buffers := layer.registered_buffers()
+	if serialized.module_buffers.len != buffers.len {
+		return error('Registered buffer count mismatch for layer ${index}: expected ${buffers.len}, got ${serialized.module_buffers.len}')
+	}
+	for buffer in buffers {
+		if buffer.name !in serialized.module_buffers {
+			return error('Missing registered buffer ${buffer.name} for layer ${index}')
+		}
+	}
+}
+
+fn restore_registered_module_state[T](layer types.Layer[T], serialized SerializedLayer) ! {
+	for parameter in layer.registered_parameters() {
+		target := parameter.value.value
+		tensor_data := decode_tensor[T](serialized.module_parameters[parameter.name], target.shape)!
+		copy_checkpoint_tensor_data[T](tensor_data, target)
+	}
+	for buffer in layer.registered_buffers() {
+		tensor_data := decode_tensor[T](serialized.module_buffers[buffer.name], buffer.value.shape)!
+		copy_checkpoint_tensor_data[T](tensor_data, buffer.value)
+	}
+}
+
+fn copy_checkpoint_tensor_data[T](source &vtl.Tensor[T], target &vtl.Tensor[T]) {
+	if source.memory == target.memory {
+		for i in 0 .. source.size() {
+			target.data.data[i] = source.data.data[i]
+		}
+	} else {
+		for i in 0 .. source.size() {
+			target.set_nth(i, source.get_nth(i))
 		}
 	}
 }
@@ -1103,6 +1162,7 @@ pub fn validate_model_compatibility[T](saved_path string, model_layers []types.L
 		if saved_vars != current_vars {
 			return error('Layer ${i} variable count mismatch: expected ${saved_vars}, got ${current_vars}')
 		}
+		validate_registered_module_state_keys[T](layer, model.layer_data[i], i)!
 	}
 
 	return true

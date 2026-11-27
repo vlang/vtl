@@ -79,14 +79,28 @@ pub fn (layer Layer[T]) variables() []&autograd.Variable[T] {
 	for ptr in ptrs {
 		vars << unsafe { &autograd.Variable[T](ptr) }
 	}
-	if layer.has_module_state {
-		for variable in layer.module_state.parameters() {
-			if variable !in vars {
-				vars << variable
-			}
+	for parameter in layer.registered_parameters() {
+		if parameter.value !in vars {
+			vars << parameter.value
 		}
 	}
 	return vars
+}
+
+// registered_parameters returns named parameters attached through module state.
+pub fn (layer Layer[T]) registered_parameters() []NamedParameter[T] {
+	if !layer.has_module_state {
+		return []NamedParameter[T]{}
+	}
+	return layer.module_state.named_parameters()
+}
+
+// registered_buffers returns named buffers attached through module state.
+pub fn (layer Layer[T]) registered_buffers() []NamedBuffer[T] {
+	if !layer.has_module_state {
+		return []NamedBuffer[T]{}
+	}
+	return layer.module_state.named_buffers()
 }
 
 // set_training updates attached module state recursively.

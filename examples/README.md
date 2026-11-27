@@ -120,6 +120,7 @@ CIFAR examples for CI-safe checks.
 | [nn_gru](./nn_gru) | GRU sequence forward and autograd backward | CPU |
 | [nn_group_norm](./nn_group_norm) | Channel-first GroupNorm in Sequential with affine parameters | CPU |
 | [nn_rms_norm](./nn_rms_norm) | Trailing-dimension RMSNorm with optional autograd weight | CPU |
+| [nn_custom_module](./nn_custom_module) | Train a callback-backed module, propagate modes, and round-trip registered state | CPU |
 | [sequential_inference_checkpoint.v](./sequential_inference_checkpoint.v) | Train, save a CPU `f64` Sequential checkpoint, reload it, and infer | CPU |
 | [nn_mnist](./nn_mnist) | MNIST training path | Dataset download/cache |
 

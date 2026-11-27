@@ -30,7 +30,9 @@ training; consult [`sequential.v`](sequential.v) for exact method signatures.
 `save(path)` writes model weights. `save_checkpoint(path, epoch, loss)` also
 stores epoch/loss metadata; `load_weights(path)` loads into an already-built
 compatible model and `Sequential.load_checkpoint[T](path)` reads checkpoint
-metadata. For resumable Adam training, build the optimizer with the model's
+metadata. Registered custom-module parameters and buffers are stored by name
+and restored into the prebuilt module graph; callback code itself is not
+serialized. For resumable Adam training, build the optimizer with the model's
 parameters and use `save_training_checkpoint(path, epoch, loss, optimizer)`;
 restore into a compatible model and a built Adam optimizer with
 `load_training_checkpoint(path, mut optimizer)`. This stores Adam's scalar
