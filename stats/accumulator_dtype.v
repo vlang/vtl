@@ -20,6 +20,16 @@ pub fn product_as[T, U](t &vtl.Tensor[T]) U {
 	return result
 }
 
+// sum_as_with_keepdims reduces all values into U and returns a tensor result.
+pub fn sum_as_with_keepdims[T, U](t &vtl.Tensor[T], keepdims bool) !&vtl.Tensor[U] {
+	return flat_reduction_result[U](sum_as[T, U](t), t.rank(), keepdims)
+}
+
+// product_as_with_keepdims reduces all values into U and returns a tensor result.
+pub fn product_as_with_keepdims[T, U](t &vtl.Tensor[T], keepdims bool) !&vtl.Tensor[U] {
+	return flat_reduction_result[U](product_as[T, U](t), t.rank(), keepdims)
+}
+
 // sum_along_axis_as reduces one axis using the requested accumulator type.
 pub fn sum_along_axis_as[T, U](t &vtl.Tensor[T], axis int, keepdims bool) !&vtl.Tensor[U] {
 	return reduce_axes_as[T, U](t, [axis], keepdims, false)

@@ -56,6 +56,51 @@ fn test_global_negative_binomial_is_seeded_and_validated() ! {
 	}
 }
 
+fn test_global_vonmises_is_seeded_and_matches_circular_moments() ! {
+	random_seed(914)
+	values := vonmises(1.0, 2.0, [8192], TensorData{})!
+	assert values.shape == [8192]
+	random_seed(914)
+	assert values.array_equal(vonmises(1.0, 2.0, [8192], TensorData{})!)
+	mut cosine_total := 0.0
+	mut sine_total := 0.0
+	for value in values.to_array() {
+		assert value >= -math.pi && value < math.pi
+		cosine_total += math.cos(value - 1.0)
+		sine_total += math.sin(value - 1.0)
+	}
+	assert math.abs(cosine_total / 8192.0 - 0.697774657964008) < 0.03
+	assert math.abs(sine_total / 8192.0) < 0.03
+
+	random_seed(915)
+	uniform := vonmises(0.0, 0.0, [8192], TensorData{})!
+	mut uniform_cosine_total := 0.0
+	mut uniform_sine_total := 0.0
+	for value in uniform.to_array() {
+		uniform_cosine_total += math.cos(value)
+		uniform_sine_total += math.sin(value)
+	}
+	assert math.abs(uniform_cosine_total / 8192.0) < 0.03
+	assert math.abs(uniform_sine_total / 8192.0) < 0.03
+	assert vonmises(0.5, 1.0, [0], TensorData{})!.shape == [0]
+	if _ := vonmises(math.inf(1), 1.0, [1], TensorData{}) {
+		assert false, 'vonmises must reject a non-finite location'
+	}
+	if _ := vonmises(0.0, -1.0, [1], TensorData{}) {
+		assert false, 'vonmises must reject negative concentration'
+	}
+	if _ := vonmises(0.0, 1e17, [1], TensorData{}) {
+		assert false, 'vonmises must reject concentration beyond its stable range'
+	}
+	mut independent := new_random_generator(916)
+	mut replay := new_random_generator(916)
+	random_seed(917)
+	_ := vonmises(0.0, 2.0, [8], TensorData{})!
+	assert independent.uniform(0.0, 1.0, [8])!.array_equal(replay.uniform(0.0, 1.0, [8])!)
+	independent.free()
+	replay.free()
+}
+
 fn test_random_i32_values_stay_within_requested_range() {
 	random_seed(42)
 	values := random[i32](-20, 20, [32], TensorData{})
@@ -153,6 +198,182 @@ fn test_global_hypergeometric_is_seeded_and_validated() ! {
 	}
 }
 
+fn test_global_multivariate_hypergeometric_is_seeded_and_validated() ! {
+	colors := from_1d([7, 11, 13])!
+	random_seed(752)
+	values := multivariate_hypergeometric(colors, 12, [2048], TensorData{})!
+	assert values.shape == [2048, 3]
+	random_seed(752)
+	assert values.array_equal(multivariate_hypergeometric(colors, 12, [2048], TensorData{})!)
+	mut totals := [0, 0, 0]
+	for sample_index in 0 .. values.shape[0] {
+		mut sample_total := 0
+		for category in 0 .. colors.size {
+			value := values.get_nth(sample_index * colors.size + category)
+			assert value >= 0 && value <= colors.get_nth(category)
+			sample_total += value
+			totals[category] += value
+		}
+		assert sample_total == 12
+	}
+	assert math.abs(f64(totals[0]) / 2048.0 - 12.0 * 7.0 / 31.0) < 0.14
+	assert math.abs(f64(totals[1]) / 2048.0 - 12.0 * 11.0 / 31.0) < 0.14
+	assert math.abs(f64(totals[2]) / 2048.0 - 12.0 * 13.0 / 31.0) < 0.14
+	assert multivariate_hypergeometric(colors, 0, [2], TensorData{})!.to_array() == [
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+	]
+	assert multivariate_hypergeometric(colors, 31, [], TensorData{})!.to_array() == [
+		7,
+		11,
+		13,
+	]
+	assert multivariate_hypergeometric(from_1d[int]([]int{})!, 0, [2],
+		TensorData{})!.shape == [2, 0]
+	if _ := multivariate_hypergeometric(from_1d([-1, 2])!, 1, [1], TensorData{}) {
+		assert false, 'multivariate hypergeometric must reject negative color counts'
+	}
+	if _ := multivariate_hypergeometric(colors, 32, [1], TensorData{}) {
+		assert false, 'multivariate hypergeometric must reject draws larger than the population'
+	}
+	if _ := multivariate_hypergeometric(from_array[int]([1, 2], [1, 2])!, 1, [1],
+		TensorData{}) {
+		assert false, 'multivariate hypergeometric must require one-dimensional colors'
+	}
+}
+
+fn test_global_zipf_is_seeded_and_matches_moments() ! {
+	random_seed(753)
+	values := zipf(4.0, [8192], TensorData{})!
+	random_seed(753)
+	assert values.array_equal(zipf(4.0, [8192], TensorData{})!)
+	mut total := 0
+	mut ones := 0
+	for value in values.to_array() {
+		assert value >= 1
+		total += value
+		if value == 1 {
+			ones++
+		}
+	}
+	assert math.abs(f64(total) / f64(values.size) - 1.1106265353261488) < 0.03
+	assert math.abs(f64(ones) / f64(values.size) - 0.9239384029215902) < 0.015
+	assert zipf(1025.0, [4], TensorData{})!.to_array() == [1, 1, 1, 1]
+	assert zipf(4.0, [0], TensorData{})!.shape == [0]
+	if _ := zipf(1.0, [1], TensorData{}) {
+		assert false, 'zipf must reject an exponent at or below one'
+	}
+	if _ := zipf(math.nan(), [1], TensorData{}) {
+		assert false, 'zipf must reject a NaN exponent'
+	}
+	if _ := zipf(math.inf(1), [1], TensorData{}) {
+		assert false, 'zipf must reject an infinite exponent'
+	}
+}
+
+fn test_global_logseries_is_seeded_and_matches_moments() ! {
+	random_seed(754)
+	values := logseries(0.5, [8192], TensorData{})!
+	random_seed(754)
+	assert values.array_equal(logseries(0.5, [8192], TensorData{})!)
+	mut total := 0
+	mut ones := 0
+	for value in values.to_array() {
+		assert value >= 1
+		total += value
+		if value == 1 {
+			ones++
+		}
+	}
+	assert math.abs(f64(total) / f64(values.size) - 1.4426950408889634) < 0.04
+	assert math.abs(f64(ones) / f64(values.size) - 0.7213475204444817) < 0.02
+	small_probability := logseries(0.01, [4096], TensorData{})!
+	mut small_total := 0
+	for value in small_probability.to_array() {
+		assert value >= 1
+		small_total += value
+	}
+	assert math.abs(f64(small_total) / f64(small_probability.size) -
+		(-0.01 / (0.99 * math.log(0.99)))) < 0.02
+	assert logseries(0.5, [0], TensorData{})!.shape == [0]
+	if _ := logseries(0.0, [1], TensorData{}) {
+		assert false, 'logseries must reject zero probability'
+	}
+	if _ := logseries(1.0, [1], TensorData{}) {
+		assert false, 'logseries must reject probability one'
+	}
+	if _ := logseries(math.nan(), [1], TensorData{}) {
+		assert false, 'logseries must reject a NaN probability'
+	}
+	if _ := logseries(math.inf(1), [1], TensorData{}) {
+		assert false, 'logseries must reject an infinite probability'
+	}
+}
+
+fn test_global_noncentral_distributions_are_seeded_and_match_moments() ! {
+	random_seed(755)
+	chi_samples := noncentral_chi_square(4.0, 3.0, [8192], TensorData{})!
+	mut chi_total := 0.0
+	for value in chi_samples.to_array() {
+		assert value >= 0 && !math.is_nan(value) && !math.is_inf(value, 0)
+		chi_total += value
+	}
+	assert math.abs(chi_total / 8192.0 - 7.0) < 0.2
+	random_seed(755)
+	assert chi_samples.array_equal(noncentral_chi_square(4.0, 3.0, [8192],
+		TensorData{})!)
+
+	random_seed(756)
+	small_df := noncentral_chi_square(0.5, 2.0, [8192], TensorData{})!
+	mut small_df_total := 0.0
+	for value in small_df.to_array() {
+		assert value >= 0 && !math.is_nan(value) && !math.is_inf(value, 0)
+		small_df_total += value
+	}
+	assert math.abs(small_df_total / 8192.0 - 2.5) < 0.16
+
+	random_seed(757)
+	central := noncentral_chi_square(4.0, 0.0, [64], TensorData{})!
+	random_seed(757)
+	assert central.array_equal(chi_square(4.0, [64], TensorData{})!)
+
+	random_seed(758)
+	f_samples := noncentral_f(5.0, 30.0, 4.0, [8192], TensorData{})!
+	mut f_total := 0.0
+	for value in f_samples.to_array() {
+		assert value >= 0 && !math.is_nan(value) && !math.is_inf(value, 0)
+		f_total += value
+	}
+	assert math.abs(f_total / 8192.0 - (30.0 * 9.0 / (5.0 * 28.0))) < 0.06
+	random_seed(758)
+	assert f_samples.array_equal(noncentral_f(5.0, 30.0, 4.0, [8192],
+		TensorData{})!)
+	random_seed(759)
+	central_f := noncentral_f(5.0, 30.0, 0.0, [64], TensorData{})!
+	random_seed(759)
+	assert central_f.array_equal(f_distribution(5.0, 30.0, [64], TensorData{})!)
+
+	if _ := noncentral_chi_square(0.0, 1.0, [1], TensorData{}) {
+		assert false, 'noncentral_chi_square must reject non-positive degrees of freedom'
+	}
+	if _ := noncentral_chi_square(2.0, -1.0, [1], TensorData{}) {
+		assert false, 'noncentral_chi_square must reject negative noncentrality'
+	}
+	if _ := noncentral_chi_square(2.0, math.nan(), [1], TensorData{}) {
+		assert false, 'noncentral_chi_square must reject NaN noncentrality'
+	}
+	if _ := noncentral_f(5.0, 0.0, 1.0, [1], TensorData{}) {
+		assert false, 'noncentral_f must reject non-positive denominator degrees of freedom'
+	}
+	if _ := noncentral_f(5.0, 30.0, -1.0, [1], TensorData{}) {
+		assert false, 'noncentral_f must reject negative noncentrality'
+	}
+}
+
 fn test_global_statistical_distributions_are_seeded_and_validated() ! {
 	random_seed(702)
 	gamma_samples := gamma(2.0, 3.0, [4096], TensorData{})!
@@ -234,14 +455,19 @@ fn test_global_location_scale_distributions_are_seeded_and_validated() ! {
 fn test_global_pareto_rayleigh_and_triangular_are_seeded_and_validated() ! {
 	random_seed(9404)
 	pareto_values := pareto(3.0, [4096], TensorData{})!
+	power_values := power(2.0, [4096], TensorData{})!
 	rayleigh_values := rayleigh(2.0, [4096], TensorData{})!
 	triangular_values := triangular(0.0, 1.0, 3.0, [4096], TensorData{})!
 	random_seed(9404)
 	assert pareto_values.array_equal(pareto(3.0, [4096], TensorData{})!)
+	assert power_values.array_equal(power(2.0, [4096], TensorData{})!)
 	assert rayleigh_values.array_equal(rayleigh(2.0, [4096], TensorData{})!)
 	assert triangular_values.array_equal(triangular(0.0, 1.0, 3.0, [4096], TensorData{})!)
 	for value in pareto_values.to_array() {
 		assert value >= 0 && !math.is_nan(value) && !math.is_inf(value, 0)
+	}
+	for value in power_values.to_array() {
+		assert value >= 0 && value <= 1 && !math.is_nan(value) && !math.is_inf(value, 0)
 	}
 	for value in rayleigh_values.to_array() {
 		assert value >= 0 && !math.is_nan(value) && !math.is_inf(value, 0)
@@ -250,11 +476,15 @@ fn test_global_pareto_rayleigh_and_triangular_are_seeded_and_validated() ! {
 		assert value >= 0 && value <= 3 && !math.is_nan(value) && !math.is_inf(value, 0)
 	}
 	assert math.abs(sample_mean_for_test(pareto_values.to_array()) - 0.5) < 0.1
+	assert math.abs(sample_mean_for_test(power_values.to_array()) - 2.0 / 3.0) < 0.02
 	assert math.abs(sample_mean_for_test(rayleigh_values.to_array()) - 2 * math.sqrt(math.pi / 2)) < 0.08
 	assert math.abs(sample_mean_for_test(triangular_values.to_array()) - 4.0 / 3.0) < 0.05
 	assert rayleigh(0.0, [2], TensorData{})!.to_array() == [0.0, 0.0]
 	if _ := pareto(math.inf(1), [1], TensorData{}) {
 		assert false, 'pareto must reject non-finite shape parameters'
+	}
+	if _ := power(0.0, [1], TensorData{}) {
+		assert false, 'power must reject non-positive shape parameters'
 	}
 	if _ := rayleigh(math.nan(), [1], TensorData{}) {
 		assert false, 'rayleigh must reject NaN scale'

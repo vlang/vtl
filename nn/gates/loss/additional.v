@@ -13,11 +13,12 @@ pub:
 	alpha       f64
 	gamma       f64
 	from_logits bool
+	eps         f64
 }
 
 // additional_loss_gate creates the internal gate used by additional loss functions.
-pub fn additional_loss_gate[T](input &vtl.Tensor[T], target &vtl.Tensor[T], kind string, alpha f64, gamma f64, from_logits bool) &AdditionalLossGate[T] {
-	return &AdditionalLossGate[T]{ input: input, target: target, kind: kind, alpha: alpha, gamma: gamma, from_logits: from_logits }
+pub fn additional_loss_gate[T](input &vtl.Tensor[T], target &vtl.Tensor[T], kind string, alpha f64, gamma f64, from_logits bool, eps f64) &AdditionalLossGate[T] {
+	return &AdditionalLossGate[T]{ input: input, target: target, kind: kind, alpha: alpha, gamma: gamma, from_logits: from_logits, eps: eps }
 }
 
 pub fn (g &AdditionalLossGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl.Tensor[T] {
@@ -28,6 +29,9 @@ pub fn (g &AdditionalLossGate[T]) backward(payload &autograd.Payload[T]) ![]&vtl
 		'hinge' { return [internal.hinge_backward[T](gradient, value, g.target)!] }
 		'focal' {
 			return [internal.focal_backward[T](gradient, value, g.target, g.alpha, g.gamma, g.from_logits)!]
+		}
+		'poisson_nll' {
+			return [internal.poisson_nll_backward[T](gradient, value, g.target, g.from_logits, g.eps)!]
 		}
 		else { return error('unknown additional loss: ${g.kind}') }
 	}

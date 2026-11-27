@@ -3,7 +3,7 @@ module vtl
 // indices returns a dense coordinate tensor with shape
 // [dimensions.len, ...dimensions], matching numpy.indices for integer arrays.
 // Each leading-axis plane contains the coordinates for one input dimension.
-pub fn indices(dimensions []int) !&Tensor[int] {
+pub fn indices(dimensions []int, params TensorData) !&Tensor[int] {
 	mut total_size := 1
 	for dimension in dimensions {
 		if dimension < 0 {
@@ -19,7 +19,7 @@ pub fn indices(dimensions []int) !&Tensor[int] {
 	}
 	mut output_shape := [dimensions.len]
 	output_shape << dimensions
-	mut result := empty[int](output_shape, memory: .row_major)
+	mut result := empty[int](output_shape, params)
 	if total_size == 0 {
 		return result
 	}
@@ -40,7 +40,7 @@ pub fn indices(dimensions []int) !&Tensor[int] {
 // Each result has rank dimensions.len and only its own axis has non-unit
 // length, matching numpy.indices(..., sparse: true) without allocating the
 // dense coordinate stack.
-pub fn indices_sparse(dimensions []int) ![]&Tensor[int] {
+pub fn indices_sparse(dimensions []int, params TensorData) ![]&Tensor[int] {
 	for dimension in dimensions {
 		if dimension < 0 {
 			return error('indices dimensions must be non-negative')
@@ -50,7 +50,7 @@ pub fn indices_sparse(dimensions []int) ![]&Tensor[int] {
 	for axis, dimension in dimensions {
 		mut shape := []int{len: dimensions.len, init: 1}
 		shape[axis] = dimension
-		mut coordinate := empty[int](shape, memory: .row_major)
+		mut coordinate := empty[int](shape, params)
 		for value in 0 .. dimension {
 			coordinate.set_nth(value, value)
 		}

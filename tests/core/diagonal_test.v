@@ -33,6 +33,22 @@ fn test_diagonal_view_writes_through_to_input() ! {
 	assert input.get([1, 0]) == 80
 }
 
+fn test_readonly_diagonal_view_shares_storage_without_exposing_mutators() ! {
+	input := vtl.from_2d([[1, 2, 3], [4, 5, 6], [7, 8, 9]])!
+	view := vtl.diagonal_readonly(input)!
+	assert view.shape() == [3]
+	assert view.rank() == 1
+	assert view.size() == 3
+	assert view.to_array() == [1, 5, 9]
+	assert view.get([1]) == 5
+
+	input.set([1, 1], 50)
+	assert view.get_nth(1) == 50
+	mut copied_values := view.to_array()
+	copied_values[0] = 100
+	assert view.get_nth(0) == 1
+}
+
 fn test_diagonal_out_of_range_offset_is_empty() ! {
 	input := vtl.from_array([1, 2, 3, 4], [2, 2])!
 	assert vtl.diagonal(input, offset: 3)!.shape == [0]

@@ -10,13 +10,13 @@ pub enum MeshgridIndexing {
 
 // meshgrid builds dense two-dimensional XY coordinate grids from two vectors.
 // The output shape is [len(y), len(x)], matching NumPy's default indexing="xy".
-pub fn meshgrid[T](x &Tensor[T], y &Tensor[T]) !(&Tensor[T], &Tensor[T]) {
+pub fn meshgrid[T](x &Tensor[T], y &Tensor[T], params TensorData) !(&Tensor[T], &Tensor[T]) {
 	if x.rank() != 1 || y.rank() != 1 {
 		return error('meshgrid expects two one-dimensional tensors')
 	}
 	shape := [y.size(), x.size()]
-	mut x_grid := empty[T](shape, memory: .row_major)
-	mut y_grid := empty[T](shape, memory: .row_major)
+	mut x_grid := empty[T](shape, params)
+	mut y_grid := empty[T](shape, params)
 	for row in 0 .. y.size() {
 		for col in 0 .. x.size() {
 			x_grid.set([row, col], x.get_nth(col))
@@ -29,7 +29,7 @@ pub fn meshgrid[T](x &Tensor[T], y &Tensor[T]) !(&Tensor[T], &Tensor[T]) {
 // meshgrid_n builds one dense coordinate tensor for each one-dimensional
 // input. With `xy`, the first two dimensions are swapped, matching NumPy's
 // default indexing convention. `ij` preserves the input axis order.
-pub fn meshgrid_n[T](vectors []&Tensor[T], indexing MeshgridIndexing) ![]&Tensor[T] {
+pub fn meshgrid_n[T](vectors []&Tensor[T], indexing MeshgridIndexing, params TensorData) ![]&Tensor[T] {
 	if vectors.len == 0 {
 		return error('meshgrid_n expects at least one vector')
 	}
@@ -66,7 +66,7 @@ pub fn meshgrid_n[T](vectors []&Tensor[T], indexing MeshgridIndexing) ![]&Tensor
 	}
 	mut grids := []&Tensor[T]{cap: vectors.len}
 	for _ in vectors {
-		grids << empty[T](shape, memory: .row_major)
+		grids << empty[T](shape, params)
 	}
 	for flat_index in 0 .. total_size {
 		mut output_index := []int{len: shape.len}
@@ -99,6 +99,7 @@ pub struct VandermondeData {
 pub:
 	n          int = -1
 	increasing bool
+	memory     MemoryFormat = .row_major
 }
 
 // vander returns a Vandermonde matrix built from a one-dimensional input.
@@ -117,18 +118,18 @@ pub fn vander[T](input &Tensor[T], params VandermondeData) !&Tensor[T] {
 	if columns > 0 && input.size > max_int / columns {
 		return error('vander output shape overflows the maximum tensor size')
 	}
-	mut result := empty[T]([input.size, columns], memory: .row_major)
+	mut result := empty[T]([input.size, columns], memory: params.memory)
 	for row in 0 .. input.size {
 		value := input.get_nth(row)
 		mut power := cast[T](1)
 		if params.increasing {
 			for column in 0 .. columns {
-				result.data.data[row * columns + column] = power
+				result.data.data[row * result.strides[0] + column * result.strides[1]] = power
 				power *= value
 			}
 		} else {
 			for column := columns - 1; column >= 0; column-- {
-				result.data.data[row * columns + column] = power
+				result.data.data[row * result.strides[0] + column * result.strides[1]] = power
 				power *= value
 			}
 		}
@@ -170,7 +171,7 @@ pub fn identity[T](n int, params TensorData) &Tensor[T] {
 // output shape is indices.shape followed by num_classes; every index must be
 // in [0, num_classes). An empty index tensor returns an empty tensor with the
 // corresponding trailing class dimension.
-pub fn one_hot(indices &Tensor[int], num_classes int) !&Tensor[int] {
+pub fn one_hot(indices &Tensor[int], num_classes int, params TensorData) !&Tensor[int] {
 	if num_classes <= 0 {
 		return error('one_hot num_classes must be positive')
 	}
@@ -185,7 +186,7 @@ pub fn one_hot(indices &Tensor[int], num_classes int) !&Tensor[int] {
 			return error('one_hot class index ${class_index} is outside [0, ${num_classes})')
 		}
 	}
-	mut result := zeros[int](output_shape)
+	mut result := zeros[int](output_shape, params)
 	for flat_index in 0 .. indices.size {
 		class_index := indices.get_nth(flat_index)
 		result.set_nth(flat_index * num_classes + class_index, 1)

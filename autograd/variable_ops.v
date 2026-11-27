@@ -4,11 +4,16 @@ import vtl
 import math.complex as vcomplex
 import vtl.stats as vtl_stats
 
+// Gate registration enables gradients only when an input is tracked.
+fn untracked_operation_result[T](context &Context[T], value &vtl.Tensor[T]) &Variable[T] {
+	return context.variable(value, requires_grad: false)
+}
+
 // sum reduces every tensor element into a one-element tensor and records the
 // broadcast backward rule when this variable requires gradients.
 pub fn (v &Variable[T]) sum() !&Variable[T] {
 	value := vtl.from_1d([vtl_stats.sum[T](v.value)])!
-	mut result := v.context.variable(value)
+	mut result := untracked_operation_result[T](v.context, value)
 	if v.requires_grad {
 		gate := sum_gate[T](v.value.shape, -1)
 		gate.cache(mut result, v)!
@@ -20,7 +25,7 @@ pub fn (v &Variable[T]) sum() !&Variable[T] {
 // the backward gradient uniformly over the input elements.
 pub fn (v &Variable[T]) mean() !&Variable[T] {
 	value := vtl.from_1d([vtl_stats.mean[T](v.value)])!
-	mut result := v.context.variable(value)
+	mut result := untracked_operation_result[T](v.context, value)
 	if v.requires_grad {
 		gate := mean_gate[T](v.value.shape, -1, v.value.size)
 		gate.cache(mut result, v)!
@@ -39,7 +44,7 @@ pub fn (v &Variable[T]) sum_along_axis(axis int, keepdims bool) !&Variable[T] {
 		return error('Variable.sum_along_axis: axis ${axis} out of bounds for shape ${v.value.shape}')
 	}
 	value := vtl_stats.sum_along_axis[T](v.value, na, keepdims)!
-	mut result := v.context.variable(value)
+	mut result := untracked_operation_result[T](v.context, value)
 	if v.requires_grad {
 		gate := sum_gate[T](v.value.shape, na)
 		gate.cache(mut result, v)!
@@ -59,7 +64,7 @@ pub fn (v &Variable[T]) cumsum(axis int) !&Variable[T] {
 		return error('Variable.cumsum: axis ${axis} out of bounds for shape ${v.value.shape}')
 	}
 	value := v.value.cumsum[T](na)!
-	mut result := v.context.variable(value)
+	mut result := untracked_operation_result[T](v.context, value)
 	if v.requires_grad {
 		gate := cumsum_gate[T](v.value.shape, na)
 		gate.cache(mut result, v)!
@@ -79,7 +84,7 @@ pub fn (v &Variable[T]) cumprod(axis int) !&Variable[T] {
 		return error('Variable.cumprod: axis ${axis} out of bounds for shape ${v.value.shape}')
 	}
 	value := v.value.cumprod[T](na)!
-	mut result := v.context.variable(value)
+	mut result := untracked_operation_result[T](v.context, value)
 	if v.requires_grad {
 		gate := cumprod_gate[T](v.value, na)
 		gate.cache(mut result, v)!
@@ -91,7 +96,7 @@ pub fn (v &Variable[T]) cumprod(axis int) !&Variable[T] {
 // returns a one-dimensional variable.
 pub fn (v &Variable[T]) cumsum_flat() !&Variable[T] {
 	value := v.value.cumsum_flat[T]()!
-	mut result := v.context.variable(value)
+	mut result := untracked_operation_result[T](v.context, value)
 	if v.requires_grad {
 		gate := cumsum_gate[T](v.value.shape, -1)
 		gate.cache(mut result, v)!
@@ -103,7 +108,7 @@ pub fn (v &Variable[T]) cumsum_flat() !&Variable[T] {
 // returns a one-dimensional variable.
 pub fn (v &Variable[T]) cumprod_flat() !&Variable[T] {
 	value := v.value.cumprod_flat[T]()!
-	mut result := v.context.variable(value)
+	mut result := untracked_operation_result[T](v.context, value)
 	if v.requires_grad {
 		gate := cumprod_gate[T](v.value, -1)
 		gate.cache(mut result, v)!
@@ -126,7 +131,7 @@ pub fn (v &Variable[T]) mean_along_axis(axis int, keepdims bool) !&Variable[T] {
 	value := mean_values.map[T](fn [T](mean f64, _ []int) T {
 		return vtl.cast[T](mean)
 	})
-	mut result := v.context.variable(value)
+	mut result := untracked_operation_result[T](v.context, value)
 	if v.requires_grad {
 		gate := mean_gate[T](v.value.shape, na, v.value.shape[na])
 		gate.cache(mut result, v)!
@@ -139,7 +144,7 @@ pub fn (v &Variable[T]) mean_along_axis(axis int, keepdims bool) !&Variable[T] {
 pub fn (v &Variable[T]) sum_along_axes(axes []int, keepdims bool) !&Variable[T] {
 	normalized_axes := normalize_variable_reduction_axes(axes, v.value.rank(), 'sum_along_axes')!
 	value := vtl_stats.sum_along_axes[T](v.value, normalized_axes, keepdims)!
-	mut result := v.context.variable(value)
+	mut result := untracked_operation_result[T](v.context, value)
 	if v.requires_grad {
 		gate := multi_axis_reduction_gate[T](v.value.shape, normalized_axes, keepdims, 1, false)
 		gate.cache(mut result, v)!
@@ -159,7 +164,7 @@ pub fn (v &Variable[T]) mean_along_axes(axes []int, keepdims bool) !&Variable[T]
 	for axis in normalized_axes {
 		num_elems *= v.value.shape[axis]
 	}
-	mut result := v.context.variable(value)
+	mut result := untracked_operation_result[T](v.context, value)
 	if v.requires_grad {
 		gate := multi_axis_reduction_gate[T](v.value.shape, normalized_axes, keepdims, num_elems,
 			true)
@@ -190,7 +195,7 @@ fn normalize_variable_reduction_axes(axes []int, rank int, operation string) ![]
 
 // add Adds two variables together.
 pub fn (v &Variable[T]) add(other &Variable[T]) !&Variable[T] {
-	mut result := v.context.variable(v.value.add(other.value)!)
+	mut result := untracked_operation_result[T](v.context, v.value.add(other.value)!)
 
 	if v.requires_grad || other.requires_grad {
 		gate := &AddGate[T]{}
@@ -202,7 +207,7 @@ pub fn (v &Variable[T]) add(other &Variable[T]) !&Variable[T] {
 
 // subtract Subtracts two variables.
 pub fn (v &Variable[T]) subtract(other &Variable[T]) !&Variable[T] {
-	mut result := v.context.variable(v.value.subtract(other.value)!)
+	mut result := untracked_operation_result[T](v.context, v.value.subtract(other.value)!)
 
 	if v.requires_grad || other.requires_grad {
 		gate := &SubtractGate[T]{}
@@ -214,7 +219,7 @@ pub fn (v &Variable[T]) subtract(other &Variable[T]) !&Variable[T] {
 
 // multiply Multiplies two variables.
 pub fn (v &Variable[T]) multiply(other &Variable[T]) !&Variable[T] {
-	mut result := v.context.variable(v.value.multiply(other.value)!)
+	mut result := untracked_operation_result[T](v.context, v.value.multiply(other.value)!)
 
 	if v.requires_grad || other.requires_grad {
 		gate := &MultiplyGate[T]{
@@ -229,7 +234,7 @@ pub fn (v &Variable[T]) multiply(other &Variable[T]) !&Variable[T] {
 
 // divide Divides two variables.
 pub fn (v &Variable[T]) divide(other &Variable[T]) !&Variable[T] {
-	mut result := v.context.variable(v.value.divide(other.value)!)
+	mut result := untracked_operation_result[T](v.context, v.value.divide(other.value)!)
 
 	if v.requires_grad || other.requires_grad {
 		gate := &DivideGate[T]{
@@ -248,7 +253,7 @@ pub fn (v &Variable[T]) divide(other &Variable[T]) !&Variable[T] {
 pub fn (v &Variable[T]) remainder(other &Variable[T]) !&Variable[T] {
 	$if T is f32 || T is f64 {
 		value := vtl.remainder_promoted[T, T, T](v.value, other.value)!
-		mut result := v.context.variable(value)
+		mut result := untracked_operation_result[T](v.context, value)
 		if v.requires_grad || other.requires_grad {
 			gate := remainder_gate[T](v, other)
 			gate.cache(mut result, v, other)!
@@ -261,7 +266,7 @@ pub fn (v &Variable[T]) remainder(other &Variable[T]) !&Variable[T] {
 
 // pow raises a variable to a power.
 pub fn (v &Variable[T]) pow(other &Variable[T]) !&Variable[T] {
-	mut result := v.context.variable(v.value.pow(other.value)!)
+	mut result := untracked_operation_result[T](v.context, v.value.pow(other.value)!)
 
 	if v.requires_grad || other.requires_grad {
 		gate := pow_gate[T](v, other)
@@ -273,7 +278,7 @@ pub fn (v &Variable[T]) pow(other &Variable[T]) !&Variable[T] {
 
 // exp Exponentiates a variable.
 pub fn (v &Variable[T]) exp() !&Variable[T] {
-	mut result := v.context.variable(v.value.exp())
+	mut result := untracked_operation_result[T](v.context, v.value.exp())
 
 	if v.requires_grad {
 		gate := exp_gate[T](v)
@@ -285,7 +290,7 @@ pub fn (v &Variable[T]) exp() !&Variable[T] {
 
 // matmul Multiplies two matrices.
 pub fn (v &Variable[T]) matmul(other &Variable[T]) !&Variable[T] {
-	mut result := v.context.variable(gate_matmul[T](v.value, other.value)!)
+	mut result := untracked_operation_result[T](v.context, gate_matmul[T](v.value, other.value)!)
 
 	if v.requires_grad || other.requires_grad {
 		gate := &MatMulGate[T]{
@@ -300,7 +305,7 @@ pub fn (v &Variable[T]) matmul(other &Variable[T]) !&Variable[T] {
 
 // sin Sine of a variable.
 pub fn (v &Variable[T]) sin() !&Variable[T] {
-	mut result := v.context.variable(v.value.sin())
+	mut result := untracked_operation_result[T](v.context, v.value.sin())
 
 	if v.requires_grad {
 		gate := sin_gate[T](v)
@@ -312,7 +317,7 @@ pub fn (v &Variable[T]) sin() !&Variable[T] {
 
 // cos Cosine of a variable.
 pub fn (v &Variable[T]) cos() !&Variable[T] {
-	mut result := v.context.variable(v.value.cos())
+	mut result := untracked_operation_result[T](v.context, v.value.cos())
 
 	if v.requires_grad {
 		gate := cos_gate[T](v)
@@ -324,7 +329,7 @@ pub fn (v &Variable[T]) cos() !&Variable[T] {
 
 // tan Tan of a variable.
 pub fn (v &Variable[T]) tan() !&Variable[T] {
-	mut result := v.context.variable(v.value.tan())
+	mut result := untracked_operation_result[T](v.context, v.value.tan())
 
 	if v.requires_grad {
 		gate := tan_gate[T](v)
@@ -347,7 +352,7 @@ pub fn (v &Variable[T]) tan() !&Variable[T] {
 pub fn (v &Variable[T]) log() !&Variable[T] {
 	g := log_gate[T](v)
 	t := v.value.log()
-	mut result := v.context.variable(t)
+	mut result := untracked_operation_result[T](v.context, t)
 	if v.requires_grad {
 		g.cache(mut result, v)!
 	}
@@ -369,7 +374,7 @@ pub fn (v &Variable[T]) log() !&Variable[T] {
 pub fn (v &Variable[T]) abs_op() !&Variable[T] {
 	g := abs_gate[T](v)
 	t := v.value.abs()
-	mut result := v.context.variable(t)
+	mut result := untracked_operation_result[T](v.context, t)
 	if v.requires_grad {
 		g.cache(mut result, v)!
 	}
@@ -392,7 +397,7 @@ pub fn (v &Variable[T]) abs_op() !&Variable[T] {
 pub fn (v &Variable[T]) sqrt_op() !&Variable[T] {
 	g := sqrt_gate[T](v)
 	t := v.value.sqrt[T]()
-	mut result := v.context.variable(t)
+	mut result := untracked_operation_result[T](v.context, t)
 	if v.requires_grad {
 		g.cache(mut result, v)!
 	}
@@ -414,7 +419,7 @@ pub fn (v &Variable[T]) sqrt_op() !&Variable[T] {
 pub fn (v &Variable[T]) tanh_op() !&Variable[T] {
 	t := v.value.tanh[T]()
 	g := tanh_gate[T](t)
-	mut result := v.context.variable(t)
+	mut result := untracked_operation_result[T](v.context, t)
 	if v.requires_grad {
 		g.cache(mut result, v)!
 	}
@@ -445,7 +450,7 @@ pub fn (v &Variable[T]) clamp(min_val T, max_val T) !&Variable[T] {
 			return x
 		}
 	})
-	mut result := v.context.variable(t)
+	mut result := untracked_operation_result[T](v.context, t)
 	if v.requires_grad {
 		g.cache(mut result, v)!
 	}
@@ -459,7 +464,7 @@ pub fn (v &Variable[T]) nan_to_num(params vtl.NanToNumConfig) !&Variable[T] {
 		return error('Variable.nan_to_num does not yet support complex tensors')
 	}
 	value := v.value.nan_to_num[T](params)
-	mut result := v.context.variable(value)
+	mut result := untracked_operation_result[T](v.context, value)
 	if v.requires_grad {
 		mut finite_mask := vtl.ones[bool](v.value.shape)
 		$if T is f32 || T is f64 {
@@ -484,7 +489,7 @@ pub fn (v &Variable[T]) nan_to_num(params vtl.NanToNumConfig) !&Variable[T] {
 pub fn (v &Variable[T]) reshape(new_shape []int) !&Variable[T] {
 	g := reshape_gate[T](v.value.shape)
 	t := v.value.reshape(new_shape)!
-	mut result := v.context.variable(t)
+	mut result := untracked_operation_result[T](v.context, t)
 	if v.requires_grad {
 		g.cache(mut result, v)!
 	}
@@ -506,7 +511,7 @@ pub fn (v &Variable[T]) reshape(new_shape []int) !&Variable[T] {
 pub fn (v &Variable[T]) transpose_op(perm []int) !&Variable[T] {
 	g := transpose_gate[T](perm)
 	t := v.value.transpose(perm)!
-	mut result := v.context.variable(t)
+	mut result := untracked_operation_result[T](v.context, t)
 	if v.requires_grad {
 		g.cache(mut result, v)!
 	}
@@ -527,7 +532,7 @@ pub fn (v &Variable[T]) rot90_k(k int) !&Variable[T] {
 // rot90_axes rotates in a selected plane and records its inverse for autograd.
 pub fn (v &Variable[T]) rot90_axes(k int, axes []int) !&Variable[T] {
 	value := vtl.rot90_axes[T](v.value, k, axes)!
-	mut result := v.context.variable(value)
+	mut result := untracked_operation_result[T](v.context, value)
 	if v.requires_grad {
 		gate := rot90_gate[T](v.value, k, axes)!
 		gate.cache(mut result, v)!
@@ -539,7 +544,7 @@ pub fn (v &Variable[T]) rot90_axes(k int, axes []int) !&Variable[T] {
 // through the same flip, which is its own inverse.
 pub fn (v &Variable[T]) flip(axes ...int) !&Variable[T] {
 	value := v.value.flip[T](...axes)!
-	mut result := v.context.variable(value)
+	mut result := untracked_operation_result[T](v.context, value)
 	if v.requires_grad {
 		gate := flip_gate[T](axes)
 		gate.cache(mut result, v)!
@@ -551,7 +556,7 @@ pub fn (v &Variable[T]) flip(axes ...int) !&Variable[T] {
 // from all copies of each source value.
 pub fn (v &Variable[T]) repeat(repeats int) !&Variable[T] {
 	value := vtl.repeat[T](v.value, repeats)!
-	mut result := v.context.variable(value)
+	mut result := untracked_operation_result[T](v.context, value)
 	if v.requires_grad {
 		gate := repeat_gate[T](v.value.shape, repeats, 0, true)
 		gate.cache(mut result, v)!
@@ -562,7 +567,7 @@ pub fn (v &Variable[T]) repeat(repeats int) !&Variable[T] {
 // repeat_axis repeats values along one axis while preserving autograd.
 pub fn (v &Variable[T]) repeat_axis(repeats int, axis int) !&Variable[T] {
 	value := vtl.repeat_axis[T](v.value, repeats, axis)!
-	mut result := v.context.variable(value)
+	mut result := untracked_operation_result[T](v.context, value)
 	if v.requires_grad {
 		normalized_axis := if axis < 0 { axis + v.value.rank() } else { axis }
 		gate := repeat_gate[T](v.value.shape, repeats, normalized_axis, false)
@@ -575,7 +580,7 @@ pub fn (v &Variable[T]) repeat_axis(repeats int, axis int) !&Variable[T] {
 // dimensions and sums gradients from each block during backpropagation.
 pub fn (v &Variable[T]) tile(reps []int) !&Variable[T] {
 	value := vtl.tile[T](v.value, reps)!
-	mut result := v.context.variable(value)
+	mut result := untracked_operation_result[T](v.context, value)
 	if v.requires_grad {
 		gate := tile_gate[T](v.value.shape, reps)
 		gate.cache(mut result, v)!
@@ -587,7 +592,7 @@ pub fn (v &Variable[T]) tile(reps []int) !&Variable[T] {
 // positions according to the selected padding mode.
 pub fn (v &Variable[T]) pad(pad_width [][]int, mode vtl.PadMode, constant_value T) !&Variable[T] {
 	value := vtl.pad[T](v.value, pad_width, mode, constant_value)!
-	mut result := v.context.variable(value)
+	mut result := untracked_operation_result[T](v.context, value)
 	if v.requires_grad {
 		gate := pad_gate[T](v.value.shape, pad_width, mode)
 		gate.cache(mut result, v)!
@@ -599,7 +604,7 @@ pub fn (v &Variable[T]) pad(pad_width [][]int, mode vtl.PadMode, constant_value 
 // axes apply the same shift to each selected axis and preserve autograd.
 pub fn (v &Variable[T]) roll(shift int, axes ...int) !&Variable[T] {
 	value := vtl.roll[T](v.value, shift, ...axes)!
-	mut result := v.context.variable(value)
+	mut result := untracked_operation_result[T](v.context, value)
 	if v.requires_grad {
 		gate := roll_gate[T](v.value, shift, axes)!
 		gate.cache(mut result, v)!
@@ -610,7 +615,7 @@ pub fn (v &Variable[T]) roll(shift int, axes ...int) !&Variable[T] {
 // roll_shifts applies paired shifts and axes while preserving autograd.
 pub fn (v &Variable[T]) roll_shifts(shifts []int, axes []int) !&Variable[T] {
 	value := vtl.roll_shifts[T](v.value, shifts, axes)!
-	mut result := v.context.variable(value)
+	mut result := untracked_operation_result[T](v.context, value)
 	if v.requires_grad {
 		gate := roll_shifts_gate[T](v.value, shifts, axes)!
 		gate.cache(mut result, v)!

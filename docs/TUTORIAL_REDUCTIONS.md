@@ -204,10 +204,12 @@ assert with_nan.nanargmax[f64]()! == 2
 ## max / min per axis
 
 `max_axis(axis)` and `min_axis(axis)` retain the reduced axis with length one.
-Use `max_axis_squeeze(axis)` or `min_axis_squeeze(axis)` to remove it, matching
-NumPy's default `keepdims=false` shape behavior. VTL represents scalar-shaped
-reductions as shape `[1]`. Use `max_axes(axes, keepdims)` or
-`min_axes(axes, keepdims)` to reduce multiple unique axes in one call.
+Use `max_axis_with_keepdims(axis, keepdims)` or
+`min_axis_with_keepdims(axis, keepdims)` to select either shape in one call;
+`max_axis_squeeze(axis)` and `min_axis_squeeze(axis)` remain convenience forms
+for NumPy's default `keepdims=false`. VTL represents scalar-shaped reductions
+as shape `[1]`. Use `max_axes(axes, keepdims)` or `min_axes(axes, keepdims)` to
+reduce multiple unique axes in one call.
 
 ```v
 import vtl
@@ -219,6 +221,9 @@ mx := t.max_axis_squeeze[f64](1)!
 
 mn := t.min_axis_squeeze[f64](0)!
 // mn = [1.0, 4.0]
+
+assert t.max_axis_with_keepdims[f64](1, true)!.shape == [2, 1]
+assert t.min_axis_with_keepdims[f64](1, false)!.to_array() == [3.0, 1.0]
 
 volume := vtl.from_array[f64]([0.0, 5.0, 3.0, 7.0, 4.0, 2.0, 8.0, 1.0], [2, 2, 2])!
 assert volume.max_axes([0, -1], false)!.to_array() == [5.0, 8.0]
@@ -313,11 +318,26 @@ wide_running_sum := measurements.cumsum_as[f64](0)!
 assert wide_running_sum.to_array() == [1e8, 1e8 + 1.0, 1.0]
 ```
 
+For floating-point tensors, `nancumsum` and `nancumprod` treat each NaN input
+as the identity value for the running accumulator. They support axis scans and
+flattened logical row-major scans; the corresponding `_as[U]` methods choose
+the accumulator and output type. Non-NaN numeric input is accumulated normally.
+
+```v
+import math
+import vtl
+
+values := vtl.from_1d([1.0, math.nan(), 3.0])!
+assert values.nancumsum(0)!.to_array() == [1.0, 1.0, 4.0]
+assert values.nancumprod_flat()!.to_array() == [1.0, 1.0, 3.0]
+```
+
 ## Autograd support
 
-All reduction operations above are differentiable when called through a
-`Variable`. See [TUTORIAL_AUTOGRAD.md](./TUTORIAL_AUTOGRAD.md) for general
-information about automatic differentiation in VTL.
+Standard reduction operations above are differentiable when called through a
+`Variable`; NaN-aware cumulative methods are currently available on `Tensor`.
+See [TUTORIAL_AUTOGRAD.md](./TUTORIAL_AUTOGRAD.md) for information about
+automatic differentiation in VTL.
 
 ## Quantiles
 
@@ -572,7 +592,9 @@ assert levels_kept.shape == [3, 1, 2, 1]
 ## NaN-aware sums and extrema
 
 `nansum`, `nanprod`, `nanmin`, and `nanmax` skip NaN values. Their axis
-variants return promoted `f64` tensors. `nansum_as[T, U]` and
+variants return promoted `f64` tensors. `nanmin_axis_with_keepdims` and
+`nanmax_axis_with_keepdims` select whether to retain the reduced dimension;
+the existing `*_axis_keepdims` forms continue to retain it. `nansum_as[T, U]` and
 `nanprod_as[T, U]` select a global accumulator type; their `_axis_as` and
 `_axes_as` variants provide the same control for axis and multi-axis
 reductions. Use `_axis_keepdims` to retain the reduced axis with length one.
@@ -597,7 +619,9 @@ assert stats.nanmean_as[f32, f64](typed_samples) == 3.0
 assert math.abs(stats.nanvariance_as[f32, f64](typed_samples, 0)! - 8.0 / 3.0) < 1e-12
 assert stats.nansum_axis_as[f64, f64](samples, 1, true)!.shape == [2, 1]
 assert stats.nanmin_axis(samples, 1)!.to_array() == [1.0, 4.0]
+assert stats.nanmin_axis_with_keepdims(samples, 1, false)!.shape == [2]
 assert stats.nanmax_axis_keepdims(samples, 1)!.to_array() == [3.0, 6.0]
+assert stats.nanmax_axis_with_keepdims(samples, 1, true)!.shape == [2, 1]
 ```
 
 ## Typed bincount accumulators

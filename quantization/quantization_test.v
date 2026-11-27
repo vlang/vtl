@@ -50,6 +50,179 @@ fn test_per_channel_quantization_uses_channel_parameters() ! {
 	assert encoded.to_array() == [i8(1), 2, 3, 1, 2, 3]
 }
 
+fn test_linear_int8_f32_uses_per_output_channel_scales_and_preserves_batch_shape() ! {
+	input := vtl.from_array([f32(1), 2, -1, 0.5], [1, 2, 2])!
+	input_params := new_params(0.1, 3, -128, 127)!
+	weights := vtl.from_array([i8(55), -95, 97, 9], [2, 2])!
+	weight_params := new_per_channel_params([0.01, 0.02], [5, -3], -2, -128, 127)!
+	bias := vtl.from_array([f32(0.25), -0.5], [1, 2])!
+
+	output := linear_int8_f32(input, weights, input_params, weight_params, bias)!
+
+	assert output.shape == [1, 2, 2]
+	expected := [f32(-1.25), 1.98, -0.75, -2.38]
+	for i in 0 .. expected.len {
+		assert math.abs(f64(output.get_nth(i) - expected[i])) < 1e-5
+	}
+}
+
+fn test_linear_int8_f32_matches_scalar_for_simd_sized_reduction() ! {
+	mut input_values := []f32{len: 256}
+	mut weight_values := []i8{len: 256}
+	for i in 0 .. input_values.len {
+		input_values[i] = f32(i % 31 - 15) / 7
+		weight_values[i] = i8((i * 13) % 256 - 128)
+	}
+	input := vtl.from_array[f32](input_values, [1, 256])!
+	input_params := new_params(0.1, -13, -128, 127)!
+	weights := vtl.from_array[i8](weight_values, [1, 256])!
+	weight_params := new_per_channel_params([0.03], [17], 0, -128, 127)!
+	bias := vtl.from_1d[f32]([0.125])!
+
+	output := linear_int8_f32(input, weights, input_params, weight_params, bias)!
+	quantized_input := quantize_per_tensor_f32(input, input_params)!
+	input_i8 := quantized_input.to_array()
+	mut expected_accumulator := i64(0)
+	for i in 0 .. input_i8.len {
+		centered_activation := i64(input_i8[i]) - i64(input_params.zero_point)
+		centered_weight := i64(weight_values[i]) - i64(weight_params.zero_points[0])
+		expected_accumulator += centered_activation * centered_weight
+	}
+	expected := f32(f64(expected_accumulator) * input_params.scale * weight_params.scales[0] +
+		0.125)
+	assert math.abs(f64(output.get_nth(0) - expected)) < 1e-5
+}
+
+fn test_linear_int8_f32_rejects_mismatched_metadata() ! {
+	input := vtl.from_array([f32(1), 2], [1, 2])!
+	input_params := new_params(0.1, 0, -128, 127)!
+	weights := vtl.from_array([i8(10), 20, 30, 40], [2, 2])!
+	bias := vtl.from_1d[f32]([0, 0])!
+	good_params := new_per_channel_params([0.1, 0.1], [0, 0], 0, -128, 127)!
+
+	mut axis_failed := false
+	linear_int8_f32(input, weights, input_params,
+		new_per_channel_params([0.1, 0.1], [0, 0], 1, -128, 127)!, bias) or {
+		axis_failed = true
+	}
+	assert axis_failed
+
+	mut bias_shape_failed := false
+	linear_int8_f32(input, weights, input_params, good_params,
+		vtl.from_array([f32(0), 0], [2, 1])!) or {
+		bias_shape_failed = true
+	}
+	assert bias_shape_failed
+
+	mut weight_range_failed := false
+	linear_int8_f32(input, weights, input_params,
+		new_per_channel_params([0.1, 0.1], [0, 0], 0, -128, 39)!, bias) or {
+		weight_range_failed = true
+	}
+	assert weight_range_failed
+}
+
+fn test_conv2d_int8_f32_handles_padding_stride_and_affine_zero_points() ! {
+	input := vtl.from_array([f32(1), 2, 3, 4, 5, 6], [1, 1, 2, 3])!
+	input_params := new_params(0.1, 3, -128, 127)!
+	weights := vtl.from_array([i8(55), 105, -55, 20], [2, 1, 1, 2])!
+	weight_params := new_per_channel_params([0.01, 0.02], [5, -5], 0, -128, 127)!
+	bias := vtl.from_array([f32(0.25), -0.5], [1, 2])!
+	config := QuantizedConv2DConfig{
+		padding: [0, 1]
+		stride:  [1, 2]
+	}
+
+	output := conv2d_int8_f32(input, weights, input_params, weight_params, bias, [1, 2],
+		config)!
+
+	assert output.shape == [1, 2, 2, 2]
+	expected := [f32(1.25), 4.25, 4.25, 8.75, 0, -1, 1.5, -2.5]
+	for i in 0 .. expected.len {
+		assert math.abs(f64(output.get_nth(i) - expected[i])) < 1e-5
+	}
+}
+
+fn test_conv2d_int8_f32_supports_groups() ! {
+	input := vtl.from_array([f32(1), 2, 3, 4], [1, 2, 1, 2])!
+	input_params := new_params(0.1, 0, -128, 127)!
+	weights := vtl.from_array([i8(10), 20], [2, 1, 1, 1])!
+	weight_params := new_per_channel_params([0.1, 0.2], [0, 0], 0, -128, 127)!
+	bias := vtl.from_array([f32(0), 0], [1, 2])!
+	config := QuantizedConv2DConfig{
+		groups: 2
+	}
+
+	output := conv2d_int8_f32(input, weights, input_params, weight_params, bias, [1, 1],
+		config)!
+
+	assert output.shape == [1, 2, 1, 2]
+	assert output.to_array() == [f32(1), 2, 12, 16]
+}
+
+fn test_conv2d_int8_f32_rejects_invalid_groups_and_weight_axis() ! {
+	input := vtl.from_array([f32(1)], [1, 1, 1, 1])!
+	input_params := new_params(0.1, 0, -128, 127)!
+	weights := vtl.from_array([i8(10)], [1, 1, 1, 1])!
+	bias := vtl.from_array([f32(0)], [1, 1])!
+	weight_params := new_per_channel_params([0.1], [0], 0, -128, 127)!
+
+	mut groups_failed := false
+	conv2d_int8_f32(input, weights, input_params, weight_params, bias, [1, 1],
+		QuantizedConv2DConfig{
+			groups: 2
+		}) or {
+		groups_failed = true
+	}
+	assert groups_failed
+
+	mut axis_failed := false
+	conv2d_int8_f32(input, weights, input_params,
+		new_per_channel_params([0.1], [0], 1, -128, 127)!, bias, [1, 1],
+		QuantizedConv2DConfig{}) or {
+		axis_failed = true
+	}
+	assert axis_failed
+}
+
+fn test_conv2d_int8_f32_uses_wide_accumulator_for_large_reductions() ! {
+	input_values := []f32{len: 40000, init: 1}
+	weight_values := []i8{len: 40000, init: 1}
+	input := vtl.from_array[f32](input_values, [1, 40000, 1, 1])!
+	weights := vtl.from_array[i8](weight_values, [1, 40000, 1, 1])!
+	input_params := new_params(1, 0, -128, 127)!
+	weight_params := new_per_channel_params([1.0], [0], 0, -128, 127)!
+	bias := vtl.from_array([f32(0)], [1, 1])!
+
+	output := conv2d_int8_f32(input, weights, input_params, weight_params, bias, [1, 1],
+		QuantizedConv2DConfig{})!
+
+	assert output.to_array() == [f32(40000)]
+}
+
+fn test_quantized_layer_wrappers_convert_f32_weights_and_forward() ! {
+	input_params := new_params(0.1, 0, -128, 127)!
+	linear_input := vtl.from_array([f32(1), 2], [1, 2])!
+	linear_weights := vtl.from_array([f32(0.5), -1, 2, 0.24], [2, 2])!
+	linear_bias := vtl.from_array([f32(0.25), -0.5], [1, 2])!
+	linear_layer := quantize_linear_layer_f32(linear_weights, linear_bias, input_params,
+		-128, 127)!
+	linear_output := linear_layer.forward(linear_input)!
+	expected_linear := [f32(-1.25), 1.98]
+	for i in 0 .. expected_linear.len {
+		assert math.abs(f64(linear_output.get_nth(i) - expected_linear[i])) < 0.03
+	}
+
+	conv_input := vtl.from_array([f32(1), 2], [1, 1, 1, 2])!
+	conv_weights := vtl.from_array([f32(0.5)], [1, 1, 1, 1])!
+	conv_bias := vtl.from_array([f32(0.25)], [1, 1])!
+	conv_layer := quantize_conv2d_layer_f32(conv_weights, conv_bias, input_params, [1, 1],
+		QuantizedConv2DConfig{}, -128, 127)!
+	conv_output := conv_layer.forward(conv_input)!
+	assert conv_output.shape == [1, 1, 1, 2]
+	assert conv_output.to_array() == [f32(0.75), 1.25]
+}
+
 fn test_minmax_observer_calibrates_and_accumulates() ! {
 	mut observer := MinMaxObserver{}
 	mut uninitialized_failed := false

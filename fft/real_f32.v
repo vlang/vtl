@@ -90,9 +90,23 @@ pub fn rfft_axis_f32(input &vtl.Tensor[f32], axis int) !&vtl.Tensor[Complex32] {
 	line_count := input.size / axis_length
 	for line_index in 0 .. line_count {
 		decode_fft_axis_line(line_index, input.shape, axis_index, mut index)
-		for position in 0 .. axis_length {
-			index[axis_index] = position
-			line[position] = input.get(index)
+		if axis_index == input.rank() - 1 && input.is_row_major_contiguous() {
+			line_offset := line_index * axis_length
+			unsafe {
+				C.memcpy(line.data, &input.data.data[line_offset], axis_length * sizeof(f32))
+			}
+		} else if axis_index == input.rank() - 1 && input.strides[axis_index] > 1
+			&& fft_strides_are_nonnegative(input.strides) {
+			index[axis_index] = 0
+			line_offset := fft_line_offset(index, input.strides)
+			for position in 0 .. axis_length {
+				line[position] = input.data.data[line_offset + position * input.strides[axis_index]]
+			}
+		} else {
+			for position in 0 .. axis_length {
+				index[axis_index] = position
+				line[position] = input.get(index)
+			}
 		}
 		if vsl_fft.forward_fft(plan, mut line) != 0 {
 			return error('rfft_axis_f32 backend failed to compute the forward transform')
@@ -236,6 +250,11 @@ pub fn irfft2_f32(input &vtl.Tensor[Complex32], shape []int) !&vtl.Tensor[f32] {
 fn copy_real_f32(input &vtl.Tensor[f32], mut packed []f32) {
 	if input.is_row_major_contiguous() {
 		unsafe { C.memcpy(packed.data, input.data.data.data, input.size * sizeof(f32)) }
+	} else if input.rank() == 1 && input.strides[0] > 0 {
+		stride := input.strides[0]
+		for i in 0 .. input.size {
+			packed[i] = input.data.get(i * stride)
+		}
 	} else {
 		for i in 0 .. input.size {
 			packed[i] = input.get_nth(i)

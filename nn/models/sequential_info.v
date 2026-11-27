@@ -1,6 +1,7 @@
 module models
 
 import vtl.autograd
+import vtl
 import vtl.nn.layers
 import vtl.nn.loss
 import vtl.nn.types
@@ -203,6 +204,34 @@ pub fn (mut ls SequentialInfo[T]) conv2d(in_channels int, out_channels int, kern
 	})
 }
 
+// conv_transpose2d adds a transposed convolution using the previous layer's [channels, height, width] shape.
+pub fn (mut ls SequentialInfo[T]) conv_transpose2d(out_channels int, kernel_size []int, config layers.ConvTranspose2DConfig) {
+	if ls.layers.len == 0 {
+		panic('conv_transpose2d requires an input layer')
+	}
+	shape := ls.layers[ls.layers.len - 1].output_shape()
+	if shape.len != 3 {
+		panic('conv_transpose2d expects the previous layer shape to be [channels, height, width]')
+	}
+	in_channels := shape[0]
+	ls.add_layer(layers.conv_transpose2d_layer[T](ls.ctx, in_channels, out_channels,
+		kernel_size, config, shape), 'ConvTranspose2DLayer', {
+		'in_channels':      in_channels
+		'out_channels':     out_channels
+		'kernel_h':         kernel_size[0]
+		'kernel_w':         kernel_size[1]
+		'stride_h':         config.stride[0]
+		'stride_w':         config.stride[1]
+		'padding_h':        config.padding[0]
+		'padding_w':        config.padding[1]
+		'output_padding_h': config.output_padding[0]
+		'output_padding_w': config.output_padding[1]
+		'dilation_h':       config.dilation[0]
+		'dilation_w':       config.dilation[1]
+		'groups':           config.groups
+	})
+}
+
 // batchnorm1d adds a new BatchNorm1D layer to the network.
 pub fn (mut ls SequentialInfo[T]) batchnorm1d(num_features int, config layers.BatchNorm1DConfig) {
 	ls.add_layer(layers.batchnorm1d_layer[T](ls.ctx, num_features, config), 'BatchNorm1DLayer', {
@@ -248,9 +277,152 @@ pub fn (mut ls SequentialInfo[T]) avgpool2d(kernel []int, padding []int, stride 
 		})
 }
 
+pub fn (mut ls SequentialInfo[T]) avgpool3d(kernel []int, padding []int, stride []int) {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.add_layer(layers.avgpool3d_layer[T](ls.ctx, shape, kernel, padding, stride),
+		'AvgPool3DLayer', {
+			'kernel_d':  kernel[0]
+			'kernel_h':  kernel[1]
+			'kernel_w':  kernel[2]
+			'padding_d': padding[0]
+			'padding_h': padding[1]
+			'padding_w': padding[2]
+			'stride_d':  stride[0]
+			'stride_h':  stride[1]
+			'stride_w':  stride[2]
+		})
+}
+
+pub fn (mut ls SequentialInfo[T]) maxpool3d(kernel []int, padding []int, stride []int) {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.add_layer(layers.maxpool3d_layer[T](ls.ctx, shape, kernel, padding, stride),
+		'MaxPool3DLayer', {})
+}
+
 // global_avgpool2d adds a new GlobalAveragePool2D layer to the network.
 pub fn (mut ls SequentialInfo[T]) global_avgpool2d() {
 	ls.add_layer(layers.global_avgpool2d_layer[T](ls.ctx), 'GlobalAvgPool2DLayer', {})
+}
+
+// adaptive_avgpool2d adds a fixed-output adaptive average-pooling layer.
+pub fn (mut ls SequentialInfo[T]) adaptive_avgpool2d(output_size []int) {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.add_layer(layers.adaptive_avgpool2d_layer[T](ls.ctx, shape, output_size),
+		'AdaptiveAvgPool2DLayer', {
+			'output_h': output_size[0]
+			'output_w': output_size[1]
+		})
+}
+
+pub fn (mut ls SequentialInfo[T]) adaptive_maxpool2d(output_size []int) {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.add_layer(layers.adaptive_maxpool2d_layer[T](ls.ctx, shape, output_size),
+		'AdaptiveMaxPool2DLayer', {
+			'output_h': output_size[0]
+			'output_w': output_size[1]
+		})
+}
+
+pub fn (mut ls SequentialInfo[T]) adaptive_avgpool1d(output_size int) {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.add_layer(layers.adaptive_avgpool1d_layer[T](ls.ctx, shape, output_size),
+		'AdaptiveAvgPool1DLayer', {
+			'output_size': output_size
+		})
+}
+
+pub fn (mut ls SequentialInfo[T]) adaptive_maxpool1d(output_size int) {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.add_layer(layers.adaptive_maxpool1d_layer[T](ls.ctx, shape, output_size),
+		'AdaptiveMaxPool1DLayer', {
+			'output_size': output_size
+		})
+}
+
+pub fn (mut ls SequentialInfo[T]) adaptive_avgpool3d(output_size []int) {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.add_layer(layers.adaptive_avgpool3d_layer[T](ls.ctx, shape, output_size),
+		'AdaptiveAvgPool3DLayer', {
+			'output_d': output_size[0]
+			'output_h': output_size[1]
+			'output_w': output_size[2]
+		})
+}
+
+pub fn (mut ls SequentialInfo[T]) adaptive_maxpool3d(output_size []int) {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.add_layer(layers.adaptive_maxpool3d_layer[T](ls.ctx, shape, output_size),
+		'AdaptiveMaxPool3DLayer', {
+			'output_d': output_size[0]
+			'output_h': output_size[1]
+			'output_w': output_size[2]
+		})
+}
+
+pub fn (mut ls SequentialInfo[T]) avgpool1d(kernel int, padding int, stride int) {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.add_layer(layers.avgpool1d_layer[T](ls.ctx, shape, kernel, padding, stride),
+		'AvgPool1DLayer', {
+			'kernel':  kernel
+			'padding': padding
+			'stride':  stride
+		})
+}
+
+pub fn (mut ls SequentialInfo[T]) maxpool1d(kernel int, padding int, stride int) {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.add_layer(layers.maxpool1d_layer[T](ls.ctx, shape, kernel, padding, stride),
+		'MaxPool1DLayer', {
+			'kernel':  kernel
+			'padding': padding
+			'stride':  stride
+		})
+}
+
+pub fn (mut ls SequentialInfo[T]) pad2d(padding []int, mode vtl.PadMode, constant T) {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.add_layer(layers.pad2d_layer[T](ls.ctx, shape, padding, mode, constant),
+		'Pad2DLayer', {
+			'left':   padding[0]
+			'right':  padding[1]
+			'top':    padding[2]
+			'bottom': padding[3]
+		})
+}
+
+pub fn (mut ls SequentialInfo[T]) pad1d(padding []int, mode vtl.PadMode, constant T) {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.add_layer(layers.pad1d_layer[T](ls.ctx, shape, padding, mode, constant),
+		'Pad1DLayer', {
+			'left':  padding[0]
+			'right': padding[1]
+		})
+}
+
+pub fn (mut ls SequentialInfo[T]) pad3d(padding []int, mode vtl.PadMode, constant T) {
+	layer := ls.layers[ls.layers.len - 1]
+	shape := layer.output_shape()
+	ls.add_layer(layers.pad3d_layer[T](ls.ctx, shape, padding, mode, constant),
+		'Pad3DLayer', {
+			'left':   padding[0]
+			'right':  padding[1]
+			'top':    padding[2]
+			'bottom': padding[3]
+			'front':  padding[4]
+			'back':   padding[5]
+		})
 }
 
 // layer_norm adds a new LayerNorm layer to the network.
@@ -326,6 +498,30 @@ pub fn (mut ls SequentialInfo[T]) conv1d(out_channels int, kernel_size int, conf
 		'dilation':     config.dilation
 		'groups':       config.groups
 		'input_length': input_length
+	})
+}
+
+// conv_transpose1d adds a transposed convolution using the previous layer's [channels, length] shape.
+pub fn (mut ls SequentialInfo[T]) conv_transpose1d(out_channels int, kernel_size int, config layers.ConvTranspose1DConfig) {
+	if ls.layers.len == 0 {
+		panic('conv_transpose1d requires an input layer')
+	}
+	shape := ls.layers[ls.layers.len - 1].output_shape()
+	if shape.len != 2 {
+		panic('conv_transpose1d expects the previous layer shape to be [channels, length]')
+	}
+	in_channels, input_length := shape[0], shape[1]
+	ls.add_layer(layers.conv_transpose1d_layer[T](ls.ctx, in_channels, out_channels,
+		kernel_size, config, input_length), 'ConvTranspose1DLayer', {
+		'in_channels':    in_channels
+		'out_channels':   out_channels
+		'kernel_size':    kernel_size
+		'stride':         config.stride
+		'padding':        config.padding
+		'output_padding': config.output_padding
+		'dilation':       config.dilation
+		'groups':         config.groups
+		'input_length':   input_length
 	})
 }
 

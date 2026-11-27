@@ -21,6 +21,29 @@ fn test_nan_sum_product_and_extrema_ignore_nan() ! {
 	assert math.is_nan(nanmax(empty))
 }
 
+fn test_nan_sum_product_global_keepdims_and_typed_accumulators() ! {
+	values := vtl.from_array([f32(2), f32(math.nan()), f32(3)], [1, 3])!
+	sum_kept := nansum_with_keepdims(values, true)!
+	product_kept := nanprod_with_keepdims(values, true)!
+	assert sum_kept.shape == [1, 1]
+	assert sum_kept.get_nth(0) == 5.0
+	assert product_kept.shape == [1, 1]
+	assert product_kept.get_nth(0) == 6.0
+	assert nansum_with_keepdims(values, false)!.shape == []int{}
+	assert nanprod_as_with_keepdims[f32, f64](values, true)!.get_nth(0) == 6.0
+	assert nansum_as_with_keepdims[f32, f64](vtl.from_1d([f32(math.nan())])!, true)!.get_nth(0) == 0.0
+
+	empty := vtl.empty[f32]([2, 0])
+	assert nansum_with_keepdims(empty, true)!.shape == [1, 1]
+	assert nanprod_with_keepdims(empty, true)!.get_nth(0) == 1.0
+
+	scalar_nan := vtl.from_array[f32]([f32(math.nan())], []int{})!
+	assert nansum_with_keepdims(scalar_nan, true)!.get_nth(0) == 0.0
+	assert nanprod_with_keepdims(scalar_nan, true)!.get_nth(0) == 1.0
+	assert nansum_as_with_keepdims[f32, f64](scalar_nan, true)!.get_nth(0) == 0.0
+	assert nanprod_as_with_keepdims[f32, f64](scalar_nan, false)!.get_nth(0) == 1.0
+}
+
 fn test_nan_axis_sum_product_and_extrema_shapes_and_empty_slices() ! {
 	values := vtl.from_array([1.0, math.nan(), 3.0, 4.0, 5.0, 6.0], [2, 3])!
 	assert nansum_axis(values, 1)!.to_array() == [4.0, 15.0]
@@ -31,6 +54,12 @@ fn test_nan_axis_sum_product_and_extrema_shapes_and_empty_slices() ! {
 	assert nanprod_axis_keepdims(values, 0)!.shape == [1, 3]
 	assert nanmin_axis_keepdims(values, -1)!.shape == [2, 1]
 	assert nanmax_axis_keepdims(values, 0)!.shape == [1, 3]
+	minimum_without_axis := nanmin_axis_with_keepdims(values, 1, false)!
+	assert minimum_without_axis.shape == [2]
+	assert minimum_without_axis.to_array() == [1.0, 4.0]
+	maximum_with_axis := nanmax_axis_with_keepdims(values, 1, true)!
+	assert maximum_with_axis.shape == [2, 1]
+	assert maximum_with_axis.to_array() == [3.0, 6.0]
 
 	missing := vtl.from_array([math.nan(), 2.0, math.nan(), math.nan()], [2, 2])!
 	sums := nansum_axis(missing, 1)!
@@ -128,5 +157,62 @@ fn test_nan_sum_product_explicit_accumulator_types_for_multi_axis_reductions() !
 	assert math.is_nan(unchanged.get_nth(1))
 	if _ := nansum_axes_as[f32, f64](values, [0, -3], false) {
 		assert false, 'dtype-controlled NaN reduction must reject duplicate axes'
+	}
+}
+
+fn test_nan_extrema_explicit_output_preserves_integer_precision() ! {
+	values := vtl.from_array([
+		i64(9_007_199_254_740_993),
+		i64(9_007_199_254_740_992),
+		i64(9_007_199_254_740_992),
+		i64(9_007_199_254_740_993),
+	], [2, 2])!
+
+	assert nanmin_as[i64, i64](values)! == i64(9_007_199_254_740_992)
+	assert nanmax_as[i64, i64](values)! == i64(9_007_199_254_740_993)
+	assert nanmin_axis_as[i64, i64](values, 1, false)!.to_array() == [
+		i64(9_007_199_254_740_992),
+		i64(9_007_199_254_740_992),
+	]
+	assert nanmax_axis_as[i64, i64](values, 1, true)!.to_array() == [
+		i64(9_007_199_254_740_993),
+		i64(9_007_199_254_740_993),
+	]
+	assert nanmin_axes_as[i64, i64](values, [0, 1], true)!.get_nth(0) == i64(9_007_199_254_740_992)
+	assert nanmax_axes_as[i64, i64](values, [0, 1], false)!.get_nth(0) == i64(9_007_199_254_740_993)
+
+	boolean_values := vtl.from_1d([true, false])!
+	assert !nanmin_as[bool, bool](boolean_values)!
+	assert nanmax_as[bool, bool](boolean_values)!
+}
+
+fn test_nan_extrema_explicit_output_handles_missing_values_and_empty_axes() ! {
+	values := vtl.from_array([
+		f32(math.nan()),
+		f32(2.0),
+		f32(math.nan()),
+		f32(math.nan()),
+	], [2, 2])!
+	minimum := nanmin_axis_as[f32, f32](values, 1, true)!
+	assert minimum.shape == [2, 1]
+	assert minimum.get([0, 0]) == 2.0
+	assert math.is_nan(minimum.get([1, 0]))
+
+	maximum := nanmax_axes_as[f32, f64](values, [1], false)!
+	assert maximum.shape == [2]
+	assert maximum.get([0]) == 2.0
+	assert math.is_nan(maximum.get([1]))
+
+	unchanged := nanmin_axes_as[f32, f32](values, [], false)!
+	assert unchanged.shape == values.shape
+	assert unchanged.get_nth(1) == 2.0
+	assert math.is_nan(unchanged.get_nth(0))
+	assert math.is_nan(nanmin_as[f32, f64](vtl.from_1d([f32(math.nan())])!)!)
+
+	if _ := nanmin_as[f32, i64](vtl.from_1d([f32(math.nan())])!) {
+		assert false, 'integer output cannot represent an empty NaN-aware extremum'
+	}
+	if _ := nanmax_axis_as[f32, i64](vtl.empty[f32]([1, 0]), 1, false) {
+		assert false, 'integer output cannot represent an empty NaN-aware slice'
 	}
 }

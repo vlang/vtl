@@ -79,22 +79,64 @@ fn nan_to_num_component(value f64, nan f64, positive_infinity f64, negative_infi
 }
 
 // sign returns the elementwise sign of each value: -1, 0, or 1. Floating-point
-// NaNs remain NaN, matching NumPy's sign behavior.
+// NaNs remain NaN. Complex values return their normalized phase, matching
+// NumPy 2.0 and later.
 pub fn (t &Tensor[T]) sign[T]() &Tensor[T] {
-	return t.map_values(fn [T](value T) T {
-		$if T is f32 || T is f64 {
-			if math.is_nan(f64(value)) {
-				return value
+	$if T is vcomplex.Complex {
+		return t.map_values(fn (value vcomplex.Complex) vcomplex.Complex {
+			return complex_sign(value)
+		})
+	} $else {
+		return t.map_values(fn [T](value T) T {
+			$if T is f32 || T is f64 {
+				if math.is_nan(f64(value)) {
+					return value
+				}
+			}
+			if value < cast[T](0) {
+				return cast[T](-1)
+			}
+			if value > cast[T](0) {
+				return cast[T](1)
+			}
+			return cast[T](0)
+		})
+	}
+}
+
+fn complex_sign(value vcomplex.Complex) vcomplex.Complex {
+	if math.is_nan(value.re) || math.is_nan(value.im) {
+		return vcomplex.Complex{
+			re: math.nan()
+			im: math.nan()
+		}
+	}
+	real_infinite := math.is_inf(value.re, 0)
+	imag_infinite := math.is_inf(value.im, 0)
+	if real_infinite || imag_infinite {
+		if real_infinite && imag_infinite {
+			return vcomplex.Complex{
+				re: math.nan()
+				im: math.nan()
 			}
 		}
-		if value < cast[T](0) {
-			return cast[T](-1)
+		if real_infinite {
+			return vcomplex.Complex{
+				re: if math.signbit(value.re) { -1.0 } else { 1.0 }
+			}
 		}
-		if value > cast[T](0) {
-			return cast[T](1)
+		return vcomplex.Complex{
+			im: if math.signbit(value.im) { -1.0 } else { 1.0 }
 		}
-		return cast[T](0)
-	})
+	}
+	magnitude := math.hypot(value.re, value.im)
+	if magnitude == 0.0 {
+		return vcomplex.Complex{}
+	}
+	return vcomplex.Complex{
+		re: value.re / magnitude
+		im: value.im / magnitude
+	}
 }
 
 // heaviside returns 0 for negative values, 1 for positive values, and x1 for
@@ -207,8 +249,13 @@ fn broadcast_tensor_offset(index int, shape []int, strides []int) int {
 @[inline]
 pub fn (t &Tensor[T]) abs[T]() &Tensor[T] {
 	return t.map_values(fn [T](x T) T {
-		// TODO: Figure out a way to do this without casting to f64
-		return cast[T](math.abs(td(x).f64()))
+		$if T is i8 || T is i16 || T is i32 || T is i64 || T is int {
+			return if x < 0 { -x } else { x }
+		} $else $if T is u8 || T is u16 || T is u32 || T is u64 {
+			return x
+		} $else {
+			return cast[T](math.abs(td(x).f64()))
+		}
 	})
 }
 
@@ -1149,10 +1196,132 @@ pub fn (a &Tensor[T]) nextafter32[T](b &Tensor[T]) !&Tensor[T] {
 @[inline]
 pub fn (a &Tensor[T]) pow[T](b &Tensor[T]) !&Tensor[T] {
 	return a.nmap[T]([b], fn [T](xs []T, _ []int) T {
-		x := xs[0]
-		y := xs[1]
-		return cast[T](math.pow(td(x).f64(), td(y).f64()))
+		$if T is vcomplex.Complex {
+			return complex_power_value(xs[0], xs[1])
+		} $else {
+			x := xs[0]
+			y := xs[1]
+			return cast[T](math.pow(td(x).f64(), td(y).f64()))
+		}
 	})
+}
+
+// square returns the elementwise square while preserving the tensor dtype.
+pub fn (t &Tensor[T]) square[T]() !&Tensor[T] {
+	$if T is bool {
+		return t.map_values(fn [T](value T) T {
+			return square_value[T](value)
+		})
+	} $else $if T is $int || T is $float || T is vcomplex.Complex {
+		return t.map_values(fn [T](value T) T {
+			return square_value[T](value)
+		})
+	} $else {
+		return error('square supports only numeric and boolean tensors')
+	}
+}
+
+// square_into writes the elementwise square to a same-shaped output tensor.
+// Internally overlapping or ambiguous output layouts are rejected. Overlapping
+// input and output storage is safe; input values are snapshotted before writes.
+pub fn (t &Tensor[T]) square_into[T](mut out Tensor[T]) !&Tensor[T] {
+	if out.shape != t.shape {
+		return error('square_into output shape ${out.shape} must match input shape ${t.shape}')
+	}
+	if tensor_has_possible_internal_overlap[T](&out) {
+		return error('square_into output must have a provably non-overlapping stride layout')
+	}
+	$if T is bool {
+		return square_values_into[T](t, mut out)
+	} $else $if T is $int || T is $float || T is vcomplex.Complex {
+		return square_values_into[T](t, mut out)
+	} $else {
+		return error('square_into supports only numeric and boolean tensors')
+	}
+}
+
+fn tensor_has_possible_internal_overlap[T](t &Tensor[T]) bool {
+	if t.size <= 1 {
+		return false
+	}
+	if t.shape.len != t.strides.len {
+		return true
+	}
+	mut axes := []int{}
+	min_int := -max_int - 1
+	for axis, dimension in t.shape {
+		if dimension <= 1 {
+			continue
+		}
+		stride := t.strides[axis]
+		if stride <= 0 || stride == min_int {
+			return true
+		}
+		axes << axis
+	}
+	for i in 1 .. axes.len {
+		axis := axes[i]
+		stride := if t.strides[axis] < 0 { -t.strides[axis] } else { t.strides[axis] }
+		mut position := i
+		for position > 0 {
+			previous_axis := axes[position - 1]
+			previous_stride := if t.strides[previous_axis] < 0 {
+				-t.strides[previous_axis]
+			} else {
+				t.strides[previous_axis]
+			}
+			if previous_stride <= stride {
+				break
+			}
+			axes[position] = previous_axis
+			position--
+		}
+		axes[position] = axis
+	}
+	mut max_offset := 0
+	for axis in axes {
+		raw_stride := t.strides[axis]
+		stride := if raw_stride < 0 { -raw_stride } else { raw_stride }
+		if stride <= max_offset {
+			return true
+		}
+		span := t.shape[axis] - 1
+		if span > 0 && stride > (max_int - max_offset) / span {
+			return true
+		}
+		max_offset += span * stride
+	}
+	return false
+}
+
+fn square_values_into[T](t &Tensor[T], mut out Tensor[T]) &Tensor[T] {
+	overlaps := tensor_shares_storage[T, T](t, &out)
+	mut source_values := []T{}
+	if overlaps {
+		source_values = t.to_array()
+	}
+	if !overlaps && t.is_row_major_contiguous() && out.is_row_major_contiguous()
+		&& t.data.data.len == t.size && out.data.data.len == out.size {
+		for i in 0 .. t.size {
+			out.data.data[i] = square_value[T](t.data.data[i])
+		}
+		return out
+	}
+	for i in 0 .. t.size {
+		value := if overlaps { source_values[i] } else { t.get_nth(i) }
+		out.set_nth[T](i, square_value[T](value))
+	}
+	return out
+}
+
+fn square_value[T](value T) T {
+	$if T is bool {
+		return value
+	} $else $if T is $int || T is $float || T is vcomplex.Complex {
+		return value * value
+	} $else {
+		return value
+	}
 }
 
 // pow10 returns the elementwise pow10 of an tensor
@@ -1260,6 +1429,31 @@ pub fn (t &Tensor[T]) sin[T]() &Tensor[T] {
 	})
 }
 
+// sinc returns sin(pi*x)/(pi*x) elementwise, with a value of 1 at either
+// signed zero. Only f32 and f64 tensors are supported; the input dtype and
+// shape are preserved.
+pub fn (t &Tensor[T]) sinc[T]() !&Tensor[T] {
+	$if T is f32 || T is f64 {
+		mut result := empty[T](t.shape.clone(), memory: .row_major)
+		for flat_index in 0 .. t.size {
+			value := f64(t.get_nth(flat_index))
+			if value == 0.0 {
+				result.data.data[flat_index] = T(1.0)
+				continue
+			}
+			if math.is_nan(value) || math.is_inf(value, 1) || math.is_inf(value, -1) {
+				result.data.data[flat_index] = T(math.nan())
+				continue
+			}
+			pi_x := math.pi * value
+			result.data.data[flat_index] = T(math.sin(pi_x) / pi_x)
+		}
+		return result
+	} $else {
+		return error('sinc requires an f32 or f64 tensor')
+	}
+}
+
 // sinh returns the elementwise sinh of an tensor
 
 // sinh exposes this operation as part of the public API.
@@ -1316,6 +1510,19 @@ pub fn (t &Tensor[T]) sqrt[T]() &Tensor[T] {
 	return t.map_values(fn [T](x T) T {
 		return cast[T](math.sqrt(td(x).f64()))
 	})
+}
+
+// reciprocal returns the elementwise floating-point reciprocal.
+pub fn (t &Tensor[T]) reciprocal[T]() !&Tensor[T] {
+	$if T is f32 || T is f64 {
+		mut result := empty[T](t.shape.clone(), memory: .row_major)
+		for flat_index in 0 .. t.size {
+			result.data.data[flat_index] = T(1.0 / f64(t.get_nth(flat_index)))
+		}
+		return result
+	} $else {
+		return error('reciprocal requires an f32 or f64 tensor')
+	}
 }
 
 // tan returns the elementwise tan of an tensor

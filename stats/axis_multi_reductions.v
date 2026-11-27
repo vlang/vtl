@@ -15,6 +15,27 @@ pub fn product_along_axes[T](t &vtl.Tensor[T], axes []int, keepdims bool) !&vtl.
 	return reduce_axes[T](t, axes, keepdims, .product)
 }
 
+// sum_with_keepdims reduces every tensor dimension into one value. When
+// keepdims is true, the result retains the input rank with dimensions of one;
+// otherwise it has scalar shape.
+pub fn sum_with_keepdims[T](t &vtl.Tensor[T], keepdims bool) !&vtl.Tensor[T] {
+	return flat_reduction_result[T](sum[T](t), t.rank(), keepdims)
+}
+
+// prod_with_keepdims multiplies every tensor element into one value. When
+// keepdims is true, the result retains the input rank with dimensions of one;
+// otherwise it has scalar shape.
+pub fn prod_with_keepdims[T](t &vtl.Tensor[T], keepdims bool) !&vtl.Tensor[T] {
+	return flat_reduction_result[T](prod[T](t), t.rank(), keepdims)
+}
+
+fn flat_reduction_result[T](value T, rank int, keepdims bool) !&vtl.Tensor[T] {
+	shape := if keepdims { []int{len: rank, init: 1} } else { []int{} }
+	mut result := reduction_output[T](shape)!
+	result.set_nth(0, value)
+	return result
+}
+
 fn reduce_axes[T](t &vtl.Tensor[T], axes []int, keepdims bool, operation AxisReduction) !&vtl.Tensor[T] {
 	rank := t.rank()
 	if axes.len == 0 {

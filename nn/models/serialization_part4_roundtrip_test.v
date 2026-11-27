@@ -2,7 +2,10 @@ module models
 
 import os
 import math
+import json2
 import vtl
+import vtl.autograd
+import vtl.nn.optimizers
 import vtl.nn.types
 
 const test_model_dir_4d = '/tmp/vtl_test_models_4d'
@@ -14,6 +17,80 @@ fn setup_test_dir_4d() string {
 
 fn cleanup_test_dir_4d() {
 	os.rmdir_all(test_model_dir_4d) or {}
+}
+
+struct ModuleCheckpointScaleLayer {
+	scale &autograd.Variable[f64]
+}
+
+fn module_checkpoint_output_shape(ptr voidptr) []int {
+	return [1, 2]
+}
+
+fn module_checkpoint_variables(_ voidptr) []voidptr {
+	return []voidptr{}
+}
+
+fn module_checkpoint_forward(ptr voidptr, input voidptr) !voidptr {
+	state := unsafe { &ModuleCheckpointScaleLayer(ptr) }
+	input_variable := unsafe { &autograd.Variable[f64](input) }
+	return voidptr(input_variable.multiply(state.scale)!)
+}
+
+fn test_registered_module_parameters_and_buffers_round_trip_after_training() ! {
+	test_dir := setup_test_dir_4d()
+	defer {
+		cleanup_test_dir_4d()
+	}
+
+	ctx := autograd.ctx[f64]()
+	scale := ctx.variable(vtl.from_array([2.0, 2.0], [1, 2])!)
+	assert scale.requires_grad
+	running_mean := vtl.from_1d([3.0])!
+	mut module := types.module[f64]()
+	mut normalizer := types.module[f64]()
+	normalizer.register_parameter('scale', scale)!
+	normalizer.register_buffer('running_mean', running_mean)!
+	module.register_module('normalizer', normalizer)!
+
+	state := &ModuleCheckpointScaleLayer{
+		scale: scale
+	}
+	callback_layer := types.layer[f64](voidptr(state), module_checkpoint_output_shape,
+		module_checkpoint_variables, module_checkpoint_forward)
+	layer := types.layer_with_module_state(callback_layer, module)
+	mut model := sequential_with_layers[f64]([layer])
+	mut optimizer := optimizers.adam_optimizer[f64](learning_rate: 0.01)
+	optimizer.build_params(model.info.layers)
+	assert optimizer.params.len == 1
+	assert optimizer.params[0] == scale
+
+	input := ctx.variable(vtl.from_array([2.0, 1.0], [1, 2])!)
+	prediction := model.forward(input)!
+	mut loss := prediction.sum()!
+	loss.backprop()!
+	assert scale.grad.to_array() == [2.0, 1.0]
+	optimizer.update()!
+	expected_scale := scale.value.to_array()
+	assert expected_scale != [2.0, 2.0]
+
+	path := '${test_dir}/registered_module.json'
+	model.save_checkpoint(path, 1, f64(loss.value.get_nth(0)))!
+	serialized := json2.decode[ModelFile](os.read_file(path)!)!
+	assert serialized.layer_data[0].module_parameters['normalizer.scale'] != ''
+	assert serialized.layer_data[0].module_buffers['normalizer.running_mean'] != ''
+
+	scale.value.set_nth(0, 10.0)
+	running_mean.set_nth(0, 11.0)
+	model.load_weights(path)!
+	assert scale.value.to_array() == expected_scale
+	assert running_mean.to_array() == [3.0]
+}
+
+fn test_serialized_layer_accepts_checkpoints_without_module_state_maps() ! {
+	serialized := json2.decode[SerializedLayer]('{"weights":{}}')!
+	assert serialized.module_parameters.len == 0
+	assert serialized.module_buffers.len == 0
 }
 
 fn test_round_trip_weights_allclose_1e9() {

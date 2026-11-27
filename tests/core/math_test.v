@@ -11,6 +11,51 @@ fn test_abs() {
 	assert result.array_equal(expected)
 }
 
+fn test_abs_preserves_large_integer_precision() {
+	values := vtl.from_1d[i64]([-9_007_199_254_740_993, 9_007_199_254_740_993])!
+	assert values.abs().to_array() == [9_007_199_254_740_993, 9_007_199_254_740_993]
+
+	unsigned := vtl.from_1d[u64]([9_007_199_254_740_993])!
+	assert unsigned.abs().to_array() == [9_007_199_254_740_993]
+}
+
+fn test_abs_preserves_signed_minimum() {
+	minimum := i64(-9_223_372_036_854_775_807) - 1
+	minimum_i32 := i32(-2_147_483_647) - 1
+	minimum_i16 := i16(-32_767) - 1
+	assert vtl.from_1d[i64]([minimum])!.abs().to_array() == [minimum]
+	assert vtl.from_1d[i32]([minimum_i32])!.abs().to_array() == [minimum_i32]
+	assert vtl.from_1d[i16]([minimum_i16])!.abs().to_array() == [minimum_i16]
+	assert vtl.from_1d[i8]([-128])!.abs().to_array() == [-128]
+	assert vtl.from_1d[int]([min_int])!.abs().to_array() == [min_int]
+	assert vtl.from_1d[u32]([4_000_000_000])!.abs().to_array() == [4_000_000_000]
+	assert vtl.from_1d[u16]([65_535])!.abs().to_array() == [65_535]
+	assert vtl.from_1d[u8]([255])!.abs().to_array() == [255]
+}
+
+fn test_abs_preserves_float_ieee_behavior() {
+	values := vtl.from_1d[f64]([-0.0, math.nan(), -2.5])!
+	result := values.abs()
+	assert !math.signbit(result.get_nth(0))
+	assert math.is_nan(result.get_nth(1))
+	assert result.get_nth(2) == 2.5
+	assert vtl.from_1d[f32]([-2.5])!.abs().get_nth(0) == f32(2.5)
+}
+
+fn test_abs_preserves_scalar_empty_and_strided_shapes() {
+	scalar := vtl.from_array[f64]([-4.5], [])!
+	scalar_abs := scalar.abs()
+	assert scalar_abs.shape == []
+	assert scalar_abs.get_nth(0) == 4.5
+
+	empty := vtl.empty[f64]([0])
+	assert empty.abs().shape == [0]
+
+	base := vtl.from_2d([[-1.0, -2.0], [-3.0, -4.0]])!
+	view := base.transpose([1, 0])!
+	assert view.abs().to_array() == [1.0, 3.0, 2.0, 4.0]
+}
+
 fn test_sign_and_heaviside() {
 	values := vtl.from_1d([-2.0, -0.0, 0.0, 3.0])!
 	assert values.sign().array_equal(vtl.from_1d([-1.0, 0.0, 0.0, 1.0])!)
@@ -29,6 +74,46 @@ fn test_sign_and_heaviside_preserve_nan() {
 	assert heavisides.get_nth(0) == 0.0
 	assert math.is_nan(heavisides.get_nth(1))
 	assert heavisides.get_nth(2) == 1.0
+}
+
+fn test_sign_matches_numpy_real_special_values_and_signed_zero() {
+	values := vtl.from_1d([math.inf(-1), -0.0, 0.0, math.inf(1), math.nan()])!
+	signs := values.sign()
+	assert signs.get_nth(0) == -1.0
+	assert signs.get_nth(1) == 0.0 && !math.signbit(signs.get_nth(1))
+	assert signs.get_nth(2) == 0.0 && !math.signbit(signs.get_nth(2))
+	assert signs.get_nth(3) == 1.0
+	assert math.is_nan(signs.get_nth(4))
+
+	float32_values := vtl.from_1d[f32]([f32(math.inf(-1)), f32(-0.0), f32(math.inf(1))])!
+	float32_signs := float32_values.sign()
+	assert float32_signs.to_array() == [f32(-1.0), f32(0.0), f32(1.0)]
+	assert !math.signbit(float32_signs.get_nth(1))
+}
+
+fn test_complex_sign_matches_numpy_phase_and_special_values() ! {
+	input := vtl.from_1d[vcomplex.Complex]([
+		vcomplex.Complex{ re: 3, im: 4 },
+		vcomplex.Complex{ re: -3, im: 4 },
+		vcomplex.Complex{},
+		vcomplex.Complex{ re: math.inf(1), im: -1 },
+		vcomplex.Complex{ re: 1, im: math.inf(-1) },
+		vcomplex.Complex{ re: math.inf(-1), im: math.inf(1) },
+		vcomplex.Complex{ re: math.nan(), im: 2 },
+		vcomplex.Complex{ re: 1, im: math.nan() },
+		vcomplex.Complex{ re: -0.0, im: 0.0 },
+	])!
+	signs := input.sign()
+	assert signs.get_nth(0) == vcomplex.Complex{ re: 0.6, im: 0.8 }
+	assert signs.get_nth(1) == vcomplex.Complex{ re: -0.6, im: 0.8 }
+	assert signs.get_nth(2) == vcomplex.Complex{}
+	assert signs.get_nth(3) == vcomplex.Complex{ re: 1 }
+	assert signs.get_nth(4) == vcomplex.Complex{ im: -1 }
+	assert math.is_nan(signs.get_nth(5).re) && math.is_nan(signs.get_nth(5).im)
+	assert math.is_nan(signs.get_nth(6).re) && math.is_nan(signs.get_nth(6).im)
+	assert math.is_nan(signs.get_nth(7).re) && math.is_nan(signs.get_nth(7).im)
+	assert signs.get_nth(8) == vcomplex.Complex{}
+	assert vtl.empty[vcomplex.Complex]([0]).sign().shape == [0]
 }
 
 fn test_clip_limits_values_and_preserves_type() {

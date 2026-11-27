@@ -190,6 +190,11 @@ fn test_coordinate_and_label_constructors_use_row_major_layout() ! {
 	x_grid, y_grid := vtl.meshgrid(x, y)!
 	assert x_grid.memory == .row_major
 	assert y_grid.memory == .row_major
+	x_grid_column, y_grid_column := vtl.meshgrid(x, y, memory: .col_major)!
+	assert x_grid_column.memory == .col_major
+	assert y_grid_column.memory == .col_major
+	assert x_grid_column.to_array() == [1, 2, 1, 2, 1, 2]
+	assert y_grid_column.to_array() == [3, 3, 4, 4, 5, 5]
 
 	grids := vtl.meshgrid_n([x, y], .ij)!
 	assert grids[0].memory == .row_major
@@ -319,6 +324,7 @@ fn test_vander_matches_numpy_power_order_and_dimensions() ! {
 	input := vtl.from_1d([1, 2, 3])!
 	descending := vtl.vander(input)!
 	assert descending.shape == [3, 3]
+	assert descending.is_row_major()
 	assert descending.to_array() == [1, 1, 1, 4, 2, 1, 9, 3, 1]
 
 	increasing := vtl.vander(input, increasing: true)!
@@ -328,6 +334,11 @@ fn test_vander_matches_numpy_power_order_and_dimensions() ! {
 	assert custom.shape == [3, 2]
 	assert custom.to_array() == [1, 1, 2, 1, 3, 1]
 	assert vtl.vander(input, n: 0)!.shape == [3, 0]
+
+	column_major := vtl.vander(input, memory: .col_major)!
+	assert column_major.is_col_major()
+	assert column_major.get([1, 0]) == 4
+	assert column_major.get([2, 2]) == 1
 }
 
 fn test_vander_rejects_invalid_input() {

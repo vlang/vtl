@@ -20,6 +20,20 @@ pub fn nanprod[T](t &vtl.Tensor[T]) f64 {
 	return nan_reduce_scalar[T](t, .product)
 }
 
+// nansum_with_keepdims returns the NaN-aware global sum as a tensor, optionally
+// retaining the input rank with dimensions of one. Otherwise, it has scalar
+// shape.
+pub fn nansum_with_keepdims[T](t &vtl.Tensor[T], keepdims bool) !&vtl.Tensor[f64] {
+	return flat_reduction_result[f64](nansum[T](t), t.rank(), keepdims)
+}
+
+// nanprod_with_keepdims returns the NaN-aware global product as a tensor,
+// optionally retaining the input rank with dimensions of one. Otherwise, it
+// has scalar shape.
+pub fn nanprod_with_keepdims[T](t &vtl.Tensor[T], keepdims bool) !&vtl.Tensor[f64] {
+	return flat_reduction_result[f64](nanprod[T](t), t.rank(), keepdims)
+}
+
 // nansum_as adds non-NaN values using an explicitly selected accumulator
 // type. Empty and all-NaN inputs return the additive identity.
 pub fn nansum_as[T, U](t &vtl.Tensor[T]) U {
@@ -32,6 +46,16 @@ pub fn nanprod_as[T, U](t &vtl.Tensor[T]) U {
 	return nan_reduce_scalar_as[T, U](t, true)
 }
 
+// nansum_as_with_keepdims returns the NaN-aware global sum accumulated in U.
+pub fn nansum_as_with_keepdims[T, U](t &vtl.Tensor[T], keepdims bool) !&vtl.Tensor[U] {
+	return flat_reduction_result[U](nansum_as[T, U](t), t.rank(), keepdims)
+}
+
+// nanprod_as_with_keepdims returns the NaN-aware global product accumulated in U.
+pub fn nanprod_as_with_keepdims[T, U](t &vtl.Tensor[T], keepdims bool) !&vtl.Tensor[U] {
+	return flat_reduction_result[U](nanprod_as[T, U](t), t.rank(), keepdims)
+}
+
 // nanmin returns the minimum non-NaN element, or NaN if none exists.
 pub fn nanmin[T](t &vtl.Tensor[T]) f64 {
 	return nan_reduce_scalar[T](t, .minimum)
@@ -40,6 +64,18 @@ pub fn nanmin[T](t &vtl.Tensor[T]) f64 {
 // nanmax returns the maximum non-NaN element, or NaN if none exists.
 pub fn nanmax[T](t &vtl.Tensor[T]) f64 {
 	return nan_reduce_scalar[T](t, .maximum)
+}
+
+// nanmin_as returns the minimum non-NaN value converted to U. If no valid
+// values exist, U must be floating point so the result can represent NaN.
+pub fn nanmin_as[T, U](t &vtl.Tensor[T]) !U {
+	return nan_reduce_extrema_scalar_as[T, U](t, .minimum)
+}
+
+// nanmax_as returns the maximum non-NaN value converted to U. If no valid
+// values exist, U must be floating point so the result can represent NaN.
+pub fn nanmax_as[T, U](t &vtl.Tensor[T]) !U {
+	return nan_reduce_extrema_scalar_as[T, U](t, .maximum)
 }
 
 // nansum_axis reduces one axis and removes it from the result shape.
@@ -78,6 +114,11 @@ pub fn nanmin_axis[T](t &vtl.Tensor[T], axis int) !&vtl.Tensor[f64] {
 	return nan_reduce_axis[T](t, axis, .minimum, false)
 }
 
+// nanmin_axis_with_keepdims selects whether the reduced axis remains in shape.
+pub fn nanmin_axis_with_keepdims[T](t &vtl.Tensor[T], axis int, keepdims bool) !&vtl.Tensor[f64] {
+	return nan_reduce_axis[T](t, axis, .minimum, keepdims)
+}
+
 // nanmin_axis_keepdims reduces one axis and keeps it with length one.
 pub fn nanmin_axis_keepdims[T](t &vtl.Tensor[T], axis int) !&vtl.Tensor[f64] {
 	return nan_reduce_axis[T](t, axis, .minimum, true)
@@ -89,9 +130,26 @@ pub fn nanmax_axis[T](t &vtl.Tensor[T], axis int) !&vtl.Tensor[f64] {
 	return nan_reduce_axis[T](t, axis, .maximum, false)
 }
 
+// nanmax_axis_with_keepdims selects whether the reduced axis remains in shape.
+pub fn nanmax_axis_with_keepdims[T](t &vtl.Tensor[T], axis int, keepdims bool) !&vtl.Tensor[f64] {
+	return nan_reduce_axis[T](t, axis, .maximum, keepdims)
+}
+
 // nanmax_axis_keepdims reduces one axis and keeps it with length one.
 pub fn nanmax_axis_keepdims[T](t &vtl.Tensor[T], axis int) !&vtl.Tensor[f64] {
 	return nan_reduce_axis[T](t, axis, .maximum, true)
+}
+
+// nanmin_axis_as reduces one axis into U and preserves the reduced dimension
+// when keepdims is true.
+pub fn nanmin_axis_as[T, U](t &vtl.Tensor[T], axis int, keepdims bool) !&vtl.Tensor[U] {
+	return nan_reduce_extrema_axis_as[T, U](t, axis, .minimum, keepdims)
+}
+
+// nanmax_axis_as reduces one axis into U and preserves the reduced dimension
+// when keepdims is true.
+pub fn nanmax_axis_as[T, U](t &vtl.Tensor[T], axis int, keepdims bool) !&vtl.Tensor[U] {
+	return nan_reduce_extrema_axis_as[T, U](t, axis, .maximum, keepdims)
 }
 
 // nansum_axes reduces multiple axes, ignoring NaN values, and selects whether
@@ -126,6 +184,144 @@ pub fn nanmin_axes[T](t &vtl.Tensor[T], axes []int, keepdims bool) !&vtl.Tensor[
 // Slices containing no non-NaN values produce NaN.
 pub fn nanmax_axes[T](t &vtl.Tensor[T], axes []int, keepdims bool) !&vtl.Tensor[f64] {
 	return nan_reduce_axes[T](t, axes, .maximum, keepdims)
+}
+
+// nanmin_axes_as reduces several axes into U. An empty axis list converts each
+// value without reducing it.
+pub fn nanmin_axes_as[T, U](t &vtl.Tensor[T], axes []int, keepdims bool) !&vtl.Tensor[U] {
+	return nan_reduce_extrema_axes_as[T, U](t, axes, .minimum, keepdims)
+}
+
+// nanmax_axes_as reduces several axes into U. An empty axis list converts each
+// value without reducing it.
+pub fn nanmax_axes_as[T, U](t &vtl.Tensor[T], axes []int, keepdims bool) !&vtl.Tensor[U] {
+	return nan_reduce_extrema_axes_as[T, U](t, axes, .maximum, keepdims)
+}
+
+fn nan_reduce_extrema_scalar_as[T, U](t &vtl.Tensor[T], operation NanReduction) !U {
+	mut has_value := false
+	mut reduced := T(0)
+	mut iter := t.iterator[T]()
+	for {
+		value, _ := iter.next() or { break }
+		if math.is_nan(f64(value)) {
+			continue
+		}
+		if !has_value || nan_extrema_is_better[T](value, reduced, operation) {
+			reduced = value
+			has_value = true
+		}
+	}
+	if !has_value {
+		return nan_extrema_empty_as[U]()
+	}
+	return vtl.cast[U](reduced)
+}
+
+fn nan_reduce_extrema_axis_as[T, U](t &vtl.Tensor[T], axis int, operation NanReduction, keepdims bool) !&vtl.Tensor[U] {
+	rank := t.rank()
+	if rank == 0 {
+		return error('NaN reduction axis requires a tensor with at least one dimension')
+	}
+	axis_index := if axis < 0 { axis + rank } else { axis }
+	if axis_index < 0 || axis_index >= rank {
+		return error('NaN reduction axis ${axis} out of bounds for rank ${rank}')
+	}
+	mut output_shape := t.shape.clone()
+	if keepdims {
+		output_shape[axis_index] = 1
+	} else {
+		output_shape.delete(axis_index)
+	}
+	mut result := vtl.empty[U](output_shape, memory: .row_major)
+	mut slice_count := 1
+	for dimension, size in t.shape {
+		if dimension != axis_index {
+			slice_count *= size
+		}
+	}
+	mut index := []int{len: rank}
+	for slice in 0 .. slice_count {
+		decode_nan_reduction_slice(slice, t.shape, axis_index, mut index)
+		mut has_value := false
+		mut reduced := T(0)
+		for position in 0 .. t.shape[axis_index] {
+			index[axis_index] = position
+			value := t.get(index)
+			if math.is_nan(f64(value)) {
+				continue
+			}
+			if !has_value || nan_extrema_is_better[T](value, reduced, operation) {
+				reduced = value
+				has_value = true
+			}
+		}
+		value := if has_value {
+			vtl.cast[U](reduced)
+		} else {
+			nan_extrema_empty_as[U]()!
+		}
+		if keepdims {
+			index[axis_index] = 0
+			result.set(index, value)
+		} else {
+			mut output_index := index[..axis_index].clone()
+			output_index << index[axis_index + 1..]
+			result.set(output_index, value)
+		}
+	}
+	return result
+}
+
+fn nan_reduce_extrema_axes_as[T, U](t &vtl.Tensor[T], axes []int, operation NanReduction, keepdims bool) !&vtl.Tensor[U] {
+	if axes.len == 0 {
+		mut result := vtl.empty[U](t.shape, memory: .row_major)
+		mut iter := t.iterator[T]()
+		for {
+			value, index := iter.next() or { break }
+			result.set(index, vtl.cast[U](value))
+		}
+		return result
+	}
+	mut normalized := []int{cap: axes.len}
+	for axis in axes {
+		axis_index := if axis < 0 { axis + t.rank() } else { axis }
+		if axis_index < 0 || axis_index >= t.rank() {
+			return error('NaN reduction axis ${axis} out of bounds for rank ${t.rank()}')
+		}
+		if axis_index in normalized {
+			return error('duplicate NaN reduction axis ${axis}')
+		}
+		normalized << axis_index
+	}
+	for i in 0 .. normalized.len {
+		for j in i + 1 .. normalized.len {
+			if normalized[i] < normalized[j] {
+				normalized[i], normalized[j] = normalized[j], normalized[i]
+			}
+		}
+	}
+	mut result := nan_reduce_extrema_axis_as[T, U](t, normalized[0], operation, keepdims)!
+	for axis_index in normalized[1..] {
+		result = nan_reduce_extrema_axis_as[U, U](result, axis_index, operation, keepdims)!
+	}
+	return result
+}
+
+fn nan_extrema_is_better[T](candidate T, current T, operation NanReduction) bool {
+	$if T is bool {
+		return if operation == .minimum { !candidate && current } else { candidate && !current }
+	} $else {
+		return if operation == .minimum { candidate < current } else { candidate > current }
+	}
+}
+
+fn nan_extrema_empty_as[U]() !U {
+	$if U is f32 || U is f64 {
+		return U(math.nan())
+	} $else {
+		return error('NaN extrema with no valid values require a floating-point output type')
+	}
 }
 
 fn nan_reduce_axes[T](t &vtl.Tensor[T], axes []int, operation NanReduction, keepdims bool) !&vtl.Tensor[f64] {

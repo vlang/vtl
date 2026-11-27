@@ -5,9 +5,8 @@ env:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  # Main pushes are serialized to the newest revision, so rapid merges do not
-  # leave stale workflows occupying the Actions queue.
-  cancel-in-progress: true
+  # Keep complete main runs as evidence; only supersede in-progress PR runs.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 on:
   # Allows you to run this workflow manually from the Actions tab
@@ -51,12 +50,15 @@ jobs:
         with:
           path: vtl
 
+      - name: Test paired release validator
+        run: python3 vtl/tools/test_check_paired_release.py
+
       - name: Setup V
         id: setup_v
         if: ${{ success() && !cancelled() && steps.checkout_vtl.outcome == 'success' }}
         uses: vlang/setup-v@663cc08827d1fc0532ee755b4dedbb183c11d06a # v1.7
         with:
-          version: ba41fa121b738a1a694e0050401a45d2376e09b9
+          version: 7f5b9a3ddedafcfa86a88a4697c12c10e5901168
 
       - name: Move VTL source code to V Modules
         id: move_vtl_source_code_to_v_modules
@@ -162,7 +164,7 @@ jobs:
         if: ${{ success() && !cancelled() && steps.checkout_vsl.outcome == 'success' }}
         uses: vlang/setup-v@663cc08827d1fc0532ee755b4dedbb183c11d06a # v1.7
         with:
-          version: ba41fa121b738a1a694e0050401a45d2376e09b9
+          version: 7f5b9a3ddedafcfa86a88a4697c12c10e5901168
 
       - name: Move VTL source code to V Modules
         id: move_vtl_source_code_to_v_modules
@@ -253,7 +255,7 @@ jobs:
         if: ${{ success() && !cancelled() && steps.checkout_vsl.outcome == 'success' }}
         uses: vlang/setup-v@663cc08827d1fc0532ee755b4dedbb183c11d06a # v1.7
         with:
-          version: ba41fa121b738a1a694e0050401a45d2376e09b9
+          version: 7f5b9a3ddedafcfa86a88a4697c12c10e5901168
 
       - name: Move modules to V Modules
         id: move_modules_to_v_modules
@@ -314,7 +316,7 @@ jobs:
         if: ${{ success() && !cancelled() && steps.checkout_vsl.outcome == 'success' }}
         uses: vlang/setup-v@663cc08827d1fc0532ee755b4dedbb183c11d06a # v1.7
         with:
-          version: ba41fa121b738a1a694e0050401a45d2376e09b9
+          version: 7f5b9a3ddedafcfa86a88a4697c12c10e5901168
 
       - name: Move modules to V Modules
         id: move_modules_to_v_modules

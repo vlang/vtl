@@ -30,6 +30,42 @@ fn test_real_f32_fft_round_trips_odd_lengths() ! {
 	}
 }
 
+fn test_real_f32_fft_reads_strided_input_in_logical_order() ! {
+	base := vtl.from_1d[f32]([1, 99, 0, 99, -1, 99, 0, 99])!
+	strided := base.slice([0, 8, 2])!
+	contiguous := vtl.from_1d[f32](strided.to_array())!
+	assert !strided.is_row_major_contiguous()
+	strided_spectrum := rfft_f32(strided)!
+	contiguous_spectrum := rfft_f32(contiguous)!
+	assert strided_spectrum.shape == contiguous_spectrum.shape
+	for i in 0 .. strided_spectrum.size {
+		assert math.abs(strided_spectrum.get_nth(i).re - contiguous_spectrum.get_nth(i).re) < 1e-5
+		assert math.abs(strided_spectrum.get_nth(i).im - contiguous_spectrum.get_nth(i).im) < 1e-5
+	}
+}
+
+fn test_real_f32_axis_and_nd_read_strided_final_axes() ! {
+	base := vtl.from_array[f32]([1, 99, 2, 99, 3, 99, 4, 99, 5, 99, 6, 99, 7, 99, 8, 99],
+		[2, 8])!
+	strided := base.slice([]int{}, [0, 8, 2])!
+	contiguous := vtl.from_array[f32](strided.to_array(), strided.shape)!
+	assert !strided.is_row_major_contiguous()
+	axis_result := rfft_axis_f32(strided, -1)!
+	axis_expected := rfft_axis_f32(contiguous, -1)!
+	assert axis_result.shape == axis_expected.shape
+	for i in 0 .. axis_expected.size {
+		assert math.abs(axis_result.get_nth(i).re - axis_expected.get_nth(i).re) < 1e-5
+		assert math.abs(axis_result.get_nth(i).im - axis_expected.get_nth(i).im) < 1e-5
+	}
+	nd_result := rfftn_f32(strided)!
+	nd_expected := rfftn_f32(contiguous)!
+	assert nd_result.shape == nd_expected.shape
+	for i in 0 .. nd_expected.size {
+		assert math.abs(nd_result.get_nth(i).re - nd_expected.get_nth(i).re) < 1e-5
+		assert math.abs(nd_result.get_nth(i).im - nd_expected.get_nth(i).im) < 1e-5
+	}
+}
+
 fn test_reusable_real_f32_fft_plan() ! {
 	input := vtl.from_1d[f32]([1, 0, 0, 0])!
 	mut plan := create_rfft_f32_plan(input.size)!
@@ -59,6 +95,78 @@ fn test_real_f32_axis_and_nd_transforms_round_trip() ! {
 		assert math.abs(nd_restored.get_nth(i) - input.get_nth(i)) < 1e-5
 		assert math.abs(two_d_restored.get_nth(i) - input.get_nth(i)) < 1e-5
 	}
+}
+
+fn test_real_f32_generic_and_dedicated_nd_dtype_contracts() ! {
+	vector := vtl.from_1d[f32]([1, 0, 0, 0])!
+	image := vtl.from_array[f32]([1, 0, 0, 0], [2, 2])!
+	input := vtl.from_array[f32]([1, 0, 0, 0, 1, 0, 0, 0], [2, 2, 2])!
+	generic_1d := rfft[f32](vector)!
+	generic_1d_norm := rfft_norm[f32](vector, .ortho)!
+	generic_axis := rfft_axis[f32](image, 1)!
+	generic_axis_norm := rfft_axis_norm[f32](image, 1, .ortho)!
+	generic_2d_norm := rfft2_norm[f32](image, .ortho)!
+	generic_nd := rfftn[f32](input)!
+	generic_nd_norm := rfftn_norm[f32](input, .ortho)!
+	generic_2d := rfft2[f32](image)!
+	assert typeof(generic_1d.get_nth(0).re).name == 'f64'
+	assert typeof(generic_1d_norm.get_nth(0).re).name == 'f64'
+	assert typeof(generic_axis.get_nth(0).re).name == 'f64'
+	assert typeof(generic_axis_norm.get_nth(0).re).name == 'f64'
+	assert typeof(generic_2d_norm.get_nth(0).re).name == 'f64'
+	assert typeof(generic_nd.get_nth(0).re).name == 'f64'
+	assert typeof(generic_nd_norm.get_nth(0).re).name == 'f64'
+	assert typeof(generic_2d.get_nth(0).re).name == 'f64'
+
+	dedicated_1d := rfft_f32(vector)!
+	dedicated_1d_norm := rfft_norm_f32(vector, .ortho)!
+	dedicated_axis := rfft_axis_f32(image, 1)!
+	dedicated_axis_norm := rfft_axis_norm_f32(image, 1, .ortho)!
+	dedicated_2d_norm := rfft2_norm_f32(image, .ortho)!
+	dedicated_nd := rfftn_f32(input)!
+	dedicated_nd_norm := rfftn_norm_f32(input, .ortho)!
+	dedicated_2d := rfft2_f32(image)!
+	assert typeof(dedicated_1d.get_nth(0).re).name == 'f32'
+	assert typeof(dedicated_1d_norm.get_nth(0).re).name == 'f32'
+	assert typeof(dedicated_axis.get_nth(0).re).name == 'f32'
+	assert typeof(dedicated_axis_norm.get_nth(0).re).name == 'f32'
+	assert typeof(dedicated_2d_norm.get_nth(0).re).name == 'f32'
+	assert typeof(dedicated_nd.get_nth(0).re).name == 'f32'
+	assert typeof(dedicated_nd_norm.get_nth(0).re).name == 'f32'
+	assert typeof(dedicated_2d.get_nth(0).re).name == 'f32'
+
+	assert typeof(irfft(generic_1d, vector.size)!.get_nth(0)).name == 'f64'
+	assert typeof(irfft_axis(generic_axis_norm, 1, 2)!.get_nth(0)).name == 'f64'
+	assert typeof(irfft2(generic_2d_norm, image.shape)!.get_nth(0)).name == 'f64'
+	assert typeof(irfftn(generic_nd_norm, input.shape)!.get_nth(0)).name == 'f64'
+	assert typeof(irfft_norm(generic_1d_norm, vector.size, .ortho)!.get_nth(0)).name == 'f64'
+	assert typeof(irfft_axis_norm(generic_axis, 1, 2, .ortho)!.get_nth(0)).name == 'f64'
+	assert typeof(irfft2_norm(generic_2d, image.shape, .ortho)!.get_nth(0)).name == 'f64'
+	assert typeof(irfftn_norm(generic_nd, input.shape, .ortho)!.get_nth(0)).name == 'f64'
+	assert typeof(irfft_f32(dedicated_1d, vector.size)!.get_nth(0)).name == 'f32'
+	assert typeof(irfft_axis_f32(dedicated_axis_norm, 1, 2)!.get_nth(0)).name == 'f32'
+	assert typeof(irfft2_f32(dedicated_2d_norm, image.shape)!.get_nth(0)).name == 'f32'
+	assert typeof(irfftn_f32(dedicated_nd_norm, input.shape)!.get_nth(0)).name == 'f32'
+	assert typeof(irfft_norm_f32(dedicated_1d_norm, vector.size, .ortho)!.get_nth(0)).name == 'f32'
+	assert typeof(irfft_axis_norm_f32(dedicated_axis, 1, 2, .ortho)!.get_nth(0)).name == 'f32'
+	assert typeof(irfft2_norm_f32(dedicated_2d, image.shape, .ortho)!.get_nth(0)).name == 'f32'
+	assert typeof(irfftn_norm_f32(dedicated_nd, input.shape, .ortho)!.get_nth(0)).name == 'f32'
+
+	mut generic_plan := create_rfft_plan[f32](vector.size)!
+	defer {
+		generic_plan.destroy()
+	}
+	assert typeof(generic_plan.forward(vector)!.get_nth(0).re).name == 'f64'
+	mut dedicated_plan := create_rfft_f32_plan(vector.size)!
+	defer {
+		dedicated_plan.destroy()
+	}
+	assert typeof(dedicated_plan.forward(vector)!.get_nth(0).re).name == 'f32'
+
+	generic_restored := irfftn(generic_nd_norm, input.shape)!
+	dedicated_restored := irfftn_f32(dedicated_nd_norm, input.shape)!
+	assert typeof(generic_restored.get_nth(0)).name == 'f64'
+	assert typeof(dedicated_restored.get_nth(0)).name == 'f32'
 }
 
 fn test_real_f32_fft_normalization_matches_numpy_modes() ! {

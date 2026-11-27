@@ -12,12 +12,9 @@ performance, or ecosystem.
 |------------|-------|
 | OpenCL compute and neural-network dispatch | [#750](https://github.com/vlang/vtl/issues/750) |
 | Vulkan activation residency across sequential layers | [#797](https://github.com/vlang/vtl/issues/797) |
-| CUDA backward for remaining neural-network layers | [#161](https://github.com/vlang/vtl/issues/161) |
 | Tensor semantics; dtype and device model | [#731](https://github.com/vlang/vtl/issues/731), [#732](https://github.com/vlang/vtl/issues/732) |
 | Higher-order autograd | [#733](https://github.com/vlang/vtl/issues/733) |
 | Functional tensor transforms such as `vmap` | [#784](https://github.com/vlang/vtl/issues/784) |
-| Core layer-family coverage | [#802](https://github.com/vlang/vtl/issues/802) |
-| Loss function coverage | [#803](https://github.com/vlang/vtl/issues/803) |
 | Stacked recurrent APIs; custom module state | [#734](https://github.com/vlang/vtl/issues/734), [#735](https://github.com/vlang/vtl/issues/735) |
 | Optimizer/scheduler parity | [#736](https://github.com/vlang/vtl/issues/736) |
 | Device-resident CUDA optimizer state and updates | [#758](https://github.com/vlang/vtl/issues/758) |
@@ -29,7 +26,6 @@ performance, or ecosystem.
 | Interoperability and deployment | [#743](https://github.com/vlang/vtl/issues/743) |
 | Sparse tensor formats and operations | [#746](https://github.com/vlang/vtl/issues/746) |
 | In-process tensor buffer interoperability | [#748](https://github.com/vlang/vtl/issues/748) |
-| PyTorch migration and training tutorials | [#770](https://github.com/vlang/vtl/issues/770) |
 | Matched VTL/PyTorch performance benchmarks | [#771](https://github.com/vlang/vtl/issues/771) |
 
 ## Capability matrix
@@ -65,11 +61,14 @@ tracked in [#750](https://github.com/vlang/vtl/issues/750).
 **Next:** Define a consistent dtype promotion and device model. Broaden backend
 coverage and test transfers, mixed precision, and device-specific behavior.
 
-VTL now has an opt-in `vtl.quantization` foundation for signed INT8 affine
-per-tensor and per-channel conversion, min/max calibration observers, and
-f32/f64 dequantization. Quantized Linear/Conv kernels, layer conversion, and
-accelerator execution are still open in [#792](https://github.com/vlang/vtl/issues/792);
-the current API makes no inference performance claim.
+VTL now has opt-in signed INT8 affine per-tensor/per-channel conversion,
+min/max calibration observers, and an f32-output quantized CPU Linear operator
+plus an NCHW/OIHW CPU Conv2D operator and forward-only Linear/Conv2D weight
+conversion helpers in `vtl.quantization`. Experimental CUDA inference is
+available for Linear and Conv2D through cuBLAS; CUDA Linear can retain weights,
+while CUDA Conv2D currently uses a one-shot path. Broader model conversion,
+additional accelerator coverage, and performance parity remain open in
+[#792](https://github.com/vlang/vtl/issues/792).
 
 ### Autograd
 
@@ -81,14 +80,25 @@ Floating-point `Variable.remainder` also propagates gradients to both operands,
 reduces broadcast gradients to their input shapes, and follows PyTorch's
 `floor(a / b)` divisor-gradient convention at exact multiples.
 
+`vtl.vmap` and `vtl.autograd.vmap` provide composable CPU transforms for mapping
+tensor or differentiable-variable functions over an input axis, with
+negative-axis support, output-axis insertion relative to the callback result,
+shape validation, and functions that return either vectors or scalar-shaped
+tensors. They intentionally do not yet transform module state or randomness.
+
 **Next:** Expand operation coverage and add gradient APIs and graph controls
 comparable to `torch.autograd`, including higher-order gradients and retained
 graphs where feasible.
 
 ### Neural-network modules
 
-**VTL today:** `Sequential`, common activations, linear, convolutional,
-recurrent, attention, and normalization layers. Typed CPU LSTM layers support
+**VTL today:** `Sequential`, common activations, linear, convolutional
+(including CPU `conv_transpose1d` and `conv_transpose2d` with autograd), padding
+and pooling (`pad1d`/`pad2d`/`pad3d`, `avgpool1d`/`avgpool2d`/`avgpool3d`,
+`maxpool1d`/`maxpool2d`/`maxpool3d`, and fixed-output `adaptive_avgpool1d`/
+`adaptive_avgpool2d`/`adaptive_avgpool3d` and `adaptive_maxpool1d`/
+`adaptive_maxpool2d`/`adaptive_maxpool3d`), recurrent, attention, and
+normalization layers. Typed CPU LSTM layers support
 stacked hidden/cell state through `forward_with_state`; typed CPU GRU layers
 support an explicit initial and final hidden state. Their default input layouts
 differ: LSTM is `[batch, sequence, features]`, while GRU is
@@ -97,6 +107,11 @@ differ: LSTM is `[batch, sequence, features]`, while GRU is
 `[batch, sequence, features]` input; `Sequential.gru` keeps the sequence-first
 layout. See the
 [NN tutorial](./TUTORIAL_NEURAL_NETWORKS.md).
+
+The listed padding, pooling, and transposed-convolution layer wrappers execute
+on CPU with CPU autograd. Their presence in `Sequential` does not imply CUDA,
+Vulkan, or OpenCL dispatch; accelerator support must be verified per backend
+and operation.
 
 GroupNorm supports channel-first `[batch, channels, ...]` inputs, per-channel
 affine parameters, and CPU input/parameter gradients. RMSNorm normalizes trailing
@@ -123,11 +138,16 @@ state API, recurrent dropout and variable-length packed sequences. `Sequential`
 supports `train()`/`eval()` behavior for Dropout, BatchNorm1D, BatchNorm2D and
 BatchNorm3D (mode propagation and running-statistics behavior are covered by
 `nn/models/sequential_normalization_test.v`); LayerNorm, GroupNorm and RMSNorm
-have no training-dependent statistics, matching PyTorch. Extending mode-aware
-behavior to custom modules remains open. Parameter and
-buffer registration and composable user-defined modules remain gaps. Stateful
-LSTM/GRU entry points are available today, but do not imply parity with the
-full `torch.nn` recurrent API or CUDA backward.
+have no training-dependent statistics, matching PyTorch. The new
+`nn.types.Module[T]` state registry supports named parameter and buffer
+registration, recursive dotted-name traversal, duplicate-name validation, and
+cycle rejection. Attach it to a callback-backed `Layer[T]` with
+`layer_with_module_state` to expose registered parameters to existing optimizer
+builders and propagate train/eval state recursively. A higher-level custom
+forward API, custom-module checkpoint serialization, and a complete
+train/round-trip example remain open. Stateful LSTM/GRU entry points are
+available today, but do not imply parity with the full `torch.nn` recurrent
+API or CUDA backward.
 
 ### Losses and optimizers
 
@@ -205,12 +225,15 @@ weighted draws with or without replacement, and the tensor-backed
 and `drop_last`. `DataLoader.set_collate_fn`, `collated_batch`, and
 `for_each_collated` support custom tensor collation from the selected source
 rows and optional labels.
+`vtl.datasets.TransformPipeline` composes fallible CPU tensor transforms in
+order for individual samples or batches; custom collation can use it for batch
+transforms.
 The dense tensor API returns feature and label tensors; it does not represent
 arbitrary Python objects or nested sample structures. Iterable datasets,
 worker processes, and pinned-memory loading remain unavailable.
 
-**Next:** Add composable transforms, worker and process loading, streaming
-datasets, generator injection, and stronger reproducibility controls. See the
+**Next:** Add worker and process loading, streaming datasets, generator
+injection, and stronger reproducibility controls. See the
 [custom collation example](../examples/datasets_custom_collate/main.v) and the
 [PyTorch data loading API](https://docs.pytorch.org/docs/stable/data.html)
 when porting a pipeline; specify VTL loader options explicitly because its

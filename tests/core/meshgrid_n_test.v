@@ -25,6 +25,18 @@ fn test_meshgrid_n_supports_xy_and_ij_indexing() ! {
 	assert empty[1].shape == [4, 0]
 }
 
+fn test_meshgrid_n_preserves_requested_memory_format() ! {
+	x := vtl.from_1d([10, 20])!
+	y := vtl.from_1d([1, 2, 3])!
+	grids := vtl.meshgrid_n([x, y], .ij, memory: .col_major)!
+	for grid in grids {
+		assert grid.memory == .col_major
+		assert grid.strides == [1, 2]
+	}
+	assert grids[0].to_array() == [10, 10, 10, 20, 20, 20]
+	assert grids[1].to_array() == [1, 2, 3, 1, 2, 3]
+}
+
 fn test_meshgrid_n_validates_inputs() ! {
 	if _ := vtl.meshgrid_n[int]([], .ij) {
 		assert false, 'meshgrid_n must reject an empty vector list'

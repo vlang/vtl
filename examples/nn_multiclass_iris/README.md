@@ -35,18 +35,19 @@ v run vtl/examples/nn_multiclass_iris/main.v
 Training MLP on synthetic 3-class dataset (2 features, 60 samples)...
 Epoch | Avg Loss
 ------|----------
-    0 | 1.158763
-  100 | 0.713452
-  200 | 0.601234
-  300 | 0.534211
-  400 | 0.489321
-  499 | 0.451234
+    0 | 1.108712
+  100 | 0.549737
+  200 | 0.189849
+  300 | 0.092818
+  400 | 0.057077
+  499 | 0.039860
 
 Evaluating training accuracy...
-Training accuracy: 52/60 = 86.7%
+Training accuracy: 60/60 = 100.0%
 ```
 
-Accuracy reaches ~87% in 500 epochs with seed 42.
+With seed 42, this synthetic training set reaches 100% training accuracy.
+This is not a held-out evaluation and does not estimate generalization.
 
 ## Key parameters
 

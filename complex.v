@@ -101,6 +101,45 @@ pub fn complex_is_finite(input &Tensor[complex.Complex]) !&Tensor[bool] {
 	})
 }
 
+fn complex_power_value(base complex.Complex, exponent complex.Complex) complex.Complex {
+	if exponent.re == 0.0 && exponent.im == 0.0 {
+		return complex.complex(1.0, 0.0)
+	}
+	if base.re == 0.0 && base.im == 0.0 {
+		if exponent.re > 0.0 {
+			return complex.complex(0.0, 0.0)
+		}
+		return complex.complex(math.nan(), math.nan())
+	}
+	if math.is_nan(base.re) || math.is_nan(base.im) {
+		return complex.complex(math.nan(), math.nan())
+	}
+	if !math.is_finite(exponent.re) || !math.is_finite(exponent.im) {
+		return complex.complex(math.nan(), math.nan())
+	}
+	if math.is_inf(base.re, 0) || math.is_inf(base.im, 0) {
+		if exponent.re <= 0.0 {
+			return complex.complex(math.nan(), math.nan())
+		}
+		mut real_part := math.inf(1)
+		if exponent.im == 0.0 && math.cos(exponent.re * math.atan2(base.im, base.re)) < 0.0 {
+			real_part = math.inf(-1)
+		}
+		return complex.complex(real_part, math.nan())
+	}
+	absolute_re := math.abs(base.re)
+	absolute_im := math.abs(base.im)
+	scale := if absolute_re > absolute_im { absolute_re } else { absolute_im }
+	scaled_re := base.re / scale
+	scaled_im := base.im / scale
+	log_radius := math.log(scale) + 0.5 * math.log(scaled_re * scaled_re + scaled_im * scaled_im)
+	angle := math.atan2(base.im, base.re)
+	log_power_re := exponent.re * log_radius - exponent.im * angle
+	log_power_im := exponent.im * log_radius + exponent.re * angle
+	magnitude := math.exp(log_power_re)
+	return complex.complex(magnitude * math.cos(log_power_im), magnitude * math.sin(log_power_im))
+}
+
 fn map_complex_predicate(input &Tensor[complex.Complex], predicate fn (complex.Complex) bool) !&Tensor[bool] {
 	mut values := []bool{len: input.size}
 	for i in 0 .. input.size {

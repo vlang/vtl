@@ -63,7 +63,10 @@ model.mse_loss() // loss function
 `Sequential` starts in training mode. Call `model.eval()` before evaluation to
 disable dropout and make BatchNorm use its running statistics; call
 `model.train()` before resuming training. These methods set module behavior and
-are independent of whether the input tensor requires gradients.
+are independent of whether the input tensor requires gradients. For inference
+without graph construction, also set the shared autograd context's `no_grad`
+flag; `eval()` alone does not disable gradient recording. See the
+[autograd tutorial](./TUTORIAL_AUTOGRAD.md#gradient-accumulation).
 
 ```v
 import vtl
@@ -166,6 +169,7 @@ model.selu()
 | `l1_loss()` | `L1Loss` | Mean Absolute Error (MAE); zero subgradient at exact matches |
 | `hinge_loss()` | `HingeLoss` | Binary SVM hinge loss; targets must be -1 or +1 |
 | `focal_loss()` | `FocalLoss` | Binary focal loss for imbalanced classes; default logits, alpha 0.25, gamma 2 |
+| `poisson_nll_loss()` | `PoissonNLLLoss` | Poisson negative log likelihood; supports log-input and Stirling full-term modes |
 | `nll_loss(weight)` | `NLLLoss` | Negative Log Likelihood |
 | `kl_div_loss()` | `KLDivLoss` | KL Divergence D_KL(P‖Q) |
 

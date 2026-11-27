@@ -12,6 +12,12 @@ pub fn mean_as[T, U](t &vtl.Tensor[T]) U {
 	return sum_as[T, U](t) / vtl.cast[U](t.size)
 }
 
+// mean_as_with_keepdims returns the global mean using U for accumulation and
+// output, with optional retained input dimensions.
+pub fn mean_as_with_keepdims[T, U](t &vtl.Tensor[T], keepdims bool) !&vtl.Tensor[U] {
+	return flat_reduction_result[U](mean_as[T, U](t), t.rank(), keepdims)
+}
+
 // mean_along_axis_as computes the mean along one axis using U for accumulation
 // and output. The reduced axis is retained when keepdims is true.
 pub fn mean_along_axis_as[T, U](t &vtl.Tensor[T], axis int, keepdims bool) !&vtl.Tensor[U] {

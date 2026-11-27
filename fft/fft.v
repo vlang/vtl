@@ -223,17 +223,36 @@ pub fn rfft_axis[T](input &vtl.Tensor[T], axis int) !&vtl.Tensor[complex.Complex
 		}
 		line_count := input.size / axis_length
 		for line_index in 0 .. line_count {
-			decode_fft_axis_line(line_index, input.shape, axis_index, mut index)
-			for position in 0 .. axis_length {
-				index[axis_index] = position
-				line[position] = T(input.get(index))
+			if axis_index == input.rank() - 1 && input.is_row_major_contiguous() {
+				line_offset := line_index * axis_length
+				unsafe {
+					C.memcpy(line.data, &input.data.data[line_offset], axis_length * sizeof(T))
+				}
+			} else if axis_index == input.rank() - 1 && input.strides[axis_index] > 1
+				&& fft_strides_are_nonnegative(input.strides) {
+				decode_fft_axis_line(line_index, input.shape, axis_index, mut index)
+				index[axis_index] = 0
+				line_offset := fft_line_offset(index, input.strides)
+				for position in 0 .. axis_length {
+					line[position] = input.data.data[line_offset + position * input.strides[axis_index]]
+				}
+			} else {
+				decode_fft_axis_line(line_index, input.shape, axis_index, mut index)
+				for position in 0 .. axis_length {
+					index[axis_index] = position
+					line[position] = T(input.get(index))
+				}
 			}
 			if vsl_fft.forward_fft(plan, mut line) != 0 {
 				return error('rfft_axis backend failed to compute the forward transform')
 			}
 			for frequency in 0 .. frequency_count {
-				index[axis_index] = frequency
-				output_index := row_major_index(index, output_shape)
+				output_index := if axis_index == input.rank() - 1 {
+					line_index * frequency_count + frequency
+				} else {
+					index[axis_index] = frequency
+					row_major_index(index, output_shape)
+				}
 				if frequency == 0 {
 					output[output_index] = complex.complex(f64(line[0]), 0)
 				} else if axis_length % 2 == 0 && frequency == axis_length / 2 {
@@ -368,17 +387,30 @@ pub fn rfftn[T](input &vtl.Tensor[T]) !&vtl.Tensor[complex.Complex] {
 		}
 		line_count := input.size / last_length
 		for line_index in 0 .. line_count {
-			decode_row_major_index(line_index, input.shape[..last_axis], mut index)
-			for position in 0 .. last_length {
-				index[last_axis] = position
-				line[position] = T(input.get(index))
+			if input.is_row_major_contiguous() {
+				line_offset := line_index * last_length
+				unsafe {
+					C.memcpy(line.data, &input.data.data[line_offset], last_length * sizeof(T))
+				}
+			} else if input.strides[last_axis] > 1 && fft_strides_are_nonnegative(input.strides) {
+				decode_row_major_index(line_index, input.shape[..last_axis], mut index)
+				index[last_axis] = 0
+				line_offset := fft_line_offset(index, input.strides)
+				for position in 0 .. last_length {
+					line[position] = input.data.data[line_offset + position * input.strides[last_axis]]
+				}
+			} else {
+				decode_row_major_index(line_index, input.shape[..last_axis], mut index)
+				for position in 0 .. last_length {
+					index[last_axis] = position
+					line[position] = T(input.get(index))
+				}
 			}
 			if vsl_fft.forward_fft(plan, mut line) != 0 {
 				return error('rfftn backend failed to compute the forward transform')
 			}
 			for frequency in 0 .. frequency_count {
-				index[last_axis] = frequency
-				output_index := row_major_index(index, output_shape)
+				output_index := line_index * frequency_count + frequency
 				if frequency == 0 {
 					compact[output_index] = complex.complex(f64(line[0]), 0)
 				} else if last_length % 2 == 0 && frequency == last_length / 2 {
@@ -562,6 +594,11 @@ pub fn irfft_axis(input &vtl.Tensor[complex.Complex], axis int, length int) !&vt
 fn rfft_f32_with_plan(input &vtl.Tensor[f32], plan vsl_fft.Fftplan, mut packed []f32) !&vtl.Tensor[complex.Complex] {
 	if input.is_row_major_contiguous() {
 		unsafe { C.memcpy(packed.data, input.data.data.data, input.size * sizeof(f32)) }
+	} else if input.rank() == 1 && input.strides[0] > 0 {
+		stride := input.strides[0]
+		for i in 0 .. input.size {
+			packed[i] = input.data.get(i * stride)
+		}
 	} else {
 		for i in 0 .. input.size {
 			packed[i] = input.get_nth(i)
@@ -576,6 +613,11 @@ fn rfft_f32_with_plan(input &vtl.Tensor[f32], plan vsl_fft.Fftplan, mut packed [
 fn rfft_f64_with_plan(input &vtl.Tensor[f64], plan vsl_fft.Fftplan, mut packed []f64) !&vtl.Tensor[complex.Complex] {
 	if input.is_row_major_contiguous() {
 		unsafe { C.memcpy(packed.data, input.data.data.data, input.size * sizeof(f64)) }
+	} else if input.rank() == 1 && input.strides[0] > 0 {
+		stride := input.strides[0]
+		for i in 0 .. input.size {
+			packed[i] = input.data.get(i * stride)
+		}
 	} else {
 		for i in 0 .. input.size {
 			packed[i] = input.get_nth(i)
@@ -629,6 +671,23 @@ fn decode_fft_axis_line(line_index int, shape []int, axis int, mut index []int) 
 	}
 }
 
+fn fft_line_offset(index []int, strides []int) int {
+	mut offset := 0
+	for axis, coordinate in index {
+		offset += coordinate * strides[axis]
+	}
+	return offset
+}
+
+fn fft_strides_are_nonnegative(strides []int) bool {
+	for stride in strides {
+		if stride < 0 {
+			return false
+		}
+	}
+	return true
+}
+
 fn multidimensional_fft(input &vtl.Tensor[complex.Complex], inverse bool) !&vtl.Tensor[complex.Complex] {
 	if input.rank() == 0 {
 		return error('fftn expects a tensor with at least one dimension')
@@ -667,6 +726,8 @@ fn transform_complex_axis(input &vtl.Tensor[complex.Complex], axis int, inverse 
 	mut line := []f64{len: axis_length * 2}
 	mut index := []int{len: input.rank()}
 	line_count := input.size / axis_length
+	direct_access := fft_strides_are_nonnegative(input.strides)
+	output_axis_stride := product(input.shape[axis + 1..])
 	for line_index in 0 .. line_count {
 		mut remainder := line_index
 		for dimension := input.rank() - 1; dimension >= 0; dimension-- {
@@ -676,11 +737,20 @@ fn transform_complex_axis(input &vtl.Tensor[complex.Complex], axis int, inverse 
 			index[dimension] = remainder % input.shape[dimension]
 			remainder /= input.shape[dimension]
 		}
+		index[axis] = 0
+		input_line_offset := fft_line_offset(index, input.strides)
+		output_line_offset := row_major_index(index, input.shape)
 		for position in 0 .. axis_length {
-			index[axis] = position
-			value := input.get(index)
-			line[2 * position] = value.re
-			line[2 * position + 1] = value.im
+			if direct_access {
+				value := input.data.data[input_line_offset + position * input.strides[axis]]
+				line[2 * position] = value.re
+				line[2 * position + 1] = value.im
+			} else {
+				index[axis] = position
+				value := input.get(index)
+				line[2 * position] = value.re
+				line[2 * position + 1] = value.im
+			}
 		}
 		status := if inverse {
 			vsl_fft.backward_complex_f64(plan, mut line)
@@ -691,11 +761,14 @@ fn transform_complex_axis(input &vtl.Tensor[complex.Complex], axis int, inverse 
 			return error('fft backend failed to compute the transform')
 		}
 		for position in 0 .. axis_length {
-			index[axis] = position
-			output_index := row_major_index(index, input.shape)
 			factor := if inverse { f64(axis_length) } else { 1.0 }
-			output[output_index] = complex.complex(line[2 * position] / factor,
-				line[2 * position + 1] / factor)
+			value := complex.complex(line[2 * position] / factor, line[2 * position + 1] / factor)
+			if direct_access {
+				output[output_line_offset + position * output_axis_stride] = value
+			} else {
+				index[axis] = position
+				output[row_major_index(index, input.shape)] = value
+			}
 		}
 	}
 	return tensor_from_owned[complex.Complex](output, input.shape)
@@ -714,13 +787,24 @@ fn transform_complex_axis_f32(input &vtl.Tensor[Complex32], axis int, inverse bo
 	mut line := []f32{len: axis_length * 2}
 	mut index := []int{len: input.rank()}
 	line_count := input.size / axis_length
+	direct_access := fft_strides_are_nonnegative(input.strides)
+	output_axis_stride := product(input.shape[axis + 1..])
 	for line_index in 0 .. line_count {
 		decode_fft_axis_line(line_index, input.shape, axis, mut index)
+		index[axis] = 0
+		input_line_offset := fft_line_offset(index, input.strides)
+		output_line_offset := row_major_index(index, input.shape)
 		for position in 0 .. axis_length {
-			index[axis] = position
-			value := input.get(index)
-			line[2 * position] = value.re
-			line[2 * position + 1] = value.im
+			if direct_access {
+				value := input.data.data[input_line_offset + position * input.strides[axis]]
+				line[2 * position] = value.re
+				line[2 * position + 1] = value.im
+			} else {
+				index[axis] = position
+				value := input.get(index)
+				line[2 * position] = value.re
+				line[2 * position + 1] = value.im
+			}
 		}
 		status := if inverse {
 			vsl_fft.backward_complex_f32(plan, mut line)
@@ -731,12 +815,16 @@ fn transform_complex_axis_f32(input &vtl.Tensor[Complex32], axis int, inverse bo
 			return error('fft f32 backend failed to compute the transform')
 		}
 		for position in 0 .. axis_length {
-			index[axis] = position
-			output_index := row_major_index(index, input.shape)
 			factor := if inverse { f32(axis_length) } else { 1.0 }
-			output[output_index] = Complex32{
+			value := Complex32{
 				re: line[2 * position] / factor
 				im: line[2 * position + 1] / factor
+			}
+			if direct_access {
+				output[output_line_offset + position * output_axis_stride] = value
+			} else {
+				index[axis] = position
+				output[row_major_index(index, input.shape)] = value
 			}
 		}
 	}

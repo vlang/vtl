@@ -4,6 +4,84 @@ import vtl
 import vtl.nn.data as nn_data
 import math
 
+fn test_transform_pipeline_applies_transforms_in_order() ! {
+	input := vtl.from_1d([1.0, 2, 3])!
+	pipeline := TransformPipeline.new[f64]([add_one_transform, double_transform])
+	output := pipeline.apply(input)!
+	assert output.to_array() == [4.0, 6, 8]
+	assert input.to_array() == [1.0, 2, 3]
+}
+
+fn test_transform_pipeline_propagates_errors_and_accepts_empty_pipeline() ! {
+	input := vtl.from_1d([1.0, 2])!
+	empty_pipeline := TransformPipeline.new[f64]([]TensorTransform[f64]{})
+	assert empty_pipeline.apply(input)! == input
+
+	pipeline := TransformPipeline.new[f64]([add_one_transform, failing_transform, double_transform])
+	pipeline.apply(input) or {
+		assert err.msg() == 'transform failed'
+		return
+	}
+	assert false, 'transform errors must stop the pipeline'
+}
+
+fn add_one_transform(input &vtl.Tensor[f64]) !&vtl.Tensor[f64] {
+	mut output := vtl.zeros[f64](input.shape)
+	for i in 0 .. input.size {
+		output.set_nth(i, input.get_nth(i) + 1)
+	}
+	return output
+}
+
+fn double_transform(input &vtl.Tensor[f64]) !&vtl.Tensor[f64] {
+	mut output := vtl.zeros[f64](input.shape)
+	for i in 0 .. input.size {
+		output.set_nth(i, input.get_nth(i) * 2)
+	}
+	return output
+}
+
+fn add_random_noise_transform(input &vtl.Tensor[f64], mut generator vtl.RandomGenerator) !&vtl.Tensor[f64] {
+	noise := generator.uniform(-0.5, 0.5, input.shape)!
+	mut output := vtl.zeros[f64](input.shape)
+	for i in 0 .. input.size {
+		output.set_nth(i, input.get_nth(i) + noise.get_nth(i))
+	}
+	return output
+}
+
+fn failing_transform(_ &vtl.Tensor[f64]) !&vtl.Tensor[f64] {
+	return error('transform failed')
+}
+
+fn test_random_batch_transforms_use_injected_replayable_generators() ! {
+	dataset := vtl.from_1d([1.0, 2])!
+	labels := vtl.from_1d([10.0, 20])!
+	loader := new_data_loader_with_labels_checked[f64](dataset, labels, DataLoaderConfig{
+		batch_size: 2
+		shuffle:    false
+		drop_last:  false
+	})!
+	pipeline := RandomTransformPipeline.new[f64]([add_random_noise_transform])
+	mut first_generator := vtl.new_random_generator(2027)
+	first_state := first_generator.snapshot()
+	first_batch := loader.collated_batch_with_random_transforms(0, pipeline, mut first_generator)!
+	assert first_batch.labels.to_array() == [10.0, 20]
+
+	mut independent_generator := vtl.new_random_generator(2027)
+	independent_batch := loader.collated_batch_with_random_transforms(0, pipeline,
+		mut independent_generator)!
+	assert independent_batch.features.to_array() == first_batch.features.to_array()
+	assert independent_batch.labels.to_array() == first_batch.labels.to_array()
+
+	first_generator.restore(first_state)!
+	replayed_batch := loader.collated_batch_with_random_transforms(0, pipeline, mut first_generator)!
+	assert replayed_batch.features.to_array() == first_batch.features.to_array()
+
+	first_generator.free()
+	independent_generator.free()
+}
+
 fn test_contiguous_batches_are_zero_copy_views() ! {
 	mut data := vtl.from_array([1.0, 2, 3, 4, 5, 6, 7, 8], [4, 2])!
 	loader := new_data_loader[f64](data, DataLoaderConfig{
@@ -96,6 +174,56 @@ fn test_for_each_collated_applies_callback_and_propagates_errors() ! {
 		return
 	}
 	assert false, 'collation errors must propagate through for_each_collated'
+}
+
+fn test_batch_transform_pipeline_runs_after_collation_and_survives_split() ! {
+	dataset := vtl.from_1d([1.0, 2, 3])!
+	mut loader := new_data_loader[f64](dataset, DataLoaderConfig{
+		batch_size: 2
+		shuffle:    false
+		drop_last:  false
+	})
+	loader.set_collate_fn(scale_feature_only_collate)
+	loader.set_batch_transform_pipeline(TransformPipeline.new[f64]([add_one_transform,
+		double_transform]))
+
+	batch := loader.collated_batch(0)!
+	assert batch.features.to_array() == [22.0, 42]
+	assert batch.labels == unsafe { nil }
+	assert dataset.to_array() == [1.0, 2, 3]
+
+	_, validation := loader.split(0.5)!
+	validation_batch := validation.collated_batch(0)!
+	assert validation_batch.features.to_array() == [62.0]
+}
+
+fn test_batch_transform_pipeline_preserves_labels() ! {
+	dataset := vtl.from_1d([1.0, 2])!
+	labels := vtl.from_1d([10.0, 20])!
+	mut loader := new_data_loader_with_labels_checked[f64](dataset, labels, DataLoaderConfig{
+		batch_size: 2
+		shuffle:    false
+		drop_last:  false
+	})!
+	loader.set_batch_transform_pipeline(TransformPipeline.new[f64]([double_transform]))
+
+	batch := loader.collated_batch(0)!
+	assert batch.features.to_array() == [2.0, 4]
+	assert batch.labels.to_array() == [10.0, 20]
+}
+
+fn test_batch_transform_pipeline_propagates_errors() ! {
+	dataset := vtl.from_1d([1.0, 2])!
+	mut loader := new_data_loader[f64](dataset, DataLoaderConfig{
+		batch_size: 2
+		shuffle:    false
+	})
+	loader.set_batch_transform_pipeline(TransformPipeline.new[f64]([failing_transform]))
+	loader.collated_batch(0) or {
+		assert err.msg() == 'transform failed'
+		return
+	}
+	assert false, 'batch transform errors must be returned'
 }
 
 fn test_collated_batch_reports_invalid_index_and_callback_errors() ! {

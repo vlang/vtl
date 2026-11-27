@@ -1,0 +1,244 @@
+module core
+
+import math
+import math.complex
+import vtl
+
+fn test_pow_promoted_broadcasts_and_uses_explicit_dtype_promotion() ! {
+	bases := vtl.from_array[i16]([2, 3], [2, 1])!
+	exponents := vtl.from_array[f32]([2.0, 3.0, 0.0], [1, 3])!
+
+	result := vtl.pow_promoted[f32, i16, f32](bases, exponents)!
+	expected := vtl.from_array[f32]([4.0, 8.0, 1.0, 9.0, 27.0, 1.0], [2, 3])!
+
+	assert result.dtype() == .float32
+	assert result.shape == [2, 3]
+	assert result.allclose(expected, rtol: 0.0, atol: 0.0)!
+
+	if _ := vtl.pow_promoted[f32, i16, f32](bases,
+		vtl.from_array[f32]([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0], [
+			3,
+			4,
+		])!) {
+		assert false, 'power must reject incompatible broadcast shapes'
+	}
+
+	integer_bases := vtl.from_1d[i8]([2, 3])!
+	integer_exponents := vtl.from_1d[i8]([3, 2])!
+	integer_result := vtl.pow_promoted[i8, i8, i8](integer_bases, integer_exponents)!
+	assert integer_result.to_array() == [i8(8), 9]
+}
+
+fn test_pow_promoted_handles_scalar_and_empty_broadcasts() ! {
+	scalar := vtl.from_array[f64]([3.0], [])!
+	exponent := vtl.from_array[i16]([2], [])!
+	scalar_result := vtl.pow_promoted[f64, f64, i16](scalar, exponent)!
+	assert scalar_result.shape.len == 0
+	assert scalar_result.get_nth(0) == 9.0
+
+	empty := vtl.empty[f32]([0, 2])
+	row := vtl.from_2d[i8]([[2, 3]])!
+	empty_result := vtl.pow_promoted[f32, f32, i8](empty, row)!
+	assert empty_result.shape == [0, 2]
+	assert empty_result.to_array().len == 0
+}
+
+fn test_pow_promoted_preserves_integer_precision_and_wraps_overflow() ! {
+	large := i64(9007199254740993)
+	large_result := vtl.pow_promoted[i64, i64, i8](vtl.from_1d([large])!,
+		vtl.from_1d[i8]([1])!)!
+	assert large_result.to_array() == [large]
+
+	overflow := vtl.pow_promoted[i8, i8, i8](vtl.from_1d[i8]([3])!,
+		vtl.from_1d[i8]([5])!)!
+	assert overflow.to_array() == [i8(-13)]
+	unsigned_overflow := vtl.pow_promoted[u8, u8, u8](vtl.from_1d[u8]([3])!,
+		vtl.from_1d[u8]([6])!)!
+	assert unsigned_overflow.to_array() == [u8(217)]
+
+	negative_exponent := vtl.from_1d[i16]([-1])!
+	if _ := vtl.pow_promoted[i16, i16, i16](vtl.from_1d[i16]([2])!,
+		negative_exponent) {
+		assert false, 'integer powers must reject negative exponents'
+	}
+}
+
+fn test_pow_promoted_preserves_float_special_values_and_signed_zero() ! {
+	bases := vtl.from_1d[f64]([-0.0, -0.0, -0.0, -2.0, math.nan(), 0.0])!
+	exponents := vtl.from_1d[f64]([3.0, 2.0, -3.0, 0.5, 0.0, -1.0])!
+	result := vtl.pow_promoted[f64, f64, f64](bases, exponents)!
+
+	assert result.get_nth(0) == 0.0
+	assert math.signbit(result.get_nth(0))
+	assert result.get_nth(1) == 0.0
+	assert !math.signbit(result.get_nth(1))
+	assert math.is_inf(result.get_nth(2), -1)
+	assert math.is_nan(result.get_nth(3))
+	assert result.get_nth(4) == 1.0
+	assert math.is_inf(result.get_nth(5), 1)
+}
+
+fn test_pow_promoted_checks_output_dtype_and_rejects_lossy_or_unsupported_inputs() ! {
+	left := vtl.from_1d[i16]([2])!
+	right := vtl.from_1d[i8]([3])!
+	if _ := vtl.pow_promoted[i32, i16, i8](left, right) {
+		assert false, 'output dtype must equal promote_types'
+	}
+
+	large_integer := vtl.from_1d[i64]([9007199254740993])!
+	float_exponent := vtl.from_1d[f64]([1.0])!
+	if _ := vtl.pow_promoted[f64, i64, f64](large_integer, float_exponent) {
+		assert false, '64-bit integers must not be silently rounded to float64'
+	}
+
+	string_values := vtl.from_1d[string](['a'])!
+	if _ := vtl.pow_promoted[string, string, string](string_values, string_values) {
+		assert false, 'string power is intentionally unsupported'
+	}
+}
+
+fn test_pow_promoted_complex_broadcasts_and_uses_the_numpy_principal_branch() ! {
+	bases := vtl.from_array[complex.Complex]([
+		complex.complex(-1.0, 0.0),
+		complex.complex(-1.0, -0.0),
+	], [2, 1])!
+	exponents := vtl.from_array[complex.Complex]([
+		complex.complex(0.5, 0.0),
+		complex.complex(2.0, 0.0),
+	], [1, 2])!
+	result := vtl.pow_promoted[complex.Complex, complex.Complex, complex.Complex](bases,
+		exponents)!
+	assert result.dtype() == .complex128
+	assert result.shape == [2, 2]
+	assert math.abs(result.get_nth(0).re) < 1e-12
+	assert math.abs(result.get_nth(0).im - 1.0) < 1e-12
+	assert math.abs(result.get_nth(1).re - 1.0) < 1e-12
+	assert math.abs(result.get_nth(1).im) < 1e-12
+	assert math.abs(result.get_nth(2).re) < 1e-12
+	assert math.abs(result.get_nth(2).im + 1.0) < 1e-12
+	assert math.abs(result.get_nth(3).re - 1.0) < 1e-12
+	assert math.abs(result.get_nth(3).im) < 1e-12
+
+	real_exponents := vtl.from_array[f64]([0.5, 0.5], [2, 1])!
+	mixed := vtl.pow_promoted[complex.Complex, complex.Complex, f64](bases, real_exponents)!
+	assert math.abs(mixed.get_nth(0).im - 1.0) < 1e-12
+	assert math.abs(mixed.get_nth(1).im + 1.0) < 1e-12
+
+	same_shape := vtl.from_1d[complex.Complex]([
+		complex.complex(-1.0, 0.0),
+		complex.complex(-1.0, -0.0),
+	])!
+	square_roots := same_shape.pow(vtl.from_1d[complex.Complex]([
+		complex.complex(0.5, 0.0),
+		complex.complex(0.5, 0.0),
+	])!)!
+	assert math.abs(square_roots.get_nth(0).im - 1.0) < 1e-12
+	assert math.abs(square_roots.get_nth(1).im + 1.0) < 1e-12
+}
+
+fn test_pow_promoted_complex_handles_zero_nonfinite_and_extreme_magnitudes() ! {
+	bases := vtl.from_1d[complex.Complex]([
+		complex.complex(0.0, 0.0),
+		complex.complex(0.0, 0.0),
+		complex.complex(0.0, 0.0),
+		complex.complex(1e300, 0.0),
+		complex.complex(1e-300, 0.0),
+		complex.complex(math.nan(), 0.0),
+		complex.complex(math.inf(1), 0.0),
+		complex.complex(0.0, 0.0),
+		complex.complex(math.inf(1), 0.0),
+		complex.complex(math.inf(1), 0.0),
+	])!
+	exponents := vtl.from_1d[complex.Complex]([
+		complex.complex(0.0, 0.0),
+		complex.complex(2.0, 0.0),
+		complex.complex(-1.0, 0.0),
+		complex.complex(0.5, 0.0),
+		complex.complex(0.5, 0.0),
+		complex.complex(2.0, 0.0),
+		complex.complex(2.0, 0.0),
+		complex.complex(0.5, 1.0),
+		complex.complex(1.0, 1.0),
+		complex.complex(-1.0, 0.0),
+	])!
+	result := vtl.pow_promoted[complex.Complex, complex.Complex, complex.Complex](bases,
+		exponents)!
+	assert result.get_nth(0).re == 1.0
+	assert result.get_nth(0).im == 0.0
+	assert result.get_nth(1).re == 0.0
+	assert result.get_nth(1).im == 0.0
+	assert math.is_nan(result.get_nth(2).re)
+	assert math.is_nan(result.get_nth(2).im)
+	assert math.abs(result.get_nth(3).re - 1e150) / 1e150 < 1e-12
+	assert result.get_nth(3).im == 0.0
+	assert math.abs(result.get_nth(4).re - 1e-150) / 1e-150 < 1e-12
+	assert result.get_nth(4).im == 0.0
+	assert math.is_nan(result.get_nth(5).re)
+	assert math.is_nan(result.get_nth(5).im)
+	assert math.is_inf(result.get_nth(6).re, 1)
+	assert math.is_nan(result.get_nth(6).im)
+	assert result.get_nth(7).re == 0.0
+	assert result.get_nth(7).im == 0.0
+	assert math.is_inf(result.get_nth(8).re, 1)
+	assert math.is_nan(result.get_nth(8).im)
+	assert math.is_nan(result.get_nth(9).re)
+	assert math.is_nan(result.get_nth(9).im)
+
+	scalar := vtl.from_array[complex.Complex]([complex.complex(2.0, 0.0)], [])!
+	scalar_exponent := vtl.from_array[complex.Complex]([complex.complex(3.0, 0.0)], [])!
+	scalar_result := vtl.pow_promoted[complex.Complex, complex.Complex, complex.Complex](scalar,
+		scalar_exponent)!
+	assert scalar_result.shape.len == 0
+	assert math.abs(scalar_result.get_nth(0).re - 8.0) < 1e-12
+	assert scalar_result.get_nth(0).im == 0.0
+
+	empty := vtl.from_array[complex.Complex]([]complex.Complex{}, [0])!
+	empty_result := vtl.pow_promoted[complex.Complex, complex.Complex, complex.Complex](empty,
+		vtl.from_1d[complex.Complex]([complex.complex(2.0, 0.0)])!)!
+	assert empty_result.shape == [0]
+	assert empty_result.size == 0
+}
+
+fn test_pow_promoted_boolean_pair_returns_numpy_int8() ! {
+	bases := vtl.from_1d([false, true, true, false])!
+	exponents := vtl.from_1d([false, false, true, true])!
+
+	result := vtl.pow_promoted[i8, bool, bool](bases, exponents)!
+	assert result.dtype() == .int8
+	assert result.to_array() == [i8(1), 1, 1, 0]
+	if _ := vtl.pow_promoted[bool, bool, bool](bases, exponents) {
+		assert false, 'boolean power results must use NumPy int8 dtype'
+	}
+}
+
+fn test_pow_weak_scalar_promoted_preserves_order_dtype_and_edge_cases() ! {
+	bases := vtl.from_1d[i8]([2, 3])!
+	right_scalar := vtl.pow_scalar_promoted[i8, i8, i16](bases, 3)!
+	assert right_scalar.to_array() == [i8(8), 27]
+
+	exponents := vtl.from_1d[i16]([-2, 3])!
+	left_scalar := vtl.pow_scalar_left_promoted[f64, i16, f64](0.5, exponents)!
+	assert left_scalar.dtype() == .float64
+	assert left_scalar.to_array() == [4.0, 0.125]
+
+	boolean_bases := vtl.from_1d([false, true])!
+	boolean_power := vtl.pow_scalar_promoted[i8, bool, bool](boolean_bases, true)!
+	assert boolean_power.dtype() == .int8
+	assert boolean_power.to_array() == [i8(0), 1]
+
+	complex_bases := vtl.from_1d[complex.Complex]([complex.complex(-1.0, 0.0)])!
+	complex_power := vtl.pow_scalar_promoted[complex.Complex, complex.Complex, f64](complex_bases, 0.5)!
+	assert math.abs(complex_power.get_nth(0).re) < 1e-12
+	assert math.abs(complex_power.get_nth(0).im - 1.0) < 1e-12
+
+	if _ := vtl.pow_scalar_promoted[f64, i8, i16](bases, 3) {
+		assert false, 'weak-scalar power must validate the requested output dtype'
+	}
+	if _ := vtl.pow_scalar_promoted[i16, i16, i16](exponents, -1) {
+		assert false, 'integer weak-scalar power must reject negative exponents'
+	}
+	large_integer := vtl.from_1d[i64]([9007199254740993])!
+	if _ := vtl.pow_scalar_promoted[f64, i64, f64](large_integer, 0.5) {
+		assert false, 'weak-scalar power must reject lossy 64-bit integer conversion'
+	}
+}

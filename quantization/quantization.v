@@ -2,6 +2,7 @@ module quantization
 
 import math
 import vtl
+import vsl.blas as vsl_blas
 
 // QuantizationParams describes affine signed INT8 quantization.
 pub struct QuantizationParams {
@@ -146,6 +147,227 @@ pub fn dequantize_per_channel_f32(input &vtl.Tensor[i8], params PerChannelParams
 pub fn dequantize_per_channel_f64(input &vtl.Tensor[i8], params PerChannelParams) !&vtl.Tensor[f64] {
 	return vtl.from_array[f64](dequantize_channel_values(input.to_array(), input.shape, params)!,
 		input.shape)!
+}
+
+// linear_int8_f32 runs a CPU affine-INT8 linear operator and returns f32 values.
+// Weights use one per-channel parameter set along output-feature axis 0.
+pub fn linear_int8_f32(input &vtl.Tensor[f32], weights &vtl.Tensor[i8], input_params QuantizationParams, weight_params PerChannelParams, bias &vtl.Tensor[f32]) !&vtl.Tensor[f32] {
+	if input.rank() == 0 {
+		return error('quantized linear input must have at least one dimension')
+	}
+	if weights.rank() != 2 {
+		return error('quantized linear weights must have shape [out_features, in_features]')
+	}
+	in_features := input.shape[input.rank() - 1]
+	out_features := weights.shape[0]
+	if weights.shape[1] != in_features {
+		return error('quantized linear input has ${in_features} features, weights expect ${weights.shape[1]}')
+	}
+	if out_features == 0 {
+		return error('quantized linear weights must contain at least one output feature')
+	}
+	bias_is_vector := bias.rank() == 1 && bias.shape[0] == out_features
+	bias_is_row := bias.rank() == 2 && bias.shape[0] == 1 && bias.shape[1] == out_features
+	if !bias_is_vector && !bias_is_row {
+		return error('quantized linear bias must have shape [out_features] or [1, out_features]')
+	}
+	weight_axis := normalize_axis(weight_params.axis, weights.rank())!
+	if weight_axis != 0 {
+		return error('quantized linear weight parameters must use output-feature axis 0')
+	}
+	validate_channel_params(weight_params, out_features)!
+	validate_params(input_params)!
+	input_i8 := quantize_per_tensor_f32(input, input_params)!
+	input_values := input_i8.to_array()
+	weight_values := weights.to_array()
+	mut centered_input := []i16{len: input_values.len}
+	for index, value in input_values {
+		centered_input[index] = i16(value) - i16(input_params.zero_point)
+	}
+	mut centered_weights := []i16{len: weight_values.len}
+	for index, value in weight_values {
+		if value < weight_params.qmin || value > weight_params.qmax {
+			return error('quantized weight at logical index ${index} is outside [${weight_params.qmin}, ${weight_params.qmax}]')
+		}
+		output_feature := index / in_features
+		centered_weights[index] = i16(value) - i16(weight_params.zero_points[output_feature])
+	}
+	bias_values := bias.to_array()
+	mut rows := 1
+	for dimension in input.shape[..input.shape.len - 1] {
+		rows *= dimension
+	}
+	mut output_shape := input.shape[..input.shape.len - 1].clone()
+	output_shape << out_features
+	mut output_scales := []f64{len: out_features}
+	for output_feature in 0 .. out_features {
+		scale := input_params.scale * weight_params.scales[output_feature]
+		if !math.is_finite(scale) || scale <= 0 {
+			return error('combined quantization scale for output feature ${output_feature} is not finite and positive')
+		}
+		output_scales[output_feature] = scale
+	}
+	mut output := []f32{len: rows * out_features}
+	for row in 0 .. rows {
+		for output_feature in 0 .. out_features {
+			input_start := row * in_features
+			weight_start := output_feature * in_features
+			accumulator := vsl_blas.dot_i16_i64(centered_input[input_start..input_start +
+				in_features], centered_weights[weight_start..weight_start + in_features])!
+			output_index := row * out_features + output_feature
+			output[output_index] = f32(f64(accumulator) * output_scales[output_feature] +
+				f64(bias_values[output_feature]))
+		}
+	}
+	return vtl.from_array[f32](output, output_shape)!
+}
+
+// QuantizedConv2DConfig describes NCHW/OIHW convolution geometry.
+pub struct QuantizedConv2DConfig {
+pub:
+	padding  []int = [0, 0]
+	stride   []int = [1, 1]
+	dilation []int = [1, 1]
+	groups   int   = 1
+}
+
+// conv2d_int8_f32 runs a CPU affine-INT8 Conv2D operator and returns f32 values.
+// Weights use one per-channel parameter set along output-channel axis 0.
+@[direct_array_access]
+pub fn conv2d_int8_f32(input &vtl.Tensor[f32], weights &vtl.Tensor[i8], input_params QuantizationParams, weight_params PerChannelParams, bias &vtl.Tensor[f32], kernel_size []int, config QuantizedConv2DConfig) !&vtl.Tensor[f32] {
+	if input.rank() != 4 || weights.rank() != 4 || bias.rank() != 2 {
+		return error('quantized Conv2D expects input and weights rank 4 and bias rank 2')
+	}
+	if kernel_size.len != 2 || config.padding.len != 2 || config.stride.len != 2
+		|| config.dilation.len != 2 {
+		return error('quantized Conv2D kernel_size, padding, stride, and dilation must have two values')
+	}
+	if kernel_size[0] <= 0 || kernel_size[1] <= 0 || config.stride[0] <= 0
+		|| config.stride[1] <= 0 || config.dilation[0] <= 0 || config.dilation[1] <= 0
+		|| config.padding[0] < 0 || config.padding[1] < 0 || config.groups <= 0 {
+		return error('quantized Conv2D kernel, stride, dilation, and groups must be positive; padding must be non-negative')
+	}
+	batch := input.shape[0]
+	in_channels := input.shape[1]
+	in_h := input.shape[2]
+	in_w := input.shape[3]
+	out_channels := weights.shape[0]
+	if batch <= 0 || in_channels <= 0 || out_channels <= 0 || in_h <= 0 || in_w <= 0
+		|| in_channels % config.groups != 0 || out_channels % config.groups != 0 {
+		return error('quantized Conv2D groups must divide positive batch and channel dimensions')
+	}
+	in_channels_per_group := in_channels / config.groups
+	out_channels_per_group := out_channels / config.groups
+	if weights.shape[1] != in_channels_per_group || weights.shape[2] != kernel_size[0]
+		|| weights.shape[3] != kernel_size[1] || bias.shape[0] != 1
+		|| bias.shape[1] != out_channels {
+		return error('quantized Conv2D weight or bias shape does not match input, kernel, and groups')
+	}
+	if config.padding[0] > (max_int - in_h) / 2
+		|| config.padding[1] > (max_int - in_w) / 2
+		|| kernel_size[0] - 1 > (max_int - 1) / config.dilation[0]
+		|| kernel_size[1] - 1 > (max_int - 1) / config.dilation[1] {
+		return error('quantized Conv2D dimensions exceed supported integer sizes')
+	}
+	effective_h := config.dilation[0] * (kernel_size[0] - 1) + 1
+	effective_w := config.dilation[1] * (kernel_size[1] - 1) + 1
+	padded_h := in_h + 2 * config.padding[0]
+	padded_w := in_w + 2 * config.padding[1]
+	if padded_h < effective_h || padded_w < effective_w {
+		return error('quantized Conv2D effective kernel must fit the padded input')
+	}
+	out_h := (padded_h - effective_h) / config.stride[0] + 1
+	out_w := (padded_w - effective_w) / config.stride[1] + 1
+	mut output_size := batch
+	for dimension in [out_channels, out_h, out_w] {
+		if output_size > max_int / dimension {
+			return error('quantized Conv2D output shape is too large')
+		}
+		output_size *= dimension
+	}
+	weight_axis := normalize_axis(weight_params.axis, weights.rank())!
+	if weight_axis != 0 {
+		return error('quantized Conv2D weight parameters must use output-channel axis 0')
+	}
+	validate_channel_params(weight_params, out_channels)!
+	validate_params(input_params)!
+	quantized_input := quantize_per_tensor_f32(input, input_params)!
+	input_values := quantized_input.to_array()
+	weight_values := weights.to_array()
+	bias_values := bias.to_array()
+	if input_values.len != input.size || weight_values.len != weights.size
+		|| bias_values.len != out_channels {
+		return error('quantized Conv2D tensor storage does not match its shape')
+	}
+	mut centered_input := []i16{len: input_values.len}
+	for index, value in input_values {
+		centered_input[index] = i16(value) - i16(input_params.zero_point)
+	}
+	mut centered_weights := []i16{len: weight_values.len}
+	weights_per_output_channel := weights.size / out_channels
+	for index, value in weight_values {
+		if value < weight_params.qmin || value > weight_params.qmax {
+			return error('quantized weight at logical index ${index} is outside [${weight_params.qmin}, ${weight_params.qmax}]')
+		}
+		output_channel := index / weights_per_output_channel
+		centered_weights[index] = i16(value) - i16(weight_params.zero_points[output_channel])
+	}
+	mut output_scales := []f64{len: out_channels}
+	for output_channel in 0 .. out_channels {
+		scale := input_params.scale * weight_params.scales[output_channel]
+		if !math.is_finite(scale) || scale <= 0 {
+			return error('combined quantization scale for output channel ${output_channel} is not finite and positive')
+		}
+		output_scales[output_channel] = scale
+	}
+	mut output := []f32{len: output_size}
+	mut patch := []i16{len: weights_per_output_channel}
+	for b in 0 .. batch {
+		for group in 0 .. config.groups {
+			for oh in 0 .. out_h {
+				for ow in 0 .. out_w {
+					mut patch_index := 0
+					for input_channel_in_group in 0 .. in_channels_per_group {
+						input_channel := group * in_channels_per_group +
+							input_channel_in_group
+						for kh in 0 .. kernel_size[0] {
+							ih := oh * config.stride[0] - config.padding[0] +
+								kh * config.dilation[0]
+							for kw in 0 .. kernel_size[1] {
+								iw := ow * config.stride[1] - config.padding[1] +
+									kw * config.dilation[1]
+								if ih >= 0 && ih < in_h && iw >= 0 && iw < in_w {
+									input_batch := b * in_channels + input_channel
+									input_row := input_batch * in_h + ih
+									input_index := input_row * in_w + iw
+									patch[patch_index] = centered_input[input_index]
+								} else {
+									patch[patch_index] = 0
+								}
+								patch_index++
+							}
+						}
+					}
+					for output_channel_in_group in 0 .. out_channels_per_group {
+						output_channel := group * out_channels_per_group +
+							output_channel_in_group
+						weight_start := output_channel * weights_per_output_channel
+						accumulator := vsl_blas.dot_i16_i64(patch,
+							centered_weights[weight_start..weight_start +
+								weights_per_output_channel])!
+						output_batch := b * out_channels + output_channel
+						output_row := output_batch * out_h + oh
+						output_plane := output_row * out_w
+						output_index := output_plane + ow
+						value := f64(accumulator) * output_scales[output_channel] +
+							f64(bias_values[output_channel])
+						output[output_index] = f32(value)
+					}
+				}
+			}
+		}
+	}
+	return vtl.from_array[f32](output, [batch, out_channels, out_h, out_w])!
 }
 
 // MinMaxObserver accumulates finite scalar range statistics for calibration.

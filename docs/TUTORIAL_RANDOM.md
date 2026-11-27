@@ -42,20 +42,27 @@ validation_mask := validation_rng.bernoulli(0.8, [128])!
 waiting_times := validation_rng.geometric(0.1, [128])!
 training_indices := vtl.from_1d([0, 1, 2, 3, 4, 5, 6, 7])!
 batch_indices := training_rng.choice[int](training_indices, 4, false)!
+rank_samples := training_rng.zipf(4.0, [128])!
+log_series_samples := training_rng.logseries(0.5, [128])!
 sampling_weights := vtl.from_1d([1.0, 1.0, 3.0, 1.0, 1.0, 1.0, 1.0, 1.0])!
 weighted_indices := training_rng.choice_weighted[int](training_indices, sampling_weights, 4, true)!
 epoch_order := training_rng.permutation(8)!
 shuffled_rows := training_rng.permutation_tensor(training_features)!
 positive_noise := training_rng.gamma(2.0, 0.5, [128])!
+circular_angles := training_rng.vonmises(1.0, 2.0, [128])!
 beta_samples := training_rng.beta(2.0, 5.0, [128])!
 positive_scales := training_rng.lognormal(0.0, 0.25, [128])!
 event_counts := training_rng.binomial(12, 0.25, [128])!
 sampled_good_counts := training_rng.hypergeometric(20, 80, 10, [128])!
+available_colors := vtl.from_1d([20, 30, 50])!
+sampled_color_counts := training_rng.multivariate_hypergeometric(available_colors, 10, [128])!
 arrival_counts := validation_rng.poisson(3.5, [128])!
 lifetimes := validation_rng.weibull(1.5, [128])!
 chi_square_samples := validation_rng.chi_square(5.0, [128])!
+noncentral_chi_square_samples := validation_rng.noncentral_chi_square(5.0, 2.0, [128])!
 test_statistics := validation_rng.student_t(7.0, [128])!
 variance_ratios := validation_rng.f_distribution(5.0, 10.0, [128])!
+noncentral_variance_ratios := validation_rng.noncentral_f(5.0, 10.0, 2.0, [128])!
 class_probabilities := vtl.from_1d([0.6, 0.3, 0.1])!
 class_counts := training_rng.multinomial(12, class_probabilities, [128])!
 waiting_durations := validation_rng.exponential(0.5, [128])!
@@ -68,6 +75,12 @@ shape)` returns the positive number of Bernoulli trials up to the first success.
 `choice(population, size, replace)` samples from the population in flattened
 logical order and can enforce unique sampled positions. `permutation(size)`
 returns every integer from zero to `size - 1` exactly once in a seeded order.
+`zipf(exponent, shape)` samples positive integer ranks with probability
+proportional to `rank^(-exponent)`; the finite exponent must be greater than
+one, and samples are bounded by the platform's maximum `int`.
+`logseries(probability, shape)` samples positive integer counts from the
+logarithmic-series distribution, where probability must be finite and in
+`(0, 1)`.
 `choice_weighted(population, weights, size, replace)` samples in proportion to
 finite non-negative weights and can sample without replacement.
 `multinomial(trials, probabilities, sample_shape)` returns one count per
@@ -88,6 +101,9 @@ in draws without replacement from a population split into good and bad items.
 Small draws use an inversion sampler; larger draws use HRUA rejection sampling,
 and the implementation samples the smaller of the requested draw and its
 complement.
+`multivariate_hypergeometric(colors, nsample, sample_shape)` samples category
+counts without replacement and appends the category axis to `sample_shape`;
+each output row sums to `nsample`, and no category count exceeds its population.
 `multivariate_normal(mean, covariance, sample_shape)` appends the variable
 dimension to `sample_shape`; both global and seeded-generator APIs accept
 positive-semidefinite covariance matrices, including singular ones. The
@@ -101,30 +117,112 @@ returning only zeros.
 `f_distribution(numerator_df, denominator_df, shape)` sample the corresponding
 statistical distributions. Their degrees of freedom and Weibull shape must be
 finite and positive. All distributions advance only their owning generator.
+`noncentral_chi_square(df, noncentrality, shape)` and
+`noncentral_f(numerator_df, denominator_df, noncentrality, shape)` require
+finite positive degrees of freedom and finite non-negative noncentrality.
+`vonmises(location, concentration, shape)` wraps angles into `[-pi, pi)` and
+uses Best-Fisher rejection sampling, with the uniform limit for near-zero
+concentration. Its parameterization matches NumPy's
+`Generator.vonmises(mu, kappa, size)` (`location = mu`,
+`concentration = kappa`); its random sequence is not cross-library identical.
 These methods return errors for invalid distribution parameters. Streams are
-reproducible with the same V/VTL versions, seed, and sequence of calls;
-cross-version compatibility is not guaranteed. See the complete data-pipeline
-example in [`examples/random_generator/main.v`](../examples/random_generator/main.v).
+reproducible with the same VTL and V runtime versions, seed, and call sequence.
 
-VTL also provides global tensor constructors for uniform range, normal,
-Bernoulli, binomial, geometric, hypergeometric, exponential, Poisson, Weibull, lognormal,
-Gamma, Beta, Dirichlet, chi-square, Student's t, and F distributions.
-The global hypergeometric API uses the same population parameters:
+## Reproducible data transforms
+
+Pass an independent generator to a `RandomTransformPipeline` when augmenting a
+batch. Snapshot and restore the generator to replay the same transform values:
+
+```v
+import vtl
+import vtl.datasets
+
+fn add_noise(input &vtl.Tensor[f64], mut generator vtl.RandomGenerator) !&vtl.Tensor[f64] {
+	noise := generator.uniform(-0.1, 0.1, input.shape)!
+	mut output := vtl.zeros[f64](input.shape)
+	for i in 0 .. input.size {
+		output.set_nth(i, input.get_nth(i) + noise.get_nth(i))
+	}
+	return output
+}
+
+dataset := vtl.from_array([1.0, 2.0, 3.0, 4.0], [2, 2])!
+loader := datasets.new_data_loader[f64](dataset, datasets.DataLoaderConfig{
+	batch_size: 2
+	shuffle:    false
+	drop_last:  false
+})
+pipeline := datasets.RandomTransformPipeline.new[f64]([add_noise])
+mut generator := vtl.new_random_generator(42)
+initial_state := generator.snapshot()
+first := loader.collated_batch_with_random_transforms(0, pipeline, mut generator)!
+generator.restore(initial_state)!
+replayed := loader.collated_batch_with_random_transforms(0, pipeline, mut generator)!
+assert first.features.array_equal(replayed.features)
+generator.free()
+```
+
+Snapshot and serialize state to resume an independent stream:
 
 ```v
 import vtl
 
+mut source := vtl.new_random_generator(42)
+_ := source.uniform(0.0, 1.0, [8])!
+snapshot := source.snapshot()
+serialized_state := snapshot.serialize()
+state := vtl.random_generator_state_from_json(serialized_state)!
+mut resumed := vtl.new_random_generator_from_state(state)!
+expected := source.normal([8], vtl.NormalTensorData{})!
+actual := resumed.normal([8], vtl.NormalTensorData{})!
+assert expected.array_equal(actual)
+source.free()
+resumed.free()
+```
+
+Snapshots are versioned and rejected when unsupported. Cross-version
+distribution-sequence compatibility is not guaranteed. See the complete
+data-pipeline example in
+[`examples/random_generator/main.v`](../examples/random_generator/main.v).
+
+VTL also provides global tensor constructors for uniform range, normal,
+Bernoulli, binomial, geometric, hypergeometric, Zipf, logarithmic-series, von
+Mises, exponential, Poisson, Weibull, lognormal, Gamma, Beta, Dirichlet,
+chi-square, noncentral chi-square, Student's t, F, and noncentral F
+distributions.
+The global hypergeometric API uses the same population parameters:
+
+```v
+import math
+import vtl
+
 vtl.random_seed(7)
 counts := vtl.hypergeometric(20, 80, 10, [8], vtl.TensorData{})!
+angles := vtl.vonmises(1.0, 2.0, [8], vtl.TensorData{})!
+color_population := vtl.from_1d([20, 30, 50])!
+counts_by_color := vtl.multivariate_hypergeometric(color_population, 10, [8],
+	vtl.TensorData{})!
 for count in counts.to_array() {
 	assert count >= 0 && count <= 10
 }
+for angle in angles.to_array() {
+	assert angle >= -math.pi && angle < math.pi
+}
 ```
+
+`vtl.vonmises(location, concentration, shape, params)` samples circular values
+from the global stream, reset by `random_seed`; the location must be finite
+and concentration must be finite and non-negative.
+`vtl.multivariate_hypergeometric(colors, nsample, sample_shape, params)` uses
+the same without-replacement semantics as the independent-generator method.
 
 `gamma(alpha, scale, shape,
 params)`, `beta(alpha, beta, shape, params)`, `chi_square(df, shape, params)`,
+`noncentral_chi_square(df, noncentrality, shape, params)`,
 `student_t(df, shape, params)`, and `f_distribution(numerator_df,
-denominator_df, shape, params)` use the global stream reset by `random_seed`.
+denominator_df, shape, params)` and
+`noncentral_f(numerator_df, denominator_df, noncentrality, shape, params)` use
+the global stream reset by `random_seed`.
 `lognormal(mean, sigma, shape, params)` samples exponentiated normal values;
 `dirichlet(alpha, sample_shape, params)` appends its category axis after the
 requested sample dimensions.

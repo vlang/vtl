@@ -18,7 +18,7 @@ pub fn (_ &L1Loss[T]) loss(input &autograd.Variable[T], target &vtl.Tensor[T]) !
 	output := internal.l1[T](input.value, target)!
 	mut result := input.context.variable(output)
 	if input.requires_grad {
-		loss.additional_loss_gate[T](input.value, target, 'l1', 0, 0, false).cache(mut result, input)!
+		loss.additional_loss_gate[T](input.value, target, 'l1', 0, 0, false, 1e-8).cache(mut result, input)!
 	}
 	return result
 }
@@ -42,7 +42,7 @@ pub fn (_ &HingeLoss[T]) loss(input &autograd.Variable[T], target &vtl.Tensor[T]
 	output := internal.hinge[T](input.value, target)!
 	mut result := input.context.variable(output)
 	if input.requires_grad {
-		loss.additional_loss_gate[T](input.value, target, 'hinge', 0, 0, false).cache(mut result, input)!
+		loss.additional_loss_gate[T](input.value, target, 'hinge', 0, 0, false, 1e-8).cache(mut result, input)!
 	}
 	return result
 }
@@ -73,11 +73,44 @@ pub fn focal_loss[T](config FocalLossConfig) types.Loss[T] {
 	return types.loss[T](voidptr(concrete), focal_loss_dispatch[T])
 }
 
+@[params]
+pub struct PoissonNLLLossConfig {
+pub:
+	log_input bool = true
+	full      bool
+	eps       f64 = 1e-8
+}
+
+pub struct PoissonNLLLoss[T] {
+	config PoissonNLLLossConfig
+}
+
+pub fn poisson_nll_loss[T](config PoissonNLLLossConfig) types.Loss[T] {
+	concrete := &PoissonNLLLoss[T]{ config: config }
+	return types.loss[T](voidptr(concrete), poisson_nll_loss_dispatch[T])
+}
+
+pub fn (l &PoissonNLLLoss[T]) loss(input &autograd.Variable[T], target &vtl.Tensor[T]) !&autograd.Variable[T] {
+	output := internal.poisson_nll[T](input.value, target, l.config.log_input, l.config.full, l.config.eps)!
+	mut result := input.context.variable(output)
+	if input.requires_grad {
+		loss.additional_loss_gate[T](input.value, target, 'poisson_nll', 0, 0, l.config.log_input, l.config.eps).cache(mut result, input)!
+	}
+	return result
+}
+
+fn poisson_nll_loss_dispatch[T](loss_ptr voidptr, input voidptr, target voidptr) !voidptr {
+	typed_input := unsafe { &autograd.Variable[T](input) }
+	typed_target := unsafe { &vtl.Tensor[T](target) }
+	result := unsafe { (&PoissonNLLLoss[T](loss_ptr)).loss(typed_input, typed_target)! }
+	return voidptr(result)
+}
+
 pub fn (l &FocalLoss[T]) loss(input &autograd.Variable[T], target &vtl.Tensor[T]) !&autograd.Variable[T] {
 	output := internal.focal[T](input.value, target, l.config.alpha, l.config.gamma, l.config.from_logits)!
 	mut result := input.context.variable(output)
 	if input.requires_grad {
-		loss.additional_loss_gate[T](input.value, target, 'focal', l.config.alpha, l.config.gamma, l.config.from_logits).cache(mut result, input)!
+		loss.additional_loss_gate[T](input.value, target, 'focal', l.config.alpha, l.config.gamma, l.config.from_logits, 1e-8).cache(mut result, input)!
 	}
 	return result
 }

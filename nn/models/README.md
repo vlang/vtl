@@ -30,7 +30,9 @@ training; consult [`sequential.v`](sequential.v) for exact method signatures.
 `save(path)` writes model weights. `save_checkpoint(path, epoch, loss)` also
 stores epoch/loss metadata; `load_weights(path)` loads into an already-built
 compatible model and `Sequential.load_checkpoint[T](path)` reads checkpoint
-metadata. For resumable Adam training, build the optimizer with the model's
+metadata. Registered custom-module parameters and buffers are stored by name
+and restored into the prebuilt module graph; callback code itself is not
+serialized. For resumable Adam training, build the optimizer with the model's
 parameters and use `save_training_checkpoint(path, epoch, loss, optimizer)`;
 restore into a compatible model and a built Adam optimizer with
 `load_training_checkpoint(path, mut optimizer)`. This stores Adam's scalar
@@ -53,6 +55,14 @@ supported by this API yet. The JSON format has version `1.0`, ordered layer
 definitions, per-layer weight maps, optimizer metadata, and checkpoint
 metadata; tensor weights are base64 encoded. Loading rejects a version
 mismatch.
+
+For versioned, inference-only CPU weights, use
+`save_inference_checkpoint(path)` and `load_inference_checkpoint(path)` on a
+prebuilt `Sequential`. This separate data-only JSON format currently supports
+f32/f64 `input`, `linear`, and `relu` layers and validates architecture,
+dtype, shapes, and finite values before loading. It does not store optimizer
+state or support training resume; see the
+[inference checkpoint guide](../../docs/TUTORIAL_INFERENCE_CHECKPOINT.md).
 
 ```v ignore
 import vtl.nn.models

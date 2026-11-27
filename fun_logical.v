@@ -1,6 +1,7 @@
 module vtl
 
 import math
+import math.complex as vcomplex
 
 // all returns whether all array elements evaluate to true.
 @[direct_array_access]
@@ -230,6 +231,34 @@ pub fn (t &Tensor[T]) is_nan[T]() &Tensor[bool] {
 	return map_predicate[T](t, fn (value T) bool {
 		return math.is_nan(td[T](value).f64())
 	})
+}
+
+// is_real returns true for values with no imaginary component. For complex
+// values, the imaginary component must compare equal to zero.
+pub fn (t &Tensor[T]) is_real[T]() &Tensor[bool] {
+	$if T is vcomplex.Complex {
+		return map_predicate[T](t, fn (value T) bool {
+			return value.im == 0.0
+		})
+	} $else {
+		return map_predicate[T](t, fn (value T) bool {
+			return true
+		})
+	}
+}
+
+// is_complex returns true for complex values with a nonzero imaginary
+// component. NaN imaginary components are considered complex.
+pub fn (t &Tensor[T]) is_complex[T]() &Tensor[bool] {
+	$if T is vcomplex.Complex {
+		return map_predicate[T](t, fn (value T) bool {
+			return value.im != 0.0
+		})
+	} $else {
+		return map_predicate[T](t, fn (value T) bool {
+			return false
+		})
+	}
 }
 
 // map_predicate builds a boolean result with a linear fast path for contiguous

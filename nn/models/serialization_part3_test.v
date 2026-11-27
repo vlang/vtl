@@ -214,6 +214,42 @@ fn test_convolutional_network_serialization() {
 	assert 'bias' in model.layer_data[1].weights
 }
 
+fn test_conv_transpose2d_serialization() {
+	test_dir := setup_test_dir_3()
+	defer {
+		cleanup_test_dir_3()
+	}
+
+	mut nn := sequential_with_layers[f64]([]types.Layer[f64]{})
+	nn.input([2, 2, 3])
+	nn.conv_transpose2d(4, [3, 5], layers.ConvTranspose2DConfig{
+		stride:         [2, 3]
+		padding:        [1, 2]
+		output_padding: [1, 2]
+		dilation:       [2, 1]
+		groups:         2
+	})
+	path := '${test_dir}/conv_transpose2d_test.json'
+	nn.save(path)!
+	model := json2.decode[ModelFile](os.read_file(path)!)!
+
+	assert model.layers[1].layer_type == 'ConvTranspose2DLayer'
+	assert model.layers[1].config['in_channels'] == 2
+	assert model.layers[1].config['out_channels'] == 4
+	assert model.layers[1].config['kernel_h'] == 3
+	assert model.layers[1].config['kernel_w'] == 5
+	assert model.layers[1].config['stride_h'] == 2
+	assert model.layers[1].config['stride_w'] == 3
+	assert model.layers[1].config['padding_h'] == 1
+	assert model.layers[1].config['padding_w'] == 2
+	assert model.layers[1].config['output_padding_h'] == 1
+	assert model.layers[1].config['output_padding_w'] == 2
+	assert model.layers[1].config['dilation_h'] == 2
+	assert model.layers[1].config['dilation_w'] == 1
+	assert model.layers[1].config['groups'] == 2
+	assert model.layer_data[1].weights.len == 2
+}
+
 fn test_adam_training_checkpoint_restores_model_and_optimizer_state() ! {
 	test_dir := setup_test_dir_3()
 	defer {

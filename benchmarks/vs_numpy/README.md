@@ -624,12 +624,12 @@ bounded; all V commands still run from `~/.vmodules`:
 
 ```bash
 cd ~/.vmodules
-systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=2 \
 	v -prod -o /tmp/vtl-f64-bench ./vtl/benchmarks/vs_numpy/f64/main/main.v
-systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-f64-bench
-systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=2 /tmp/vtl-f64-bench
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=2 \
 	v -prod -o /tmp/vtl-f32-bench ./vtl/benchmarks/vs_numpy/f32/main/main.v
-systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-f32-bench
+systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=2 /tmp/vtl-f32-bench
 ```
 
 Both programs use the same deterministic inputs as the NumPy baselines, three
@@ -637,9 +637,9 @@ warmups, ten timed calls, and an output sanity check. The combined benchmark
 below remains useful on machines with more compiler memory.
 
 ```bash
-systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=2 \
 	v -prod -o /tmp/vtl-matmul-bench ./vtl/benchmarks/vs_numpy/matmul_bench.v
-systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-matmul-bench
+systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=2 /tmp/vtl-matmul-bench
 ```
 
 ```bash
@@ -654,11 +654,11 @@ for sizes 128, 256, and 512. With CBLAS enabled, it measures sizes through
 both allocate a fresh result on each timed call and use the same inputs:
 
 ```bash
-systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=2 \
 	v -d vsl_blas_generic_cblas -prod -o /tmp/vtl-matmul-cblas \
 	./vtl/benchmarks/vs_numpy/matmul_bench.v
-systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 \
-	OPENBLAS_NUM_THREADS=2 /tmp/vtl-matmul-cblas
+systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=2 \
+	/tmp/vtl-matmul-cblas
 systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
 	OPENBLAS_NUM_THREADS=2 uv run --with numpy python \
 	./vtl/benchmarks/vs_numpy/numpy_matmul_baseline.py
@@ -675,6 +675,66 @@ With either CBLAS flag, VTL `f32` matrix multiplication dispatches to
 single-precision CBLAS `sgemm`; without those flags, it uses VSL's pure-V
 `sgemm` implementation. `f64` continues to use `dgemm`. The benchmark reports
 both `f64` and `f32` results for either backend.
+
+### Reproducible backend/thread matrix
+
+The benchmark prints the selected backend and thread environment. For a
+matched pure-V versus system-CBLAS comparison, compile each binary once and
+run each with `VJOBS=1` and `VJOBS=2` from `~/.vmodules`:
+
+```bash
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=2 \
+	v -no-parallel -cc gcc -prod -cflags "-march=native" \
+	-o ./vtl/benchmarks/vs_numpy/matmul_bench \
+	./vtl/benchmarks/vs_numpy/matmul_bench.v
+systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=2 \
+	v -no-parallel -cc gcc -d vsl_blas_generic_cblas -prod -cflags "-march=native" \
+	-o ./vtl/benchmarks/vs_numpy/matmul_bench-cblas \
+	./vtl/benchmarks/vs_numpy/matmul_bench.v
+
+for jobs in 1 2; do
+	systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -p CPUQuota=200% \
+		-- env VJOBS=$jobs ./vtl/benchmarks/vs_numpy/matmul_bench
+	systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 -p CPUQuota=200% \
+		-- env VJOBS=$jobs ./vtl/benchmarks/vs_numpy/matmul_bench-cblas
+done
+```
+
+`VJOBS` controls the pure-V worker count. The generic system `libcblas`
+backend used here is not OpenBLAS and does not expose a matching runtime
+thread control; its `VJOBS=1` and `VJOBS=2` rows are therefore a control for
+the V process, not evidence of CBLAS scaling. Record the printed metadata,
+compiler flags, CPU, V version, and checksums with each run.
+
+On the Ryzen 9 5900X host, V 0.5.2 (`4a23b18`) and GCC 16.2.1, the matched
+512×512 results were:
+
+| backend | `VJOBS` | f64 GFLOPS | f32 GFLOPS |
+| --- | ---: | ---: | ---: |
+| pure-V | 1 | 18.73 | 41.66 |
+| pure-V | 2 | 29.77 | 100.84 |
+| system CBLAS (`libcblas`) | 1 | 7.71 | 7.85 |
+| system CBLAS (`libcblas`) | 2 | 7.29 | 7.57 |
+
+These are one host, one matrix shape, and one generic CBLAS library; they do
+not establish superiority. The immediate implementation target is the CPU GEMM
+backend: retain the pure-V comparison while adding a reproducible build against
+an actually threaded optimized CBLAS (for example OpenBLAS) before drawing
+thread-scaling conclusions.
+
+### OpenBLAS availability check (2026-11-24)
+
+Before using `-d vsl_blas_cblas`, confirm that a threaded OpenBLAS exists:
+`ldconfig -p | grep -i openblas` and `pacman -Qs openblas` (or the distro
+equivalent). On the Ryzen 9 5900X host, neither found OpenBLAS, `/usr/lib`
+contains only reference netlib `libblas`/`libcblas` 3.12.1, and the system
+NumPy 2.5.5 is linked against that same reference BLAS. Within a 2-CPU
+(`CPUQuota=200%`), 4 GiB scope, the generic-CBLAS VTL build at 512×512
+measured 7.6 GFLOPS (`f64` and `f32`) versus 28.6–29.2 GFLOPS (`f64`) and
+80.6–104.3 GFLOPS (`f32`) for pure-V; 2048×2048 `f32` CBLAS was 7.5–7.7 GFLOPS,
+matching system NumPy (7.1–7.5 GFLOPS). The comparison against NumPy's bundled
+OpenBLAS could not run offline (uv cache lacked a CPython 3.14 wheel), so no
+optimized-BLAS comparison is claimed.
 
 ## Earlier local CPU sample
 
@@ -916,38 +976,151 @@ when both benchmark commands produce timings.
 ## Real FFT
 
 ```bash
-systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+systemd-run --user --scope --quiet -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=1 \
 	v -prod -o /tmp/vtl-fft-bench ./vtl/benchmarks/vs_numpy/fft_bench.v
-systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-fft-bench
-systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
-	uv run --with numpy python ./vtl/benchmarks/vs_numpy/numpy_fft_baseline.py
+systemd-run --user --scope -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=1 /tmp/vtl-fft-bench
+systemd-run --user --scope --quiet -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% -- \
+	env OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OMP_NUM_THREADS=1 uv run --with numpy==2.5.5 python \
+	./vtl/benchmarks/vs_numpy/numpy_fft_baseline.py
 ```
 
-The FFT benchmark covers real f64 and real f32 inputs with the same sizes and
-iteration counts in VTL and NumPy. For real f32, VTL's dedicated API returns
-complex f32 output while NumPy's `np.fft.rfft` promotes to complex128. Install
-NumPy in an isolated environment if needed, for example with
+The FFT benchmark covers contiguous and stride-2 real f64 and real f32 inputs
+with the same sizes and iteration counts in VTL and NumPy. Each reports the
+median and range from seven timed batches, maximum absolute error against the
+analytic spectrum, and a weighted checksum. For real f32, VTL's dedicated API
+returns complex f32 output while NumPy's `np.fft.rfft` promotes to complex128.
+Install NumPy in an isolated environment if needed, for example with
 `uv run --with numpy python ./vtl/benchmarks/vs_numpy/numpy_fft_baseline.py`.
 
 ## Complex f32 FFT
 
-The complex f32 benchmark uses deterministic complex64 input, matching sizes,
-three warmups, and identical iteration counts. It measures the public VTL FFT
-path, including plan creation and output allocation, against NumPy's public
-`fft` call. NumPy currently promotes complex64 inputs to complex128 output, so
-the timings compare user-facing behavior rather than identical internal
-precision. Run both commands from `~/.vmodules`:
+The complex f32 benchmark uses deterministic contiguous and stride-2 complex64
+input, matching sizes, three warmups, and identical iteration counts. It
+measures the public VTL FFT path, including plan creation and output
+allocation, against NumPy's public `fft` call. NumPy currently promotes
+complex64 inputs to complex128 output, so the timings compare user-facing
+behavior rather than identical internal precision. Each benchmark reports the
+median and range from seven timed batches, maximum absolute error against the
+analytic spectrum, and a weighted checksum. Run both commands from
+`~/.vmodules`:
 
 ```bash
-systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -- env VJOBS=2 \
+systemd-run --user --scope --quiet -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=1 \
 	v -prod -o /tmp/vtl-fft-complex-f32-bench ./vtl/benchmarks/vs_numpy/fft_complex_f32_bench.v
-systemd-run --user --scope -p MemoryMax=1G -p MemorySwapMax=0 -- env VJOBS=2 /tmp/vtl-fft-complex-f32-bench
-systemd-run --user --scope --quiet -p MemoryMax=768M -p MemorySwapMax=0 -- env VJOBS=2 \
-	uv run --with numpy python ./vtl/benchmarks/vs_numpy/numpy_fft_complex_f32_baseline.py
+systemd-run --user --scope -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=1 /tmp/vtl-fft-complex-f32-bench
+systemd-run --user --scope --quiet -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% -- \
+	env OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OMP_NUM_THREADS=1 uv run --with numpy==2.5.5 python \
+	./vtl/benchmarks/vs_numpy/numpy_fft_complex_f32_baseline.py
 ```
 
 This benchmark reports measurements but does not claim a speedup before a
 matched run on the target machine.
+
+## Batched-axis and N-D real FFT
+
+This benchmark measures `rfft_axis` on a `[64, 512]` batched tensor and `rfftn`
+on a `[32, 32, 64]` tensor. The contiguous cases cover f64 and f32; the
+stride-2 cases also cover both dtypes, with dedicated and generic VTL f32
+wrappers. The two programs use matching deterministic inputs, three warmups,
+seven timed batches, and 5 or 3 transforms per batch. Each reports a weighted
+spectrum checksum and maximum round-trip error. The timed operation includes
+plan creation and output allocation. Run three alternating process pairs for a
+local comparison, from `~/.vmodules`:
+
+```bash
+systemd-run --user --scope --quiet -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=1 \
+	v -no-parallel -prod -o /tmp/vtl-fft-nd-bench ./vtl/benchmarks/vs_numpy/fft_nd_bench.v
+systemd-run --user --scope -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% -- env VJOBS=1 \
+	/tmp/vtl-fft-nd-bench
+systemd-run --user --scope --quiet -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% -- \
+	env OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OMP_NUM_THREADS=1 python3 \
+	./vtl/benchmarks/vs_numpy/numpy_fft_nd_baseline.py
+```
+
+On 2026-11-25, three alternating process runs on an AMD Ryzen 9 5900X with V
+0.5.2 (`7f5b9a3`), GCC 16.2.1, VTL using VSL `d60f9c36`, and NumPy 2.5.5
+measured:
+
+| f64 transform | VTL before (median, range), us | VTL direct-pack (median, range), us | NumPy (median, range), us | VTL / NumPy max round-trip error |
+| --- | ---: | ---: | ---: | ---: |
+| Batched axis, `[64, 512]` | 268.213 (267.502-271.547) | 104.417 (94.568-167.955) | 49.799 (48.797-50.586) | 1.110e-15 / 1.110e-15 |
+| N-D, `[32, 32, 64]` | 1450.163 (1447.281-1452.501) | 908.629 (882.844-961.467) | 451.596 (449.822-467.425) | 1.332e-15 / 1.110e-15 |
+
+The contiguous final-axis packing fast path improved VTL by 2.57x for the
+batched-axis case and 1.60x for the N-D case. NumPy remains 2.10x and 2.01x
+faster, respectively. Weighted checksums agree within `3e-6` absolute; the
+small difference reflects floating-point reduction order.
+
+For stride-2 f64 views, the benchmark first measured the indexed fallback, then
+the direct positive-stride real and complex-axis gather paths. Three
+alternating process pairs on the same host and software setup produced these
+process-median results:
+
+| f64 transform | VTL initial indexed fallback, us | VTL direct gather, us | NumPy, us | VTL / NumPy max round-trip error |
+| --- | ---: | ---: | ---: | ---: |
+| Batched axis, `[64, 512]`, stride 2 | 252.219 (241.629-262.090) | 126.601 (121.367-151.335) | 49.311 (49.209-49.702) | 1.110e-15 / 1.110e-15 |
+| N-D, `[32, 32, 64]`, stride 2 | 1257.609 (1249.654-1309.182) | 727.372 (723.010-729.813) | 454.991 (447.598-456.725) | 1.332e-15 / 1.110e-15 |
+
+The gather paths improve VTL by about 2.0x for the batched-axis view and 1.7x
+for the N-D view versus the initial indexed fallback. The f64 weighted
+checksums agree within `3e-6` absolute, but VTL remains about 2.57x and 1.60x
+slower than NumPy, respectively. With complex-axis gathers, the contiguous
+f64 `rfft_axis` median is 120.537 us (119.902-132.402) versus NumPy's 49.820 us
+(49.395-54.014); contiguous `rfftn` is 653.239 us (642.545-763.700) versus
+452.804 us (442.729-521.671).
+
+The stride-2 f32-input cases measured:
+
+| f32-input transform | VTL mode, us | NumPy, us | VTL / NumPy max round-trip error |
+| --- | ---: | ---: | ---: |
+| Batched axis, dedicated `_f32` | 170.708 (166.047-186.017) | 61.286 (60.588-61.550) | 7.153e-7 / 3.576e-7 |
+| Batched axis, generic `f32` | 129.887 (127.310-170.393) | 61.286 (60.588-61.550) | 4.181e-7 / 3.576e-7 |
+| N-D, dedicated `_f32` | 819.228 (792.668-822.381) | 346.637 (341.925-348.370) | 7.153e-7 / 4.768e-7 |
+| N-D, generic `f32` | 740.089 (740.059-746.144) | 346.637 (341.925-348.370) | 3.005e-7 / 4.768e-7 |
+
+The f32 rows use the same NumPy f32-input baseline. VTL's dedicated path
+returns complex32/f32, while its generic wrapper and NumPy return
+complex128/f64, so these are not equivalent-precision timing comparisons.
+These CPU measurements expose remaining gaps and do not establish parity.
+
+| f32-input transform | VTL mode (median, range), us | NumPy (median, range), us | VTL / NumPy max round-trip error |
+| --- | ---: | ---: | ---: |
+| Batched axis, dedicated `_f32` | 135.965 (134.622-141.365) | 198.218 (194.118-240.253) | 7.153e-7 / 3.576e-7 |
+| Batched axis, generic `f32` | 94.797 (94.252-117.594) | 198.218 (194.118-240.253) | 4.181e-7 / 3.576e-7 |
+| N-D, dedicated `_f32` | 743.509 (732.735-745.225) | 1282.085 (1270.683-1293.977) | 7.153e-7 / 4.768e-7 |
+| N-D, generic `f32` | 653.219 (647.201-671.430) | 1282.085 (1270.683-1293.977) | 3.005e-7 / 4.768e-7 |
+
+All f32 timings use the same NumPy f32-input baseline. VTL's dedicated paths
+return complex32/f32, while its generic wrappers and NumPy return
+complex128/f64. The f32 results therefore are not equivalent-precision
+comparisons. These CPU microbenchmarks do not establish overall performance
+parity.
+
+### Reference large-array results
+
+On 2026-11-25, three alternating independent process runs per implementation
+measured 16,384-element inputs on an AMD Ryzen 9 5900X with V 0.5.2
+(`7f5b9a3`), GCC 16.2.1, VTL `-prod` using the local VSL checkout at
+`d60f9c36`, and NumPy 2.5.5. NumPy's OpenBLAS, MKL, and OpenMP thread variables
+were set to 1. Each
+process result is the median of seven timed batches; the reported range is the
+minimum-to-maximum of the three process medians.
+
+| Transform input | Layout | VTL median (range), us | NumPy median (range), us | VTL max abs error | NumPy max abs error |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Real f64 | contiguous | 81.646 (67.161-86.837) | 65.365 (65.101-69.507) | 1.515e-11 | 1.521e-11 |
+| Real f64 | stride 2 | 79.254 (78.119-89.372) | 67.945 (67.779-68.335) | 1.515e-11 | 1.521e-11 |
+| Real f32 | contiguous | 78.783 (77.276-96.949) | 200.781 (200.314-203.955) | 1.567e-04 | 9.793e-06 |
+| Real f32 | stride 2 | 88.902 (88.470-90.545) | 205.720 (204.613-206.960) | 1.567e-04 | 9.793e-06 |
+| Complex f32 | contiguous | 252.883 (249.563-253.161) | 443.107 (441.616-445.328) | 2.441e-04 | 1.179e-05 |
+| Complex f32 | stride 2 | 254.003 (252.898-255.576) | 441.082 (440.090-443.137) | 2.441e-04 | 1.179e-05 |
+
+These are narrow CPU microbenchmarks over analytic signals, not a general
+performance or full numerical-parity claim. VTL's dedicated f32 FFT paths
+retain f32 output while NumPy promotes these inputs to complex128; interpret
+the timing and error columns with that precision difference in mind. The
+weighted checksums are emitted by both programs to make regressions visible,
+but f32 checksums are not expected to match exactly across precisions.
 
 ## Binary cross-entropy
 

@@ -45,15 +45,23 @@ jobs:
 
       - uses: vlang/setup-v@663cc08827d1fc0532ee755b4dedbb183c11d06a # v1.7
         with:
-          version: ba41fa121b738a1a694e0050401a45d2376e09b9
+          version: 7f5b9a3ddedafcfa86a88a4697c12c10e5901168
 
       - name: Install deps
         run: |
           sudo apt-get update -qq
           sudo apt-get install -qq -y libopenblas-dev liblapacke-dev gfortran python3 python3-numpy
 
-      - name: Test matmul performance budget parser
-        run: python3 -m unittest discover -s vtl/benchmarks/vs_numpy -p test_check_matmul_perf.py
+      - name: Record benchmark toolchain metadata
+        run: |
+          {
+            echo "VTL_V_VERSION=$(v version)"
+            echo "VTL_C_COMPILER=$(gcc --version | head -n 1)"
+            echo "VTL_NUMPY_VERSION=$(python3 -c 'import numpy; print(numpy.__version__)')"
+          } >> "$GITHUB_ENV"
+
+      - name: Test benchmark report helpers
+        run: python3 -m unittest discover -s vtl/benchmarks/vs_numpy -p 'test_*.py'
 
       - name: Install module
         run: |
@@ -84,11 +92,16 @@ jobs:
             run_v_benchmark vtl-conv2d vtl/benchmarks/vs_numpy/conv2d_bench.v
             env HOME="$HOME" PATH="$PATH" VJOBS=2 OPENBLAS_NUM_THREADS=2 python3 vtl/benchmarks/vs_numpy/numpy_conv2d_baseline.py
             echo '## Reduced SVD vs NumPy'
+            echo '### VTL reduced SVD pure-V'
             run_v_benchmark vtl-svd-purev vtl/benchmarks/vs_numpy/svd_bench.v
+            echo '### VTL reduced SVD LAPACKE'
             run_v_benchmark vtl-svd-lapacke vtl/benchmarks/vs_numpy/svd_bench.v -d vsl_lapack_lapacke
+            echo '### NumPy reduced SVD'
             env HOME="$HOME" PATH="$PATH" VJOBS=2 OPENBLAS_NUM_THREADS=2 python3 vtl/benchmarks/vs_numpy/numpy_svd_baseline.py
             echo '## Contiguous sum and mean'
+            echo '### VTL contiguous sum/mean'
             run_v_benchmark vtl-stats vtl/benchmarks/vs_numpy/stats_bench.v
+            echo '### NumPy contiguous sum/mean'
             env HOME="$HOME" PATH="$PATH" VJOBS=2 OPENBLAS_NUM_THREADS=2 python3 vtl/benchmarks/vs_numpy/numpy_stats_baseline.py
             echo '## Cumulative sum and product'
             run_v_benchmark vtl-cumulative vtl/benchmarks/vs_numpy/cumulative_bench.v
@@ -102,15 +115,29 @@ jobs:
             env HOME="$HOME" PATH="$PATH" VJOBS=2 OPENBLAS_NUM_THREADS=2 python3 vtl/benchmarks/vs_numpy/numpy_linear_bias_reduction_baseline.py
           } 2>&1 | tee "$report_file"
 
-      - name: Add matmul ratios to benchmark report
-        run: python3 vtl/benchmarks/vs_numpy/check_matmul_perf.py --annotate vs_numpy_pr.md
+      - name: Add matmul ratios and machine-readable results
+        run: python3 vtl/benchmarks/vs_numpy/check_matmul_perf.py --annotate --json-out vs_numpy_pr.json vs_numpy_pr.md
+
+      - name: Prepare bounded benchmark comment
+        run: python3 vtl/benchmarks/vs_numpy/prepare_pr_comment.py vs_numpy_pr.md vs_numpy_pr_comment.md
+
+      - name: Upload benchmark report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vtl-vs-numpy-${{ github.run_id }}
+          path: |
+            vs_numpy_pr.md
+            vs_numpy_pr.json
+          if-no-files-found: warn
+          retention-days: 30
 
       - name: Post sticky PR comment
         if: github.event.pull_request.head.repo.full_name == github.repository
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: vtl-vs-numpy
-          path: vs_numpy_pr.md
+          path: vs_numpy_pr_comment.md
 
       - name: Enforce 3x CPU matmul slowdown budget
         if: ${{ !contains(github.event.pull_request.labels.*.name, 'performance-exempt') }}

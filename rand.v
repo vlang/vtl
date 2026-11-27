@@ -1,6 +1,8 @@
 module vtl
 
 import math
+import hash
+import json2
 import rand
 import rand.config
 import vsl.blas as vsl_blas
@@ -10,22 +12,164 @@ import vsl.lapack as vsl_lapack
 // experiments that must not modify or depend on V's global random state.
 pub struct RandomGenerator {
 mut:
-	rng &rand.PRNG
+	rng    &rand.PRNG
+	engine &VTLRandomPRNG
+}
+
+// RandomGeneratorState is a versioned snapshot of an independent random stream.
+pub struct RandomGeneratorState {
+pub:
+	version    int
+	state      u64
+	bytes_left int
+	buffer     u64
+}
+
+struct VTLRandomPRNG {
+mut:
+	state      u64
+	bytes_left int
+	buffer     u64
+}
+
+const random_generator_state_version = 1
+const random_generator_wyrand_increment = u64(0x2d358dccaa6c78a5)
+const random_generator_wyrand_xor = u64(0x8bb84b93962eacc9)
+
+pub fn (mut rng VTLRandomPRNG) seed(seed_data []u32) {
+	if seed_data.len != 2 {
+		panic('VTLRandomPRNG requires two u32 seed words')
+	}
+	rng.state = seed_data[0] | (u64(seed_data[1]) << 32)
+	rng.bytes_left = 0
+	rng.buffer = 0
+}
+
+@[inline]
+pub fn (mut rng VTLRandomPRNG) u8() u8 {
+	if rng.bytes_left >= 1 {
+		rng.bytes_left--
+		value := u8(rng.buffer)
+		rng.buffer >>= 8
+		return value
+	}
+	rng.buffer = rng.u64()
+	rng.bytes_left = 7
+	value := u8(rng.buffer)
+	rng.buffer >>= 8
+	return value
+}
+
+@[inline]
+pub fn (mut rng VTLRandomPRNG) u16() u16 {
+	if rng.bytes_left >= 2 {
+		rng.bytes_left -= 2
+		value := u16(rng.buffer)
+		rng.buffer >>= 16
+		return value
+	}
+	answer := rng.u64()
+	rng.buffer = answer >> 16
+	rng.bytes_left = 6
+	return u16(answer)
+}
+
+@[inline]
+pub fn (mut rng VTLRandomPRNG) u32() u32 {
+	if rng.bytes_left >= 4 {
+		rng.bytes_left -= 4
+		value := u32(rng.buffer)
+		rng.buffer >>= 32
+		return value
+	}
+	answer := rng.u64()
+	rng.buffer = answer >> 32
+	rng.bytes_left = 4
+	return u32(answer)
+}
+
+@[ignore_overflow; inline]
+pub fn (mut rng VTLRandomPRNG) u64() u64 {
+	rng.state += random_generator_wyrand_increment
+	return hash.wymum(rng.state ^ random_generator_wyrand_xor, rng.state)
+}
+
+@[inline]
+pub fn (mut rng VTLRandomPRNG) block_size() int {
+	return 64
+}
+
+pub fn (mut rng VTLRandomPRNG) free() {
 }
 
 // new_random_generator creates an independent generator initialized from seed.
 pub fn new_random_generator(seed int) RandomGenerator {
-	mut rng := rand.new_default(config.PRNGConfigStruct{
-		seed_: [u32(seed), 0]
-	})
+	mut engine := &VTLRandomPRNG{}
+	engine.seed([u32(seed), 0])
+	mut rng := &rand.PRNG(engine)
 	return RandomGenerator{
-		rng: rng
+		rng:    rng
+		engine: engine
 	}
 }
 
 // free releases the generator's underlying pseudorandom engine.
 pub fn (mut generator RandomGenerator) free() {
 	generator.rng.free()
+}
+
+// snapshot captures the generator's exact raw PRNG state for replay.
+pub fn (generator &RandomGenerator) snapshot() RandomGeneratorState {
+	return RandomGeneratorState{
+		version:    random_generator_state_version
+		state:      generator.engine.state
+		bytes_left: generator.engine.bytes_left
+		buffer:     generator.engine.buffer
+	}
+}
+
+// restore replaces this generator's raw PRNG state with a validated snapshot.
+pub fn (mut generator RandomGenerator) restore(state RandomGeneratorState) ! {
+	validate_random_generator_state(state)!
+	generator.engine.state = state.state
+	generator.engine.bytes_left = state.bytes_left
+	generator.engine.buffer = state.buffer
+}
+
+// serialize returns a versioned JSON snapshot of the generator state.
+pub fn (state RandomGeneratorState) serialize() string {
+	return json2.encode(state, json2.EncoderOptions{})
+}
+
+// random_generator_state_from_json parses and validates a serialized snapshot.
+pub fn random_generator_state_from_json(value string) !RandomGeneratorState {
+	state := json2.decode[RandomGeneratorState](value, json2.DecoderOptions{})!
+	validate_random_generator_state(state)!
+	return state
+}
+
+// new_random_generator_from_state restores an independent generator snapshot.
+pub fn new_random_generator_from_state(state RandomGeneratorState) !RandomGenerator {
+	validate_random_generator_state(state)!
+	mut engine := &VTLRandomPRNG{
+		state:      state.state
+		bytes_left: state.bytes_left
+		buffer:     state.buffer
+	}
+	mut rng := &rand.PRNG(engine)
+	return RandomGenerator{
+		rng:    rng
+		engine: engine
+	}
+}
+
+fn validate_random_generator_state(state RandomGeneratorState) ! {
+	if state.version != random_generator_state_version {
+		return error('random generator state: unsupported version ${state.version}')
+	}
+	if state.bytes_left < 0 || state.bytes_left > 7 {
+		return error('random generator state: buffered byte count must be between 0 and 7')
+	}
 }
 
 // uniform returns f64 values in the [minimum, maximum) range.
@@ -298,54 +442,50 @@ fn sample_negative_binomial(n f64, probability f64, mut rng &rand.PRNG) !int {
 pub fn (mut generator RandomGenerator) hypergeometric(ngood int, nbad int, nsample int, shape []int) !&Tensor[int] {
 	validate_hypergeometric_parameters(ngood, nbad, nsample)!
 	mut values := []int{len: size_from_shape(shape)}
-	total_population := ngood + nbad
-	sample_count := if nsample < total_population - nsample {
-		nsample
-	} else {
-		total_population - nsample
-	}
-	hrua_config := if sample_count > 10 && ngood > 0 && nbad > 0 {
-		hypergeometric_hrua_config(ngood, nbad, sample_count)
-	} else {
-		HypergeometricHruaConfig{}
-	}
+	log_factorials := hypergeometric_log_factorials_for_sample(ngood, nbad, nsample)
+	hrua_config := hypergeometric_sampling_config(ngood, nbad, nsample, log_factorials)
+	mut rng := generator.rng
 	for sample_index in 0 .. values.len {
-		mut selected_good := 0
-		if sample_count > 10 && ngood > 0 && nbad > 0 {
-			for {
-				x := open_unit_interval(generator.rng.f64_in_range(0.0, 1.0)!)
-				y := generator.rng.f64_in_range(0.0, 1.0)!
-				candidate, accepted := hypergeometric_hrua_candidate(hrua_config, sample_count, x,
-					y)
-				if accepted {
-					selected_good = candidate
-					break
-				}
-			}
-		} else {
-			mut remaining_good := f64(if ngood < nbad { ngood } else { nbad })
-			mut remaining := sample_count
-			d1 := total_population - sample_count
-			for remaining_good > 0 && remaining > 0 {
-				u := generator.rng.f64_in_range(0.0, 1.0)!
-				remaining_good = hypergeometric_hyp_update(remaining_good, d1, remaining, u)
-				remaining--
-			}
-			selected_good = int(f64(if ngood < nbad { ngood } else { nbad }) - remaining_good)
-			if ngood > nbad {
-				selected_good = sample_count - selected_good
-			}
-		}
-		// HRUA samples the minority of the sample and its complement. Reflect
-		// the result back to the requested sample if the complement was drawn.
-		selected_good = if sample_count == nsample {
-			selected_good
-		} else {
-			ngood - selected_good
-		}
-		values[sample_index] = selected_good
+		values[sample_index] = sample_hypergeometric_validated(ngood, nbad, nsample,
+			hrua_config, mut rng)!
 	}
 	return from_array[int](values, shape)
+}
+
+// multivariate_hypergeometric samples category counts without replacement.
+// The final output axis has one count per entry in colors.
+pub fn (mut generator RandomGenerator) multivariate_hypergeometric(colors &Tensor[int], nsample int, sample_shape []int) !&Tensor[int] {
+	total_population := validate_multivariate_hypergeometric_inputs(colors, nsample, sample_shape)!
+	mut output_shape := sample_shape.clone()
+	output_shape << colors.size
+	mut result := zeros[int](output_shape, TensorData{})
+	if colors.size == 0 {
+		return result
+	}
+	log_factorials := hypergeometric_log_factorial_table(total_population)
+	mut rng := generator.rng
+	sample_count := result.size / colors.size
+	for sample_index in 0 .. sample_count {
+		mut remaining_population := total_population
+		mut remaining_sample := nsample
+		offset := sample_index * colors.size
+		for category in 0 .. colors.size {
+			category_count := colors.get_nth(category)
+			if category == colors.size - 1 {
+				result.set_nth(offset + category, remaining_sample)
+			} else {
+				hrua_config := hypergeometric_sampling_config(category_count,
+					remaining_population - category_count, remaining_sample, log_factorials)
+				selected := sample_hypergeometric_validated(category_count,
+					remaining_population - category_count, remaining_sample, hrua_config,
+					mut rng)!
+				result.set_nth(offset + category, selected)
+				remaining_population -= category_count
+				remaining_sample -= selected
+			}
+		}
+	}
+	return result
 }
 
 // multinomial returns category counts for repeated samples from one
@@ -493,6 +633,19 @@ pub fn (mut generator RandomGenerator) pareto(shape_parameter f64, shape []int) 
 	return from_array[f64](values, shape)
 }
 
+// power returns samples from NumPy's power distribution on [0, 1] using the
+// given positive shape parameter and this generator's independent stream.
+pub fn (mut generator RandomGenerator) power(shape_parameter f64, shape []int) !&Tensor[f64] {
+	validate_power_shape(shape_parameter)!
+	mut values := []f64{len: size_from_shape(shape)}
+	exponent := 1 / shape_parameter
+	for i in 0 .. values.len {
+		u := generator.rng.f64_in_range(0.0, 1.0)!
+		values[i] = math.pow(u, exponent)
+	}
+	return from_array[f64](values, shape)
+}
+
 // rayleigh returns samples from a Rayleigh distribution with non-negative
 // scale and this generator's independent stream.
 pub fn (mut generator RandomGenerator) rayleigh(scale f64, shape []int) !&Tensor[f64] {
@@ -506,6 +659,70 @@ pub fn (mut generator RandomGenerator) rayleigh(scale f64, shape []int) !&Tensor
 		values[i] = scale * math.sqrt(-2 * math.log(1 - u))
 	}
 	return from_array[f64](values, shape)
+}
+
+// vonmises returns angles in [-pi, pi) from a circular distribution with the
+// given location and non-negative concentration using this generator's stream.
+pub fn (mut generator RandomGenerator) vonmises(location f64, concentration f64, shape []int) !&Tensor[f64] {
+	validate_vonmises_parameters(location, concentration)!
+	mut values := []f64{len: size_from_shape(shape)}
+	for i in 0 .. values.len {
+		values[i] = sample_vonmises(location, concentration, mut generator.rng)!
+	}
+	return from_array[f64](values, shape)
+}
+
+// vonmises returns angles in [-pi, pi) from VTL's global random stream.
+pub fn vonmises(location f64, concentration f64, shape []int, params TensorData) !&Tensor[f64] {
+	validate_vonmises_parameters(location, concentration)!
+	mut rng := rand.get_current_rng()
+	mut values := []f64{len: size_from_shape(shape)}
+	for i in 0 .. values.len {
+		values[i] = sample_vonmises(location, concentration, mut rng)!
+	}
+	return from_array[f64](values, shape, params)
+}
+
+fn validate_vonmises_parameters(location f64, concentration f64) ! {
+	if math.is_nan(location) || math.is_inf(location, 0) || concentration < 0
+		|| math.is_nan(concentration) || math.is_inf(concentration, 0) {
+		return error('vonmises: location must be finite and concentration must be finite and non-negative')
+	}
+	if concentration > 1e16 {
+		return error('vonmises: concentration above 1e16 exceeds stable sampling precision')
+	}
+}
+
+fn sample_vonmises(location f64, concentration f64, mut rng &rand.PRNG) !f64 {
+	if concentration <= 1e-150 {
+		u := open_unit_interval(rng.f64_in_range(0.0, 1.0)!)
+		return wrap_vonmises_angle(location + 2 * math.pi * u - math.pi)
+	}
+	s := math.sqrt(1 + 4 * concentration * concentration)
+	a := 1 + s
+	b := 2 * a * concentration / ((s + 1) * (a + math.sqrt(2 * a)))
+	r := (1 + b * b) / (2 * b)
+	for {
+		u1 := open_unit_interval(rng.f64_in_range(0.0, 1.0)!)
+		z := math.cos(math.pi * u1)
+		f := math.max(-1.0, math.min(1.0, (1 + r * z) / (r + z)))
+		c := concentration * (r - f)
+		u2 := open_unit_interval(rng.f64_in_range(0.0, 1.0)!)
+		if c * (2 - c) <= u2 && math.log(c / u2) + 1 - c < 0 {
+			continue
+		}
+		u3 := open_unit_interval(rng.f64_in_range(0.0, 1.0)!)
+		direction := if u3 > 0.5 { 1.0 } else { -1.0 }
+		return wrap_vonmises_angle(location + direction * math.acos(f))
+	}
+}
+
+fn wrap_vonmises_angle(angle f64) f64 {
+	mut wrapped := math.fmod(angle + math.pi, 2 * math.pi)
+	if wrapped < 0 {
+		wrapped += 2 * math.pi
+	}
+	return wrapped - math.pi
 }
 
 // triangular returns samples from a triangular distribution defined by its
@@ -530,6 +747,29 @@ pub fn (mut generator RandomGenerator) geometric(probability f64, shape []int) !
 		result.set_nth(i, geometric_sample(probability, u))
 	}
 	return result
+}
+
+// zipf samples positive integers from a Zipf distribution on this generator's
+// independent stream. The exponent must be finite and greater than one.
+pub fn (mut generator RandomGenerator) zipf(exponent f64, shape []int) !&Tensor[int] {
+	validate_zipf_exponent(exponent)!
+	mut values := []int{len: size_from_shape(shape)}
+	mut rng := generator.rng
+	for i in 0 .. values.len {
+		values[i] = sample_zipf(exponent, mut rng)!
+	}
+	return from_array[int](values, shape)
+}
+
+// logseries samples positive integers from a logarithmic-series distribution.
+pub fn (mut generator RandomGenerator) logseries(probability f64, shape []int) !&Tensor[int] {
+	validate_logseries_probability(probability)!
+	mut values := []int{len: size_from_shape(shape)}
+	mut rng := generator.rng
+	for i in 0 .. values.len {
+		values[i] = sample_logseries(probability, mut rng)!
+	}
+	return from_array[int](values, shape)
 }
 
 // poisson returns integer event counts with the given finite, non-negative
@@ -599,6 +839,19 @@ pub fn (mut generator RandomGenerator) chi_square(degrees_of_freedom f64, shape 
 	return from_array[f64](values, shape)
 }
 
+// noncentral_chi_square returns samples from a noncentral chi-square
+// distribution using this generator's independent stream.
+pub fn (mut generator RandomGenerator) noncentral_chi_square(degrees_of_freedom f64, noncentrality f64, shape []int) !&Tensor[f64] {
+	validate_noncentral_distribution_parameters(degrees_of_freedom, noncentrality,
+		'noncentral_chi_square')!
+	mut rng := generator.rng
+	mut values := []f64{len: size_from_shape(shape)}
+	for i in 0 .. values.len {
+		values[i] = sample_noncentral_chi_square(degrees_of_freedom, noncentrality, mut rng)!
+	}
+	return from_array[f64](values, shape)
+}
+
 // student_t returns samples from the standard Student's t distribution.
 pub fn (mut generator RandomGenerator) student_t(degrees_of_freedom f64, shape []int) !&Tensor[f64] {
 	validate_degrees_of_freedom(degrees_of_freedom, 'student_t')!
@@ -627,6 +880,23 @@ pub fn (mut generator RandomGenerator) f_distribution(numerator_df f64, denomina
 		denominator := sample_gamma(denominator_df / 2, 2, mut rng)!
 		if denominator <= 0 {
 			return error('f_distribution: sampled denominator underflowed to zero')
+		}
+		values[i] = (numerator / numerator_df) / (denominator / denominator_df)
+	}
+	return from_array[f64](values, shape)
+}
+
+// noncentral_f returns samples from a noncentral F distribution.
+pub fn (mut generator RandomGenerator) noncentral_f(numerator_df f64, denominator_df f64, noncentrality f64, shape []int) !&Tensor[f64] {
+	validate_degrees_of_freedom(denominator_df, 'noncentral_f')!
+	validate_noncentral_distribution_parameters(numerator_df, noncentrality, 'noncentral_f')!
+	mut rng := generator.rng
+	mut values := []f64{len: size_from_shape(shape)}
+	for i in 0 .. values.len {
+		numerator := sample_noncentral_chi_square(numerator_df, noncentrality, mut rng)!
+		denominator := sample_gamma(denominator_df / 2, 2, mut rng)!
+		if denominator <= 0 {
+			return error('noncentral_f: sampled denominator underflowed to zero')
 		}
 		values[i] = (numerator / numerator_df) / (denominator / denominator_df)
 	}
@@ -863,6 +1133,31 @@ fn sample_gamma(alpha f64, scale f64, mut rng &rand.PRNG) !f64 {
 	return error('gamma: rejection sampler did not converge')
 }
 
+fn validate_noncentral_distribution_parameters(degrees_of_freedom f64, noncentrality f64, distribution string) ! {
+	validate_degrees_of_freedom(degrees_of_freedom, distribution)!
+	if noncentrality < 0 || math.is_nan(noncentrality) || math.is_inf(noncentrality, 0) {
+		return error('${distribution}: noncentrality must be finite and non-negative')
+	}
+	if degrees_of_freedom <= 1 && noncentrality / 2 >= f64(max_int) {
+		return error('${distribution}: noncentrality is too large for the Poisson sampler')
+	}
+}
+
+fn sample_noncentral_chi_square(degrees_of_freedom f64, noncentrality f64, mut rng &rand.PRNG) !f64 {
+	if noncentrality == 0 {
+		return sample_gamma(degrees_of_freedom / 2, 2, mut rng)
+	}
+	if degrees_of_freedom > 1 {
+		central := sample_gamma((degrees_of_freedom - 1) / 2, 2, mut rng)!
+		normal_sample := rng.normal(config.NormalConfigStruct{})!
+		shifted := normal_sample + math.sqrt(noncentrality)
+		return central + shifted * shifted
+	}
+	poisson_count := sample_poisson(noncentrality / 2, mut rng)!
+	effective_degrees_of_freedom := degrees_of_freedom + 2 * f64(poisson_count)
+	return sample_gamma(effective_degrees_of_freedom / 2, 2, mut rng)
+}
+
 fn gamma_candidate(d f64, c f64, x f64, uniform_value f64) (f64, bool) {
 	base := 1 + c * x
 	if base <= 0 {
@@ -1048,6 +1343,18 @@ pub fn pareto(shape_parameter f64, shape []int, params TensorData) !&Tensor[f64]
 	return from_array[f64](values, shape, params)
 }
 
+// power returns samples from NumPy's power distribution on [0, 1] using VTL's global stream.
+pub fn power(shape_parameter f64, shape []int, params TensorData) !&Tensor[f64] {
+	validate_power_shape(shape_parameter)!
+	mut values := []f64{len: size_from_shape(shape)}
+	exponent := 1 / shape_parameter
+	for i in 0 .. values.len {
+		u := rand.f64_in_range(0.0, 1.0)!
+		values[i] = math.pow(u, exponent)
+	}
+	return from_array[f64](values, shape, params)
+}
+
 // rayleigh returns samples from a Rayleigh distribution using VTL's global stream.
 pub fn rayleigh(scale f64, shape []int, params TensorData) !&Tensor[f64] {
 	validate_location_scale(0, scale, 'rayleigh')!
@@ -1082,6 +1389,12 @@ fn validate_location_scale(location f64, scale f64, distribution string) ! {
 fn validate_pareto_shape(shape_parameter f64) ! {
 	if shape_parameter <= 0 || math.is_nan(shape_parameter) || math.is_inf(shape_parameter, 0) {
 		return error('pareto: shape parameter must be finite and positive')
+	}
+}
+
+fn validate_power_shape(shape_parameter f64) ! {
+	if shape_parameter <= 0 || math.is_nan(shape_parameter) || math.is_inf(shape_parameter, 0) {
+		return error('power: shape parameter must be finite and positive')
 	}
 }
 
@@ -1169,6 +1482,29 @@ pub fn geometric(probability f64, shape []int, params TensorData) !&Tensor[int] 
 	return result
 }
 
+// zipf samples positive integers from a Zipf distribution on VTL's global RNG.
+pub fn zipf(exponent f64, shape []int, params TensorData) !&Tensor[int] {
+	validate_zipf_exponent(exponent)!
+	mut result := zeros[int](shape, params)
+	mut rng := rand.get_current_rng()
+	for i in 0 .. result.size {
+		result.set_nth(i, sample_zipf(exponent, mut rng)!)
+	}
+	return result
+}
+
+// logseries samples positive integers from a logarithmic-series distribution
+// using VTL's global random stream.
+pub fn logseries(probability f64, shape []int, params TensorData) !&Tensor[int] {
+	validate_logseries_probability(probability)!
+	mut result := zeros[int](shape, params)
+	mut rng := rand.get_current_rng()
+	for i in 0 .. result.size {
+		result.set_nth(i, sample_logseries(probability, mut rng)!)
+	}
+	return result
+}
+
 // negative_binomial counts failures before n successes on VTL's global
 // random stream. n may be any finite positive real value.
 pub fn negative_binomial(n f64, probability f64, shape []int, params TensorData) !&Tensor[int] {
@@ -1196,6 +1532,70 @@ fn validate_geometric_probability(probability f64) ! {
 	}
 }
 
+fn validate_zipf_exponent(exponent f64) ! {
+	if exponent <= 1 || math.is_nan(exponent) || math.is_inf(exponent, 0) {
+		return error('zipf: exponent must be finite and greater than one')
+	}
+}
+
+fn sample_zipf(exponent f64, mut rng &rand.PRNG) !int {
+	if exponent >= 1025 {
+		// Avoid overflow in 2^(a-1); the probability of a value above one is negligible.
+		return 1
+	}
+	exponent_minus_one := exponent - 1.0
+	b := math.pow(2.0, exponent_minus_one)
+	minimum_uniform := math.pow(f64(max_int), -exponent_minus_one)
+	for _ in 0 .. 10000 {
+		u01 := rng.f64_in_range(0.0, 1.0)!
+		u := u01 * minimum_uniform + (1.0 - u01)
+		v := rng.f64_in_range(0.0, 1.0)!
+		x := math.floor(math.pow(u, -1.0 / exponent_minus_one))
+		if x >= f64(max_int) || x < 1.0 {
+			continue
+		}
+		t := math.pow(1.0 + 1.0 / x, exponent_minus_one)
+		if v * x * (t - 1.0) / (b - 1.0) <= t / b {
+			return int(x)
+		}
+	}
+	return error('zipf: rejection sampler did not converge')
+}
+
+fn validate_logseries_probability(probability f64) ! {
+	if probability <= 0 || probability >= 1 || math.is_nan(probability) || math.is_inf(probability,
+		0) {
+		return error('logseries: probability must be finite and in (0, 1)')
+	}
+}
+
+fn sample_logseries(probability f64, mut rng &rand.PRNG) !int {
+	log_one_minus_probability := math.log1p(-probability)
+	for _ in 0 .. 10000 {
+		v := rng.f64_in_range(0.0, 1.0)!
+		if v >= probability {
+			return 1
+		}
+		u := rng.f64_in_range(0.0, 1.0)!
+		q := -math.expm1(log_one_minus_probability * u)
+		if v <= q * q {
+			if v == 0 || q == 0 {
+				continue
+			}
+			candidate := math.floor(1.0 + math.log(v) / math.log(q))
+			if candidate >= 1.0 && candidate < f64(max_int) {
+				return int(candidate)
+			}
+			continue
+		}
+		if v >= q {
+			return 1
+		}
+		return 2
+	}
+	return error('logseries: rejection sampler did not converge')
+}
+
 fn geometric_sample(probability f64, uniform_value f64) int {
 	if probability == 1 {
 		return 1
@@ -1218,52 +1618,165 @@ pub fn poisson(lambda f64, shape []int, params TensorData) !&Tensor[int] {
 pub fn hypergeometric(ngood int, nbad int, nsample int, shape []int, params TensorData) !&Tensor[int] {
 	validate_hypergeometric_parameters(ngood, nbad, nsample)!
 	mut result := zeros[int](shape, params)
+	log_factorials := hypergeometric_log_factorials_for_sample(ngood, nbad, nsample)
+	hrua_config := hypergeometric_sampling_config(ngood, nbad, nsample, log_factorials)
+	mut rng := rand.get_current_rng()
+	for sample_index in 0 .. result.size {
+		result.set_nth(sample_index, sample_hypergeometric_validated(ngood, nbad, nsample,
+			hrua_config, mut rng)!)
+	}
+	return result
+}
+
+// multivariate_hypergeometric samples category counts from VTL's global RNG.
+// The final output axis has one count per entry in colors.
+pub fn multivariate_hypergeometric(colors &Tensor[int], nsample int, sample_shape []int, params TensorData) !&Tensor[int] {
+	total_population := validate_multivariate_hypergeometric_inputs(colors, nsample, sample_shape)!
+	mut output_shape := sample_shape.clone()
+	output_shape << colors.size
+	mut result := zeros[int](output_shape, params)
+	if colors.size == 0 {
+		return result
+	}
+	log_factorials := hypergeometric_log_factorial_table(total_population)
+	mut rng := rand.get_current_rng()
+	sample_count := result.size / colors.size
+	for sample_index in 0 .. sample_count {
+		mut remaining_population := total_population
+		mut remaining_sample := nsample
+		offset := sample_index * colors.size
+		for category in 0 .. colors.size {
+			category_count := colors.get_nth(category)
+			if category == colors.size - 1 {
+				result.set_nth(offset + category, remaining_sample)
+			} else {
+				hrua_config := hypergeometric_sampling_config(category_count,
+					remaining_population - category_count, remaining_sample, log_factorials)
+				selected := sample_hypergeometric_validated(category_count,
+					remaining_population - category_count, remaining_sample, hrua_config,
+					mut rng)!
+				result.set_nth(offset + category, selected)
+				remaining_population -= category_count
+				remaining_sample -= selected
+			}
+		}
+	}
+	return result
+}
+
+fn validate_multivariate_hypergeometric_inputs(colors &Tensor[int], nsample int, sample_shape []int) !int {
+	if colors.rank() != 1 {
+		return error('multivariate_hypergeometric: colors must be a one-dimensional tensor')
+	}
+	mut total_population := 0
+	for count in colors.to_array() {
+		if count < 0 {
+			return error('multivariate_hypergeometric: color counts must be non-negative')
+		}
+		if count > max_int - total_population {
+			return error('multivariate_hypergeometric: total population exceeds the supported integer range')
+		}
+		total_population += count
+	}
+	if nsample < 0 || nsample > total_population {
+		return error('multivariate_hypergeometric: sample size must be within the population')
+	}
+	mut sample_count := 1
+	mut has_empty_dimension := false
+	for dimension in sample_shape {
+		if dimension < 0 {
+			return error('multivariate_hypergeometric: sample dimensions must be non-negative')
+		}
+		if dimension == 0 {
+			has_empty_dimension = true
+			continue
+		}
+		if sample_count > max_int / dimension {
+			return error('multivariate_hypergeometric: sample shape is too large')
+		}
+		sample_count *= dimension
+	}
+	if has_empty_dimension {
+		sample_count = 0
+	}
+	if colors.size > 0 && sample_count > max_int / colors.size {
+		return error('multivariate_hypergeometric: output shape is too large')
+	}
+	return total_population
+}
+
+fn hypergeometric_sampling_config(ngood int, nbad int, nsample int, log_factorials []f64) HypergeometricHruaConfig {
 	total_population := ngood + nbad
 	sample_count := if nsample < total_population - nsample {
 		nsample
 	} else {
 		total_population - nsample
 	}
-	hrua_config := if sample_count > 10 && ngood > 0 && nbad > 0 {
-		hypergeometric_hrua_config(ngood, nbad, sample_count)
+	return if sample_count > 10 && ngood > 0 && nbad > 0 {
+		hypergeometric_hrua_config(ngood, nbad, sample_count, log_factorials)
 	} else {
 		HypergeometricHruaConfig{}
 	}
-	for sample_index in 0 .. result.size {
-		mut selected_good := 0
-		if sample_count > 10 && ngood > 0 && nbad > 0 {
-			for {
-				x := open_unit_interval(rand.f64_in_range(0.0, 1.0)!)
-				y := rand.f64_in_range(0.0, 1.0)!
-				candidate, accepted := hypergeometric_hrua_candidate(hrua_config, sample_count, x,
-					y)
-				if accepted {
-					selected_good = candidate
-					break
-				}
-			}
-		} else {
-			mut remaining_good := f64(if ngood < nbad { ngood } else { nbad })
-			mut remaining := sample_count
-			d1 := total_population - sample_count
-			for remaining_good > 0 && remaining > 0 {
-				u := rand.f64_in_range(0.0, 1.0)!
-				remaining_good = hypergeometric_hyp_update(remaining_good, d1, remaining, u)
-				remaining--
-			}
-			selected_good = int(f64(if ngood < nbad { ngood } else { nbad }) - remaining_good)
-			if ngood > nbad {
-				selected_good = sample_count - selected_good
-			}
-		}
-		selected_good = if sample_count == nsample {
-			selected_good
-		} else {
-			ngood - selected_good
-		}
-		result.set_nth(sample_index, selected_good)
+}
+
+fn hypergeometric_log_factorials_for_sample(ngood int, nbad int, nsample int) []f64 {
+	total_population := ngood + nbad
+	sample_count := if nsample < total_population - nsample {
+		nsample
+	} else {
+		total_population - nsample
 	}
-	return result
+	if sample_count > 10 && ngood > 0 && nbad > 0 {
+		return hypergeometric_log_factorial_table(if ngood > nbad { ngood } else { nbad })
+	}
+	return []f64{}
+}
+
+fn hypergeometric_log_factorial_table(max_value int) []f64 {
+	if max_value > 100_000 {
+		return []f64{}
+	}
+	mut values := []f64{len: max_value + 2}
+	for i in 2 .. values.len {
+		values[i] = values[i - 1] + math.log(f64(i))
+	}
+	return values
+}
+
+fn sample_hypergeometric_validated(ngood int, nbad int, nsample int, hrua_config HypergeometricHruaConfig, mut rng &rand.PRNG) !int {
+	total_population := ngood + nbad
+	sample_count := if nsample < total_population - nsample {
+		nsample
+	} else {
+		total_population - nsample
+	}
+	mut selected_good := 0
+	if sample_count > 10 && ngood > 0 && nbad > 0 {
+		for {
+			x := open_unit_interval(rng.f64_in_range(0.0, 1.0)!)
+			y := rng.f64_in_range(0.0, 1.0)!
+			candidate, accepted := hypergeometric_hrua_candidate(hrua_config, sample_count, x,
+				y)
+			if accepted {
+				selected_good = candidate
+				break
+			}
+		}
+	} else {
+		mut remaining_good := f64(if ngood < nbad { ngood } else { nbad })
+		mut remaining := sample_count
+		d1 := total_population - sample_count
+		for remaining_good > 0 && remaining > 0 {
+			u := rng.f64_in_range(0.0, 1.0)!
+			remaining_good = hypergeometric_hyp_update(remaining_good, d1, remaining, u)
+			remaining--
+		}
+		selected_good = int(f64(if ngood < nbad { ngood } else { nbad }) - remaining_good)
+		if ngood > nbad {
+			selected_good = sample_count - selected_good
+		}
+	}
+	return if sample_count == nsample { selected_good } else { ngood - selected_good }
 }
 
 fn hypergeometric_hyp_update(remaining_good f64, d1 int, remaining_sample int, uniform_value f64) f64 {
@@ -1284,7 +1797,7 @@ struct HypergeometricHruaConfig {
 	log_factorials []f64
 }
 
-fn hypergeometric_hrua_config(good int, bad int, sample int) HypergeometricHruaConfig {
+fn hypergeometric_hrua_config(good int, bad int, sample int, log_factorials []f64) HypergeometricHruaConfig {
 	population := good + bad
 	min_good := if good < bad { good } else { bad }
 	max_good := if good > bad { good } else { bad }
@@ -1295,13 +1808,6 @@ fn hypergeometric_hrua_config(good int, bad int, sample int) HypergeometricHruaC
 	d7 := math.sqrt(f64(population - m) * f64(sample) * d4 * d5 / f64(population - 1) + 0.5)
 	d8 := 1.7155277699214135 * d7 + 0.8989161620588988
 	d9 := int(math.floor(f64(m + 1) * f64(min_good + 1) / (f64(population) + 2)))
-	mut log_factorials := []f64{}
-	if max_good <= 100_000 {
-		log_factorials = []f64{len: max_good + 2}
-		for i in 2 .. log_factorials.len {
-			log_factorials[i] = log_factorials[i - 1] + math.log(f64(i))
-		}
-	}
 	d10 := hypergeometric_log_factorial(d9, log_factorials) + hypergeometric_log_factorial(min_good - d9,
 		log_factorials) + hypergeometric_log_factorial(m - d9, log_factorials) + hypergeometric_log_factorial(max_good - m + d9,
 		log_factorials)
@@ -1472,6 +1978,20 @@ pub fn chi_square(degrees_of_freedom f64, shape []int, params TensorData) !&Tens
 	return result
 }
 
+// noncentral_chi_square returns samples from a noncentral chi-square
+// distribution using VTL's global random stream.
+pub fn noncentral_chi_square(degrees_of_freedom f64, noncentrality f64, shape []int, params TensorData) !&Tensor[f64] {
+	validate_noncentral_distribution_parameters(degrees_of_freedom, noncentrality,
+		'noncentral_chi_square')!
+	mut result := zeros[f64](shape, params)
+	mut rng := rand.get_current_rng()
+	for i in 0 .. result.size {
+		result.set_nth(i, sample_noncentral_chi_square(degrees_of_freedom, noncentrality,
+			mut rng)!)
+	}
+	return result
+}
+
 // student_t returns samples from the standard Student's t distribution using
 // VTL's global random stream.
 pub fn student_t(degrees_of_freedom f64, shape []int, params TensorData) !&Tensor[f64] {
@@ -1499,6 +2019,24 @@ pub fn f_distribution(numerator_df f64, denominator_df f64, shape []int, params 
 		denominator := sample_gamma_global(denominator_df / 2, 2)!
 		if denominator <= 0 {
 			return error('f_distribution: sampled denominator underflowed to zero')
+		}
+		result.set_nth(i, (numerator / numerator_df) / (denominator / denominator_df))
+	}
+	return result
+}
+
+// noncentral_f returns samples from a noncentral F distribution using VTL's
+// global random stream.
+pub fn noncentral_f(numerator_df f64, denominator_df f64, noncentrality f64, shape []int, params TensorData) !&Tensor[f64] {
+	validate_degrees_of_freedom(denominator_df, 'noncentral_f')!
+	validate_noncentral_distribution_parameters(numerator_df, noncentrality, 'noncentral_f')!
+	mut result := zeros[f64](shape, params)
+	mut rng := rand.get_current_rng()
+	for i in 0 .. result.size {
+		numerator := sample_noncentral_chi_square(numerator_df, noncentrality, mut rng)!
+		denominator := sample_gamma(denominator_df / 2, 2, mut rng)!
+		if denominator <= 0 {
+			return error('noncentral_f: sampled denominator underflowed to zero')
 		}
 		result.set_nth(i, (numerator / numerator_df) / (denominator / denominator_df))
 	}

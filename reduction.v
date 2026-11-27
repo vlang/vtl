@@ -33,6 +33,14 @@ pub fn (t &Tensor[T]) argmax_axis[T](axis int) !&Tensor[int] {
 		return result
 	}
 
+	// Dense row-major fast path: linear indexing with no per-row
+	// allocation and no multi-index decode. A leading NaN wins; otherwise
+	// the first NaN wins, matching NumPy. Ties keep the earlier index.
+	if t.is_row_major_contiguous() && t.data.data.len >= t.size {
+		arg_extrema_axis_contiguous[T](t, na, mut result, true)
+		return result
+	}
+
 	mut out_strides := []int{len: rank}
 	out_strides[rank - 1] = 1
 	for i := rank - 2; i >= 0; i-- {
@@ -48,12 +56,12 @@ pub fn (t &Tensor[T]) argmax_axis[T](axis int) !&Tensor[int] {
 		for j := 1; j < shape[na]; j++ {
 			input_idx[na] = j
 			val := t.get(input_idx)
+			if best_is_nan {
+				break
+			}
 			if math.is_nan(f64(val)) {
 				best_arg = j
 				break
-			}
-			if best_is_nan {
-				continue
 			}
 			if val > best_val {
 				best_val = val
@@ -116,6 +124,14 @@ pub fn (t &Tensor[T]) argmin_axis[T](axis int) !&Tensor[int] {
 		return result
 	}
 
+	// Dense row-major fast path: linear indexing with no per-row
+	// allocation and no multi-index decode. A leading NaN wins; otherwise
+	// the first NaN wins, matching NumPy. Ties keep the earlier index.
+	if t.is_row_major_contiguous() && t.data.data.len >= t.size {
+		arg_extrema_axis_contiguous[T](t, na, mut result, false)
+		return result
+	}
+
 	mut out_strides := []int{len: rank}
 	out_strides[rank - 1] = 1
 	for i := rank - 2; i >= 0; i-- {
@@ -131,12 +147,12 @@ pub fn (t &Tensor[T]) argmin_axis[T](axis int) !&Tensor[int] {
 		for j := 1; j < shape[na]; j++ {
 			input_idx[na] = j
 			val := t.get(input_idx)
+			if best_is_nan {
+				break
+			}
 			if math.is_nan(f64(val)) {
 				best_arg = j
 				break
-			}
-			if best_is_nan {
-				continue
 			}
 			if val < best_val {
 				best_val = val
@@ -168,6 +184,81 @@ pub fn (t &Tensor[T]) argmin_axis[T](axis int) !&Tensor[int] {
 	return result
 }
 
+// arg_extrema_axis_contiguous is the dense row-major fast path behind
+// argmax_axis (maximum=true) and argmin_axis (maximum=false). The caller
+// guarantees validated shapes and dense storage, so indexing is linear
+// with no per-row allocation and no multi-index decode. A leading NaN wins;
+// otherwise the first NaN wins, matching NumPy. Ties keep the earlier index.
+@[direct_array_access]
+fn arg_extrema_axis_contiguous[T](t &Tensor[T], na int, mut result &Tensor[int], maximum bool) {
+	shape := t.shape
+	rank := shape.len
+	axis_size := shape[na]
+	// Dense row-major strides, computed once (mirrors extrema_axis).
+	mut in_strides := []int{len: rank}
+	in_strides[rank - 1] = 1
+	for i := rank - 2; i >= 0; i-- {
+		in_strides[i] = in_strides[i + 1] * shape[i + 1]
+	}
+	axis_stride := in_strides[na]
+	// Output strides: the reduced axis has extent 1.
+	mut out_strides := []int{len: rank}
+	out_strides[rank - 1] = 1
+	for i := rank - 2; i >= 0; i-- {
+		d := if i + 1 == na { 1 } else { shape[i + 1] }
+		out_strides[i] = out_strides[i + 1] * d
+	}
+	mut outer := []int{len: rank}
+	for {
+		mut base := 0
+		for i in 0 .. rank {
+			base += outer[i] * in_strides[i]
+		}
+		mut best_arg := 0
+		mut best_val := t.data.data[base]
+		mut best_is_nan := math.is_nan(f64(best_val))
+		for j := 1; j < axis_size; j++ {
+			val := t.data.data[base + j * axis_stride]
+			if best_is_nan {
+				break
+			}
+			if math.is_nan(f64(val)) {
+				best_arg = j
+				break
+			}
+			if maximum && val > best_val {
+				best_val = val
+				best_arg = j
+			}
+			if !maximum && val < best_val {
+				best_val = val
+				best_arg = j
+			}
+		}
+		mut out_lin := 0
+		for i in 0 .. rank {
+			out_lin += outer[i] * out_strides[i]
+		}
+		result.set_nth(out_lin, best_arg)
+		// Odometer over outer dims; one index array reused, never cloned.
+		mut done := true
+		for i := rank - 1; i >= 0; i-- {
+			if i == na {
+				continue
+			}
+			outer[i]++
+			if outer[i] < shape[i] {
+				done = false
+				break
+			}
+			outer[i] = 0
+		}
+		if done {
+			break
+		}
+	}
+}
+
 // max_axis returns the maximum value along the given axis as a reduced tensor.
 
 // max_axis exposes this operation as part of the public API.
@@ -188,6 +279,24 @@ pub fn (t &Tensor[T]) min_axis[T](axis int) !&Tensor[T] {
 	return extrema_axis[T](t, axis, false)
 }
 
+// max_axis_with_keepdims returns maximum values with the reduced axis
+// optionally retained with length one.
+pub fn (t &Tensor[T]) max_axis_with_keepdims[T](axis int, keepdims bool) !&Tensor[T] {
+	if keepdims {
+		return t.max_axis[T](axis)
+	}
+	return t.max_axis_squeeze[T](axis)
+}
+
+// min_axis_with_keepdims returns minimum values with the reduced axis
+// optionally retained with length one.
+pub fn (t &Tensor[T]) min_axis_with_keepdims[T](axis int, keepdims bool) !&Tensor[T] {
+	if keepdims {
+		return t.min_axis[T](axis)
+	}
+	return t.min_axis_squeeze[T](axis)
+}
+
 fn extrema_axis[T](t &Tensor[T], axis int, maximum bool) !&Tensor[T] {
 	shape := t.shape
 	rank := shape.len
@@ -206,6 +315,15 @@ fn extrema_axis[T](t &Tensor[T], axis int, maximum bool) !&Tensor[T] {
 	output_shape[axis_index] = 1
 	mut result := empty[T](output_shape)
 	if result.size == 0 {
+		return result
+	}
+	// Dense row-major fast path: linear indexing with no multi-index
+	// decode (mirrors the contiguous branch convention of cumsum/cumprod
+	// and arg_extrema_axis_contiguous). NaN semantics match exactly:
+	// any NaN poisons the line, otherwise the extremum wins ties by
+	// first occurrence.
+	if t.is_row_major_contiguous() && t.data.data.len >= t.size {
+		extrema_axis_contiguous[T](t, axis_index, maximum, mut result)
 		return result
 	}
 	mut output_strides := []int{len: rank}
@@ -258,6 +376,68 @@ fn extrema_axis[T](t &Tensor[T], axis int, maximum bool) !&Tensor[T] {
 		}
 	}
 	return result
+}
+
+// extrema_axis_contiguous is the dense row-major fast path behind
+// max_axis/min_axis (via extrema_axis). The caller guarantees validated
+// shapes and dense storage, so indexing is linear with no multi-index
+// decode. NaN semantics match the generic path exactly.
+@[direct_array_access]
+fn extrema_axis_contiguous[T](t &Tensor[T], axis_index int, maximum bool, mut result &Tensor[T]) {
+	shape := t.shape
+	rank := shape.len
+	axis_size := shape[axis_index]
+	mut in_strides := []int{len: rank}
+	in_strides[rank - 1] = 1
+	for i := rank - 2; i >= 0; i-- {
+		in_strides[i] = in_strides[i + 1] * shape[i + 1]
+	}
+	axis_stride := in_strides[axis_index]
+	mut out_strides := []int{len: rank}
+	out_strides[rank - 1] = 1
+	for i := rank - 2; i >= 0; i-- {
+		d := if i + 1 == axis_index { 1 } else { shape[i + 1] }
+		out_strides[i] = out_strides[i + 1] * d
+	}
+	mut outer := []int{len: rank}
+	for {
+		mut base := 0
+		for i in 0 .. rank {
+			base += outer[i] * in_strides[i]
+		}
+		mut best_value := t.data.data[base]
+		mut best_is_nan := value_is_nan[T](best_value)
+		for position in 1 .. axis_size {
+			value := t.data.data[base + position * axis_stride]
+			value_nan := value_is_nan[T](value)
+			if value_nan {
+				best_value = value
+				best_is_nan = true
+			} else if !best_is_nan && (if maximum { value > best_value } else { value < best_value }) {
+				best_value = value
+			}
+		}
+		mut out_lin := 0
+		for i in 0 .. rank {
+			out_lin += outer[i] * out_strides[i]
+		}
+		result.set_nth(out_lin, best_value)
+		mut done := true
+		for i := rank - 1; i >= 0; i-- {
+			if i == axis_index {
+				continue
+			}
+			outer[i]++
+			if outer[i] < shape[i] {
+				done = false
+				break
+			}
+			outer[i] = 0
+		}
+		if done {
+			break
+		}
+	}
 }
 
 fn value_is_nan[T](value T) bool {
@@ -466,12 +646,15 @@ pub fn (t &Tensor[T]) argmin_flat[T]() !int {
 // nanargmax returns the flattened index of the largest non-NaN value. The
 // first index wins ties, matching NumPy. Empty and all-NaN tensors return an error.
 pub fn (t &Tensor[T]) nanargmax[T]() !int {
+	if t.size == 0 {
+		return error('nanargmax: tensor contains no non-NaN values')
+	}
 	mut found := false
-	mut best_value := f64(0)
+	mut best_value := t.get_nth(0)
 	mut best_index := 0
 	for index in 0 .. t.size {
-		value := f64(t.get_nth(index))
-		if math.is_nan(value) {
+		value := t.get_nth(index)
+		if math.is_nan(f64(value)) {
 			continue
 		}
 		if !found || value > best_value {
@@ -489,12 +672,15 @@ pub fn (t &Tensor[T]) nanargmax[T]() !int {
 // nanargmin returns the flattened index of the smallest non-NaN value. The
 // first index wins ties, matching NumPy. Empty and all-NaN tensors return an error.
 pub fn (t &Tensor[T]) nanargmin[T]() !int {
+	if t.size == 0 {
+		return error('nanargmin: tensor contains no non-NaN values')
+	}
 	mut found := false
-	mut best_value := f64(0)
+	mut best_value := t.get_nth(0)
 	mut best_index := 0
 	for index in 0 .. t.size {
-		value := f64(t.get_nth(index))
-		if math.is_nan(value) {
+		value := t.get_nth(index)
+		if math.is_nan(f64(value)) {
 			continue
 		}
 		if !found || value < best_value {
@@ -507,6 +693,43 @@ pub fn (t &Tensor[T]) nanargmin[T]() !int {
 		return error('nanargmin: tensor contains no non-NaN values')
 	}
 	return best_index
+}
+
+// argmax_flat_with_keepdims returns the flattened maximum index as a tensor.
+// When keepdims is true, the tensor retains the input rank with all dimensions
+// set to one; otherwise it is scalar-shaped.
+pub fn (t &Tensor[T]) argmax_flat_with_keepdims[T](keepdims bool) !&Tensor[int] {
+	index := t.argmax_flat()!
+	return flat_arg_index_tensor(index, t.rank(), keepdims)
+}
+
+// argmin_flat_with_keepdims returns the flattened minimum index as a tensor.
+// When keepdims is true, the tensor retains the input rank with all dimensions
+// set to one; otherwise it is scalar-shaped.
+pub fn (t &Tensor[T]) argmin_flat_with_keepdims[T](keepdims bool) !&Tensor[int] {
+	index := t.argmin_flat()!
+	return flat_arg_index_tensor(index, t.rank(), keepdims)
+}
+
+// nanargmax_flat_with_keepdims returns the flattened non-NaN maximum index as
+// a tensor, optionally retaining the input rank with length-one dimensions.
+pub fn (t &Tensor[T]) nanargmax_flat_with_keepdims[T](keepdims bool) !&Tensor[int] {
+	index := t.nanargmax()!
+	return flat_arg_index_tensor(index, t.rank(), keepdims)
+}
+
+// nanargmin_flat_with_keepdims returns the flattened non-NaN minimum index as
+// a tensor, optionally retaining the input rank with length-one dimensions.
+pub fn (t &Tensor[T]) nanargmin_flat_with_keepdims[T](keepdims bool) !&Tensor[int] {
+	index := t.nanargmin()!
+	return flat_arg_index_tensor(index, t.rank(), keepdims)
+}
+
+fn flat_arg_index_tensor(index int, rank int, keepdims bool) &Tensor[int] {
+	shape := if keepdims { []int{len: rank, init: 1} } else { []int{} }
+	mut result := zeros[int](shape)
+	result.set_nth(0, index)
+	return result
 }
 
 // nanargmax_axis returns the index of the largest non-NaN value on axis.
@@ -567,12 +790,12 @@ fn nanarg_axis[T](t &Tensor[T], axis int, keepdims bool, maximum bool) !&Tensor[
 			output_dimension++
 		}
 		mut found := false
-		mut best_value := f64(0)
+		mut best_value := t.get(input_index)
 		mut best_index := 0
 		for position in 0 .. t.shape[axis_index] {
 			input_index[axis_index] = position
-			value := f64(t.get(input_index))
-			if math.is_nan(value) {
+			value := t.get(input_index)
+			if math.is_nan(f64(value)) {
 				continue
 			}
 			if !found || (maximum && value > best_value) || (!maximum && value < best_value) {
@@ -945,4 +1168,212 @@ fn cumulative_flat_as[T, U](t &Tensor[T], product bool) !&Tensor[U] {
 		}
 	}
 	return result
+}
+
+// nancumsum returns the cumulative sum along an axis, treating NaN inputs as
+// zero while preserving the input element type.
+pub fn (t &Tensor[T]) nancumsum[T](axis int) !&Tensor[T] {
+	return t.nancumsum_as[T](axis)
+}
+
+// nancumsum_as selects the accumulator and output type for an axis scan.
+pub fn (t &Tensor[T]) nancumsum_as[U](axis int) !&Tensor[U] {
+	return nan_cumulative_axis_as[T, U](t, axis, false)
+}
+
+// nancumprod returns the cumulative product along an axis, treating NaN inputs
+// as one while preserving the input element type.
+pub fn (t &Tensor[T]) nancumprod[T](axis int) !&Tensor[T] {
+	return t.nancumprod_as[T](axis)
+}
+
+// nancumprod_as selects the accumulator and output type for an axis scan.
+pub fn (t &Tensor[T]) nancumprod_as[U](axis int) !&Tensor[U] {
+	return nan_cumulative_axis_as[T, U](t, axis, true)
+}
+
+// nancumsum_flat returns a one-dimensional cumulative sum in logical row-major
+// order, treating NaN inputs as zero.
+pub fn (t &Tensor[T]) nancumsum_flat[T]() !&Tensor[T] {
+	return t.nancumsum_flat_as[T]()
+}
+
+// nancumsum_flat_as selects the accumulator and output type for a flattened
+// NaN-aware cumulative sum.
+pub fn (t &Tensor[T]) nancumsum_flat_as[U]() !&Tensor[U] {
+	return nan_cumulative_flat_as[T, U](t, false)
+}
+
+// nancumprod_flat returns a one-dimensional cumulative product in logical
+// row-major order, treating NaN inputs as one.
+pub fn (t &Tensor[T]) nancumprod_flat[T]() !&Tensor[T] {
+	return t.nancumprod_flat_as[T]()
+}
+
+// nancumprod_flat_as selects the accumulator and output type for a flattened
+// NaN-aware cumulative product.
+pub fn (t &Tensor[T]) nancumprod_flat_as[U]() !&Tensor[U] {
+	return nan_cumulative_flat_as[T, U](t, true)
+}
+
+@[direct_array_access]
+fn nan_cumulative_axis_as[T, U](t &Tensor[T], axis int, product bool) !&Tensor[U] {
+	shape := t.shape
+	rank := shape.len
+	if rank == 0 {
+		return error('NaN-aware cumulative operation requires a tensor with dimensions')
+	}
+	na := if axis < 0 { axis + rank } else { axis }
+	if na < 0 || na >= rank {
+		return error('NaN-aware cumulative axis ${axis} out of bounds for shape ${shape}')
+	}
+	if t.strides.len != rank || t.size != size_from_shape(shape) {
+		return error('NaN-aware cumulative operation: inconsistent tensor shape, strides, or size')
+	}
+	mut strides := []int{len: rank}
+	strides[rank - 1] = 1
+	for i := rank - 2; i >= 0; i-- {
+		strides[i] = strides[i + 1] * shape[i + 1]
+	}
+	axis_stride := strides[na]
+	n_axis := shape[na]
+	mut result := zeros[U](shape)
+	if result.size == 0 {
+		return result
+	}
+	input_is_contiguous := t.is_row_major_contiguous()
+	if input_is_contiguous && t.data.data.len < t.size {
+		return error('NaN-aware cumulative operation: contiguous storage is shorter than its size')
+	}
+	mut outer_idx := []int{len: rank}
+	for {
+		mut base_lin := 0
+		for i in 0 .. rank {
+			base_lin += outer_idx[i] * strides[i]
+		}
+		$if U is bool {
+			mut acc := if product { true } else { false }
+			for j in 0 .. n_axis {
+				lin := base_lin + j * axis_stride
+				value := if input_is_contiguous { t.data.data[lin] } else { t.get_nth(lin) }
+				if cumulative_value_is_nan[T](value) {
+					result.data.data[lin] = acc
+					continue
+				}
+				converted := cast[U](value)
+				acc = if product { acc && converted } else { acc || converted }
+				result.data.data[lin] = acc
+			}
+		} $else $if U is string {
+			if !product {
+				mut acc := ''
+				for j in 0 .. n_axis {
+					lin := base_lin + j * axis_stride
+					value := if input_is_contiguous { t.data.data[lin] } else { t.get_nth(lin) }
+					if cumulative_value_is_nan[T](value) {
+						result.data.data[lin] = acc
+						continue
+					}
+					acc += cast[U](value)
+					result.data.data[lin] = acc
+				}
+			}
+		} $else {
+			mut acc := if product { cast[U](1) } else { cast[U](0) }
+			for j in 0 .. n_axis {
+				lin := base_lin + j * axis_stride
+				value := if input_is_contiguous { t.data.data[lin] } else { t.get_nth(lin) }
+				if cumulative_value_is_nan[T](value) {
+					result.data.data[lin] = acc
+					continue
+				}
+				converted := cast[U](value)
+				if product {
+					acc *= converted
+				} else {
+					acc += converted
+				}
+				result.data.data[lin] = acc
+			}
+		}
+		mut done := true
+		for i := rank - 1; i >= 0; i-- {
+			if i == na {
+				continue
+			}
+			outer_idx[i]++
+			if outer_idx[i] < shape[i] {
+				done = false
+				break
+			}
+			outer_idx[i] = 0
+		}
+		if done {
+			break
+		}
+	}
+	return result
+}
+
+@[direct_array_access]
+fn nan_cumulative_flat_as[T, U](t &Tensor[T], product bool) !&Tensor[U] {
+	if t.size != size_from_shape(t.shape) || (t.shape.len > 0 && t.strides.len != t.shape.len) {
+		return error('flattened NaN-aware cumulative operation: inconsistent tensor shape, strides, or size')
+	}
+	input_is_contiguous := t.is_row_major_contiguous()
+	if input_is_contiguous && t.data.data.len < t.size {
+		return error('flattened NaN-aware cumulative operation: contiguous storage is shorter than its size')
+	}
+	mut result := zeros[U]([t.size], TensorData{})
+	$if U is bool {
+		mut acc := if product { true } else { false }
+		for i in 0 .. t.size {
+			value := if input_is_contiguous { t.data.data[i] } else { t.get_nth(i) }
+			if cumulative_value_is_nan[T](value) {
+				result.data.data[i] = acc
+				continue
+			}
+			converted := cast[U](value)
+			acc = if product { acc && converted } else { acc || converted }
+			result.data.data[i] = acc
+		}
+	} $else $if U is string {
+		if !product {
+			mut acc := ''
+			for i in 0 .. t.size {
+				value := if input_is_contiguous { t.data.data[i] } else { t.get_nth(i) }
+				if cumulative_value_is_nan[T](value) {
+					result.data.data[i] = acc
+					continue
+				}
+				acc += cast[U](value)
+				result.data.data[i] = acc
+			}
+		}
+	} $else {
+		mut acc := if product { cast[U](1) } else { cast[U](0) }
+		for i in 0 .. t.size {
+			value := if input_is_contiguous { t.data.data[i] } else { t.get_nth(i) }
+			if cumulative_value_is_nan[T](value) {
+				result.data.data[i] = acc
+				continue
+			}
+			converted := cast[U](value)
+			if product {
+				acc *= converted
+			} else {
+				acc += converted
+			}
+			result.data.data[i] = acc
+		}
+	}
+	return result
+}
+
+fn cumulative_value_is_nan[T](value T) bool {
+	$if T is f32 || T is f64 {
+		return math.is_nan(f64(value))
+	} $else {
+		return false
+	}
 }

@@ -15,3 +15,24 @@ new components. Most application code can use constructors from
 The contracts are defined in [`layer.v`](layer.v), [`loss.v`](loss.v), and
 [`optimizer.v`](optimizer.v). Implementations should keep tensor shapes and
 context ownership consistent across forward and backward calls.
+
+`Module[T]` is a state registry for custom components. Register trainable
+`Variable[T]` values with `register_parameter`, non-trainable tensor state with
+`register_buffer`, and nested registries with `register_module`. Names must be
+non-empty, cannot contain dots, and must be unique within each module across
+parameters, buffers, and children. `named_parameters` and `named_buffers`
+traverse nested registries depth-first using dotted names; `parameters` and
+`buffers` return their values without names. Cyclic child graphs are rejected.
+
+Attach a registry to a callback-backed `Layer[T]` with
+`layer_with_module_state`. Its registered parameters are included by
+`Layer.variables`, so existing optimizers that build from
+`Sequential.info.layers` discover them. Registered buffers remain available
+from the module registry. `Sequential.train` and `Sequential.eval` also update
+the attached module and its registered children, while mode-aware layer
+callbacks continue to receive the sequential training flag.
+
+Model saves and checkpoints persist registered parameters and buffers by name;
+`load_weights` restores them into an already-constructed custom module graph.
+The custom callbacks themselves are not serialized, so recreate the same model
+before loading. A higher-level forward API is not implemented yet.

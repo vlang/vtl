@@ -10,6 +10,7 @@ VTL provides dataset loaders and batching utilities for ML examples and tests.
 | IMDB | `datasets.load_imdb()` | Sentiment analysis reviews |
 | CIFAR-10 | `datasets.load_cifar10(...)` | Image classification examples |
 | DataLoader | `datasets.DataLoader[T]` | Batch, shuffle, and iterate tensors/labels |
+| IterableDataLoader | `datasets.IterableDataLoader[T]` | Stream and batch samples on demand |
 
 DataLoader returns a view when a batch's sample indices form a contiguous range.
 Shuffled, non-contiguous batches allocate tensors to preserve the requested
@@ -20,6 +21,85 @@ sample order. A non-positive `batch_size` produces an empty loader.
 `false`), so set all three explicitly when porting a training pipeline. Call
 `reset()` between epochs to advance the deterministic shuffle order from the
 configured seed.
+
+For sources that should not be materialized as one tensor, implement
+`IterableDataset[T]` with `next_sample()` and `reset()`, then pass it to
+`new_iterable_data_loader`. The loader holds at most one batch of samples,
+stacks matching feature and optional label shapes, and returns source errors.
+It snapshots each sample as it is read, so a source may reuse mutable buffers.
+`StreamSample.finished` ends iteration; `reset()` delegates replay to the
+source, which may return an error when it cannot rewind.
+Use `next_batch_with_transform_pipeline` for deterministic feature transforms
+or `next_batch_with_random_transforms` to apply random transforms with an
+explicit generator.
+
+`TransformPipeline[T]` composes tensor transforms in order and propagates the
+first transform error. Apply it to a sample or batch tensor; transforms receive
+the preceding transform's output, and an empty pipeline returns its input.
+Transforms that should preserve their input must return a new tensor rather
+than mutating the input. For batch transforms, pass a pipeline to
+`DataLoader.set_batch_transform_pipeline`; `collated_batch` applies it to
+features after default batching or custom collation, preserves labels, and
+returns transform errors to the caller. `split` preserves the configured
+pipeline.
+
+```v
+import vtl
+import vtl.datasets
+
+fn center(input &vtl.Tensor[f64]) !&vtl.Tensor[f64] {
+	mut output := vtl.zeros[f64](input.shape)
+	for i in 0 .. input.size {
+		output.set_nth(i, input.get_nth(i) - 1.0)
+	}
+	return output
+}
+
+fn scale(input &vtl.Tensor[f64]) !&vtl.Tensor[f64] {
+	mut output := vtl.zeros[f64](input.shape)
+	for i in 0 .. input.size {
+		output.set_nth(i, input.get_nth(i) * 0.5)
+	}
+	return output
+}
+
+pipeline := datasets.TransformPipeline.new[f64]([center, scale])
+sample := vtl.from_1d([1.0, 3.0])!
+transformed := pipeline.apply(sample)!
+assert transformed.to_array() == [0.0, 1.0]
+```
+
+Use `RandomTransformPipeline[T]` when transforms need randomness. Each batch
+call receives an explicit `vtl.RandomGenerator`, so separate generators remain
+independent and `snapshot()`/`restore()` can replay the same augmentation stream:
+`DataLoader.collated_batch_with_random_transforms` and
+`IterableDataLoader.next_batch_with_random_transforms` accept the pipeline and
+generator explicitly.
+
+```v
+import vtl
+import vtl.datasets
+
+fn add_noise(input &vtl.Tensor[f64], mut generator vtl.RandomGenerator) !&vtl.Tensor[f64] {
+	noise := generator.uniform(-0.1, 0.1, input.shape)!
+	mut output := vtl.zeros[f64](input.shape)
+	for i in 0 .. input.size {
+		output.set_nth(i, input.get_nth(i) + noise.get_nth(i))
+	}
+	return output
+}
+
+dataset := vtl.from_1d([1.0, 2.0])!
+pipeline := datasets.RandomTransformPipeline.new[f64]([add_noise])
+mut generator := vtl.new_random_generator(42)
+loader := datasets.new_data_loader[f64](dataset, datasets.DataLoaderConfig{
+	batch_size: 2
+	shuffle:    false
+	drop_last:  false
+})
+batch := loader.collated_batch_with_random_transforms(0, pipeline, mut generator)!
+assert batch.features.size == 2
+```
 
 For custom sample order, `new_data_loader_with_sampler_checked` and
 `new_data_loader_with_labels_and_sampler_checked` accept samplers from

@@ -39,3 +39,11 @@ fn test_pad_empty_input_and_validation() ! {
 		assert false, 'padded dimensions must not overflow int'
 	}
 }
+
+fn test_pad_copies_transposed_input() ! {
+	source := vtl.from_2d([[1, 2], [3, 4]])!
+	transposed := source.transpose([1, 0])!
+	mut padded := vtl.pad[int](transposed, [[1, 0], [0, 1]], .constant, 0)!
+	padded.set([1, 0], 99)
+	assert source.get([0, 0]) == 1
+}

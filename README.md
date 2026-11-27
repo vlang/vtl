@@ -29,6 +29,7 @@ CUDA, and Vulkan compute paths from one V-native API.
 [vlang.io](https://vlang.io) |
 [Docs](https://vlang.github.io/vtl) |
 [Tutorials](docs/TUTORIAL.md) |
+[NumPy/ML migration](docs/TUTORIAL_NUMPY_ML_MIGRATION.md) |
 [Histograms](docs/TUTORIAL_HISTOGRAMS.md) |
 [PyTorch parity](docs/PYTORCH_PARITY.md) |
 [Burn comparison](docs/BURN_PARITY.md) |
@@ -129,6 +130,7 @@ opt.update()!
 | Module | Purpose | Guide |
 |--------|---------|-------|
 | `vtl` | Tensor creation, slicing, broadcasting, reductions | [First steps](docs/TUTORIAL_FIRST_STEPS.md) |
+| `vtl.array_api` | Explicit, capability-discoverable Python Array API subset | [Array API namespace](array_api/README.md) |
 | Complex tensors | `math.complex.Complex` storage and elementwise arithmetic | [Complex tensors](docs/TUTORIAL_COMPLEX.md) |
 | `vtl.fft` | Real and complex FFTs via VSL PocketFFT | [FFT](docs/TUTORIAL_FFT.md) |
 | `vtl.csv` | Numeric CSV tensor input and output | [NumPy I/O](docs/TUTORIAL_NUMPY_IO.md) |
@@ -173,6 +175,7 @@ systemd-run --user --scope --property=MemoryMax=4G --property=MemorySwapMax=0 \
 ```
 
 See [DEV_LIGHTWEIGHT.md](docs/DEV_LIGHTWEIGHT.md) for memory-safe subsets in CI.
+See [PAIRED_RELEASES.md](docs/PAIRED_RELEASES.md) for VTL/VSL candidate release validation.
 
 ## Documentation
 

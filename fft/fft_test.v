@@ -62,6 +62,64 @@ fn test_rfft_axis_and_irfft_axis_roundtrip_even_odd_and_f32() ! {
 	assert math.abs(f32_spectrum.get([1, 0]).re - 1) < 1e-6
 }
 
+fn test_rfft_axis_and_rfftn_read_strided_final_axes() ! {
+	base := vtl.from_array[f64]([1, 99, 2, 99, 3, 99, 4, 99, 5, 99, 6, 99, 7, 99, 8, 99],
+		[2, 8])!
+	strided := base.slice([]int{}, [0, 8, 2])!
+	contiguous := vtl.from_array[f64](strided.to_array(), strided.shape)!
+	assert !strided.is_row_major_contiguous()
+	axis_result := rfft_axis(strided, -1)!
+	axis_expected := rfft_axis(contiguous, -1)!
+	assert axis_result.shape == axis_expected.shape
+	for i in 0 .. axis_expected.size {
+		assert math.abs(axis_result.get_nth(i).re - axis_expected.get_nth(i).re) < 1e-12
+		assert math.abs(axis_result.get_nth(i).im - axis_expected.get_nth(i).im) < 1e-12
+	}
+	nd_result := rfftn(strided)!
+	nd_expected := rfftn(contiguous)!
+	assert nd_result.shape == nd_expected.shape
+	for i in 0 .. nd_expected.size {
+		assert math.abs(nd_result.get_nth(i).re - nd_expected.get_nth(i).re) < 1e-12
+		assert math.abs(nd_result.get_nth(i).im - nd_expected.get_nth(i).im) < 1e-12
+	}
+}
+
+fn test_complex_axis_and_nd_transforms_read_strided_views() ! {
+	base := vtl.from_array[complex.Complex]([
+		complex.complex(1, 0),
+		complex.complex(99, 99),
+		complex.complex(2, 1),
+		complex.complex(99, 99),
+		complex.complex(3, -1),
+		complex.complex(99, 99),
+		complex.complex(4, 2),
+		complex.complex(99, 99),
+		complex.complex(5, 1),
+		complex.complex(99, 99),
+		complex.complex(6, -2),
+		complex.complex(99, 99),
+		complex.complex(7, 3),
+		complex.complex(99, 99),
+		complex.complex(8, 0),
+		complex.complex(99, 99),
+	], [2, 8])!
+	strided := base.slice([]int{}, [0, 8, 2])!
+	contiguous := vtl.from_array[complex.Complex](strided.to_array(), strided.shape)!
+	assert !strided.is_row_major_contiguous()
+	axis_result := fft_axis(strided, 1)!
+	axis_expected := fft_axis(contiguous, 1)!
+	for i in 0 .. axis_result.size {
+		assert math.abs(axis_result.get_nth(i).re - axis_expected.get_nth(i).re) < 1e-12
+		assert math.abs(axis_result.get_nth(i).im - axis_expected.get_nth(i).im) < 1e-12
+	}
+	nd_result := fftn(strided)!
+	nd_expected := fftn(contiguous)!
+	for i in 0 .. nd_result.size {
+		assert math.abs(nd_result.get_nth(i).re - nd_expected.get_nth(i).re) < 1e-12
+		assert math.abs(nd_result.get_nth(i).im - nd_expected.get_nth(i).im) < 1e-12
+	}
+}
+
 fn test_rfft_accepts_f32_and_returns_f64_complex_values() ! {
 	input := vtl.from_1d([f32(1), 0, -1, 0])!
 
@@ -107,6 +165,10 @@ fn test_rfft_plan_reuses_workspace_for_strided_inputs() ! {
 	offset_view := offset_base.slice([1, 5])!
 	assert offset_view.is_row_major_contiguous()
 	assert plan.forward(offset_view)!.array_equal(expected)
+	strided_offset_base := vtl.from_1d([f64(99), 1, 99, 0, 99, -1, 99, 0, 99])!
+	strided_offset := strided_offset_base.slice([1, 9, 2])!
+	assert !strided_offset.is_row_major_contiguous()
+	assert plan.forward(strided_offset)!.array_equal(expected)
 }
 
 fn test_rfft_plan_rejects_use_after_destroy() ! {

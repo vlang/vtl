@@ -9,13 +9,32 @@ pub:
 	axis int
 }
 
+fn assert_non_empty_tensor_list[T](ts []&Tensor[T]) ! {
+	if ts.len == 0 {
+		return error('at least one tensor is required')
+	}
+}
+
+fn insertion_axis(axis int, rank int) !int {
+	mut actual_axis := axis
+	if actual_axis < 0 {
+		actual_axis += rank + 1
+	}
+	if actual_axis < 0 || actual_axis > rank {
+		return error('axis out of range')
+	}
+	return actual_axis
+}
+
 // vstack stack arrays in sequence vertically (row wise)
 pub fn vstack[T](ts []&Tensor[T]) !&Tensor[T] {
+	assert_non_empty_tensor_list[T](ts)!
 	return concatenate[T](ts, axis: 0)
 }
 
 // hstack stacks arrays in sequence horizontally (column wise)
 pub fn hstack[T](ts []&Tensor[T]) !&Tensor[T] {
+	assert_non_empty_tensor_list[T](ts)!
 	if ts[0].rank() == 1 {
 		return concatenate[T](ts, axis: 0)
 	}
@@ -24,6 +43,7 @@ pub fn hstack[T](ts []&Tensor[T]) !&Tensor[T] {
 
 // dstack stacks arrays in sequence depth wise (along third axis)
 pub fn dstack[T](ts []&Tensor[T]) !&Tensor[T] {
+	assert_non_empty_tensor_list[T](ts)!
 	first_tensor := ts[0]
 	assert_shape[T](first_tensor.shape, ts)!
 	if first_tensor.rank() > 2 {
@@ -48,6 +68,7 @@ pub fn dstack[T](ts []&Tensor[T]) !&Tensor[T] {
 
 // column_stack stacks 1-D arrays as columns into a 2-D array.
 pub fn column_stack[T](ts []&Tensor[T]) !&Tensor[T] {
+	assert_non_empty_tensor_list[T](ts)!
 	first_tensor := ts[0]
 	assert_shape[T](first_tensor.shape, ts)!
 
@@ -68,6 +89,7 @@ pub fn column_stack[T](ts []&Tensor[T]) !&Tensor[T] {
 
 // stack join a sequence of arrays along a new axis.
 pub fn stack[T](ts []&Tensor[T], data AxisData) !&Tensor[T] {
+	assert_non_empty_tensor_list[T](ts)!
 	assert_shape[T](ts[0].shape, ts)!
 	mut expanded := []&Tensor[T]{cap: ts.len}
 	for t in ts {
@@ -85,14 +107,8 @@ fn shape_view[T](t &Tensor[T], shape []int, strides []int) &Tensor[T] {
 
 // unsqueeze adds a dimension of size one to a Tensor
 pub fn (t &Tensor[T]) unsqueeze[T](data AxisData) !&Tensor[T] {
-	axis := data.axis
+	actual_axis := insertion_axis(data.axis, t.rank())!
 	mut newshape := t.shape.clone()
-	newaxis := match axis < 0 {
-		true { axis + t.rank() + 1 }
-		else { axis }
-	}
-
-	actual_axis := if newaxis > t.rank() { t.rank() } else { newaxis }
 	newshape.insert(actual_axis, 1)
 	inserted_stride := if actual_axis < t.rank() { t.strides[actual_axis] } else { 1 }
 	mut newstrides := t.strides.clone()
@@ -133,6 +149,7 @@ pub fn (t &Tensor[T]) squeeze[T](data AxisData) !&Tensor[T] {
 
 // concatenate concatenates two Tensors together
 pub fn concatenate[T](ts []&Tensor[T], data AxisData) !&Tensor[T] {
+	assert_non_empty_tensor_list[T](ts)!
 	mut newshape := ts[0].shape.clone()
 	// just a check for negative axes, so that negative axes can be inferred.
 	axis := clip_axis(data.axis, newshape.len)!
@@ -156,13 +173,8 @@ pub fn concatenate[T](ts []&Tensor[T], data AxisData) !&Tensor[T] {
 // expand_dims adds an axis to a Tensor in order to support
 // broadcasting operations
 pub fn (t &Tensor[T]) expand_dims[T](data AxisData) !&Tensor[T] {
-	axis := data.axis
+	newaxis := insertion_axis(data.axis, t.rank())!
 	mut newshape := []int{}
-	newaxis := match axis < 0 {
-		true { axis + t.rank() + 1 }
-		else { axis }
-	}
-
 	newshape << t.shape[..newaxis]
 	newshape << 1
 	newshape << t.shape[newaxis..]

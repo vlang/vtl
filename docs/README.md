@@ -23,7 +23,7 @@ neural network module.
 | Unique values and occurrence counts | [Unique values](./TUTORIAL_UNIQUE.md) |
 | Missing values and masked reductions | [Masked data](./TUTORIAL_MASKED_DATA.md) |
 | Gather and indexed updates | [Indexing and scatter](./TUTORIAL_INDEXING.md) |
-| Broadcasting, maps, reductions | [Broadcasting](./TUTORIAL_BROADCASTING.md), [Map/reduce](./TUTORIAL_MAP_REDUCE.md), [Reductions](./TUTORIAL_REDUCTIONS.md) |
+| Broadcasting, maps, reductions | [Broadcasting](./TUTORIAL_BROADCASTING.md), [Map/reduce](./TUTORIAL_MAP_REDUCE.md), [Reductions](./TUTORIAL_REDUCTIONS.md), [Functional transforms](./TUTORIAL_FUNCTIONAL_TRANSFORMS.md) |
 | Random tensors and reproducibility | [Random numbers](./TUTORIAL_RANDOM.md) |
 | Histograms and binning | [Histograms](./TUTORIAL_HISTOGRAMS.md) |
 | Fourier transforms | [FFT and normalization modes](./TUTORIAL_FFT.md) |
@@ -31,7 +31,7 @@ neural network module.
 | INT8 tensor quantization | [Quantization API](../quantization/README.md), [runnable example](../examples/quantization_int8/main.v) |
 | Linear algebra and norms | [Linear algebra](./TUTORIAL_LINEAR_ALGEBRA.md), [Advanced LA](./TUTORIAL_ADVANCED_LA.md) |
 | Autograd | [Autograd](./TUTORIAL_AUTOGRAD.md) |
-| Neural networks | [Neural networks](./TUTORIAL_NEURAL_NETWORKS.md), [Optimizers](./TUTORIAL_OPTIMIZERS.md) |
+| Neural networks | [Tutorial](./TUTORIAL_NEURAL_NETWORKS.md), [NumPy and classical ML migration](./TUTORIAL_NUMPY_ML_MIGRATION.md), [PyTorch migration](./TUTORIAL_PYTORCH_MIGRATION.md), [Checkpoints](./TUTORIAL_INFERENCE_CHECKPOINT.md), [Optimizers](./TUTORIAL_OPTIMIZERS.md) |
 | Datasets and examples | [Datasets](../datasets/README.md), [Examples catalog](../examples/README.md) |
 | DataLoader sampling | [Subset sampler example](../examples/dataloader_sampler/README.md), [PyTorch parity](./PYTORCH_PARITY.md#data-pipeline) |
 | GPU/dev workflow | [Device memory](./DEVICE_MEMORY.md), [Lightweight development](./DEV_LIGHTWEIGHT.md) |
@@ -50,7 +50,9 @@ neural network module.
 8. [Advanced Linear Algebra](./TUTORIAL_ADVANCED_LA.md)
 9. [Automatic Differentiation](./TUTORIAL_AUTOGRAD.md)
 10. [Neural Networks](./TUTORIAL_NEURAL_NETWORKS.md)
-11. [Optimizers](./TUTORIAL_OPTIMIZERS.md)
+11. [CPU Sequential Inference Checkpoints](./TUTORIAL_INFERENCE_CHECKPOINT.md)
+12. [NumPy and Classical ML Migration](./TUTORIAL_NUMPY_ML_MIGRATION.md)
+13. [Optimizers](./TUTORIAL_OPTIMIZERS.md)
 
 ## ML Release Docs
 

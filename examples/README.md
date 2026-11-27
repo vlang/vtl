@@ -17,6 +17,7 @@ CIFAR examples for CI-safe checks.
 | [diag](./diag) | Construct and extract offset diagonals, including N-D diagonal views | `v run ./vtl/examples/diag/main.v` |
 | [kron](./kron) | Build NumPy-style Kronecker products from tensors of any rank | `v run ./vtl/examples/kron/main.v` |
 | [vander](./vander) | Build polynomial features from powers of a vector | `v run ./vtl/examples/vander/main.v` |
+| [polynomial_fit](./polynomial_fit) | Fit and evaluate a degree-2 polynomial with CPU `f64` tensors | `v run ./vtl/examples/polynomial_fit/main.v` |
 | [one_hot](./one_hot) | Encode integer class labels as one-hot tensors | `v run ./vtl/examples/one_hot/main.v` |
 | [complex_tensors](./complex_tensors) | Create `complex128` tensors and use elementwise arithmetic | `v run ./vtl/examples/complex_tensors/main.v` |
 | [einsum_complex](./einsum_complex) | Contract complex tensors with Einstein summation | `v run ./vtl/examples/einsum_complex/main.v` |
@@ -25,6 +26,7 @@ CIFAR examples for CI-safe checks.
 | [vtl_basic_usage](./vtl_basic_usage) | Tensor creation and basic operations | `v run ./vtl/examples/vtl_basic_usage/main.v` |
 | [vtl_vandermont](./vtl_vandermont) | Matrix construction and LA utilities | `v run ./vtl/examples/vtl_vandermont/main.v` |
 | [autograd_backprop](./autograd_backprop) | Manual autograd/backprop flow | `v run ./vtl/examples/autograd_backprop/main.v` |
+| [pytorch_migration](./pytorch_migration/main.v) | Compare a tensor/autograd example and differentiable `vmap` with familiar NumPy/PyTorch patterns | `v run ./vtl/examples/pytorch_migration/main.v` |
 | [autograd_gather](./autograd_gather) | Gather gradients with repeated-index accumulation | `v run ./vtl/examples/autograd_gather/main.v` |
 | [autograd_mixed_index](./autograd_mixed_index) | Backpropagate through mixed indexing with repeated coordinates | `v run ./vtl/examples/autograd_mixed_index/main.v` |
 | [autograd_nan_to_num](./autograd_nan_to_num) | Sanitize non-finite values and mask their gradients | `v run ./vtl/examples/autograd_nan_to_num/main.v` |
@@ -34,10 +36,10 @@ CIFAR examples for CI-safe checks.
 | [autograd_scalar_loss](./autograd_scalar_loss) | Scalar sum/mean loss and backward pass | `v run ./vtl/examples/autograd_scalar_loss/main.v` |
 | [cross_entropy_unbatched](./cross_entropy_unbatched) | Unbatched logits and scalar labels | `v run ./vtl/examples/cross_entropy_unbatched/main.v` |
 | [nll_unbatched](./nll_unbatched) | PyTorch-style `[C]` NLL input, scalar class target, weighting, and autograd | `v run ./vtl/examples/nll_unbatched/main.v` |
-| [npy_round_trip](./npy_round_trip) | Read and write NumPy `.npy` arrays | `v run ./vtl/examples/npy_round_trip/main.v` |
+| [npy_round_trip](./npy_round_trip) | Read/write NumPy `.npy` arrays and read rows through a mapping | `v run ./vtl/examples/npy_round_trip/main.v` |
 | [npy_complex128](./npy_complex128) | Read and write NumPy complex128 `.npy` arrays | `v run ./vtl/examples/npy_complex128/main.v` |
 | [quantization_int8](./quantization_int8) | Calibrate and dequantize signed INT8 tensors | See [guide](../quantization/README.md) |
-| [csv_round_trip](./csv_round_trip) | Read and write numeric CSV tensors with headers | `v run ./vtl/examples/csv_round_trip/main.v` |
+| [csv_round_trip](./csv_round_trip) | Read/write numeric CSV and import NumPy text with missing-value handling | `v run ./vtl/examples/csv_round_trip/main.v` |
 | [npz_round_trip](./npz_round_trip) | Write and read named arrays in `.npz` archives | `v run ./vtl/examples/npz_round_trip/main.v` |
 | [NPZ fixture](./npz_read_compressed) | Compressed NumPy fixture | `v run vtl/examples/npz_read_compressed/main.v vtl/npz/testdata/numpy_compressed.npz` |
 | [stats_variance](./stats_variance) | Stable population/sample variance and standard deviation | `v run ./vtl/examples/stats_variance/main.v` |
@@ -92,8 +94,13 @@ CIFAR examples for CI-safe checks.
 | [digitize](./digitize) | Assign values to monotonic bins and find insertion positions | `v run ./vtl/examples/digitize/main.v` |
 | [clip](./clip) | Clamp a tensor with broadcastable per-element bounds in one pass | `v run ./vtl/examples/clip/main.v` |
 | [round_decimals](./round_decimals) | Round floating-point tensors to positive or negative decimal places | `v run ./vtl/examples/round_decimals/main.v` |
+| [reciprocal](./reciprocal) | Compute floating-point reciprocals with IEEE zero and infinity behavior | `v run ./vtl/examples/reciprocal/main.v` |
 | [math_decomposition](./math_decomposition) | Split and reconstruct binary floating-point values | `v run ./vtl/examples/math_decomposition/main.v` |
+| [sinc](./sinc) | Compute the normalized sinc of floating-point tensors | `v run ./vtl/examples/sinc/main.v` |
 | [math_log_domain](./math_log_domain) | Combine log values stably and inspect floating-point sign bits | `v run ./vtl/examples/math_log_domain/main.v` |
+| [pow_promoted](./pow_promoted) | Compare explicit and runtime-selected dtype promotion for tensor powers and weak-scalar arithmetic | `v run ./vtl/examples/pow_promoted/main.v` |
+| [scalar_extrema](./math_promoted_extrema_scalars) | NumPy-style weak-scalar extrema | `v run ./vtl/examples/math_promoted_extrema_scalars/main.v` |
+| [math_promoted_extrema](./math_promoted_extrema) | Compare mixed-dtype tensors with NumPy-style extrema and NaN rules | `v run ./vtl/examples/math_promoted_extrema/main.v` |
 | [nan_to_num](./nan_to_num) | Replace NaN and infinities before numerical processing | `v run ./vtl/examples/nan_to_num/main.v` |
 | [bitwise](./bitwise) | Broadcast integer masks and shift flag bits | `v run ./vtl/examples/bitwise/main.v` |
 | [take_nd](./take_nd) | Gather along an axis while preserving a multidimensional index shape | `v run ./vtl/examples/take_nd/main.v` |
@@ -113,7 +120,12 @@ CIFAR examples for CI-safe checks.
 | [nn_gru](./nn_gru) | GRU sequence forward and autograd backward | CPU |
 | [nn_group_norm](./nn_group_norm) | Channel-first GroupNorm in Sequential with affine parameters | CPU |
 | [nn_rms_norm](./nn_rms_norm) | Trailing-dimension RMSNorm with optional autograd weight | CPU |
+| [nn_custom_module](./nn_custom_module) | Train a callback-backed module, propagate modes, and round-trip registered state | CPU |
+| [sequential_inference_checkpoint.v](./sequential_inference_checkpoint.v) | Train, save a CPU `f64` Sequential checkpoint, reload it, and infer | CPU |
 | [nn_mnist](./nn_mnist) | MNIST training path | Dataset download/cache |
+
+See the [CPU Sequential inference checkpoint guide](../docs/TUTORIAL_INFERENCE_CHECKPOINT.md)
+for the versioned format's supported architecture and validation guarantees.
 
 ## CIFAR-10 release examples
 

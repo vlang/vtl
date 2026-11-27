@@ -42,6 +42,18 @@ fn test_arg_extrema_axis_respect_strides_and_numpy_nan_order() {
 	assert transposed.argmin_axis(0)!.to_array() == [0, 1]
 }
 
+fn test_arg_extrema_contiguous_nan_matches_generic() {
+	// Match NumPy: a leading NaN wins; otherwise the first NaN wins.
+	contig := vtl.from_2d[f64]([[math.nan(), 1.0, math.nan()], [1.0, math.nan(), 3.0]])!
+	assert contig.argmax_axis(1)!.to_array() == [0, 1]
+	assert contig.argmin_axis(1)!.to_array() == [0, 1]
+	// Exercise the same logical rows through the strided generic path.
+	base := vtl.from_2d[f64]([[math.nan(), 1.0], [1.0, math.nan()], [math.nan(), 3.0]])!
+	view := base.transpose([1, 0])!
+	assert view.argmax_axis(1)!.to_array() == [0, 1]
+	assert view.argmin_axis(1)!.to_array() == [0, 1]
+}
+
 fn test_arg_axis_rejects_empty_reduced_axis_and_preserves_empty_output() {
 	empty_axis := vtl.zeros[f64]([2, 0])
 	if _ := empty_axis.argmax_axis(1) {
@@ -110,6 +122,26 @@ fn test_flat_arg_extrema_return_first_index_and_handle_nan() {
 	assert large_u64.argmax_flat()! == 1
 }
 
+fn test_flat_arg_extrema_keepdims_shapes_and_values() {
+	values := vtl.from_array[f64]([1.0, 5.0, 3.0, 7.0, 4.0, 2.0, 8.0, 1.0], [2, 2, 2])!
+	maximum := values.argmax_flat_with_keepdims(true)!
+	assert maximum.shape == [1, 1, 1]
+	assert maximum.to_array() == [6]
+	assert values.argmin_flat_with_keepdims(true)!.to_array() == [0]
+	assert values.argmax_flat_with_keepdims(false)!.shape == []int{}
+	assert values.argmax_flat_with_keepdims(false)!.to_array() == [6]
+
+	with_nan := vtl.from_1d[f64]([1.0, math.nan(), 3.0])!
+	assert with_nan.argmax_flat_with_keepdims(true)!.to_array() == [1]
+	assert with_nan.nanargmax_flat_with_keepdims(true)!.to_array() == [2]
+	assert with_nan.nanargmin_flat_with_keepdims(false)!.shape == []int{}
+	assert with_nan.nanargmin_flat_with_keepdims(false)!.to_array() == [0]
+
+	scalar := vtl.from_array[f64]([7.0], []int{})!
+	assert scalar.argmax_flat_with_keepdims(true)!.shape == []int{}
+	assert scalar.nanargmin_flat_with_keepdims(true)!.to_array() == [0]
+}
+
 fn test_flat_arg_extrema_reject_empty_tensors() {
 	empty := vtl.from_1d[f64]([]f64{})!
 	if _ := empty.argmax_flat() {
@@ -118,12 +150,30 @@ fn test_flat_arg_extrema_reject_empty_tensors() {
 	if _ := empty.argmin_flat() {
 		assert false, 'argmin_flat must reject empty input'
 	}
+	if _ := empty.argmax_flat_with_keepdims(true) {
+		assert false, 'argmax_flat_with_keepdims must reject empty input'
+	}
+	if _ := empty.nanargmax_flat_with_keepdims(false) {
+		assert false, 'nanargmax_flat_with_keepdims must reject empty input'
+	}
 }
 
 fn test_nanarg_flattened_skips_nan_and_keeps_first_tie() {
 	t := vtl.from_1d[f64]([math.nan(), 7.0, 2.0, 7.0])!
 	assert t.nanargmax()! == 1
 	assert t.nanargmin()! == 2
+}
+
+fn test_nanarg_integer_comparisons_preserve_u64_precision() {
+	larger := u64(9007199254740993)
+	smaller := u64(9007199254740992)
+	values := vtl.from_1d[u64]([larger, smaller])!
+	assert values.nanargmax()! == 0
+	assert values.nanargmin()! == 1
+
+	matrix := vtl.from_2d[u64]([[larger, smaller], [smaller, larger]])!
+	assert matrix.nanargmax_axis(1, false)!.to_array() == [0, 1]
+	assert matrix.nanargmin_axis(1, false)!.to_array() == [1, 0]
 }
 
 fn test_nanarg_flattened_errors_when_no_valid_values() {
@@ -204,6 +254,22 @@ fn test_min_max_axis_squeeze_matches_numpy_shape() {
 
 	vector := vtl.from_1d([4.0, 2.0, 6.0])!
 	assert vector.max_axis_squeeze(0)!.to_array() == [6.0]
+}
+
+fn test_min_max_axis_keepdims_options_preserve_legacy_defaults() {
+	t := vtl.from_array[f64]([1.0, 5.0, 3.0, 4.0, 2.0, 6.0], [2, 3])!
+	assert t.max_axis(1)!.shape == [2, 1]
+	assert t.min_axis(1)!.shape == [2, 1]
+	assert t.max_axis_with_keepdims(1, true)!.shape == [2, 1]
+	assert t.min_axis_with_keepdims(1, true)!.shape == [2, 1]
+	assert t.max_axis_with_keepdims(1, false)!.shape == [2]
+	assert t.min_axis_with_keepdims(1, false)!.shape == [2]
+	assert t.max_axis_with_keepdims(1, false)!.to_array() == [5.0, 6.0]
+	assert t.min_axis_with_keepdims(1, false)!.to_array() == [1.0, 2.0]
+
+	empty_output := vtl.zeros[f64]([0, 3])
+	assert empty_output.max_axis_with_keepdims(1, true)!.shape == [0, 1]
+	assert empty_output.min_axis_with_keepdims(1, false)!.shape == [0]
 }
 
 fn test_min_max_multi_axis_reductions_match_numpy_shapes() {
@@ -359,5 +425,58 @@ fn test_flattened_cumulative_operations_reject_inconsistent_storage() ! {
 	}
 	if _ := values.cumprod_flat() {
 		assert false, 'flattened cumprod must reject inconsistent storage'
+	}
+}
+
+fn test_nan_cumulative_operations_skip_nan_and_preserve_axis_shape() ! {
+	values := vtl.from_2d[f64]([[1.0, math.nan(), 3.0], [math.nan(), 4.0, math.nan()]])!
+	assert values.nancumsum(1)!.shape == [2, 3]
+	assert values.nancumsum(1)!.to_array() == [1.0, 1.0, 4.0, 0.0, 4.0, 4.0]
+	assert values.nancumprod(-1)!.to_array() == [1.0, 1.0, 3.0, 1.0, 4.0, 4.0]
+
+	transposed := values.transpose([1, 0])!
+	assert transposed.nancumsum(1)!.to_array() == [1.0, 1.0, 0.0, 4.0, 3.0, 3.0]
+	assert transposed.nancumprod(1)!.to_array() == [1.0, 1.0, 1.0, 4.0, 3.0, 3.0]
+}
+
+fn test_nan_cumulative_flattened_operations_follow_logical_order_and_typed_accumulation() ! {
+	values := vtl.from_array[f64]([1.0, math.nan(), 3.0, 4.0], [2, 2])!
+	transposed := values.transpose([1, 0])!
+	assert transposed.nancumsum_flat()!.to_array() == [1.0, 4.0, 4.0, 8.0]
+	assert transposed.nancumprod_flat()!.to_array() == [1.0, 3.0, 3.0, 12.0]
+
+	wide_input := vtl.from_1d([f32(1e8), f32(math.nan()), 1])!
+	assert wide_input.nancumsum_flat()!.to_array() == [f32(1e8), f32(1e8), f32(1e8)]
+	assert wide_input.nancumprod_flat()!.to_array() == [f32(1e8), f32(1e8), f32(1e8)]
+	assert wide_input.nancumsum_as[f64](0)!.to_array() == [1e8, 1e8, 1e8 + 1.0]
+	assert wide_input.nancumprod_as[f64](0)!.to_array() == [1e8, 1e8, 1e8]
+	assert wide_input.nancumsum_flat_as[f64]()!.to_array() == [1e8, 1e8, 1e8 + 1.0]
+	assert wide_input.nancumprod_flat_as[f64]()!.to_array() == [1e8, 1e8, 1e8]
+}
+
+fn test_nan_cumulative_operations_cover_non_nan_and_empty_inputs() ! {
+	integers := vtl.from_1d([1, 2, 3])!
+	assert integers.nancumsum(0)!.to_array() == [1, 3, 6]
+	assert integers.nancumprod_flat()!.to_array() == [1, 2, 6]
+
+	all_nan := vtl.from_1d([math.nan(), math.nan()])!
+	assert all_nan.nancumsum_flat()!.to_array() == [0.0, 0.0]
+	assert all_nan.nancumprod(0)!.to_array() == [1.0, 1.0]
+
+	empty := vtl.zeros[f64]([2, 0], vtl.TensorData{})
+	assert empty.nancumsum(1)!.shape == [2, 0]
+	assert empty.nancumprod_flat()!.shape == [0]
+	if _ := integers.nancumsum(1) {
+		assert false, 'NaN-aware cumulative operations must validate axes'
+	}
+
+	mut malformed := vtl.from_1d([1.0, math.nan()])!
+	malformed.shape = [3]
+	malformed.size = 3
+	if _ := malformed.nancumsum(0) {
+		assert false, 'axis NaN-aware cumulative operations must validate storage'
+	}
+	if _ := malformed.nancumprod_flat() {
+		assert false, 'flattened NaN-aware cumulative operations must validate storage'
 	}
 }

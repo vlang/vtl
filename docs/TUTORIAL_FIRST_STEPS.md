@@ -38,6 +38,16 @@ assert column_major.to_array() == [1, 2, 3, 4, 5, 6]
 assert column_major.get([0, 1]) == 2
 ```
 
+Coordinate-grid constructors accept the same `memory:` option:
+
+```v
+import vtl
+
+coordinates := vtl.indices([2, 3], memory: .col_major)!
+assert coordinates.memory == .col_major
+assert coordinates.get([1, 1, 2]) == 2
+```
+
 ## Tensor Creation
 
 The canonical way to create a tensor is to use the `vtl.from_*` functions.
@@ -165,14 +175,25 @@ assert float_remainders.to_array() == [1.0, -1.0]
 ```
 
 The `*_scalar_promoted` variants apply NumPy-style weak scalar promotion to
-real numeric tensors. Floating tensors retain their dtype with boolean,
+real numeric tensors, with the tensor on the left. The matching
+`*_scalar_left_promoted` variants accept the scalar first and preserve operand
+order. Floating tensors retain their dtype with boolean,
 integer, or floating scalars. Integer tensors retain their dtype for in-range
 integer and boolean scalars, while floating scalars promote the result to
 `f64`; an out-of-range integer scalar returns an error. Integer true division
 returns `f64`. Because V generic return types are static, specify the result
 type `R`; VTL validates it against the inferred result dtype.
 
+Complex tensors keep `complex128` with real or complex scalars. A complex
+scalar promotes real numeric and boolean tensors to `complex128`; complex
+remainder is unsupported.
+`pow_scalar_promoted` and `pow_scalar_left_promoted` provide weak-scalar
+elementwise powers in either operand order. Boolean power returns `int8`;
+negative integer exponents and floating outputs that would lose a 64-bit
+integer operand are rejected.
+
 ```v
+import math.complex
 import vtl
 
 values := vtl.from_1d[f32]([1.5, -2.0])!
@@ -184,6 +205,28 @@ integers := vtl.from_1d[i8]([10, -5])!
 fractional := vtl.add_scalar_promoted[f64, i8, f64](integers, 0.5)!
 assert fractional.dtype() == .float64
 assert fractional.to_array() == [10.5, -4.5]
+
+left_difference := vtl.subtract_scalar_left_promoted[f64, i8, int](12, integers)!
+assert left_difference.to_array() == [2.0, 17.0]
+
+powers := vtl.pow_scalar_promoted[i8, i8, i16](integers, 2)!
+assert powers.to_array() == [100, 25]
+
+complex_values := vtl.add_scalar_promoted[complex.Complex, f32, complex.Complex](values,
+	complex.complex(0.25, 0.5))!
+assert complex_values.dtype() == .complex128
+assert complex_values.get_nth(0).re == 1.75
+assert complex_values.get_nth(0).im == 0.5
+
+complex_array := vtl.from_1d[complex.Complex]([
+	complex.complex(1.0, 2.0),
+	complex.complex(-1.0, 1.0),
+])!
+real_array := vtl.from_1d[f32]([1.0, 2.0])!
+mixed_sum := vtl.add_promoted[complex.Complex, complex.Complex, f32](complex_array,
+	real_array)!
+assert mixed_sum.get_nth(1).re == 1.0
+assert mixed_sum.get_nth(1).im == 1.0
 ```
 
 Same-dtype tensors support elementwise arithmetic operators with broadcasting.

@@ -151,6 +151,11 @@ pub fn (mut nn Sequential[T]) conv2d(in_channels int, out_channels int, kernel_s
 	nn.info.conv2d(in_channels, out_channels, kernel_size, config)
 }
 
+// conv_transpose2d adds a 2D transposed convolution over channel-first input.
+pub fn (mut nn Sequential[T]) conv_transpose2d(out_channels int, kernel_size []int, config layers.ConvTranspose2DConfig) {
+	nn.info.conv_transpose2d(out_channels, kernel_size, config)
+}
+
 // batchnorm1d adds a new BatchNorm1D layer to the network.
 pub fn (mut nn Sequential[T]) batchnorm1d(num_features int, config layers.BatchNorm1DConfig) {
 	nn.info.batchnorm1d(num_features, config)
@@ -176,9 +181,62 @@ pub fn (mut nn Sequential[T]) avgpool2d(kernel []int, padding []int, stride []in
 	nn.info.avgpool2d(kernel, padding, stride)
 }
 
+pub fn (mut nn Sequential[T]) avgpool3d(kernel []int, padding []int, stride []int) {
+	nn.info.avgpool3d(kernel, padding, stride)
+}
+
+pub fn (mut nn Sequential[T]) maxpool3d(kernel []int, padding []int, stride []int) {
+	nn.info.maxpool3d(kernel, padding, stride)
+}
+
 // global_avgpool2d adds a new GlobalAveragePool2D layer to the network.
 pub fn (mut nn Sequential[T]) global_avgpool2d() {
 	nn.info.global_avgpool2d()
+}
+
+// adaptive_avgpool2d adds a fixed-output adaptive average-pooling layer.
+pub fn (mut nn Sequential[T]) adaptive_avgpool2d(output_size []int) {
+	nn.info.adaptive_avgpool2d(output_size)
+}
+
+pub fn (mut nn Sequential[T]) adaptive_maxpool2d(output_size []int) {
+	nn.info.adaptive_maxpool2d(output_size)
+}
+
+pub fn (mut nn Sequential[T]) adaptive_avgpool1d(output_size int) {
+	nn.info.adaptive_avgpool1d(output_size)
+}
+
+pub fn (mut nn Sequential[T]) adaptive_maxpool1d(output_size int) {
+	nn.info.adaptive_maxpool1d(output_size)
+}
+
+pub fn (mut nn Sequential[T]) adaptive_avgpool3d(output_size []int) {
+	nn.info.adaptive_avgpool3d(output_size)
+}
+
+pub fn (mut nn Sequential[T]) adaptive_maxpool3d(output_size []int) {
+	nn.info.adaptive_maxpool3d(output_size)
+}
+
+pub fn (mut nn Sequential[T]) avgpool1d(kernel int, padding int, stride int) {
+	nn.info.avgpool1d(kernel, padding, stride)
+}
+
+pub fn (mut nn Sequential[T]) maxpool1d(kernel int, padding int, stride int) {
+	nn.info.maxpool1d(kernel, padding, stride)
+}
+
+pub fn (mut nn Sequential[T]) pad2d(padding []int, mode vtl.PadMode, constant T) {
+	nn.info.pad2d(padding, mode, constant)
+}
+
+pub fn (mut nn Sequential[T]) pad1d(padding []int, mode vtl.PadMode, constant T) {
+	nn.info.pad1d(padding, mode, constant)
+}
+
+pub fn (mut nn Sequential[T]) pad3d(padding []int, mode vtl.PadMode, constant T) {
+	nn.info.pad3d(padding, mode, constant)
 }
 
 // layer_norm adds a new LayerNorm layer to the network.
@@ -214,6 +272,11 @@ pub fn (mut nn Sequential[T]) gru(input_size int, hidden_size int) {
 // conv1d adds a one-dimensional convolution over channel-first sequence input.
 pub fn (mut nn Sequential[T]) conv1d(out_channels int, kernel_size int, config layers.Conv1DConfig) {
 	nn.info.conv1d(out_channels, kernel_size, config)
+}
+
+// conv_transpose1d adds a transposed convolution over channel-first sequence input.
+pub fn (mut nn Sequential[T]) conv_transpose1d(out_channels int, kernel_size int, config layers.ConvTranspose1DConfig) {
+	nn.info.conv_transpose1d(out_channels, kernel_size, config)
 }
 
 // multihead_attention adds a new MultiHeadAttention layer to the network.
@@ -284,12 +347,18 @@ pub fn (mut nn Sequential[T]) forward(train &autograd.Variable[T]) !&autograd.Va
 // batch normalization.
 pub fn (mut nn Sequential[T]) train() {
 	nn.training = true
+	for layer in nn.info.layers {
+		layer.set_training(true)
+	}
 }
 
 // eval enables evaluation behavior for mode-aware layers such as dropout and
 // batch normalization.
 pub fn (mut nn Sequential[T]) eval() {
 	nn.training = false
+	for layer in nn.info.layers {
+		layer.set_training(false)
+	}
 }
 
 // loss exposes this operation as part of the public API.

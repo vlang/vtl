@@ -12,4 +12,10 @@ fn main() {
 	loaded := npy.read[f64](path)!
 	println('shape: ${loaded.shape}')
 	println('values: ${loaded.to_array()}')
+	mut mapped := npy.open_mapped[f64](path)!
+	defer {
+		mapped.close()
+	}
+	first_row := mapped.read_rows(0, 1)!
+	println('first mapped row: ${first_row.to_array()}')
 }

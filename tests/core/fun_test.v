@@ -255,3 +255,19 @@ fn test_slice_hilo() {
 	slice := t.slice_hilo([0], [2])!
 	assert t.array_equal(slice)
 }
+
+fn test_slice_views_share_storage_for_contiguous_and_transposed_inputs() ! {
+	mut input := vtl.from_2d([[1, 2, 3], [4, 5, 6]])!
+	mut basic_slice := input.slice([0, 2], [1, 3])!
+	basic_slice.set([0, 1], 30)
+	assert input.get([0, 2]) == 30
+
+	mut range_view := input.slice_hilo([1, 0], [2, 2])!
+	range_view.set([0, 1], 60)
+	assert input.get([1, 1]) == 60
+
+	mut transposed := input.transpose([1, 0])!
+	mut strided_slice := transposed.slice([1, 3], [0, 2])!
+	strided_slice.set([1, 1], 90)
+	assert input.get([1, 2]) == 90
+}

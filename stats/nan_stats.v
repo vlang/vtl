@@ -47,6 +47,26 @@ pub fn nanstd[T](t &vtl.Tensor[T], ddof int) !f64 {
 	return math.sqrt(nanvar(t, ddof)?)
 }
 
+// nanmean_with_keepdims returns the NaN-aware global mean as a tensor,
+// optionally retaining the input rank with dimensions of one.
+pub fn nanmean_with_keepdims[T](t &vtl.Tensor[T], keepdims bool) !&vtl.Tensor[f64] {
+	return flat_reduction_result[f64](nanmean[T](t), t.rank(), keepdims)
+}
+
+// nanvar_with_keepdims returns NaN-aware global variance as a tensor,
+// optionally retaining the input rank with dimensions of one.
+pub fn nanvar_with_keepdims[T](t &vtl.Tensor[T], ddof int, keepdims bool) !&vtl.Tensor[f64] {
+	value := nanvar[T](t, ddof)!
+	return flat_reduction_result[f64](value, t.rank(), keepdims)
+}
+
+// nanstd_with_keepdims returns NaN-aware global standard deviation as a tensor,
+// optionally retaining the input rank with dimensions of one.
+pub fn nanstd_with_keepdims[T](t &vtl.Tensor[T], ddof int, keepdims bool) !&vtl.Tensor[f64] {
+	value := nanstd[T](t, ddof)!
+	return flat_reduction_result[f64](value, t.rank(), keepdims)
+}
+
 // nanmean_axis computes means along axis and retains the reduced dimension as
 // length one. NaN-only slices produce NaN.
 pub fn nanmean_axis[T](t &vtl.Tensor[T], axis int) !&vtl.Tensor[f64] {

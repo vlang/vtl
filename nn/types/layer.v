@@ -22,6 +22,17 @@ pub struct Layer[T] {
 	forward_fn       LayerForwardFn     = unsafe { nil }
 	forward_mode_fn  LayerForwardModeFn = unsafe { nil }
 	has_forward_mode bool
+	module_state     &Module[T] = unsafe { nil }
+	has_module_state bool
+}
+
+// layer_with_module_state attaches registered custom-module state to a layer.
+// The layer's own callbacks remain responsible for shape and forward behavior.
+pub fn layer_with_module_state[T](layer Layer[T], module &Module[T]) Layer[T] {
+	mut result := layer
+	result.module_state = module
+	result.has_module_state = true
+	return result
 }
 
 // layer_with_mode creates a typed wrapper for a layer whose behavior depends
@@ -68,7 +79,36 @@ pub fn (layer Layer[T]) variables() []&autograd.Variable[T] {
 	for ptr in ptrs {
 		vars << unsafe { &autograd.Variable[T](ptr) }
 	}
+	for parameter in layer.registered_parameters() {
+		if parameter.value !in vars {
+			vars << parameter.value
+		}
+	}
 	return vars
+}
+
+// registered_parameters returns named parameters attached through module state.
+pub fn (layer Layer[T]) registered_parameters() []NamedParameter[T] {
+	if !layer.has_module_state {
+		return []NamedParameter[T]{}
+	}
+	return layer.module_state.named_parameters()
+}
+
+// registered_buffers returns named buffers attached through module state.
+pub fn (layer Layer[T]) registered_buffers() []NamedBuffer[T] {
+	if !layer.has_module_state {
+		return []NamedBuffer[T]{}
+	}
+	return layer.module_state.named_buffers()
+}
+
+// set_training updates attached module state recursively.
+pub fn (layer Layer[T]) set_training(training bool) {
+	if layer.has_module_state {
+		mut module := layer.module_state
+		module.set_training(training)
+	}
 }
 
 // forward runs a forward pass through the wrapped layer.
