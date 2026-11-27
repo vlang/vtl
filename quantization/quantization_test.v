@@ -158,6 +158,29 @@ fn test_conv2d_int8_f32_rejects_invalid_groups_and_weight_axis() ! {
 	assert axis_failed
 }
 
+fn test_quantized_layer_wrappers_convert_f32_weights_and_forward() ! {
+	input_params := new_params(0.1, 0, -128, 127)!
+	linear_input := vtl.from_array([f32(1), 2], [1, 2])!
+	linear_weights := vtl.from_array([f32(0.5), -1, 2, 0.24], [2, 2])!
+	linear_bias := vtl.from_array([f32(0.25), -0.5], [1, 2])!
+	linear_layer := quantize_linear_layer_f32(linear_weights, linear_bias, input_params,
+		-128, 127)!
+	linear_output := linear_layer.forward(linear_input)!
+	expected_linear := [f32(-1.25), 1.98]
+	for i in 0 .. expected_linear.len {
+		assert math.abs(f64(linear_output.get_nth(i) - expected_linear[i])) < 0.03
+	}
+
+	conv_input := vtl.from_array([f32(1), 2], [1, 1, 1, 2])!
+	conv_weights := vtl.from_array([f32(0.5)], [1, 1, 1, 1])!
+	conv_bias := vtl.from_array([f32(0.25)], [1, 1])!
+	conv_layer := quantize_conv2d_layer_f32(conv_weights, conv_bias, input_params, [1, 1],
+		QuantizedConv2DConfig{}, -128, 127)!
+	conv_output := conv_layer.forward(conv_input)!
+	assert conv_output.shape == [1, 1, 1, 2]
+	assert conv_output.to_array() == [f32(0.75), 1.25]
+}
+
 fn test_minmax_observer_calibrates_and_accumulates() ! {
 	mut observer := MinMaxObserver{}
 	mut uninitialized_failed := false

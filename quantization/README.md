@@ -15,8 +15,11 @@ a CPU inference path with per-tensor activation quantization, per-output-channel
 weight quantization, i64 accumulation, and f32 output with bias. Quantized
 Conv2D is available through `conv2d_int8_f32` for NCHW/OIHW tensors, including
 groups, padding, stride, and dilation via `QuantizedConv2DConfig`. Layer
-conversion, accelerator dispatch, and broad performance parity remain open
-under [issue #792](https://github.com/vlang/vtl/issues/792).
+conversion helpers `quantize_linear_layer_f32` and
+`quantize_conv2d_layer_f32` create forward-only inference wrappers from trained
+f32 weight/bias tensors and externally calibrated activation parameters.
+Accelerator dispatch and broad performance parity remain open under
+[issue #792](https://github.com/vlang/vtl/issues/792).
 
 See the runnable [INT8 quantization example](../examples/quantization_int8/main.v).
 The end-to-end f32-vs-INT8 latency and weight-payload benchmark is
