@@ -12,6 +12,24 @@ fn main() {
 	println('dtype: ${result.dtype()}')
 	println('powers: ${result.to_array()}')
 
+	auto_result := vtl.binary_promoted_auto(bases, exponents, .power) or { panic(err) }
+	println('automatic dtype: ${vtl.promoted_tensor_dtype(auto_result)}')
+	if auto_result is &vtl.Tensor[f32] {
+		auto_powers := auto_result as &vtl.Tensor[f32]
+		println('automatic powers: ${auto_powers.to_array()}')
+	} else {
+		panic('power promotion should produce float32')
+	}
+
+	scalar_result := vtl.scalar_left_promoted_auto(10, bases, .subtract) or { panic(err) }
+	println('weak-scalar dtype: ${vtl.promoted_tensor_dtype(scalar_result)}')
+	if scalar_result is &vtl.Tensor[i16] {
+		scalar_difference := scalar_result as &vtl.Tensor[i16]
+		println('weak-scalar difference: ${scalar_difference.to_array()}')
+	} else {
+		panic('in-range integer scalar should preserve int16')
+	}
+
 	complex_bases := vtl.from_1d[complex.Complex]([
 		complex.complex(-1.0, 0.0),
 		complex.complex(-1.0, -0.0),

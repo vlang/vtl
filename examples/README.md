@@ -98,7 +98,7 @@ CIFAR examples for CI-safe checks.
 | [math_decomposition](./math_decomposition) | Split and reconstruct binary floating-point values | `v run ./vtl/examples/math_decomposition/main.v` |
 | [sinc](./sinc) | Compute the normalized sinc of floating-point tensors | `v run ./vtl/examples/sinc/main.v` |
 | [math_log_domain](./math_log_domain) | Combine log values stably and inspect floating-point sign bits | `v run ./vtl/examples/math_log_domain/main.v` |
-| [pow_promoted](./pow_promoted) | Broadcast tensor powers with explicit result dtype promotion | `v run ./vtl/examples/pow_promoted/main.v` |
+| [pow_promoted](./pow_promoted) | Compare explicit and runtime-selected dtype promotion for tensor powers and weak-scalar arithmetic | `v run ./vtl/examples/pow_promoted/main.v` |
 | [scalar_extrema](./math_promoted_extrema_scalars) | NumPy-style weak-scalar extrema | `v run ./vtl/examples/math_promoted_extrema_scalars/main.v` |
 | [math_promoted_extrema](./math_promoted_extrema) | Compare mixed-dtype tensors with NumPy-style extrema and NaN rules | `v run ./vtl/examples/math_promoted_extrema/main.v` |
 | [nan_to_num](./nan_to_num) | Replace NaN and infinities before numerical processing | `v run ./vtl/examples/nan_to_num/main.v` |
