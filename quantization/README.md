@@ -12,8 +12,10 @@ The API includes per-tensor and per-channel parameters, finite-value min/max
 calibration observers, and explicit f32/f64 quantize/dequantize entry points.
 Quantized results are ordinary `Tensor[i8]` values. `linear_int8_f32` provides
 a CPU inference path with per-tensor activation quantization, per-output-channel
-weight quantization, i64 accumulation, and f32 output with bias. Quantized
-Conv2D is available through `conv2d_int8_f32` for NCHW/OIHW tensors, including
+weight quantization, exact i64 accumulation, and f32 output with bias. Linear
+inference uses VSL's AVX2-dispatched INT16 dot product for reductions of at
+least 128 features on supported x86 CPUs, with a scalar fallback elsewhere.
+Quantized Conv2D is available through `conv2d_int8_f32` for NCHW/OIHW tensors, including
 groups, padding, stride, and dilation via `QuantizedConv2DConfig`. Layer
 conversion helpers `quantize_linear_layer_f32` and
 `quantize_conv2d_layer_f32` create forward-only inference wrappers from trained
@@ -33,8 +35,8 @@ the INT8 timing, while weights are quantized before timing as they would be for
 inference. It reports the maximum absolute difference from the f32 result and
 weight tensor payload plus per-channel metadata; bias and V object overhead are
 excluded. On an AMD Ryzen 9 5900X with V 0.5.2 (`7f5b9a3`) and GCC 16.2.1,
-three independent runs measured a median f32/INT8 latency ratio of 1.286x
-(per-run ratios 1.184x-1.427x), with maximum absolute error 0.015401. Weight
+three independent runs measured a median f32/INT8 latency ratio of 6.792x
+(per-run ratios 6.521x-6.864x), with maximum absolute error 0.015401. Weight
 payload was 524,288 bytes for f32 versus 131,072 bytes plus 8,192 bytes of
 per-channel metadata for INT8 (3.765x smaller including that metadata). This is
 one CPU, shape, and implementation only; it is not evidence of general PyTorch,

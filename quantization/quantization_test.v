@@ -66,6 +66,33 @@ fn test_linear_int8_f32_uses_per_output_channel_scales_and_preserves_batch_shape
 	}
 }
 
+fn test_linear_int8_f32_matches_scalar_for_simd_sized_reduction() ! {
+	mut input_values := []f32{len: 256}
+	mut weight_values := []i8{len: 256}
+	for i in 0 .. input_values.len {
+		input_values[i] = f32(i % 31 - 15) / 7
+		weight_values[i] = i8((i * 13) % 256 - 128)
+	}
+	input := vtl.from_array[f32](input_values, [1, 256])!
+	input_params := new_params(0.1, -13, -128, 127)!
+	weights := vtl.from_array[i8](weight_values, [1, 256])!
+	weight_params := new_per_channel_params([0.03], [17], 0, -128, 127)!
+	bias := vtl.from_1d[f32]([0.125])!
+
+	output := linear_int8_f32(input, weights, input_params, weight_params, bias)!
+	quantized_input := quantize_per_tensor_f32(input, input_params)!
+	input_i8 := quantized_input.to_array()
+	mut expected_accumulator := i64(0)
+	for i in 0 .. input_i8.len {
+		centered_activation := i64(input_i8[i]) - i64(input_params.zero_point)
+		centered_weight := i64(weight_values[i]) - i64(weight_params.zero_points[0])
+		expected_accumulator += centered_activation * centered_weight
+	}
+	expected := f32(f64(expected_accumulator) * input_params.scale * weight_params.scales[0] +
+		0.125)
+	assert math.abs(f64(output.get_nth(0) - expected)) < 1e-5
+}
+
 fn test_linear_int8_f32_rejects_mismatched_metadata() ! {
 	input := vtl.from_array([f32(1), 2], [1, 2])!
 	input_params := new_params(0.1, 0, -128, 127)!

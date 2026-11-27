@@ -2,6 +2,7 @@ module quantization
 
 import math
 import vtl
+import vsl.blas as vsl_blas
 
 const max_i32_accumulation_terms = 33025
 
@@ -181,10 +182,17 @@ pub fn linear_int8_f32(input &vtl.Tensor[f32], weights &vtl.Tensor[i8], input_pa
 	input_i8 := quantize_per_tensor_f32(input, input_params)!
 	input_values := input_i8.to_array()
 	weight_values := weights.to_array()
+	mut centered_input := []i16{len: input_values.len}
+	for index, value in input_values {
+		centered_input[index] = i16(value) - i16(input_params.zero_point)
+	}
+	mut centered_weights := []i16{len: weight_values.len}
 	for index, value in weight_values {
 		if value < weight_params.qmin || value > weight_params.qmax {
 			return error('quantized weight at logical index ${index} is outside [${weight_params.qmin}, ${weight_params.qmax}]')
 		}
+		output_feature := index / in_features
+		centered_weights[index] = i16(value) - i16(weight_params.zero_points[output_feature])
 	}
 	bias_values := bias.to_array()
 	mut rows := 1
@@ -204,15 +212,10 @@ pub fn linear_int8_f32(input &vtl.Tensor[f32], weights &vtl.Tensor[i8], input_pa
 	mut output := []f32{len: rows * out_features}
 	for row in 0 .. rows {
 		for output_feature in 0 .. out_features {
-			mut accumulator := i64(0)
-			for feature in 0 .. in_features {
-				input_index := row * in_features + feature
-				weight_index := output_feature * in_features + feature
-				input_value := i64(input_values[input_index]) - i64(input_params.zero_point)
-				weight_value := i64(weight_values[weight_index]) -
-					i64(weight_params.zero_points[output_feature])
-				accumulator += input_value * weight_value
-			}
+			input_start := row * in_features
+			weight_start := output_feature * in_features
+			accumulator := vsl_blas.dot_i16_i64(centered_input[input_start..input_start +
+				in_features], centered_weights[weight_start..weight_start + in_features])!
 			output_index := row * out_features + output_feature
 			output[output_index] = f32(f64(accumulator) * output_scales[output_feature] +
 				f64(bias_values[output_feature]))
