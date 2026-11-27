@@ -10,6 +10,7 @@ VTL provides dataset loaders and batching utilities for ML examples and tests.
 | IMDB | `datasets.load_imdb()` | Sentiment analysis reviews |
 | CIFAR-10 | `datasets.load_cifar10(...)` | Image classification examples |
 | DataLoader | `datasets.DataLoader[T]` | Batch, shuffle, and iterate tensors/labels |
+| IterableDataLoader | `datasets.IterableDataLoader[T]` | Stream and batch samples on demand |
 
 DataLoader returns a view when a batch's sample indices form a contiguous range.
 Shuffled, non-contiguous batches allocate tensors to preserve the requested
@@ -20,6 +21,14 @@ sample order. A non-positive `batch_size` produces an empty loader.
 `false`), so set all three explicitly when porting a training pipeline. Call
 `reset()` between epochs to advance the deterministic shuffle order from the
 configured seed.
+
+For sources that should not be materialized as one tensor, implement
+`IterableDataset[T]` with `next_sample()` and `reset()`, then pass it to
+`new_iterable_data_loader`. The loader holds at most one batch of samples,
+stacks matching feature and optional label shapes, and returns source errors.
+It snapshots each sample as it is read, so a source may reuse mutable buffers.
+`StreamSample.finished` ends iteration; `reset()` delegates replay to the
+source, which may return an error when it cannot rewind.
 
 `TransformPipeline[T]` composes tensor transforms in order and propagates the
 first transform error. Apply it to a sample or batch tensor; transforms receive
