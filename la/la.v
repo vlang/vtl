@@ -210,6 +210,11 @@ fn matmul_complex(a &vtl.Tensor[vcomplex.Complex], b &vtl.Tensor[vcomplex.Comple
 		b_im[i] = value.im
 	}
 	mut result_data := []vcomplex.Complex{len: batch_size * rows * columns}
+	mut a_sum := []f64{len: rows * inner}
+	mut b_sum := []f64{len: inner * columns}
+	mut p1 := []f64{len: rows * columns}
+	mut p2 := []f64{len: rows * columns}
+	mut p3 := []f64{len: rows * columns}
 	for batch in 0 .. batch_size {
 		if rows == 0 || columns == 0 || inner == 0 {
 			continue
@@ -219,18 +224,19 @@ fn matmul_complex(a &vtl.Tensor[vcomplex.Complex], b &vtl.Tensor[vcomplex.Comple
 		a_start := a_batch * rows * inner
 		b_start := b_batch * inner * columns
 		result_start := batch * rows * columns
-		mut c_re := []f64{len: rows * columns}
-		blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_re[a_start..], inner, b_re[b_start..], columns, 0.0, mut c_re, columns)
-		mut temp := []f64{len: rows * columns}
-		blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_im[a_start..], inner, b_im[b_start..], columns, 0.0, mut temp, columns)
-		for i in 0 .. rows * columns {
-			c_re[i] -= temp[i]
+		for i in 0 .. rows * inner {
+			a_sum[i] = a_re[a_start + i] + a_im[a_start + i]
 		}
-		mut c_im := []f64{len: rows * columns}
-		blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_re[a_start..], inner, b_im[b_start..], columns, 0.0, mut c_im, columns)
-		blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_im[a_start..], inner, b_re[b_start..], columns, 1.0, mut c_im, columns)
+		for i in 0 .. inner * columns {
+			b_sum[i] = b_re[b_start + i] + b_im[b_start + i]
+		}
+		// Three real products: p1 = Re(A)Re(B), p2 = Im(A)Im(B),
+		// p3 = (Re(A)+Im(A))(Re(B)+Im(B)); Re(C) = p1-p2, Im(C) = p3-p1-p2.
+		blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_re[a_start..], inner, b_re[b_start..], columns, 0.0, mut p1, columns)
+		blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_im[a_start..], inner, b_im[b_start..], columns, 0.0, mut p2, columns)
+		blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_sum, inner, b_sum, columns, 0.0, mut p3, columns)
 		for i in 0 .. rows * columns {
-			result_data[result_start + i] = vcomplex.Complex{ re: c_re[i], im: c_im[i] }
+			result_data[result_start + i] = vcomplex.Complex{ re: p1[i] - p2[i], im: p3[i] - p1[i] - p2[i] }
 		}
 	}
 	return vtl.from_array[vcomplex.Complex](result_data, result_shape)
