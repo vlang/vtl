@@ -86,6 +86,26 @@ fn test_iterable_data_loader_snapshots_reused_sample_buffers() ! {
 	assert batch.features.to_array() == [0.0, 1]
 }
 
+fn test_iterable_data_loader_random_transforms_replay_with_injected_generator() ! {
+	mut source := &CounterStreamDataset{
+		limit: 2
+	}
+	mut loader := new_iterable_data_loader[f64](source, 2, false)!
+	pipeline := RandomTransformPipeline.new[f64]([add_stream_noise_transform])
+	mut generator := vtl.new_random_generator(2028)
+	initial_state := generator.snapshot()
+	first_batch := loader.next_batch_with_random_transforms(pipeline, mut generator)!
+	assert first_batch.available
+	assert first_batch.labels.to_array() == [0.0, 10]
+
+	loader.reset()!
+	generator.restore(initial_state)!
+	replayed_batch := loader.next_batch_with_random_transforms(pipeline, mut generator)!
+	assert replayed_batch.features.to_array() == first_batch.features.to_array()
+	assert replayed_batch.labels.to_array() == first_batch.labels.to_array()
+	generator.free()
+}
+
 fn test_iterable_data_loader_drops_incomplete_batch_and_propagates_errors() ! {
 	mut source := &CounterStreamDataset{
 		limit: 3
@@ -168,4 +188,13 @@ fn (mut source ReusingStreamDataset) next_sample() !StreamSample[f64] {
 
 fn (mut source ReusingStreamDataset) reset() ! {
 	source.next_value = 0
+}
+
+fn add_stream_noise_transform(input &vtl.Tensor[f64], mut generator vtl.RandomGenerator) !&vtl.Tensor[f64] {
+	noise := generator.uniform(-0.5, 0.5, input.shape)!
+	mut output := vtl.zeros[f64](input.shape)
+	for i in 0 .. input.size {
+		output.set_nth(i, input.get_nth(i) + noise.get_nth(i))
+	}
+	return output
 }

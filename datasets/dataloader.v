@@ -163,6 +163,14 @@ pub fn (dl &DataLoader[T]) collated_batch(i int) !CollatedBatch[T] {
 	return batch
 }
 
+// collated_batch_with_random_transforms applies random transforms after collation
+// using the caller-owned generator, leaving its state available for replay.
+pub fn (dl &DataLoader[T]) collated_batch_with_random_transforms(i int, pipeline RandomTransformPipeline[T], mut generator vtl.RandomGenerator) !CollatedBatch[T] {
+	mut batch := dl.collated_batch(i)!
+	batch.features = pipeline.apply(batch.features, mut generator)!
+	return batch
+}
+
 fn (dl &DataLoader[T]) build_collated_batch(i int, batch_indices []int) !CollatedBatch[T] {
 	if dl.collate_fn != unsafe { nil } {
 		callback := unsafe { CollateFn[T](dl.collate_fn) }

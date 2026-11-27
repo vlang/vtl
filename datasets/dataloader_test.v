@@ -41,8 +41,45 @@ fn double_transform(input &vtl.Tensor[f64]) !&vtl.Tensor[f64] {
 	return output
 }
 
+fn add_random_noise_transform(input &vtl.Tensor[f64], mut generator vtl.RandomGenerator) !&vtl.Tensor[f64] {
+	noise := generator.uniform(-0.5, 0.5, input.shape)!
+	mut output := vtl.zeros[f64](input.shape)
+	for i in 0 .. input.size {
+		output.set_nth(i, input.get_nth(i) + noise.get_nth(i))
+	}
+	return output
+}
+
 fn failing_transform(_ &vtl.Tensor[f64]) !&vtl.Tensor[f64] {
 	return error('transform failed')
+}
+
+fn test_random_batch_transforms_use_injected_replayable_generators() ! {
+	dataset := vtl.from_1d([1.0, 2])!
+	labels := vtl.from_1d([10.0, 20])!
+	loader := new_data_loader_with_labels_checked[f64](dataset, labels, DataLoaderConfig{
+		batch_size: 2
+		shuffle:    false
+		drop_last:  false
+	})!
+	pipeline := RandomTransformPipeline.new[f64]([add_random_noise_transform])
+	mut first_generator := vtl.new_random_generator(2027)
+	first_state := first_generator.snapshot()
+	first_batch := loader.collated_batch_with_random_transforms(0, pipeline, mut first_generator)!
+	assert first_batch.labels.to_array() == [10.0, 20]
+
+	mut independent_generator := vtl.new_random_generator(2027)
+	independent_batch := loader.collated_batch_with_random_transforms(0, pipeline,
+		mut independent_generator)!
+	assert independent_batch.features.to_array() == first_batch.features.to_array()
+	assert independent_batch.labels.to_array() == first_batch.labels.to_array()
+
+	first_generator.restore(first_state)!
+	replayed_batch := loader.collated_batch_with_random_transforms(0, pipeline, mut first_generator)!
+	assert replayed_batch.features.to_array() == first_batch.features.to_array()
+
+	first_generator.free()
+	independent_generator.free()
 }
 
 fn test_contiguous_batches_are_zero_copy_views() ! {

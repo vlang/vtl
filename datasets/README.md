@@ -66,6 +66,38 @@ transformed := pipeline.apply(sample)!
 assert transformed.to_array() == [0.0, 1.0]
 ```
 
+Use `RandomTransformPipeline[T]` when transforms need randomness. Each batch
+call receives an explicit `vtl.RandomGenerator`, so separate generators remain
+independent and `snapshot()`/`restore()` can replay the same augmentation stream:
+`DataLoader.collated_batch_with_random_transforms` and
+`IterableDataLoader.next_batch_with_random_transforms` accept the pipeline and
+generator explicitly.
+
+```v
+import vtl
+import vtl.datasets
+
+fn add_noise(input &vtl.Tensor[f64], mut generator vtl.RandomGenerator) !&vtl.Tensor[f64] {
+	noise := generator.uniform(-0.1, 0.1, input.shape)!
+	mut output := vtl.zeros[f64](input.shape)
+	for i in 0 .. input.size {
+		output.set_nth(i, input.get_nth(i) + noise.get_nth(i))
+	}
+	return output
+}
+
+dataset := vtl.from_1d([1.0, 2.0])!
+pipeline := datasets.RandomTransformPipeline.new[f64]([add_noise])
+mut generator := vtl.new_random_generator(42)
+loader := datasets.new_data_loader[f64](dataset, datasets.DataLoaderConfig{
+	batch_size: 2
+	shuffle:    false
+	drop_last:  false
+})
+batch := loader.collated_batch_with_random_transforms(0, pipeline, mut generator)!
+assert batch.features.size == 2
+```
+
 For custom sample order, `new_data_loader_with_sampler_checked` and
 `new_data_loader_with_labels_and_sampler_checked` accept samplers from
 `vtl.nn.data`. Built-in options include sequential, random, subset-random,

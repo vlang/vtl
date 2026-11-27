@@ -113,6 +113,20 @@ pub fn (mut loader IterableDataLoader[T]) next_batch() !StreamBatch[T] {
 	}
 }
 
+// next_batch_with_random_transforms applies random transforms to an available
+// batch using the caller-owned generator; labels are returned unchanged.
+pub fn (mut loader IterableDataLoader[T]) next_batch_with_random_transforms(pipeline RandomTransformPipeline[T], mut generator vtl.RandomGenerator) !StreamBatch[T] {
+	batch := loader.next_batch()!
+	if !batch.available {
+		return batch
+	}
+	return StreamBatch[T]{
+		available: true
+		features:  pipeline.apply(batch.features, mut generator)!
+		labels:    batch.labels
+	}
+}
+
 // reset rewinds the underlying source. Sources that cannot replay should
 // return an error from their reset implementation.
 pub fn (mut loader IterableDataLoader[T]) reset() ! {
