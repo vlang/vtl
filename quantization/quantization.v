@@ -3,6 +3,8 @@ module quantization
 import math
 import vtl
 
+const max_i32_accumulation_terms = 33025
+
 // QuantizationParams describes affine signed INT8 quantization.
 pub struct QuantizationParams {
 pub:
@@ -230,6 +232,7 @@ pub:
 
 // conv2d_int8_f32 runs a CPU affine-INT8 Conv2D operator and returns f32 values.
 // Weights use one per-channel parameter set along output-channel axis 0.
+@[direct_array_access]
 pub fn conv2d_int8_f32(input &vtl.Tensor[f32], weights &vtl.Tensor[i8], input_params QuantizationParams, weight_params PerChannelParams, bias &vtl.Tensor[f32], kernel_size []int, config QuantizedConv2DConfig) !&vtl.Tensor[f32] {
 	if input.rank() != 4 || weights.rank() != 4 || bias.rank() != 2 {
 		return error('quantized Conv2D expects input and weights rank 4 and bias rank 2')
@@ -290,12 +293,25 @@ pub fn conv2d_int8_f32(input &vtl.Tensor[f32], weights &vtl.Tensor[i8], input_pa
 	quantized_input := quantize_per_tensor_f32(input, input_params)!
 	input_values := quantized_input.to_array()
 	weight_values := weights.to_array()
+	bias_values := bias.to_array()
+	if input_values.len != input.size || weight_values.len != weights.size
+		|| bias_values.len != out_channels {
+		return error('quantized Conv2D tensor storage does not match its shape')
+	}
+	mut centered_input := []i16{len: input_values.len}
+	for index, value in input_values {
+		centered_input[index] = i16(value) - i16(input_params.zero_point)
+	}
+	mut centered_weights := []i16{len: weight_values.len}
+	weights_per_output_channel := weights.size / out_channels
+	use_i32_accumulator := weights_per_output_channel <= max_i32_accumulation_terms
 	for index, value in weight_values {
 		if value < weight_params.qmin || value > weight_params.qmax {
 			return error('quantized weight at logical index ${index} is outside [${weight_params.qmin}, ${weight_params.qmax}]')
 		}
+		output_channel := index / weights_per_output_channel
+		centered_weights[index] = i16(value) - i16(weight_params.zero_points[output_channel])
 	}
-	bias_values := bias.to_array()
 	mut output_scales := []f64{len: out_channels}
 	for output_channel in 0 .. out_channels {
 		scale := input_params.scale * weight_params.scales[output_channel]
@@ -311,36 +327,14 @@ pub fn conv2d_int8_f32(input &vtl.Tensor[f32], weights &vtl.Tensor[i8], input_pa
 				output_channel := group * out_channels_per_group + output_channel_in_group
 				for oh in 0 .. out_h {
 					for ow in 0 .. out_w {
-						mut accumulator := i64(0)
-						for input_channel_in_group in 0 .. in_channels_per_group {
-							input_channel := group * in_channels_per_group + input_channel_in_group
-							for kh in 0 .. kernel_size[0] {
-								ih := oh * config.stride[0] - config.padding[0] +
-									kh * config.dilation[0]
-								if ih < 0 || ih >= in_h {
-									continue
-								}
-								for kw in 0 .. kernel_size[1] {
-									iw := ow * config.stride[1] - config.padding[1] +
-										kw * config.dilation[1]
-									if iw >= 0 && iw < in_w {
-										input_batch := b * in_channels + input_channel
-										input_row := input_batch * in_h + ih
-										input_plane := input_row * in_w
-										input_index := input_plane + iw
-										weight_channel := output_channel * in_channels_per_group +
-											input_channel_in_group
-										weight_row := weight_channel * kernel_size[0] + kh
-										weight_kernel := weight_row * kernel_size[1]
-										weight_index := weight_kernel + kw
-										input_value := i64(input_values[input_index]) -
-											i64(input_params.zero_point)
-										weight_value := i64(weight_values[weight_index]) -
-											i64(weight_params.zero_points[output_channel])
-										accumulator += input_value * weight_value
-									}
-								}
-							}
+						accumulator := if use_i32_accumulator {
+							i64(conv2d_int8_accumulate_i32(centered_input, centered_weights,
+								b, group, output_channel, oh, ow, in_channels, in_h, in_w,
+								in_channels_per_group, kernel_size, config))
+						} else {
+							conv2d_int8_accumulate_i64(centered_input, centered_weights, b,
+								group, output_channel, oh, ow, in_channels, in_h, in_w,
+								in_channels_per_group, kernel_size, config)
 						}
 						output_batch := b * out_channels + output_channel
 						output_row := output_batch * out_h + oh
@@ -355,6 +349,62 @@ pub fn conv2d_int8_f32(input &vtl.Tensor[f32], weights &vtl.Tensor[i8], input_pa
 		}
 	}
 	return vtl.from_array[f32](output, [batch, out_channels, out_h, out_w])!
+}
+
+@[direct_array_access; inline]
+fn conv2d_int8_accumulate_i32(input []i16, weights []i16, batch int, group int, output_channel int, oh int, ow int, in_channels int, in_h int, in_w int, in_channels_per_group int, kernel_size []int, config QuantizedConv2DConfig) i32 {
+	mut accumulator := i32(0)
+	for input_channel_in_group in 0 .. in_channels_per_group {
+		input_channel := group * in_channels_per_group + input_channel_in_group
+		for kh in 0 .. kernel_size[0] {
+			ih := oh * config.stride[0] - config.padding[0] + kh * config.dilation[0]
+			if ih < 0 || ih >= in_h {
+				continue
+			}
+			for kw in 0 .. kernel_size[1] {
+				iw := ow * config.stride[1] - config.padding[1] + kw * config.dilation[1]
+				if iw >= 0 && iw < in_w {
+					input_batch := batch * in_channels + input_channel
+					input_row := input_batch * in_h + ih
+					input_index := input_row * in_w + iw
+					weight_channel := output_channel * in_channels_per_group +
+						input_channel_in_group
+					weight_row := weight_channel * kernel_size[0] + kh
+					weight_index := weight_row * kernel_size[1] + kw
+					accumulator += i32(input[input_index]) * i32(weights[weight_index])
+				}
+			}
+		}
+	}
+	return accumulator
+}
+
+@[direct_array_access; inline]
+fn conv2d_int8_accumulate_i64(input []i16, weights []i16, batch int, group int, output_channel int, oh int, ow int, in_channels int, in_h int, in_w int, in_channels_per_group int, kernel_size []int, config QuantizedConv2DConfig) i64 {
+	mut accumulator := i64(0)
+	for input_channel_in_group in 0 .. in_channels_per_group {
+		input_channel := group * in_channels_per_group + input_channel_in_group
+		for kh in 0 .. kernel_size[0] {
+			ih := oh * config.stride[0] - config.padding[0] + kh * config.dilation[0]
+			if ih < 0 || ih >= in_h {
+				continue
+			}
+			for kw in 0 .. kernel_size[1] {
+				iw := ow * config.stride[1] - config.padding[1] + kw * config.dilation[1]
+				if iw >= 0 && iw < in_w {
+					input_batch := batch * in_channels + input_channel
+					input_row := input_batch * in_h + ih
+					input_index := input_row * in_w + iw
+					weight_channel := output_channel * in_channels_per_group +
+						input_channel_in_group
+					weight_row := weight_channel * kernel_size[0] + kh
+					weight_index := weight_row * kernel_size[1] + kw
+					accumulator += i64(input[input_index]) * i64(weights[weight_index])
+				}
+			}
+		}
+	}
+	return accumulator
 }
 
 // MinMaxObserver accumulates finite scalar range statistics for calibration.

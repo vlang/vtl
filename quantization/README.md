@@ -33,12 +33,12 @@ the INT8 timing, while weights are quantized before timing as they would be for
 inference. It reports the maximum absolute difference from the f32 result and
 weight tensor payload plus per-channel metadata; bias and V object overhead are
 excluded. On an AMD Ryzen 9 5900X with V 0.5.2 (`7f5b9a3`) and GCC 16.2.1,
-three independent runs measured a median 1.286x INT8/f32 speedup (per-run
-speedups 1.184x–1.427x), with maximum absolute error 0.015401. Weight payload
-was 524,288 bytes for f32 versus 131,072 bytes plus 8,192 bytes of per-channel
-metadata for INT8 (3.765x smaller including that metadata). This is one CPU,
-shape, and implementation only; it is not evidence of general PyTorch, NumPy,
-or accelerator performance parity.
+three independent runs measured a median f32/INT8 latency ratio of 1.286x
+(per-run ratios 1.184x-1.427x), with maximum absolute error 0.015401. Weight
+payload was 524,288 bytes for f32 versus 131,072 bytes plus 8,192 bytes of
+per-channel metadata for INT8 (3.765x smaller including that metadata). This is
+one CPU, shape, and implementation only; it is not evidence of general PyTorch,
+NumPy, or accelerator performance parity.
 
 Run reproducibly from `~/.vmodules`:
 
@@ -50,6 +50,25 @@ systemd-run --user --scope --working-directory="$HOME/.vmodules" \
 systemd-run --user --scope --working-directory="$HOME/.vmodules" \
   -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% -- \
   /tmp/vtl-quantization-int8-bench
+```
+
+The Conv2D benchmark is `../benchmarks/quantization_int8_conv2d_bench.v`. It
+uses input `[1, 8, 32, 32]`, weights `[16, 8, 3, 3]`, padding 1, one warmup,
+and three timed calls. On the same Ryzen 9 5900X / V 0.5.2 / GCC 16.2.1 host,
+three independent runs had median f32 latency 0.8234 ms and INT8 latency
+1.4641 ms; INT8 was 1.778x slower, with maximum absolute error 0.038690.
+Effective INT8 weight payload plus per-channel metadata was 1,408 bytes versus
+4,608 bytes f32 (3.273x smaller, excluding bias and V object overhead). This
+reference CPU kernel is currently a storage/accuracy path, not a Conv2D speedup.
+
+```sh
+systemd-run --user --scope --working-directory="$HOME/.vmodules" \
+  -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% -E VJOBS=1 -- \
+  v -no-parallel -prod -o /tmp/vtl-quantization-int8-conv2d-bench \
+  ./vtl/benchmarks/quantization_int8_conv2d_bench.v
+systemd-run --user --scope --working-directory="$HOME/.vmodules" \
+  -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% -- \
+  /tmp/vtl-quantization-int8-conv2d-bench
 ```
 
 Per-channel conversion accepts an axis and one scale/zero point per channel.

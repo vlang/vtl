@@ -158,6 +158,21 @@ fn test_conv2d_int8_f32_rejects_invalid_groups_and_weight_axis() ! {
 	assert axis_failed
 }
 
+fn test_conv2d_int8_f32_uses_wide_accumulator_for_large_reductions() ! {
+	input_values := []f32{len: 40000, init: 1}
+	weight_values := []i8{len: 40000, init: 1}
+	input := vtl.from_array[f32](input_values, [1, 40000, 1, 1])!
+	weights := vtl.from_array[i8](weight_values, [1, 40000, 1, 1])!
+	input_params := new_params(1, 0, -128, 127)!
+	weight_params := new_per_channel_params([1.0], [0], 0, -128, 127)!
+	bias := vtl.from_array([f32(0)], [1, 1])!
+
+	output := conv2d_int8_f32(input, weights, input_params, weight_params, bias, [1, 1],
+		QuantizedConv2DConfig{})!
+
+	assert output.to_array() == [f32(40000)]
+}
+
 fn test_quantized_layer_wrappers_convert_f32_weights_and_forward() ! {
 	input_params := new_params(0.1, 0, -128, 127)!
 	linear_input := vtl.from_array([f32(1), 2], [1, 2])!
