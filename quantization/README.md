@@ -56,9 +56,11 @@ systemd-run --user --scope --working-directory="$HOME/.vmodules" \
 
 The Conv2D benchmark is `../benchmarks/quantization_int8_conv2d_bench.v`. It
 uses input `[1, 8, 32, 32]`, weights `[16, 8, 3, 3]`, padding 1, one warmup,
-and three timed calls. On the same Ryzen 9 5900X / V 0.5.2 / GCC 16.2.1 host,
-three independent runs had median f32 latency 0.8234 ms and INT8 latency
-1.4641 ms; INT8 was 1.778x slower, with maximum absolute error 0.038690.
+and three timed calls. The CPU path packs each input patch once and reuses it
+across output channels. On the same Ryzen 9 5900X / V 0.5.2 / GCC 16.2.1 host,
+three independent runs had median f32 latency 0.8562 ms and INT8 latency
+0.9818 ms (median per-run f32/INT8 ratio 0.857x; range 0.769x-0.924x), so
+INT8 remained slower on this shape. Maximum absolute error was 0.038690.
 Effective INT8 weight payload plus per-channel metadata was 1,408 bytes versus
 4,608 bytes f32 (3.273x smaller, excluding bias and V object overhead). This
 reference CPU kernel is currently a storage/accuracy path, not a Conv2D speedup.
