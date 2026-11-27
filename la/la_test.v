@@ -122,6 +122,19 @@ fn test_matmul_complex128_falls_back_when_three_product_overflows() {
 	assert value.im == 1e308
 }
 
+fn test_matmul_complex128_falls_back_when_small_imag_is_absorbed() {
+	a := vtl.from_array[vcomplex.Complex]([
+		vcomplex.Complex{ re: 9007199254740992.0, im: 1.0 },
+	], [1, 1])!
+	b := vtl.from_array[vcomplex.Complex]([
+		vcomplex.Complex{ re: 1.0, im: 0.0 },
+	], [1, 1])!
+	result := matmul(a, b)!
+	value := result.to_array()[0]
+	assert value.re == 9007199254740992.0
+	assert value.im == 1.0
+}
+
 fn test_matmul_complex128_vector_dot_does_not_conjugate() {
 	a := vtl.from_1d[vcomplex.Complex]([
 		vcomplex.Complex{ re: 1, im: 1 },

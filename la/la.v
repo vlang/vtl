@@ -182,6 +182,20 @@ fn array_all_finite(values []f64) bool {
 	return true
 }
 
+fn sums_preserve_operands(left []f64, right []f64, sum []f64) bool {
+	for i in 0 .. sum.len {
+		if !math.is_finite(sum[i]) {
+			return false
+		}
+		// The three-product form is only equivalent if (Re+Im) did not
+		// round/absorb either operand; otherwise fall back to 4 products.
+		if (sum[i] - left[i]) != right[i] || (sum[i] - right[i]) != left[i] {
+			return false
+		}
+	}
+	return true
+}
+
 fn three_product_results_finite(p1 []f64, p2 []f64, p3 []f64) bool {
 	for i in 0 .. p1.len {
 		re := p1[i] - p2[i]
@@ -269,7 +283,7 @@ fn matmul_complex(a &vtl.Tensor[vcomplex.Complex], b &vtl.Tensor[vcomplex.Comple
 		blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_re[a_start..], inner, b_re[b_start..], columns, 0.0, mut p1, columns)
 		blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_im[a_start..], inner, b_im[b_start..], columns, 0.0, mut p2, columns)
 		mut used_three_product := false
-		if array_all_finite(a_sum) && array_all_finite(b_sum) && array_all_finite(p1) && array_all_finite(p2) {
+		if array_all_finite(a_sum) && array_all_finite(b_sum) && array_all_finite(p1) && array_all_finite(p2) && sums_preserve_operands(a_re[a_start..a_start + rows * inner], a_im[a_start..a_start + rows * inner], a_sum) && sums_preserve_operands(b_re[b_start..b_start + inner * columns], b_im[b_start..b_start + inner * columns], b_sum) {
 			blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_sum, inner, b_sum, columns, 0.0, mut p3, columns)
 			if array_all_finite(p3) && three_product_results_finite(p1, p2, p3) {
 				for i in 0 .. rows * columns {
