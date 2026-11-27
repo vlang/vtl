@@ -64,9 +64,10 @@ coverage and test transfers, mixed precision, and device-specific behavior.
 VTL now has opt-in signed INT8 affine per-tensor/per-channel conversion,
 min/max calibration observers, and an f32-output quantized CPU Linear operator
 plus an NCHW/OIHW CPU Conv2D operator and forward-only Linear/Conv2D weight
-conversion helpers in `vtl.quantization`. Accelerator execution, whole-model
-conversion, and performance parity beyond the single local Linear workload
-recorded in `quantization/README.md` remain open in
+conversion helpers in `vtl.quantization`. Experimental CUDA inference is
+available for Linear and Conv2D through cuBLAS; CUDA Linear can retain weights,
+while CUDA Conv2D currently uses a one-shot path. Broader model conversion,
+additional accelerator coverage, and performance parity remain open in
 [#792](https://github.com/vlang/vtl/issues/792).
 
 ### Autograd
