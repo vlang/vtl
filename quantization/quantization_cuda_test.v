@@ -24,3 +24,33 @@ fn test_linear_int8_f32_cuda_matches_cpu_with_affine_zero_points() ! {
 		assert math.abs(gpu_values[i] - cpu_values[i]) < 1e-6, 'CUDA INT8 Linear mismatch at ${i}: got ${gpu_values[i]}, want ${cpu_values[i]}'
 	}
 }
+
+$if cuda ? {
+	fn test_cuda_quantized_linear_layer_reuses_device_weights() ! {
+		if os.getenv('VTL_TEST_CUDA') != '1' {
+			return
+		}
+		dev := cuda.get_default_device()!
+		input := vtl.from_array[f32]([0.3, -1.2, 2.4, 1.1, 0.0, -0.5], [2, 3])!
+		weights := vtl.from_array[f32]([0.7, -0.8, 1.1, -1.0, 1.2, 0.5], [2, 3])!
+		bias := vtl.from_1d[f32]([0.25, -0.75])!
+		input_params := new_params(0.05, 5, -128, 127)!
+		cpu_layer := quantize_linear_layer_f32(weights, bias, input_params, -128, 127)!
+		mut cuda_layer := upload_quantized_linear_layer_cuda(dev, cpu_layer)!
+		defer {
+			cuda_layer.release() or { panic(err) }
+		}
+		cpu := cpu_layer.forward(input)!
+		mut source_weights := cpu_layer.weights
+		source_weights.data.data[0] = source_weights.data.data[0] + 1
+		for _ in 0 .. 2 {
+			gpu := cuda_layer.forward(input)!
+			cpu_values := cpu.to_array()
+			gpu_values := gpu.to_array()
+			assert gpu.shape == cpu.shape
+			for i in 0 .. cpu_values.len {
+				assert math.abs(gpu_values[i] - cpu_values[i]) < 1e-6, 'retained CUDA INT8 Linear mismatch at ${i}'
+			}
+		}
+	}
+}

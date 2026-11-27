@@ -17,18 +17,20 @@ inference uses VSL's AVX2-dispatched INT16 dot product for reductions of at
 least 128 features on supported x86 CPUs, with a scalar fallback elsewhere.
 CUDA builds also provide `linear_int8_f32_cuda(dev, ...)`, an explicit cuBLAS
 path that returns a CPU-resident f32 tensor. It pads GEMM dimensions and keeps
-integer accumulation exact, including reductions larger than INT32. The current
-API uploads and transposes weights per call; this makes it slower than CPU INT8
-for small inference workloads, so it remains experimental pending reusable
-device-resident weights and broader benchmarks.
+integer accumulation exact, including reductions larger than INT32. This
+one-shot function transposes and uploads weights per call. For repeated
+inference, `upload_quantized_linear_layer_cuda(dev, layer)` returns a
+`CudaQuantizedLinearLayer` that retains the aligned INT8 weights on the device;
+call `forward(input)` for inference and `release()` when finished. The CPU
+`QuantizedLinearLayer` remains available for host inference.
 Quantized Conv2D is available through `conv2d_int8_f32` for NCHW/OIHW tensors, including
 groups, padding, stride, and dilation via `QuantizedConv2DConfig`. Layer
 conversion helpers `quantize_linear_layer_f32` and
 `quantize_conv2d_layer_f32` create forward-only inference wrappers from trained
 f32 weight/bias tensors and externally calibrated activation parameters.
-CUDA INT8 Linear is an experimental explicit path. GPU Conv2D, reusable
-device-resident quantized weights, broader model conversion, and performance
-parity remain open under [issue #792](https://github.com/vlang/vtl/issues/792).
+CUDA INT8 Linear is an experimental explicit path. GPU Conv2D, broader model
+conversion, and performance parity remain open under
+[issue #792](https://github.com/vlang/vtl/issues/792).
 
 See the runnable [INT8 quantization example](../examples/quantization_int8/main.v).
 The end-to-end f32-vs-INT8 latency and weight-payload benchmark is
@@ -64,6 +66,20 @@ INT8, and CUDA INT8 latencies were 56.467 ms, 6.7714 ms, and 4.4597 ms,
 respectively; CUDA was 1.52x faster than CPU INT8 at the median with the same
 0.021986 maximum absolute error. CUDA timings ranged from 4.3181 to 9.7551 ms,
 so these host measurements show workload scaling, not a universal speedup.
+
+The current CUDA benchmark additionally measures `CudaQuantizedLinearLayer`
+after its one-time device upload. Five production runs with three warmups and 24
+timed calls measured the `[32, 256] x [512, 256]` workload at median 1.0820 ms
+for one-shot CUDA and 0.2312 ms for resident weights; CPU INT8 was 0.7181 ms.
+One resident run had a 2.0705 ms outlier (the other four ranged from 0.2296 to
+0.2566 ms). For `[128, 512] x [1024, 512]`, medians were 6.8626 ms one-shot,
+1.6359 ms resident, and 8.7833 ms CPU INT8; resident timings ranged from
+1.6126 to 1.7129 ms. Maximum absolute error versus f32 was unchanged at
+0.015401 and 0.021986, respectively. Timing includes per-call activation
+quantization, allocations, transfers, and output conversion; resident-layer
+construction and its one-time weight upload are excluded. Results are specific
+to this RTX 3060 host and these shapes, and do not establish general accelerator
+parity.
 
 Run reproducibly from `~/.vmodules`:
 

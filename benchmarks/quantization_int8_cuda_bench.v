@@ -1,4 +1,4 @@
-// Compare f32 Linear, CPU INT8 Linear, and cuBLAS INT8 Linear end to end.
+// Compare f32, CPU INT8, one-shot CUDA INT8, and resident-weight CUDA INT8 Linear.
 // Compile with `-d cuda -prod` from ~/.vmodules, then run the binary separately.
 module main
 
@@ -14,8 +14,8 @@ import vsl.cuda
 const default_batch = 32
 const default_in_features = 256
 const default_out_features = 512
-const warmup_runs = 2
-const iterations = 8
+const warmup_runs = 3
+const iterations = 24
 
 struct BenchResult {
 	ms       f64
@@ -44,6 +44,18 @@ fn main() {
 	quantized_weights := quantization.quantize_per_channel_f32(weights, weight_params) or {
 		panic(err)
 	}
+	cpu_layer := &quantization.QuantizedLinearLayer{
+		weights:       quantized_weights
+		weight_params: weight_params
+		input_params:  input_params
+		bias:          bias
+	}
+	mut resident_cuda_layer := quantization.upload_quantized_linear_layer_cuda(dev, cpu_layer) or {
+		panic(err)
+	}
+	defer {
+		resident_cuda_layer.release() or { panic(err) }
+	}
 
 	reference := linear_f32(input, weights, bias, out_features) or { panic(err) }
 	cpu := quantization.linear_int8_f32(input, quantized_weights, input_params, weight_params,
@@ -54,9 +66,12 @@ fn main() {
 		weight_params, bias) or {
 		panic(err)
 	}
+	resident_gpu := resident_cuda_layer.forward(input) or { panic(err) }
 	cpu_error := max_abs_difference(reference, cpu)
 	gpu_error := max_abs_difference(reference, gpu)
+	resident_gpu_error := max_abs_difference(reference, resident_gpu)
 	assert math.is_finite(cpu_error) && math.is_finite(gpu_error)
+	assert math.is_finite(resident_gpu_error)
 
 	for _ in 0 .. warmup_runs {
 		_ = linear_f32(input, weights, bias, out_features) or { panic(err) }
@@ -68,6 +83,7 @@ fn main() {
 			weight_params, bias) or {
 			panic(err)
 		}
+		_ = resident_cuda_layer.forward(input) or { panic(err) }
 	}
 	float32 := time_float32(input, weights, bias, out_features) or { panic(err) }
 	cpu_int8 := time_int8(input, quantized_weights, input_params, weight_params, bias) or {
@@ -76,14 +92,15 @@ fn main() {
 	gpu_int8 := time_cuda(dev, input, quantized_weights, input_params, weight_params, bias) or {
 		panic(err)
 	}
+	resident_gpu_int8 := time_cuda_resident(resident_cuda_layer, input) or { panic(err) }
 
 	println('device_id: ${dev.device_id}')
 	println('shape: [${batch}, ${in_features}] x [${out_features}, ${in_features}]')
 	println('warmups: ${warmup_runs}; iterations: ${iterations}')
-	println('f32_ms: ${float32.ms:.4f}; cpu_int8_ms: ${cpu_int8.ms:.4f}; cuda_int8_ms: ${gpu_int8.ms:.4f}')
-	println('speedup_vs_f32: cpu=${float32.ms / cpu_int8.ms:.3f}x; cuda=${float32.ms / gpu_int8.ms:.3f}x')
-	println('max_abs_error_vs_f32: cpu=${cpu_error:.6f}; cuda=${gpu_error:.6f}')
-	println('checksums: f32=${float32.checksum:.6f}; cpu_int8=${cpu_int8.checksum:.6f}; cuda_int8=${gpu_int8.checksum:.6f}')
+	println('f32_ms: ${float32.ms:.4f}; cpu_int8_ms: ${cpu_int8.ms:.4f}; cuda_int8_ms: ${gpu_int8.ms:.4f}; cuda_resident_int8_ms: ${resident_gpu_int8.ms:.4f}')
+	println('speedup_vs_f32: cpu=${float32.ms / cpu_int8.ms:.3f}x; cuda=${float32.ms / gpu_int8.ms:.3f}x; cuda_resident=${float32.ms / resident_gpu_int8.ms:.3f}x')
+	println('max_abs_error_vs_f32: cpu=${cpu_error:.6f}; cuda=${gpu_error:.6f}; cuda_resident=${resident_gpu_error:.6f}')
+	println('checksums: f32=${float32.checksum:.6f}; cpu_int8=${cpu_int8.checksum:.6f}; cuda_int8=${gpu_int8.checksum:.6f}; cuda_resident=${resident_gpu_int8.checksum:.6f}')
 }
 
 fn benchmark_dimension(index int, fallback int) int {
@@ -175,6 +192,19 @@ fn time_cuda(dev &cuda.CudaDevice, input &vtl.Tensor[f32], weights &vtl.Tensor[i
 	for _ in 0 .. iterations {
 		result := quantization.linear_int8_f32_cuda(dev, input, weights, input_params,
 			weight_params, bias)!
+		checksum += f64(result.get_nth(0))
+	}
+	return BenchResult{
+		ms:       f64(time.sys_mono_now() - started) / f64(iterations) / 1_000_000.0
+		checksum: checksum
+	}
+}
+
+fn time_cuda_resident(layer &quantization.CudaQuantizedLinearLayer, input &vtl.Tensor[f32]) !BenchResult {
+	mut checksum := 0.0
+	started := time.sys_mono_now()
+	for _ in 0 .. iterations {
+		result := layer.forward(input)!
 		checksum += f64(result.get_nth(0))
 	}
 	return BenchResult{

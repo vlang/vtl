@@ -3,6 +3,7 @@ module quantization
 import vtl
 
 // QuantizedLinearLayer is a forward-only INT8 Linear inference layer.
+@[heap]
 pub struct QuantizedLinearLayer {
 pub:
 	weights       &vtl.Tensor[i8]
