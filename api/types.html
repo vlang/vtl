@@ -150,6 +150,8 @@
 <p>Shared adapter types for neural-network components. <code>Layer[T]</code> erases a concrete layer behind callbacks for output shape, variables, and forward execution; <code>Loss[T]</code> provides a common loss interface; <code>Optimizer[T]</code> exposes registered variables, learning rate, parameter building, and update. These adapters let the sequential model and optimizers work with multiple implementations.</p>
 <p>This package is mainly useful when implementing custom layers or integrating new components. Most application code can use constructors from <a href="https://github.com/vlang/vtl/blob/master/nn/layers/README.md"><code>layers</code></a>, <a href="https://github.com/vlang/vtl/blob/master/nn/loss/README.md"><code>loss</code></a>, and <a href="https://github.com/vlang/vtl/blob/master/nn/models/README.md"><code>models</code></a>.</p>
 <p>The contracts are defined in <a href="https://github.com/vlang/vtl/blob/master/nn/types/layer.v"><code>layer.v</code></a>, <a href="https://github.com/vlang/vtl/blob/master/nn/types/loss.v"><code>loss.v</code></a>, and <a href="https://github.com/vlang/vtl/blob/master/nn/types/optimizer.v"><code>optimizer.v</code></a>. Implementations should keep tensor shapes and context ownership consistent across forward and backward calls.</p>
+<p><code>Module[T]</code> is a state registry for custom components. Register trainable <code>Variable[T]</code> values with <code>register_parameter</code>, non-trainable tensor state with <code>register_buffer</code>, and nested registries with <code>register_module</code>. Names must be non-empty, cannot contain dots, and must be unique within each module across parameters, buffers, and children. <code>named_parameters</code> and <code>named_buffers</code> traverse nested registries depth-first using dotted names; <code>parameters</code> and <code>buffers</code> return their values without names. Cyclic child graphs are rejected.</p>
+<p>This registry does not yet provide custom forward/mode hooks or automatically adapt state to <code>Sequential</code>, optimizer construction, or checkpoint serialization. Existing <code>Layer[T]</code> wrappers and <code>Sequential</code> behavior are unchanged.</p>
 
 </section>
 
@@ -174,6 +176,14 @@
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token function">loss</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>ptr <span class="token builtin">voidptr</span><span class="token punctuation">,</span> loss_fn <span class="token type_name">LossFn</span><span class="token punctuation">)</span> <span class="token type_name">Loss</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
 <p>loss creates a typed loss wrapper.</p>
+
+</section>
+
+		<section id="module" class="doc-node">
+			<div class="title"><h2>fn module <a href="#module">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/types/module.v#L36"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token keyword">module</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token type_name">Module</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+<p>module creates an empty custom-module state registry.</p>
 
 </section>
 
@@ -279,6 +289,62 @@
 
 </section>
 
+		<section id="Module[T].register_parameter" class="doc-node">
+			<div class="title"><h2>fn (Module[T]) register_parameter <a href="#Module[T].register_parameter">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/types/module.v#L67"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> <span class="token keyword">module</span> <span class="token type_name">Module</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">register_parameter</span><span class="token punctuation">(</span>name <span class="token builtin">string</span><span class="token punctuation">,</span> value <span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<p>register_parameter adds a trainable variable to this module. Names share one namespace with buffers and child modules.</p>
+
+</section>
+
+		<section id="Module[T].register_buffer" class="doc-node">
+			<div class="title"><h2>fn (Module[T]) register_buffer <a href="#Module[T].register_buffer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/types/module.v#L80"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> <span class="token keyword">module</span> <span class="token type_name">Module</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">register_buffer</span><span class="token punctuation">(</span>name <span class="token builtin">string</span><span class="token punctuation">,</span> value <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<p>register_buffer adds non-trainable tensor state to this module. Buffers are traversed separately from optimizer parameters.</p>
+
+</section>
+
+		<section id="Module[T].register_module" class="doc-node">
+			<div class="title"><h2>fn (Module[T]) register_module <a href="#Module[T].register_module">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/types/module.v#L109"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> <span class="token keyword">module</span> <span class="token type_name">Module</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">register_module</span><span class="token punctuation">(</span>name <span class="token builtin">string</span><span class="token punctuation">,</span> child <span class="token operator">&amp;</span><span class="token type_name">Module</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<p>register_module attaches a child registry. Cyclic module graphs are rejected so recursive state traversal always terminates.</p>
+
+</section>
+
+		<section id="Module[T].named_parameters" class="doc-node">
+			<div class="title"><h2>fn (Module[T]) named_parameters <a href="#Module[T].named_parameters">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/types/module.v#L139"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">module</span> <span class="token operator">&amp;</span><span class="token type_name">Module</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">named_parameters</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token type_name">NamedParameter</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+<p>named_parameters returns local parameters followed by depth-first child parameters, joining nested names with dots.</p>
+
+</section>
+
+		<section id="Module[T].parameters" class="doc-node">
+			<div class="title"><h2>fn (Module[T]) parameters <a href="#Module[T].parameters">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/types/module.v#L146"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">module</span> <span class="token operator">&amp;</span><span class="token type_name">Module</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">parameters</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+<p>parameters returns registered parameter variables without their names.</p>
+
+</section>
+
+		<section id="Module[T].named_buffers" class="doc-node">
+			<div class="title"><h2>fn (Module[T]) named_buffers <a href="#Module[T].named_buffers">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/types/module.v#L170"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">module</span> <span class="token operator">&amp;</span><span class="token type_name">Module</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">named_buffers</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token type_name">NamedBuffer</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+<p>named_buffers returns local buffers followed by depth-first child buffers, joining nested names with dots.</p>
+
+</section>
+
+		<section id="Module[T].buffers" class="doc-node">
+			<div class="title"><h2>fn (Module[T]) buffers <a href="#Module[T].buffers">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/types/module.v#L177"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">module</span> <span class="token operator">&amp;</span><span class="token type_name">Module</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">buffers</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+<p>buffers returns registered tensors without their names.</p>
+
+</section>
+
 		<section id="Layer" class="doc-node">
 			<div class="title"><h2>struct Layer <a href="#Layer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/types/layer.v#L18"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -305,8 +371,45 @@
 
 </section>
 
+		<section id="Module" class="doc-node">
+			<div class="title"><h2>struct Module <a href="#Module">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/types/module.v#L28"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token type_name">Module</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<span class="token keyword">mut</span><span class="token punctuation">:</span>
+	parameters <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token type_name">NamedParameter</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span>
+	buffers    <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token type_name">NamedBuffer</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span>
+	children   <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token type_name">NamedModule</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+<p>Module stores named parameters, buffers, and child modules for user-defined neural-network components. It is a state registry; forward and mode behavior remain the responsibility of the custom component.</p>
 
-						<div class="footer">Powered by vdoc. Generated on: 25 Nov 2026 10:46:34</div>
+</section>
+
+		<section id="NamedBuffer" class="doc-node">
+			<div class="title"><h2>struct NamedBuffer <a href="#NamedBuffer">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/types/module.v#L14"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token type_name">NamedBuffer</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	name  <span class="token builtin">string</span>
+	value <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+<p>NamedBuffer associates non-parameter state with its registration name.</p>
+
+</section>
+
+		<section id="NamedParameter" class="doc-node">
+			<div class="title"><h2>struct NamedParameter <a href="#NamedParameter">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/types/module.v#L7"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token type_name">NamedParameter</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	name  <span class="token builtin">string</span>
+	value <span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+<p>NamedParameter associates a custom-module parameter with its registration name.</p>
+
+</section>
+
+
+						<div class="footer">Powered by vdoc. Generated on: 27 Nov 2026 04:38:13</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_types">README</a></li>
 <li class="open"><a href="#layer">fn layer</a>        <ul>
@@ -316,6 +419,9 @@
 </ul>
 </li>
 <li class="open"><a href="#loss">fn loss</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#module">fn module</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#variable_ptrs_to_voidptrs">fn variable_ptrs_to_voidptrs</a>        <ul>
@@ -350,10 +456,29 @@
 <li><a href="#Loss[T].loss">fn loss</a></li>
 </ul>
 </li>
+<li class="open"><a href="#Module[T].register_parameter">type Module[T]</a>        <ul>
+<li><a href="#Module[T].register_parameter">fn register_parameter</a></li>
+<li><a href="#Module[T].register_buffer">fn register_buffer</a></li>
+<li><a href="#Module[T].register_module">fn register_module</a></li>
+<li><a href="#Module[T].named_parameters">fn named_parameters</a></li>
+<li><a href="#Module[T].parameters">fn parameters</a></li>
+<li><a href="#Module[T].named_buffers">fn named_buffers</a></li>
+<li><a href="#Module[T].buffers">fn buffers</a></li>
+</ul>
+</li>
 <li class="open"><a href="#Layer">struct Layer</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#Loss">struct Loss</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#Module">struct Module</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#NamedBuffer">struct NamedBuffer</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#NamedParameter">struct NamedParameter</a>        <ul>
 </ul>
 </li>
 </ul></div>
