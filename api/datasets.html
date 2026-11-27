@@ -178,10 +178,16 @@
 <td><code>datasets.DataLoader[T]</code></td>
 <td>Batch, shuffle, and iterate tensors/labels</td>
 </tr>
+<tr>
+<td>IterableDataLoader</td>
+<td><code>datasets.IterableDataLoader[T]</code></td>
+<td>Stream and batch samples on demand</td>
+</tr>
 </tbody>
 </table>
 <p>DataLoader returns a view when a batch's sample indices form a contiguous range. Shuffled, non-contiguous batches allocate tensors to preserve the requested sample order. A non-positive <code>batch_size</code> produces an empty loader.</p>
 <p><code>DataLoaderConfig</code> defaults to <code>batch_size: 32</code>, <code>shuffle: true</code>, and <code>drop_last: true</code>. These differ from PyTorch's defaults (<code>1</code>, <code>false</code>, and <code>false</code>), so set all three explicitly when porting a training pipeline. Call <code>reset()</code> between epochs to advance the deterministic shuffle order from the configured seed.</p>
+<p>For sources that should not be materialized as one tensor, implement <code>IterableDataset[T]</code> with <code>next_sample()</code> and <code>reset()</code>, then pass it to <code>new_iterable_data_loader</code>. The loader holds at most one batch of samples, stacks matching feature and optional label shapes, and returns source errors. It snapshots each sample as it is read, so a source may reuse mutable buffers. <code>StreamSample.finished</code> ends iteration; <code>reset()</code> delegates replay to the source, which may return an error when it cannot rewind.</p>
 <p><code>TransformPipeline[T]</code> composes tensor transforms in order and propagates the first transform error. Apply it to a sample or batch tensor; transforms receive the preceding transform's output, and an empty pipeline returns its input. Transforms that should preserve their input must return a new tensor rather than mutating the input. For batch transforms, pass a pipeline to <code>DataLoader.set_batch_transform_pipeline</code>; <code>collated_batch</code> applies it to features after default batching or custom collation, preserves labels, and returns transform errors to the caller. <code>split</code> preserves the configured pipeline.</p>
 <pre><code class="language-v"><span class="token keyword">import</span> <span class="token module_">vtl</span>
 <span class="token keyword">import</span> <span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token module_">datasets</span>
@@ -439,6 +445,14 @@ v run ./vtl/examples/nn_cifar10_tiny_synth/main.v
 
 </section>
 
+		<section id="new_iterable_data_loader" class="doc-node">
+			<div class="title"><h2>fn new_iterable_data_loader <a href="#new_iterable_data_loader">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/streaming.v#L44"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">new_iterable_data_loader</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>dataset <span class="token type_name">IterableDataset</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> batch_size <span class="token builtin">int</span><span class="token punctuation">,</span> drop_last <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token type_name">IterableDataLoader</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+<p>new_iterable_data_loader creates a loader over a source that yields equally shaped feature samples and, optionally, equally shaped labels.</p>
+
+</section>
+
 		<section id="tokenize_text" class="doc-node">
 			<div class="title"><h2>fn tokenize_text <a href="#tokenize_text">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/text.v#L22"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -452,6 +466,20 @@ v run ./vtl/examples/nn_cifar10_tiny_synth/main.v
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token type_name">TransformPipeline</span><span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>transforms <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token type_name">TensorTransform</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token type_name">TransformPipeline</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
 <p>TransformPipeline.new creates a pipeline and snapshots the transform list.</p>
+
+</section>
+
+		<section id="IterableDataset" class="doc-node">
+			<div class="title"><h2>interface IterableDataset <a href="#IterableDataset">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/streaming.v#L16"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">interface</span> <span class="token type_name">IterableDataset</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+	<span class="token comment">// next_sample returns one sample, a finished marker, or a source error.</span>
+<span class="token keyword">mut</span><span class="token punctuation">:</span>
+	<span class="token function">next_sample</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token type_name">StreamSample</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span>
+	<span class="token comment">// reset rewinds the source or reports that replay is unsupported.</span>
+	<span class="token function">reset</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span>
+<span class="token punctuation">}</span></code></pre>
+<p>IterableDataset produces samples on demand and owns its source state. Implement reset when the source can be replayed; otherwise return an error.</p>
 
 </section>
 
@@ -588,6 +616,22 @@ v run ./vtl/examples/nn_cifar10_tiny_synth/main.v
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>dl <span class="token operator">&amp;</span><span class="token type_name">DataLoader</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">mini_batch_count</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">int</span></code></pre>
 <p>mini_batch_count returns the total number of batches in one epoch.</p>
+
+</section>
+
+		<section id="IterableDataLoader[T].next_batch" class="doc-node">
+			<div class="title"><h2>fn (IterableDataLoader[T]) next_batch <a href="#IterableDataLoader[T].next_batch">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/streaming.v#L58"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> loader <span class="token type_name">IterableDataLoader</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">next_batch</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token type_name">StreamBatch</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+<p>next_batch reads at most batch_size samples and stacks them into dense tensors. It returns available=false after exhaustion; source errors and inconsistent sample shapes are returned to the caller.</p>
+
+</section>
+
+		<section id="IterableDataLoader[T].reset" class="doc-node">
+			<div class="title"><h2>fn (IterableDataLoader[T]) reset <a href="#IterableDataLoader[T].reset">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/streaming.v#L118"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> loader <span class="token type_name">IterableDataLoader</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">reset</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<p>reset rewinds the underlying source. Sources that cannot replay should return an error from their reset implementation.</p>
 
 </section>
 
@@ -733,6 +777,21 @@ v run ./vtl/examples/nn_cifar10_tiny_synth/main.v
 
 </section>
 
+		<section id="IterableDataLoader" class="doc-node">
+			<div class="title"><h2>struct IterableDataLoader <a href="#IterableDataLoader">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/streaming.v#L33"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token type_name">IterableDataLoader</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	batch_size <span class="token builtin">int</span>
+	drop_last  <span class="token builtin">bool</span>
+<span class="token keyword">mut</span><span class="token punctuation">:</span>
+	dataset   <span class="token type_name">IterableDataset</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span>
+	exhausted <span class="token builtin">bool</span>
+<span class="token punctuation">}</span></code></pre>
+<p>IterableDataLoader batches an IterableDataset without materializing it.</p>
+
+</section>
+
 		<section id="MnistDataset" class="doc-node">
 			<div class="title"><h2>struct MnistDataset <a href="#MnistDataset">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/mnist.v#L18"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
@@ -744,6 +803,32 @@ v run ./vtl/examples/nn_cifar10_tiny_synth/main.v
 	test_labels    <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token builtin">u8</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
 <span class="token punctuation">}</span></code></pre>
 <p>MnistDataset is a dataset of MNIST handwritten digits.</p>
+
+</section>
+
+		<section id="StreamBatch" class="doc-node">
+			<div class="title"><h2>struct StreamBatch <a href="#StreamBatch">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/streaming.v#L25"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token type_name">StreamBatch</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	available <span class="token builtin">bool</span>
+	features  <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	labels    <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<p>StreamBatch contains one dense batch produced from an iterable source.</p>
+
+</section>
+
+		<section id="StreamSample" class="doc-node">
+			<div class="title"><h2>struct StreamSample <a href="#StreamSample">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/streaming.v#L7"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token type_name">StreamSample</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	features <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	labels   <span class="token operator">&amp;</span><span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">Tensor</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">unsafe</span> <span class="token punctuation">{</span> <span class="token keyword">nil</span> <span class="token punctuation">}</span>
+	finished <span class="token builtin">bool</span>
+<span class="token punctuation">}</span></code></pre>
+<p>StreamSample contains one feature sample and optional labels. Set finished to true to signal exhaustion; tensor fields are ignored in that result.</p>
 
 </section>
 
@@ -795,7 +880,7 @@ v run ./vtl/examples/nn_cifar10_tiny_synth/main.v
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 27 Nov 2026 05:43:35</div>
+						<div class="footer">Powered by vdoc. Generated on: 27 Nov 2026 05:48:21</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_datasets">README</a></li>
 <li class="open"><a href="#Constants">Constants</a></li>
@@ -841,10 +926,16 @@ v run ./vtl/examples/nn_cifar10_tiny_synth/main.v
 <li class="open"><a href="#new_data_loader_with_sampler_checked">fn new_data_loader_with_sampler_checked</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#new_iterable_data_loader">fn new_iterable_data_loader</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#tokenize_text">fn tokenize_text</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#TransformPipeline.new">fn TransformPipeline.new</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#IterableDataset">interface IterableDataset</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#CollateFn">type CollateFn</a>        <ul>
@@ -870,6 +961,11 @@ v run ./vtl/examples/nn_cifar10_tiny_synth/main.v
 <li><a href="#DataLoader[T].for_each_collated">fn for_each_collated</a></li>
 <li><a href="#DataLoader[T].split">fn split</a></li>
 <li><a href="#DataLoader[T].mini_batch_count">fn mini_batch_count</a></li>
+</ul>
+</li>
+<li class="open"><a href="#IterableDataLoader[T].next_batch">type IterableDataLoader[T]</a>        <ul>
+<li><a href="#IterableDataLoader[T].next_batch">fn next_batch</a></li>
+<li><a href="#IterableDataLoader[T].reset">fn reset</a></li>
 </ul>
 </li>
 <li class="open"><a href="#TensorTransform">type TensorTransform</a>        <ul>
@@ -903,7 +999,16 @@ v run ./vtl/examples/nn_cifar10_tiny_synth/main.v
 <li class="open"><a href="#ImdbDataset">struct ImdbDataset</a>        <ul>
 </ul>
 </li>
+<li class="open"><a href="#IterableDataLoader">struct IterableDataLoader</a>        <ul>
+</ul>
+</li>
 <li class="open"><a href="#MnistDataset">struct MnistDataset</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#StreamBatch">struct StreamBatch</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#StreamSample">struct StreamSample</a>        <ul>
 </ul>
 </li>
 <li class="open"><a href="#TextVocabulary">struct TextVocabulary</a>        <ul>
