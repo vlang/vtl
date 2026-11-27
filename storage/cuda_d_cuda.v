@@ -7,7 +7,7 @@ import vsl.cuda
 // CudaParams defines a public data structure for this module.
 @[params]
 pub struct CudaParams {
-	device_id int = 0
+	device_id int
 }
 
 // CudaStorage holds tensor data on GPU memory

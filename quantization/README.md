@@ -15,13 +15,20 @@ a CPU inference path with per-tensor activation quantization, per-output-channel
 weight quantization, exact i64 accumulation, and f32 output with bias. Linear
 inference uses VSL's AVX2-dispatched INT16 dot product for reductions of at
 least 128 features on supported x86 CPUs, with a scalar fallback elsewhere.
+CUDA builds also provide `linear_int8_f32_cuda(dev, ...)`, an explicit cuBLAS
+path that returns a CPU-resident f32 tensor. It pads GEMM dimensions and keeps
+integer accumulation exact, including reductions larger than INT32. The current
+API uploads and transposes weights per call; this makes it slower than CPU INT8
+for small inference workloads, so it remains experimental pending reusable
+device-resident weights and broader benchmarks.
 Quantized Conv2D is available through `conv2d_int8_f32` for NCHW/OIHW tensors, including
 groups, padding, stride, and dilation via `QuantizedConv2DConfig`. Layer
 conversion helpers `quantize_linear_layer_f32` and
 `quantize_conv2d_layer_f32` create forward-only inference wrappers from trained
 f32 weight/bias tensors and externally calibrated activation parameters.
-Accelerator dispatch and broad performance parity remain open under
-[issue #792](https://github.com/vlang/vtl/issues/792).
+CUDA INT8 Linear is an experimental explicit path. GPU Conv2D, reusable
+device-resident quantized weights, broader model conversion, and performance
+parity remain open under [issue #792](https://github.com/vlang/vtl/issues/792).
 
 See the runnable [INT8 quantization example](../examples/quantization_int8/main.v).
 The end-to-end f32-vs-INT8 latency and weight-payload benchmark is
@@ -41,6 +48,22 @@ payload was 524,288 bytes for f32 versus 131,072 bytes plus 8,192 bytes of
 per-channel metadata for INT8 (3.765x smaller including that metadata). This is
 one CPU, shape, and implementation only; it is not evidence of general PyTorch,
 NumPy, or accelerator performance parity.
+
+The opt-in CUDA benchmark is
+`../benchmarks/quantization_int8_cuda_bench.v`. On an NVIDIA GeForce RTX 3060
+with V 0.5.2, three independent production runs of the same `[32, 256] x
+[512, 256]` workload measured median f32 latency 21.1657 ms, CPU INT8 latency
+0.7157 ms, and CUDA INT8 latency 0.8749 ms. CUDA's maximum absolute error
+matched CPU INT8 at 0.015401, but the per-call transfers made it 1.22x slower
+than CPU INT8 on this small workload. These results are specific to this
+machine and shape; they do not establish a general GPU speedup.
+
+The same benchmark accepts optional `batch in_features out_features` arguments.
+Across seven production runs of `[128, 512] x [1024, 512]`, median f32, CPU
+INT8, and CUDA INT8 latencies were 56.467 ms, 6.7714 ms, and 4.4597 ms,
+respectively; CUDA was 1.52x faster than CPU INT8 at the median with the same
+0.021986 maximum absolute error. CUDA timings ranged from 4.3181 to 9.7551 ms,
+so these host measurements show workload scaling, not a universal speedup.
 
 Run reproducibly from `~/.vmodules`:
 
@@ -73,6 +96,18 @@ systemd-run --user --scope --working-directory="$HOME/.vmodules" \
 systemd-run --user --scope --working-directory="$HOME/.vmodules" \
   -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% -- \
   /tmp/vtl-quantization-int8-conv2d-bench
+```
+
+Run the CUDA benchmark from `~/.vmodules`:
+
+```sh
+systemd-run --user --scope --working-directory="$HOME/.vmodules" \
+  -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% -E VJOBS=1 -- \
+  v -d cuda -no-parallel -prod -o /tmp/vtl-quantization-int8-cuda-bench \
+  ./vtl/benchmarks/quantization_int8_cuda_bench.v
+systemd-run --user --scope --working-directory="$HOME/.vmodules" \
+  -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% -- \
+  /tmp/vtl-quantization-int8-cuda-bench 128 512 1024
 ```
 
 Per-channel conversion accepts an axis and one scale/zero point per channel.
