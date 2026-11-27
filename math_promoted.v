@@ -3,7 +3,7 @@ module vtl
 import math
 import math.complex
 
-enum PromotedBinaryOperation {
+pub enum PromotedArithmetic {
 	add
 	subtract
 	multiply
@@ -15,23 +15,81 @@ enum PromotedBinaryOperation {
 	float_power
 }
 
-// add_promoted adds numeric tensors after converting both operands to
-// the explicitly selected NumPy-style promoted dtype. The output type R must
-// match promote_types(dtype_of[T](), dtype_of[U]()).
+// PromotedTensor is the dynamically selected result of binary_promoted_auto.
+pub type PromotedTensor = &Tensor[bool]
+	| &Tensor[i8]
+	| &Tensor[i16]
+	| &Tensor[i32]
+	| &Tensor[i64]
+	| &Tensor[int]
+	| &Tensor[u8]
+	| &Tensor[u16]
+	| &Tensor[u32]
+	| &Tensor[u64]
+	| &Tensor[f32]
+	| &Tensor[f64]
+	| &Tensor[complex.Complex]
+
+// promoted_tensor_dtype returns the runtime-selected dtype of a promoted tensor.
+pub fn promoted_tensor_dtype(t PromotedTensor) DType {
+	return match t {
+		&Tensor[bool] { .boolean }
+		&Tensor[i8] { .int8 }
+		&Tensor[i16] { .int16 }
+		&Tensor[i32] { .int32 }
+		&Tensor[i64] { .int64 }
+		&Tensor[int] { .native_int }
+		&Tensor[u8] { .uint8 }
+		&Tensor[u16] { .uint16 }
+		&Tensor[u32] { .uint32 }
+		&Tensor[u64] { .uint64 }
+		&Tensor[f32] { .float32 }
+		&Tensor[f64] { .float64 }
+		&Tensor[complex.Complex] { .complex128 }
+	}
+}
+
+// binary_promoted_auto selects the NumPy-style result dtype at runtime.
+// The returned sum type preserves the concrete tensor dtype for callers that
+// need statically typed values; use promoted_tensor_dtype or match on the result.
+pub fn binary_promoted_auto[T, U](a &Tensor[T], b &Tensor[U], operation PromotedArithmetic) !PromotedTensor {
+	result_dtype := promoted_operation_dtype(dtype_of[T](), dtype_of[U](), operation)!
+	return match result_dtype {
+		.boolean { PromotedTensor(binary_promoted[bool, T, U](a, b, operation)!) }
+		.int8 { PromotedTensor(binary_promoted[i8, T, U](a, b, operation)!) }
+		.int16 { PromotedTensor(binary_promoted[i16, T, U](a, b, operation)!) }
+		.int32 { PromotedTensor(binary_promoted[i32, T, U](a, b, operation)!) }
+		.int64 { PromotedTensor(binary_promoted[i64, T, U](a, b, operation)!) }
+		.native_int { PromotedTensor(binary_promoted[int, T, U](a, b, operation)!) }
+		.uint8 { PromotedTensor(binary_promoted[u8, T, U](a, b, operation)!) }
+		.uint16 { PromotedTensor(binary_promoted[u16, T, U](a, b, operation)!) }
+		.uint32 { PromotedTensor(binary_promoted[u32, T, U](a, b, operation)!) }
+		.uint64 { PromotedTensor(binary_promoted[u64, T, U](a, b, operation)!) }
+		.float32 { PromotedTensor(binary_promoted[f32, T, U](a, b, operation)!) }
+		.float64 { PromotedTensor(binary_promoted[f64, T, U](a, b, operation)!) }
+		.complex128 {
+			PromotedTensor(binary_promoted[complex.Complex, T, U](a, b, operation)!)
+		}
+		.string { error('promoted arithmetic does not support string tensors') }
+	}
+}
+
+// add_promoted adds real numeric or boolean tensors after converting both
+// operands to the explicitly selected NumPy-style result dtype. The output
+// type R must match the operation's NumPy result dtype.
 pub fn add_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
 	return binary_promoted[R, T, U](a, b, .add)
 }
 
-// subtract_promoted subtracts numeric tensors after converting both
-// operands to the explicitly selected NumPy-style promoted dtype. The output
-// type R must match promote_types(dtype_of[T](), dtype_of[U]()).
+// subtract_promoted subtracts real numeric or boolean tensors after converting
+// both operands to the explicitly selected NumPy-style result dtype. Boolean
+// subtraction is unsupported.
 pub fn subtract_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
 	return binary_promoted[R, T, U](a, b, .subtract)
 }
 
-// multiply_promoted multiplies numeric tensors after converting both
-// operands to the explicitly selected NumPy-style promoted dtype. The output
-// type R must match promote_types(dtype_of[T](), dtype_of[U]()).
+// multiply_promoted multiplies real numeric or boolean tensors after converting
+// both operands to the explicitly selected NumPy-style result dtype.
 pub fn multiply_promoted[R, T, U](a &Tensor[T], b &Tensor[U]) !&Tensor[R] {
 	return binary_promoted[R, T, U](a, b, .multiply)
 }
@@ -585,10 +643,66 @@ pub fn fmod_scalar_left_promoted[R, T, U](scalar U, a &Tensor[T]) !&Tensor[R] {
 	return scalar_left_promoted[R, T, U](scalar, a, .fmod)
 }
 
+fn promoted_operation_dtype(left DType, right DType, operation PromotedArithmetic) !DType {
+	promoted := promote_types(left, right)!
+	if operation == .float_power {
+		return .float64
+	}
+	if operation == .divide {
+		return if promoted == .complex128 { .complex128 } else { division_result_dtype(promoted) }
+	}
+	boolean_pair_integer_result := left == .boolean && right == .boolean
+		&& (operation == .power || operation == .floor_divide || operation == .fmod
+			|| operation == .remainder)
+	if boolean_pair_integer_result {
+		return .int8
+	}
+	return promoted
+}
+
 @[inline]
-fn binary_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation PromotedBinaryOperation) !&Tensor[R] {
+fn binary_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation PromotedArithmetic) !&Tensor[R] {
 	$if R is bool {
-		return error('promoted arithmetic requires a numeric output dtype')
+		if dtype_of[T]() != .boolean || dtype_of[U]() != .boolean {
+			return error('boolean promoted output requires two boolean tensor inputs')
+		}
+		if operation == .subtract {
+			return error('promoted boolean subtraction is not supported')
+		}
+		if operation != .add && operation != .multiply {
+			return error('promoted boolean output supports only addition and multiplication')
+		}
+		if promoted_operation_dtype(.boolean, .boolean, operation)! != .boolean {
+			return error('output dtype ${dtype_of[R]()} does not match operation result dtype')
+		}
+		shape := broadcast_shapes(a.shape, b.shape)!
+		left := a.broadcast_to(shape)!
+		right := b.broadcast_to(shape)!
+		mut result := empty[R](shape, memory: .row_major)
+		left_is_singleton := a.size == 1
+		right_is_singleton := b.size == 1
+		left_is_flat := left.size == result.size && left.is_row_major_contiguous()
+		right_is_flat := right.size == result.size && right.is_row_major_contiguous()
+		for index in 0 .. result.size {
+			left_offset := if left_is_flat {
+				index
+			} else if left_is_singleton {
+				0
+			} else {
+				broadcast_tensor_offset(index, shape, left.strides)
+			}
+			right_offset := if right_is_flat {
+				index
+			} else if right_is_singleton {
+				0
+			} else {
+				broadcast_tensor_offset(index, shape, right.strides)
+			}
+			x := cast_promoted_value[T, R](left.data.data[left_offset])
+			y := cast_promoted_value[U, R](right.data.data[right_offset])
+			result.data.data[index] = if operation == .add { x || y } else { x && y }
+		}
+		return result
 	} $else $if R is complex.Complex {
 		if operation == .float_power {
 			return error('promoted float_power does not support complex values')
@@ -607,12 +721,7 @@ fn binary_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation PromotedBinary
 		if !is_complex_numeric_dtype(left_dtype) || !is_complex_numeric_dtype(right_dtype) {
 			return error('complex promoted arithmetic requires numeric or boolean tensors')
 		}
-		promoted_dtype := promote_types(left_dtype, right_dtype)!
-		expected := if operation == .divide && promoted_dtype != .complex128 {
-			division_result_dtype(promoted_dtype)
-		} else {
-			promoted_dtype
-		}
+		expected := promoted_operation_dtype(left_dtype, right_dtype, operation)!
 		if dtype_of[R]() != expected {
 			return error('output dtype ${dtype_of[R]()} does not match operation result dtype ${expected}')
 		}
@@ -647,25 +756,12 @@ fn binary_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation PromotedBinary
 	} $else $if R is $int || R is $float {
 		left_dtype := dtype_of[T]()
 		right_dtype := dtype_of[U]()
-		left_supported := is_real_numeric_dtype(left_dtype)
-			|| ((operation == .divide || operation == .power || operation == .float_power)
-				&& left_dtype == .boolean)
-		right_supported := is_real_numeric_dtype(right_dtype)
-			|| ((operation == .divide || operation == .power || operation == .float_power)
-				&& right_dtype == .boolean)
+		left_supported := is_real_numeric_dtype(left_dtype) || left_dtype == .boolean
+		right_supported := is_real_numeric_dtype(right_dtype) || right_dtype == .boolean
 		if !left_supported || !right_supported {
-			return error('promoted arithmetic supports only real numeric tensors and boolean power, float_power, or division')
+			return error('promoted arithmetic supports only real numeric and boolean tensors')
 		}
-		promoted_dtype := promote_types(left_dtype, right_dtype)!
-		expected := if operation == .float_power {
-			DType.float64
-		} else if operation == .power && left_dtype == .boolean && right_dtype == .boolean {
-			DType.int8
-		} else if operation == .divide {
-			division_result_dtype(promoted_dtype)
-		} else {
-			promoted_dtype
-		}
+		expected := promoted_operation_dtype(left_dtype, right_dtype, operation)!
 		if dtype_of[R]() != expected {
 			return error('output dtype ${dtype_of[R]()} does not match operation result dtype ${expected}')
 		}
@@ -765,11 +861,11 @@ fn binary_promoted[R, T, U](a &Tensor[T], b &Tensor[U], operation PromotedBinary
 	}
 }
 
-fn scalar_promoted[R, T, U](a &Tensor[T], scalar U, operation PromotedBinaryOperation) !&Tensor[R] {
+fn scalar_promoted[R, T, U](a &Tensor[T], scalar U, operation PromotedArithmetic) !&Tensor[R] {
 	return scalar_promoted_impl[R, T, U](a, scalar, operation, false)
 }
 
-fn scalar_left_promoted[R, T, U](scalar U, a &Tensor[T], operation PromotedBinaryOperation) !&Tensor[R] {
+fn scalar_left_promoted[R, T, U](scalar U, a &Tensor[T], operation PromotedArithmetic) !&Tensor[R] {
 	return scalar_promoted_impl[R, T, U](a, scalar, operation, true)
 }
 
@@ -788,7 +884,7 @@ fn float_power_scalar_impl[T, U](a &Tensor[T], scalar U, scalar_on_left bool) !&
 	return binary_promoted[f64, f64, f64](left, right, .float_power)
 }
 
-fn scalar_promoted_impl[R, T, U](a &Tensor[T], scalar U, operation PromotedBinaryOperation, scalar_on_left bool) !&Tensor[R] {
+fn scalar_promoted_impl[R, T, U](a &Tensor[T], scalar U, operation PromotedArithmetic, scalar_on_left bool) !&Tensor[R] {
 	$if R is complex.Complex {
 		if operation == .remainder {
 			return error('promoted remainder does not support complex values')
@@ -816,16 +912,32 @@ fn scalar_promoted_impl[R, T, U](a &Tensor[T], scalar U, operation PromotedBinar
 			}
 		}
 		return result
+	} $else $if R is bool {
+		if dtype_of[T]() != .boolean || dtype_of[U]() != .boolean {
+			return error('boolean weak-scalar output requires a boolean tensor and scalar')
+		}
+		if operation != .add && operation != .multiply {
+			return error('promoted boolean scalar output supports only addition and multiplication')
+		}
+		if weak_scalar_result_dtype[T, U](dtype_of[T](), scalar)! != .boolean {
+			return error('output dtype ${dtype_of[R]()} does not match weak-scalar result dtype')
+		}
+		left := cast_promoted_tensor_values[T, R](a)!
+		right_scalar := cast_promoted_value[U, R](scalar)
+		scalar_tensor := from_array[R]([right_scalar], [])!
+		if scalar_on_left {
+			return binary_promoted[R, R, R](scalar_tensor, left, operation)
+		}
+		return binary_promoted[R, R, R](left, scalar_tensor, operation)
 	} $else $if R is $int || R is $float {
 		array_dtype := dtype_of[T]()
-		result_dtype := if operation == .power && array_dtype == .boolean && dtype_of[U]() == .boolean {
-			DType.boolean
-		} else {
-			weak_scalar_result_dtype[T, U](array_dtype, scalar)!
-		}
+		result_dtype := weak_scalar_result_dtype[T, U](array_dtype, scalar)!
+		boolean_pair_integer_result := array_dtype == .boolean && dtype_of[U]() == .boolean
+			&& (operation == .power || operation == .floor_divide || operation == .fmod
+				|| operation == .remainder)
 		expected := if operation == .divide {
 			division_result_dtype(result_dtype)
-		} else if operation == .power && array_dtype == .boolean && dtype_of[U]() == .boolean {
+		} else if boolean_pair_integer_result {
 			DType.int8
 		} else {
 			result_dtype
@@ -863,7 +975,7 @@ fn weak_complex_scalar_result_dtype[T, U]() !DType {
 	return .complex128
 }
 
-fn complex_promoted_value(x complex.Complex, y complex.Complex, operation PromotedBinaryOperation) !complex.Complex {
+fn complex_promoted_value(x complex.Complex, y complex.Complex, operation PromotedArithmetic) !complex.Complex {
 	return match operation {
 		.add { x + y }
 		.subtract { x - y }
@@ -906,10 +1018,16 @@ fn numpy_power[T](base T, exponent T) !T {
 }
 
 fn weak_scalar_result_dtype[T, U](array_dtype DType, scalar U) !DType {
-	if !is_real_numeric_dtype(array_dtype) {
-		return error('weak-scalar promoted arithmetic supports real numeric tensors')
-	}
 	scalar_dtype := dtype_of[U]()
+	if array_dtype == .boolean {
+		if scalar_dtype == .boolean || is_real_numeric_dtype(scalar_dtype) {
+			return scalar_dtype
+		}
+		return error('weak-scalar promoted arithmetic supports real numeric and boolean scalars')
+	}
+	if !is_real_numeric_dtype(array_dtype) {
+		return error('weak-scalar promoted arithmetic supports real numeric or boolean tensors')
+	}
 	if !is_real_numeric_dtype(scalar_dtype) && scalar_dtype != .boolean {
 		return error('weak-scalar promoted arithmetic supports real numeric and boolean scalars')
 	}

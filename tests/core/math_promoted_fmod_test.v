@@ -62,11 +62,12 @@ fn test_fmod_promoted_weak_scalars_preserve_operand_order_and_empty_shapes() ! {
 	assert empty_result.to_array().len == 0
 }
 
-fn test_fmod_promoted_rejects_boolean_and_complex_inputs() ! {
+fn test_fmod_promoted_accepts_boolean_and_rejects_complex_inputs() ! {
 	boolean_values := vtl.from_1d([true, false])!
-	if _ := vtl.fmod_promoted[i8, bool, i8](boolean_values, vtl.from_1d[i8]([2])!) {
-		assert false, 'fmod must reject boolean tensors'
-	}
+	boolean_remainders := vtl.fmod_promoted[i8, bool, i8](boolean_values,
+		vtl.from_1d[i8]([2])!)!
+	assert boolean_remainders.dtype() == .int8
+	assert boolean_remainders.to_array() == [i8(1), 0]
 
 	complex_values := vtl.from_1d[complex.Complex]([complex.complex(1.0, 1.0)])!
 	if _ := vtl.fmod_promoted[complex.Complex, complex.Complex, complex.Complex](complex_values,

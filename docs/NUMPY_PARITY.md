@@ -307,16 +307,23 @@ round signed quotients toward negative infinity, preserve input dtype, return
 zero for integer zero divisors, and follow IEEE results for floating-point
 zero divisors. Mixed-dtype promotion remains tracked in
 [#717](https://github.com/vlang/vtl/issues/717). `add_promoted`, `subtract_promoted`, and
-`multiply_promoted` accept mixed real and complex numeric dtypes, broadcast
-their inputs, and validate an explicitly selected output dtype against
-`promote_types`. `divide_promoted` performs NumPy-style true division for mixed
-real numeric, complex, and boolean tensors, broadcasts inputs, and returns
+`multiply_promoted` accept mixed real numeric and complex dtypes, plus boolean
+operands with real numeric values, broadcast their inputs, and validate an
+explicitly selected output dtype against the operation's NumPy result dtype.
+Boolean addition and multiplication return boolean for boolean pairs; boolean
+subtraction is rejected, while mixed boolean/numeric pairs use the numeric
+dtype. `binary_promoted_auto` selects a tensor-to-tensor result dtype without
+requiring the caller to provide `R`; it returns a `PromotedTensor` sum type, so
+callers can inspect `promoted_tensor_dtype` or match the concrete tensor type.
+`divide_promoted` performs NumPy-style true division for mixed real numeric,
+complex, and boolean tensors, broadcasts inputs, and returns
 `complex128` when either input is complex; real inputs return `float32` only
 when the promoted input dtype is `float32`, and `float64` otherwise.
-`remainder_promoted` performs NumPy-style remainder with mixed integer and
-floating-point dtypes and broadcasting. Nonzero results follow the divisor's
-sign; signed zero follows the divisor; integer zero divisors produce zero and
-floating-point zero divisors produce NaN; complex inputs are rejected.
+`remainder_promoted` performs NumPy-style remainder with mixed integer,
+floating-point, and boolean dtypes and broadcasting. Nonzero results follow
+the divisor's sign; signed zero follows the divisor; integer zero divisors
+produce zero and floating-point zero divisors produce NaN; complex inputs are
+rejected.
 `pow_promoted` broadcasts mixed real numeric or complex tensors and validates
 its explicit output dtype against the operation's NumPy result dtype: numeric
 pairs use `promote_types`, while boolean pairs return `int8`. Integer powers retain
@@ -337,8 +344,8 @@ remain unsupported.
 remainder rule across promoted real numeric dtypes and broadcasting. Integer
 operations retain exact-width arithmetic; zero divisors and signed minimum
 modulo `-1` produce zero. Floating-point operations use `math.fmod`, including
-IEEE NaN results and signed-zero preservation. Boolean and complex inputs are
-unsupported.
+IEEE NaN results and signed-zero preservation. Boolean operands are accepted
+with NumPy's integer result for boolean pairs; complex inputs are unsupported.
 `maximum_promoted`, `minimum_promoted`, `fmax_promoted`, and `fmin_promoted`
 broadcast mixed numeric, boolean, or complex tensor pairs using `promote_types`.
 The first pair propagates NaNs; the latter pair ignores one NaN operand. Integer
@@ -406,7 +413,7 @@ Promoted tensor-to-tensor result dtypes are:
 |-----------------|-----------------------|-------|-------------|--------------|--------------|------|-----------|
 | Real numeric pair | `promote_types` | `promote_types` | f64 | f32 if promoted dtype is f32; else f64 | `promote_types` | `promote_types` | `promote_types` |
 | Complex128 with numeric, bool, or complex128 | complex128 | unsupported | unsupported | complex128 | unsupported | unsupported | unsupported |
-| Boolean pair | unsupported | int8 | f64 | f64 | unsupported | unsupported | unsupported |
+| Boolean pair | boolean for add/multiply; subtraction unsupported | int8 | f64 | f64 | int8 | int8 | int8 |
 
 `pow_promoted` rejects 64-bit integer operands when `promote_types` selects a
 floating output, and rejects negative exponents when the result dtype is
@@ -422,9 +429,8 @@ The `add_scalar_promoted`, `subtract_scalar_promoted`,
 the corresponding `floor_divide_scalar_promoted` form, apply NumPy-style
 weak scalar promotion with the tensor as the left operand. Matching
 `*_scalar_left_promoted` variants put the scalar on the left, preserving
-noncommutative operation order. These APIs support real numeric and complex
-tensors, except remainder, fmod, and floor division, which reject complex
-values. Real float arrays retain their dtype;
+noncommutative operation order. These APIs support real numeric, boolean, and complex tensors, except
+remainder, fmod, and floor division, which reject complex values. Real float arrays retain their dtype;
 integer arrays retain their dtype for in-range integer/bool scalars and promote
 to float64 for floating scalars; integer true division returns float64.
 Complex arrays retain complex128 with real or complex scalars, while a complex
@@ -444,11 +450,14 @@ Weak-scalar result dtypes for the supported arithmetic are:
 | f32 / f64 | real numeric or bool | array dtype | array dtype | array dtype for floats | array dtype | array dtype | array dtype |
 | integer | in-range integer or bool | array dtype | array dtype | f64 | array dtype | array dtype | array dtype |
 | integer | real float | f64 | f64 | f64 | f64 | f64 | f64 |
+| boolean | boolean | boolean for add/multiply; subtraction unsupported | int8 | f64 | int8 | int8 | int8 |
+| boolean | real numeric | scalar dtype | scalar dtype | f32 for f32 scalar, else f64 | scalar dtype | scalar dtype | scalar dtype |
 | real numeric or bool | complex128 | complex128 | complex128 | complex128 | unsupported | unsupported | unsupported |
 | complex128 | real numeric, bool, or complex128 | complex128 | complex128 | complex128 | unsupported | unsupported | unsupported |
 
 An out-of-range integer scalar is an error rather than an implicit wrap.
-Boolean-to-boolean power returns `int8` rather than the boolean input dtype.
+Boolean-to-boolean power, floor division, fmod, and remainder return `int8`
+rather than the boolean input dtype; boolean subtraction is unsupported.
 `round_decimals` rounds real floating-point tensors to positive or negative
 decimal places using ties-to-even, matching NumPy `round` for the supported
 same-dtype inputs; integer tensors are copied unchanged. VTL preserves finite
@@ -818,10 +827,9 @@ complex variance and standard deviation return real tensors and support
 `as_*` conversions cover real numeric and boolean types, preserve shape and
 logical order, and truncate floating-point values when converting to integers.
 
-**Remaining:** provide an output-type dispatch API that does not require the
-caller to specify the generic result type, extend weak scalar promotion to
-additional scalar categories, extend promoted arithmetic coverage across
-supported operations and string conversion, and extend complex support beyond
+**Remaining:** provide runtime output-type dispatch for weak-scalar arithmetic,
+extend weak-scalar promotion to additional scalar categories, extend promoted
+arithmetic coverage to string conversion, and extend complex support beyond
 elementwise operations, `matmul`, Einstein contractions, `solve_complex`,
 `inv_complex`, `det_complex`, `slogdet_complex`, and `lstsq_complex` to more
 general linear algebra and random generation, add complex32, and define integer

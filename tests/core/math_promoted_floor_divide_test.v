@@ -62,11 +62,13 @@ fn test_floor_divide_weak_scalar_promoted_float_ieee_and_dtype() ! {
 	assert math.is_nan(result.get_nth(2))
 }
 
-fn test_floor_divide_promoted_rejects_boolean_and_complex_inputs() ! {
-	boolean_values := vtl.from_1d([true])!
-	if _ := vtl.floor_divide_promoted[f64, bool, bool](boolean_values, boolean_values) {
-		assert false, 'floor division must reject boolean tensors'
-	}
+fn test_floor_divide_promoted_accepts_boolean_and_rejects_complex_inputs() ! {
+	boolean_values := vtl.from_1d([true, false])!
+	boolean_divisors := vtl.from_1d([true, true])!
+	boolean_quotients := vtl.floor_divide_promoted[i8, bool, bool](boolean_values,
+		boolean_divisors)!
+	assert boolean_quotients.dtype() == .int8
+	assert boolean_quotients.to_array() == [i8(1), 0]
 
 	complex_values := vtl.from_1d[complex.Complex]([complex.complex(1.0, 1.0)])!
 	if _ := vtl.floor_divide_promoted[complex.Complex, complex.Complex, complex.Complex](complex_values,

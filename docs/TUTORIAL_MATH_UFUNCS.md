@@ -56,6 +56,30 @@ Complex and string inputs are unsupported. The same-dtype `Tensor.sqrt()` and
 `Tensor.cbrt()` methods remain available for compatibility; use the promoted
 functions when NumPy-style integer output is needed.
 
+## Promoted binary arithmetic
+
+The `*_promoted[R, T, U]` arithmetic functions validate an explicit result
+type. When the result dtype should be chosen at runtime, use
+`binary_promoted_auto` with a `PromotedArithmetic` operation. It returns a
+`PromotedTensor` sum type, so the selected dtype is available through
+`promoted_tensor_dtype` and the concrete tensor can be selected with a type
+match. Boolean addition and multiplication preserve boolean results for
+boolean pairs; boolean subtraction is rejected, and mixed boolean/numeric
+arithmetic uses the numeric dtype.
+
+```v
+import vtl
+
+flags := vtl.from_1d[bool]([true, false])!
+counts := vtl.from_1d[i8]([3, 4])!
+sum := vtl.binary_promoted_auto(flags, counts, .add)!
+println(vtl.promoted_tensor_dtype(sum)) // int8
+if sum is &vtl.Tensor[i8] {
+	typed_sum := sum as &vtl.Tensor[i8]
+	println(typed_sum.to_array()) // [4, 4]
+}
+```
+
 ## Promoted tensor power
 
 `vtl.pow_promoted[R, T, U](bases, exponents)` broadcasts its tensor operands
@@ -287,7 +311,8 @@ sign of the dividend, unlike `remainder_promoted`, whose results follow the
 divisor's sign. Tensor inputs broadcast and use `promote_types` for the output
 dtype. Integer inputs retain exact-width arithmetic; integer zero divisors
 produce zero. Floating-point inputs use `math.fmod`, preserving signed zero and
-IEEE results. Boolean and complex inputs are unsupported.
+IEEE results. Boolean pairs return int8, matching NumPy; complex inputs are
+unsupported.
 
 The weak-scalar variants preserve NumPy-style promotion and operand order:
 
