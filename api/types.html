@@ -152,7 +152,7 @@
 <p>The contracts are defined in <a href="https://github.com/vlang/vtl/blob/master/nn/types/layer.v"><code>layer.v</code></a>, <a href="https://github.com/vlang/vtl/blob/master/nn/types/loss.v"><code>loss.v</code></a>, and <a href="https://github.com/vlang/vtl/blob/master/nn/types/optimizer.v"><code>optimizer.v</code></a>. Implementations should keep tensor shapes and context ownership consistent across forward and backward calls.</p>
 <p><code>Module[T]</code> is a state registry for custom components. Register trainable <code>Variable[T]</code> values with <code>register_parameter</code>, non-trainable tensor state with <code>register_buffer</code>, and nested registries with <code>register_module</code>. Names must be non-empty, cannot contain dots, and must be unique within each module across parameters, buffers, and children. <code>named_parameters</code> and <code>named_buffers</code> traverse nested registries depth-first using dotted names; <code>parameters</code> and <code>buffers</code> return their values without names. Cyclic child graphs are rejected.</p>
 <p>Attach a registry to a callback-backed <code>Layer[T]</code> with <code>layer_with_module_state</code>. Its registered parameters are included by <code>Layer.variables</code>, so existing optimizers that build from <code>Sequential.info.layers</code> discover them. Registered buffers remain available from the module registry. <code>Sequential.train</code> and <code>Sequential.eval</code> also update the attached module and its registered children, while mode-aware layer callbacks continue to receive the sequential training flag.</p>
-<p>Custom-module checkpoint serialization and a higher-level forward API are not implemented yet.</p>
+<p>Model saves and checkpoints persist registered parameters and buffers by name; <code>load_weights</code> restores them into an already-constructed custom module graph. The custom callbacks themselves are not serialized, so recreate the same model before loading. A higher-level forward API is not implemented yet.</p>
 
 </section>
 
@@ -266,8 +266,24 @@
 
 </section>
 
+		<section id="Layer[T].registered_parameters" class="doc-node">
+			<div class="title"><h2>fn (Layer[T]) registered_parameters <a href="#Layer[T].registered_parameters">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/types/layer.v#L91"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token type_name">Layer</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">registered_parameters</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token type_name">NamedParameter</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+<p>registered_parameters returns named parameters attached through module state.</p>
+
+</section>
+
+		<section id="Layer[T].registered_buffers" class="doc-node">
+			<div class="title"><h2>fn (Layer[T]) registered_buffers <a href="#Layer[T].registered_buffers">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/types/layer.v#L99"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token type_name">Layer</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">registered_buffers</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token type_name">NamedBuffer</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+<p>registered_buffers returns named buffers attached through module state.</p>
+
+</section>
+
 		<section id="Layer[T].set_training" class="doc-node">
-			<div class="title"><h2>fn (Layer[T]) set_training <a href="#Layer[T].set_training">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/types/layer.v#L93"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (Layer[T]) set_training <a href="#Layer[T].set_training">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/types/layer.v#L107"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token type_name">Layer</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">set_training</span><span class="token punctuation">(</span>training <span class="token builtin">bool</span><span class="token punctuation">)</span></code></pre>
 <p>set_training updates attached module state recursively.</p>
@@ -275,7 +291,7 @@
 </section>
 
 		<section id="Layer[T].forward" class="doc-node">
-			<div class="title"><h2>fn (Layer[T]) forward <a href="#Layer[T].forward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/types/layer.v#L101"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (Layer[T]) forward <a href="#Layer[T].forward">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/types/layer.v#L115"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token type_name">Layer</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">forward</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
 <p>forward runs a forward pass through the wrapped layer.</p>
@@ -283,7 +299,7 @@
 </section>
 
 		<section id="Layer[T].forward_with_mode" class="doc-node">
-			<div class="title"><h2>fn (Layer[T]) forward_with_mode <a href="#Layer[T].forward_with_mode">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/types/layer.v#L108"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (Layer[T]) forward_with_mode <a href="#Layer[T].forward_with_mode">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/nn/types/layer.v#L122"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span>layer <span class="token type_name">Layer</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">forward_with_mode</span><span class="token punctuation">(</span>input <span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> training <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token operator">&amp;</span><span class="token module_">autograd</span><span class="token punctuation">.</span><span class="token type_name">Variable</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
 <p>forward_with_mode runs the wrapped layer with an explicit training mode. Layers without a mode-specific implementation keep their regular behavior.</p>
@@ -454,7 +470,7 @@
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 27 Nov 2026 05:55:34</div>
+						<div class="footer">Powered by vdoc. Generated on: 27 Nov 2026 06:08:59</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_types">README</a></li>
 <li class="open"><a href="#layer">fn layer</a>        <ul>
@@ -493,6 +509,8 @@
 <li class="open"><a href="#Layer[T].output_shape">type Layer[T]</a>        <ul>
 <li><a href="#Layer[T].output_shape">fn output_shape</a></li>
 <li><a href="#Layer[T].variables">fn variables</a></li>
+<li><a href="#Layer[T].registered_parameters">fn registered_parameters</a></li>
+<li><a href="#Layer[T].registered_buffers">fn registered_buffers</a></li>
 <li><a href="#Layer[T].set_training">fn set_training</a></li>
 <li><a href="#Layer[T].forward">fn forward</a></li>
 <li><a href="#Layer[T].forward_with_mode">fn forward_with_mode</a></li>

@@ -187,7 +187,7 @@
 </table>
 <p>DataLoader returns a view when a batch's sample indices form a contiguous range. Shuffled, non-contiguous batches allocate tensors to preserve the requested sample order. A non-positive <code>batch_size</code> produces an empty loader.</p>
 <p><code>DataLoaderConfig</code> defaults to <code>batch_size: 32</code>, <code>shuffle: true</code>, and <code>drop_last: true</code>. These differ from PyTorch's defaults (<code>1</code>, <code>false</code>, and <code>false</code>), so set all three explicitly when porting a training pipeline. Call <code>reset()</code> between epochs to advance the deterministic shuffle order from the configured seed.</p>
-<p>For sources that should not be materialized as one tensor, implement <code>IterableDataset[T]</code> with <code>next_sample()</code> and <code>reset()</code>, then pass it to <code>new_iterable_data_loader</code>. The loader holds at most one batch of samples, stacks matching feature and optional label shapes, and returns source errors. It snapshots each sample as it is read, so a source may reuse mutable buffers. <code>StreamSample.finished</code> ends iteration; <code>reset()</code> delegates replay to the source, which may return an error when it cannot rewind.</p>
+<p>For sources that should not be materialized as one tensor, implement <code>IterableDataset[T]</code> with <code>next_sample()</code> and <code>reset()</code>, then pass it to <code>new_iterable_data_loader</code>. The loader holds at most one batch of samples, stacks matching feature and optional label shapes, and returns source errors. It snapshots each sample as it is read, so a source may reuse mutable buffers. <code>StreamSample.finished</code> ends iteration; <code>reset()</code> delegates replay to the source, which may return an error when it cannot rewind. Use <code>next_batch_with_transform_pipeline</code> for deterministic feature transforms or <code>next_batch_with_random_transforms</code> to apply random transforms with an explicit generator.</p>
 <p><code>TransformPipeline[T]</code> composes tensor transforms in order and propagates the first transform error. Apply it to a sample or batch tensor; transforms receive the preceding transform's output, and an empty pipeline returns its input. Transforms that should preserve their input must return a new tensor rather than mutating the input. For batch transforms, pass a pipeline to <code>DataLoader.set_batch_transform_pipeline</code>; <code>collated_batch</code> applies it to features after default batching or custom collation, preserves labels, and returns transform errors to the caller. <code>split</code> preserves the configured pipeline.</p>
 <pre><code class="language-v"><span class="token keyword">import</span> <span class="token module_">vtl</span>
 <span class="token keyword">import</span> <span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token module_">datasets</span>
@@ -666,8 +666,16 @@ v run ./vtl/examples/nn_cifar10_tiny_synth/main.v
 
 </section>
 
+		<section id="IterableDataLoader[T].next_batch_with_transform_pipeline" class="doc-node">
+			<div class="title"><h2>fn (IterableDataLoader[T]) next_batch_with_transform_pipeline <a href="#IterableDataLoader[T].next_batch_with_transform_pipeline">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/streaming.v#L117"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> loader <span class="token type_name">IterableDataLoader</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">next_batch_with_transform_pipeline</span><span class="token punctuation">(</span>pipeline <span class="token type_name">TransformPipeline</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token type_name">StreamBatch</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
+<p>next_batch_with_transform_pipeline applies deterministic transforms to features.</p>
+
+</section>
+
 		<section id="IterableDataLoader[T].next_batch_with_random_transforms" class="doc-node">
-			<div class="title"><h2>fn (IterableDataLoader[T]) next_batch_with_random_transforms <a href="#IterableDataLoader[T].next_batch_with_random_transforms">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/streaming.v#L118"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (IterableDataLoader[T]) next_batch_with_random_transforms <a href="#IterableDataLoader[T].next_batch_with_random_transforms">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/streaming.v#L131"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> loader <span class="token type_name">IterableDataLoader</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">next_batch_with_random_transforms</span><span class="token punctuation">(</span>pipeline <span class="token type_name">RandomTransformPipeline</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token keyword">mut</span> generator <span class="token module_">vtl</span><span class="token punctuation">.</span><span class="token type_name">RandomGenerator</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token type_name">StreamBatch</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span></code></pre>
 <p>next_batch_with_random_transforms applies random transforms to an available batch using the caller-owned generator; labels are returned unchanged.</p>
@@ -675,7 +683,7 @@ v run ./vtl/examples/nn_cifar10_tiny_synth/main.v
 </section>
 
 		<section id="IterableDataLoader[T].reset" class="doc-node">
-			<div class="title"><h2>fn (IterableDataLoader[T]) reset <a href="#IterableDataLoader[T].reset">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/streaming.v#L132"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+			<div class="title"><h2>fn (IterableDataLoader[T]) reset <a href="#IterableDataLoader[T].reset">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/datasets/streaming.v#L145"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
 <pre class="signature">
 <code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> loader <span class="token type_name">IterableDataLoader</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token function">reset</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
 <p>reset rewinds the underlying source. Sources that cannot replay should return an error from their reset implementation.</p>
@@ -953,7 +961,7 @@ v run ./vtl/examples/nn_cifar10_tiny_synth/main.v
 </section>
 
 
-						<div class="footer">Powered by vdoc. Generated on: 27 Nov 2026 05:55:34</div>
+						<div class="footer">Powered by vdoc. Generated on: 27 Nov 2026 06:08:58</div>
 					</div>
 					<div class="doc-toc"><ul><li class="open"><a href="#readme_datasets">README</a></li>
 <li class="open"><a href="#Constants">Constants</a></li>
@@ -1042,6 +1050,7 @@ v run ./vtl/examples/nn_cifar10_tiny_synth/main.v
 </li>
 <li class="open"><a href="#IterableDataLoader[T].next_batch">type IterableDataLoader[T]</a>        <ul>
 <li><a href="#IterableDataLoader[T].next_batch">fn next_batch</a></li>
+<li><a href="#IterableDataLoader[T].next_batch_with_transform_pipeline">fn next_batch_with_transform_pipeline</a></li>
 <li><a href="#IterableDataLoader[T].next_batch_with_random_transforms">fn next_batch_with_random_transforms</a></li>
 <li><a href="#IterableDataLoader[T].reset">fn reset</a></li>
 </ul>
