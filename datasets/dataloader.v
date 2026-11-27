@@ -31,11 +31,13 @@ pub mut:
 	indices []int
 	epoch   int
 mut:
-	sampler            nn_data.Sampler
-	uses_sampler       bool
-	batch_sampler      nn_data.BatchSampler
-	uses_batch_sampler bool
-	batches            [][]int
+	sampler                       nn_data.Sampler
+	uses_sampler                  bool
+	batch_sampler                 nn_data.BatchSampler
+	uses_batch_sampler            bool
+	batch_transform_pipeline      TransformPipeline[T]
+	uses_batch_transform_pipeline bool
+	batches                       [][]int
 	// Erase the generic callback to avoid emitting an incomplete result type
 	// when consumers instantiate DataLoader without using collated batches.
 	collate_fn voidptr
@@ -137,15 +139,31 @@ pub fn (mut dl DataLoader[T]) set_collate_fn(collate_fn CollateFn[T]) {
 	dl.collate_fn = unsafe { voidptr(collate_fn) }
 }
 
+// set_batch_transform_pipeline applies the pipeline to feature batches after
+// collation. The TransformPipeline constructor snapshots the transform list.
+pub fn (mut dl DataLoader[T]) set_batch_transform_pipeline(pipeline TransformPipeline[T]) {
+	dl.batch_transform_pipeline = pipeline
+	dl.uses_batch_transform_pipeline = true
+}
+
 // collated_batch builds the batch selected by `i`. A custom callback receives
 // the source tensors and a copy of the selected indices, so it can implement
 // custom padding, filtering, transforms, or ordering without changing loader
 // state. Without a callback, this returns the same default tensors as batch
-// and batch_with_labels.
+// and batch_with_labels. An optional transform pipeline runs on features after
+// either default batching or custom collation; its errors are returned.
 pub fn (dl &DataLoader[T]) collated_batch(i int) !CollatedBatch[T] {
 	batch_indices := dl.batch_indices(i) or {
 		return error('batch index ${i} is out of range')
 	}
+	mut batch := dl.build_collated_batch(i, batch_indices)!
+	if dl.uses_batch_transform_pipeline {
+		batch.features = dl.batch_transform_pipeline.apply(batch.features)!
+	}
+	return batch
+}
+
+fn (dl &DataLoader[T]) build_collated_batch(i int, batch_indices []int) !CollatedBatch[T] {
 	if dl.collate_fn != unsafe { nil } {
 		callback := unsafe { CollateFn[T](dl.collate_fn) }
 		return callback(dl.dataset, dl.labels, batch_indices.clone())
@@ -530,31 +548,35 @@ pub fn (dl &DataLoader[T]) split(val_fraction f64) !(&DataLoader[T], &DataLoader
 	mut val_indices := dl.indices[train_size..].clone()
 
 	train_dl := &DataLoader[T]{
-		dataset:       dl.dataset
-		labels:        dl.labels
-		batch_size:    dl.batch_size
-		shuffle:       false
-		drop_last:     dl.drop_last
-		seed:          dl.seed
-		sampler:       &nn_data.SequentialSampler{}
-		batch_sampler: &nn_data.FixedBatchSampler{}
-		collate_fn:    dl.collate_fn
-		indices:       train_indices
-		epoch:         dl.epoch
+		dataset:                       dl.dataset
+		labels:                        dl.labels
+		batch_size:                    dl.batch_size
+		shuffle:                       false
+		drop_last:                     dl.drop_last
+		seed:                          dl.seed
+		sampler:                       &nn_data.SequentialSampler{}
+		batch_sampler:                 &nn_data.FixedBatchSampler{}
+		collate_fn:                    dl.collate_fn
+		batch_transform_pipeline:      dl.batch_transform_pipeline
+		uses_batch_transform_pipeline: dl.uses_batch_transform_pipeline
+		indices:                       train_indices
+		epoch:                         dl.epoch
 	}
 
 	val_dl := &DataLoader[T]{
-		dataset:       dl.dataset
-		labels:        dl.labels
-		batch_size:    dl.batch_size
-		shuffle:       false
-		drop_last:     false
-		seed:          dl.seed
-		sampler:       &nn_data.SequentialSampler{}
-		batch_sampler: &nn_data.FixedBatchSampler{}
-		collate_fn:    dl.collate_fn
-		indices:       val_indices
-		epoch:         0
+		dataset:                       dl.dataset
+		labels:                        dl.labels
+		batch_size:                    dl.batch_size
+		shuffle:                       false
+		drop_last:                     false
+		seed:                          dl.seed
+		sampler:                       &nn_data.SequentialSampler{}
+		batch_sampler:                 &nn_data.FixedBatchSampler{}
+		collate_fn:                    dl.collate_fn
+		batch_transform_pipeline:      dl.batch_transform_pipeline
+		uses_batch_transform_pipeline: dl.uses_batch_transform_pipeline
+		indices:                       val_indices
+		epoch:                         0
 	}
 
 	return train_dl, val_dl

@@ -25,8 +25,11 @@ configured seed.
 first transform error. Apply it to a sample or batch tensor; transforms receive
 the preceding transform's output, and an empty pipeline returns its input.
 Transforms that should preserve their input must return a new tensor rather
-than mutating the input. For batch transforms, call the pipeline from a custom
-collation callback installed with `DataLoader.set_collate_fn`.
+than mutating the input. For batch transforms, pass a pipeline to
+`DataLoader.set_batch_transform_pipeline`; `collated_batch` applies it to
+features after default batching or custom collation, preserves labels, and
+returns transform errors to the caller. `split` preserves the configured
+pipeline.
 
 ```v
 import vtl

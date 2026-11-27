@@ -139,6 +139,56 @@ fn test_for_each_collated_applies_callback_and_propagates_errors() ! {
 	assert false, 'collation errors must propagate through for_each_collated'
 }
 
+fn test_batch_transform_pipeline_runs_after_collation_and_survives_split() ! {
+	dataset := vtl.from_1d([1.0, 2, 3])!
+	mut loader := new_data_loader[f64](dataset, DataLoaderConfig{
+		batch_size: 2
+		shuffle:    false
+		drop_last:  false
+	})
+	loader.set_collate_fn(scale_feature_only_collate)
+	loader.set_batch_transform_pipeline(TransformPipeline.new[f64]([add_one_transform,
+		double_transform]))
+
+	batch := loader.collated_batch(0)!
+	assert batch.features.to_array() == [22.0, 42]
+	assert batch.labels == unsafe { nil }
+	assert dataset.to_array() == [1.0, 2, 3]
+
+	_, validation := loader.split(0.5)!
+	validation_batch := validation.collated_batch(0)!
+	assert validation_batch.features.to_array() == [62.0]
+}
+
+fn test_batch_transform_pipeline_preserves_labels() ! {
+	dataset := vtl.from_1d([1.0, 2])!
+	labels := vtl.from_1d([10.0, 20])!
+	mut loader := new_data_loader_with_labels_checked[f64](dataset, labels, DataLoaderConfig{
+		batch_size: 2
+		shuffle:    false
+		drop_last:  false
+	})!
+	loader.set_batch_transform_pipeline(TransformPipeline.new[f64]([double_transform]))
+
+	batch := loader.collated_batch(0)!
+	assert batch.features.to_array() == [2.0, 4]
+	assert batch.labels.to_array() == [10.0, 20]
+}
+
+fn test_batch_transform_pipeline_propagates_errors() ! {
+	dataset := vtl.from_1d([1.0, 2])!
+	mut loader := new_data_loader[f64](dataset, DataLoaderConfig{
+		batch_size: 2
+		shuffle:    false
+	})
+	loader.set_batch_transform_pipeline(TransformPipeline.new[f64]([failing_transform]))
+	loader.collated_batch(0) or {
+		assert err.msg() == 'transform failed'
+		return
+	}
+	assert false, 'batch transform errors must be returned'
+}
+
 fn test_collated_batch_reports_invalid_index_and_callback_errors() ! {
 	dataset := vtl.from_1d([1.0, 2])!
 	mut loader := new_data_loader[f64](dataset, DataLoaderConfig{
