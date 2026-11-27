@@ -313,8 +313,10 @@ explicitly selected output dtype against the operation's NumPy result dtype.
 Boolean addition and multiplication return boolean for boolean pairs; boolean
 subtraction is rejected, while mixed boolean/numeric pairs use the numeric
 dtype. `binary_promoted_auto` selects a tensor-to-tensor result dtype without
-requiring the caller to provide `R`; it returns a `PromotedTensor` sum type, so
-callers can inspect `promoted_tensor_dtype` or match the concrete tensor type.
+requiring the caller to provide `R`; `scalar_promoted_auto` and
+`scalar_left_promoted_auto` do the same for weak scalars in either operand
+order. These APIs return a `PromotedTensor` sum type, so callers can inspect
+`promoted_tensor_dtype` or match the concrete tensor type.
 `divide_promoted` performs NumPy-style true division for mixed real numeric,
 complex, and boolean tensors, broadcasts inputs, and returns
 `complex128` when either input is complex; real inputs return `float32` only
@@ -341,7 +343,7 @@ large integers may lose precision just as they do with NumPy.
 the same contract with weak scalar operands in either order; complex values
 remain unsupported.
 `fmod_promoted` and its weak-scalar variants preserve the sign-of-dividend
-remainder rule across promoted real numeric dtypes and broadcasting. Integer
+remainder rule across promoted real numeric and boolean dtypes and broadcasting. Integer
 operations retain exact-width arithmetic; zero divisors and signed minimum
 modulo `-1` produce zero. Floating-point operations use `math.fmod`, including
 IEEE NaN results and signed-zero preservation. Boolean operands are accepted
@@ -429,8 +431,9 @@ The `add_scalar_promoted`, `subtract_scalar_promoted`,
 the corresponding `floor_divide_scalar_promoted` form, apply NumPy-style
 weak scalar promotion with the tensor as the left operand. Matching
 `*_scalar_left_promoted` variants put the scalar on the left, preserving
-noncommutative operation order. These APIs support real numeric, boolean, and complex tensors, except
-remainder, fmod, and floor division, which reject complex values. Real float arrays retain their dtype;
+noncommutative operation order. These explicitly typed APIs support real
+numeric, boolean, and complex tensors, except remainder, fmod, and floor
+division, which reject complex values. Real float arrays retain their dtype;
 integer arrays retain their dtype for in-range integer/bool scalars and promote
 to float64 for floating scalars; integer true division returns float64.
 Complex arrays retain complex128 with real or complex scalars, while a complex
@@ -438,7 +441,8 @@ scalar promotes real numeric and boolean arrays to complex128. Out-of-range
 integer scalars return an error. Complex remainder, fmod, and floor division
 are unsupported. The output type parameter is explicit because V requires
 statically typed generic return values; the implementation checks it against
-the inferred result dtype.
+the inferred result dtype. Use `scalar_promoted_auto` or
+`scalar_left_promoted_auto` for a runtime-selected `PromotedTensor` result.
 Floor division preserves the promoted dtype, rounds toward negative infinity,
 returns zero for integer zero divisors, and follows IEEE behavior for floating
 zero divisors.
@@ -827,10 +831,9 @@ complex variance and standard deviation return real tensors and support
 `as_*` conversions cover real numeric and boolean types, preserve shape and
 logical order, and truncate floating-point values when converting to integers.
 
-**Remaining:** provide runtime output-type dispatch for weak-scalar arithmetic,
-extend weak-scalar promotion to additional scalar categories, extend promoted
-arithmetic coverage to string conversion, and extend complex support beyond
-elementwise operations, `matmul`, Einstein contractions, `solve_complex`,
+**Remaining:** extend weak-scalar promotion to additional scalar categories,
+extend promoted arithmetic coverage to string conversion, and extend complex
+support beyond elementwise operations, `matmul`, Einstein contractions, `solve_complex`,
 `inv_complex`, `det_complex`, `slogdet_complex`, and `lstsq_complex` to more
 general linear algebra and random generation, add complex32, and define integer
 overflow and structured-data limits.

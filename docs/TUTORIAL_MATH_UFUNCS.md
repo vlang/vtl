@@ -60,12 +60,14 @@ functions when NumPy-style integer output is needed.
 
 The `*_promoted[R, T, U]` arithmetic functions validate an explicit result
 type. When the result dtype should be chosen at runtime, use
-`binary_promoted_auto` with a `PromotedArithmetic` operation. It returns a
-`PromotedTensor` sum type, so the selected dtype is available through
-`promoted_tensor_dtype` and the concrete tensor can be selected with a type
-match. Boolean addition and multiplication preserve boolean results for
-boolean pairs; boolean subtraction is rejected, and mixed boolean/numeric
-arithmetic uses the numeric dtype.
+`binary_promoted_auto` for tensor pairs, or `scalar_promoted_auto` and
+`scalar_left_promoted_auto` for weak scalars in either operand order. These
+functions accept a `PromotedArithmetic` operation and return a `PromotedTensor`
+sum type, so the selected dtype is available through `promoted_tensor_dtype`
+and the concrete tensor can be selected with a type match. Boolean addition
+and multiplication preserve boolean results for boolean pairs; boolean
+subtraction is rejected, and mixed boolean/numeric arithmetic uses the numeric
+dtype.
 
 ```v
 import vtl
@@ -78,6 +80,8 @@ if sum is &vtl.Tensor[i8] {
 	typed_sum := sum as &vtl.Tensor[i8]
 	println(typed_sum.to_array()) // [4, 4]
 }
+difference := vtl.scalar_left_promoted_auto(1, flags, .subtract)!
+println(vtl.promoted_tensor_dtype(difference)) // native_int
 ```
 
 ## Promoted tensor power

@@ -74,6 +74,68 @@ pub fn binary_promoted_auto[T, U](a &Tensor[T], b &Tensor[U], operation Promoted
 	}
 }
 
+// scalar_promoted_auto selects the NumPy-style result dtype for a weak scalar
+// on the right, without requiring the caller to provide the output type.
+pub fn scalar_promoted_auto[T, U](a &Tensor[T], scalar U, operation PromotedArithmetic) !PromotedTensor {
+	return scalar_promoted_auto_impl[T, U](a, scalar, operation, false)
+}
+
+// scalar_left_promoted_auto selects the NumPy-style result dtype for a weak
+// scalar on the left, preserving noncommutative operation order.
+pub fn scalar_left_promoted_auto[T, U](scalar U, a &Tensor[T], operation PromotedArithmetic) !PromotedTensor {
+	return scalar_promoted_auto_impl[T, U](a, scalar, operation, true)
+}
+
+fn scalar_promoted_auto_impl[T, U](a &Tensor[T], scalar U, operation PromotedArithmetic, scalar_on_left bool) !PromotedTensor {
+	if operation == .float_power {
+		return PromotedTensor(float_power_scalar_impl[T, U](a, scalar, scalar_on_left)!)
+	}
+	result_dtype := promoted_scalar_operation_dtype[T, U](dtype_of[T](), scalar, operation)!
+	return match result_dtype {
+		.boolean {
+			PromotedTensor(scalar_promoted_impl[bool, T, U](a, scalar, operation, scalar_on_left)!)
+		}
+		.int8 {
+			PromotedTensor(scalar_promoted_impl[i8, T, U](a, scalar, operation, scalar_on_left)!)
+		}
+		.int16 {
+			PromotedTensor(scalar_promoted_impl[i16, T, U](a, scalar, operation, scalar_on_left)!)
+		}
+		.int32 {
+			PromotedTensor(scalar_promoted_impl[i32, T, U](a, scalar, operation, scalar_on_left)!)
+		}
+		.int64 {
+			PromotedTensor(scalar_promoted_impl[i64, T, U](a, scalar, operation, scalar_on_left)!)
+		}
+		.native_int {
+			PromotedTensor(scalar_promoted_impl[int, T, U](a, scalar, operation, scalar_on_left)!)
+		}
+		.uint8 {
+			PromotedTensor(scalar_promoted_impl[u8, T, U](a, scalar, operation, scalar_on_left)!)
+		}
+		.uint16 {
+			PromotedTensor(scalar_promoted_impl[u16, T, U](a, scalar, operation, scalar_on_left)!)
+		}
+		.uint32 {
+			PromotedTensor(scalar_promoted_impl[u32, T, U](a, scalar, operation, scalar_on_left)!)
+		}
+		.uint64 {
+			PromotedTensor(scalar_promoted_impl[u64, T, U](a, scalar, operation, scalar_on_left)!)
+		}
+		.float32 {
+			PromotedTensor(scalar_promoted_impl[f32, T, U](a, scalar, operation, scalar_on_left)!)
+		}
+		.float64 {
+			PromotedTensor(scalar_promoted_impl[f64, T, U](a, scalar, operation, scalar_on_left)!)
+		}
+		.complex128 {
+			PromotedTensor(scalar_promoted_impl[complex.Complex, T, U](a, scalar, operation,
+				scalar_on_left)!)
+		}
+		.string { error('promoted arithmetic does not support string scalars or tensors') }
+	}
+}
+
 // add_promoted adds real numeric or boolean tensors after converting both
 // operands to the explicitly selected NumPy-style result dtype. The output
 // type R must match the operation's NumPy result dtype.
@@ -658,6 +720,24 @@ fn promoted_operation_dtype(left DType, right DType, operation PromotedArithmeti
 		return .int8
 	}
 	return promoted
+}
+
+fn promoted_scalar_operation_dtype[T, U](array_dtype DType, scalar U, operation PromotedArithmetic) !DType {
+	scalar_dtype := dtype_of[U]()
+	if array_dtype == .complex128 || scalar_dtype == .complex128 {
+		return .complex128
+	}
+	result_dtype := weak_scalar_result_dtype[T, U](array_dtype, scalar)!
+	if operation == .divide {
+		return division_result_dtype(result_dtype)
+	}
+	boolean_pair_integer_result := array_dtype == .boolean && scalar_dtype == .boolean
+		&& (operation == .power || operation == .floor_divide || operation == .fmod
+			|| operation == .remainder)
+	if boolean_pair_integer_result {
+		return .int8
+	}
+	return result_dtype
 }
 
 @[inline]

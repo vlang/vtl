@@ -69,16 +69,39 @@ fn test_promoted_boolean_weak_scalars_use_numpy_dtypes() ! {
 
 	added := vtl.add_scalar_promoted[bool, bool, bool](flags, true)!
 	assert added.to_array() == [true, true]
+	auto_added := vtl.scalar_promoted_auto(flags, true, .add)!
+	assert vtl.promoted_tensor_dtype(auto_added) == .boolean
+	assert (auto_added as &vtl.Tensor[bool]).to_array() == [true, true]
 
 	multiplied := vtl.multiply_scalar_promoted[int, bool, int](flags, 2)!
 	assert multiplied.dtype() == .native_int
 	assert multiplied.to_array() == [2, 0]
+	auto_multiplied := vtl.scalar_promoted_auto(flags, 2, .multiply)!
+	assert vtl.promoted_tensor_dtype(auto_multiplied) == .native_int
+	assert (auto_multiplied as &vtl.Tensor[int]).to_array() == [2, 0]
 
 	subtracted := vtl.subtract_scalar_left_promoted[int, bool, int](1, flags)!
 	assert subtracted.dtype() == .native_int
 	assert subtracted.to_array() == [0, 1]
+	auto_subtracted := vtl.scalar_left_promoted_auto(1, flags, .subtract)!
+	assert vtl.promoted_tensor_dtype(auto_subtracted) == .native_int
+	assert (auto_subtracted as &vtl.Tensor[int]).to_array() == [0, 1]
 
 	powered := vtl.pow_scalar_promoted[i8, bool, bool](flags, true)!
 	assert powered.dtype() == .int8
 	assert powered.to_array() == [i8(1), 0]
+	auto_powered := vtl.scalar_promoted_auto(flags, true, .power)!
+	assert vtl.promoted_tensor_dtype(auto_powered) == .int8
+	assert (auto_powered as &vtl.Tensor[i8]).to_array() == [i8(1), 0]
+
+	float_powered := vtl.scalar_promoted_auto(flags, 2, .float_power)!
+	assert vtl.promoted_tensor_dtype(float_powered) == .float64
+	assert (float_powered as &vtl.Tensor[f64]).to_array() == [1.0, 0.0]
+
+	complex_result := vtl.scalar_promoted_auto(flags, complex.complex(0.0, 1.0), .add)!
+	assert vtl.promoted_tensor_dtype(complex_result) == .complex128
+	assert (complex_result as &vtl.Tensor[complex.Complex]).to_array() == [
+		complex.complex(1.0, 1.0),
+		complex.complex(0.0, 1.0),
+	]
 }
