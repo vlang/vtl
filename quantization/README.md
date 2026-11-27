@@ -22,14 +22,20 @@ one-shot function transposes and uploads weights per call. For repeated
 inference, `upload_quantized_linear_layer_cuda(dev, layer)` returns a
 `CudaQuantizedLinearLayer` that retains the aligned INT8 weights on the device;
 call `forward(input)` for inference and `release()` when finished. The CPU
-`QuantizedLinearLayer` remains available for host inference.
+`QuantizedLinearLayer` remains available for host inference. CUDA builds also
+provide `conv2d_int8_f32_cuda(dev, ...)`, an explicit cuBLAS inference path for
+NCHW/OIHW tensors. It supports groups, padding, stride, and dilation; bounds
+its temporary im2col blocks to 64 MiB when one row fits; and returns a
+CPU-resident f32 tensor. This Conv2D path is one-shot and uploads weights for
+each GEMM call; unlike CUDA Linear, it does not yet retain weights across
+inference calls.
 Quantized Conv2D is available through `conv2d_int8_f32` for NCHW/OIHW tensors, including
 groups, padding, stride, and dilation via `QuantizedConv2DConfig`. Layer
 conversion helpers `quantize_linear_layer_f32` and
 `quantize_conv2d_layer_f32` create forward-only inference wrappers from trained
 f32 weight/bias tensors and externally calibrated activation parameters.
-CUDA INT8 Linear is an experimental explicit path. GPU Conv2D, broader model
-conversion, and performance parity remain open under
+CUDA INT8 Linear and Conv2D are experimental explicit paths. Broader model
+conversion and performance parity remain open under
 [issue #792](https://github.com/vlang/vtl/issues/792).
 
 See the runnable [INT8 quantization example](../examples/quantization_int8/main.v).
@@ -103,6 +109,27 @@ INT8 remained slower on this shape. Maximum absolute error was 0.038690.
 Effective INT8 weight payload plus per-channel metadata was 1,408 bytes versus
 4,608 bytes f32 (3.273x smaller, excluding bias and V object overhead). This
 reference CPU kernel is currently a storage/accuracy path, not a Conv2D speedup.
+
+The opt-in CUDA comparison is
+`../benchmarks/quantization_int8_conv2d_cuda_bench.v`. It compares CPU and
+one-shot CUDA INT8 Conv2D on the same deterministic `[1, 8, 32, 32]` input and
+`[16, 8, 3, 3]` weights, including quantization, im2col, transfer, output
+conversion, and allocation in each timed path. On an NVIDIA GeForce RTX 3060
+with V 0.5.2 (`7f5b9a3`), seven 24-call process runs had median CPU and CUDA
+latencies of 2.6613 ms and 2.7184 ms (0.979x CPU/CUDA ratio; ranges 2.6276–
+3.7435 ms and 2.5280–4.1102 ms, respectively). These noisy results show no
+repeatable speedup for this small one-shot workload. The CUDA output matched
+the CPU INT8 result exactly. Persistent CUDA Conv2D weights are not implemented.
+
+```sh
+systemd-run --user --scope --working-directory="$HOME/.vmodules" \
+  -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% -E VJOBS=1 -- \
+  v -d cuda -no-parallel -prod -o /tmp/vtl-quantization-int8-conv2d-cuda-bench \
+  ./vtl/benchmarks/quantization_int8_conv2d_cuda_bench.v
+systemd-run --user --scope --working-directory="$HOME/.vmodules" \
+  -p MemoryMax=2G -p MemorySwapMax=0 -p CPUQuota=200% -- \
+  /tmp/vtl-quantization-int8-conv2d-cuda-bench
+```
 
 ```sh
 systemd-run --user --scope --working-directory="$HOME/.vmodules" \
