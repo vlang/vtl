@@ -95,6 +95,69 @@ fn test_linear_int8_f32_rejects_mismatched_metadata() ! {
 	assert weight_range_failed
 }
 
+fn test_conv2d_int8_f32_handles_padding_stride_and_affine_zero_points() ! {
+	input := vtl.from_array([f32(1), 2, 3, 4, 5, 6], [1, 1, 2, 3])!
+	input_params := new_params(0.1, 3, -128, 127)!
+	weights := vtl.from_array([i8(55), 105, -55, 20], [2, 1, 1, 2])!
+	weight_params := new_per_channel_params([0.01, 0.02], [5, -5], 0, -128, 127)!
+	bias := vtl.from_array([f32(0.25), -0.5], [1, 2])!
+	config := QuantizedConv2DConfig{
+		padding: [0, 1]
+		stride:  [1, 2]
+	}
+
+	output := conv2d_int8_f32(input, weights, input_params, weight_params, bias, [1, 2],
+		config)!
+
+	assert output.shape == [1, 2, 2, 2]
+	expected := [f32(1.25), 4.25, 4.25, 8.75, 0, -1, 1.5, -2.5]
+	for i in 0 .. expected.len {
+		assert math.abs(f64(output.get_nth(i) - expected[i])) < 1e-5
+	}
+}
+
+fn test_conv2d_int8_f32_supports_groups() ! {
+	input := vtl.from_array([f32(1), 2, 3, 4], [1, 2, 1, 2])!
+	input_params := new_params(0.1, 0, -128, 127)!
+	weights := vtl.from_array([i8(10), 20], [2, 1, 1, 1])!
+	weight_params := new_per_channel_params([0.1, 0.2], [0, 0], 0, -128, 127)!
+	bias := vtl.from_array([f32(0), 0], [1, 2])!
+	config := QuantizedConv2DConfig{
+		groups: 2
+	}
+
+	output := conv2d_int8_f32(input, weights, input_params, weight_params, bias, [1, 1],
+		config)!
+
+	assert output.shape == [1, 2, 1, 2]
+	assert output.to_array() == [f32(1), 2, 12, 16]
+}
+
+fn test_conv2d_int8_f32_rejects_invalid_groups_and_weight_axis() ! {
+	input := vtl.from_array([f32(1)], [1, 1, 1, 1])!
+	input_params := new_params(0.1, 0, -128, 127)!
+	weights := vtl.from_array([i8(10)], [1, 1, 1, 1])!
+	bias := vtl.from_array([f32(0)], [1, 1])!
+	weight_params := new_per_channel_params([0.1], [0], 0, -128, 127)!
+
+	mut groups_failed := false
+	conv2d_int8_f32(input, weights, input_params, weight_params, bias, [1, 1],
+		QuantizedConv2DConfig{
+			groups: 2
+		}) or {
+		groups_failed = true
+	}
+	assert groups_failed
+
+	mut axis_failed := false
+	conv2d_int8_f32(input, weights, input_params,
+		new_per_channel_params([0.1], [0], 1, -128, 127)!, bias, [1, 1],
+		QuantizedConv2DConfig{}) or {
+		axis_failed = true
+	}
+	assert axis_failed
+}
+
 fn test_minmax_observer_calibrates_and_accumulates() ! {
 	mut observer := MinMaxObserver{}
 	mut uninitialized_failed := false

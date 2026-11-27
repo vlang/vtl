@@ -13,8 +13,10 @@ calibration observers, and explicit f32/f64 quantize/dequantize entry points.
 Quantized results are ordinary `Tensor[i8]` values. `linear_int8_f32` provides
 a CPU inference path with per-tensor activation quantization, per-output-channel
 weight quantization, i64 accumulation, and f32 output with bias. Quantized
-Conv, layer conversion, accelerator dispatch, and broad performance parity
-remain open under [issue #792](https://github.com/vlang/vtl/issues/792).
+Conv2D is available through `conv2d_int8_f32` for NCHW/OIHW tensors, including
+groups, padding, stride, and dilation via `QuantizedConv2DConfig`. Layer
+conversion, accelerator dispatch, and broad performance parity remain open
+under [issue #792](https://github.com/vlang/vtl/issues/792).
 
 See the runnable [INT8 quantization example](../examples/quantization_int8/main.v).
 The end-to-end f32-vs-INT8 latency and weight-payload benchmark is
