@@ -246,22 +246,21 @@ fn complex_term_bound(a_re []f64, a_im []f64, b_re []f64, b_im []f64, rows int, 
 	return bound
 }
 
-// three_product_im_accurate reports whether Im(C) = p3-p1-p2 keeps enough
-// significant bits. The subtraction mixes the full-scale products p1, p2
-// and p3, so a small imaginary part can lose all of its digits even when
-// every value is finite and the (Re+Im) sums preserved their operands; the
-// component-wise form derives Im from the cross terms directly and does
-// not have this failure mode. Re(C) = p1-p2 is identical in both forms,
-// so only Im needs the guard. term_bound[i] bounds the operand-term
-// magnitudes behind p1[i], p2[i] and p3[i] (see complex_term_bound): the
-// products can cancel to almost zero while their terms stay huge, so the
-// outputs alone cannot reveal the lost bits. Fall back once the bound
-// exceeds a quarter of the computed Im (i.e. more than ~48 bits could
-// be lost).
-fn three_product_im_accurate(p1 []f64, p2 []f64, p3 []f64, term_bound []f64) bool {
+// three_product_accurate reports whether both components of the
+// three-product result keep enough significant bits. Re = p1-p2 and
+// Im = p3-p1-p2 each subtract separately summed full-scale products, so a
+// small component can be absorbed even when every value is finite and the
+// (Re+Im) sums preserved their operands; the term-wise form avoids this.
+// term_bound[i] bounds the operand-term magnitudes behind the products
+// (see complex_term_bound): the outputs can cancel to almost zero while
+// their terms stay huge, so output magnitudes alone cannot reveal the
+// loss. Accept only when the estimated error is at most 1e-8 of BOTH
+// components; otherwise use the term-wise form.
+fn three_product_accurate(p1 []f64, p2 []f64, p3 []f64, term_bound []f64) bool {
 	for i in 0 .. p1.len {
+		re := p1[i] - p2[i]
 		im := p3[i] - p1[i] - p2[i]
-		if term_bound[i] > 0.25 * math.abs(im) {
+		if term_bound[i] > 1e-8 * math.abs(re) || term_bound[i] > 1e-8 * math.abs(im) {
 			return false
 		}
 	}
@@ -333,7 +332,7 @@ fn matmul_complex(a &vtl.Tensor[vcomplex.Complex], b &vtl.Tensor[vcomplex.Comple
 		if array_all_finite(a_sum) && array_all_finite(b_sum) && array_all_finite(p1) && array_all_finite(p2) && sums_preserve_operands(a_re[a_start..a_start + rows * inner], a_im[a_start..a_start + rows * inner], a_sum) && sums_preserve_operands(b_re[b_start..b_start + inner * columns], b_im[b_start..b_start + inner * columns], b_sum) {
 			blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_sum, inner, b_sum, columns, 0.0, mut p3, columns)
 			term_bound := complex_term_bound(a_re[a_start..a_start + rows * inner], a_im[a_start..a_start + rows * inner], b_re[b_start..b_start + inner * columns], b_im[b_start..b_start + inner * columns], rows, columns, inner)
-			if array_all_finite(p3) && three_product_results_finite(p1, p2, p3) && three_product_im_accurate(p1,
+			if array_all_finite(p3) && three_product_results_finite(p1, p2, p3) && three_product_accurate(p1,
 				p2, p3, term_bound)
 			{
 				for i in 0 .. rows * columns {
@@ -343,36 +342,25 @@ fn matmul_complex(a &vtl.Tensor[vcomplex.Complex], b &vtl.Tensor[vcomplex.Comple
 			}
 		}
 		if !used_three_product {
-			// Fall back to the component-wise form when the sums lose
-			// operands, a product overflows/non-finite, or Im = p3-p1-p2
-			// would cancel below the rounding bound. p1 and p2 above are
-			// bit-identical to the component-wise products, so reuse them
-			// for Re when they are finite; only the two cross terms remain.
-			if array_all_finite(p1) && array_all_finite(p2) {
-				blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_re[a_start..], inner, b_im[b_start..], columns, 0.0, mut p3, columns)
-				blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_im[a_start..], inner, b_re[b_start..], columns, 1.0, mut p3, columns)
-				for i in 0 .. rows * columns {
-					result_data[result_start + i] = vcomplex.Complex{ re: p1[i] - p2[i], im: p3[i] }
-				}
-			} else {
-				// p1 or p2 overflowed: their difference can be NaN even
-				// when the exact real part is finite. Accumulate both
-				// components per entry so cancellation happens term by
-				// term, as in the original component-wise loop.
-				for i in 0 .. rows {
-					for j in 0 .. columns {
-						mut re := 0.0
-						mut im := 0.0
-						for k in 0 .. inner {
-							ar := a_re[a_start + i * inner + k]
-							ai := a_im[a_start + i * inner + k]
-							br := b_re[b_start + k * columns + j]
-							bi := b_im[b_start + k * columns + j]
-							re += ar * br - ai * bi
-							im += ar * bi + ai * br
-						}
-						result_data[result_start + i * columns + j] = vcomplex.Complex{ re: re, im: im }
+			// Accumulate each complex product term by term. p1 and p2 are
+			// separately summed real products, so reusing them would absorb
+			// small real parts; two separately summed cross products can
+			// absorb a small imaginary part into a large one. This form is
+			// the same one used before this PR, including when p1 or p2
+			// overflowed to Inf.
+			for i in 0 .. rows {
+				for j in 0 .. columns {
+					mut re := 0.0
+					mut im := 0.0
+					for k in 0 .. inner {
+						ar := a_re[a_start + i * inner + k]
+						ai := a_im[a_start + i * inner + k]
+						br := b_re[b_start + k * columns + j]
+						bi := b_im[b_start + k * columns + j]
+						re += ar * br - ai * bi
+						im += ar * bi + ai * br
 					}
+					result_data[result_start + i * columns + j] = vcomplex.Complex{ re: re, im: im }
 				}
 			}
 		}
