@@ -257,10 +257,14 @@ PyTorch pickle compatibility is not implied.
 
 ### Compilation and execution
 
-**VTL today:** Eager V execution with optional backend kernels.
+**VTL today:** Eager V execution with optional backend kernels. An opt-in CPU
+profiler in `vtl.profiler` reports operation timing and peak/active bytes for
+caller-attributed buffers; see
+[#741](https://github.com/vlang/vtl/issues/741).
 
-**Next:** Add graph capture or compilation, operator fusion, memory planning,
-and profiling tools before comparing with `torch.compile` or graph execution.
+**Next:** Add graph capture or compilation, operator fusion, reusable-buffer
+planning, in-kernel instrumentation, accelerator memory attribution, and
+profiling examples before comparing with `torch.compile` or graph execution.
 
 ### Distributed and mixed precision
 
