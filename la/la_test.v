@@ -198,8 +198,9 @@ fn test_three_product_results_finite_rejects_non_finite_combination() {
 fn test_matmul_complex128_falls_back_when_term_rounding_dominates_im() {
 	// Review counterexample: d=2^-52, M=2^52. The operand sums are exact,
 	// p1=0, p2=4, but p3 rounds to 8 (or 7 with FMA) instead of 6, so
-	// Im = 4 (or 3) instead of 2. The term bound rejects the three-product
-	// form; the cross terms give the exact result.
+	// Im = 4 (or 3). The term bound rejects the three-product form. The
+	// term-wise result is Im=1: each product rounds at scale 2M before the
+	// summation, exactly as in main's per-term multiplication.
 	d := math.pow(2.0, -52.0)
 	m := math.pow(2.0, 52.0)
 	a := vtl.from_array[vcomplex.Complex]([
@@ -213,7 +214,7 @@ fn test_matmul_complex128_falls_back_when_term_rounding_dominates_im() {
 	result := matmul(a, b)!
 	value := result.to_array()[0]
 	assert value.re == -4.0
-	assert value.im == 2.0
+	assert value.im == 1.0
 }
 
 fn test_matmul_complex128_rejects_three_product_with_cancelled_operands() {
@@ -334,7 +335,7 @@ fn test_matmul_complex128_fallback_after_three_product_batch() {
 	benign := vcomplex.Complex{ re: -2.0 * m, im: 6.0 * m }
 	assert values[0] == benign
 	assert values[1] == benign
-	assert values[2] == vcomplex.Complex{ re: -4.0, im: 2.0 }
+	assert values[2] == vcomplex.Complex{ re: -4.0, im: 1.0 }
 	assert values[3] == benign
 }
 
@@ -356,7 +357,7 @@ fn test_matmul_complex128_fallback_checks_every_entry() {
 	result := matmul(a, b)!
 	values := result.to_array()
 	assert values[0] == vcomplex.Complex{ re: -2.0 * m, im: 6.0 * m }
-	assert values[1] == vcomplex.Complex{ re: -4.0, im: 2.0 }
+	assert values[1] == vcomplex.Complex{ re: -4.0, im: 1.0 }
 }
 
 fn test_matmul_complex128_zero_sized_dimensions() {
