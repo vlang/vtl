@@ -1,5 +1,6 @@
 module optimizers
 
+import math
 import vtl
 import vtl.autograd
 
@@ -59,6 +60,42 @@ fn test_step_group_learning_rates_rejects_invalid_scheduled_rate() ! {
 		return
 	}
 	assert false, 'a negative scheduled rate should be rejected'
+}
+
+fn test_step_group_learning_rates_rejects_non_finite_current_rates() ! {
+	for rate in [math.nan(), math.inf(1)] {
+		mut calls := 0
+		step_group_learning_rates([rate], 0,
+			fn (lr f64, step int) f64 {
+				return lr
+			},
+			fn [mut calls] (group int, lr f64) ! {
+				calls++
+			}) or {
+			assert err.msg().contains('invalid current learning rate')
+			assert calls == 0
+			continue
+		}
+		assert false, 'non-finite current rate should be rejected'
+	}
+}
+
+fn test_step_group_learning_rates_rejects_non_finite_scheduled_rates() ! {
+	for rate in [math.nan(), math.inf(1)] {
+		mut calls := 0
+		step_group_learning_rates([0.1], 0,
+			fn [rate] (lr f64, step int) f64 {
+				return rate
+			},
+			fn [mut calls] (group int, lr f64) ! {
+				calls++
+			}) or {
+			assert err.msg().contains('invalid scheduled learning rate')
+			assert calls == 0
+			continue
+		}
+		assert false, 'non-finite scheduled rate should be rejected'
+	}
 }
 
 fn test_step_group_learning_rates_propagates_apply_errors() ! {
