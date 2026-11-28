@@ -119,3 +119,14 @@ fn test_tensor_bytes_rejects_overflow() ! {
 	}
 	assert false, 'overflowing byte size should be rejected'
 }
+
+fn test_tensor_bytes_rejects_positive_wrap_overflow() ! {
+	// 2e9 * 2e9 * 2 elements (8e18) fit in i64, but the ×8 byte count wraps
+	// all the way around to a positive value, so only a pre-multiplication
+	// check can catch it.
+	prof.tensor_bytes[f64]([2_000_000_000, 2_000_000_000, 2]) or {
+		assert err.msg().contains('overflow')
+		return
+	}
+	assert false, 'positive-wrapping byte size should be rejected'
+}

@@ -116,6 +116,10 @@ pub fn (mut p Profiler) reset() {
 	p.timings = []TimingEvent{}
 }
 
+// max_i64_value is the largest i64 value, used for pre-multiplication
+// overflow checks in tensor_bytes.
+const max_i64_value = i64(9223372036854775807)
+
 // tensor_bytes computes the byte size of a dense tensor shape. Zero-sized
 // dimensions are allowed; negative dimensions and overflow are rejected.
 pub fn tensor_bytes[T](shape []int) !i64 {
@@ -124,14 +128,14 @@ pub fn tensor_bytes[T](shape []int) !i64 {
 		if dim < 0 {
 			return error('shape dimensions must be non-negative')
 		}
-		elements *= i64(dim)
-		if elements < 0 {
+		if dim != 0 && elements > max_i64_value / i64(dim) {
 			return error('shape overflows element count')
 		}
+		elements *= i64(dim)
 	}
-	bytes := elements * i64(sizeof(T))
-	if bytes < 0 {
+	width := i64(sizeof(T))
+	if width != 0 && elements > max_i64_value / width {
 		return error('shape overflows byte size')
 	}
-	return bytes
+	return elements * width
 }
