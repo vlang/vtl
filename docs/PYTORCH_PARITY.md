@@ -267,8 +267,14 @@ and profiling tools before comparing with `torch.compile` or graph execution.
 **VTL today:** VSL includes selected backend and MPI support; VTL's training
 surface is primarily local.
 
+`vtl.amp.GradScaler` provides backend-independent loss scaling, in-place
+gradient unscaling with overflow detection, growth/backoff updates, and
+checkpointable state; see
+[#742](https://github.com/vlang/vtl/issues/742).
+
 **Next:** Establish tensor and gradient synchronization, distributed optimizers,
-autocast and scaling, and multi-device training contracts with dedicated tests.
+autocast policies, device-aware scaling, and multi-device training contracts
+with dedicated tests.
 
 ### Ecosystem
 
