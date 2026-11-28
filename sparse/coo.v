@@ -2,6 +2,12 @@ module sparse
 
 import vtl
 
+struct CooKey {
+	row int
+	col int
+	idx int
+}
+
 // CooTensor is a two-dimensional sparse tensor in coordinate (COO) format.
 // Rows, cols and values are parallel arrays. Duplicate coordinates and
 // explicit zeros are permitted; to_dense sums values in insertion order.
@@ -81,25 +87,32 @@ pub fn (t &CooTensor[T]) to_dense() !&vtl.Tensor[T] {
 // column and duplicates summed. Explicit zeros are retained so that the
 // stored count stays predictable.
 pub fn (t &CooTensor[T]) coalesce() !CooTensor[T] {
-	mut order := []int{len: t.values.len}
-	for i in 0 .. order.len {
-		order[i] = i
+	mut keys := []CooKey{len: t.values.len}
+	for i in 0 .. keys.len {
+		keys[i] = CooKey{t.rows[i], t.cols[i], i}
 	}
-	for i in 1 .. order.len {
-		current := order[i]
-		mut j := i - 1
-		for j >= 0 && coord_greater(t, order[j], current) {
-			order[j + 1] = order[j]
-			j--
+	keys.sort_with_compare(fn (a &CooKey, b &CooKey) int {
+		if a.row < b.row {
+			return -1
 		}
-		order[j + 1] = current
-	}
+		if a.row > b.row {
+			return 1
+		}
+		if a.col < b.col {
+			return -1
+		}
+		if a.col > b.col {
+			return 1
+		}
+		return 0
+	})
 	mut rows := []int{}
 	mut cols := []int{}
 	mut values := []T{}
-	for idx in order {
-		r := t.rows[idx]
-		c := t.cols[idx]
+	for key in keys {
+		r := key.row
+		c := key.col
+		idx := key.idx
 		if rows.len > 0 && rows.last() == r && cols.last() == c {
 			values[values.len - 1] += t.values[idx]
 		} else {
@@ -109,11 +122,4 @@ pub fn (t &CooTensor[T]) coalesce() !CooTensor[T] {
 		}
 	}
 	return from_coo[T](t.shape, rows, cols, values)
-}
-
-fn coord_greater[T](t &CooTensor[T], a int, b int) bool {
-	if t.rows[a] != t.rows[b] {
-		return t.rows[a] > t.rows[b]
-	}
-	return t.cols[a] > t.cols[b]
 }
