@@ -89,3 +89,28 @@ fn test_from_state_rejects_invalid_state() ! {
 	}
 	assert false, 'zero restored scale should be rejected'
 }
+
+fn test_unscale_detects_post_op_overflow_and_leaves_value_untouched() ! {
+	// Finite f32 input whose unscaled result overflows f32: a naive
+	// implementation would store +inf, the fixed one leaves it unchanged.
+	mut scaler := amp.new(amp.GradScalerConfig{ init_scale: 0.5 })!
+	large := f32(3.0e38)
+	assert math.is_finite(f64(large))
+	mut grad := vtl.from_array([large], [1])!
+	mut gradients := [grad]
+	assert !scaler.unscale(mut gradients)!
+	stored := grad.get_nth[f32](0)
+	assert math.is_finite(f64(stored)), 'post-op overflow must not store inf'
+	assert stored == large
+}
+
+fn test_disabled_state_round_trip_restores_disabled() ! {
+	mut scaler := amp.new(amp.GradScalerConfig{ enabled: false })!
+	state := scaler.state()
+	assert state.enabled == false
+	// Saved disabled flag wins even when the restore config is enabled.
+	restored := amp.from_state(state, amp.GradScalerConfig{ init_scale: 4.0, growth_interval: 3 })!
+	assert restored.state().enabled == false
+	assert restored.scale_loss(3.0) == 3.0
+	assert restored.state().scale == state.scale
+}

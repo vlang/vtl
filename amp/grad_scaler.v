@@ -98,7 +98,18 @@ pub fn (mut s GradScaler) unscale[T](mut gradients []&vtl.Tensor[T]) !bool {
 				overflow = true
 				continue
 			}
-			tensor.set_nth[T](i, vtl.cast[T](as_f64 * factor))
+			candidate := as_f64 * factor
+			if !math.is_finite(candidate) {
+				overflow = true
+				continue
+			}
+			narrowed := vtl.cast[T](candidate)
+			back := f64(vtl.cast[f64](narrowed))
+			if !math.is_finite(back) {
+				overflow = true
+				continue
+			}
+			tensor.set_nth[T](i, narrowed)
 		}
 	}
 	return !overflow
@@ -133,6 +144,9 @@ pub fn (s &GradScaler) state() GradScalerState {
 }
 
 // from_state restores a scaler state created by state.
+// The saved `state.enabled` flag wins: if the checkpoint was taken from a
+// disabled scaler, the restored scaler stays disabled even when
+// `config.enabled` is true.
 pub fn from_state(state GradScalerState, config GradScalerConfig) !&GradScaler {
 	if state.scale <= 0.0 || !math.is_finite(state.scale) {
 		return error('amp: restored scale must be finite and positive')
@@ -143,5 +157,6 @@ pub fn from_state(state GradScalerState, config GradScalerConfig) !&GradScaler {
 	mut scaler := new(config)!
 	scaler.scale = state.scale
 	scaler.good_steps = state.good_steps
+	scaler.enabled = state.enabled
 	return scaler
 }
