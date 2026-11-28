@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="x-ua-compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>profiler | vdoc</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link
+			href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+		<link rel="manifest" href="site.webmanifest" />
+		<link rel="mask-icon" href="safari-pinned-tab.svg" color="#5bbad5" />
+		<meta name="msapplication-TileColor" content="#da532c" />
+		<meta name="theme-color" content="#ffffff" />
+		<link rel="stylesheet" href="doc.css" />
+		<link rel="stylesheet" href="normalize.css" />
+		<script src="dark-mode.js"></script>
+	</head>
+
+	<body>
+		<div><a id="skip-to-content-link" href="#main-content">Skip to content</a></div>
+		<div id="page">
+			<header class="doc-nav hidden">
+				<div class="heading-container">
+					<div class="heading">
+						<div class="info">
+							<div class="module">vtl</div>
+							<div class="toggle-version-container">
+								<span>0.2.0-beta.2 </span>
+								<div
+									id="dark-mode-toggle"
+									role="switch"
+									aria-checked="false"
+									aria-label="Toggle dark mode"
+								>
+									<svg xmlns="http://www.w3.org/2000/svg" class="light-icon" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" class="dark-icon" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><g><rect fill="none" height="24" width="24"/></g><g><g><g><path d="M11.1,12.08C8.77,7.57,10.6,3.6,11.63,2.01C6.27,2.2,1.98,6.59,1.98,12c0,0.14,0.02,0.28,0.02,0.42 C2.62,12.15,3.29,12,4,12c1.66,0,3.18,0.83,4.1,2.15C9.77,14.63,11,16.17,11,18c0,1.52-0.87,2.83-2.12,3.51 c0.98,0.32,2.03,0.5,3.11,0.5c3.5,0,6.58-1.8,8.37-4.52C18,17.72,13.38,16.52,11.1,12.08z"/></g><path d="M7,16l-0.18,0C6.4,14.84,5.3,14,4,14c-1.66,0-3,1.34-3,3s1.34,3,3,3c0.62,0,2.49,0,3,0c1.1,0,2-0.9,2-2 C9,16.9,8.1,16,7,16z"/></g></g></svg>
+
+								</div>
+							</div>
+							<svg xmlns="http://www.w3.org/2000/svg" id="toggle-menu" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+
+						</div>
+						<div id="search">
+							<input type="text" placeholder="Search... (beta)" autocomplete="off" />
+						</div>
+					</div>
+				</div>
+				<nav class="search hidden"></nav>
+				<nav class="content hidden">
+					<ul>
+						<li class="open">
+<div class="menu-row"><a href="./index.html">README</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./vtl.html">vtl</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./array_api.html">array_api</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./autograd.html">autograd</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./autograd_cuda.html">autograd_cuda</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./main.html">main</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./util.html">util</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./csv.html">csv</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./datasets.html">datasets</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./fft.html">fft</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./la.html">la</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./metrics.html">metrics</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./data.html">data</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./activation.html">activation</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./layers.html">layers</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./loss.html">loss</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./hooks.html">hooks</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./internal.html">internal</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./models.html">models</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./optimizers.html">optimizers</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./types.html">types</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./npy.html">npy</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./npz.html">npz</a></div>
+</li>
+<li class="open active">
+<div class="menu-row"><a href="./profiler.html">profiler</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./quantization.html">quantization</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./stats.html">stats</a></div>
+</li>
+<li class="open">
+<div class="menu-row"><a href="./storage.html">storage</a></div>
+</li>
+
+					</ul>
+				</nav>
+			</header>
+			<div class="doc-scrollview" tabindex="-1" id="main-content">
+				<div class="doc-container">
+					<div class="doc-content">
+								<section id="readme_profiler" class="doc-node">
+			<div class="title"><h1> profiler <a href="#readme_profiler">#</a></h1></div>
+<h1 id="cpu-profiler">CPU profiler</h1>
+<p><code>vtl.profiler</code> is an opt-in timing and memory-accounting module for <a href="https://github.com/vlang/vtl/issues/741">#741</a>. It reports operation timing and peak/active CPU memory for bytes that callers explicitly attribute to labels. It does not intercept VTL allocations automatically, so overhead is paid only where instrumentation is inserted.</p>
+<pre><code class="language-v"><span class="token keyword">mut</span> p <span class="token operator">:=</span> <span class="token module_">profiler</span><span class="token punctuation">.</span><span class="token function">new</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span>
+p<span class="token punctuation">.</span><span class="token function">allocate</span><span class="token punctuation">(</span><span class="token string">'weights'</span><span class="token punctuation">,</span> <span class="token number">4096</span><span class="token punctuation">)</span><span class="token operator">!</span>
+value <span class="token operator">:=</span> <span class="token module_">profiler</span><span class="token punctuation">.</span><span class="token function">timed</span><span class="token punctuation">[</span><span class="token builtin">f64</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> p<span class="token punctuation">,</span> <span class="token string">'forward'</span><span class="token punctuation">,</span> <span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token builtin">f64</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token number">1.0</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token operator">!</span>
+p<span class="token punctuation">.</span><span class="token function">release</span><span class="token punctuation">(</span><span class="token string">'weights'</span><span class="token punctuation">,</span> <span class="token number">4096</span><span class="token punctuation">)</span><span class="token operator">!</span>
+<span class="token function">println</span><span class="token punctuation">(</span>p<span class="token punctuation">.</span><span class="token function">report</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+<ul>
+<li><code>allocate(label, bytes)</code> / <code>release(label, bytes)</code> track live buffers per label. Over-release and negative sizes are rejected.</li>
+<li><code>peak_active_bytes()</code> is the maximum total live bytes; <code>active_bytes(label)</code> and <code>active_total_bytes()</code> report current usage.</li>
+<li><code>timed(label, op)</code> records elapsed nanoseconds and still records the event when <code>op</code> fails, then propagates the error.</li>
+<li><code>tensor_bytes[T](shape)</code> computes dense byte size with zero-dimension and overflow handling.</li>
+<li><code>new(false)</code> keeps call sites in place while recording nothing.</li></ul>
+<p>Run the focused tests with:</p>
+<pre><code class="language-sh">v test tests/profiler/profiler_test.v
+</code></pre>
+<p>Reusable-buffer planning, accelerator memory attribution, operation-level instrumentation inside VTL kernels, and memory-budget examples remain tracked in <a href="https://github.com/vlang/vtl/issues/741">#741</a>.</p>
+
+</section>
+
+		<section id="new" class="doc-node">
+			<div class="title"><h2>fn new <a href="#new">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/profiler/profiler.v#L28"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">new</span><span class="token punctuation">(</span>enabled <span class="token builtin">bool</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span><span class="token type_name">Profiler</span></code></pre>
+<p>new returns a profiler. A disabled profiler still runs timed operations but records no events, so callers can leave instrumentation in place.</p>
+
+</section>
+
+		<section id="tensor_bytes" class="doc-node">
+			<div class="title"><h2>fn tensor_bytes <a href="#tensor_bytes">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/profiler/profiler.v#L125"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">tensor_bytes</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span>shape <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token builtin">i64</span></code></pre>
+<p>tensor_bytes computes the byte size of a dense tensor shape. Zero-sized dimensions are allowed; negative dimensions and overflow are rejected.</p>
+
+</section>
+
+		<section id="timed" class="doc-node">
+			<div class="title"><h2>fn timed <a href="#timed">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/profiler/profiler.v#L72"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token function">timed</span><span class="token punctuation">[</span><span class="token type_name">T</span><span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">mut</span> p <span class="token type_name">Profiler</span><span class="token punctuation">,</span> label <span class="token builtin">string</span><span class="token punctuation">,</span> op <span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token type_name">T</span><span class="token punctuation">)</span> <span class="token operator">!</span><span class="token type_name">T</span></code></pre>
+<p>timed runs <code>op</code>, records its elapsed time under <code>label</code>, and returns its result. Errors from <code>op</code> are propagated and the timing is still recorded.</p>
+
+</section>
+
+		<section id="Profiler" class="doc-node">
+			<div class="title"><h2>struct Profiler <a href="#Profiler">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/profiler/profiler.v#L16"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token type_name">Profiler</span> <span class="token punctuation">{</span>
+<span class="token keyword">mut</span><span class="token punctuation">:</span>
+	enabled         <span class="token builtin">bool</span>
+	active          <span class="token builtin">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token builtin">i64</span>
+	total_active    <span class="token builtin">i64</span>
+	peak_active     <span class="token builtin">i64</span>
+	total_allocated <span class="token builtin">i64</span>
+	timings         <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token type_name">TimingEvent</span>
+<span class="token punctuation">}</span></code></pre>
+<p>Profiler collects opt-in timing and CPU memory-accounting events. It does not intercept allocations automatically: callers report bytes when they allocate and release a reusable buffer, which keeps instrumentation costs explicit and attribution precise.</p>
+
+</section>
+
+		<section id="Profiler.allocate" class="doc-node">
+			<div class="title"><h2>fn (Profiler) allocate <a href="#Profiler.allocate">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/profiler/profiler.v#L33"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> p <span class="token type_name">Profiler</span><span class="token punctuation">)</span> <span class="token function">allocate</span><span class="token punctuation">(</span>label <span class="token builtin">string</span><span class="token punctuation">,</span> bytes <span class="token builtin">i64</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<p>allocate records bytes held under <code>label</code>. Negative sizes are rejected.</p>
+
+</section>
+
+		<section id="Profiler.release" class="doc-node">
+			<div class="title"><h2>fn (Profiler) release <a href="#Profiler.release">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/profiler/profiler.v#L50"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> p <span class="token type_name">Profiler</span><span class="token punctuation">)</span> <span class="token function">release</span><span class="token punctuation">(</span>label <span class="token builtin">string</span><span class="token punctuation">,</span> bytes <span class="token builtin">i64</span><span class="token punctuation">)</span> <span class="token operator">!</span></code></pre>
+<p>release records bytes returned under <code>label</code>. Releasing more than the currently active bytes for a label is rejected so lifetimes stay balanced.</p>
+
+</section>
+
+		<section id="Profiler.active_total_bytes" class="doc-node">
+			<div class="title"><h2>fn (Profiler) active_total_bytes <a href="#Profiler.active_total_bytes">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/profiler/profiler.v#L66"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>p <span class="token operator">&amp;</span><span class="token type_name">Profiler</span><span class="token punctuation">)</span> <span class="token function">active_total_bytes</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">i64</span></code></pre>
+<p>active_total_bytes reports bytes currently active across all labels.</p>
+
+</section>
+
+		<section id="Profiler.peak_active_bytes" class="doc-node">
+			<div class="title"><h2>fn (Profiler) peak_active_bytes <a href="#Profiler.peak_active_bytes">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/profiler/profiler.v#L86"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>p <span class="token operator">&amp;</span><span class="token type_name">Profiler</span><span class="token punctuation">)</span> <span class="token function">peak_active_bytes</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">i64</span></code></pre>
+<p>peak_active_bytes reports the highest simultaneously active byte count.</p>
+
+</section>
+
+		<section id="Profiler.total_allocated_bytes" class="doc-node">
+			<div class="title"><h2>fn (Profiler) total_allocated_bytes <a href="#Profiler.total_allocated_bytes">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/profiler/profiler.v#L91"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>p <span class="token operator">&amp;</span><span class="token type_name">Profiler</span><span class="token punctuation">)</span> <span class="token function">total_allocated_bytes</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">i64</span></code></pre>
+<p>total_allocated_bytes reports the sum of all reported allocations.</p>
+
+</section>
+
+		<section id="Profiler.active_bytes" class="doc-node">
+			<div class="title"><h2>fn (Profiler) active_bytes <a href="#Profiler.active_bytes">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/profiler/profiler.v#L96"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>p <span class="token operator">&amp;</span><span class="token type_name">Profiler</span><span class="token punctuation">)</span> <span class="token function">active_bytes</span><span class="token punctuation">(</span>label <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token builtin">i64</span></code></pre>
+<p>active_bytes reports bytes currently active for one label.</p>
+
+</section>
+
+		<section id="Profiler.timings" class="doc-node">
+			<div class="title"><h2>fn (Profiler) timings <a href="#Profiler.timings">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/profiler/profiler.v#L101"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>p <span class="token operator">&amp;</span><span class="token type_name">Profiler</span><span class="token punctuation">)</span> <span class="token function">timings</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token type_name">TimingEvent</span></code></pre>
+<p>timings returns a copy of the recorded timing events in call order.</p>
+
+</section>
+
+		<section id="Profiler.report" class="doc-node">
+			<div class="title"><h2>fn (Profiler) report <a href="#Profiler.report">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/profiler/profiler.v#L106"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span>p <span class="token operator">&amp;</span><span class="token type_name">Profiler</span><span class="token punctuation">)</span> <span class="token function">report</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">string</span></code></pre>
+<p>report returns a short human-readable memory summary.</p>
+
+</section>
+
+		<section id="Profiler.reset" class="doc-node">
+			<div class="title"><h2>fn (Profiler) reset <a href="#Profiler.reset">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/profiler/profiler.v#L111"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">fn</span> <span class="token punctuation">(</span><span class="token keyword">mut</span> p <span class="token type_name">Profiler</span><span class="token punctuation">)</span> <span class="token function">reset</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code></pre>
+<p>reset clears all recorded events and active buffers.</p>
+
+</section>
+
+		<section id="TimingEvent" class="doc-node">
+			<div class="title"><h2>struct TimingEvent <a href="#TimingEvent">#</a></h2><a class="link" rel="noreferrer" target="_blank" href="https://github.com/vlang/vtl/blob/master/profiler/profiler.v#L6"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></a></div>
+<pre class="signature">
+<code><span class="token keyword">struct</span> <span class="token type_name">TimingEvent</span> <span class="token punctuation">{</span>
+<span class="token keyword">pub</span><span class="token punctuation">:</span>
+	label <span class="token builtin">string</span>
+	ns    <span class="token builtin">i64</span>
+<span class="token punctuation">}</span></code></pre>
+<p>TimingEvent records one timed operation.</p>
+
+</section>
+
+
+						<div class="footer">Powered by vdoc. Generated on: 28 Nov 2026 18:41:14</div>
+					</div>
+					<div class="doc-toc"><ul><li class="open"><a href="#readme_profiler">README</a></li>
+<li class="open"><a href="#new">fn new</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#tensor_bytes">fn tensor_bytes</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#timed">fn timed</a>        <ul>
+</ul>
+</li>
+<li class="open"><a href="#Profiler">struct Profiler</a>        <ul>
+<li><a href="#Profiler.allocate">fn allocate</a></li>
+<li><a href="#Profiler.release">fn release</a></li>
+<li><a href="#Profiler.active_total_bytes">fn active_total_bytes</a></li>
+<li><a href="#Profiler.peak_active_bytes">fn peak_active_bytes</a></li>
+<li><a href="#Profiler.total_allocated_bytes">fn total_allocated_bytes</a></li>
+<li><a href="#Profiler.active_bytes">fn active_bytes</a></li>
+<li><a href="#Profiler.timings">fn timings</a></li>
+<li><a href="#Profiler.report">fn report</a></li>
+<li><a href="#Profiler.reset">fn reset</a></li>
+</ul>
+</li>
+<li class="open"><a href="#TimingEvent">struct TimingEvent</a>        <ul>
+</ul>
+</li>
+</ul></div>
+				</div>
+			</div>
+		</div>
+		<script src="doc.js"></script>
+		<script async src="search_index.js"></script>
+	</body>
+</html>
