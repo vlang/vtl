@@ -186,7 +186,9 @@ All seven optimizers (`SgdOptimizer`, `AdamOptimizer`, `AdamWOptimizer`,
 `add_param_group`, each with its own learning rate and optimizer-specific
 settings and independent state buffers (including per-group step counters
 and NAdam momentum products); `set_group_learning_rate` is the scheduler
-integration point.
+integration point. `step_group_learning_rates(current_lrs, step, next_lr,
+apply)` advances a scheduler across groups, preserving each group's own base
+rate and validating every computed rate before any group is updated.
 
 `nll_loss` supports weighted class-index and one-hot/soft targets, mean and sum
 reductions, per-position `none` reduction, and `ignore_index` for class-index

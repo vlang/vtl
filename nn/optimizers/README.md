@@ -11,6 +11,10 @@ loss.backprop()!
 optimizer.update()!
 ```
 
+`step_group_learning_rates` advances a scheduler across parameter groups. It
+computes and validates every group's new rate before applying any of them, and
+an apply callback writes each rate to the concrete optimizer.
+
 See the [optimizer tutorial](../../docs/TUTORIAL_OPTIMIZERS.md) for end-to-end
 training examples and [neural network tutorial](../../docs/TUTORIAL_NEURAL_NETWORKS.md)
 for `Sequential` models.
