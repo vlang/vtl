@@ -45,7 +45,9 @@ tensor planes and propagate gradients through the inverse rotation.
 `Variable.repeat` and `Variable.repeat_axis` sum gradients across copies.
 `Variable.tile` reduces gradients from each repeated block to the input.
 `Variable.pad` routes gradients according to its constant, edge, wrap, reflect,
-or symmetric boundary mode.
+or symmetric boundary mode. `Tensor.view` shares storage, while `Tensor.clone`
+returns an owning copy with the same shape, strides, and memory format,
+including for non-contiguous views.
 
 **Next:** Audit operator coverage and semantics against `torch.Tensor`, including
 dtype promotion, scalar behavior, strides, views, in-place operations, and error

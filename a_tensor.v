@@ -191,3 +191,17 @@ pub fn (t &Tensor[T]) view() &Tensor[T] {
 		size:    t.size
 	}
 }
+
+// clone returns an owning copy of the tensor with the same shape, strides,
+// and memory format. Unlike `view`, mutating the clone cannot affect the
+// source, including when the source is a non-contiguous view.
+pub fn (t &Tensor[T]) clone() &Tensor[T] {
+	physical := t.data.data[..t.size].clone()
+	return &Tensor[T]{
+		data:    storage.from_array[T](physical)
+		memory:  t.memory
+		shape:   t.shape.clone()
+		strides: t.strides.clone()
+		size:    t.size
+	}
+}
