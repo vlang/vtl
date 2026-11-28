@@ -76,6 +76,9 @@ pub fn (t &CooTensor[T]) nnz() int {
 // to_dense expands the COO tensor into a dense row-major tensor. Values at
 // the same coordinate are summed in insertion order.
 pub fn (t &CooTensor[T]) to_dense() !&vtl.Tensor[T] {
+	if t.shape[0] != 0 && t.shape[1] > max_int / t.shape[0] {
+		return error('COO shape overflows dense size')
+	}
 	mut data := []T{len: t.shape[0] * t.shape[1]}
 	for i in 0 .. t.values.len {
 		data[t.rows[i] * t.shape[1] + t.cols[i]] += t.values[i]

@@ -89,3 +89,12 @@ fn test_coo_handles_empty_and_zero_sized_dimensions() ! {
 	rows := sp.from_coo[f64]([2, 0], [], [], [])!
 	assert rows.to_dense()!.shape == [2, 0]
 }
+
+fn test_coo_to_dense_rejects_shape_product_overflow() ! {
+	huge := sp.from_coo[f64]([2_000_000_000, 2_000_000_000], []int{}, []int{}, []f64{})!
+	huge.to_dense() or {
+		assert err.msg().contains('overflow')
+		return
+	}
+	assert false, 'overflowing dense shape should be rejected'
+}
