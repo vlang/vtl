@@ -879,7 +879,12 @@ backends. Contiguous `f64` p=2 vector norms use VSL's backend-dispatching
 `dnrm2`, so CBLAS builds can call the configured implementation.
 OpenCL currently covers tensor transfer and a small `add_scalar` smoke path;
 broader compute and neural-network dispatch are tracked in
-[#750](https://github.com/vlang/vtl/issues/750).
+[#750](https://github.com/vlang/vtl/issues/750). A matched VTL/PyTorch CPU pair
+for `f64` `sum`, `mean`, `tanh`, and GEMM lives in
+`benchmarks/vs_numpy/pytorch_pair_bench.v` and
+`benchmarks/vs_numpy/pytorch_pair_baseline.py`, with matched values, warmup,
+repetitions, checksums, and environment metadata; see
+[#771](https://github.com/vlang/vtl/issues/771).
 
 **Remaining:** publish reproducible per-backend benchmarks and optimize while
 preserving numerical behavior.
