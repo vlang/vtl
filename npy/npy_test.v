@@ -6,6 +6,28 @@ import math.complex as vcomplex
 import os
 import vtl
 
+fn test_npy_read_rejects_string_dtype_with_policy_message() {
+	header := "{'descr': '|S3', 'fortran_order': False, 'shape': (2,), }"
+	padding := 64 - ((10 + header.len + 1) % 64)
+	padded := header + ' '.repeat(padding) + '\n'
+	mut bytes := []u8{len: 10, cap: 10 + padded.len + 6}
+	for i, byte in magic {
+		bytes[i] = byte
+	}
+	bytes[6] = 1
+	bytes[7] = 0
+	binary.little_endian_put_u16_at(mut bytes, u16(padded.len), 8)
+	bytes << padded.bytes()
+	bytes << [u8(0), 0, 0, 0, 0, 0]
+
+	read_bytes[f64](bytes) or {
+		assert err.msg().contains('fixed-width bytes')
+		assert err.msg().contains('companion table')
+		return
+	}
+	assert false, 'string dtype should be rejected with a policy message'
+}
+
 fn test_npy_f64_round_trip_preserves_shape_and_values() {
 	path := os.join_path(os.temp_dir(), 'vtl_npy_f64_round_trip.npy')
 	defer {
