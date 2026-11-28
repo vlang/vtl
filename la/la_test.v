@@ -137,9 +137,9 @@ fn test_matmul_complex128_falls_back_when_small_imag_is_absorbed() {
 
 fn test_matmul_complex128_falls_back_when_im_cancels_below_rounding_bound() {
 	// The (Re+Im) sums preserve both operands and every product stays
-	// finite, but Im = p3-p1-p2 mixes full-scale sums: the accumulated
-	// rounding of p3 lands ~33% away from the exact n*2^-52. The
-	// component-wise cross terms compute Im exactly.
+	// finite, but Im = n*2^-52 is tiny next to the operand-term scale n:
+	// the term bound rejects the three-product form. The component-wise
+	// cross terms compute Im exactly.
 	delta := math.pow(2.0, -52.0)
 	n := 768
 	mut a_vals := []vcomplex.Complex{len: n}
@@ -147,9 +147,8 @@ fn test_matmul_complex128_falls_back_when_im_cancels_below_rounding_bound() {
 		a_vals[i] = vcomplex.Complex{ re: delta, im: 1.0 }
 	}
 	a := vtl.from_array[vcomplex.Complex](a_vals, [1, n])!
-	b := vtl.from_array[vcomplex.Complex]([
-		vcomplex.Complex{ re: 0.0, im: 1.0 },
-	], [n, 1])!
+	mut b_vals := []vcomplex.Complex{len: n, init: vcomplex.Complex{ re: 0.0, im: 1.0 }}
+	b := vtl.from_array[vcomplex.Complex](b_vals, [n, 1])!
 	result := matmul(a, b)!
 	value := result.to_array()[0]
 	assert value.re == -f64(n)
@@ -157,20 +156,102 @@ fn test_matmul_complex128_falls_back_when_im_cancels_below_rounding_bound() {
 }
 
 fn test_three_product_im_accurate_detects_cancellation() {
-	// Im = p3-p1-p2 cancels to zero while the products stay full scale:
-	// the rounding bound exceeds any fraction of Im, so the predicate
+	// Im = p3-p1-p2 cancels to zero while the operand terms stay full
+	// scale: the term bound exceeds any fraction of Im, so the predicate
 	// must reject the three-product form.
-	assert !three_product_im_accurate([1e10], [1e10], [2e10])
+	assert !three_product_im_accurate([1e10], [1e10], [2e10], [1e10])
+	// The products can look benign while the terms behind them are huge:
+	// the output-only bound accepted this shape with Im off by one or two.
+	assert !three_product_im_accurate([0.0], [4.0], [8.0], [36.0])
 	// A well-scaled imaginary part passes.
-	assert three_product_im_accurate([1.0], [2.0], [4.0])
+	assert three_product_im_accurate([1.0], [2.0], [4.0], [1e-10])
 	// All-zero products are exact and pass.
-	assert three_product_im_accurate([0.0], [0.0], [0.0])
+	assert three_product_im_accurate([0.0], [0.0], [0.0], [0.0])
+}
+
+fn test_complex_term_bound_tracks_operand_magnitudes() {
+	// A=[1+d*i, -1+d*i], B=[M+2M*i, M+2M*i]^T: the products nearly
+	// cancel, but the operand terms are of scale 3*M, so the bound must
+	// stay far above the quarter-of-Im acceptance threshold.
+	d := math.pow(2.0, -52.0)
+	m := math.pow(2.0, 52.0)
+	bound := complex_term_bound([1.0, -1.0], [d, d], [m, m], [2.0 * m, 2.0 * m], 1, 1, 2)
+	assert bound.len == 1
+	assert bound[0] > 1.0
+	// Doubling every operand scales the row sum and the column maximum,
+	// hence the bound, by four.
+	scaled := complex_term_bound([2.0, -2.0], [2.0 * d, 2.0 * d], [2.0 * m, 2.0 * m], [
+		4.0 * m,
+		4.0 * m,
+	], 1, 1, 2)
+	assert scaled[0] == 4.0 * bound[0]
 }
 
 fn test_three_product_results_finite_rejects_non_finite_combination() {
 	// p1-p2 overflows even though each product is finite.
 	assert !three_product_results_finite([1e308], [-1e308], [0.0])
 	assert three_product_results_finite([1.0], [2.0], [4.0])
+}
+
+fn test_matmul_complex128_falls_back_when_term_rounding_dominates_im() {
+	// Review counterexample: d=2^-52, M=2^52. The operand sums are exact,
+	// p1=0, p2=4, but p3 rounds to 8 (or 7 with FMA) instead of 6, so
+	// Im = 4 (or 3) instead of 2. The term bound rejects the three-product
+	// form; the cross terms give the exact result.
+	d := math.pow(2.0, -52.0)
+	m := math.pow(2.0, 52.0)
+	a := vtl.from_array[vcomplex.Complex]([
+		vcomplex.Complex{ re: 1.0, im: d },
+		vcomplex.Complex{ re: -1.0, im: d },
+	], [1, 2])!
+	b := vtl.from_array[vcomplex.Complex]([
+		vcomplex.Complex{ re: m, im: 2.0 * m },
+		vcomplex.Complex{ re: m, im: 2.0 * m },
+	], [2, 1])!
+	result := matmul(a, b)!
+	value := result.to_array()[0]
+	assert value.re == -4.0
+	assert value.im == 2.0
+}
+
+fn test_matmul_complex128_rejects_three_product_with_cancelled_operands() {
+	// Maintainer review: A=(2^53+2i), B=(2^53-2i). Both sums preserve
+	// their operands; p1=p3=2^106 and p2=-4, so the three-product Im
+	// comes back as 4 while the exact cross-term Im is 0.
+	big := math.pow(2.0, 53.0)
+	a := vtl.from_array[vcomplex.Complex]([
+		vcomplex.Complex{ re: big, im: 2.0 },
+	], [1, 1])!
+	b := vtl.from_array[vcomplex.Complex]([
+		vcomplex.Complex{ re: big, im: -2.0 },
+	], [1, 1])!
+	result := matmul(a, b)!
+	value := result.to_array()[0]
+	assert value.re == math.pow(2.0, 106.0)
+	assert value.im == 0.0
+}
+
+fn test_matmul_complex128_avoids_nan_when_re_products_overflow() {
+	// x=2^511: x*x=2^1022 is finite, but four such terms overflow both
+	// p1 and p2 to Inf. Reusing them gives Inf-Inf=NaN for a result
+	// whose exact real part is 0; fall back to term-by-term cancellation.
+	x := math.pow(2.0, 511.0)
+	a := vtl.from_array[vcomplex.Complex]([
+		vcomplex.Complex{ re: x, im: x },
+		vcomplex.Complex{ re: x, im: -x },
+		vcomplex.Complex{ re: x, im: x },
+		vcomplex.Complex{ re: x, im: -x },
+	], [1, 4])!
+	b := vtl.from_array[vcomplex.Complex]([
+		vcomplex.Complex{ re: x, im: x },
+		vcomplex.Complex{ re: x, im: -x },
+		vcomplex.Complex{ re: x, im: x },
+		vcomplex.Complex{ re: x, im: -x },
+	], [4, 1])!
+	result := matmul(a, b)!
+	value := result.to_array()[0]
+	assert value.re == 0.0
+	assert value.im == 0.0
 }
 
 fn test_matmul_complex128_vector_dot_does_not_conjugate() {
