@@ -1,5 +1,30 @@
 # VTL vs NumPy baselines
 
+## Matched VTL / PyTorch CPU pair
+
+`pytorch_pair_bench.v` and `pytorch_pair_baseline.py` run the same `f64` CPU
+workloads with identical input values, three warmups, ten timed calls, and the
+same checksums. Both emit `source | op | size | median_ms | stddev_ms |
+checksum` rows so results can be paired directly. The cases are `sum`, `mean`,
+and `tanh` on 100k and 1M contiguous values, plus `gemm` at 128/256/512. Build
+the V binary with `-prod` before timing; do not use `v run`.
+
+```bash
+v -no-parallel -cc gcc -prod -o /tmp/vtl-pytorch-pair \
+  ./vtl/benchmarks/vs_numpy/pytorch_pair_bench.v
+VJOBS=2 /tmp/vtl-pytorch-pair
+VJOBS=2 python3 ./vtl/benchmarks/vs_numpy/pytorch_pair_baseline.py all
+```
+
+The baseline prints its version, device, dtype, thread count, MKL/oneDNN
+availability, warmup, and iteration count. PyTorch is optional: the script
+skips cleanly when `torch` is not installed. Set `PYTORCH_BENCH_DEVICE=cuda` to
+time on CUDA; the baseline synchronizes before recording each sample and keeps
+accelerator results separate from CPU results. Report hardware and compiler
+versions with any published comparison. This is an incremental CPU pair for
+[#771](https://github.com/vlang/vtl/issues/771); it does not replace the NumPy
+matrix in [#729](https://github.com/vlang/vtl/issues/729).
+
 ## Peak-to-peak range
 
 This paired benchmark reduces deterministic `f64` values to their peak-to-peak
