@@ -830,6 +830,11 @@ complex variance and standard deviation return real tensors and support
 `keepdims` and `ddof`. Promotion with a complex operand produces `complex128`. Explicit
 `as_*` conversions cover real numeric and boolean types, preserve shape and
 logical order, and truncate floating-point values when converting to integers.
+`vtl.dtypes` defines the boundary for non-numeric NumPy dtypes: boolean,
+integer, unsigned, float, and complex are supported; fixed-width bytes/strings,
+datetime/timedelta, object, and structured/void records are intentionally
+excluded and rejected by name, without implicit coercion; see
+[#747](https://github.com/vlang/vtl/issues/747).
 
 **Remaining:** extend weak-scalar promotion to additional scalar categories,
 extend promoted arithmetic coverage to string conversion, and extend complex

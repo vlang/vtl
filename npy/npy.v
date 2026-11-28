@@ -6,6 +6,7 @@ import math.complex as vcomplex
 import os
 import strconv
 import vtl
+import vtl.dtypes
 
 const magic = [u8(0x93), u8(`N`), u8(`U`), u8(`M`), u8(`P`), u8(`Y`)]
 
@@ -337,18 +338,29 @@ fn parse_descriptor(header string) !NpyDescriptor {
 	key := header.index("'descr'") or { return error('npy.read: missing descr field') }
 	colon := header[key..].index(':') or { return error('npy.read: malformed descr field') }
 	value := header[key + colon + 1..].trim_space()
+	if value.len > 0 && value[0] == u8(`[`) {
+		return error('npy.read: structured dtype descriptors are not supported')
+	}
 	if value.len < 4 || value[0] != u8(`'`) {
 		return error('npy.read: malformed dtype descriptor')
 	}
 	end := value[1..].index("'") or { return error('npy.read: unterminated dtype descriptor') }
 	descriptor := value[1..end + 1]
-	if descriptor.len < 3 {
+	if descriptor.len < 2 {
 		return error('npy.read: invalid dtype descriptor')
 	}
 	endian := descriptor[0]
 	kind := descriptor[1]
-	if endian !in [`<`, `>`, `=`, `|`] || kind !in [`b`, `c`, `f`, `i`, `u`] {
+	if endian !in [`<`, `>`, `=`, `|`] {
 		return error('npy.read: unsupported dtype descriptor ${descriptor}')
+	}
+	if kind !in [`b`, `c`, `f`, `i`, `u`] {
+		policy := dtypes.parse(descriptor) or {
+			return error('npy.read: unsupported dtype descriptor ${descriptor}')
+		}
+		policy.ensure_supported() or {
+			return error('npy.read: ${err.msg()}')
+		}
 	}
 	width := strconv.atoi(descriptor[2..]) or { return error('npy.read: invalid dtype width') }
 	if width !in [1, 2, 4, 8, 16] || (endian == `|` && width != 1) || (kind == `b` && width != 1)
