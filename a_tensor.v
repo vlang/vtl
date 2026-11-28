@@ -192,16 +192,15 @@ pub fn (t &Tensor[T]) view() &Tensor[T] {
 	}
 }
 
-// clone returns an owning copy of the tensor with the same shape, strides,
-// and memory format. Unlike `view`, mutating the clone cannot affect the
-// source, including when the source is a non-contiguous view.
+// clone returns an owning contiguous copy of the tensor with the same shape
+// and memory format. Logical elements are copied in order via get_nth/set_nth
+// and contiguous strides are recalculated, so cloning a non-contiguous view
+// (e.g. a slice whose physical span exceeds its size) yields correct values.
+// Unlike `view`, mutating the clone cannot affect the source.
 pub fn (t &Tensor[T]) clone() &Tensor[T] {
-	physical := t.data.data[..t.size].clone()
-	return &Tensor[T]{
-		data:    storage.from_array[T](physical)
-		memory:  t.memory
-		shape:   t.shape.clone()
-		strides: t.strides.clone()
-		size:    t.size
+	mut ret := tensor[T](cast[T](0), t.shape, memory: t.memory)
+	for i in 0 .. t.size {
+		ret.set_nth(i, t.get_nth(i))
 	}
+	return ret
 }
