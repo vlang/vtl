@@ -173,6 +173,100 @@ pub fn matmul[T](a &vtl.Tensor[T], b &vtl.Tensor[T]) !&vtl.Tensor[T] {
 	}
 }
 
+fn array_all_finite(values []f64) bool {
+	for value in values {
+		if !math.is_finite(value) {
+			return false
+		}
+	}
+	return true
+}
+
+fn sums_preserve_operands(left []f64, right []f64, sum []f64) bool {
+	for i in 0 .. sum.len {
+		if !math.is_finite(sum[i]) {
+			return false
+		}
+		// The three-product form is only equivalent if (Re+Im) did not
+		// round/absorb either operand; otherwise fall back to 4 products.
+		if (sum[i] - left[i]) != right[i] || (sum[i] - right[i]) != left[i] {
+			return false
+		}
+	}
+	return true
+}
+
+fn three_product_results_finite(p1 []f64, p2 []f64, p3 []f64) bool {
+	for i in 0 .. p1.len {
+		re := p1[i] - p2[i]
+		im := p3[i] - p1[i] - p2[i]
+		if !math.is_finite(re) || !math.is_finite(im) {
+			return false
+		}
+	}
+	return true
+}
+
+// complex_term_bound bounds the operand-term magnitudes summed into the
+// three products for each entry, rather than the (possibly cancelled)
+// outputs. row_abs_sums[i] = sum_k (|a_re|+|a_im|) and
+// col_abs_maxs[j] = max_k (|b_re|+|b_im|) give, for entry (i, j):
+//   sum_k |a_re*b_re| + sum_k |a_im*b_im| + sum_k |a_sum*b_sum| <= 2*row*col
+// The (inner+2)*eps factor covers the at most inner roundings in each
+// dgemm summation and the two subtractions forming Im (inner*eps << 1
+// for any matrix that fits in memory).
+fn complex_term_bound(a_re []f64, a_im []f64, b_re []f64, b_im []f64, rows int, columns int, inner int) []f64 {
+	eps := 2.220446049250313e-16
+	mut row_abs_sums := []f64{len: rows}
+	for i in 0 .. rows {
+		mut total := 0.0
+		for k in 0 .. inner {
+			total += math.abs(a_re[i * inner + k]) + math.abs(a_im[i * inner + k])
+		}
+		row_abs_sums[i] = total
+	}
+	mut col_abs_maxs := []f64{len: columns}
+	for j in 0 .. columns {
+		mut largest := 0.0
+		for k in 0 .. inner {
+			magnitude := math.abs(b_re[k * columns + j]) + math.abs(b_im[k * columns + j])
+			if magnitude > largest {
+				largest = magnitude
+			}
+		}
+		col_abs_maxs[j] = largest
+	}
+	factor := 2.0 * f64(inner + 2) * eps
+	mut bound := []f64{len: rows * columns}
+	for i in 0 .. rows {
+		for j in 0 .. columns {
+			bound[i * columns + j] = factor * row_abs_sums[i] * col_abs_maxs[j]
+		}
+	}
+	return bound
+}
+
+// three_product_accurate reports whether both components of the
+// three-product result keep enough significant bits. Re = p1-p2 and
+// Im = p3-p1-p2 each subtract separately summed full-scale products, so a
+// small component can be absorbed even when every value is finite and the
+// (Re+Im) sums preserved their operands; the term-wise form avoids this.
+// term_bound[i] bounds the operand-term magnitudes behind the products
+// (see complex_term_bound): the outputs can cancel to almost zero while
+// their terms stay huge, so output magnitudes alone cannot reveal the
+// loss. Accept only when the estimated error is at most 1e-8 of BOTH
+// components; otherwise use the term-wise form.
+fn three_product_accurate(p1 []f64, p2 []f64, p3 []f64, term_bound []f64) bool {
+	for i in 0 .. p1.len {
+		re := p1[i] - p2[i]
+		im := p3[i] - p1[i] - p2[i]
+		if term_bound[i] > 1e-8 * math.abs(re) || term_bound[i] > 1e-8 * math.abs(im) {
+			return false
+		}
+	}
+	return true
+}
+
 fn matmul_complex(a &vtl.Tensor[vcomplex.Complex], b &vtl.Tensor[vcomplex.Complex]) !&vtl.Tensor[vcomplex.Complex] {
 	if a.rank() < 2 || b.rank() < 2 || a.shape[a.rank() - 1] != b.shape[b.rank() - 2] {
 		return error('Invalid shapes for matrix multiplication ${a.shape} and ${b.shape}')
@@ -210,6 +304,11 @@ fn matmul_complex(a &vtl.Tensor[vcomplex.Complex], b &vtl.Tensor[vcomplex.Comple
 		b_im[i] = value.im
 	}
 	mut result_data := []vcomplex.Complex{len: batch_size * rows * columns}
+	mut a_sum := []f64{len: rows * inner}
+	mut b_sum := []f64{len: inner * columns}
+	mut p1 := []f64{len: rows * columns}
+	mut p2 := []f64{len: rows * columns}
+	mut p3 := []f64{len: rows * columns}
 	for batch in 0 .. batch_size {
 		if rows == 0 || columns == 0 || inner == 0 {
 			continue
@@ -219,18 +318,51 @@ fn matmul_complex(a &vtl.Tensor[vcomplex.Complex], b &vtl.Tensor[vcomplex.Comple
 		a_start := a_batch * rows * inner
 		b_start := b_batch * inner * columns
 		result_start := batch * rows * columns
-		mut c_re := []f64{len: rows * columns}
-		blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_re[a_start..], inner, b_re[b_start..], columns, 0.0, mut c_re, columns)
-		mut temp := []f64{len: rows * columns}
-		blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_im[a_start..], inner, b_im[b_start..], columns, 0.0, mut temp, columns)
-		for i in 0 .. rows * columns {
-			c_re[i] -= temp[i]
+		for i in 0 .. rows * inner {
+			a_sum[i] = a_re[a_start + i] + a_im[a_start + i]
 		}
-		mut c_im := []f64{len: rows * columns}
-		blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_re[a_start..], inner, b_im[b_start..], columns, 0.0, mut c_im, columns)
-		blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_im[a_start..], inner, b_re[b_start..], columns, 1.0, mut c_im, columns)
-		for i in 0 .. rows * columns {
-			result_data[result_start + i] = vcomplex.Complex{ re: c_re[i], im: c_im[i] }
+		for i in 0 .. inner * columns {
+			b_sum[i] = b_re[b_start + i] + b_im[b_start + i]
+		}
+		// Three real products: p1 = Re(A)Re(B), p2 = Im(A)Im(B),
+		// p3 = (Re(A)+Im(A))(Re(B)+Im(B)); Re(C) = p1-p2, Im(C) = p3-p1-p2.
+		blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_re[a_start..], inner, b_re[b_start..], columns, 0.0, mut p1, columns)
+		blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_im[a_start..], inner, b_im[b_start..], columns, 0.0, mut p2, columns)
+		mut used_three_product := false
+		if array_all_finite(a_sum) && array_all_finite(b_sum) && array_all_finite(p1) && array_all_finite(p2) && sums_preserve_operands(a_re[a_start..a_start + rows * inner], a_im[a_start..a_start + rows * inner], a_sum) && sums_preserve_operands(b_re[b_start..b_start + inner * columns], b_im[b_start..b_start + inner * columns], b_sum) {
+			blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_sum, inner, b_sum, columns, 0.0, mut p3, columns)
+			term_bound := complex_term_bound(a_re[a_start..a_start + rows * inner], a_im[a_start..a_start + rows * inner], b_re[b_start..b_start + inner * columns], b_im[b_start..b_start + inner * columns], rows, columns, inner)
+			if array_all_finite(p3) && three_product_results_finite(p1, p2, p3) && three_product_accurate(p1,
+				p2, p3, term_bound)
+			{
+				for i in 0 .. rows * columns {
+					result_data[result_start + i] = vcomplex.Complex{ re: p1[i] - p2[i], im: p3[i] - p1[i] - p2[i] }
+				}
+				used_three_product = true
+			}
+		}
+		if !used_three_product {
+			// Accumulate each complex product term by term. p1 and p2 are
+			// separately summed real products, so reusing them would absorb
+			// small real parts; two separately summed cross products can
+			// absorb a small imaginary part into a large one. This form is
+			// the same one used before this PR, including when p1 or p2
+			// overflowed to Inf.
+			for i in 0 .. rows {
+				for j in 0 .. columns {
+					mut re := 0.0
+					mut im := 0.0
+					for k in 0 .. inner {
+						ar := a_re[a_start + i * inner + k]
+						ai := a_im[a_start + i * inner + k]
+						br := b_re[b_start + k * columns + j]
+						bi := b_im[b_start + k * columns + j]
+						re += ar * br - ai * bi
+						im += ar * bi + ai * br
+					}
+					result_data[result_start + i * columns + j] = vcomplex.Complex{ re: re, im: im }
+				}
+			}
 		}
 	}
 	return vtl.from_array[vcomplex.Complex](result_data, result_shape)
