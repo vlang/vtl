@@ -16,7 +16,7 @@ const iterations = 10
 fn main() {
 	bu.print_header('VTL / PyTorch matched CPU benchmarks (f64)')
 	backend := $if vsl_blas_cblas || vsl_blas_generic_cblas { 'CBLAS' } $else { 'pure-V' }
-	println('vtl | device=cpu | dtype=float64 | backend=${backend} | VJOBS=${env_value('VJOBS')} | warmup=${warmup_runs} | iterations=${iterations}')
+	println('vtl | device=cpu | dtype=float64 | backend=${backend} | VJOBS=${env_value('VJOBS')} | OPENBLAS_NUM_THREADS=${env_value('OPENBLAS_NUM_THREADS')} | warmup=${warmup_runs} | iterations=${iterations}')
 	println('source | op | size | median_ms | stddev_ms | checksum')
 	println('------+----+------+-----------+-----------+---------')
 	for n in [100_000, 1_000_000] {

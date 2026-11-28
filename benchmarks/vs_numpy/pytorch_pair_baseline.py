@@ -26,11 +26,11 @@ def time_op(operation):
     result = None
     for _ in range(ITERATIONS):
         if device.type == "cuda":
-            torch.cuda.synchronize()
+            torch.cuda.synchronize(device)
         started = time.perf_counter_ns()
         result = operation()
         if device.type == "cuda":
-            torch.cuda.synchronize()
+            torch.cuda.synchronize(device)
         samples.append((time.perf_counter_ns() - started) / 1_000_000)
     return samples, result
 
