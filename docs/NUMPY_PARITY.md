@@ -676,7 +676,10 @@ and complex128 values;
 offset diagonal construction and extraction; solve, least squares,
 QR/LU/Cholesky, pseudoinverse, trace, matrix norms,
 flattened, single-axis, and tuple-axis p-norms, and covariance/correlation
-matrices.
+matrices. A first CPU-only COO slice in `vtl.sparse` supports validated
+2-D construction, dense round-trips, and duplicate coalescing; CSR/CSC,
+sparse arithmetic, reductions, and autograd remain tracked in
+[#746](https://github.com/vlang/vtl/issues/746).
 
 `la.vector_norm_axes(t, ord, axes, keepdims)` reduces any non-empty tuple of
 unique axes in one operation. It accepts negative axes, preserves retained
