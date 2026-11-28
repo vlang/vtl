@@ -338,12 +338,15 @@ fn parse_descriptor(header string) !NpyDescriptor {
 	key := header.index("'descr'") or { return error('npy.read: missing descr field') }
 	colon := header[key..].index(':') or { return error('npy.read: malformed descr field') }
 	value := header[key + colon + 1..].trim_space()
+	if value.len > 0 && value[0] == u8(`[`) {
+		return error('npy.read: structured dtype descriptors are not supported')
+	}
 	if value.len < 4 || value[0] != u8(`'`) {
 		return error('npy.read: malformed dtype descriptor')
 	}
 	end := value[1..].index("'") or { return error('npy.read: unterminated dtype descriptor') }
 	descriptor := value[1..end + 1]
-	if descriptor.len < 3 {
+	if descriptor.len < 2 {
 		return error('npy.read: invalid dtype descriptor')
 	}
 	endian := descriptor[0]

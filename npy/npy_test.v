@@ -28,6 +28,38 @@ fn test_npy_read_rejects_string_dtype_with_policy_message() {
 	assert false, 'string dtype should be rejected with a policy message'
 }
 
+fn test_npy_read_rejects_object_descr_with_policy_message() {
+	path := os.join_path(os.temp_dir(), 'vtl_npy_object_descr.npy')
+	defer {
+		os.rm(path) or {}
+	}
+	write_test_npy(path, 1, "{'descr': '|O', 'fortran_order': False, 'shape': (1,), }", [u8(0)])
+	read[f64](path) or {
+		assert err.msg().contains('object')
+		assert err.msg().contains('companion table')
+		return
+	}
+	assert false, 'object dtype should be rejected with a policy message'
+}
+
+fn test_npy_read_rejects_structured_descr_with_policy_message() {
+	path := os.join_path(os.temp_dir(), 'vtl_npy_structured_descr.npy')
+	defer {
+		os.rm(path) or {}
+	}
+	write_test_npy(path, 1, "{'descr': [('f0', '<i4')], 'fortran_order': False, 'shape': (1,), }", [
+		u8(0),
+		0,
+		0,
+		0,
+	])
+	read[f64](path) or {
+		assert err.msg().contains('structured')
+		return
+	}
+	assert false, 'structured dtype should be rejected explicitly'
+}
+
 fn test_npy_f64_round_trip_preserves_shape_and_values() {
 	path := os.join_path(os.temp_dir(), 'vtl_npy_f64_round_trip.npy')
 	defer {

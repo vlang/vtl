@@ -50,6 +50,9 @@ pub fn parse(text string) !Descriptor {
 		if close <= open + 1 {
 			return error('dtype: empty datetime unit in ${text}')
 		}
+		if close != rest.len - 1 {
+			return error('dtype: trailing data after datetime unit in ${text}')
+		}
 		unit = rest[open + 1..close]
 		width = strconv.atoi(rest[..open]) or { return error('dtype: invalid width in ${text}') }
 		if width != 8 {

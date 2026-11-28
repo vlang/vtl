@@ -102,6 +102,14 @@ fn test_parse_rejects_missing_datetime_unit() ! {
 	assert false, 'datetime without unit should be rejected'
 }
 
+fn test_parse_rejects_trailing_data_after_datetime_unit() ! {
+	dt.parse('<M8[ns]x') or {
+		assert err.msg().contains('trailing data')
+		return
+	}
+	assert false, 'trailing data after datetime unit should be rejected'
+}
+
 fn test_family_lists_are_disjoint() ! {
 	supported := dt.supported_families()
 	excluded := dt.excluded_families()
