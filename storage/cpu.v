@@ -34,6 +34,15 @@ pub fn from_array[T](arr []T) &CpuStorage[T] {
 	}
 }
 
+// from_borrowed wraps an existing array without copying it. The caller must
+// keep the backing array alive and must not mutate it while the storage is in
+// use; use from_array when an owned copy is required.
+pub fn from_borrowed[T](arr []T) &CpuStorage[T] {
+	return &CpuStorage[T]{
+		data: arr
+	}
+}
+
 // Private function. Used to implement the Storage operator
 
 // get exposes this operation as part of the public API.

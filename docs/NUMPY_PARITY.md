@@ -807,7 +807,11 @@ dtypes. `.npy` accepts v1/v2/v3 headers, both byte orders, Fortran order,
 bool, f32/f64, complex128, and signed or unsigned integer widths when the
 requested V type matches. Read-only `.npy` mappings expose leading-axis row
 ranges as owned tensors without decoding the full payload at open.
-`.npz` read/write also supports complex128 members.
+`.npz` read/write also supports complex128 members. For in-process exchange,
+`vtl.interop` provides validated borrowed buffer views with explicit strides,
+mutability, copy fallback, and a guarded zero-copy tensor wrap; see
+[#748](https://github.com/vlang/vtl/issues/748). This is distinct from file and
+model interchange.
 
 **Remaining:** support more text formats and dtypes, add optional HDF5
 interoperability, and continue rejecting unsupported object/structured values.
