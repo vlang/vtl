@@ -207,18 +207,25 @@ fn three_product_results_finite(p1 []f64, p2 []f64, p3 []f64) bool {
 	return true
 }
 
-fn complex_matmul_four_product(rows int, columns int, inner int, a_re []f64, a_im []f64, b_re []f64, b_im []f64) ([]f64, []f64) {
-	mut c_re := []f64{len: rows * columns}
-	mut c_im := []f64{len: rows * columns}
-	mut temp := []f64{len: rows * columns}
-	blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_re, inner, b_re, columns, 0.0, mut c_re, columns)
-	blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_im, inner, b_im, columns, 0.0, mut temp, columns)
-	for i in 0 .. rows * columns {
-		c_re[i] -= temp[i]
+// three_product_im_accurate reports whether Im(C) = p3-p1-p2 keeps enough
+// significant bits. The subtraction mixes the full-scale products p1, p2
+// and p3, so a small imaginary part can lose all of its digits even when
+// every value is finite and the (Re+Im) sums preserved their operands; the
+// component-wise form derives Im from the cross terms directly and does
+// not have this failure mode. Re(C) = p1-p2 is identical in both forms,
+// so only Im needs the guard. 4*eps*(|p1|+|p2|+|p3|) conservatively bounds
+// the rounding of the products and the subtraction chain; fall back once
+// it exceeds a quarter of the computed Im (i.e. more than ~48 bits could
+// be lost).
+fn three_product_im_accurate(p1 []f64, p2 []f64, p3 []f64) bool {
+	for i in 0 .. p1.len {
+		im := p3[i] - p1[i] - p2[i]
+		bound := 8.881784197001252e-16 * (math.abs(p1[i]) + math.abs(p2[i]) + math.abs(p3[i]))
+		if bound > 0.25 * math.abs(im) {
+			return false
+		}
 	}
-	blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_re, inner, b_im, columns, 0.0, mut c_im, columns)
-	blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_im, inner, b_re, columns, 1.0, mut c_im, columns)
-	return c_re, c_im
+	return true
 }
 
 fn matmul_complex(a &vtl.Tensor[vcomplex.Complex], b &vtl.Tensor[vcomplex.Complex]) !&vtl.Tensor[vcomplex.Complex] {
@@ -285,7 +292,9 @@ fn matmul_complex(a &vtl.Tensor[vcomplex.Complex], b &vtl.Tensor[vcomplex.Comple
 		mut used_three_product := false
 		if array_all_finite(a_sum) && array_all_finite(b_sum) && array_all_finite(p1) && array_all_finite(p2) && sums_preserve_operands(a_re[a_start..a_start + rows * inner], a_im[a_start..a_start + rows * inner], a_sum) && sums_preserve_operands(b_re[b_start..b_start + inner * columns], b_im[b_start..b_start + inner * columns], b_sum) {
 			blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_sum, inner, b_sum, columns, 0.0, mut p3, columns)
-			if array_all_finite(p3) && three_product_results_finite(p1, p2, p3) {
+			if array_all_finite(p3) && three_product_results_finite(p1, p2, p3) && three_product_im_accurate(p1,
+				p2, p3)
+			{
 				for i in 0 .. rows * columns {
 					result_data[result_start + i] = vcomplex.Complex{ re: p1[i] - p2[i], im: p3[i] - p1[i] - p2[i] }
 				}
@@ -293,12 +302,15 @@ fn matmul_complex(a &vtl.Tensor[vcomplex.Complex], b &vtl.Tensor[vcomplex.Comple
 			}
 		}
 		if !used_three_product {
-			// Fall back to four real products when summed operands or
-			// product intermediates overflow/non-finite; the 4-product
-			// form does not require (Re+Im) temporaries.
-			c_re4, c_im4 := complex_matmul_four_product(rows, columns, inner, a_re[a_start..], a_im[a_start..], b_re[b_start..], b_im[b_start..])
+			// Fall back to the component-wise form when the sums lose
+			// operands, a product overflows/non-finite, or Im = p3-p1-p2
+			// would cancel below the rounding bound. p1 and p2 above are
+			// bit-identical to the component-wise products, so only the
+			// two cross terms remain to compute.
+			blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_re[a_start..], inner, b_im[b_start..], columns, 0.0, mut p3, columns)
+			blas.dgemm(.no_trans, .no_trans, rows, columns, inner, 1.0, a_im[a_start..], inner, b_re[b_start..], columns, 1.0, mut p3, columns)
 			for i in 0 .. rows * columns {
-				result_data[result_start + i] = vcomplex.Complex{ re: c_re4[i], im: c_im4[i] }
+				result_data[result_start + i] = vcomplex.Complex{ re: p1[i] - p2[i], im: p3[i] }
 			}
 		}
 	}

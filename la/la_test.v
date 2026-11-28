@@ -135,6 +135,44 @@ fn test_matmul_complex128_falls_back_when_small_imag_is_absorbed() {
 	assert value.im == 1.0
 }
 
+fn test_matmul_complex128_falls_back_when_im_cancels_below_rounding_bound() {
+	// The (Re+Im) sums preserve both operands and every product stays
+	// finite, but Im = p3-p1-p2 mixes full-scale sums: the accumulated
+	// rounding of p3 lands ~33% away from the exact n*2^-52. The
+	// component-wise cross terms compute Im exactly.
+	delta := math.pow(2.0, -52.0)
+	n := 768
+	mut a_vals := []vcomplex.Complex{len: n}
+	for i in 0 .. n {
+		a_vals[i] = vcomplex.Complex{ re: delta, im: 1.0 }
+	}
+	a := vtl.from_array[vcomplex.Complex](a_vals, [1, n])!
+	b := vtl.from_array[vcomplex.Complex]([
+		vcomplex.Complex{ re: 0.0, im: 1.0 },
+	], [n, 1])!
+	result := matmul(a, b)!
+	value := result.to_array()[0]
+	assert value.re == -f64(n)
+	assert value.im == f64(n) * delta
+}
+
+fn test_three_product_im_accurate_detects_cancellation() {
+	// Im = p3-p1-p2 cancels to zero while the products stay full scale:
+	// the rounding bound exceeds any fraction of Im, so the predicate
+	// must reject the three-product form.
+	assert !three_product_im_accurate([1e10], [1e10], [2e10])
+	// A well-scaled imaginary part passes.
+	assert three_product_im_accurate([1.0], [2.0], [4.0])
+	// All-zero products are exact and pass.
+	assert three_product_im_accurate([0.0], [0.0], [0.0])
+}
+
+fn test_three_product_results_finite_rejects_non_finite_combination() {
+	// p1-p2 overflows even though each product is finite.
+	assert !three_product_results_finite([1e308], [-1e308], [0.0])
+	assert three_product_results_finite([1.0], [2.0], [4.0])
+}
+
 fn test_matmul_complex128_vector_dot_does_not_conjugate() {
 	a := vtl.from_1d[vcomplex.Complex]([
 		vcomplex.Complex{ re: 1, im: 1 },
